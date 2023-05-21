@@ -1,4 +1,5 @@
-import ctypes, sys, os
+from ctypes import *
+import sys, os
 import livekit._proto.ffi_pb2 as proto 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -10,7 +11,14 @@ else:
     libfile = 'liblivekit_ffi.so' 
 libpath = os.path.join(basedir, libfile)
 
-ffi_lib = ctypes.CDLL(libpath)
+ffi_lib = CDLL(libpath)
+
+# C function types
+ffi_lib.livekit_ffi_request.argtypes = [POINTER(c_ubyte), c_size_t, POINTER(POINTER(c_ubyte)), c_size_t]
+ffi_lib.livekit_ffi_request.restype = c_size_t
+
+ffi_lib.livekit_ffi_drop_handle.argtypes = [c_size_t]
+ffi_lib.livekit_ffi_drop_handle.restype = c_bool
 
 INVALID_HANDLE = 0
 
@@ -19,7 +27,18 @@ class FfiClient:
         pass
 
     def request(self, req: proto.FFIRequest) -> proto.FFIResponse: 
-        pass
+        data = bytearray(req.SerializeToString())
+        data_len = len(data)
+        resp_ptr = POINTER(c_ubyte)()
+        resp_len = c_size_t()
+        handle = ffi_lib.livekit_ffi_request(data, data_len, byref(resp_ptr), byref(resp_len))
+
+        resp_data = bytearray(resp_ptr[:resp_len.value])
+        resp = proto.FFIResponse()
+        resp.ParseFromString(resp_data)
+
+        FfiHandle(handle)
+        return resp
 
 class FfiHandle:
     handle = INVALID_HANDLE
@@ -29,4 +48,4 @@ class FfiHandle:
 
     def __del__(self):
         if self.handle != INVALID_HANDLE:
-            assert(ffi_lib.livekit_ffi_drop_handle(self.handle))
+            assert(ffi_lib.livekit_ffi_drop_handle(c_size_t(self.handle)))
