@@ -1,0 +1,325 @@
+import handle_pb2 as _handle_pb2
+import participant_pb2 as _participant_pb2
+import track_pb2 as _track_pb2
+import video_frame_pb2 as _video_frame_pb2
+from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+
+CONN_CONNECTED: ConnectionState
+CONN_DISCONNECTED: ConnectionState
+CONN_RECONNECTING: ConnectionState
+CONN_UNKNOWN: ConnectionState
+DESCRIPTOR: _descriptor.FileDescriptor
+KIND_RELIABLE: DataPacketKind
+KIND_UNRELIABLE: DataPacketKind
+QUALITY_EXCELLENT: ConnectionQuality
+QUALITY_GOOD: ConnectionQuality
+QUALITY_POOR: ConnectionQuality
+
+class ActiveSpeakersChanged(_message.Message):
+    __slots__ = ["participant_sids"]
+    PARTICIPANT_SIDS_FIELD_NUMBER: _ClassVar[int]
+    participant_sids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, participant_sids: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class AudioEncoding(_message.Message):
+    __slots__ = ["max_bitrate"]
+    MAX_BITRATE_FIELD_NUMBER: _ClassVar[int]
+    max_bitrate: int
+    def __init__(self, max_bitrate: _Optional[int] = ...) -> None: ...
+
+class ConnectCallback(_message.Message):
+    __slots__ = ["async_id", "error", "room"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    error: str
+    room: RoomInfo
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ..., error: _Optional[str] = ..., room: _Optional[_Union[RoomInfo, _Mapping]] = ...) -> None: ...
+
+class ConnectRequest(_message.Message):
+    __slots__ = ["options", "token", "url"]
+    OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    options: RoomOptions
+    token: str
+    url: str
+    def __init__(self, url: _Optional[str] = ..., token: _Optional[str] = ..., options: _Optional[_Union[RoomOptions, _Mapping]] = ...) -> None: ...
+
+class ConnectResponse(_message.Message):
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ...) -> None: ...
+
+class Connected(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ConnectionQualityChanged(_message.Message):
+    __slots__ = ["participant_sid", "quality"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    QUALITY_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    quality: ConnectionQuality
+    def __init__(self, participant_sid: _Optional[str] = ..., quality: _Optional[_Union[ConnectionQuality, str]] = ...) -> None: ...
+
+class ConnectionStateChanged(_message.Message):
+    __slots__ = ["state"]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    state: ConnectionState
+    def __init__(self, state: _Optional[_Union[ConnectionState, str]] = ...) -> None: ...
+
+class DataReceived(_message.Message):
+    __slots__ = ["data_ptr", "data_size", "handle", "kind", "participant_sid"]
+    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
+    DATA_SIZE_FIELD_NUMBER: _ClassVar[int]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    data_ptr: int
+    data_size: int
+    handle: _handle_pb2.FFIHandleId
+    kind: DataPacketKind
+    participant_sid: str
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., data_ptr: _Optional[int] = ..., data_size: _Optional[int] = ..., kind: _Optional[_Union[DataPacketKind, str]] = ...) -> None: ...
+
+class DisconnectCallback(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class DisconnectRequest(_message.Message):
+    __slots__ = ["room_handle"]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    room_handle: _handle_pb2.FFIHandleId
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ...) -> None: ...
+
+class DisconnectResponse(_message.Message):
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ...) -> None: ...
+
+class Disconnected(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ParticipantConnected(_message.Message):
+    __slots__ = ["info"]
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: _participant_pb2.ParticipantInfo
+    def __init__(self, info: _Optional[_Union[_participant_pb2.ParticipantInfo, _Mapping]] = ...) -> None: ...
+
+class ParticipantDisconnected(_message.Message):
+    __slots__ = ["info"]
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: _participant_pb2.ParticipantInfo
+    def __init__(self, info: _Optional[_Union[_participant_pb2.ParticipantInfo, _Mapping]] = ...) -> None: ...
+
+class PublishTrackCallback(_message.Message):
+    __slots__ = ["async_id", "error", "publication"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    PUBLICATION_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    error: str
+    publication: _track_pb2.TrackPublicationInfo
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ..., error: _Optional[str] = ..., publication: _Optional[_Union[_track_pb2.TrackPublicationInfo, _Mapping]] = ...) -> None: ...
+
+class PublishTrackRequest(_message.Message):
+    __slots__ = ["options", "room_handle", "track_handle"]
+    OPTIONS_FIELD_NUMBER: _ClassVar[int]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    TRACK_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    options: TrackPublishOptions
+    room_handle: _handle_pb2.FFIHandleId
+    track_handle: _handle_pb2.FFIHandleId
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., track_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., options: _Optional[_Union[TrackPublishOptions, _Mapping]] = ...) -> None: ...
+
+class PublishTrackResponse(_message.Message):
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ...) -> None: ...
+
+class Reconnected(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class Reconnecting(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class RoomEvent(_message.Message):
+    __slots__ = ["connected", "connection_quality_changed", "connection_state_changed", "data_received", "disconnected", "participant_connected", "participant_disconnected", "reconnected", "reconnecting", "room_handle", "speakers_changed", "track_muted", "track_published", "track_subscribed", "track_unmuted", "track_unpublished", "track_unsubscribed"]
+    CONNECTED_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_QUALITY_CHANGED_FIELD_NUMBER: _ClassVar[int]
+    CONNECTION_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
+    DATA_RECEIVED_FIELD_NUMBER: _ClassVar[int]
+    DISCONNECTED_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_CONNECTED_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_DISCONNECTED_FIELD_NUMBER: _ClassVar[int]
+    RECONNECTED_FIELD_NUMBER: _ClassVar[int]
+    RECONNECTING_FIELD_NUMBER: _ClassVar[int]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    SPEAKERS_CHANGED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_MUTED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_PUBLISHED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SUBSCRIBED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_UNMUTED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_UNPUBLISHED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_UNSUBSCRIBED_FIELD_NUMBER: _ClassVar[int]
+    connected: Connected
+    connection_quality_changed: ConnectionQualityChanged
+    connection_state_changed: ConnectionStateChanged
+    data_received: DataReceived
+    disconnected: Disconnected
+    participant_connected: ParticipantConnected
+    participant_disconnected: ParticipantDisconnected
+    reconnected: Reconnected
+    reconnecting: Reconnecting
+    room_handle: _handle_pb2.FFIHandleId
+    speakers_changed: ActiveSpeakersChanged
+    track_muted: TrackMuted
+    track_published: TrackPublished
+    track_subscribed: TrackSubscribed
+    track_unmuted: TrackUnmuted
+    track_unpublished: TrackUnpublished
+    track_unsubscribed: TrackUnsubscribed
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., participant_connected: _Optional[_Union[ParticipantConnected, _Mapping]] = ..., participant_disconnected: _Optional[_Union[ParticipantDisconnected, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublished, _Mapping]] = ..., track_unpublished: _Optional[_Union[TrackUnpublished, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., track_unsubscribed: _Optional[_Union[TrackUnsubscribed, _Mapping]] = ..., track_muted: _Optional[_Union[TrackMuted, _Mapping]] = ..., track_unmuted: _Optional[_Union[TrackUnmuted, _Mapping]] = ..., speakers_changed: _Optional[_Union[ActiveSpeakersChanged, _Mapping]] = ..., connection_quality_changed: _Optional[_Union[ConnectionQualityChanged, _Mapping]] = ..., data_received: _Optional[_Union[DataReceived, _Mapping]] = ..., connection_state_changed: _Optional[_Union[ConnectionStateChanged, _Mapping]] = ..., connected: _Optional[_Union[Connected, _Mapping]] = ..., disconnected: _Optional[_Union[Disconnected, _Mapping]] = ..., reconnecting: _Optional[_Union[Reconnecting, _Mapping]] = ..., reconnected: _Optional[_Union[Reconnected, _Mapping]] = ...) -> None: ...
+
+class RoomInfo(_message.Message):
+    __slots__ = ["handle", "local_participant", "metadata", "name", "participants", "sid"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    LOCAL_PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
+    SID_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FFIHandleId
+    local_participant: _participant_pb2.ParticipantInfo
+    metadata: str
+    name: str
+    participants: _containers.RepeatedCompositeFieldContainer[_participant_pb2.ParticipantInfo]
+    sid: str
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., sid: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., local_participant: _Optional[_Union[_participant_pb2.ParticipantInfo, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[_participant_pb2.ParticipantInfo, _Mapping]]] = ...) -> None: ...
+
+class RoomOptions(_message.Message):
+    __slots__ = ["adaptive_stream", "auto_subscribe"]
+    ADAPTIVE_STREAM_FIELD_NUMBER: _ClassVar[int]
+    AUTO_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
+    adaptive_stream: bool
+    auto_subscribe: bool
+    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ...) -> None: ...
+
+class TrackMuted(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class TrackPublishOptions(_message.Message):
+    __slots__ = ["audio_encoding", "dtx", "name", "red", "simulcast", "source", "video_codec", "video_encoding"]
+    AUDIO_ENCODING_FIELD_NUMBER: _ClassVar[int]
+    DTX_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    RED_FIELD_NUMBER: _ClassVar[int]
+    SIMULCAST_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_CODEC_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_ENCODING_FIELD_NUMBER: _ClassVar[int]
+    audio_encoding: AudioEncoding
+    dtx: bool
+    name: str
+    red: bool
+    simulcast: bool
+    source: _track_pb2.TrackSource
+    video_codec: _video_frame_pb2.VideoCodec
+    video_encoding: VideoEncoding
+    def __init__(self, video_encoding: _Optional[_Union[VideoEncoding, _Mapping]] = ..., audio_encoding: _Optional[_Union[AudioEncoding, _Mapping]] = ..., video_codec: _Optional[_Union[_video_frame_pb2.VideoCodec, str]] = ..., dtx: bool = ..., red: bool = ..., simulcast: bool = ..., name: _Optional[str] = ..., source: _Optional[_Union[_track_pb2.TrackSource, str]] = ...) -> None: ...
+
+class TrackPublished(_message.Message):
+    __slots__ = ["participant_sid", "publication"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    PUBLICATION_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    publication: _track_pb2.TrackPublicationInfo
+    def __init__(self, participant_sid: _Optional[str] = ..., publication: _Optional[_Union[_track_pb2.TrackPublicationInfo, _Mapping]] = ...) -> None: ...
+
+class TrackSubscribed(_message.Message):
+    __slots__ = ["participant_sid", "track"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track: _track_pb2.TrackInfo
+    def __init__(self, participant_sid: _Optional[str] = ..., track: _Optional[_Union[_track_pb2.TrackInfo, _Mapping]] = ...) -> None: ...
+
+class TrackUnmuted(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class TrackUnpublished(_message.Message):
+    __slots__ = ["participant_sid", "publication_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    PUBLICATION_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    publication_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., publication_sid: _Optional[str] = ...) -> None: ...
+
+class TrackUnsubscribed(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class UnpublishTrackCallback(_message.Message):
+    __slots__ = ["error"]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    error: str
+    def __init__(self, error: _Optional[str] = ...) -> None: ...
+
+class UnpublishTrackRequest(_message.Message):
+    __slots__ = ["room_handle", "stop_on_unpublish", "track_sid"]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    STOP_ON_UNPUBLISH_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    room_handle: _handle_pb2.FFIHandleId
+    stop_on_unpublish: bool
+    track_sid: str
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., track_sid: _Optional[str] = ..., stop_on_unpublish: bool = ...) -> None: ...
+
+class UnpublishTrackResponse(_message.Message):
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FFIAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FFIAsyncId, _Mapping]] = ...) -> None: ...
+
+class VideoEncoding(_message.Message):
+    __slots__ = ["max_bitrate", "max_framerate"]
+    MAX_BITRATE_FIELD_NUMBER: _ClassVar[int]
+    MAX_FRAMERATE_FIELD_NUMBER: _ClassVar[int]
+    max_bitrate: int
+    max_framerate: float
+    def __init__(self, max_bitrate: _Optional[int] = ..., max_framerate: _Optional[float] = ...) -> None: ...
+
+class ConnectionQuality(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class ConnectionState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class DataPacketKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
