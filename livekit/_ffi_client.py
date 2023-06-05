@@ -1,5 +1,5 @@
 from ctypes import *
-import sys
+import platform
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
 from pyee.asyncio import EventEmitter
@@ -8,14 +8,18 @@ import asyncio
 import threading
 import logging
 
-if sys.platform == "win32":
-    libfile = 'livekit_ffi.dll'
-elif sys.platform == "darwin":
-    libfile = 'liblivekit_ffi.dylib'
-else:
-    libfile = 'liblivekit_ffi.so'
+os = platform.system().lower()
+arch = platform.machine().lower()
+lib_path = 'lib/{}/{}'.format(os, arch)
 
-libpath = pkg_resources.resource_filename('livekit', libfile)
+if os == "windows":
+    lib_file = 'livekit_ffi.dll'
+elif os == "darwin":
+    lib_file = 'liblivekit_ffi.dylib'
+else:
+    lib_file = 'liblivekit_ffi.so'
+
+libpath = pkg_resources.resource_filename('livekit', lib_path + '/' + lib_file)
 
 ffi_lib = CDLL(libpath)
 
