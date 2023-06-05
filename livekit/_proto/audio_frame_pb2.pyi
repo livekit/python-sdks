@@ -4,18 +4,27 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
-AUDIO_SOURCE_NATIVE: AudioSourceType
-AUDIO_STREAM_HTML: AudioStreamType
-AUDIO_STREAM_NATIVE: AudioStreamType
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class AudioStreamType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    AUDIO_STREAM_NATIVE: _ClassVar[AudioStreamType]
+    AUDIO_STREAM_HTML: _ClassVar[AudioStreamType]
+
+class AudioSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    AUDIO_SOURCE_NATIVE: _ClassVar[AudioSourceType]
+AUDIO_STREAM_NATIVE: AudioStreamType
+AUDIO_STREAM_HTML: AudioStreamType
+AUDIO_SOURCE_NATIVE: AudioSourceType
+
 class AllocAudioBufferRequest(_message.Message):
-    __slots__ = ["num_channels", "sample_rate", "samples_per_channel"]
+    __slots__ = ["sample_rate", "num_channels", "samples_per_channel"]
+    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
     NUM_CHANNELS_FIELD_NUMBER: _ClassVar[int]
     SAMPLES_PER_CHANNEL_FIELD_NUMBER: _ClassVar[int]
-    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
-    num_channels: int
     sample_rate: int
+    num_channels: int
     samples_per_channel: int
     def __init__(self, sample_rate: _Optional[int] = ..., num_channels: _Optional[int] = ..., samples_per_channel: _Optional[int] = ...) -> None: ...
 
@@ -25,73 +34,23 @@ class AllocAudioBufferResponse(_message.Message):
     buffer: AudioFrameBufferInfo
     def __init__(self, buffer: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
 
-class AudioFrameBufferInfo(_message.Message):
-    __slots__ = ["data_ptr", "handle", "num_channels", "sample_rate", "samples_per_channel"]
-    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
-    NUM_CHANNELS_FIELD_NUMBER: _ClassVar[int]
-    SAMPLES_PER_CHANNEL_FIELD_NUMBER: _ClassVar[int]
-    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
-    data_ptr: int
-    handle: _handle_pb2.FFIHandleId
-    num_channels: int
-    sample_rate: int
-    samples_per_channel: int
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., data_ptr: _Optional[int] = ..., num_channels: _Optional[int] = ..., sample_rate: _Optional[int] = ..., samples_per_channel: _Optional[int] = ...) -> None: ...
-
-class AudioFrameReceived(_message.Message):
-    __slots__ = ["frame"]
-    FRAME_FIELD_NUMBER: _ClassVar[int]
-    frame: AudioFrameBufferInfo
-    def __init__(self, frame: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
-
-class AudioSourceInfo(_message.Message):
-    __slots__ = ["handle", "type"]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
-    handle: _handle_pb2.FFIHandleId
-    type: AudioSourceType
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioSourceType, str]] = ...) -> None: ...
-
-class AudioStreamEvent(_message.Message):
-    __slots__ = ["frame_received", "handle"]
-    FRAME_RECEIVED_FIELD_NUMBER: _ClassVar[int]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
-    frame_received: AudioFrameReceived
-    handle: _handle_pb2.FFIHandleId
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., frame_received: _Optional[_Union[AudioFrameReceived, _Mapping]] = ...) -> None: ...
-
-class AudioStreamInfo(_message.Message):
-    __slots__ = ["handle", "track_sid", "type"]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
+class NewAudioStreamRequest(_message.Message):
+    __slots__ = ["room_handle", "participant_sid", "track_sid", "type"]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     TRACK_SID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    handle: _handle_pb2.FFIHandleId
+    room_handle: _handle_pb2.FfiHandleId
+    participant_sid: str
     track_sid: str
     type: AudioStreamType
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioStreamType, str]] = ..., track_sid: _Optional[str] = ...) -> None: ...
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., type: _Optional[_Union[AudioStreamType, str]] = ...) -> None: ...
 
-class CaptureAudioFrameRequest(_message.Message):
-    __slots__ = ["buffer_handle", "source_handle"]
-    BUFFER_HANDLE_FIELD_NUMBER: _ClassVar[int]
-    SOURCE_HANDLE_FIELD_NUMBER: _ClassVar[int]
-    buffer_handle: _handle_pb2.FFIHandleId
-    source_handle: _handle_pb2.FFIHandleId
-    def __init__(self, source_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., buffer_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ...) -> None: ...
-
-class CaptureAudioFrameResponse(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
-
-class NewAudioResamplerRequest(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
-
-class NewAudioResamplerResponse(_message.Message):
-    __slots__ = ["handle"]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
-    handle: _handle_pb2.FFIHandleId
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ...) -> None: ...
+class NewAudioStreamResponse(_message.Message):
+    __slots__ = ["stream"]
+    STREAM_FIELD_NUMBER: _ClassVar[int]
+    stream: AudioStreamInfo
+    def __init__(self, stream: _Optional[_Union[AudioStreamInfo, _Mapping]] = ...) -> None: ...
 
 class NewAudioSourceRequest(_message.Message):
     __slots__ = ["type"]
@@ -105,35 +64,39 @@ class NewAudioSourceResponse(_message.Message):
     source: AudioSourceInfo
     def __init__(self, source: _Optional[_Union[AudioSourceInfo, _Mapping]] = ...) -> None: ...
 
-class NewAudioStreamRequest(_message.Message):
-    __slots__ = ["participant_sid", "room_handle", "track_sid", "type"]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
-    TYPE_FIELD_NUMBER: _ClassVar[int]
-    participant_sid: str
-    room_handle: _handle_pb2.FFIHandleId
-    track_sid: str
-    type: AudioStreamType
-    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., type: _Optional[_Union[AudioStreamType, str]] = ...) -> None: ...
+class CaptureAudioFrameRequest(_message.Message):
+    __slots__ = ["source_handle", "buffer_handle"]
+    SOURCE_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    BUFFER_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    source_handle: _handle_pb2.FfiHandleId
+    buffer_handle: _handle_pb2.FfiHandleId
+    def __init__(self, source_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., buffer_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ...) -> None: ...
 
-class NewAudioStreamResponse(_message.Message):
-    __slots__ = ["stream"]
-    STREAM_FIELD_NUMBER: _ClassVar[int]
-    stream: AudioStreamInfo
-    def __init__(self, stream: _Optional[_Union[AudioStreamInfo, _Mapping]] = ...) -> None: ...
+class CaptureAudioFrameResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class NewAudioResamplerRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class NewAudioResamplerResponse(_message.Message):
+    __slots__ = ["handle"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ...) -> None: ...
 
 class RemixAndResampleRequest(_message.Message):
-    __slots__ = ["buffer_handle", "num_channels", "resampler_handle", "sample_rate"]
+    __slots__ = ["resampler_handle", "buffer_handle", "num_channels", "sample_rate"]
+    RESAMPLER_HANDLE_FIELD_NUMBER: _ClassVar[int]
     BUFFER_HANDLE_FIELD_NUMBER: _ClassVar[int]
     NUM_CHANNELS_FIELD_NUMBER: _ClassVar[int]
-    RESAMPLER_HANDLE_FIELD_NUMBER: _ClassVar[int]
     SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
-    buffer_handle: _handle_pb2.FFIHandleId
+    resampler_handle: _handle_pb2.FfiHandleId
+    buffer_handle: _handle_pb2.FfiHandleId
     num_channels: int
-    resampler_handle: _handle_pb2.FFIHandleId
     sample_rate: int
-    def __init__(self, resampler_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., buffer_handle: _Optional[_Union[_handle_pb2.FFIHandleId, _Mapping]] = ..., num_channels: _Optional[int] = ..., sample_rate: _Optional[int] = ...) -> None: ...
+    def __init__(self, resampler_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., buffer_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., num_channels: _Optional[int] = ..., sample_rate: _Optional[int] = ...) -> None: ...
 
 class RemixAndResampleResponse(_message.Message):
     __slots__ = ["buffer"]
@@ -141,8 +104,48 @@ class RemixAndResampleResponse(_message.Message):
     buffer: AudioFrameBufferInfo
     def __init__(self, buffer: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
 
-class AudioStreamType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+class AudioFrameBufferInfo(_message.Message):
+    __slots__ = ["handle", "data_ptr", "num_channels", "sample_rate", "samples_per_channel"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
+    NUM_CHANNELS_FIELD_NUMBER: _ClassVar[int]
+    SAMPLE_RATE_FIELD_NUMBER: _ClassVar[int]
+    SAMPLES_PER_CHANNEL_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    data_ptr: int
+    num_channels: int
+    sample_rate: int
+    samples_per_channel: int
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., data_ptr: _Optional[int] = ..., num_channels: _Optional[int] = ..., sample_rate: _Optional[int] = ..., samples_per_channel: _Optional[int] = ...) -> None: ...
 
-class AudioSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+class AudioStreamInfo(_message.Message):
+    __slots__ = ["handle", "type", "track_sid"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    type: AudioStreamType
+    track_sid: str
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioStreamType, str]] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class AudioStreamEvent(_message.Message):
+    __slots__ = ["handle", "frame_received"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    FRAME_RECEIVED_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    frame_received: AudioFrameReceived
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., frame_received: _Optional[_Union[AudioFrameReceived, _Mapping]] = ...) -> None: ...
+
+class AudioFrameReceived(_message.Message):
+    __slots__ = ["frame"]
+    FRAME_FIELD_NUMBER: _ClassVar[int]
+    frame: AudioFrameBufferInfo
+    def __init__(self, frame: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
+
+class AudioSourceInfo(_message.Message):
+    __slots__ = ["handle", "type"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    type: AudioSourceType
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioSourceType, str]] = ...) -> None: ...

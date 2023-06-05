@@ -6,11 +6,19 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class IsSpeakingChanged(_message.Message):
-    __slots__ = ["speaking"]
-    SPEAKING_FIELD_NUMBER: _ClassVar[int]
-    speaking: bool
-    def __init__(self, speaking: bool = ...) -> None: ...
+class ParticipantInfo(_message.Message):
+    __slots__ = ["sid", "name", "identity", "metadata", "publications"]
+    SID_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    PUBLICATIONS_FIELD_NUMBER: _ClassVar[int]
+    sid: str
+    name: str
+    identity: str
+    metadata: str
+    publications: _containers.RepeatedCompositeFieldContainer[_track_pb2.TrackPublicationInfo]
+    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., identity: _Optional[str] = ..., metadata: _Optional[str] = ..., publications: _Optional[_Iterable[_Union[_track_pb2.TrackPublicationInfo, _Mapping]]] = ...) -> None: ...
 
 class ParticipantEvent(_message.Message):
     __slots__ = ["participant_sid", "speaking_changed"]
@@ -20,16 +28,8 @@ class ParticipantEvent(_message.Message):
     speaking_changed: IsSpeakingChanged
     def __init__(self, participant_sid: _Optional[str] = ..., speaking_changed: _Optional[_Union[IsSpeakingChanged, _Mapping]] = ...) -> None: ...
 
-class ParticipantInfo(_message.Message):
-    __slots__ = ["identity", "metadata", "name", "publications", "sid"]
-    IDENTITY_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
-    PUBLICATIONS_FIELD_NUMBER: _ClassVar[int]
-    SID_FIELD_NUMBER: _ClassVar[int]
-    identity: str
-    metadata: str
-    name: str
-    publications: _containers.RepeatedCompositeFieldContainer[_track_pb2.TrackPublicationInfo]
-    sid: str
-    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., identity: _Optional[str] = ..., metadata: _Optional[str] = ..., publications: _Optional[_Iterable[_Union[_track_pb2.TrackPublicationInfo, _Mapping]]] = ...) -> None: ...
+class IsSpeakingChanged(_message.Message):
+    __slots__ = ["speaking"]
+    SPEAKING_FIELD_NUMBER: _ClassVar[int]
+    speaking: bool
+    def __init__(self, speaking: bool = ...) -> None: ...
