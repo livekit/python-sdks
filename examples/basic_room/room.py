@@ -11,7 +11,18 @@ async def main():
 
     @room.on("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant):
-        print("Participant connected: " + participant.identity)
+        print("participant connected: " + participant.identity)
+
+    @room.on("track_subscribed")
+    def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+        if track.kind == livekit.TrackKind.KIND_VIDEO:
+            video_stream = livekit.VideoStream(track)
+
+            @video_stream.on("frame_received")
+            def on_video_frame(frame: livekit.VideoFrame, buffer: livekit.VideoFrameBuffer):
+                argb = livekit.ArgbFrame(
+                    livekit.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
+                buffer.to_argb(argb)
 
     print("Connected to room with sid: " + room.sid)
     await room.run()

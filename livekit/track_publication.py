@@ -1,10 +1,12 @@
 from livekit._proto import track_pb2 as proto_track
 from ._proto import track_pb2 as proto_track
+from .track import Track
 
 
 class TrackPublication():
     def __init__(self, info: proto_track.TrackPublicationInfo):
         self._info = info
+        self._track: Track = None
 
     @property
     def sid(self) -> str:
@@ -23,8 +25,8 @@ class TrackPublication():
         return self._info.source
 
     @property
-    def simulcast(self) -> bool:
-        return self._info.simulcast
+    def simulcasted(self) -> bool:
+        return self._info.simulcasted
 
     @property
     def width(self) -> int:

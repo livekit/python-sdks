@@ -3,7 +3,6 @@ from .track_publication import TrackPublication
 
 
 class Participant():
-
     def __init__(self, info: proto_participant.ParticipantInfo):
         self._info = info
         self._tracks: dict[str, TrackPublication] = {}
