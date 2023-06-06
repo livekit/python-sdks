@@ -53,7 +53,7 @@ class VideoFrameBuffer():
         req.to_argb.buffer.id = self._ffi_handle.handle
         req.to_argb.dst_ptr = ctypes.addressof(dst.data)
         req.to_argb.dst_format = dst.format
-        req.to_argb.dst_stride = dst.width
+        req.to_argb.dst_stride = dst.width * 4
         req.to_argb.dst_width = dst.width
         req.to_argb.dst_height = dst.height
 
