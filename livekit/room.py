@@ -64,9 +64,24 @@ class Room(AsyncIOEventEmitter):
         ffi_client.add_listener('room_event', self._on_room_event)
 
     async def close(self):
-        self._ffi_handle = None
-        # TODO(theomonnom): wait for ffi resp
+        ffi_client = FfiClient()
+
+        req = proto_ffi.FfiRequest()
+        req.disconnect.room_handle.id = self._ffi_handle.handle
+
+        resp = ffi_client.request(req)
+        future = asyncio.Future()
+
+        @ffi_client.on('disconnect')
+        def on_disconnect_callback(cb: proto_room.DisconnectCallback):
+            if cb.async_id == resp.disconnect.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'disconnect', on_disconnect_callback)
+
+        await future
         self._close_future.set_result(None)
+        self._ffi_handle = None
 
     async def run(self):
         await self._close_future

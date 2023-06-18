@@ -108,4 +108,5 @@ class FfiHandle:
 
     def __del__(self):
         if self.handle != INVALID_HANDLE:
-            assert (ffi_lib.livekit_ffi_drop_handle(c_size_t(self.handle)))
+            ffi_lib.livekit_ffi_drop_handle(
+                c_size_t(self.handle))  # TODO Assert
