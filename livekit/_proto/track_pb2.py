@@ -16,7 +16,7 @@ import video_frame_pb2 as video__frame__pb2
 import audio_frame_pb2 as audio__frame__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0btrack.proto\x12\x07livekit\x1a\x0chandle.proto\x1a\x11video_frame.proto\x1a\x11\x61udio_frame.proto\"C\n\x13VideoCaptureOptions\x12,\n\nresolution\x18\x01 \x01(\x0b\x32\x18.livekit.VideoResolution\"f\n\x13\x41udioCaptureOptions\x12\x19\n\x11\x65\x63ho_cancellation\x18\x01 \x01(\x08\x12\x19\n\x11noise_suppression\x18\x02 \x01(\x08\x12\x19\n\x11\x61uto_gain_control\x18\x03 \x01(\x08\"\x83\x01\n\x17\x43reateVideoTrackRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12-\n\x07options\x18\x02 \x01(\x0b\x32\x1c.livekit.VideoCaptureOptions\x12+\n\rsource_handle\x18\x03 \x01(\x0b\x32\x14.livekit.FfiHandleId\"=\n\x18\x43reateVideoTrackResponse\x12!\n\x05track\x18\x01 \x01(\x0b\x32\x12.livekit.TrackInfo\"\x83\x01\n\x17\x43reateAudioTrackRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12-\n\x07options\x18\x02 \x01(\x0b\x32\x1c.livekit.AudioCaptureOptions\x12+\n\rsource_handle\x18\x03 \x01(\x0b\x32\x14.livekit.FfiHandleId\"=\n\x18\x43reateAudioTrackResponse\x12!\n\x05track\x18\x01 \x01(\x0b\x32\x12.livekit.TrackInfo\"\x0c\n\nTrackEvent\"\xdf\x01\n\x14TrackPublicationInfo\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12 \n\x04kind\x18\x03 \x01(\x0e\x32\x12.livekit.TrackKind\x12$\n\x06source\x18\x04 \x01(\x0e\x32\x14.livekit.TrackSource\x12\x13\n\x0bsimulcasted\x18\x05 \x01(\x08\x12\r\n\x05width\x18\x06 \x01(\r\x12\x0e\n\x06height\x18\x07 \x01(\r\x12\x11\n\tmime_type\x18\x08 \x01(\t\x12\r\n\x05muted\x18\t \x01(\x08\x12\x0e\n\x06remote\x18\n \x01(\x08\"\xbd\x01\n\tTrackInfo\x12(\n\nopt_handle\x18\x01 \x01(\x0b\x32\x14.livekit.FfiHandleId\x12\x0b\n\x03sid\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12 \n\x04kind\x18\x04 \x01(\x0e\x32\x12.livekit.TrackKind\x12*\n\x0cstream_state\x18\x05 \x01(\x0e\x32\x14.livekit.StreamState\x12\r\n\x05muted\x18\x06 \x01(\x08\x12\x0e\n\x06remote\x18\x07 \x01(\x08*=\n\tTrackKind\x12\x10\n\x0cKIND_UNKNOWN\x10\x00\x12\x0e\n\nKIND_AUDIO\x10\x01\x12\x0e\n\nKIND_VIDEO\x10\x02*\x81\x01\n\x0bTrackSource\x12\x12\n\x0eSOURCE_UNKNOWN\x10\x00\x12\x11\n\rSOURCE_CAMERA\x10\x01\x12\x15\n\x11SOURCE_MICROPHONE\x10\x02\x12\x16\n\x12SOURCE_SCREENSHARE\x10\x03\x12\x1c\n\x18SOURCE_SCREENSHARE_AUDIO\x10\x04*D\n\x0bStreamState\x12\x11\n\rSTATE_UNKNOWN\x10\x00\x12\x10\n\x0cSTATE_ACTIVE\x10\x01\x12\x10\n\x0cSTATE_PAUSED\x10\x02\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0btrack.proto\x12\x07livekit\x1a\x0chandle.proto\x1a\x11video_frame.proto\x1a\x11\x61udio_frame.proto\"T\n\x17\x43reateVideoTrackRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12+\n\rsource_handle\x18\x02 \x01(\x0b\x32\x14.livekit.FfiHandleId\"=\n\x18\x43reateVideoTrackResponse\x12!\n\x05track\x18\x01 \x01(\x0b\x32\x12.livekit.TrackInfo\"T\n\x17\x43reateAudioTrackRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12+\n\rsource_handle\x18\x02 \x01(\x0b\x32\x14.livekit.FfiHandleId\"=\n\x18\x43reateAudioTrackResponse\x12!\n\x05track\x18\x01 \x01(\x0b\x32\x12.livekit.TrackInfo\"\x0c\n\nTrackEvent\"\xdf\x01\n\x14TrackPublicationInfo\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12 \n\x04kind\x18\x03 \x01(\x0e\x32\x12.livekit.TrackKind\x12$\n\x06source\x18\x04 \x01(\x0e\x32\x14.livekit.TrackSource\x12\x13\n\x0bsimulcasted\x18\x05 \x01(\x08\x12\r\n\x05width\x18\x06 \x01(\r\x12\x0e\n\x06height\x18\x07 \x01(\r\x12\x11\n\tmime_type\x18\x08 \x01(\t\x12\r\n\x05muted\x18\t \x01(\x08\x12\x0e\n\x06remote\x18\n \x01(\x08\"\xb9\x01\n\tTrackInfo\x12$\n\x06handle\x18\x01 \x01(\x0b\x32\x14.livekit.FfiHandleId\x12\x0b\n\x03sid\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12 \n\x04kind\x18\x04 \x01(\x0e\x32\x12.livekit.TrackKind\x12*\n\x0cstream_state\x18\x05 \x01(\x0e\x32\x14.livekit.StreamState\x12\r\n\x05muted\x18\x06 \x01(\x08\x12\x0e\n\x06remote\x18\x07 \x01(\x08*=\n\tTrackKind\x12\x10\n\x0cKIND_UNKNOWN\x10\x00\x12\x0e\n\nKIND_AUDIO\x10\x01\x12\x0e\n\nKIND_VIDEO\x10\x02*\x81\x01\n\x0bTrackSource\x12\x12\n\x0eSOURCE_UNKNOWN\x10\x00\x12\x11\n\rSOURCE_CAMERA\x10\x01\x12\x15\n\x11SOURCE_MICROPHONE\x10\x02\x12\x16\n\x12SOURCE_SCREENSHARE\x10\x03\x12\x1c\n\x18SOURCE_SCREENSHARE_AUDIO\x10\x04*D\n\x0bStreamState\x12\x11\n\rSTATE_UNKNOWN\x10\x00\x12\x10\n\x0cSTATE_ACTIVE\x10\x01\x12\x10\n\x0cSTATE_PAUSED\x10\x02\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,28 +25,24 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_TRACKKIND']._serialized_start=1075
-  _globals['_TRACKKIND']._serialized_end=1136
-  _globals['_TRACKSOURCE']._serialized_start=1139
-  _globals['_TRACKSOURCE']._serialized_end=1268
-  _globals['_STREAMSTATE']._serialized_start=1270
-  _globals['_STREAMSTATE']._serialized_end=1338
-  _globals['_VIDEOCAPTUREOPTIONS']._serialized_start=76
-  _globals['_VIDEOCAPTUREOPTIONS']._serialized_end=143
-  _globals['_AUDIOCAPTUREOPTIONS']._serialized_start=145
-  _globals['_AUDIOCAPTUREOPTIONS']._serialized_end=247
-  _globals['_CREATEVIDEOTRACKREQUEST']._serialized_start=250
-  _globals['_CREATEVIDEOTRACKREQUEST']._serialized_end=381
-  _globals['_CREATEVIDEOTRACKRESPONSE']._serialized_start=383
-  _globals['_CREATEVIDEOTRACKRESPONSE']._serialized_end=444
-  _globals['_CREATEAUDIOTRACKREQUEST']._serialized_start=447
-  _globals['_CREATEAUDIOTRACKREQUEST']._serialized_end=578
-  _globals['_CREATEAUDIOTRACKRESPONSE']._serialized_start=580
-  _globals['_CREATEAUDIOTRACKRESPONSE']._serialized_end=641
-  _globals['_TRACKEVENT']._serialized_start=643
-  _globals['_TRACKEVENT']._serialized_end=655
-  _globals['_TRACKPUBLICATIONINFO']._serialized_start=658
-  _globals['_TRACKPUBLICATIONINFO']._serialized_end=881
-  _globals['_TRACKINFO']._serialized_start=884
-  _globals['_TRACKINFO']._serialized_end=1073
+  _globals['_TRACKKIND']._serialized_start=802
+  _globals['_TRACKKIND']._serialized_end=863
+  _globals['_TRACKSOURCE']._serialized_start=866
+  _globals['_TRACKSOURCE']._serialized_end=995
+  _globals['_STREAMSTATE']._serialized_start=997
+  _globals['_STREAMSTATE']._serialized_end=1065
+  _globals['_CREATEVIDEOTRACKREQUEST']._serialized_start=76
+  _globals['_CREATEVIDEOTRACKREQUEST']._serialized_end=160
+  _globals['_CREATEVIDEOTRACKRESPONSE']._serialized_start=162
+  _globals['_CREATEVIDEOTRACKRESPONSE']._serialized_end=223
+  _globals['_CREATEAUDIOTRACKREQUEST']._serialized_start=225
+  _globals['_CREATEAUDIOTRACKREQUEST']._serialized_end=309
+  _globals['_CREATEAUDIOTRACKRESPONSE']._serialized_start=311
+  _globals['_CREATEAUDIOTRACKRESPONSE']._serialized_end=372
+  _globals['_TRACKEVENT']._serialized_start=374
+  _globals['_TRACKEVENT']._serialized_end=386
+  _globals['_TRACKPUBLICATIONINFO']._serialized_start=389
+  _globals['_TRACKPUBLICATIONINFO']._serialized_end=612
+  _globals['_TRACKINFO']._serialized_start=615
+  _globals['_TRACKINFO']._serialized_end=800
 # @@protoc_insertion_point(module_scope)

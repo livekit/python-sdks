@@ -18,6 +18,8 @@ class VideoStream(AsyncIOEventEmitter):
 
         cls._initialized = True
         ffi_client = FfiClient()
+        # Not using the instance method the listener because it keeps a strong reference to the instance
+        # And we rely on __del__ to determine when the instance isn't used
         ffi_client.add_listener('video_stream_event',
                                 cls._on_video_stream_event)
 
@@ -33,27 +35,17 @@ class VideoStream(AsyncIOEventEmitter):
             buffer_info = event.frame_received.buffer
             ffi_handle = FfiHandle(buffer_info.handle.id)
 
-            frame = VideoFrame(frame_info)
-            buffer = VideoFrameBuffer.create(ffi_handle, buffer_info)
-            stream._on_frame_received(frame, buffer)
+            frame = VideoFrame(
+                frame_info, VideoFrameBuffer.create(ffi_handle, buffer_info))
+            stream._on_frame_received(frame)
 
     def __init__(self, track: Track):
         super().__init__()
         self.initalize()
 
-        room = track._room()
-        if room is None:
-            raise ValueError("track's room is not valid anymore")
-
-        participant = track._participant()
-        if participant is None:
-            raise ValueError("track's participant is not valid anymore")
-
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
-        new_video_stream.room_handle.id = room._ffi_handle.handle
-        new_video_stream.track_sid = track.sid
-        new_video_stream.participant_sid = participant.sid
+        new_video_stream.track_handle.id = track._ffi_handle.handle
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
 
         ffi_client = FfiClient()
@@ -65,8 +57,8 @@ class VideoStream(AsyncIOEventEmitter):
         self._info = stream_info
         self._track = track
 
-    def _on_frame_received(self, frame: VideoFrame, buffer: VideoFrameBuffer):
-        self.emit('frame_received', frame, buffer)
+    def _on_frame_received(self, frame: VideoFrame):
+        self.emit('frame_received', frame)
 
     def __del__(self):
         self._streams.pop(self._ffi_handle.handle, None)

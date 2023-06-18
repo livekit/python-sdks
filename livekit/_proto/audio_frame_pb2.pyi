@@ -35,16 +35,12 @@ class AllocAudioBufferResponse(_message.Message):
     def __init__(self, buffer: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
 
 class NewAudioStreamRequest(_message.Message):
-    __slots__ = ["room_handle", "participant_sid", "track_sid", "type"]
-    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["track_handle", "type"]
+    TRACK_HANDLE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    room_handle: _handle_pb2.FfiHandleId
-    participant_sid: str
-    track_sid: str
+    track_handle: _handle_pb2.FfiHandleId
     type: AudioStreamType
-    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., type: _Optional[_Union[AudioStreamType, str]] = ...) -> None: ...
+    def __init__(self, track_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioStreamType, str]] = ...) -> None: ...
 
 class NewAudioStreamResponse(_message.Message):
     __slots__ = ["stream"]
@@ -53,10 +49,12 @@ class NewAudioStreamResponse(_message.Message):
     def __init__(self, stream: _Optional[_Union[AudioStreamInfo, _Mapping]] = ...) -> None: ...
 
 class NewAudioSourceRequest(_message.Message):
-    __slots__ = ["type"]
+    __slots__ = ["type", "options"]
     TYPE_FIELD_NUMBER: _ClassVar[int]
+    OPTIONS_FIELD_NUMBER: _ClassVar[int]
     type: AudioSourceType
-    def __init__(self, type: _Optional[_Union[AudioSourceType, str]] = ...) -> None: ...
+    options: AudioSourceOptions
+    def __init__(self, type: _Optional[_Union[AudioSourceType, str]] = ..., options: _Optional[_Union[AudioSourceOptions, _Mapping]] = ...) -> None: ...
 
 class NewAudioSourceResponse(_message.Message):
     __slots__ = ["source"]
@@ -119,14 +117,12 @@ class AudioFrameBufferInfo(_message.Message):
     def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., data_ptr: _Optional[int] = ..., num_channels: _Optional[int] = ..., sample_rate: _Optional[int] = ..., samples_per_channel: _Optional[int] = ...) -> None: ...
 
 class AudioStreamInfo(_message.Message):
-    __slots__ = ["handle", "type", "track_sid"]
+    __slots__ = ["handle", "type"]
     HANDLE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
     handle: _handle_pb2.FfiHandleId
     type: AudioStreamType
-    track_sid: str
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioStreamType, str]] = ..., track_sid: _Optional[str] = ...) -> None: ...
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[AudioStreamType, str]] = ...) -> None: ...
 
 class AudioStreamEvent(_message.Message):
     __slots__ = ["handle", "frame_received"]
@@ -141,6 +137,16 @@ class AudioFrameReceived(_message.Message):
     FRAME_FIELD_NUMBER: _ClassVar[int]
     frame: AudioFrameBufferInfo
     def __init__(self, frame: _Optional[_Union[AudioFrameBufferInfo, _Mapping]] = ...) -> None: ...
+
+class AudioSourceOptions(_message.Message):
+    __slots__ = ["echo_cancellation", "noise_suppression", "auto_gain_control"]
+    ECHO_CANCELLATION_FIELD_NUMBER: _ClassVar[int]
+    NOISE_SUPPRESSION_FIELD_NUMBER: _ClassVar[int]
+    AUTO_GAIN_CONTROL_FIELD_NUMBER: _ClassVar[int]
+    echo_cancellation: bool
+    noise_suppression: bool
+    auto_gain_control: bool
+    def __init__(self, echo_cancellation: bool = ..., noise_suppression: bool = ..., auto_gain_control: bool = ...) -> None: ...
 
 class AudioSourceInfo(_message.Message):
     __slots__ = ["handle", "type"]

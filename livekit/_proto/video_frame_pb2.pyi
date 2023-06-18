@@ -87,16 +87,12 @@ class AllocVideoBufferResponse(_message.Message):
     def __init__(self, buffer: _Optional[_Union[VideoFrameBufferInfo, _Mapping]] = ...) -> None: ...
 
 class NewVideoStreamRequest(_message.Message):
-    __slots__ = ["room_handle", "participant_sid", "track_sid", "type"]
-    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["track_handle", "type"]
+    TRACK_HANDLE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    room_handle: _handle_pb2.FfiHandleId
-    participant_sid: str
-    track_sid: str
+    track_handle: _handle_pb2.FfiHandleId
     type: VideoStreamType
-    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., type: _Optional[_Union[VideoStreamType, str]] = ...) -> None: ...
+    def __init__(self, track_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[VideoStreamType, str]] = ...) -> None: ...
 
 class NewVideoStreamResponse(_message.Message):
     __slots__ = ["stream"]
@@ -105,10 +101,12 @@ class NewVideoStreamResponse(_message.Message):
     def __init__(self, stream: _Optional[_Union[VideoStreamInfo, _Mapping]] = ...) -> None: ...
 
 class NewVideoSourceRequest(_message.Message):
-    __slots__ = ["type"]
+    __slots__ = ["type", "resolution"]
     TYPE_FIELD_NUMBER: _ClassVar[int]
+    RESOLUTION_FIELD_NUMBER: _ClassVar[int]
     type: VideoSourceType
-    def __init__(self, type: _Optional[_Union[VideoSourceType, str]] = ...) -> None: ...
+    resolution: VideoSourceResolution
+    def __init__(self, type: _Optional[_Union[VideoSourceType, str]] = ..., resolution: _Optional[_Union[VideoSourceResolution, _Mapping]] = ...) -> None: ...
 
 class NewVideoSourceResponse(_message.Message):
     __slots__ = ["source"]
@@ -193,12 +191,12 @@ class ARGBBufferInfo(_message.Message):
     def __init__(self, ptr: _Optional[int] = ..., format: _Optional[_Union[VideoFormatType, str]] = ..., stride: _Optional[int] = ..., width: _Optional[int] = ..., height: _Optional[int] = ...) -> None: ...
 
 class VideoFrameInfo(_message.Message):
-    __slots__ = ["timestamp", "rotation"]
-    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["timestamp_us", "rotation"]
+    TIMESTAMP_US_FIELD_NUMBER: _ClassVar[int]
     ROTATION_FIELD_NUMBER: _ClassVar[int]
-    timestamp: int
+    timestamp_us: int
     rotation: VideoRotation
-    def __init__(self, timestamp: _Optional[int] = ..., rotation: _Optional[_Union[VideoRotation, str]] = ...) -> None: ...
+    def __init__(self, timestamp_us: _Optional[int] = ..., rotation: _Optional[_Union[VideoRotation, str]] = ...) -> None: ...
 
 class VideoFrameBufferInfo(_message.Message):
     __slots__ = ["handle", "buffer_type", "width", "height", "yuv", "bi_yuv", "native"]
@@ -263,14 +261,12 @@ class NativeBufferInfo(_message.Message):
     def __init__(self) -> None: ...
 
 class VideoStreamInfo(_message.Message):
-    __slots__ = ["handle", "type", "track_sid"]
+    __slots__ = ["handle", "type"]
     HANDLE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
     handle: _handle_pb2.FfiHandleId
     type: VideoStreamType
-    track_sid: str
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[VideoStreamType, str]] = ..., track_sid: _Optional[str] = ...) -> None: ...
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., type: _Optional[_Union[VideoStreamType, str]] = ...) -> None: ...
 
 class VideoStreamEvent(_message.Message):
     __slots__ = ["handle", "frame_received"]
@@ -287,6 +283,14 @@ class VideoFrameReceived(_message.Message):
     frame: VideoFrameInfo
     buffer: VideoFrameBufferInfo
     def __init__(self, frame: _Optional[_Union[VideoFrameInfo, _Mapping]] = ..., buffer: _Optional[_Union[VideoFrameBufferInfo, _Mapping]] = ...) -> None: ...
+
+class VideoSourceResolution(_message.Message):
+    __slots__ = ["width", "height"]
+    WIDTH_FIELD_NUMBER: _ClassVar[int]
+    HEIGHT_FIELD_NUMBER: _ClassVar[int]
+    width: int
+    height: int
+    def __init__(self, width: _Optional[int] = ..., height: _Optional[int] = ...) -> None: ...
 
 class VideoSourceInfo(_message.Message):
     __slots__ = ["handle", "type"]

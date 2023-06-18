@@ -7,9 +7,9 @@ from livekit import (VideoRotation, VideoFormatType, VideoFrameBufferType)
 
 
 class VideoFrame():
-    def __init__(self, info: proto_video_frame.VideoFrameInfo) -> None:
+    def __init__(self, info: proto_video_frame.VideoFrameInfo, buffer: 'VideoFrameBuffer') -> None:
         self._info = info
-        pass
+        self.buffer = buffer
 
     @property
     def timestamp(self) -> int:
@@ -223,6 +223,21 @@ class ArgbFrame:
         self.height = height
         self.data = (ctypes.c_uint8 * (width * height *
                      ctypes.sizeof(ctypes.c_uint32)))()  # alloc frame
+
+    def to_i420(self) -> I420Buffer:
+        # TODO(theomonnom): avoid unnecessary buffer allocation
+        req = proto_ffi.FfiRequest()
+        req.to_i420.argb.format = self._format
+        req.to_i420.argb.width = self.width
+        req.to_i420.argb.height = self.height
+        req.to_i420.argb.stride = self.width * 4
+        req.to_i420.argb.ptr = ctypes.addressof(self.data)
+
+        ffi_client = FfiClient()
+        res = ffi_client.request(req)
+        buffer_info = res.to_i420.buffer
+        ffi_handle = FfiHandle(buffer_info.handle.id)
+        return I420Buffer(ffi_handle, buffer_info)
 
     @property
     def format(self) -> VideoFormatType:

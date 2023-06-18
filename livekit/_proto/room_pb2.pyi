@@ -25,7 +25,7 @@ class ConnectionState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 
 class DataPacketKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
-    KIND_UNRELIABLE: _ClassVar[DataPacketKind]
+    KIND_LOSSY: _ClassVar[DataPacketKind]
     KIND_RELIABLE: _ClassVar[DataPacketKind]
 QUALITY_POOR: ConnectionQuality
 QUALITY_GOOD: ConnectionQuality
@@ -34,7 +34,7 @@ CONN_DISCONNECTED: ConnectionState
 CONN_CONNECTED: ConnectionState
 CONN_RECONNECTING: ConnectionState
 CONN_UNKNOWN: ConnectionState
-KIND_UNRELIABLE: DataPacketKind
+KIND_LOSSY: DataPacketKind
 KIND_RELIABLE: DataPacketKind
 
 class ConnectRequest(_message.Message):
@@ -76,8 +76,10 @@ class DisconnectResponse(_message.Message):
     def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ...) -> None: ...
 
 class DisconnectCallback(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FfiAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ...) -> None: ...
 
 class PublishTrackRequest(_message.Message):
     __slots__ = ["room_handle", "track_handle", "options"]
@@ -122,10 +124,40 @@ class UnpublishTrackResponse(_message.Message):
     def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ...) -> None: ...
 
 class UnpublishTrackCallback(_message.Message):
-    __slots__ = ["error"]
+    __slots__ = ["async_id", "error"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FfiAsyncId
     error: str
-    def __init__(self, error: _Optional[str] = ...) -> None: ...
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ..., error: _Optional[str] = ...) -> None: ...
+
+class PublishDataRequest(_message.Message):
+    __slots__ = ["room_handle", "data_ptr", "data_size", "kind", "destination_sids"]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
+    DATA_SIZE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    DESTINATION_SIDS_FIELD_NUMBER: _ClassVar[int]
+    room_handle: _handle_pb2.FfiHandleId
+    data_ptr: int
+    data_size: int
+    kind: DataPacketKind
+    destination_sids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., data_ptr: _Optional[int] = ..., data_size: _Optional[int] = ..., kind: _Optional[_Union[DataPacketKind, str]] = ..., destination_sids: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class PublishDataResponse(_message.Message):
+    __slots__ = ["async_id"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FfiAsyncId
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ...) -> None: ...
+
+class PublishDataCallback(_message.Message):
+    __slots__ = ["async_id", "error"]
+    ASYNC_ID_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    async_id: _handle_pb2.FfiAsyncId
+    error: str
+    def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ..., error: _Optional[str] = ...) -> None: ...
 
 class VideoEncoding(_message.Message):
     __slots__ = ["max_bitrate", "max_framerate"]
@@ -142,14 +174,13 @@ class AudioEncoding(_message.Message):
     def __init__(self, max_bitrate: _Optional[int] = ...) -> None: ...
 
 class TrackPublishOptions(_message.Message):
-    __slots__ = ["video_encoding", "audio_encoding", "video_codec", "dtx", "red", "simulcast", "name", "source"]
+    __slots__ = ["video_encoding", "audio_encoding", "video_codec", "dtx", "red", "simulcast", "source"]
     VIDEO_ENCODING_FIELD_NUMBER: _ClassVar[int]
     AUDIO_ENCODING_FIELD_NUMBER: _ClassVar[int]
     VIDEO_CODEC_FIELD_NUMBER: _ClassVar[int]
     DTX_FIELD_NUMBER: _ClassVar[int]
     RED_FIELD_NUMBER: _ClassVar[int]
     SIMULCAST_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     video_encoding: VideoEncoding
     audio_encoding: AudioEncoding
@@ -157,17 +188,18 @@ class TrackPublishOptions(_message.Message):
     dtx: bool
     red: bool
     simulcast: bool
-    name: str
     source: _track_pb2.TrackSource
-    def __init__(self, video_encoding: _Optional[_Union[VideoEncoding, _Mapping]] = ..., audio_encoding: _Optional[_Union[AudioEncoding, _Mapping]] = ..., video_codec: _Optional[_Union[_video_frame_pb2.VideoCodec, str]] = ..., dtx: bool = ..., red: bool = ..., simulcast: bool = ..., name: _Optional[str] = ..., source: _Optional[_Union[_track_pb2.TrackSource, str]] = ...) -> None: ...
+    def __init__(self, video_encoding: _Optional[_Union[VideoEncoding, _Mapping]] = ..., audio_encoding: _Optional[_Union[AudioEncoding, _Mapping]] = ..., video_codec: _Optional[_Union[_video_frame_pb2.VideoCodec, str]] = ..., dtx: bool = ..., red: bool = ..., simulcast: bool = ..., source: _Optional[_Union[_track_pb2.TrackSource, str]] = ...) -> None: ...
 
 class RoomOptions(_message.Message):
-    __slots__ = ["auto_subscribe", "adaptive_stream"]
+    __slots__ = ["auto_subscribe", "adaptive_stream", "dynacast"]
     AUTO_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     ADAPTIVE_STREAM_FIELD_NUMBER: _ClassVar[int]
+    DYNACAST_FIELD_NUMBER: _ClassVar[int]
     auto_subscribe: bool
     adaptive_stream: bool
-    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ...) -> None: ...
+    dynacast: bool
+    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., dynacast: bool = ...) -> None: ...
 
 class RoomEvent(_message.Message):
     __slots__ = ["room_handle", "participant_connected", "participant_disconnected", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_muted", "track_unmuted", "speakers_changed", "connection_quality_changed", "data_received", "connection_state_changed", "connected", "disconnected", "reconnecting", "reconnected"]

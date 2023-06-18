@@ -21,7 +21,8 @@ class Room(AsyncIOEventEmitter):
         super().__init__()
         self._ffi_handle: FfiHandle = None
         self._room_info: proto_room.RoomInfo = None
-        self._participants: dict[str, RemoteParticipant] = {}
+        self.participants: dict[str, RemoteParticipant] = {}
+        self.local_participant: LocalParticipant = None
 
     def __del__(self):
         ffi_client = FfiClient()
@@ -37,29 +38,30 @@ class Room(AsyncIOEventEmitter):
         req.connect.token = token
 
         resp = ffi_client.request(req)
-        async_id = resp.connect.async_id
-
         future = asyncio.Future()
 
+        @ffi_client.on('connect')
         def on_connect_callback(cb: proto_room.ConnectCallback):
-            if cb.async_id == async_id:
-                # add existing participants
-                for participant_info in cb.room.participants:
-                    self._create_remote_participant(participant_info)
-
+            if cb.async_id == resp.connect.async_id:
                 future.set_result(cb)
                 ffi_client.remove_listener('connect', on_connect_callback)
 
-        ffi_client.add_listener('connect', on_connect_callback)
-        resp = await future
+        resp: proto_room.ConnectCallback = await future
 
         if resp.error:
             raise ConnectError(resp.error)
-        else:
-            self._ffi_handle = FfiHandle(resp.room.handle.id)
-            self._room_info = resp.room
-            self._close_future = asyncio.Future()
-            ffi_client.add_listener('room_event', self._on_room_event)
+
+        self._ffi_handle = FfiHandle(resp.room.handle.id)
+        self._room_info = resp.room
+        self._close_future = asyncio.Future()
+
+        self.local_participant = LocalParticipant(
+            resp.room.local_participant, weakref.ref(self))
+
+        for participant_info in resp.room.participants:
+            self._create_remote_participant(participant_info)
+
+        ffi_client.add_listener('room_event', self._on_room_event)
 
     async def close(self):
         self._ffi_handle = None
@@ -77,54 +79,52 @@ class Room(AsyncIOEventEmitter):
             self.emit('participant_connected', remote_participant)
         elif which == 'participant_disconnected':
             sid = event.participant_disconnected.info.sid
-            participant = self._participants.pop(sid)
+            participant = self.participants.pop(sid)
             self.emit('participant_disconnected', participant)
         elif which == 'track_published':
-            participant = self._participants[event.track_published.participant_sid]
+            participant = self.participants[event.track_published.participant_sid]
             publication = RemoteTrackPublication(
                 event.track_published.publication)
-            participant._tracks[publication.sid] = publication
+            participant.tracks[publication.sid] = publication
             self.emit('track_published', publication, participant)
         elif which == 'track_unpublished':
-            participant = self._participants[event.track_unpublished.participant_sid]
-            publication = participant._tracks.pop(
+            participant = self.participants[event.track_unpublished.participant_sid]
+            publication = participant.tracks.pop(
                 event.track_unpublished.publication_sid)
             self.emit('track_unpublished', publication, participant)
         elif which == 'track_subscribed':
             track_info = event.track_subscribed.track
-            participant = self._participants[event.track_subscribed.participant_sid]
-            publication = participant._tracks[track_info.sid]
+            participant = self.participants[event.track_subscribed.participant_sid]
+            publication = participant.tracks[track_info.sid]
+            ffi_handle = FfiHandle(track_info.handle.id)
 
             if track_info.kind == TrackKind.KIND_VIDEO:
-                video_track = RemoteVideoTrack(
-                    track_info, weakref.ref(self), weakref.ref(participant))
+                video_track = RemoteVideoTrack(ffi_handle, track_info)
                 publication._track = video_track
                 self.emit('track_subscribed', video_track,
                           publication, participant)
             elif track_info.kind == TrackKind.KIND_AUDIO:
-                audio_track = RemoteAudioTrack(
-                    track_info, weakref.ref(self), weakref.ref(participant))
+                audio_track = RemoteAudioTrack(ffi_handle, track_info)
                 publication._track = audio_track
                 self.emit('track_subscribed', audio_track,
                           publication, participant)
         elif which == 'track_unsubscribed':
-            participant = self._participants[event.track_unsubscribed.participant_sid]
-            publication = participant._tracks[event.track_unsubscribed.track_sid]
+            participant = self.participants[event.track_unsubscribed.participant_sid]
+            publication = participant.tracks[event.track_unsubscribed.track_sid]
             track = publication._track
             publication._track = None
             self.emit('track_unsubscribed', track, publication, participant)
 
     def _create_remote_participant(self, info: proto_participant.ParticipantInfo) -> RemoteParticipant:
-        if info.sid in self._participants:
+        if info.sid in self.participants:
             raise Exception('participant already exists')
 
-        participant = RemoteParticipant(info)
-        self._participants[participant.sid] = participant
+        participant = RemoteParticipant(info, weakref.ref(self))
+        self.participants[participant.sid] = participant
 
-        #  add existing track publications
         for publication_info in info.publications:
             publication = RemoteTrackPublication(publication_info)
-            participant._tracks[publication.sid] = publication
+            participant.tracks[publication.sid] = publication
 
         return participant
 

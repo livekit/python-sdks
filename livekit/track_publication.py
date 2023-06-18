@@ -6,7 +6,7 @@ from .track import Track
 class TrackPublication():
     def __init__(self, info: proto_track.TrackPublicationInfo):
         self._info = info
-        self._track: Track = None
+        self.track: Track = None
 
     @property
     def sid(self) -> str:
