@@ -23,3 +23,4 @@ from .video_source import VideoSource
 from .audio_frame import AudioFrame
 from .audio_stream import AudioStream
 from .audio_source import AudioSource
+from .token import create_access_token
