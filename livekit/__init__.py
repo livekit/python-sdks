@@ -19,3 +19,7 @@ from .video_frame import (ArgbFrame, VideoFrame, VideoFrameBuffer, NativeVideoFr
                           PlanarYuv8Buffer, PlanarYuv16Buffer, I420Buffer, I420ABuffer, I422Buffer, I010Buffer, NV12Buffer)
 from .video_stream import VideoStream
 from .video_source import VideoSource
+
+from .audio_frame import AudioFrame
+from .audio_stream import AudioStream
+from .audio_source import AudioSource

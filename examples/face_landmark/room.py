@@ -75,9 +75,12 @@ async def room():
     await room.connect(URL, TOKEN)
     print("connected to room: " + room.name)
 
+    video_stream = None
+
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         if track.kind == livekit.TrackKind.KIND_VIDEO:
+            nonlocal video_stream
             video_stream = livekit.VideoStream(track)
 
             @video_stream.on("frame_received")

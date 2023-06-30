@@ -10,6 +10,9 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 async def main():
     room = livekit.Room()
 
+    audio_stream = None
+    video_stream = None
+
     logging.info("connecting to %s", URL)
     try:
         await room.connect(URL, TOKEN)
@@ -41,11 +44,21 @@ async def main():
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
+            nonlocal video_stream
             video_stream = livekit.VideoStream(track)
 
             @video_stream.on("frame_received")
             def on_video_frame(frame: livekit.VideoFrame):
-                # e.g: Do something with the frames here :)
+                # received a video frame from the track
+                pass
+        elif track.kind == livekit.TrackKind.KIND_AUDIO:
+            print("Subscribed to an Audio Track")
+            nonlocal audio_stream
+            audio_stream = livekit.AudioStream(track)
+
+            @audio_stream.on('frame_received')
+            def on_audio_frame(frame: livekit.AudioFrame):
+                # received an audio frame from the track
                 pass
 
     @room.on("track_unsubscribed")
