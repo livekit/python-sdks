@@ -7,17 +7,10 @@ from livekit import (VideoRotation, VideoFormatType, VideoFrameBufferType)
 
 
 class VideoFrame():
-    def __init__(self, info: proto_video_frame.VideoFrameInfo, buffer: 'VideoFrameBuffer') -> None:
-        self._info = info
+    def __init__(self, timestamp_us: int, rotation: VideoRotation, buffer: 'VideoFrameBuffer'):
         self.buffer = buffer
-
-    @property
-    def timestamp(self) -> int:
-        return self._info.timestamp
-
-    @property
-    def rotation(self) -> VideoRotation:
-        return self._info.rotation
+        self.timestamp_us = timestamp_us
+        self.rotation = rotation
 
 
 class VideoFrameBuffer():

@@ -53,8 +53,8 @@ class LocalVideoTrack(Track):
         ffi_client = FfiClient()
         resp = ffi_client.request(req)
         track_info = resp.create_video_track.track
-        ffi_handle = FfiHandle(track_info.opt_handle.id)
-        return LocalVideoTrack(ffi_handle, track_info, None, None)
+        ffi_handle = FfiHandle(track_info.handle.id)
+        return LocalVideoTrack(ffi_handle, track_info)
 
 
 class RemoteAudioTrack(Track):

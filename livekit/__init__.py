@@ -8,7 +8,7 @@ from ._proto.video_frame_pb2 import (
 from ._proto.track_pb2 import (TrackKind, TrackSource, StreamState)
 from ._proto.room_pb2 import (TrackPublishOptions)
 
-from .room import Room
+from .room import (Room, ConnectError)
 from .participant import (Participant, LocalParticipant, RemoteParticipant)
 from .track import (Track, LocalAudioTrack, LocalVideoTrack,
                     RemoteAudioTrack, RemoteVideoTrack)

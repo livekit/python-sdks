@@ -19,7 +19,7 @@ class VideoSource:
         req.capture_video_frame.source_handle.id = self._ffi_handle.handle
         req.capture_video_frame.buffer_handle.id = frame.buffer._ffi_handle.handle
         req.capture_video_frame.frame.rotation = frame.rotation
-        req.capture_video_frame.frame.timestamp = frame.timestamp
+        req.capture_video_frame.frame.timestamp_us = frame.timestamp_us
 
         ffi_client = FfiClient()
         ffi_client.request(req)

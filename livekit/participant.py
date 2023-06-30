@@ -19,9 +19,8 @@ class PublishTrackError(Exception):
 
 
 class Participant():
-    def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']):
+    def __init__(self, info: proto_participant.ParticipantInfo):
         self._info = info
-        self._room = room
         self.tracks: dict[str, TrackPublication] = {}
 
     @property
@@ -43,7 +42,8 @@ class Participant():
 
 class LocalParticipant(Participant):
     def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']):
-        super().__init__(info, room)
+        super().__init__(info)
+        self._room = room
 
     async def publish_track(self, track: Track, options: TrackPublishOptions) -> TrackPublication:
         if not isinstance(track, LocalAudioTrack) and not isinstance(track, LocalVideoTrack):
@@ -56,7 +56,7 @@ class LocalParticipant(Participant):
         req = proto_ffi.FfiRequest()
         req.publish_track.track_handle.id = track._ffi_handle.handle
         req.publish_track.room_handle.id = room._ffi_handle.handle
-        req.publish_track.options = options
+        req.publish_track.options.CopyFrom(options)
 
         ffi_client = FfiClient()
         resp = ffi_client.request(req)
@@ -64,7 +64,7 @@ class LocalParticipant(Participant):
 
         @ffi_client.on('publish_track')
         def on_publish_callback(cb: proto_room.PublishTrackCallback):
-            if cb.async_id == resp.async_id:
+            if cb.async_id == resp.publish_track.async_id:
                 future.set_result(cb)
                 ffi_client.remove_listener(
                     'publish_track', on_publish_callback)
@@ -82,5 +82,5 @@ class LocalParticipant(Participant):
 
 
 class RemoteParticipant(Participant):
-    def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']):
-        super().__init__(info, room)
+    def __init__(self, info: proto_participant.ParticipantInfo):
+        super().__init__(info)

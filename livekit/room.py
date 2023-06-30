@@ -24,6 +24,9 @@ class Room(AsyncIOEventEmitter):
         self.participants: dict[str, RemoteParticipant] = {}
         self.local_participant: LocalParticipant = None
 
+        ffi_client = FfiClient()
+        ffi_client.add_listener('room_event', self._on_room_event)
+
     def __del__(self):
         ffi_client = FfiClient()
         ffi_client.remove_listener('room_event', self._on_room_event)
@@ -61,8 +64,6 @@ class Room(AsyncIOEventEmitter):
         for participant_info in resp.room.participants:
             self._create_remote_participant(participant_info)
 
-        ffi_client.add_listener('room_event', self._on_room_event)
-
     async def close(self):
         ffi_client = FfiClient()
 
@@ -80,13 +81,17 @@ class Room(AsyncIOEventEmitter):
                     'disconnect', on_disconnect_callback)
 
         await future
-        self._close_future.set_result(None)
-        self._ffi_handle = None
+        if not self._close_future.cancelled:
+            self._close_future.set_result(None)
 
     async def run(self):
+        # Not needed atm
         await self._close_future
 
     def _on_room_event(self, event: proto_room.RoomEvent):
+        if event.room_handle.id != self._ffi_handle.handle:
+            return
+
         which = event.WhichOneof('message')
         if which == 'participant_connected':
             remote_participant = self._create_remote_participant(
@@ -134,7 +139,7 @@ class Room(AsyncIOEventEmitter):
         if info.sid in self.participants:
             raise Exception('participant already exists')
 
-        participant = RemoteParticipant(info, weakref.ref(self))
+        participant = RemoteParticipant(info)
         self.participants[participant.sid] = participant
 
         for publication_info in info.publications:
