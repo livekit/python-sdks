@@ -37,11 +37,7 @@ class AudioStream(AsyncIOEventEmitter):
         if which == 'frame_received':
             frame_info = event.frame_received.frame
             ffi_handle = FfiHandle(frame_info.handle.id)
-            data_len = frame_info.num_channels * frame_info.samples_per_channel
-            data = ctypes.cast(frame_info.data_ptr,
-                               ctypes.POINTER(ctypes.c_uint16 * data_len)).contents
-            frame = AudioFrame(
-                frame_info.sample_rate, frame_info.num_channels, frame_info.samples_per_channel, data, ffi_handle)
+            frame = AudioFrame(frame_info, ffi_handle)
             stream._on_frame_received(frame)
 
     def __init__(self, track: Track):
