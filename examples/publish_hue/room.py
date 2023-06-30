@@ -24,18 +24,23 @@ async def publish_frames(source: livekit.VideoSource):
 
         rgb = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
         rgb = [int(x * 255) for x in rgb]
-        argb_color = rgb + [255]
 
-        for i in range(0, len(arr), 4):
-            arr[i:i+4] = argb_color
+        argb_color = np.array(rgb + [255], dtype=np.uint8)
+        arr.flat[::4] = argb_color[0]
+        arr.flat[1::4] = argb_color[1]
+        arr.flat[2::4] = argb_color[2]
+        arr.flat[3::4] = argb_color[3]
 
         source.capture_frame(frame)
 
-        hue += framerate/2  # 3s for a full cycle
+        hue += framerate/3  # 3s for a full cycle
         if hue >= 1.0:
-            hue -= 1.0
+            hue = 0.0
 
-        await asyncio.sleep(framerate)
+        try:
+            await asyncio.sleep(framerate)
+        except asyncio.CancelledError:
+            break
 
 
 async def main():
@@ -63,6 +68,8 @@ async def main():
         await room.run()
     except asyncio.CancelledError:
         logging.info("closing the room")
+        source_task.cancel()
+        await source_task
         await room.close()
 
 
