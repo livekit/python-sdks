@@ -1,7 +1,7 @@
 """LiveKit Client SDK
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from ._proto.video_frame_pb2 import (
     VideoRotation, VideoFormatType, VideoFrameBufferType)
