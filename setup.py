@@ -6,8 +6,8 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="livekit",
-    version="0.1.0",
-    description="A sample Python project",
+    version="0.1.1",
+    description="LiveKit Python Client SDK for LiveKit",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/livekit/client-sdk-python",
