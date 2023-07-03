@@ -1,3 +1,4 @@
+<!--BEGIN_BANNER_IMAGE--><!--END_BANNER_IMAGE-->
 
 [![crates.io](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
 
@@ -29,3 +30,5 @@ async def main():
                 # received a video frame from the track
                 pass
 ```
+
+<!--BEGIN_REPO_NAV--><!--END_REPO_NAV-->
