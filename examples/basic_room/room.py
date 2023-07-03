@@ -13,14 +13,6 @@ async def main():
     audio_stream = None
     video_stream = None
 
-    logging.info("connecting to %s", URL)
-    try:
-        await room.connect(URL, TOKEN)
-        logging.info("connected to room %s", room.name)
-    except livekit.ConnectError as e:
-        logging.error("failed to connect to the room: %s", e)
-        return False
-
     @room.on("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant):
         logging.info(
@@ -65,8 +57,20 @@ async def main():
     def on_track_unsubscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track unsubscribed: %s", publication.sid)
 
+    @room.on("data_received")
+    def on_data_received(data: bytes, kind: livekit.DataPacketKind, participant: livekit.Participant):
+        logging.info("received data from %s: %s", participant.identity, data)
+
     try:
+        logging.info("connecting to %s", URL)
+        await room.connect(URL, TOKEN)
+        logging.info("connected to room %s", room.name)
+
+        await room.local_participant.publish_data("hello world")
+
         await room.run()
+    except livekit.ConnectError as e:
+        logging.error("failed to connect to the room: %s", e)
     except asyncio.CancelledError:
         logging.info("closing the room")
         await room.close()

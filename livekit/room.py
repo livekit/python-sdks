@@ -9,6 +9,7 @@ from .track_publication import (RemoteTrackPublication, LocalTrackPublication)
 from .track import (RemoteAudioTrack, RemoteVideoTrack)
 from livekit import TrackKind
 import weakref
+import ctypes
 
 
 class ConnectError(Exception):
@@ -30,6 +31,21 @@ class Room(AsyncIOEventEmitter):
     def __del__(self):
         ffi_client = FfiClient()
         ffi_client.remove_listener('room_event', self._on_room_event)
+
+    @property
+    def sid(self) -> str:
+        return self._room_info.sid
+
+    @property
+    def name(self) -> str:
+        return self._room_info.name
+
+    @property
+    def metadata(self) -> str:
+        return self._room_info.metadata
+
+    def isconnected(self) -> bool:
+        return self._ffi_handle is not None
 
     async def connect(self, url: str, token: str):
         # TODO(theomonnom): We should be more flexible about the event loop
@@ -65,6 +81,9 @@ class Room(AsyncIOEventEmitter):
             self._create_remote_participant(participant_info)
 
     async def close(self):
+        if not self.isconnected():
+            return
+
         ffi_client = FfiClient()
 
         req = proto_ffi.FfiRequest()
@@ -134,6 +153,14 @@ class Room(AsyncIOEventEmitter):
             track = publication._track
             publication._track = None
             self.emit('track_unsubscribed', track, publication, participant)
+        elif which == 'data_received':
+            participant = self.participants[event.data_received.participant_sid]
+            data = ctypes.cast(event.data_received.data_ptr,
+                               ctypes.POINTER(ctypes.c_byte * event.data_received.data_size)).contents
+            data = bytes(data)
+            FfiHandle(event.data_received.handle.id)
+            self.emit('data_received', data,
+                      event.data_received.kind, participant)
 
     def _create_remote_participant(self, info: proto_participant.ParticipantInfo) -> RemoteParticipant:
         if info.sid in self.participants:
@@ -147,15 +174,3 @@ class Room(AsyncIOEventEmitter):
             participant.tracks[publication.sid] = publication
 
         return participant
-
-    @property
-    def sid(self) -> str:
-        return self._room_info.sid
-
-    @property
-    def name(self) -> str:
-        return self._room_info.name
-
-    @property
-    def metadata(self) -> str:
-        return self._room_info.metadata
