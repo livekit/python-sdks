@@ -6,7 +6,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="livekit",
-    version="0.1.1",
+    version="0.1.3",
     description="LiveKit Python Client SDK for LiveKit",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -31,7 +31,7 @@ setup(
     python_requires=">=3.7, <4",
     install_requires=["pyee>=9.0.0"],
     package_data={
-        "livekit": ['lib/*/*/*.*'],
+        "livekit": ['lib/*/*/*.*', '_proto/*.py'],
     },
     project_urls={
         "Website": "https://livekit.io/",
