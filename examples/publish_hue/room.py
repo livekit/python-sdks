@@ -70,7 +70,7 @@ async def main():
         logging.info("closing the room")
         source_task.cancel()
         await source_task
-        await room.close()
+        await room.disconnect()
 
 
 if __name__ == "__main__":

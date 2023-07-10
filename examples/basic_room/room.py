@@ -73,7 +73,7 @@ async def main():
         logging.error("failed to connect to the room: %s", e)
     except asyncio.CancelledError:
         logging.info("closing the room")
-        await room.close()
+        await room.disconnect()
 
 
 if __name__ == "__main__":
