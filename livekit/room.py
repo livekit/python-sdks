@@ -80,7 +80,7 @@ class Room(AsyncIOEventEmitter):
         for participant_info in resp.room.participants:
             self._create_remote_participant(participant_info)
 
-    async def close(self):
+    async def disconnect(self):
         if not self.isconnected():
             return
 
