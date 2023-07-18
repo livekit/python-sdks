@@ -21,7 +21,6 @@ class ConnectionState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CONN_DISCONNECTED: _ClassVar[ConnectionState]
     CONN_CONNECTED: _ClassVar[ConnectionState]
     CONN_RECONNECTING: _ClassVar[ConnectionState]
-    CONN_UNKNOWN: _ClassVar[ConnectionState]
 
 class DataPacketKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -33,7 +32,6 @@ QUALITY_EXCELLENT: ConnectionQuality
 CONN_DISCONNECTED: ConnectionState
 CONN_CONNECTED: ConnectionState
 CONN_RECONNECTING: ConnectionState
-CONN_UNKNOWN: ConnectionState
 KIND_LOSSY: DataPacketKind
 KIND_RELIABLE: DataPacketKind
 
@@ -159,6 +157,22 @@ class PublishDataCallback(_message.Message):
     error: str
     def __init__(self, async_id: _Optional[_Union[_handle_pb2.FfiAsyncId, _Mapping]] = ..., error: _Optional[str] = ...) -> None: ...
 
+class SetSubscribedRequest(_message.Message):
+    __slots__ = ["room_handle", "subscribe", "participant_sid", "track_sid"]
+    ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    room_handle: _handle_pb2.FfiHandleId
+    subscribe: bool
+    participant_sid: str
+    track_sid: str
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., subscribe: bool = ..., participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class SetSubscribedResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class VideoEncoding(_message.Message):
     __slots__ = ["max_bitrate", "max_framerate"]
     MAX_BITRATE_FIELD_NUMBER: _ClassVar[int]
@@ -202,17 +216,20 @@ class RoomOptions(_message.Message):
     def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., dynacast: bool = ...) -> None: ...
 
 class RoomEvent(_message.Message):
-    __slots__ = ["room_handle", "participant_connected", "participant_disconnected", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_muted", "track_unmuted", "speakers_changed", "connection_quality_changed", "data_received", "connection_state_changed", "connected", "disconnected", "reconnecting", "reconnected"]
+    __slots__ = ["room_handle", "participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "connection_quality_changed", "data_received", "connection_state_changed", "connected", "disconnected", "reconnecting", "reconnected"]
     ROOM_HANDLE_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_CONNECTED_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_DISCONNECTED_FIELD_NUMBER: _ClassVar[int]
+    LOCAL_TRACK_PUBLISHED_FIELD_NUMBER: _ClassVar[int]
+    LOCAL_TRACK_UNPUBLISHED_FIELD_NUMBER: _ClassVar[int]
     TRACK_PUBLISHED_FIELD_NUMBER: _ClassVar[int]
     TRACK_UNPUBLISHED_FIELD_NUMBER: _ClassVar[int]
     TRACK_SUBSCRIBED_FIELD_NUMBER: _ClassVar[int]
     TRACK_UNSUBSCRIBED_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SUBSCRIPTION_FAILED_FIELD_NUMBER: _ClassVar[int]
     TRACK_MUTED_FIELD_NUMBER: _ClassVar[int]
     TRACK_UNMUTED_FIELD_NUMBER: _ClassVar[int]
-    SPEAKERS_CHANGED_FIELD_NUMBER: _ClassVar[int]
+    ACTIVE_SPEAKERS_CHANGED_FIELD_NUMBER: _ClassVar[int]
     CONNECTION_QUALITY_CHANGED_FIELD_NUMBER: _ClassVar[int]
     DATA_RECEIVED_FIELD_NUMBER: _ClassVar[int]
     CONNECTION_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
@@ -223,13 +240,16 @@ class RoomEvent(_message.Message):
     room_handle: _handle_pb2.FfiHandleId
     participant_connected: ParticipantConnected
     participant_disconnected: ParticipantDisconnected
+    local_track_published: LocalTrackPublished
+    local_track_unpublished: LocalTrackUnpublished
     track_published: TrackPublished
     track_unpublished: TrackUnpublished
     track_subscribed: TrackSubscribed
     track_unsubscribed: TrackUnsubscribed
+    track_subscription_failed: TrackSubscriptionFailed
     track_muted: TrackMuted
     track_unmuted: TrackUnmuted
-    speakers_changed: ActiveSpeakersChanged
+    active_speakers_changed: ActiveSpeakersChanged
     connection_quality_changed: ConnectionQualityChanged
     data_received: DataReceived
     connection_state_changed: ConnectionStateChanged
@@ -237,7 +257,7 @@ class RoomEvent(_message.Message):
     disconnected: Disconnected
     reconnecting: Reconnecting
     reconnected: Reconnected
-    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_connected: _Optional[_Union[ParticipantConnected, _Mapping]] = ..., participant_disconnected: _Optional[_Union[ParticipantDisconnected, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublished, _Mapping]] = ..., track_unpublished: _Optional[_Union[TrackUnpublished, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., track_unsubscribed: _Optional[_Union[TrackUnsubscribed, _Mapping]] = ..., track_muted: _Optional[_Union[TrackMuted, _Mapping]] = ..., track_unmuted: _Optional[_Union[TrackUnmuted, _Mapping]] = ..., speakers_changed: _Optional[_Union[ActiveSpeakersChanged, _Mapping]] = ..., connection_quality_changed: _Optional[_Union[ConnectionQualityChanged, _Mapping]] = ..., data_received: _Optional[_Union[DataReceived, _Mapping]] = ..., connection_state_changed: _Optional[_Union[ConnectionStateChanged, _Mapping]] = ..., connected: _Optional[_Union[Connected, _Mapping]] = ..., disconnected: _Optional[_Union[Disconnected, _Mapping]] = ..., reconnecting: _Optional[_Union[Reconnecting, _Mapping]] = ..., reconnected: _Optional[_Union[Reconnected, _Mapping]] = ...) -> None: ...
+    def __init__(self, room_handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_connected: _Optional[_Union[ParticipantConnected, _Mapping]] = ..., participant_disconnected: _Optional[_Union[ParticipantDisconnected, _Mapping]] = ..., local_track_published: _Optional[_Union[LocalTrackPublished, _Mapping]] = ..., local_track_unpublished: _Optional[_Union[LocalTrackUnpublished, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublished, _Mapping]] = ..., track_unpublished: _Optional[_Union[TrackUnpublished, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., track_unsubscribed: _Optional[_Union[TrackUnsubscribed, _Mapping]] = ..., track_subscription_failed: _Optional[_Union[TrackSubscriptionFailed, _Mapping]] = ..., track_muted: _Optional[_Union[TrackMuted, _Mapping]] = ..., track_unmuted: _Optional[_Union[TrackUnmuted, _Mapping]] = ..., active_speakers_changed: _Optional[_Union[ActiveSpeakersChanged, _Mapping]] = ..., connection_quality_changed: _Optional[_Union[ConnectionQualityChanged, _Mapping]] = ..., data_received: _Optional[_Union[DataReceived, _Mapping]] = ..., connection_state_changed: _Optional[_Union[ConnectionStateChanged, _Mapping]] = ..., connected: _Optional[_Union[Connected, _Mapping]] = ..., disconnected: _Optional[_Union[Disconnected, _Mapping]] = ..., reconnecting: _Optional[_Union[Reconnecting, _Mapping]] = ..., reconnected: _Optional[_Union[Reconnected, _Mapping]] = ...) -> None: ...
 
 class RoomInfo(_message.Message):
     __slots__ = ["handle", "sid", "name", "metadata", "local_participant", "participants"]
@@ -255,52 +275,6 @@ class RoomInfo(_message.Message):
     participants: _containers.RepeatedCompositeFieldContainer[_participant_pb2.ParticipantInfo]
     def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., sid: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., local_participant: _Optional[_Union[_participant_pb2.ParticipantInfo, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[_participant_pb2.ParticipantInfo, _Mapping]]] = ...) -> None: ...
 
-class DataReceived(_message.Message):
-    __slots__ = ["handle", "participant_sid", "data_ptr", "data_size", "kind"]
-    HANDLE_FIELD_NUMBER: _ClassVar[int]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
-    DATA_SIZE_FIELD_NUMBER: _ClassVar[int]
-    KIND_FIELD_NUMBER: _ClassVar[int]
-    handle: _handle_pb2.FfiHandleId
-    participant_sid: str
-    data_ptr: int
-    data_size: int
-    kind: DataPacketKind
-    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., data_ptr: _Optional[int] = ..., data_size: _Optional[int] = ..., kind: _Optional[_Union[DataPacketKind, str]] = ...) -> None: ...
-
-class TrackSubscribed(_message.Message):
-    __slots__ = ["participant_sid", "track"]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_FIELD_NUMBER: _ClassVar[int]
-    participant_sid: str
-    track: _track_pb2.TrackInfo
-    def __init__(self, participant_sid: _Optional[str] = ..., track: _Optional[_Union[_track_pb2.TrackInfo, _Mapping]] = ...) -> None: ...
-
-class TrackUnsubscribed(_message.Message):
-    __slots__ = ["participant_sid", "track_sid"]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
-    participant_sid: str
-    track_sid: str
-    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
-
-class TrackMuted(_message.Message):
-    __slots__ = ["participant_sid", "track_sid"]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
-    participant_sid: str
-    track_sid: str
-    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
-
-class TrackUnmuted(_message.Message):
-    __slots__ = ["participant_sid", "track_sid"]
-    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
-    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
-    participant_sid: str
-    track_sid: str
-    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
-
 class ParticipantConnected(_message.Message):
     __slots__ = ["info"]
     INFO_FIELD_NUMBER: _ClassVar[int]
@@ -312,6 +286,20 @@ class ParticipantDisconnected(_message.Message):
     INFO_FIELD_NUMBER: _ClassVar[int]
     info: _participant_pb2.ParticipantInfo
     def __init__(self, info: _Optional[_Union[_participant_pb2.ParticipantInfo, _Mapping]] = ...) -> None: ...
+
+class LocalTrackPublished(_message.Message):
+    __slots__ = ["publication", "track"]
+    PUBLICATION_FIELD_NUMBER: _ClassVar[int]
+    TRACK_FIELD_NUMBER: _ClassVar[int]
+    publication: _track_pb2.TrackPublicationInfo
+    track: _track_pb2.TrackInfo
+    def __init__(self, publication: _Optional[_Union[_track_pb2.TrackPublicationInfo, _Mapping]] = ..., track: _Optional[_Union[_track_pb2.TrackInfo, _Mapping]] = ...) -> None: ...
+
+class LocalTrackUnpublished(_message.Message):
+    __slots__ = ["publication_sid"]
+    PUBLICATION_SID_FIELD_NUMBER: _ClassVar[int]
+    publication_sid: str
+    def __init__(self, publication_sid: _Optional[str] = ...) -> None: ...
 
 class TrackPublished(_message.Message):
     __slots__ = ["participant_sid", "publication"]
@@ -329,6 +317,48 @@ class TrackUnpublished(_message.Message):
     publication_sid: str
     def __init__(self, participant_sid: _Optional[str] = ..., publication_sid: _Optional[str] = ...) -> None: ...
 
+class TrackSubscribed(_message.Message):
+    __slots__ = ["participant_sid", "track"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track: _track_pb2.TrackInfo
+    def __init__(self, participant_sid: _Optional[str] = ..., track: _Optional[_Union[_track_pb2.TrackInfo, _Mapping]] = ...) -> None: ...
+
+class TrackUnsubscribed(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class TrackSubscriptionFailed(_message.Message):
+    __slots__ = ["participant_sid", "track_sid", "error"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    error: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., error: _Optional[str] = ...) -> None: ...
+
+class TrackMuted(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
+class TrackUnmuted(_message.Message):
+    __slots__ = ["participant_sid", "track_sid"]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+    participant_sid: str
+    track_sid: str
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+
 class ActiveSpeakersChanged(_message.Message):
     __slots__ = ["participant_sids"]
     PARTICIPANT_SIDS_FIELD_NUMBER: _ClassVar[int]
@@ -342,6 +372,20 @@ class ConnectionQualityChanged(_message.Message):
     participant_sid: str
     quality: ConnectionQuality
     def __init__(self, participant_sid: _Optional[str] = ..., quality: _Optional[_Union[ConnectionQuality, str]] = ...) -> None: ...
+
+class DataReceived(_message.Message):
+    __slots__ = ["handle", "participant_sid", "data_ptr", "data_size", "kind"]
+    HANDLE_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
+    DATA_PTR_FIELD_NUMBER: _ClassVar[int]
+    DATA_SIZE_FIELD_NUMBER: _ClassVar[int]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    handle: _handle_pb2.FfiHandleId
+    participant_sid: str
+    data_ptr: int
+    data_size: int
+    kind: DataPacketKind
+    def __init__(self, handle: _Optional[_Union[_handle_pb2.FfiHandleId, _Mapping]] = ..., participant_sid: _Optional[str] = ..., data_ptr: _Optional[int] = ..., data_size: _Optional[int] = ..., kind: _Optional[_Union[DataPacketKind, str]] = ...) -> None: ...
 
 class ConnectionStateChanged(_message.Message):
     __slots__ = ["state"]

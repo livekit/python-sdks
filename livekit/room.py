@@ -6,7 +6,8 @@ from ._proto import room_pb2 as proto_room
 from ._proto import participant_pb2 as proto_participant
 from .participant import (Participant, LocalParticipant, RemoteParticipant)
 from .track_publication import (RemoteTrackPublication, LocalTrackPublication)
-from .track import (RemoteAudioTrack, RemoteVideoTrack)
+from .track import (RemoteAudioTrack, RemoteVideoTrack,
+                    LocalVideoTrack, LocalAudioTrack)
 from livekit import TrackKind
 import weakref
 import ctypes
@@ -104,7 +105,7 @@ class Room(AsyncIOEventEmitter):
             self._close_future.set_result(None)
 
     async def run(self):
-        # Not needed atm
+        # wait for disconnect
         await self._close_future
 
     def _on_room_event(self, event: proto_room.RoomEvent):
@@ -120,6 +121,27 @@ class Room(AsyncIOEventEmitter):
             sid = event.participant_disconnected.info.sid
             participant = self.participants.pop(sid)
             self.emit('participant_disconnected', participant)
+        elif which == 'local_track_published':
+            publication = LocalTrackPublication(
+                event.local_track_published.publication)
+            track_info = event.local_track_published.track
+            ffi_handle = FfiHandle(track_info.handle.id)
+
+            self.local_participant.tracks[publication.sid] = publication
+
+            if track_info.kind == TrackKind.KIND_VIDEO:
+                track = LocalVideoTrack(ffi_handle, track_info)
+                publication.track = track
+                self.emit('local_track_published', publication, track)
+            elif track_info.kind == TrackKind.KIND_AUDIO:
+                track = LocalAudioTrack(ffi_handle, track_info)
+                publication.track = track
+                self.emit('local_track_published', publication, track)
+        elif which == 'local_track_unpublished':
+            publication = self.local_participant.tracks.pop(
+                event.local_track_unpublished.publication_sid)
+            publication.track = None
+            self.emit('local_track_unpublished', publication)
         elif which == 'track_published':
             participant = self.participants[event.track_published.participant_sid]
             publication = RemoteTrackPublication(
@@ -139,20 +161,58 @@ class Room(AsyncIOEventEmitter):
 
             if track_info.kind == TrackKind.KIND_VIDEO:
                 video_track = RemoteVideoTrack(ffi_handle, track_info)
-                publication._track = video_track
+                publication.track = video_track
                 self.emit('track_subscribed', video_track,
                           publication, participant)
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 audio_track = RemoteAudioTrack(ffi_handle, track_info)
-                publication._track = audio_track
+                publication.track = audio_track
                 self.emit('track_subscribed', audio_track,
                           publication, participant)
         elif which == 'track_unsubscribed':
             participant = self.participants[event.track_unsubscribed.participant_sid]
             publication = participant.tracks[event.track_unsubscribed.track_sid]
-            track = publication._track
-            publication._track = None
+            track = publication.track
+            publication.track = None
             self.emit('track_unsubscribed', track, publication, participant)
+        elif which == 'track_subscription_failed':
+            participant = self.participants[event.track_subscription_failed.participant_sid]
+            error = event.track_subscription_failed.error
+            self.emit('track_subscription_failed', participant,
+                      event.track_subscription_failed.track_sid, error)
+        elif which == 'track_muted':
+            sid = event.track_muted.participant_sid
+            participant = self.participants[sid]
+            if sid == self.local_participant.sid:
+                participant = self.local_participant
+
+            track = participant.tracks[event.track_muted.track_sid]
+            self.emit('track_muted', participant, track)
+        elif which == 'track_unmuted':
+            sid = event.track_unmuted.participant_sid
+            participant = self.participants[sid]
+            if sid == self.local_participant.sid:
+                participant = self.local_participant
+
+            track = participant.tracks[event.track_unmuted.track_sid]
+            self.emit('track_unmuted', participant, track)
+        elif which == 'active_speakers_changed':
+            speakers = []
+            for sid in event.active_speakers_changed.participant_sids:
+                if sid == self.local_participant.sid:
+                    speakers.append(self.local_participant)
+                else:
+                    speakers.append(self.participants[sid])
+
+            self.emit('active_speakers_changed', speakers)
+        elif which == 'connection_quality_changed':
+            sid = event.connection_quality_changed.participant_sid
+            participant = self.participants[sid]
+            if sid == self.local_participant.sid:
+                participant = self.local_participant
+
+            self.emit('connection_quality_changed',
+                      participant, event.connection_quality_changed.quality)
         elif which == 'data_received':
             participant = self.participants[event.data_received.participant_sid]
             data = ctypes.cast(event.data_received.data_ptr,
@@ -161,6 +221,17 @@ class Room(AsyncIOEventEmitter):
             FfiHandle(event.data_received.handle.id)
             self.emit('data_received', data,
                       event.data_received.kind, participant)
+        elif which == 'connection_state_changed':
+            state = event.connection_state_changed.state
+            self.emit('connection_state_changed', state)
+        elif which == 'connected':
+            self.emit('connected')
+        elif which == 'disconnected':
+            self.emit('disconnected')
+        elif which == 'reconnecting':
+            self.emit('reconnecting')
+        elif which == 'reconnected':
+            self.emit('reconnected')
 
     def _create_remote_participant(self, info: proto_participant.ParticipantInfo) -> RemoteParticipant:
         if info.sid in self.participants:
