@@ -124,7 +124,7 @@ class Room(AsyncIOEventEmitter):
             self.emit('participant_disconnected', participant)
         elif which == 'local_track_published':
             publication = LocalTrackPublication(
-                event.local_track_published.publication)
+                event.local_track_published.publication, weakref.ref(self.local_participant))
             track_info = event.local_track_published.track
             ffi_handle = FfiHandle(track_info.handle.id)
 
@@ -146,7 +146,7 @@ class Room(AsyncIOEventEmitter):
         elif which == 'track_published':
             participant = self.participants[event.track_published.participant_sid]
             publication = RemoteTrackPublication(
-                event.track_published.publication)
+                event.track_published.publication, weakref.ref(participant))
             participant.tracks[publication.sid] = publication
             self.emit('track_published', publication, participant)
         elif which == 'track_unpublished':
@@ -252,7 +252,8 @@ class Room(AsyncIOEventEmitter):
         self.participants[participant.sid] = participant
 
         for publication_info in info.publications:
-            publication = RemoteTrackPublication(publication_info)
+            publication = RemoteTrackPublication(
+                publication_info, weakref.ref(participant))
             participant.tracks[publication.sid] = publication
 
         return participant
