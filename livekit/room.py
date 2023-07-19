@@ -184,9 +184,10 @@ class Room(AsyncIOEventEmitter):
                       event.track_subscription_failed.track_sid, error)
         elif which == 'track_muted':
             sid = event.track_muted.participant_sid
-            participant = self.participants[sid]
             if sid == self.local_participant.sid:
                 participant = self.local_participant
+            else:
+                participant = self.participants[sid]
 
             publication = participant.tracks[event.track_muted.track_sid]
             publication._info.muted = True
@@ -196,9 +197,10 @@ class Room(AsyncIOEventEmitter):
             self.emit('track_muted', participant, publication)
         elif which == 'track_unmuted':
             sid = event.track_unmuted.participant_sid
-            participant = self.participants[sid]
             if sid == self.local_participant.sid:
                 participant = self.local_participant
+            else:
+                participant = self.participants[sid]
 
             publication = participant.tracks[event.track_unmuted.track_sid]
             publication._info.muted = False
@@ -217,9 +219,10 @@ class Room(AsyncIOEventEmitter):
             self.emit('active_speakers_changed', speakers)
         elif which == 'connection_quality_changed':
             sid = event.connection_quality_changed.participant_sid
-            participant = self.participants[sid]
             if sid == self.local_participant.sid:
                 participant = self.local_participant
+            else:
+                participant = self.participants[sid]
 
             self.emit('connection_quality_changed',
                       participant, event.connection_quality_changed.quality)
