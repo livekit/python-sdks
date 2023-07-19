@@ -102,7 +102,7 @@ class Room(AsyncIOEventEmitter):
                     'disconnect', on_disconnect_callback)
 
         await future
-        if not self._close_future.cancelled:
+        if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
     async def run(self):
