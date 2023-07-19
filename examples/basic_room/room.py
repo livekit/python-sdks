@@ -10,9 +10,6 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 async def main():
     room = livekit.Room()
 
-    audio_stream = None
-    video_stream = None
-
     @room.on("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant):
         logging.info(
@@ -43,6 +40,10 @@ async def main():
     @room.on("track_unpublished")
     def on_track_unpublished(publication: livekit.LocalTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
+
+    # Keep a reference to the streams, otherwise they will be disposed
+    audio_stream = None
+    video_stream = None
 
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):

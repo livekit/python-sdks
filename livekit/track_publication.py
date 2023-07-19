@@ -53,3 +53,4 @@ class LocalTrackPublication(TrackPublication):
 class RemoteTrackPublication(TrackPublication):
     def __init__(self, info: proto_track.TrackPublicationInfo):
         super().__init__(info)
+        self.subscribed = False

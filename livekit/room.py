@@ -8,7 +8,7 @@ from .participant import (Participant, LocalParticipant, RemoteParticipant)
 from .track_publication import (RemoteTrackPublication, LocalTrackPublication)
 from .track import (RemoteAudioTrack, RemoteVideoTrack,
                     LocalVideoTrack, LocalAudioTrack)
-from livekit import TrackKind
+from livekit import (TrackKind, ConnectionState)
 import weakref
 import ctypes
 
@@ -22,9 +22,10 @@ class Room(AsyncIOEventEmitter):
     def __init__(self):
         super().__init__()
         self._ffi_handle: FfiHandle = None
-        self._room_info: proto_room.RoomInfo = None
+        self._info: proto_room.RoomInfo = None
         self.participants: dict[str, RemoteParticipant] = {}
         self.local_participant: LocalParticipant = None
+        self.connection_state = ConnectionState.CONN_DISCONNECTED
 
         ffi_client = FfiClient()
         ffi_client.add_listener('room_event', self._on_room_event)
@@ -35,18 +36,18 @@ class Room(AsyncIOEventEmitter):
 
     @property
     def sid(self) -> str:
-        return self._room_info.sid
+        return self._info.sid
 
     @property
     def name(self) -> str:
-        return self._room_info.name
+        return self._info.name
 
     @property
     def metadata(self) -> str:
-        return self._room_info.metadata
+        return self._info.metadata
 
     def isconnected(self) -> bool:
-        return self._ffi_handle is not None
+        return self._ffi_handle is not None and self.connection_state == ConnectionState.CONN_CONNECTED
 
     async def connect(self, url: str, token: str):
         # TODO(theomonnom): We should be more flexible about the event loop
@@ -72,7 +73,7 @@ class Room(AsyncIOEventEmitter):
             raise ConnectError(resp.error)
 
         self._ffi_handle = FfiHandle(resp.room.handle.id)
-        self._room_info = resp.room
+        self._info = resp.room
         self._close_future = asyncio.Future()
 
         self.local_participant = LocalParticipant(
@@ -158,7 +159,7 @@ class Room(AsyncIOEventEmitter):
             participant = self.participants[event.track_subscribed.participant_sid]
             publication = participant.tracks[track_info.sid]
             ffi_handle = FfiHandle(track_info.handle.id)
-
+            publication.subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 video_track = RemoteVideoTrack(ffi_handle, track_info)
                 publication.track = video_track
@@ -174,6 +175,7 @@ class Room(AsyncIOEventEmitter):
             publication = participant.tracks[event.track_unsubscribed.track_sid]
             track = publication.track
             publication.track = None
+            publication.subscribed = False
             self.emit('track_unsubscribed', track, publication, participant)
         elif which == 'track_subscription_failed':
             participant = self.participants[event.track_subscription_failed.participant_sid]
@@ -186,16 +188,24 @@ class Room(AsyncIOEventEmitter):
             if sid == self.local_participant.sid:
                 participant = self.local_participant
 
-            track = participant.tracks[event.track_muted.track_sid]
-            self.emit('track_muted', participant, track)
+            publication = participant.tracks[event.track_muted.track_sid]
+            publication._info.muted = True
+            if publication.track:
+                publication.track._info.muted = True
+
+            self.emit('track_muted', participant, publication)
         elif which == 'track_unmuted':
             sid = event.track_unmuted.participant_sid
             participant = self.participants[sid]
             if sid == self.local_participant.sid:
                 participant = self.local_participant
 
-            track = participant.tracks[event.track_unmuted.track_sid]
-            self.emit('track_unmuted', participant, track)
+            publication = participant.tracks[event.track_unmuted.track_sid]
+            publication._info.muted = False
+            if publication.track:
+                publication.track._info.muted = False
+
+            self.emit('track_unmuted', participant, publication)
         elif which == 'active_speakers_changed':
             speakers = []
             for sid in event.active_speakers_changed.participant_sids:
@@ -223,6 +233,7 @@ class Room(AsyncIOEventEmitter):
                       event.data_received.kind, participant)
         elif which == 'connection_state_changed':
             state = event.connection_state_changed.state
+            self.connection_state = state
             self.emit('connection_state_changed', state)
         elif which == 'connected':
             self.emit('connected')
