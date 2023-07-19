@@ -1,6 +1,4 @@
 import handle_pb2 as _handle_pb2
-import video_frame_pb2 as _video_frame_pb2
-import audio_frame_pb2 as _audio_frame_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message

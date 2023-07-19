@@ -4,7 +4,6 @@ from livekit import Track
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from .audio_frame import AudioFrame
-import ctypes
 import weakref
 
 
