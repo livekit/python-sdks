@@ -40,6 +40,7 @@ class LocalAudioTrack(Track):
     def __init__(self, ffi_handle: FfiHandle, info: proto_track.TrackInfo):
         super().__init__(ffi_handle, info)
 
+    @staticmethod
     def create_audio_track(name: str, source: 'AudioSource') -> 'LocalAudioTrack':
         req = proto_ffi.FfiRequest()
         req.create_audio_track.name = name
@@ -56,6 +57,7 @@ class LocalVideoTrack(Track):
     def __init__(self, ffi_handle: FfiHandle, info: proto_track.TrackInfo):
         super().__init__(ffi_handle, info)
 
+    @staticmethod
     def create_video_track(name: str, source: 'VideoSource') -> 'LocalVideoTrack':
         req = proto_ffi.FfiRequest()
         req.create_video_track.name = name
