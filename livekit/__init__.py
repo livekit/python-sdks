@@ -6,7 +6,8 @@ __version__ = "0.1.3"
 from ._proto.video_frame_pb2 import (
     VideoRotation, VideoFormatType, VideoFrameBufferType)
 from ._proto.track_pb2 import (TrackKind, TrackSource, StreamState)
-from ._proto.room_pb2 import (TrackPublishOptions, DataPacketKind)
+from ._proto.room_pb2 import (
+    TrackPublishOptions, DataPacketKind, ConnectionQuality, ConnectionState)
 
 from .room import (Room, ConnectError)
 from .participant import (Participant, LocalParticipant, RemoteParticipant)

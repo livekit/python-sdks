@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0chandle.proto\x12\x07livekit\"\x19\n\x0b\x46\x66iHandleId\x12\n\n\x02id\x18\x01 \x01(\x04\"\x18\n\nFfiAsyncId\x12\n\n\x02id\x18\x01 \x01(\x04\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0chandle.proto\x12\rlivekit.proto\"\x19\n\x0b\x46\x66iHandleId\x12\n\n\x02id\x18\x01 \x01(\x04\"\x18\n\nFfiAsyncId\x12\n\n\x02id\x18\x01 \x01(\x04\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,8 +22,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_FFIHANDLEID']._serialized_start=25
-  _globals['_FFIHANDLEID']._serialized_end=50
-  _globals['_FFIASYNCID']._serialized_start=52
-  _globals['_FFIASYNCID']._serialized_end=76
+  _globals['_FFIHANDLEID']._serialized_start=31
+  _globals['_FFIHANDLEID']._serialized_end=56
+  _globals['_FFIASYNCID']._serialized_start=58
+  _globals['_FFIASYNCID']._serialized_end=82
 # @@protoc_insertion_point(module_scope)
