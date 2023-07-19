@@ -4,8 +4,11 @@ from ._proto import room_pb2 as proto_room
 from ._ffi_client import (FfiClient, FfiHandle)
 from ._proto import ffi_pb2 as proto_ffi
 from .track import Track
-from livekit import (LocalParticipant, RemoteParticipant)
 import weakref
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from livekit import (LocalParticipant, RemoteParticipant)
 
 
 class TrackPublication():
@@ -51,13 +54,13 @@ class TrackPublication():
 
 
 class LocalTrackPublication(TrackPublication):
-    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref[LocalParticipant]):
+    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref['LocalParticipant']):
         super().__init__(info)
         self.participant = participant
 
 
 class RemoteTrackPublication(TrackPublication):
-    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref[RemoteParticipant]):
+    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref['RemoteParticipant']):
         super().__init__(info)
         self.subscribed = False
         self.participant = participant
