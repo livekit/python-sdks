@@ -1,16 +1,17 @@
-import matplotlib.pyplot as plt
-import livekit
 import asyncio
-import cv2
-import numpy as np
 import os
 from queue import Queue
+
+import cv2
+import livekit
+import matplotlib.pyplot as plt
 import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 import numpy as np
+
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'

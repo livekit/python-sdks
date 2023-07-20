@@ -1,10 +1,13 @@
-from pyee.asyncio import AsyncIOEventEmitter
-from ._ffi_client import (FfiClient, FfiHandle)
-from livekit import Track
-from ._proto import ffi_pb2 as proto_ffi
-from ._proto import audio_frame_pb2 as proto_audio_frame
-from .audio_frame import AudioFrame
 import weakref
+
+from livekit import Track
+from pyee.asyncio import AsyncIOEventEmitter
+
+from ._ffi_client import FfiClient
+from ._ffi_client import FfiHandle
+from ._proto import audio_frame_pb2 as proto_audio_frame
+from ._proto import ffi_pb2 as proto_ffi
+from .audio_frame import AudioFrame
 
 
 class AudioStream(AsyncIOEventEmitter):

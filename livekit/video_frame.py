@@ -1,9 +1,13 @@
 import ctypes
-from ._ffi_client import FfiHandle
-from ._proto import video_frame_pb2 as proto_video_frame
-from ._proto import ffi_pb2 as proto_ffi
+
+from livekit import VideoFormatType
+from livekit import VideoFrameBufferType
+from livekit import VideoRotation
+
 from ._ffi_client import FfiClient
-from livekit import (VideoRotation, VideoFormatType, VideoFrameBufferType)
+from ._ffi_client import FfiHandle
+from ._proto import ffi_pb2 as proto_ffi
+from ._proto import video_frame_pb2 as proto_video_frame
 
 
 class VideoFrame():

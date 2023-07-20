@@ -1,7 +1,9 @@
-from ._ffi_client import (FfiClient, FfiHandle)
-from ._proto import ffi_pb2 as proto_ffi
+from livekit import AudioFrame
+
+from ._ffi_client import FfiClient
+from ._ffi_client import FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio_frame
-from livekit import (AudioFrame)
+from ._proto import ffi_pb2 as proto_ffi
 
 
 class AudioSource:

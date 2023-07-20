@@ -5,10 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.mypy]
 disallow_untyped_calls = true
 disallow_untyped_decorators = true
-mypy_path = "stubs"
-# strict = true
 warn_redundant_casts = true
-warn_unused_ignores = true
 exclude = [
     'examples/whisper/whisper.cpp/*',
     'build'

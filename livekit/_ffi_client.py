@@ -1,12 +1,15 @@
+import asyncio
+import ctypes
+import logging
 import platform
+import threading
+
+import pkg_resources
+from pyee.asyncio import EventEmitter
+
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
-from pyee.asyncio import EventEmitter
-import pkg_resources
-import asyncio
-import threading
-import logging
-import ctypes
+
 
 os = platform.system().lower()
 arch = platform.machine().lower()

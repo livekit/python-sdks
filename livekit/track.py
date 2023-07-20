@@ -1,10 +1,14 @@
-from ._proto import track_pb2 as proto_track
+from typing import Optional, TYPE_CHECKING
+
+from ._ffi_client import FfiClient
+from ._ffi_client import FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
-from ._ffi_client import (FfiHandle, FfiClient)
-from typing import (Optional, TYPE_CHECKING)
+from ._proto import track_pb2 as proto_track
+
 
 if TYPE_CHECKING:
-    from livekit import (VideoSource, AudioSource)
+    from livekit import AudioSource
+    from livekit import VideoSource
 
 
 class Track():

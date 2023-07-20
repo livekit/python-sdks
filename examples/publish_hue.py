@@ -1,9 +1,12 @@
-import livekit
-import logging
-import numpy as np
-import colorsys
 import asyncio
-from signal import SIGINT, SIGTERM
+import colorsys
+import logging
+from signal import SIGINT
+from signal import SIGTERM
+
+import livekit
+import numpy as np
+
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
