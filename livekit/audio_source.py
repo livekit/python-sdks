@@ -5,7 +5,7 @@ from livekit import (AudioFrame)
 
 
 class AudioSource:
-    def __init__(self):
+    def __init__(self) -> None:
         req = proto_ffi.FfiRequest()
         req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
 
@@ -14,7 +14,7 @@ class AudioSource:
         self._info = resp.new_audio_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
-    def capture_frame(self, frame: AudioFrame):
+    def capture_frame(self, frame: AudioFrame) -> None:
         req = proto_ffi.FfiRequest()
 
         req.capture_audio_frame.source_handle.id = self._ffi_handle.handle

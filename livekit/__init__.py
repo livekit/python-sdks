@@ -1,7 +1,6 @@
 """LiveKit Client SDK
 """
 
-__version__ = "0.1.3"
 
 from ._proto.video_frame_pb2 import (
     VideoRotation, VideoFormatType, VideoFrameBufferType)
@@ -24,3 +23,5 @@ from .video_source import VideoSource
 from .audio_frame import AudioFrame
 from .audio_stream import AudioStream
 from .audio_source import AudioSource
+
+__version__ = "0.1.3"

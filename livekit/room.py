@@ -19,12 +19,9 @@ class ConnectError(Exception):
 
 
 class Room(AsyncIOEventEmitter):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._ffi_handle: FfiHandle = None
-        self._info: proto_room.RoomInfo = None
         self.participants: dict[str, RemoteParticipant] = {}
-        self.local_participant: LocalParticipant = None
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
         ffi_client = FfiClient()
@@ -49,7 +46,7 @@ class Room(AsyncIOEventEmitter):
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and self.connection_state == ConnectionState.CONN_CONNECTED
 
-    async def connect(self, url: str, token: str):
+    async def connect(self, url: str, token: str) -> None:
         # TODO(theomonnom): We should be more flexible about the event loop
         ffi_client = FfiClient()
         ffi_client.set_event_loop(asyncio.get_running_loop())
@@ -59,30 +56,29 @@ class Room(AsyncIOEventEmitter):
         req.connect.token = token
 
         resp = ffi_client.request(req)
-        future = asyncio.Future()
+        future: asyncio.Future[proto_room.ConnectCallback] = asyncio.Future()
 
-        @ffi_client.on('connect')
+        @ffi_client.listens_to('connect')
         def on_connect_callback(cb: proto_room.ConnectCallback):
             if cb.async_id == resp.connect.async_id:
                 future.set_result(cb)
                 ffi_client.remove_listener('connect', on_connect_callback)
 
-        resp: proto_room.ConnectCallback = await future
+        cb = await future
+        if cb.error:
+            raise ConnectError(cb.error)
 
-        if resp.error:
-            raise ConnectError(resp.error)
-
-        self._ffi_handle = FfiHandle(resp.room.handle.id)
-        self._info = resp.room
-        self._close_future = asyncio.Future()
+        self._ffi_handle = FfiHandle(cb.room.handle.id)
+        self._info = cb.room
+        self._close_future: asyncio.Future[None] = asyncio.Future()
 
         self.local_participant = LocalParticipant(
-            resp.room.local_participant, weakref.ref(self))
+            cb.room.local_participant, weakref.ref(self))
 
-        for participant_info in resp.room.participants:
+        for participant_info in cb.room.participants:
             self._create_remote_participant(participant_info)
 
-    async def disconnect(self):
+    async def disconnect(self) -> None:
         if not self.isconnected():
             return
 
@@ -92,7 +88,8 @@ class Room(AsyncIOEventEmitter):
         req.disconnect.room_handle.id = self._ffi_handle.handle
 
         resp = ffi_client.request(req)
-        future = asyncio.Future()
+        future: asyncio.Future[proto_room.DisconnectCallback] = asyncio.Future(
+        )
 
         @ffi_client.on('disconnect')
         def on_disconnect_callback(cb: proto_room.DisconnectCallback):
@@ -105,7 +102,7 @@ class Room(AsyncIOEventEmitter):
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
-    async def run(self):
+    async def run(self) -> None:
         # wait for disconnect
         await self._close_future
 

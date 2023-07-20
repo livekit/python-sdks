@@ -12,9 +12,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/livekit/client-sdk-python",
     classifiers=[
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
@@ -29,7 +26,7 @@ setup(
     keywords="webrtc, livekit",
     packages=["livekit"],
     python_requires=">=3.7, <4",
-    install_requires=["pyee>=9.0.0"],
+    install_requires=["pyee>=11.0.0", "protobuf>=3.1.0"],
     package_data={
         "livekit": ['lib/*/*/*.*', '_proto/*.py'],
     },

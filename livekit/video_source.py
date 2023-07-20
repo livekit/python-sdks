@@ -5,7 +5,7 @@ from livekit import (VideoFrame)
 
 
 class VideoSource:
-    def __init__(self):
+    def __init__(self) -> None:
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = proto_video_frame.VideoSourceType.VIDEO_SOURCE_NATIVE
 
@@ -14,7 +14,7 @@ class VideoSource:
         self._info = resp.new_video_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
-    def capture_frame(self, frame: VideoFrame):
+    def capture_frame(self, frame: VideoFrame) -> None:
         req = proto_ffi.FfiRequest()
         req.capture_video_frame.source_handle.id = self._ffi_handle.handle
         req.capture_video_frame.buffer_handle.id = frame.buffer._ffi_handle.handle

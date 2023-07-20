@@ -70,7 +70,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             .get_default_face_mesh_iris_connections_style())
 
 
-async def room():
+async def room() -> None:
     room = livekit.Room()
     await room.connect(URL, TOKEN)
     print("connected to room: " + room.name)
@@ -90,7 +90,7 @@ async def room():
     await room.run()
 
 
-def display_frames():
+def display_frames() -> None:
     cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
 
@@ -128,7 +128,7 @@ def display_frames():
     cv2.destroyAllWindows()
 
 
-async def main():
+async def main() -> None:
     loop = asyncio.get_event_loop()
     future = loop.run_in_executor(None, asyncio.run, room())
 

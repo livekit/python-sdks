@@ -25,11 +25,11 @@ class TrackPublication():
         return self._info.name
 
     @property
-    def kind(self) -> proto_track.TrackKind:
+    def kind(self) -> proto_track.TrackKind.ValueType:
         return self._info.kind
 
     @property
-    def source(self) -> proto_track.TrackSource:
+    def source(self) -> proto_track.TrackSource.ValueType:
         return self._info.source
 
     @property

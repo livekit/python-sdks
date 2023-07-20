@@ -40,7 +40,7 @@ async def publish_frames(source: livekit.AudioSource):
             break
 
 
-async def main():
+async def main() -> None:
     room = livekit.Room()
 
     logging.info("connecting to %s", URL)
