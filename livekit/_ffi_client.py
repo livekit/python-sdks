@@ -1,6 +1,5 @@
 import asyncio
 import ctypes
-import logging
 import platform
 import threading
 
@@ -35,9 +34,9 @@ ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
 INVALID_HANDLE = 0
 
 
-@ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
-def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None:
-    event_data = bytes(data_ptr[:data_len])
+@ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t) 
+def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None: # type: ignore
+    event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 

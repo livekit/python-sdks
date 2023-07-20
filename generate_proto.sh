@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
+
 FFI_PROTOCOL=./client-sdk-rust/livekit-ffi/protocol
 OUT_PYTHON=./livekit/_proto
 

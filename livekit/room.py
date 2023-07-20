@@ -130,13 +130,13 @@ class Room(AsyncIOEventEmitter):
             self.local_participant.tracks[publication.sid] = publication
 
             if track_info.kind == TrackKind.KIND_VIDEO:
-                track = LocalVideoTrack(ffi_handle, track_info)
-                publication.track = track
-                self.emit('local_track_published', publication, track)
+                local_video_track = LocalVideoTrack(ffi_handle, track_info)
+                publication.track = local_video_track 
+                self.emit('local_track_published', publication, local_video_track)
             elif track_info.kind == TrackKind.KIND_AUDIO:
-                track = LocalAudioTrack(ffi_handle, track_info)
-                publication.track = track
-                self.emit('local_track_published', publication, track)
+                local_audio_track = LocalAudioTrack(ffi_handle, track_info)
+                publication.track = local_audio_track
+                self.emit('local_track_published', publication, local_audio_track)
         elif which == 'local_track_unpublished':
             publication = self.local_participant.tracks.pop(
                 event.local_track_unpublished.publication_sid)
@@ -160,14 +160,14 @@ class Room(AsyncIOEventEmitter):
             ffi_handle = FfiHandle(track_info.handle.id)
             publication.subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
-                video_track = RemoteVideoTrack(ffi_handle, track_info)
-                publication.track = video_track
-                self.emit('track_subscribed', video_track,
+                remote_video_track = RemoteVideoTrack(ffi_handle, track_info)
+                publication.track = remote_video_track
+                self.emit('track_subscribed', remote_video_track,
                           publication, participant)
             elif track_info.kind == TrackKind.KIND_AUDIO:
-                audio_track = RemoteAudioTrack(ffi_handle, track_info)
-                publication.track = audio_track
-                self.emit('track_subscribed', audio_track,
+                remote_audio_track = RemoteAudioTrack(ffi_handle, track_info)
+                publication.track = remote_audio_track
+                self.emit('track_subscribed', remote_audio_track,
                           publication, participant)
         elif which == 'track_unsubscribed':
             participant = self.participants[event.track_unsubscribed.participant_sid]

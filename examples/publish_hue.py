@@ -18,7 +18,7 @@ async def publish_frames(source: livekit.VideoSource):
     arr = np.ctypeslib.as_array(argb_frame.data)
 
     framerate = 1 / 30
-    hue = 0
+    hue = 0.0
 
     while True:
         frame = livekit.VideoFrame(
