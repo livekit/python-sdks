@@ -1,16 +1,21 @@
 import asyncio
 import ctypes
 import weakref
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional, Union
+from weakref import ref
 
 from livekit import DataPacketKind, TrackPublishOptions
 
-from ._ffi_client import FfiClient
+from ._ffi_client import ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from .track import LocalAudioTrack, LocalVideoTrack, Track
-from .track_publication import TrackPublication
+from .track_publication import (
+    LocalTrackPublication,
+    RemoteTrackPublication,
+    TrackPublication,
+)
 
 if TYPE_CHECKING:
     from livekit import Room
@@ -52,12 +57,12 @@ class LocalParticipant(Participant):
     def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']):
         super().__init__(info)
         self._room = room
+        self.tracks: dict[str, LocalTrackPublication] = {}
 
     async def publish_data(self,
-                           # TODO(theomonnom): Allow ctypes.Array as payload?
-                           payload: bytes or str,
+                           payload: Union[bytes, str],
                            kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
-                           destination_sids: list[str] or list['RemoteParticipant'] = []) -> None:
+                           destination_sids: Optional[Union[List[str], List['RemoteParticipant']]] = None) -> None:
 
         room = self._room()
         if room is None:
@@ -70,21 +75,24 @@ class LocalParticipant(Participant):
 
         cdata = (ctypes.c_byte * data_len)(*payload)
 
-        sids = []
-        for p in destination_sids:
-            if isinstance(p, RemoteParticipant):
-                sids.append(p.sid)
-            else:
-                sids.append(p)
+
 
         req = proto_ffi.FfiRequest()
         req.publish_data.room_handle.id = room._ffi_handle.handle
         req.publish_data.data_ptr = ctypes.addressof(cdata)
         req.publish_data.data_size = data_len
         req.publish_data.kind = kind
-        req.publish_data.destination_sids.extend(sids)
 
-        ffi_client = FfiClient()
+        if destination_sids is not None:
+            sids = []
+            for p in destination_sids:
+                if isinstance(p, RemoteParticipant):
+                    sids.append(p.sid)
+                else:
+                    sids.append(p)
+
+            req.publish_data.destination_sids.extend(sids)
+
         resp = ffi_client.request(req)
         future: asyncio.Future[proto_room.PublishDataCallback] = asyncio.Future(
         )
@@ -113,8 +121,6 @@ class LocalParticipant(Participant):
         req.publish_track.room_handle.id = room._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        ffi_client = FfiClient()
-
         resp = ffi_client.request(req)
 
         future: asyncio.Future[proto_room.PublishTrackCallback] = asyncio.Future(
@@ -132,7 +138,7 @@ class LocalParticipant(Participant):
         if cb.error:
             raise PublishTrackError(cb.error)
 
-        track_publication = TrackPublication(cb.publication)
+        track_publication = LocalTrackPublication(cb.publication, ref(self))
         track_publication.track = track
         self.tracks[track_publication.sid] = track_publication
         # TODO: Update track info
@@ -142,3 +148,4 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, info: proto_participant.ParticipantInfo):
         super().__init__(info)
+        self.tracks: dict[str, RemoteTrackPublication] = {}

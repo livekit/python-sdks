@@ -2,7 +2,7 @@ import ctypes
 
 from livekit import VideoFormatType, VideoFrameBufferType, VideoRotation
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
 
@@ -35,7 +35,6 @@ class VideoFrameBuffer():
         req = proto_ffi.FfiRequest()
         req.to_i420.buffer.id = self._ffi_handle.handle
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
 
         new_info = resp.to_i420.buffer
@@ -51,7 +50,6 @@ class VideoFrameBuffer():
         req.to_argb.dst_width = dst.width
         req.to_argb.dst_height = dst.height
 
-        ffi_client = FfiClient()
         ffi_client.request(req)
 
     @staticmethod
@@ -229,7 +227,6 @@ class ArgbFrame:
         req.to_i420.argb.stride = self.width * 4
         req.to_i420.argb.ptr = ctypes.addressof(self.data)
 
-        ffi_client = FfiClient()
         res = ffi_client.request(req)
         buffer_info = res.to_i420.buffer
         ffi_handle = FfiHandle(buffer_info.handle.id)

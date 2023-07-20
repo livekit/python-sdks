@@ -50,7 +50,7 @@ async def main() -> None:
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
-        return False
+        return
 
     # publish a track
     source = livekit.AudioSource()

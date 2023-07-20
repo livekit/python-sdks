@@ -4,7 +4,7 @@ from pyee.asyncio import AsyncIOEventEmitter
 
 from livekit import Track
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
 from .video_frame import VideoFrame, VideoFrameBuffer
@@ -20,7 +20,6 @@ class VideoStream(AsyncIOEventEmitter):
             return
 
         cls._initialized = True
-        ffi_client = FfiClient()
 
         # Not using the instance method the listener because it keeps a strong reference to the instance
         # And we rely on __del__ to determine when the instance isn't used
@@ -56,7 +55,6 @@ class VideoStream(AsyncIOEventEmitter):
         new_video_stream.track_handle.id = track._ffi_handle.handle
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
         stream_info = resp.new_video_stream.stream
 

@@ -1,6 +1,6 @@
 import ctypes
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
 
@@ -22,7 +22,6 @@ class AudioFrame():
         req.alloc_audio_buffer.num_channels = num_channels
         req.alloc_audio_buffer.samples_per_channel = samples_per_channel
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
 
         info = resp.alloc_audio_buffer.buffer

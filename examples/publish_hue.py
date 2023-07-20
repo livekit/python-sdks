@@ -25,7 +25,7 @@ async def publish_frames(source: livekit.VideoSource):
             0, livekit.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
 
         rgb = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
-        rgb = [int(x * 255) for x in rgb]
+        rgb = [(x * 255) for x in rgb] # type: ignore
 
         argb_color = np.array(rgb + [255], dtype=np.uint8)
         arr.flat[::4] = argb_color[0]

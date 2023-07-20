@@ -6,7 +6,7 @@ from pyee.asyncio import AsyncIOEventEmitter
 
 from livekit import ConnectionState, TrackKind
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
@@ -26,11 +26,9 @@ class Room(AsyncIOEventEmitter):
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
-        ffi_client = FfiClient()
         ffi_client.add_listener('room_event', self._on_room_event)
 
     def __del__(self):
-        ffi_client = FfiClient()
         ffi_client.remove_listener('room_event', self._on_room_event)
 
     @property
@@ -50,7 +48,6 @@ class Room(AsyncIOEventEmitter):
 
     async def connect(self, url: str, token: str) -> None:
         # TODO(theomonnom): We should be more flexible about the event loop
-        ffi_client = FfiClient()
         ffi_client.set_event_loop(asyncio.get_running_loop())
 
         req = proto_ffi.FfiRequest()
@@ -83,8 +80,6 @@ class Room(AsyncIOEventEmitter):
     async def disconnect(self) -> None:
         if not self.isconnected():
             return
-
-        ffi_client = FfiClient()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle.id = self._ffi_handle.handle
