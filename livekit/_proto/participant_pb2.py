@@ -11,7 +11,7 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-import track_pb2 as track__pb2
+from . import track_pb2 as track__pb2
 
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11participant.proto\x12\rlivekit.proto\x1a\x0btrack.proto\"\x8b\x01\n\x0fParticipantInfo\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x10\n\x08identity\x18\x03 \x01(\t\x12\x10\n\x08metadata\x18\x04 \x01(\t\x12\x39\n\x0cpublications\x18\x05 \x03(\x0b\x32#.livekit.proto.TrackPublicationInfo\"t\n\x10ParticipantEvent\x12\x17\n\x0fparticipant_sid\x18\x01 \x01(\t\x12<\n\x10speaking_changed\x18\x02 \x01(\x0b\x32 .livekit.proto.IsSpeakingChangedH\x00\x42\t\n\x07message\"%\n\x11IsSpeakingChanged\x12\x10\n\x08speaking\x18\x01 \x01(\x08\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')

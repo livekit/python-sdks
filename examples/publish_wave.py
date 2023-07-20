@@ -1,9 +1,10 @@
-import livekit
-import logging
-import numpy as np
-import math
 import asyncio
+import logging
 from signal import SIGINT, SIGTERM
+
+import numpy as np
+
+import livekit
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
@@ -40,7 +41,7 @@ async def publish_frames(source: livekit.AudioSource):
             break
 
 
-async def main():
+async def main() -> None:
     room = livekit.Room()
 
     logging.info("connecting to %s", URL)

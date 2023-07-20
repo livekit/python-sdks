@@ -1,14 +1,15 @@
-from livekit._proto import track_pb2 as proto_track
-from ._proto import track_pb2 as proto_track
-from ._proto import room_pb2 as proto_room
-from ._ffi_client import (FfiClient, FfiHandle)
-from ._proto import ffi_pb2 as proto_ffi
-from .track import Track
 import weakref
 from typing import TYPE_CHECKING
 
+from livekit._proto import track_pb2 as proto_track
+
+from ._ffi_client import FfiClient
+from ._proto import ffi_pb2 as proto_ffi
+from ._proto import track_pb2 as proto_track
+from .track import Track
+
 if TYPE_CHECKING:
-    from livekit import (LocalParticipant, RemoteParticipant)
+    from livekit import LocalParticipant, RemoteParticipant
 
 
 class TrackPublication():
@@ -25,11 +26,11 @@ class TrackPublication():
         return self._info.name
 
     @property
-    def kind(self) -> proto_track.TrackKind:
+    def kind(self) -> proto_track.TrackKind.ValueType:
         return self._info.kind
 
     @property
-    def source(self) -> proto_track.TrackSource:
+    def source(self) -> proto_track.TrackSource.ValueType:
         return self._info.source
 
     @property

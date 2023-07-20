@@ -1,17 +1,19 @@
-from ._proto import participant_pb2 as proto_participant
-from ._proto import ffi_pb2 as proto_ffi
-from ._proto import room_pb2 as proto_room
-from .track_publication import TrackPublication
-from .track import (Track, LocalAudioTrack, LocalVideoTrack)
-from ._ffi_client import (FfiClient, FfiHandle)
-from typing import TYPE_CHECKING
-import weakref
-import ctypes
 import asyncio
-from livekit import (TrackPublishOptions, DataPacketKind)
+import ctypes
+import weakref
+from typing import TYPE_CHECKING
+
+from livekit import DataPacketKind, TrackPublishOptions
+
+from ._ffi_client import FfiClient
+from ._proto import ffi_pb2 as proto_ffi
+from ._proto import participant_pb2 as proto_participant
+from ._proto import room_pb2 as proto_room
+from .track import LocalAudioTrack, LocalVideoTrack, Track
+from .track_publication import TrackPublication
 
 if TYPE_CHECKING:
-    from livekit import (Room, Participant)
+    from livekit import Room
 
 
 class PublishTrackError(Exception):
@@ -54,8 +56,8 @@ class LocalParticipant(Participant):
     async def publish_data(self,
                            # TODO(theomonnom): Allow ctypes.Array as payload?
                            payload: bytes or str,
-                           kind: DataPacketKind = DataPacketKind.KIND_RELIABLE,
-                           destination_sids: list[str] or list['RemoteParticipant'] = []):
+                           kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
+                           destination_sids: list[str] or list['RemoteParticipant'] = []) -> None:
 
         room = self._room()
         if room is None:
@@ -84,7 +86,8 @@ class LocalParticipant(Participant):
 
         ffi_client = FfiClient()
         resp = ffi_client.request(req)
-        future = asyncio.Future()
+        future: asyncio.Future[proto_room.PublishDataCallback] = asyncio.Future(
+        )
 
         @ffi_client.on('publish_data')
         def on_publish_callback(cb: proto_room.PublishDataCallback):
@@ -93,9 +96,9 @@ class LocalParticipant(Participant):
                 ffi_client.remove_listener(
                     'publish_data', on_publish_callback)
 
-        resp: proto_room.PublishDataCallback = await future
-        if resp.error:
-            raise PublishDataError(resp.error)
+        cb = await future
+        if cb.error:
+            raise PublishDataError(cb.error)
 
     async def publish_track(self, track: Track, options: TrackPublishOptions) -> TrackPublication:
         if not isinstance(track, LocalAudioTrack) and not isinstance(track, LocalVideoTrack):
@@ -111,8 +114,11 @@ class LocalParticipant(Participant):
         req.publish_track.options.CopyFrom(options)
 
         ffi_client = FfiClient()
+
         resp = ffi_client.request(req)
-        future = asyncio.Future()
+
+        future: asyncio.Future[proto_room.PublishTrackCallback] = asyncio.Future(
+        )
 
         @ffi_client.on('publish_track')
         def on_publish_callback(cb: proto_room.PublishTrackCallback):
@@ -121,12 +127,12 @@ class LocalParticipant(Participant):
                 ffi_client.remove_listener(
                     'publish_track', on_publish_callback)
 
-        resp: proto_room.PublishTrackCallback = await future
+        cb = await future
 
-        if resp.error:
-            raise PublishTrackError(resp.error)
+        if cb.error:
+            raise PublishTrackError(cb.error)
 
-        track_publication = TrackPublication(resp.publication)
+        track_publication = TrackPublication(cb.publication)
         track_publication.track = track
         self.tracks[track_publication.sid] = track_publication
         # TODO: Update track info

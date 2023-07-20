@@ -1,37 +1,40 @@
+from weakref import ReferenceType, ref
+
 from pyee.asyncio import AsyncIOEventEmitter
-from ._ffi_client import (FfiClient, FfiHandle)
-from livekit import (Track, Room, Participant)
-from ._proto import track_pb2 as proto_track
+
+from livekit import Track
+
+from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
-from .video_frame import (VideoFrame, VideoFrameBuffer)
-import weakref
+from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream(AsyncIOEventEmitter):
-    _streams: dict[int, weakref.ref['VideoStream']] = {}
+    _streams: dict[int, ReferenceType['VideoStream']] = {}
     _initialized = False
 
     @classmethod
-    def initalize(cls):
+    def initalize(cls) -> None:
         if cls._initialized:
             return
 
         cls._initialized = True
         ffi_client = FfiClient()
+
         # Not using the instance method the listener because it keeps a strong reference to the instance
         # And we rely on __del__ to determine when the instance isn't used
         ffi_client.add_listener('video_stream_event',
                                 cls._on_video_stream_event)
 
     @classmethod
-    def _on_video_stream_event(cls, event: proto_video_frame.VideoStreamEvent):
+    def _on_video_stream_event(cls, event: proto_video_frame.VideoStreamEvent) -> None:
         stream = cls._streams.get(event.handle.id)
         if stream is None:
             return
 
-        stream = stream()
-        if stream is None:
+        nstream = stream()
+        if nstream is None:
             return
 
         which = event.WhichOneof('message')
@@ -42,9 +45,9 @@ class VideoStream(AsyncIOEventEmitter):
 
             frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
                                VideoFrameBuffer.create(ffi_handle, buffer_info))
-            stream._on_frame_received(frame)
+            nstream._on_frame_received(frame)
 
-    def __init__(self, track: Track):
+    def __init__(self, track: Track) -> None:
         super().__init__()
         self.initalize()
 
@@ -57,13 +60,13 @@ class VideoStream(AsyncIOEventEmitter):
         resp = ffi_client.request(req)
         stream_info = resp.new_video_stream.stream
 
-        self._streams[stream_info.handle.id] = weakref.ref(self)
+        self._streams[stream_info.handle.id] = ref(self)
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info
         self._track = track
 
-    def _on_frame_received(self, frame: VideoFrame):
+    def _on_frame_received(self, frame: VideoFrame) -> None:
         self.emit('frame_received', frame)
 
-    def __del__(self):
+    def __del__(self) -> None:
         self._streams.pop(self._ffi_handle.handle, None)
