@@ -1,19 +1,15 @@
-from typing import TYPE_CHECKING
 import weakref
+from typing import TYPE_CHECKING
 
 from livekit._proto import track_pb2 as proto_track
 
 from ._ffi_client import FfiClient
-from ._ffi_client import FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
-from ._proto import room_pb2 as proto_room
 from ._proto import track_pb2 as proto_track
 from .track import Track
 
-
 if TYPE_CHECKING:
-    from livekit import LocalParticipant
-    from livekit import RemoteParticipant
+    from livekit import LocalParticipant, RemoteParticipant
 
 
 class TrackPublication():

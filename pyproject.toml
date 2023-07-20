@@ -3,11 +3,21 @@ requires = ["setuptools >= 40.9.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.mypy]
-disallow_untyped_calls = true
-disallow_untyped_decorators = true
-warn_redundant_casts = true
+files = [
+    'livekit/*',
+    'livekit/proto/*',
+]
 exclude = [
-    'examples/whisper/whisper.cpp/*',
-    'build'
+    'examples/whisper/whisper.cpp',
 ]
 
+[tool.ruff]
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "I",  # isort
+]
+exclude = [
+    'examples/whisper/whisper.cpp',
+    'livekit/proto',
+]

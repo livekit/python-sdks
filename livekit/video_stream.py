@@ -1,15 +1,13 @@
-from weakref import ref
-from weakref import ReferenceType
+from weakref import ReferenceType, ref
 
-from livekit import Track
 from pyee.asyncio import AsyncIOEventEmitter
 
-from ._ffi_client import FfiClient
-from ._ffi_client import FfiHandle
+from livekit import Track
+
+from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
-from .video_frame import VideoFrame
-from .video_frame import VideoFrameBuffer
+from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream(AsyncIOEventEmitter):

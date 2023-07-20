@@ -1,8 +1,6 @@
 import pathlib
 
-from setuptools import find_packages
 from setuptools import setup
-
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
@@ -29,7 +27,8 @@ setup(
     keywords="webrtc, livekit",
     packages=["livekit"],
     python_requires=">=3.7, <4",
-    install_requires=["pyee>=11.0.0", "protobuf>=3.1.0"],
+    install_requires=["pyee>=11.0.0",
+                      "protobuf>=3.1.0", "types-protobuf>=3.1.0"],
     package_data={
         "livekit": ['lib/*/*/*.*', '_proto/*.py'],
     },

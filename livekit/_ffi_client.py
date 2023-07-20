@@ -8,8 +8,6 @@ import pkg_resources
 from pyee.asyncio import EventEmitter
 
 from ._proto import ffi_pb2 as proto_ffi
-from ._proto import room_pb2 as proto_room
-
 
 os = platform.system().lower()
 arch = platform.machine().lower()
@@ -39,7 +37,7 @@ INVALID_HANDLE = 0
 
 @ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None:
-    event_data = bytes(data_ptr[:data_len.value])
+    event_data = bytes(data_ptr[:data_len])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 
@@ -78,10 +76,6 @@ class FfiClient(EventEmitter, metaclass=Singleton):
 
     def set_event_loop(self, loop: asyncio.AbstractEventLoop) -> None:
         with self._lock:
-            if self._event_loop is not None and self._event_loop != loop:
-                logging.warning(
-                    "FfiClient is now using a different asyncio event_loop")
-
             self._event_loop = loop
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:

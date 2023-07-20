@@ -1,21 +1,16 @@
 import asyncio
 import ctypes
-from typing import TYPE_CHECKING
 import weakref
+from typing import TYPE_CHECKING
 
-from livekit import DataPacketKind
-from livekit import TrackPublishOptions
+from livekit import DataPacketKind, TrackPublishOptions
 
 from ._ffi_client import FfiClient
-from ._ffi_client import FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
-from .track import LocalAudioTrack
-from .track import LocalVideoTrack
-from .track import Track
+from .track import LocalAudioTrack, LocalVideoTrack, Track
 from .track_publication import TrackPublication
-
 
 if TYPE_CHECKING:
     from livekit import Room
