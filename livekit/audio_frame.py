@@ -1,11 +1,12 @@
 import ctypes
-from ._ffi_client import (FfiClient, FfiHandle)
-from ._proto import ffi_pb2 as proto_ffi
+
+from ._ffi_client import FfiClient, FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio_frame
+from ._proto import ffi_pb2 as proto_ffi
 
 
 class AudioFrame():
-    def __init__(self, info: proto_audio_frame.AudioFrameBufferInfo, ffi_handle: FfiHandle):
+    def __init__(self, info: proto_audio_frame.AudioFrameBufferInfo, ffi_handle: FfiHandle) -> None:
         self._info = info
         self._ffi_handle = ffi_handle
 
@@ -14,7 +15,7 @@ class AudioFrame():
                                 ctypes.POINTER(ctypes.c_int16 * data_len)).contents
 
     @staticmethod
-    def create(sample_rate: int, num_channels: int, samples_per_channel: int):
+    def create(sample_rate: int, num_channels: int, samples_per_channel: int) -> 'AudioFrame':
         # TODO(theomonnom): There should be no problem to directly send audio date from a Python created ctypes buffer
         req = proto_ffi.FfiRequest()
         req.alloc_audio_buffer.sample_rate = sample_rate

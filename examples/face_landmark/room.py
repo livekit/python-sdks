@@ -1,16 +1,14 @@
-import matplotlib.pyplot as plt
-import livekit
 import asyncio
-import cv2
-import numpy as np
 import os
 from queue import Queue
+
+import cv2
 import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+import numpy as np
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
-import numpy as np
+
+import livekit
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
@@ -70,7 +68,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             .get_default_face_mesh_iris_connections_style())
 
 
-async def room():
+async def room() -> None:
     room = livekit.Room()
     await room.connect(URL, TOKEN)
     print("connected to room: " + room.name)
@@ -90,7 +88,7 @@ async def room():
     await room.run()
 
 
-def display_frames():
+def display_frames() -> None:
     cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
 
@@ -128,7 +126,7 @@ def display_frames():
     cv2.destroyAllWindows()
 
 
-async def main():
+async def main() -> None:
     loop = asyncio.get_event_loop()
     future = loop.run_in_executor(None, asyncio.run, room())
 

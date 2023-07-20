@@ -1,10 +1,13 @@
-from pyee.asyncio import AsyncIOEventEmitter
-from ._ffi_client import (FfiClient, FfiHandle)
-from livekit import Track
-from ._proto import ffi_pb2 as proto_ffi
-from ._proto import audio_frame_pb2 as proto_audio_frame
-from .audio_frame import AudioFrame
 import weakref
+
+from pyee.asyncio import AsyncIOEventEmitter
+
+from livekit import Track
+
+from ._ffi_client import FfiClient, FfiHandle
+from ._proto import audio_frame_pb2 as proto_audio_frame
+from ._proto import ffi_pb2 as proto_ffi
+from .audio_frame import AudioFrame
 
 
 class AudioStream(AsyncIOEventEmitter):
@@ -12,7 +15,7 @@ class AudioStream(AsyncIOEventEmitter):
     _initialized = False
 
     @classmethod
-    def initalize(cls):
+    def initalize(cls) -> None:
         if cls._initialized:
             return
 
@@ -23,7 +26,7 @@ class AudioStream(AsyncIOEventEmitter):
                                 cls._on_audio_stream_event)
 
     @classmethod
-    def _on_audio_stream_event(cls, event: proto_audio_frame.AudioStreamEvent):
+    def _on_audio_stream_event(cls, event: proto_audio_frame.AudioStreamEvent) -> None:
         stream = cls._streams.get(event.handle.id)
         if stream is None:
             return
@@ -39,7 +42,7 @@ class AudioStream(AsyncIOEventEmitter):
             frame = AudioFrame(frame_info, ffi_handle)
             stream._on_frame_received(frame)
 
-    def __init__(self, track: Track):
+    def __init__(self, track: Track) -> None:
         super().__init__()
         self.initalize()
 
@@ -57,7 +60,7 @@ class AudioStream(AsyncIOEventEmitter):
         self._info = stream_info
         self._track = track
 
-    def _on_frame_received(self, frame: AudioFrame):
+    def _on_frame_received(self, frame: AudioFrame) -> None:
         self.emit('frame_received', frame)
 
     def __del__(self):

@@ -1,43 +1,44 @@
-import livekit
-import logging
 import asyncio
+import logging
 from signal import SIGINT, SIGTERM
+
+import livekit
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
 
 
-async def main():
+async def main() -> None:
     room = livekit.Room()
 
-    @room.on("participant_connected")
-    def on_participant_connected(participant: livekit.RemoteParticipant):
+    @room.listens_to("participant_connected")
+    def on_participant_connected(participant: livekit.RemoteParticipant) -> None:
         logging.info(
             "participant connected: %s %s", participant.sid, participant.identity)
 
-    @room.on("participant_disconnected")
+    @room.listens_to("participant_disconnected")
     def on_participant_disconnected(participant: livekit.RemoteParticipant):
         logging.info("participant disconnected: %s %s",
                      participant.sid, participant.identity)
 
-    @room.on("local_track_published")
+    @room.listens_to("local_track_published")
     def on_local_track_published(publication: livekit.LocalTrackPublication, track: livekit.LocalAudioTrack | livekit.LocalVideoTrack):
         logging.info("local track published: %s", publication.sid)
 
-    @room.on("active_speakers_changed")
+    @room.listens_to("active_speakers_changed")
     def on_active_speakers_changed(speakers: list[livekit.Participant]):
         logging.info("active speakers changed: %s", speakers)
 
-    @room.on("local_track_unpublished")
+    @room.listens_to("local_track_unpublished")
     def on_local_track_unpublished(publication: livekit.LocalTrackPublication):
         logging.info("local track unpublished: %s", publication.sid)
 
-    @room.on("track_published")
+    @room.listens_to("track_published")
     def on_track_published(publication: livekit.LocalTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track published: %s from participant %s (%s)",
                      publication.sid, participant.sid, participant.identity)
 
-    @room.on("track_unpublished")
+    @room.listens_to("track_unpublished")
     def on_track_unpublished(publication: livekit.LocalTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
 
@@ -45,7 +46,7 @@ async def main():
     audio_stream = None
     video_stream = None
 
-    @room.on("track_subscribed")
+    @room.listens_to("track_subscribed")
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
@@ -66,41 +67,41 @@ async def main():
                 # received an audio frame from the track
                 pass
 
-    @room.on("track_unsubscribed")
+    @room.listens_to("track_unsubscribed")
     def on_track_unsubscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track unsubscribed: %s", publication.sid)
 
-    @room.on("data_received")
+    @room.listens_to("data_received")
     def on_data_received(data: bytes, kind: livekit.DataPacketKind, participant: livekit.Participant):
         logging.info("received data from %s: %s", participant.identity, data)
 
-    @room.on("connection_quality_changed")
+    @room.listens_to("connection_quality_changed")
     def on_connection_quality_changed(participant: livekit.Participant, quality: livekit.ConnectionQuality):
         logging.info("connection quality changed for %s", participant.identity)
 
-    @room.on("track_subscription_failed")
+    @room.listens_to("track_subscription_failed")
     def on_track_subscription_failed(participant: livekit.RemoteParticipant, track_sid: str, error: str):
         logging.info("track subscription failed: %s %s",
                      participant.identity, error)
 
-    @room.on("connection_state_changed")
+    @room.listens_to("connection_state_changed")
     def on_connection_state_changed(state: livekit.ConnectionState):
         logging.info("connection state changed: %s", state)
 
-    @room.on("connected")
-    def on_connected():
+    @room.listens_to("connected")
+    def on_connected() -> None:
         logging.info("connected")
 
-    @room.on("disconnected")
-    def on_disconnected():
+    @room.listens_to("disconnected")
+    def on_disconnected() -> None:
         logging.info("disconnected")
 
-    @room.on("reconnecting")
-    def on_reconnecting():
+    @room.listens_to("reconnecting")
+    def on_reconnecting() -> None:
         logging.info("reconnecting")
 
-    @room.on("reconnected")
-    def on_reconnected():
+    @room.listens_to("reconnected")
+    def on_reconnected() -> None:
         logging.info("reconnected")
 
     try:
