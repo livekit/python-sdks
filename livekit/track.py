@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
 
@@ -47,7 +47,6 @@ class LocalAudioTrack(Track):
         req.create_audio_track.name = name
         req.create_audio_track.source_handle.id = source._ffi_handle.handle
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
         track_info = resp.create_audio_track.track
         ffi_handle = FfiHandle(track_info.handle.id)
@@ -64,7 +63,6 @@ class LocalVideoTrack(Track):
         req.create_video_track.name = name
         req.create_video_track.source_handle.id = source._ffi_handle.handle
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
         track_info = resp.create_video_track.track
         ffi_handle = FfiHandle(track_info.handle.id)

@@ -4,7 +4,7 @@ from pyee.asyncio import AsyncIOEventEmitter
 
 from livekit import Track
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
 from .audio_frame import AudioFrame
@@ -20,18 +20,17 @@ class AudioStream(AsyncIOEventEmitter):
             return
 
         cls._initialized = True
-        ffi_client = FfiClient()
         # See VideoStream for the reason we don't use the instance method for the listener
         ffi_client.add_listener('audio_stream_event',
                                 cls._on_audio_stream_event)
 
     @classmethod
     def _on_audio_stream_event(cls, event: proto_audio_frame.AudioStreamEvent) -> None:
-        stream = cls._streams.get(event.handle.id)
-        if stream is None:
+        weak_stream = cls._streams.get(event.handle.id)
+        if weak_stream is None:
             return
 
-        stream = stream()
+        stream = weak_stream()
         if stream is None:
             return
 
@@ -51,7 +50,6 @@ class AudioStream(AsyncIOEventEmitter):
         new_audio_stream.track_handle.id = track._ffi_handle.handle
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
         stream_info = resp.new_audio_stream.stream
 

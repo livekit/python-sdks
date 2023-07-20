@@ -1,6 +1,6 @@
 from livekit import VideoFrame
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
 
@@ -10,7 +10,6 @@ class VideoSource:
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = proto_video_frame.VideoSourceType.VIDEO_SOURCE_NATIVE
 
-        ffi_client = FfiClient()
         resp = ffi_client.request(req)
         self._info = resp.new_video_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
@@ -22,5 +21,4 @@ class VideoSource:
         req.capture_video_frame.frame.rotation = frame.rotation
         req.capture_video_frame.frame.timestamp_us = frame.timestamp_us
 
-        ffi_client = FfiClient()
         ffi_client.request(req)

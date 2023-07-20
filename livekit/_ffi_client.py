@@ -33,14 +33,12 @@ ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
 
 INVALID_HANDLE = 0
 
-
-@ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t) 
-def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None: # type: ignore
+@ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
+def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None:  # type: ignore
     event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 
-    ffi_client = FfiClient()
     with ffi_client._lock:
         loop = ffi_client._event_loop
 
@@ -48,29 +46,19 @@ def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctype
 
 
 def dispatch_event(event: proto_ffi.FfiEvent) -> None:
-    ffi_client = FfiClient()
     which = str(event.WhichOneof('message'))
     ffi_client.emit(which, getattr(event, which))
 
 
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(
-                Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
-
-
-class FfiClient(EventEmitter, metaclass=Singleton):
+class FfiClient(EventEmitter):
     def __init__(self) -> None:
         super().__init__()
         self._lock = threading.Lock()
 
         req = proto_ffi.FfiRequest()
-        req.initialize.event_callback_ptr = ctypes.cast(
-            ffi_event_callback, ctypes.c_void_p).value
+        cb_callback = int(ctypes.cast(
+            ffi_event_callback, ctypes.c_void_p).value) # type: ignore
+        req.initialize.event_callback_ptr = cb_callback
         self.request(req)
 
     def set_event_loop(self, loop: asyncio.AbstractEventLoop) -> None:
@@ -78,14 +66,14 @@ class FfiClient(EventEmitter, metaclass=Singleton):
             self._event_loop = loop
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
-        data = req.SerializeToString()
-        data_len = len(data)
-        data = (ctypes.c_ubyte * data_len)(*data)
+        proto_data = req.SerializeToString()
+        proto_len = len(proto_data)
+        data = (ctypes.c_ubyte * proto_len)(*proto_data)
 
         resp_ptr = ctypes.POINTER(ctypes.c_ubyte)()
         resp_len = ctypes.c_size_t()
         handle = ffi_lib.livekit_ffi_request(
-            data, data_len, ctypes.byref(resp_ptr), ctypes.byref(resp_len))
+            data, proto_len, ctypes.byref(resp_ptr), ctypes.byref(resp_len))
 
         resp_data = bytes(resp_ptr[:resp_len.value])
         resp = proto_ffi.FfiResponse()
@@ -93,7 +81,6 @@ class FfiClient(EventEmitter, metaclass=Singleton):
 
         FfiHandle(handle)
         return resp
-
 
 class FfiHandle:
     handle = INVALID_HANDLE
@@ -105,3 +92,6 @@ class FfiHandle:
         if self.handle != INVALID_HANDLE:
             assert ffi_lib.livekit_ffi_drop_handle(
                 ctypes.c_size_t(self.handle))
+
+
+ffi_client = FfiClient()

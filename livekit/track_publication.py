@@ -1,11 +1,10 @@
 import weakref
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from livekit._proto import track_pb2 as proto_track
 
-from ._ffi_client import FfiClient
+from ._ffi_client import ffi_client
 from ._proto import ffi_pb2 as proto_ffi
-from ._proto import track_pb2 as proto_track
 from .track import Track
 
 if TYPE_CHECKING:
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
 class TrackPublication():
     def __init__(self, info: proto_track.TrackPublicationInfo):
         self._info = info
-        self.track: Track = None
+        self.track: Optional[Track] = None
 
     @property
     def sid(self) -> str:
@@ -76,5 +75,4 @@ class RemoteTrackPublication(TrackPublication):
         req.set_subscribed.participant_sid = participant.sid
         req.set_subscribed.subscribe = subscribed
 
-        ffi_client = FfiClient()
         ffi_client.request(req)
