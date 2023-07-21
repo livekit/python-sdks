@@ -5,7 +5,8 @@ from dataclasses import dataclass
 
 from pyee.asyncio import AsyncIOEventEmitter
 
-from livekit import ConnectionState, TrackKind
+from ._proto.room_pb2 import ConnectionState
+from ._proto.track_pb2 import TrackKind
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi

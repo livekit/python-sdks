@@ -1,6 +1,6 @@
 import ctypes
 
-from livekit import VideoFormatType, VideoFrameBufferType, VideoRotation
+from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
 
 from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi

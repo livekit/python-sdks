@@ -5,7 +5,8 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
 
 if TYPE_CHECKING:
-    from livekit import AudioSource, VideoSource
+    from .audio_source import AudioSource
+    from .video_source import VideoSource
 
 
 class Track():

@@ -8,7 +8,7 @@ from ._proto import ffi_pb2 as proto_ffi
 from .track import Track
 
 if TYPE_CHECKING:
-    from livekit import LocalParticipant, RemoteParticipant
+    from .participant import LocalParticipant, RemoteParticipant
 
 
 class TrackPublication():
