@@ -1,12 +1,12 @@
 import ctypes
 
 from ._ffi_client import FfiHandle, ffi_client
-from ._proto import audio_frame_pb2 as proto_audio_frame
+from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 
 
 class AudioFrame():
-    def __init__(self, info: proto_audio_frame.AudioFrameBufferInfo, ffi_handle: FfiHandle) -> None:
+    def __init__(self, info: proto_audio.AudioFrameBufferInfo, ffi_handle: FfiHandle) -> None:
         self._info = info
         self._ffi_handle = ffi_handle
 
@@ -27,6 +27,26 @@ class AudioFrame():
         info = resp.alloc_audio_buffer.buffer
         ffi_handle = FfiHandle(info.handle.id)
 
+        return AudioFrame(info, ffi_handle)
+
+    def remix_and_resample(self, sample_rate: int, num_channels: int) -> 'AudioFrame':
+        """ Resample the audio frame to the given sample rate and number of channels."""
+
+        req = proto_ffi.FfiRequest()
+        req.new_audio_resampler = proto_audio.NewAudioResamplerRequest()
+
+        resp = ffi_client.request(req)
+        resampler_handle = FfiHandle(resp.new_audio_resampler.handle.id)
+
+        resample_req = proto_ffi.FfiRequest()
+        resample_req.remix_and_resample.resampler_handle.id = resampler_handle.handle
+        resample_req.remix_and_resample.buffer_handle.id = self._ffi_handle.handle
+        resample_req.remix_and_resample.sample_rate = sample_rate
+        resample_req.remix_and_resample.num_channels = num_channels
+
+        resp = ffi_client.request(resample_req)
+        info = resp.remix_and_resample.buffer
+        ffi_handle = FfiHandle(info.handle.id)
         return AudioFrame(info, ffi_handle)
 
     @property
