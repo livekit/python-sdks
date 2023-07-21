@@ -2,7 +2,7 @@ import weakref
 
 from pyee.asyncio import AsyncIOEventEmitter
 
-from livekit import Track
+from .track import Track
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame

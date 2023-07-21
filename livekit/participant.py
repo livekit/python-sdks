@@ -4,7 +4,7 @@ import weakref
 from typing import TYPE_CHECKING, List, Optional, Union
 from weakref import ref
 
-from livekit import DataPacketKind, TrackPublishOptions
+from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
 
 from ._ffi_client import ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -18,7 +18,7 @@ from .track_publication import (
 )
 
 if TYPE_CHECKING:
-    from livekit import Room
+    from .room import Room
 
 
 class PublishTrackError(Exception):
