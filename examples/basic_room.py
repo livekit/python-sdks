@@ -34,12 +34,12 @@ async def main() -> None:
         logging.info("local track unpublished: %s", publication.sid)
 
     @room.listens_to("track_published")
-    def on_track_published(publication: livekit.LocalTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_published(publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track published: %s from participant %s (%s)",
                      publication.sid, participant.sid, participant.identity)
 
     @room.listens_to("track_unpublished")
-    def on_track_unpublished(publication: livekit.LocalTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_unpublished(publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
 
     # Keep a reference to the streams, otherwise they will be disposed

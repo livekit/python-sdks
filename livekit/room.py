@@ -1,6 +1,7 @@
 import asyncio
 import ctypes
 import weakref
+from dataclasses import dataclass
 
 from pyee.asyncio import AsyncIOEventEmitter
 
@@ -14,6 +15,12 @@ from ._proto import room_pb2 as proto_room
 from .participant import LocalParticipant, RemoteParticipant
 from .track import LocalAudioTrack, LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import LocalTrackPublication, RemoteTrackPublication
+
+
+@dataclass
+class RoomOptions:
+    auto_subscribe: bool = True
+    dynacast: bool = True
 
 
 class ConnectError(Exception):
@@ -47,13 +54,17 @@ class Room(AsyncIOEventEmitter):
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and self.connection_state == ConnectionState.CONN_CONNECTED
 
-    async def connect(self, url: str, token: str) -> None:
+    async def connect(self, url: str, token: str, options: RoomOptions = RoomOptions()) -> None:
         # TODO(theomonnom): We should be more flexible about the event loop
         ffi_client.set_event_loop(asyncio.get_running_loop())
 
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
+
+        # options
+        req.connect.options.auto_subscribe = options.auto_subscribe
+        req.connect.options.dynacast = options.dynacast
 
         resp = ffi_client.request(req)
         future: asyncio.Future[proto_room.ConnectCallback] = asyncio.Future()
@@ -127,12 +138,14 @@ class Room(AsyncIOEventEmitter):
 
             if track_info.kind == TrackKind.KIND_VIDEO:
                 local_video_track = LocalVideoTrack(ffi_handle, track_info)
-                publication.track = local_video_track 
-                self.emit('local_track_published', publication, local_video_track)
+                publication.track = local_video_track
+                self.emit('local_track_published',
+                          publication, local_video_track)
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 local_audio_track = LocalAudioTrack(ffi_handle, track_info)
                 publication.track = local_audio_track
-                self.emit('local_track_published', publication, local_audio_track)
+                self.emit('local_track_published',
+                          publication, local_audio_track)
         elif which == 'local_track_unpublished':
             publication = self.local_participant.tracks.pop(
                 event.local_track_unpublished.publication_sid)
