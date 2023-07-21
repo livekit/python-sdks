@@ -33,7 +33,8 @@ class AudioFrame():
         """ Resample the audio frame to the given sample rate and number of channels."""
 
         req = proto_ffi.FfiRequest()
-        req.new_audio_resampler = proto_audio.NewAudioResamplerRequest()
+        req.new_audio_resampler.CopyFrom(
+            proto_audio.NewAudioResamplerRequest())
 
         resp = ffi_client.request(req)
         resampler_handle = FfiHandle(resp.new_audio_resampler.handle.id)
