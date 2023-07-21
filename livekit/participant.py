@@ -22,17 +22,17 @@ if TYPE_CHECKING:
 
 
 class PublishTrackError(Exception):
-    def __init__(self, message: str):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
 class PublishDataError(Exception):
-    def __init__(self, message: str):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 
 class Participant():
-    def __init__(self, info: proto_participant.ParticipantInfo):
+    def __init__(self, info: proto_participant.ParticipantInfo) -> None:
         self._info = info
         self.tracks: dict[str, TrackPublication] = {}
 
@@ -54,7 +54,7 @@ class Participant():
 
 
 class LocalParticipant(Participant):
-    def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']):
+    def __init__(self, info: proto_participant.ParticipantInfo, room: weakref.ref['Room']) -> None:
         super().__init__(info)
         self._room = room
         self.tracks: dict[str, LocalTrackPublication] = {}
@@ -74,8 +74,6 @@ class LocalParticipant(Participant):
         data_len = len(payload)
 
         cdata = (ctypes.c_byte * data_len)(*payload)
-
-
 
         req = proto_ffi.FfiRequest()
         req.publish_data.room_handle.id = room._ffi_handle.handle
@@ -146,6 +144,6 @@ class LocalParticipant(Participant):
 
 
 class RemoteParticipant(Participant):
-    def __init__(self, info: proto_participant.ParticipantInfo):
+    def __init__(self, info: proto_participant.ParticipantInfo) -> None:
         super().__init__(info)
         self.tracks: dict[str, RemoteTrackPublication] = {}
