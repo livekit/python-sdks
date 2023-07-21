@@ -1,4 +1,4 @@
-from livekit import VideoFrame
+from .video_frame import VideoFrame
 
 from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi

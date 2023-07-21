@@ -2,7 +2,7 @@ from weakref import ReferenceType, ref
 
 from pyee.asyncio import AsyncIOEventEmitter
 
-from livekit import Track
+from .track import Track
 
 from ._ffi_client import ffi_client, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
