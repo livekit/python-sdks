@@ -15,7 +15,6 @@
 import asyncio
 import ctypes
 from typing import List, Optional, Union
-from weakref import ref
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -41,7 +40,8 @@ class PublishDataError(Exception):
 
 
 class Participant():
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) -> None:
+    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
+            -> None:
         self._info = info
         self._ffi_handle = handle
         self.tracks: dict[str, TrackPublication] = {}
@@ -64,7 +64,8 @@ class Participant():
 
 
 class LocalParticipant(Participant):
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) -> None:
+    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
+            -> None:
         super().__init__(handle, info)
         self.tracks: dict[str, LocalTrackPublication] = {}  # type: ignore
 
@@ -111,8 +112,10 @@ class LocalParticipant(Participant):
         if cb.error:
             raise PublishDataError(cb.error)
 
-    async def publish_track(self, track: Track, options: TrackPublishOptions) -> TrackPublication:
-        if not isinstance(track, LocalAudioTrack) and not isinstance(track, LocalVideoTrack):
+    async def publish_track(self, track: Track, options: TrackPublishOptions) \
+            -> TrackPublication:
+        if not isinstance(track, LocalAudioTrack) \
+                and not isinstance(track, LocalVideoTrack):
             raise Exception('cannot publish a remote track')
 
         req = proto_ffi.FfiRequest()
@@ -146,6 +149,7 @@ class LocalParticipant(Participant):
 
 
 class RemoteParticipant(Participant):
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) -> None:
+    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
+            -> None:
         super().__init__(handle, info)
         self.tracks: dict[str, RemoteTrackPublication] = {}  # type: ignore
