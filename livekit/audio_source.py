@@ -31,7 +31,6 @@ class AudioSource:
     def capture_frame(self, frame: AudioFrame) -> None:
         req = proto_ffi.FfiRequest()
 
-        req.capture_audio_frame.source_handle.id = self._ffi_handle.handle
-        req.capture_audio_frame.buffer_handle.id = frame._ffi_handle.handle
-
+        req.capture_audio_frame.source_handle = self._ffi_handle.handle
+        req.capture_audio_frame.buffer_handle = frame._ffi_handle.handle
         ffi_client.request(req)

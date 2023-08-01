@@ -40,7 +40,7 @@ class AudioStream(AsyncIOEventEmitter):
 
     @classmethod
     def _on_audio_stream_event(cls, event: proto_audio_frame.AudioStreamEvent) -> None:
-        weak_stream = cls._streams.get(event.handle.id)
+        weak_stream = cls._streams.get(event.source_handle)
         if weak_stream is None:
             return
 
@@ -61,7 +61,7 @@ class AudioStream(AsyncIOEventEmitter):
 
         req = proto_ffi.FfiRequest()
         new_audio_stream = req.new_audio_stream
-        new_audio_stream.track_handle.id = track._ffi_handle.handle
+        new_audio_stream.track_handle = track._ffi_handle.handle
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
 
         resp = ffi_client.request(req)

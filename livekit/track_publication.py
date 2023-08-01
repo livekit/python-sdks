@@ -12,23 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import weakref
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from livekit._proto import track_pb2 as proto_track
 
-from ._ffi_client import ffi_client
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from .track import Track
 
-if TYPE_CHECKING:
-    from .participant import LocalParticipant, RemoteParticipant
-
 
 class TrackPublication():
-    def __init__(self, info: proto_track.TrackPublicationInfo):
+    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
         self._info = info
         self.track: Optional[Track] = None
+        self._ffi_handle = handle
 
     @property
     def sid(self) -> str:
@@ -68,25 +65,17 @@ class TrackPublication():
 
 
 class LocalTrackPublication(TrackPublication):
-    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref['LocalParticipant']):
-        super().__init__(info)
-        self.participant = participant
+    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
+        super().__init__(handle, info)
 
 
 class RemoteTrackPublication(TrackPublication):
-    def __init__(self, info: proto_track.TrackPublicationInfo, participant: weakref.ref['RemoteParticipant']):
-        super().__init__(info)
+    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
+        super().__init__(handle, info)
         self.subscribed = False
-        self.participant = participant
 
     def set_subscribed(self, subscribed: bool):
-        participant = self.participant()
-        if participant is None:
-            return
-
         req = proto_ffi.FfiRequest()
-        req.set_subscribed.track_sid = self.sid
-        req.set_subscribed.participant_sid = participant.sid
         req.set_subscribed.subscribe = subscribed
-
+        req.set_subscribed.publication_handle = self._ffi_handle.handle
         ffi_client.request(req)

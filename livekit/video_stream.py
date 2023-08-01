@@ -16,11 +16,10 @@ from weakref import ReferenceType, ref
 
 from pyee.asyncio import AsyncIOEventEmitter
 
-from .track import Track
-
-from ._ffi_client import ffi_client, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
+from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
 
@@ -35,14 +34,15 @@ class VideoStream(AsyncIOEventEmitter):
 
         cls._initialized = True
 
-        # Not using the instance method the listener because it keeps a strong reference to the instance
+        # Not using the instance method the listener because it keeps a strong reference
+        # to the instance.
         # And we rely on __del__ to determine when the instance isn't used
         ffi_client.add_listener('video_stream_event',
                                 cls._on_video_stream_event)
 
     @classmethod
     def _on_video_stream_event(cls, event: proto_video_frame.VideoStreamEvent) -> None:
-        stream = cls._streams.get(event.handle.id)
+        stream = cls._streams.get(event.stream_handle)
         if stream is None:
             return
 
@@ -66,7 +66,7 @@ class VideoStream(AsyncIOEventEmitter):
 
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
-        new_video_stream.track_handle.id = track._ffi_handle.handle
+        new_video_stream.track_handle = track._ffi_handle.handle
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
 
         resp = ffi_client.request(req)
