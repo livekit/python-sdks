@@ -22,7 +22,9 @@ async def main() -> None:
                      participant.sid, participant.identity)
 
     @room.listens_to("local_track_published")
-    def on_local_track_published(publication: livekit.LocalTrackPublication, track: livekit.LocalAudioTrack | livekit.LocalVideoTrack):
+    def on_local_track_published(publication: livekit.LocalTrackPublication,
+                                 track: livekit.LocalAudioTrack
+                                 | livekit.LocalVideoTrack):
         logging.info("local track published: %s", publication.sid)
 
     @room.listens_to("active_speakers_changed")
@@ -34,12 +36,14 @@ async def main() -> None:
         logging.info("local track unpublished: %s", publication.sid)
 
     @room.listens_to("track_published")
-    def on_track_published(publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_published(publication: livekit.RemoteTrackPublication,
+                           participant: livekit.RemoteParticipant):
         logging.info("track published: %s from participant %s (%s)",
                      publication.sid, participant.sid, participant.identity)
 
     @room.listens_to("track_unpublished")
-    def on_track_unpublished(publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_unpublished(publication: livekit.RemoteTrackPublication,
+                             participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
 
     # Keep a reference to the streams, otherwise they will be disposed
@@ -47,7 +51,9 @@ async def main() -> None:
     video_stream = None
 
     @room.listens_to("track_subscribed")
-    def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_subscribed(track: livekit.Track,
+                            publication: livekit.RemoteTrackPublication,
+                            participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
@@ -68,19 +74,26 @@ async def main() -> None:
                 pass
 
     @room.listens_to("track_unsubscribed")
-    def on_track_unsubscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_unsubscribed(track: livekit.Track,
+                              publication: livekit.RemoteTrackPublication,
+                              participant: livekit.RemoteParticipant):
         logging.info("track unsubscribed: %s", publication.sid)
 
     @room.listens_to("data_received")
-    def on_data_received(data: bytes, kind: livekit.DataPacketKind, participant: livekit.Participant):
+    def on_data_received(data: bytes,
+                         kind: livekit.DataPacketKind,
+                         participant: livekit.Participant):
         logging.info("received data from %s: %s", participant.identity, data)
 
     @room.listens_to("connection_quality_changed")
-    def on_connection_quality_changed(participant: livekit.Participant, quality: livekit.ConnectionQuality):
+    def on_connection_quality_changed(participant: livekit.Participant,
+                                      quality: livekit.ConnectionQuality):
         logging.info("connection quality changed for %s", participant.identity)
 
     @room.listens_to("track_subscription_failed")
-    def on_track_subscription_failed(participant: livekit.RemoteParticipant, track_sid: str, error: str):
+    def on_track_subscription_failed(participant: livekit.RemoteParticipant,
+                                     track_sid: str,
+                                     error: str):
         logging.info("track subscription failed: %s %s",
                      participant.identity, error)
 
@@ -110,6 +123,8 @@ async def main() -> None:
         logging.info("connected to room %s", room.name)
 
         await room.local_participant.publish_data("hello world")
+
+        logging.info("participants: %s", room.participants)
 
         await room.run()
     except livekit.ConnectError as e:

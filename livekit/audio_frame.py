@@ -51,11 +51,12 @@ class AudioFrame():
             proto_audio.NewAudioResamplerRequest())
 
         resp = ffi_client.request(req)
-        resampler_handle = FfiHandle(resp.new_audio_resampler.handle.id)
+        resampler_handle = FfiHandle(
+            resp.new_audio_resampler.resampler.handle.id)
 
         resample_req = proto_ffi.FfiRequest()
-        resample_req.remix_and_resample.resampler_handle.id = resampler_handle.handle
-        resample_req.remix_and_resample.buffer_handle.id = self._ffi_handle.handle
+        resample_req.remix_and_resample.resampler_handle = resampler_handle.handle
+        resample_req.remix_and_resample.buffer_handle = self._ffi_handle.handle
         resample_req.remix_and_resample.sample_rate = sample_rate
         resample_req.remix_and_resample.num_channels = num_channels
 

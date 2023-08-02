@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .video_frame import VideoFrame
-
-from ._ffi_client import ffi_client, FfiHandle
+from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
+from .video_frame import VideoFrame
 
 
 class VideoSource:
@@ -30,9 +29,8 @@ class VideoSource:
 
     def capture_frame(self, frame: VideoFrame) -> None:
         req = proto_ffi.FfiRequest()
-        req.capture_video_frame.source_handle.id = self._ffi_handle.handle
-        req.capture_video_frame.buffer_handle.id = frame.buffer._ffi_handle.handle
+        req.capture_video_frame.source_handle = self._ffi_handle.handle
+        req.capture_video_frame.buffer_handle = frame.buffer._ffi_handle.handle
         req.capture_video_frame.frame.rotation = frame.rotation
         req.capture_video_frame.frame.timestamp_us = frame.timestamp_us
-
         ffi_client.request(req)
