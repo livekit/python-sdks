@@ -39,7 +39,11 @@ ffi_lib = ctypes.CDLL(libpath)
 
 # C function types
 ffi_lib.livekit_ffi_request.argtypes = [
-    ctypes.POINTER(ctypes.c_ubyte), ctypes.c_size_t, ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte)), ctypes.POINTER(ctypes.c_size_t)]
+    ctypes.POINTER(ctypes.c_ubyte),
+    ctypes.c_size_t,
+    ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte)),
+    ctypes.POINTER(ctypes.c_size_t)
+]
 ffi_lib.livekit_ffi_request.restype = ctypes.c_size_t
 
 ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_size_t]
@@ -47,8 +51,10 @@ ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
 
 INVALID_HANDLE = 0
 
+
 @ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
-def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8), data_len: ctypes.c_size_t) -> None:  # type: ignore
+def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
+                       data_len: ctypes.c_size_t) -> None:
     event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
@@ -71,7 +77,7 @@ class FfiClient(EventEmitter):
 
         req = proto_ffi.FfiRequest()
         cb_callback = int(ctypes.cast(
-            ffi_event_callback, ctypes.c_void_p).value) # type: ignore
+            ffi_event_callback, ctypes.c_void_p).value)  # type: ignore
         req.initialize.event_callback_ptr = cb_callback
         self.request(req)
 
@@ -96,9 +102,8 @@ class FfiClient(EventEmitter):
         FfiHandle(handle)
         return resp
 
-class FfiHandle:
-    handle = INVALID_HANDLE
 
+class FfiHandle:
     def __init__(self, handle: int) -> None:
         self.handle = handle
 
@@ -109,3 +114,4 @@ class FfiHandle:
 
 
 ffi_client = FfiClient()
+ffi_client.set_event_loop(asyncio.get_event_loop())
