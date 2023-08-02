@@ -14,7 +14,6 @@
 
 import asyncio
 import ctypes
-import weakref
 from dataclasses import dataclass
 
 from pyee.asyncio import EventEmitter
