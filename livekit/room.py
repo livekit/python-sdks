@@ -14,9 +14,10 @@
 
 import asyncio
 import ctypes
+import weakref
 from dataclasses import dataclass
 
-from pyee.asyncio import AsyncIOEventEmitter
+from pyee.asyncio import EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -40,16 +41,35 @@ class ConnectError(Exception):
         self.message = message
 
 
-class Room(AsyncIOEventEmitter):
+class Room(EventEmitter):
+    _queues: dict[int, asyncio.Queue] = {}
+    _initialized = False
+
+    @classmethod
+    def initalize(cls) -> None:
+        if cls._initialized:
+            return
+
+        cls._initialized = True
+        ffi_client.add_listener('room_event',
+                                cls._on_room_event)
+
+    @classmethod
+    def _on_room_event(cls, event: proto_room.RoomEvent) -> None:
+        queue = cls._queues.get(event.room_handle)
+        if queue is None:
+            # create a new queue, an event could have been received before connect
+            queue = asyncio.Queue()
+            cls._queues[event.room_handle] = queue
+            return
+
+        queue.put_nowait(event)
+
     def __init__(self) -> None:
         super().__init__()
+        self.__class__.initalize()
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
-
-        ffi_client.add_listener('room_event', self._on_room_event)
-
-    def __del__(self):
-        ffi_client.remove_listener('room_event', self._on_room_event)
 
     @property
     def sid(self) -> str:
@@ -65,15 +85,12 @@ class Room(AsyncIOEventEmitter):
 
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and \
-            self.connection_state == ConnectionState.CONN_CONNECTED
+            self.connection_state != ConnectionState.CONN_DISCONNECTED
 
     async def connect(self,
                       url: str,
                       token: str,
                       options: RoomOptions = RoomOptions()) -> None:
-        # TODO(theomonnom): We should be more flexible about the event loop
-        ffi_client.set_event_loop(asyncio.get_running_loop())
-
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
@@ -95,10 +112,7 @@ class Room(AsyncIOEventEmitter):
         if cb.error:
             raise ConnectError(cb.error)
 
-        self._ffi_handle = FfiHandle(cb.room.handle.id)
         self._info = cb.room
-        self._close_future: asyncio.Future[None] = asyncio.Future()
-
         lp_handle = FfiHandle(cb.local_participant.handle.id)
         self.local_participant = LocalParticipant(
             lp_handle, cb.local_participant)
@@ -113,6 +127,8 @@ class Room(AsyncIOEventEmitter):
                 publication = RemoteTrackPublication(
                     pub_handle, publication_info)
                 rp.tracks[publication.sid] = publication
+
+        self._ffi_handle = FfiHandle(cb.room.handle.id)
 
     async def disconnect(self) -> None:
         if not self.isconnected():
@@ -133,14 +149,15 @@ class Room(AsyncIOEventEmitter):
                     'disconnect', on_disconnect_callback)
 
         await future
-        if not self._close_future.cancelled():
-            self._close_future.set_result(None)
+        self._ffi_handle = None
 
     async def run(self) -> None:
-        # wait for disconnect
-        await self._close_future
+        queue = self._queues[self._ffi_handle.handle]
+        while self._ffi_handle is not None or not queue.empty():
+            event = await queue.get()
+            self._handle_event(event)
 
-    def _on_room_event(self, event: proto_room.RoomEvent):
+    def _handle_event(self, event: proto_room.RoomEvent):
         if event.room_handle != self._ffi_handle.handle:
             return
 

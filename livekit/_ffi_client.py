@@ -104,8 +104,6 @@ class FfiClient(EventEmitter):
 
 
 class FfiHandle:
-    handle = INVALID_HANDLE
-
     def __init__(self, handle: int) -> None:
         self.handle = handle
 
@@ -116,3 +114,4 @@ class FfiHandle:
 
 
 ffi_client = FfiClient()
+ffi_client.set_event_loop(asyncio.get_event_loop())

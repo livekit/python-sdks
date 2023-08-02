@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from weakref import ReferenceType, ref
+from weakref import WeakValueDictionary
 
-from pyee.asyncio import AsyncIOEventEmitter
+from pyee.asyncio import EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -23,8 +23,8 @@ from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
 
-class VideoStream(AsyncIOEventEmitter):
-    _streams: dict[int, ReferenceType['VideoStream']] = {}
+class VideoStream(EventEmitter):
+    _streams: WeakValueDictionary[int, 'VideoStream'] = WeakValueDictionary()
     _initialized = False
 
     @classmethod
@@ -46,10 +46,6 @@ class VideoStream(AsyncIOEventEmitter):
         if stream is None:
             return
 
-        nstream = stream()
-        if nstream is None:
-            return
-
         which = event.WhichOneof('message')
         if which == 'frame_received':
             frame_info = event.frame_received.frame
@@ -58,11 +54,11 @@ class VideoStream(AsyncIOEventEmitter):
 
             frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
                                VideoFrameBuffer.create(ffi_handle, buffer_info))
-            nstream._on_frame_received(frame)
+            stream._on_frame_received(frame)
 
     def __init__(self, track: Track) -> None:
         super().__init__()
-        self.initalize()
+        self.__class__.initalize()
 
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
@@ -72,7 +68,7 @@ class VideoStream(AsyncIOEventEmitter):
         resp = ffi_client.request(req)
         stream_info = resp.new_video_stream.stream
 
-        self._streams[stream_info.handle.id] = ref(self)
+        self._streams[stream_info.handle.id] = self
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info
         self._track = track
