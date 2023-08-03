@@ -34,6 +34,11 @@ class PublishTrackError(Exception):
         self.message = message
 
 
+class UnpublishTrackError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
 class PublishDataError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -146,6 +151,27 @@ class LocalParticipant(Participant):
         track_publication.track = track
         self.tracks[track_publication.sid] = track_publication
         return track_publication
+
+    async def unpublish_track(self, track_sid: str) -> None:
+        req = proto_ffi.FfiRequest()
+        req.unpublish_track.local_participant_handle = self._ffi_handle.handle
+        req.unpublish_track.track_sid = track_sid
+
+        resp = ffi_client.request(req)
+
+        future: asyncio.Future[proto_room.UnpublishTrackCallback] = asyncio.Future(
+        )
+
+        @ffi_client.on('unpublish_track')
+        def on_unpublish_callback(cb: proto_room.UnpublishTrackCallback):
+            if cb.async_id == resp.unpublish_track.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'unpublish_track', on_unpublish_callback)
+
+        cb = await future
+        if cb.error:
+            raise UnpublishTrackError(cb.error)
 
 
 class RemoteParticipant(Participant):
