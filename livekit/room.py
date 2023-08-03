@@ -96,6 +96,8 @@ class Room(EventEmitter):
         self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.room.handle.id)
         self._info = cb.room
+        self.connection_state = ConnectionState.CONN_CONNECTED
+
         lp_handle = FfiHandle(cb.local_participant.handle.id)
         self.local_participant = LocalParticipant(
             lp_handle, cb.local_participant)
@@ -162,6 +164,7 @@ class Room(EventEmitter):
             track = lpublication.track
             self.emit('local_track_published', lpublication, track)
         elif which == 'local_track_unpublished':
+            sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.tracks[sid]
             self.emit('local_track_unpublished', lpublication)
         elif which == 'track_published':

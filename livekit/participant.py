@@ -173,7 +173,7 @@ class LocalParticipant(Participant):
         if cb.error:
             raise UnpublishTrackError(cb.error)
 
-        publication = self.local_participant.tracks.pop(track_sid)
+        publication = self.tracks.pop(track_sid)
         publication.track = None
 
 
