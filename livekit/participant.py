@@ -173,6 +173,9 @@ class LocalParticipant(Participant):
         if cb.error:
             raise UnpublishTrackError(cb.error)
 
+        publication = self.local_participant.tracks.pop(track_sid)
+        publication.track = None
+
 
 class RemoteParticipant(Participant):
     def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \

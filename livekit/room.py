@@ -15,6 +15,7 @@
 import asyncio
 import ctypes
 from dataclasses import dataclass
+from typing import Optional
 
 from pyee.asyncio import EventEmitter
 
@@ -41,34 +42,15 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter):
-    _queues: dict[int, asyncio.Queue] = {}
-    _initialized = False
-
-    @classmethod
-    def initalize(cls) -> None:
-        if cls._initialized:
-            return
-
-        cls._initialized = True
-        ffi_client.add_listener('room_event',
-                                cls._on_room_event)
-
-    @classmethod
-    def _on_room_event(cls, event: proto_room.RoomEvent) -> None:
-        queue = cls._queues.get(event.room_handle)
-        if queue is None:
-            # create a new queue, an event could have been received before connect
-            queue = asyncio.Queue()
-            cls._queues[event.room_handle] = queue
-            return
-
-        queue.put_nowait(event)
-
     def __init__(self) -> None:
         super().__init__()
-        self.__class__.initalize()
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
+        self._ffi_handle: Optional[FfiHandle] = None
+        ffi_client.add_listener('room_event', self._on_room_event)
+
+    def __del__(self):
+        ffi_client.remove_listener('room_event', self._on_room_event)
 
     @property
     def sid(self) -> str:
@@ -111,6 +93,8 @@ class Room(EventEmitter):
         if cb.error:
             raise ConnectError(cb.error)
 
+        self._close_future: asyncio.Future[None] = asyncio.Future()
+        self._ffi_handle = FfiHandle(cb.room.handle.id)
         self._info = cb.room
         lp_handle = FfiHandle(cb.local_participant.handle.id)
         self.local_participant = LocalParticipant(
@@ -127,14 +111,12 @@ class Room(EventEmitter):
                     pub_handle, publication_info)
                 rp.tracks[publication.sid] = publication
 
-        self._ffi_handle = FfiHandle(cb.room.handle.id)
-
     async def disconnect(self) -> None:
         if not self.isconnected():
             return
 
         req = proto_ffi.FfiRequest()
-        req.disconnect.room_handle = self._ffi_handle.handle
+        req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
         resp = ffi_client.request(req)
         future: asyncio.Future[proto_room.DisconnectCallback] = asyncio.Future(
@@ -148,15 +130,16 @@ class Room(EventEmitter):
                     'disconnect', on_disconnect_callback)
 
         await future
-        self._ffi_handle = None
+        if not self._close_future.cancelled():
+            self._close_future.set_result(None)
 
     async def run(self) -> None:
-        queue = self._queues[self._ffi_handle.handle]
-        while self._ffi_handle is not None or not queue.empty():
-            event = await queue.get()
-            self._handle_event(event)
+        await self._close_future
 
-    def _handle_event(self, event: proto_room.RoomEvent):
+    def _on_room_event(self, event: proto_room.RoomEvent):
+        if self._ffi_handle is None:
+            return
+
         if event.room_handle != self._ffi_handle.handle:
             return
 
@@ -173,16 +156,13 @@ class Room(EventEmitter):
             self.emit('participant_disconnected', rparticipant)
         elif which == 'local_track_published':
             sid = event.local_track_published.track_sid
-            # publication created inside LocalParticipant.publish_track
-            # the event is always received after the publish_track result so it is
-            # safe to assume the publication exists here
+            # publication is created inside LocalParticipant.publish_track
+            # (This event is called after that)
             lpublication = self.local_participant.tracks[sid]
             track = lpublication.track
             self.emit('local_track_published', lpublication, track)
         elif which == 'local_track_unpublished':
-            lpublication = self.local_participant.tracks.pop(
-                event.local_track_unpublished.publication_sid)
-            lpublication.track = None
+            lpublication = self.local_participant.tracks[sid]
             self.emit('local_track_unpublished', lpublication)
         elif which == 'track_published':
             rparticipant = self.participants[event.track_published.participant_sid]
