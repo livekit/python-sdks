@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from signal import SIGINT, SIGTERM
+from typing import Union
 
 import livekit
 
@@ -23,8 +24,8 @@ async def main() -> None:
 
     @room.listens_to("local_track_published")
     def on_local_track_published(publication: livekit.LocalTrackPublication,
-                                 track: livekit.LocalAudioTrack
-                                 | livekit.LocalVideoTrack):
+                                 track: Union[livekit.LocalAudioTrack,
+                                              livekit.LocalVideoTrack]):
         logging.info("local track published: %s", publication.sid)
 
     @room.listens_to("active_speakers_changed")
