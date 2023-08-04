@@ -16,7 +16,7 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 frame_queue = Queue()
 argb_frame = None
 
-# You can downlo9ad a face landmark model file from https://developers.google.com/mediapipe/solutions/vision/face_landmarker#models
+# You can download a face landmark model file from https://developers.google.com/mediapipe/solutions/vision/face_landmarker#models
 model_file = 'face_landmarker.task'
 model_path = os.path.dirname(os.path.realpath(__file__)) + '/' + model_file
 
