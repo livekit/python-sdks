@@ -14,7 +14,7 @@ The Livekit Python Client provides a convenient interface for integrating Liveki
 
 Documentation: https://docs.livekit.io/
 
-### Connecting to a room
+## Connecting to a room
 
 ```python
 async def main():
@@ -43,12 +43,16 @@ async def main():
     await room.run()
 ```
 
-### Examples
+## Examples
  - [Facelandmark](https://github.com/livekit/client-sdk-python/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
  - [Whisper](https://github.com/livekit/client-sdk-python/tree/main/examples/whisper): Transcribe an audio track using OpenAI whisper
  - [Basic room](https://github.com/livekit/client-sdk-python/blob/main/examples/basic_room.py): Connect to a room
  - [Publish hue](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a rainbow video track
  - [Publish wave](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a sine wave 
+
+## Getting help / Contributing
+
+Please join us on [Slack](https://join.slack.com/t/livekit-users/shared_invite/zt-rrdy5abr-5pZ1wW8pXEkiQxBzFiXPUg) to get help from our [devs](https://github.com/orgs/livekit/teams/devs/members) / community members. We welcome your contributions(PRs) and details can be discussed there.
 
 <!--BEGIN_REPO_NAV-->
 <br/><table>
