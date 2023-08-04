@@ -1,8 +1,6 @@
 ## Whisper example
 
-Whisper is not really suited for realtime applications. 
-The input requires to have 30s of data.
-The way we can workaround this is by filling our data using silence
+[Whisper](https://github.com/openai/whisper) is a speech-to-text model from OpenAI. It ordinarily requires 30s of input data for transcription, making it challenging to use in real-time applications. We work around this by limitation by padding shorter bursts of speech with silent audio packets.
 
 ## Run the demo
 
