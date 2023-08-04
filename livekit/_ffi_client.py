@@ -44,9 +44,9 @@ ffi_lib.livekit_ffi_request.argtypes = [
     ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte)),
     ctypes.POINTER(ctypes.c_size_t)
 ]
-ffi_lib.livekit_ffi_request.restype = ctypes.c_size_t
+ffi_lib.livekit_ffi_request.restype = ctypes.c_uint64
 
-ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_size_t]
+ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_uint64]
 ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
 
 INVALID_HANDLE = 0
@@ -110,7 +110,7 @@ class FfiHandle:
     def __del__(self):
         if self.handle != INVALID_HANDLE:
             assert ffi_lib.livekit_ffi_drop_handle(
-                ctypes.c_size_t(self.handle))
+                ctypes.c_uint64(self.handle))
 
 
 ffi_client = FfiClient()
