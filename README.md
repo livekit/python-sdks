@@ -12,6 +12,8 @@
 
 The Livekit Python Client provides a convenient interface for integrating Livekit's real-time video and audio capabilities into your Python applications. With this library, developers can easily leverage Livekit's WebRTC functionalities, allowing them to focus on building their AI models or other application logic without worrying about the complexities of WebRTC.
 
+Documentation: https://docs.livekit.io/
+
 ### Connecting to a room
 
 ```python
@@ -37,7 +39,16 @@ async def main():
             def on_video_frame(frame: livekit.VideoFrame):
                 # received a video frame from the track
                 pass
+
+    await room.run()
 ```
+
+### Examples
+ - [Facelandmark](https://github.com/livekit/client-sdk-python/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
+ - [Whisper](https://github.com/livekit/client-sdk-python/tree/main/examples/whisper): Transcribe an audio track using OpenAI whisper
+ - [Basic room](https://github.com/livekit/client-sdk-python/blob/main/examples/basic_room.py): Connect to a room
+ - [Publish hue](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a rainbow video track
+ - [Publish wave](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a sine wave 
 
 <!--BEGIN_REPO_NAV-->
 <br/><table>

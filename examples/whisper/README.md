@@ -10,7 +10,7 @@ Change the URL and TOKEN inside the script
 
 Clone whisper.cpp inside this directory
 
-### Build a sharted lib:
+### Build a shared lib:
 
 ```
 gcc -O3 -std=c11 -pthread -mavx -mavx2 -mfma -mf16c -fPIC -c ggml.c
