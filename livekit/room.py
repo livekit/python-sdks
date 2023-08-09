@@ -36,6 +36,12 @@ class RoomOptions:
     dynacast: bool = True
 
 
+@dataclass
+class DataEmittedEvent:
+    _handle: FfiHandle
+    data: ctypes.Array[ctypes.c_byte]
+
+
 class ConnectError(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -245,8 +251,9 @@ class Room(EventEmitter):
             data = ctypes.cast(buffer_info.data_ptr,
                                ctypes.POINTER(ctypes.c_byte
                                               * buffer_info.data_len)).contents
-            FfiHandle(buffer_info.handle.id)
-            self.emit('data_received', data,
+            handle = FfiHandle(buffer_info.handle.id)
+            emitted_event = DataEmittedEvent(handle, data)
+            self.emit('data_received', emitted_event,
                       event.data_received.kind, rparticipant)
         elif which == 'connection_state_changed':
             state = event.connection_state_changed.state
