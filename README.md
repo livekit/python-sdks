@@ -8,11 +8,16 @@
 
 [![pypi-v](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
 
-# client-sdk-python
+# 📹🎙️🐍 Python Client SDK for LiveKit
 
 The Livekit Python Client provides a convenient interface for integrating Livekit's real-time video and audio capabilities into your Python applications. With this library, developers can easily leverage Livekit's WebRTC functionalities, allowing them to focus on building their AI models or other application logic without worrying about the complexities of WebRTC.
 
-Documentation: https://docs.livekit.io/
+Official LiveKit documentation: https://docs.livekit.io/
+
+## Installation
+```shell
+$ pip install livekit
+```
 
 ## Connecting to a room
 
