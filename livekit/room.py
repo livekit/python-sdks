@@ -242,9 +242,10 @@ class Room(EventEmitter):
         elif which == 'data_received':
             rparticipant = self.participants[event.data_received.participant_sid]
             buffer_info = event.data_received.data
-            data = ctypes.cast(buffer_info.data_ptr,
-                               ctypes.POINTER(ctypes.c_byte
-                                              * buffer_info.data_len)).contents
+            native_data = ctypes.cast(buffer_info.data_ptr,
+                                      ctypes.POINTER(ctypes.c_byte
+                                                     * buffer_info.data_len)).contents
+            data = bytearray(native_data)
             FfiHandle(buffer_info.handle.id)
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
