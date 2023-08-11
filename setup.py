@@ -21,7 +21,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="livekit",
-    version="0.2.0",
+    version="0.2.2",
     description="LiveKit Python Client SDK for LiveKit",
     long_description=long_description,
     long_description_content_type="text/markdown",
