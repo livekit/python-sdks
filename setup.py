@@ -21,7 +21,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="livekit",
-    version="0.2.2",
+    version="0.2.3",
     description="LiveKit Python Client SDK for LiveKit",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -39,6 +39,7 @@ setup(
     ],
 
     keywords="webrtc, livekit",
+    license="Apache-2.0",
     packages=["livekit"],
     python_requires=">=3.7, <4",
     install_requires=["pyee>=11.0.0",
@@ -47,6 +48,7 @@ setup(
         "livekit": ['lib/*/*/*.*', '_proto/*.py'],
     },
     project_urls={
+        "Documentation": "https://docs.livekit.io",
         "Website": "https://livekit.io/",
         "Source": "https://github.com/livekit/client-sdk-python/",
     },
