@@ -15,21 +15,23 @@
 import pathlib
 
 from setuptools import setup
+from setuptools.dist import Distribution
 
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
     class bdist_wheel(_bdist_wheel):
-        def finalize_options(self):
-            _bdist_wheel.finalize_options(self)
-            self.root_is_pure = False
-
         def get_tag(self):
             python, abi, plat = _bdist_wheel.get_tag(self)
             python, abi = 'py3', 'none'
             return python, abi, plat
 except ImportError:
     bdist_wheel = None
+
+
+class BinaryDistribution(Distribution):
+    def has_ext_modules(foo):
+        return True
 
 
 here = pathlib.Path(__file__).parent.resolve()
@@ -45,6 +47,7 @@ setup(
     cmdclass={
         'bdist_wheel': bdist_wheel,
     },
+    distclass=BinaryDistribution,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
