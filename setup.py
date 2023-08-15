@@ -33,6 +33,9 @@ class BinaryDistribution(Distribution):
     def has_ext_modules(foo):
         return True
 
+    def is_pure(self):
+        return False
+
 
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
