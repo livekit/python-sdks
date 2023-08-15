@@ -16,6 +16,22 @@ import pathlib
 
 from setuptools import setup
 
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+
+    class bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = False
+
+        def get_tag(self):
+            python, abi, plat = _bdist_wheel.get_tag(self)
+            python, abi = 'py3', 'none'
+            return python, abi, plat
+except ImportError:
+    bdist_wheel = None
+
+
 here = pathlib.Path(__file__).parent.resolve()
 long_description = (here / "README.md").read_text(encoding="utf-8")
 
@@ -26,6 +42,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/livekit/client-sdk-python",
+    cmdclass={
+        'bdist_wheel': bdist_wheel,
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -37,13 +56,13 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
     ],
-
-    keywords="webrtc, livekit",
+    keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
     packages=["livekit"],
     python_requires=">=3.7, <4",
     install_requires=["pyee>=11.0.0",
-                      "protobuf>=3.1.0", "types-protobuf>=3.1.0"],
+                      "protobuf>=3.1.0",
+                      "types-protobuf>=3.1.0"],
     package_data={
         "livekit": ['lib/*/*/*.*', '_proto/*.py'],
     },
