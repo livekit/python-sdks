@@ -1,0 +1,9 @@
+# download binaries
+requests
+
+# build wheels
+wheel
+setuptools
+twine
+auditwheel; sys_platform == 'linux'
+cibuildwheel

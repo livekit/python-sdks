@@ -13,44 +13,51 @@
 # limitations under the License.
 
 import pathlib
+import platform
+import subprocess
 
-from setuptools import setup
-from setuptools.dist import Distribution
-
-try:
-    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
-
-    class bdist_wheel(_bdist_wheel):
-        def get_tag(self):
-            python, abi, plat = _bdist_wheel.get_tag(self)
-            python, abi = 'py3', 'none'
-            return python, abi, plat
-except ImportError:
-    bdist_wheel = None
-
-
-class BinaryDistribution(Distribution):
-    def has_ext_modules(foo):
-        return True
-
-    def is_pure(self):
-        return False
-
+import setuptools
+import setuptools.command.build_py
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+from wheel.bdist_wheel import get_platform
 
 here = pathlib.Path(__file__).parent.resolve()
-long_description = (here / "README.md").read_text(encoding="utf-8")
 
-setup(
+
+class bdist_wheel(_bdist_wheel):
+    def finalize_options(self):
+        self.plat_name = get_platform(None)  # force a platform tag
+        _bdist_wheel.finalize_options(self)
+
+
+class BuildPyCommand(setuptools.command.build_py.build_py):
+    def run(self):
+        # download a prebuilt version of livekit_ffi
+        download_script = here / 'client-sdk-rust' / 'download_ffi.py'
+        subprocess.run(
+            ['python3', download_script.absolute()], check=True)
+        setuptools.command.build_py.build_py.run(self)
+
+
+if platform.system() == "Linux":
+    libname = "liblivekit_ffi.so"
+elif platform.system() == "Darwin":
+    libname = "liblivekit_ffi.dylib"
+elif platform.system() == "Windows":
+    libname = "livekit_ffi.dll"
+
+
+setuptools.setup(
     name="livekit",
     version="0.2.3",
     description="LiveKit Python Client SDK for LiveKit",
-    long_description=long_description,
+    long_description=(here / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     url="https://github.com/livekit/client-sdk-python",
     cmdclass={
         'bdist_wheel': bdist_wheel,
+        'build_py': BuildPyCommand,
     },
-    distclass=BinaryDistribution,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -65,12 +72,12 @@ setup(
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
     packages=["livekit"],
-    python_requires=">=3.7, <4",
+    python_requires=">=3.7.0",
     install_requires=["pyee>=11.0.0",
                       "protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
     package_data={
-        "livekit": ['lib/*/*/*.*', '_proto/*.py'],
+        "livekit": [f'resources/{libname}', '_proto/*.py'],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
