@@ -12,10 +12,8 @@ jobs:
         os: [ubuntu-20.04, windows-2019, macOS-11]
 
     steps:
-      - name: Checkout Git LFS
-        uses: actions/checkout@v3
-        with:
-          lfs: "true"
+      - uses: actions/checkout@v3
+        submodules: true
 
       - uses: actions/setup-python@v3
 
