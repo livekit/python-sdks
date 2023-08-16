@@ -20,7 +20,7 @@ exclude = [
 build = "cp39-*"
 archs = ["x86_64", "aarch64"]
 
-before-build = "pip install requests" # rust download script needs requests
+before-all = "pip install requests" # rust download script needs requests
 
 manylinux-x86_64-image = "manylinux2014"
 manylinux-aarch64-image = "manylinux2014"
