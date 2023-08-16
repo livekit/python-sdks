@@ -14,6 +14,7 @@
 
 import asyncio
 import ctypes
+import os
 import platform
 import threading
 
@@ -22,20 +23,30 @@ from pyee.asyncio import EventEmitter
 
 from ._proto import ffi_pb2 as proto_ffi
 
-os = platform.system().lower()
-arch = platform.machine().lower()
-lib_path = 'lib/{}/{}'.format(os, arch)
 
-if os == "windows":
-    lib_file = 'livekit_ffi.dll'
-elif os == "darwin":
-    lib_file = 'liblivekit_ffi.dylib'
-else:
-    lib_file = 'liblivekit_ffi.so'
+def get_ffi_lib_path():
+    # allow to override the lib path using an env var
+    libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
+    if libpath:
+        return libpath
 
-libpath = pkg_resources.resource_filename('livekit', lib_path + '/' + lib_file)
+    if platform.system() == "Linux":
+        libname = "liblivekit_ffi.so"
+    elif platform.system() == "Darwin":
+        libname = "liblivekit_ffi.dylib"
+    elif platform.system() == "Windows":
+        libname = "livekit_ffi.dll"
+    else:
+        raise Exception(
+            f"no ffi library found for platform {platform.system()}. \
+                Set LIVEKIT_LIB_PATH to specify a the lib path")
 
-ffi_lib = ctypes.CDLL(libpath)
+    libpath = pkg_resources.resource_filename(
+        'livekit', os.path.join('resources', libname))
+    return libpath
+
+
+ffi_lib = ctypes.CDLL(get_ffi_lib_path())
 
 # C function types
 ffi_lib.livekit_ffi_request.argtypes = [
