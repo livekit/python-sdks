@@ -12,6 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # wheels to build:
         include:
           - os: ubuntu-latest
             archs: x86_64
@@ -27,7 +28,7 @@ jobs:
         with:
           submodules: true
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.15.0
