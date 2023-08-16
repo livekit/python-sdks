@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import pathlib
 import platform
 import subprocess
@@ -31,19 +32,21 @@ class bdist_wheel(_bdist_wheel):
 
 
 class BuildPyCommand(setuptools.command.build_py.build_py):
+    """ Download a prebuilt version of livekit_ffi """
+
     def run(self):
-        # download a prebuilt version of livekit_ffi
+
         download_script = here / 'client-sdk-rust' / 'download_ffi.py'
-        subprocess.run(
-            [
-                'python',
-                download_script.absolute(),
-                '--output',
-                'livekit/resources'
-            ],
-            capture_output=True,
-            check=True
-        )
+        cmd = ['python3', download_script.absolute(), '--output',
+               'livekit/resources']
+
+        # cibuildwheel is crosscompiling to arm64 on macos, make sure we download the
+        # right binary (kind of a hack here...)
+        if os.environ.get("CIBUILDWHEEL") == "1" \
+                and "arm64" in os.environ.get("ARCHFLAGS", ""):
+            cmd += ['--arch', 'arm64']
+
+        subprocess.run(cmd, capture_output=True, check=True)
         setuptools.command.build_py.build_py.run(self)
 
 
