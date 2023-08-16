@@ -1,10 +1,10 @@
 <!--BEGIN_BANNER_IMAGE-->
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
-    <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="/.github/banner_light.png">
-  </picture>
-  <!--END_BANNER_IMAGE-->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
+  <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/client-sdk-python/main/.github/banner_light.png">
+</picture>
+<!--END_BANNER_IMAGE-->
 
 [![pypi-v](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
 
