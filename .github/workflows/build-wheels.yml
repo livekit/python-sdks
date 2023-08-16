@@ -19,7 +19,7 @@ jobs:
           - os: buildjet-4vcpu-ubuntu-2204-arm
             archs: aarch64
           - os: windows-latest
-            archs: amd64 arm64
+            archs: AMD64 ARM64
           - os: macos-latest
             archs: x86_64 arm64
 
@@ -28,12 +28,13 @@ jobs:
         with:
           submodules: true
 
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.15.0
+
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.15.0
+        run: python -m cibuildwheel --output-dir dist
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
-        with:
-          output-dir: dist
 
       - uses: actions/upload-artifact@v3
         with:
