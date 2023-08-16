@@ -25,5 +25,5 @@ manylinux-aarch64-image = "manylinux2014"
 manylinux-pypy_x86_64-image = "manylinux2014"
 manylinux-pypy_aarch64-image = "manylinux2014"
 
-[tool.cibuildwheel.macos]
+[tool.cibuildwheel.linux]
 archs = ["x86_64", "aarch64"]
