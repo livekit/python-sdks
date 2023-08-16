@@ -36,7 +36,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
         download_script = here / 'client-sdk-rust' / 'download_ffi.py'
         subprocess.run(
             [
-                'python3',
+                'python',
                 download_script.absolute(),
                 '--output',
                 'livekit/resources'
