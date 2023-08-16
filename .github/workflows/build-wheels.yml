@@ -19,7 +19,7 @@ jobs:
           - os: buildjet-4vcpu-ubuntu-2204-arm
             archs: aarch64
           - os: windows-latest
-            archs: x86_64 arm64
+            archs: amd64 arm64
           - os: macos-latest
             archs: x86_64 arm64
 
