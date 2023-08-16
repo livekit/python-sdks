@@ -41,6 +41,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
                 '--output',
                 'livekit/resources'
             ],
+            capture_output=True,
             check=True
         )
         setuptools.command.build_py.build_py.run(self)
@@ -66,9 +67,11 @@ setuptools.setup(
         'build_py': BuildPyCommand,
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
+        "Topic :: Multimedia :: Sound/Audio",
+        "Topic :: Multimedia :: Video",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
