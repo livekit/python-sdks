@@ -14,7 +14,7 @@
 
 from weakref import WeakValueDictionary
 
-from pyee.asyncio import EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter as EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
