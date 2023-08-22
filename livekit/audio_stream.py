@@ -14,7 +14,7 @@
 
 from weakref import WeakValueDictionary
 
-from pyee.asyncio import AsyncIOEventEmitter as EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -23,7 +23,7 @@ from .audio_frame import AudioFrame
 from .track import Track
 
 
-class AudioStream(EventEmitter):
+class AudioStream(AsyncIOEventEmitter):
     _streams: WeakValueDictionary[int, 'AudioStream'] = WeakValueDictionary()
     _initialized = False
 

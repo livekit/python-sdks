@@ -14,7 +14,7 @@
 
 from weakref import WeakValueDictionary
 
-from pyee.asyncio import AsyncIOEventEmitter as EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -23,7 +23,7 @@ from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
 
-class VideoStream(EventEmitter):
+class VideoStream(AsyncIOEventEmitter):
     _streams: WeakValueDictionary[int, 'VideoStream'] = WeakValueDictionary()
     _initialized = False
 

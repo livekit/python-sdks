@@ -17,7 +17,7 @@ import ctypes
 from dataclasses import dataclass
 from typing import Optional
 
-from pyee.asyncio import AsyncIOEventEmitter as EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -41,7 +41,7 @@ class ConnectError(Exception):
         self.message = message
 
 
-class Room(EventEmitter):
+class Room(AsyncIOEventEmitter):
     def __init__(self) -> None:
         super().__init__()
         self.participants: dict[str, RemoteParticipant] = {}
