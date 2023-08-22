@@ -58,4 +58,4 @@ from .video_frame import (
 from .video_source import VideoSource
 from .video_stream import VideoStream
 
-__version__ = "0.2.0"
+from .version import __version__
