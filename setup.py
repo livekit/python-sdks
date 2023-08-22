@@ -23,6 +23,9 @@ from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 from wheel.bdist_wheel import get_platform
 
 here = pathlib.Path(__file__).parent.resolve()
+about = {}
+with open(os.path.join(here, 'livekit', 'version.py'), 'r') as f:
+    exec(f.read(), about)
 
 
 class bdist_wheel(_bdist_wheel):
@@ -60,7 +63,7 @@ elif platform.system() == "Windows":
 
 setuptools.setup(
     name="livekit",
-    version="0.2.4",
+    version=about['__version__'],
     description="LiveKit Python Client SDK for LiveKit",
     long_description=(here / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
