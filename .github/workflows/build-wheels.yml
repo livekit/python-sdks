@@ -3,7 +3,10 @@ name: Build
 on:
   push:
     branches: ["main"]
+    tags: ["v*"]
   pull_request:
+  workflow_dispatch:
+  
 
 jobs:
   build_wheels:
@@ -42,3 +45,37 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: dist/*.whl
+
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Build SDist
+      run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v3
+      with:
+        path: dist/*.tar.gz
+  
+  publish:
+    name: Publish
+    needs: [build_wheels, make_sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    # only execute on tag push v1 or workflow_dispatch
+    if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
