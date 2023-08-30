@@ -154,6 +154,24 @@ class E2EEManager:
 
         await future
     
+    async def set_shared_key(self, enabled_shared_key: bool, shared_key: str) -> None:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.e2ee_manager_set_shared_key.room_handle = self.ffi_handle()
+        req.e2ee.e2ee_manager_set_shared_key.shared_key = shared_key
+        req.e2ee.e2ee_manager_set_shared_key.enabled_shared_key = enabled_shared_key
+
+        resp = ffi_client.request(req)
+        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
+
+        @ffi_client.on('e2ee')
+        def on_e2ee_manager_set_shared_key_callback(cb: e2ee_pb2.E2EEResponse):
+            if cb.async_id == resp.e2ee.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'e2ee', on_e2ee_manager_set_shared_key_callback)
+
+        await future
+
     async def frame_cryptors(self) -> []:
         req = proto_ffi.FfiRequest()
         req.e2ee.e2ee_manager_get_frame_cryptors.room_handle = self.ffi_handle()
