@@ -19,21 +19,30 @@ from typing import Optional
 
 from pyee.asyncio import EventEmitter
 
+
+
 from ._ffi_client import FfiHandle, ffi_client
+from ._proto import e2ee_pb2
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
+from .e2ee import E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
+
+DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
+DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
+DEFAULT_RATCHET_WINDOW_SIZE = 16
 
 
 @dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     dynacast: bool = True
+    e2ee_options: Optional[E2EEOptions] = None
 
 
 class ConnectError(Exception):
@@ -75,6 +84,14 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
+
+        if options.e2ee_options:
+            req.connect.options.e2ee_options.enabled = True
+            req.connect.options.e2ee_options.is_shared_key = options.e2ee_options.is_shared_key
+            req.connect.options.e2ee_options.shared_key = options.e2ee_options.shared_key
+            req.connect.options.e2ee_options.key_provider_options.ratchet_salt = DEFAULT_RATCHET_SALT
+            req.connect.options.e2ee_options.key_provider_options.uncrypted_magic_bytes = DEFAULT_MAGIC_BYTES
+            req.connect.options.e2ee_options.key_provider_options.ratchet_window_size = DEFAULT_RATCHET_WINDOW_SIZE
 
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
@@ -261,6 +278,12 @@ class Room(EventEmitter):
             self.emit('reconnecting')
         elif which == 'reconnected':
             self.emit('reconnected')
+        elif which == 'e2ee_state_changed':
+            sid = event.e2ee_state_changed.participant_sid
+            p = self._retrieve_participant(sid)
+            publication = p.tracks[event.e2ee_state_changed.track_sid]
+            self.emit('e2ee_state_changed',
+                      p, publication, event.e2ee_state_changed.participant_id, event.e2ee_state_changed.state)
 
     def _retrieve_participant(self, sid: str) -> Participant:
         """ Retrieve a participant by sid, returns the LocalParticipant

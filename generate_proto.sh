@@ -24,12 +24,14 @@ protoc \
     --python_out=$OUT_PYTHON \
     --mypy_out=$OUT_PYTHON \
     $FFI_PROTOCOL/audio_frame.proto \
+    $FFI_PROTOCOL/e2ee.proto \
     $FFI_PROTOCOL/ffi.proto \
     $FFI_PROTOCOL/handle.proto \
     $FFI_PROTOCOL/participant.proto \
     $FFI_PROTOCOL/room.proto \
     $FFI_PROTOCOL/track.proto \
     $FFI_PROTOCOL/video_frame.proto
+    
 
 touch -a "$OUT_PYTHON/__init__.py"
 

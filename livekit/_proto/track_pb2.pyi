@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import builtins
+import e2ee_pb2
 import google.protobuf.descriptor
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
@@ -188,6 +189,7 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     MIME_TYPE_FIELD_NUMBER: builtins.int
     MUTED_FIELD_NUMBER: builtins.int
     REMOTE_FIELD_NUMBER: builtins.int
+    ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     sid: builtins.str
@@ -200,6 +202,7 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     mime_type: builtins.str
     muted: builtins.bool
     remote: builtins.bool
+    encryption_type: e2ee_pb2.EncryptionType.ValueType
     def __init__(
         self,
         *,
@@ -214,9 +217,10 @@ class TrackPublicationInfo(google.protobuf.message.Message):
         mime_type: builtins.str = ...,
         muted: builtins.bool = ...,
         remote: builtins.bool = ...,
+        encryption_type: e2ee_pb2.EncryptionType.ValueType = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["handle", b"handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["encryption_type", b"encryption_type", "handle", b"handle", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
 global___TrackPublicationInfo = TrackPublicationInfo
 

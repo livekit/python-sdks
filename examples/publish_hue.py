@@ -1,14 +1,24 @@
 import asyncio
 import colorsys
 import logging
+from pathlib import Path
 from signal import SIGINT, SIGTERM
 
 import numpy as np
+import os
+import sys
+
+# Get the parent directory for debug only
+parent_dir = os.path.dirname(os.path.realpath(__file__))
+import_dir = os.path.normpath(os.path.join(parent_dir, os.pardir)) 
+# Add the parent directory to sys.path
+sys.path.append(import_dir)
+
 
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTUxNzA2OTEsImlzcyI6IkFQSXJramtRYVZRSjVERSIsIm5hbWUiOiJweWUyZWUiLCJuYmYiOjE2OTMzNzA2OTEsInN1YiI6InB5ZTJlZSIsInZpZGVvIjp7InJvb20iOiJsaXZlIiwicm9vbUpvaW4iOnRydWV9fQ.CZnT4fOBjUTxrTlkijxb_D_4HAbZoxljNRjDlCRHNBY'  # noqa
 
 
 async def publish_frames(source: livekit.VideoSource):
@@ -50,7 +60,14 @@ async def main():
 
     logging.info("connecting to %s", URL)
     try:
-        await room.connect(URL, TOKEN)
+        await room.connect(URL, TOKEN, options= livekit.RoomOptions(
+            auto_subscribe= True,
+            dynacast= True,
+            e2ee_options= livekit.E2EEOptions(
+                is_shared_key= True,
+                shared_key= "12345678",
+            ),
+        ))
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
