@@ -24,19 +24,16 @@ DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
 DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
 DEFAULT_RATCHET_WINDOW_SIZE = 16
 
-
 class EncryptionType(enum.Enum):
     NONE = 0
     GCM = 1
     CUSTOM = 2
 
-@dataclass
 class KeyProviderOptions:
     salt: bytes = DEFAULT_RATCHET_SALT
     magic_bytes: bytes = DEFAULT_MAGIC_BYTES
     ratchet_window_size: int = DEFAULT_RATCHET_WINDOW_SIZE
 
-@dataclass
 class E2EEOptions:
     is_shared_key: bool = True
     shared_key: str = True
