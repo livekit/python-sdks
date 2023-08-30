@@ -28,14 +28,10 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
-from .e2ee import E2EEOptions
+from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
-
-DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
-DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
-DEFAULT_RATCHET_WINDOW_SIZE = 16
 
 
 @dataclass
@@ -56,6 +52,7 @@ class Room(EventEmitter):
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
         self._ffi_handle: Optional[FfiHandle] = None
+        self.e2ee_manager: Optional[E2EEManager] = None
         ffi_client.add_listener('room_event', self._on_room_event)
 
     def __del__(self):
@@ -72,6 +69,12 @@ class Room(EventEmitter):
     @property
     def metadata(self) -> str:
         return self._info.metadata
+    
+    def e2ee_manager(self) -> Optional[E2EEManager]:
+        return self.e2ee_manager
+    
+    def ffi_handle(self) -> FfiHandle:
+        return self._ffi_handle
 
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and \
@@ -89,9 +92,10 @@ class Room(EventEmitter):
             req.connect.options.e2ee_options.enabled = True
             req.connect.options.e2ee_options.is_shared_key = options.e2ee_options.is_shared_key
             req.connect.options.e2ee_options.shared_key = options.e2ee_options.shared_key
-            req.connect.options.e2ee_options.key_provider_options.ratchet_salt = DEFAULT_RATCHET_SALT
-            req.connect.options.e2ee_options.key_provider_options.uncrypted_magic_bytes = DEFAULT_MAGIC_BYTES
-            req.connect.options.e2ee_options.key_provider_options.ratchet_window_size = DEFAULT_RATCHET_WINDOW_SIZE
+            req.connect.options.e2ee_options.key_provider_options.ratchet_salt = options.e2ee_options.key_provider_options.ratchet_salt
+            req.connect.options.e2ee_options.key_provider_options.uncrypted_magic_bytes = options.e2ee_options.key_provider_options.uncrypted_magic_bytes
+            req.connect.options.e2ee_options.key_provider_options.ratchet_window_size = options.e2ee_options.key_provider_options.ratchet_window_size
+            self.e2ee_manager = E2EEManager(self._ffi_handle, options.e2ee_options)
 
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
