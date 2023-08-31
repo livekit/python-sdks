@@ -19,8 +19,6 @@ from typing import Optional
 
 from pyee.asyncio import EventEmitter
 
-
-
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import e2ee_pb2
 from ._proto import ffi_pb2 as proto_ffi
@@ -89,13 +87,11 @@ class Room(EventEmitter):
         req.connect.token = token
 
         if options.e2ee_options:
-            req.connect.options.e2ee_options.enabled = True
-            req.connect.options.e2ee_options.is_shared_key = options.e2ee_options.is_shared_key
-            req.connect.options.e2ee_options.shared_key = options.e2ee_options.shared_key
+            req.connect.options.e2ee_options.encryption_type = options.e2ee_options.encryption_type.value
+            req.connect.options.e2ee_options.key_provider_options.shared_key = options.e2ee_options.key_provider_options.shared_key
             req.connect.options.e2ee_options.key_provider_options.ratchet_salt = options.e2ee_options.key_provider_options.ratchet_salt
             req.connect.options.e2ee_options.key_provider_options.uncrypted_magic_bytes = options.e2ee_options.key_provider_options.uncrypted_magic_bytes
             req.connect.options.e2ee_options.key_provider_options.ratchet_window_size = options.e2ee_options.key_provider_options.ratchet_window_size
-            self.e2ee_manager = E2EEManager(self._ffi_handle, options.e2ee_options)
 
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
@@ -116,6 +112,10 @@ class Room(EventEmitter):
 
         self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.room.handle.id)
+       
+        if options.e2ee_options:
+            self.e2ee_manager = E2EEManager(self._ffi_handle, options.e2ee_options)
+       
         self._info = cb.room
         self.connection_state = ConnectionState.CONN_CONNECTED
 

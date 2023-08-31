@@ -15,6 +15,7 @@
 import asyncio
 from dataclasses import dataclass
 import enum
+import logging
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import e2ee_pb2
@@ -38,88 +39,69 @@ class FrameCryptorState(enum.Enum):
     KEY_RATCHETED = 5
     INTERNAL_ERROR = 6
 
+@dataclass
 class KeyProviderOptions:
-    salt: bytes = DEFAULT_RATCHET_SALT
-    magic_bytes: bytes = DEFAULT_MAGIC_BYTES
+    shared_key: bool = True
+    ratchet_salt: bytes = DEFAULT_RATCHET_SALT
+    uncrypted_magic_bytes: bytes = DEFAULT_MAGIC_BYTES
     ratchet_window_size: int = DEFAULT_RATCHET_WINDOW_SIZE
 
+@dataclass
 class E2EEOptions:
-    is_shared_key: bool = True
-    shared_key: str = True
     key_provider_options: KeyProviderOptions = KeyProviderOptions()
+    encryption_type: EncryptionType = EncryptionType.NONE
 
 class KeyProvider:
     def __init__(self, ffi_handle: FfiHandle, options: KeyProviderOptions):
         self._options = options
-        self.ffi_handle = ffi_handle
+        self._ffi_handle = ffi_handle
     
     @property
     def options(self) -> KeyProviderOptions:
         return self._options
     
-    async def set_key(self, partcipant_id: str, key: bytes, key_index: int) -> None:
+    def set_shared_key(self, key: bytes, key_index: int) -> None:
         req = proto_ffi.FfiRequest()
-        req.e2ee.key_provider_set_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_set_shared_key.room_handle = self._ffi_handle.handle
+        req.e2ee.key_provider_set_shared_key.key_index = key_index
+        req.e2ee.key_provider_set_shared_key.shared_key = key
+
+        ffi_client.request(req)
+
+    def set_key(self, partcipant_id: str, key: bytes, key_index: int) -> None:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_set_key.room_handle = self._ffi_handle.handle
         req.e2ee.key_provider_set_key.participant_id = partcipant_id
         req.e2ee.key_provider_set_key.key_index = key_index
         req.e2ee.key_provider_set_key.key = key
 
         self.key_index = key_index
+        ffi_client.request(req)
 
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_key_provider_set_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_key_provider_set_key_callback)
-
-        await future
-
-    async def export_key(self, partcipant_id: str, key_index: int) -> bytes:
+    def export_key(self, partcipant_id: str, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
-        req.e2ee.key_provider_export_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_export_key.room_handle = self._ffi_handle.handle
         req.e2ee.key_provider_export_key.participant_id = partcipant_id
         req.e2ee.key_provider_export_key.key_index = key_index
-
         resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_key_provider_export_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_key_provider_export_key_callback)
-
-        await future
-        return future.result().e2ee.frame_cryptor_export_key.key
+        key =  resp.e2ee.key_provider_export_key.key
+        return key
     
-    async def rachet_key(self, partcipant_id: str, key_index: int) -> bytes:
+    def rachet_key(self, partcipant_id: str, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
-        req.e2ee.key_provider_rachet_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_rachet_key.room_handle = self._ffi_handle.handle
         req.e2ee.key_provider_rachet_key.participant_id = partcipant_id
         req.e2ee.key_provider_rachet_key.key_index = key_index
 
         resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
 
-        @ffi_client.on('e2ee')
-        def on_key_provider_rachet_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_key_provider_rachet_key_callback)
-
-        await future
-        return future.result().e2ee.frame_cryptor_rachet_key.new_key
+        new_key = resp.e2ee.key_provider_rachet_key.new_key
+        return new_key
 
 
 class FrameCryptor:
     def __init__(self, ffi_handle: FfiHandle, partcipant_id: str, key_index: int, enabled: bool):
-        self.ffi_handle = ffi_handle
+        self._ffi_handle = ffi_handle
         self.partcipant_id = partcipant_id
         self.key_index = key_index
         self._enabled = enabled
@@ -136,36 +118,30 @@ class FrameCryptor:
     def enabled(self) -> bool:
         return self._enabled
     
-    @property
-    def encryption_type(self) -> EncryptionType:
-        return self.encryption_type
-    
-    async def set_enabled(self, enabled: bool) -> None:
+    def set_enabled(self, enabled: bool) -> None:
         req = proto_ffi.FfiRequest()
-        req.e2ee.frame_cryptor_set_enabled.room_handle = self.ffi_handle()
+        req.e2ee.frame_cryptor_set_enabled.room_handle = self._ffi_handle.handle
         req.e2ee.frame_cryptor_set_enabled.participant_id = self.partcipant_id
-        req.e2ee.frame_cryptor_set_enabled.key_index = self.key_index
         req.e2ee.frame_cryptor_set_enabled.enabled = enabled
 
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_frame_cryptor_set_enabled_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_frame_cryptor_set_enabled_callback)
-
-        await future
+        ffi_client.request(req)
         self._enabled = enabled
+
+    def set_key_index(self, key_index: int) -> None:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.frame_cryptor_set_key_index.room_handle = self._ffi_handle.handle
+        req.e2ee.frame_cryptor_set_key_index.participant_id = self.partcipant_id
+        req.e2ee.frame_cryptor_set_key_index.key_index = key_index
+
+        ffi_client.request(req)
+        self.key_index = key_index
 
 class E2EEManager:
     def __init__(self, ffi_handle: FfiHandle, options: E2EEOptions):
         self.options = options
-        self.ffi_handle = ffi_handle
+        self._ffi_handle = ffi_handle
         self._enabled = True
-        self._key_provider = KeyProvider(ffi_handle, options.key_provider_options)
+        self._key_provider = KeyProvider(self._ffi_handle, options.key_provider_options)
 
     @property
     def key_provider(self) -> KeyProvider:
@@ -175,62 +151,25 @@ class E2EEManager:
     def enabled(self) -> bool:
         return self._enabled
 
-    async def set_enabled(self, enabled: bool) -> None:
+    def set_enabled(self, enabled: bool) -> None:
         req = proto_ffi.FfiRequest()
-        req.e2ee.e2ee_manager_set_enabled.room_handle = self.ffi_handle()
+        req.e2ee.e2ee_manager_set_enabled.room_handle = self._ffi_handle.handle
         req.e2ee.e2ee_manager_set_enabled.enabled = enabled
 
         resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
 
-        @ffi_client.on('e2ee')
-        def on_e2ee_manager_set_enabled_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_e2ee_manager_set_enabled_callback)
+        self._enabled = resp.e2ee_manager_set_enabled.enabled
 
-        await future
-        self.enabled = enabled
-    
-    async def set_shared_key(self, enabled_shared_key: bool, shared_key: str) -> None:
+    def frame_cryptors(self) -> []:
         req = proto_ffi.FfiRequest()
-        req.e2ee.e2ee_manager_set_shared_key.room_handle = self.ffi_handle()
-        req.e2ee.e2ee_manager_set_shared_key.shared_key = shared_key
-        req.e2ee.e2ee_manager_set_shared_key.enabled_shared_key = enabled_shared_key
+        req.e2ee.e2ee_manager_get_frame_cryptors.room_handle = self._ffi_handle.handle
 
         resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
 
-        @ffi_client.on('e2ee')
-        def on_e2ee_manager_set_shared_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_e2ee_manager_set_shared_key_callback)
-
-        await future
-
-    async def frame_cryptors(self) -> []:
-        req = proto_ffi.FfiRequest()
-        req.e2ee.e2ee_manager_get_frame_cryptors.room_handle = self.ffi_handle()
-
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_e2ee_manager_get_frame_cryptors(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_e2ee_manager_get_frame_cryptors)
-
-        await future
-        res = future.result()
         frame_cryptors = []
-        for frame_cryptor in res.e2ee.e2ee_manager_get_frame_cryptors.frame_cryptors:
+        for frame_cryptor in resp.e2ee.e2ee_manager_get_frame_cryptors.frame_cryptors:
             frame_cryptors.append(FrameCryptor(
-                ffi_handle=self.ffi_handle,
+                ffi_handle=self._ffi_handle,
                 partcipant_id=frame_cryptor.participant_id,
                 key_index=frame_cryptor.key_index,
                 enabled=frame_cryptor.enabled

@@ -55,6 +55,32 @@ async def publish_frames(source: livekit.VideoSource):
             break
 
 
+def do_e2ee_test(room: livekit.Room):
+        room.e2ee_manager.key_provider.set_shared_key(b"87654321", 1)
+        key0 = room.e2ee_manager.key_provider.export_key("shared", 0)
+
+        if key0 != b"12345678":
+            logging.info("key0 is not 12345678")
+        
+        key1 = room.e2ee_manager.key_provider.export_key("shared", 1)
+
+        if key1 != b"87654321":
+            logging.info("key1 is not 87654321")
+
+        room.e2ee_manager.key_provider.set_shared_key(b"88888888", 3)
+        key3 = room.e2ee_manager.key_provider.export_key("shared", 3)
+        room.e2ee_manager.key_provider.rachet_key("shared", 3)
+        key4 = room.e2ee_manager.key_provider.export_key("shared", 3)
+
+        room.e2ee_manager.key_provider.set_key("participant1", b"11111111", 0)
+        key5 = room.e2ee_manager.key_provider.export_key("participant1", 0)
+
+        room.e2ee_manager.key_provider.set_key("shared", b"22222222", 0)
+        key6 = room.e2ee_manager.key_provider.export_key("shared", 0)
+
+
+        room.e2ee_manager.key_provider.set_key("shared", b"12345678", 0)
+
 async def main():
     room = livekit.Room()
 
@@ -63,20 +89,25 @@ async def main():
         await room.connect(URL, TOKEN, options= livekit.RoomOptions(
             auto_subscribe= True,
             dynacast= True,
-            e2ee_options= livekit.E2EEOptions(
-                is_shared_key= True,
-                shared_key= "12345678",
+            e2ee_options= livekit.e2ee.E2EEOptions(
+                encryption_type= livekit.e2ee.EncryptionType.GCM,
+                key_provider_options= livekit.e2ee.KeyProviderOptions()
             ),
         ))
+        room.e2ee_manager.key_provider.set_shared_key(b"12345678", 0)
+        
+        #do_e2ee_test(room)
+
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
         return False
 
     @room.listens_to("e2ee_state_changed")
-    def on_e2ee_state_changed(participant: livekit.Participant, publication: livekit.TrackPublication, participant_id: str, state: int) -> None:
+    def on_e2ee_state_changed(participant: livekit.Participant, publication: livekit.TrackPublication, participant_id: str, state: any) -> None:
         logging.info(
             "e2ee state changed for %s %s, track %s, state: %s, e2ee participant_id %s", participant.sid, participant.identity, publication.sid, state, participant_id)
+    
 
     # publish a track
     source = livekit.VideoSource()

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ne2ee.proto\x12\rlivekit.proto\"f\n\x12KeyProviderOptions\x12\x1b\n\x13ratchet_window_size\x18\x01 \x01(\r\x12\x14\n\x0cratchet_salt\x18\x02 \x01(\x0c\x12\x1d\n\x15uncrypted_magic_bytes\x18\x03 \x01(\x0c\"\x8a\x01\n\x0b\x45\x32\x45\x45Options\x12\x0f\n\x07\x65nabled\x18\x01 \x01(\x08\x12\x15\n\ris_shared_key\x18\x02 \x01(\x08\x12\x12\n\nshared_key\x18\x03 \x01(\t\x12?\n\x14key_provider_options\x18\x04 \x01(\x0b\x32!.livekit.proto.KeyProviderOptions\"V\n\x1c\x45\x32\x45\x45ManagerSetEnabledRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x0f\n\x07\x65nabled\x18\x03 \x01(\x08\"1\n\x1d\x45\x32\x45\x45ManagerSetEnabledResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"v\n\x1e\x45\x32\x45\x45ManagerSetSharedKeyRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x19\n\x11\x65nable_shared_key\x18\x03 \x01(\x08\x12\x12\n\nshared_key\x18\x04 \x01(\t\"3\n\x1f\x45\x32\x45\x45ManagerSetSharedKeyResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"K\n\"E2EEManagerGetFrameCryptorsRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\"\x82\x01\n\x0c\x46rameCryptor\x12\x16\n\x0eparticipant_id\x18\x01 \x01(\t\x12\x36\n\x0f\x65ncryption_type\x18\x02 \x01(\x0e\x32\x1d.livekit.proto.EncryptionType\x12\x11\n\tkey_index\x18\x03 \x01(\x05\x12\x0f\n\x07\x65nabled\x18\x04 \x01(\x08\"l\n#E2EEManagerGetFrameCryptorsResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x33\n\x0e\x66rame_cryptors\x18\x02 \x03(\x0b\x32\x1b.livekit.proto.FrameCryptor\"o\n\x1d\x46rameCryptorSetEnabledRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x03 \x01(\t\x12\x0f\n\x07\x65nabled\x18\x04 \x01(\x08\"2\n\x1e\x46rameCryptorSetEnabledResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"y\n\x18KeyProviderSetKeyRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x03 \x01(\t\x12\x0b\n\x03key\x18\x04 \x01(\t\x12\x11\n\tkey_index\x18\x05 \x01(\x05\"-\n\x19KeyProviderSetKeyResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"o\n\x1bKeyProviderRachetKeyRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x03 \x01(\t\x12\x11\n\tkey_index\x18\x04 \x01(\x05\"A\n\x1cKeyProviderRachetKeyResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x0f\n\x07new_key\x18\x02 \x01(\x0c\"o\n\x1bKeyProviderExportKeyRequest\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x13\n\x0broom_handle\x18\x02 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x03 \x01(\t\x12\x11\n\tkey_index\x18\x04 \x01(\x05\"=\n\x1cKeyProviderExportKeyResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x0b\n\x03key\x18\x02 \x01(\x0c\"\xd7\x04\n\x0b\x45\x32\x45\x45Request\x12O\n\x18\x65\x32\x65\x65_manager_set_enabled\x18\x01 \x01(\x0b\x32+.livekit.proto.E2EEManagerSetEnabledRequestH\x00\x12T\n\x1b\x65\x32\x65\x65_manager_set_shared_key\x18\x02 \x01(\x0b\x32-.livekit.proto.E2EEManagerSetSharedKeyRequestH\x00\x12\\\n\x1f\x65\x32\x65\x65_manager_get_frame_cryptors\x18\x03 \x01(\x0b\x32\x31.livekit.proto.E2EEManagerGetFrameCryptorsRequestH\x00\x12Q\n\x19\x66rame_cryptor_set_enabled\x18\x04 \x01(\x0b\x32,.livekit.proto.FrameCryptorSetEnabledRequestH\x00\x12G\n\x14key_provider_set_key\x18\x05 \x01(\x0b\x32\'.livekit.proto.KeyProviderSetKeyRequestH\x00\x12M\n\x17key_provider_rachet_key\x18\x06 \x01(\x0b\x32*.livekit.proto.KeyProviderRachetKeyRequestH\x00\x12M\n\x17key_provider_export_key\x18\x07 \x01(\x0b\x32*.livekit.proto.KeyProviderExportKeyRequestH\x00\x42\t\n\x07message\"\xdf\x04\n\x0c\x45\x32\x45\x45Response\x12P\n\x18\x65\x32\x65\x65_manager_set_enabled\x18\x01 \x01(\x0b\x32,.livekit.proto.E2EEManagerSetEnabledResponseH\x00\x12U\n\x1b\x65\x32\x65\x65_manager_set_shared_key\x18\x02 \x01(\x0b\x32..livekit.proto.E2EEManagerSetSharedKeyResponseH\x00\x12]\n\x1f\x65\x32\x65\x65_manager_get_frame_cryptors\x18\x03 \x01(\x0b\x32\x32.livekit.proto.E2EEManagerGetFrameCryptorsResponseH\x00\x12R\n\x19\x66rame_cryptor_set_enabled\x18\x04 \x01(\x0b\x32-.livekit.proto.FrameCryptorSetEnabledResponseH\x00\x12H\n\x14key_provider_set_key\x18\x05 \x01(\x0b\x32(.livekit.proto.KeyProviderSetKeyResponseH\x00\x12N\n\x17key_provider_rachet_key\x18\x06 \x01(\x0b\x32+.livekit.proto.KeyProviderRachetKeyResponseH\x00\x12N\n\x17key_provider_export_key\x18\x07 \x01(\x0b\x32+.livekit.proto.KeyProviderExportKeyResponseH\x00\x42\t\n\x07message*/\n\x0e\x45ncryptionType\x12\x08\n\x04None\x10\x00\x12\x07\n\x03Gcm\x10\x01\x12\n\n\x06\x43ustom\x10\x02*\x82\x01\n\tE2EEState\x12\x07\n\x03NEW\x10\x00\x12\x06\n\x02OK\x10\x01\x12\x15\n\x11\x45NCRYPTION_FAILED\x10\x02\x12\x15\n\x11\x44\x45\x43RYPTION_FAILED\x10\x03\x12\x0f\n\x0bMISSING_KEY\x10\x04\x12\x11\n\rKEY_RATCHETED\x10\x05\x12\x12\n\x0eINTERNAL_ERROR\x10\x06\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ne2ee.proto\x12\rlivekit.proto\"z\n\x12KeyProviderOptions\x12\x12\n\nshared_key\x18\x01 \x01(\x08\x12\x1b\n\x13ratchet_window_size\x18\x02 \x01(\x05\x12\x14\n\x0cratchet_salt\x18\x03 \x01(\x0c\x12\x1d\n\x15uncrypted_magic_bytes\x18\x04 \x01(\x0c\"\x86\x01\n\x0b\x45\x32\x45\x45Options\x12\x36\n\x0f\x65ncryption_type\x18\x01 \x01(\x0e\x32\x1d.livekit.proto.EncryptionType\x12?\n\x14key_provider_options\x18\x02 \x01(\x0b\x32!.livekit.proto.KeyProviderOptions\"D\n\x1c\x45\x32\x45\x45ManagerSetEnabledRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x0f\n\x07\x65nabled\x18\x02 \x01(\x08\"\x1f\n\x1d\x45\x32\x45\x45ManagerSetEnabledResponse\"9\n\"E2EEManagerGetFrameCryptorsRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\"\x82\x01\n\x0c\x46rameCryptor\x12\x16\n\x0eparticipant_id\x18\x01 \x01(\t\x12\x36\n\x0f\x65ncryption_type\x18\x02 \x01(\x0e\x32\x1d.livekit.proto.EncryptionType\x12\x11\n\tkey_index\x18\x03 \x01(\x05\x12\x0f\n\x07\x65nabled\x18\x04 \x01(\x08\"Z\n#E2EEManagerGetFrameCryptorsResponse\x12\x33\n\x0e\x66rame_cryptors\x18\x01 \x03(\x0b\x32\x1b.livekit.proto.FrameCryptor\"]\n\x1d\x46rameCryptorSetEnabledRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x02 \x01(\t\x12\x0f\n\x07\x65nabled\x18\x03 \x01(\x08\" \n\x1e\x46rameCryptorSetEnabledResponse\"`\n\x1e\x46rameCryptorSetKeyIndexRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x02 \x01(\t\x12\x11\n\tkey_index\x18\x03 \x01(\x05\"!\n\x1f\x46rameCryptorSetKeyIndexResponse\"\\\n\x1eKeyProviderSetSharedKeyRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x12\n\nshared_key\x18\x02 \x01(\t\x12\x11\n\tkey_index\x18\x03 \x01(\x05\"!\n\x1fKeyProviderSetSharedKeyResponse\"g\n\x18KeyProviderSetKeyRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x02 \x01(\t\x12\x0b\n\x03key\x18\x03 \x01(\t\x12\x11\n\tkey_index\x18\x04 \x01(\x05\"\x1b\n\x19KeyProviderSetKeyResponse\"]\n\x1bKeyProviderRachetKeyRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x02 \x01(\t\x12\x11\n\tkey_index\x18\x03 \x01(\x05\"/\n\x1cKeyProviderRachetKeyResponse\x12\x0f\n\x07new_key\x18\x02 \x01(\x0c\"]\n\x1bKeyProviderExportKeyRequest\x12\x13\n\x0broom_handle\x18\x01 \x01(\x04\x12\x16\n\x0eparticipant_id\x18\x02 \x01(\t\x12\x11\n\tkey_index\x18\x03 \x01(\x05\"+\n\x1cKeyProviderExportKeyResponse\x12\x0b\n\x03key\x18\x02 \x01(\x0c\"\xad\x05\n\x0b\x45\x32\x45\x45Request\x12O\n\x18\x65\x32\x65\x65_manager_set_enabled\x18\x01 \x01(\x0b\x32+.livekit.proto.E2EEManagerSetEnabledRequestH\x00\x12\\\n\x1f\x65\x32\x65\x65_manager_get_frame_cryptors\x18\x02 \x01(\x0b\x32\x31.livekit.proto.E2EEManagerGetFrameCryptorsRequestH\x00\x12Q\n\x19\x66rame_cryptor_set_enabled\x18\x03 \x01(\x0b\x32,.livekit.proto.FrameCryptorSetEnabledRequestH\x00\x12T\n\x1b\x66rame_cryptor_set_key_index\x18\x04 \x01(\x0b\x32-.livekit.proto.FrameCryptorSetKeyIndexRequestH\x00\x12T\n\x1bkey_provider_set_shared_key\x18\x05 \x01(\x0b\x32-.livekit.proto.KeyProviderSetSharedKeyRequestH\x00\x12G\n\x14key_provider_set_key\x18\x06 \x01(\x0b\x32\'.livekit.proto.KeyProviderSetKeyRequestH\x00\x12M\n\x17key_provider_rachet_key\x18\x07 \x01(\x0b\x32*.livekit.proto.KeyProviderRachetKeyRequestH\x00\x12M\n\x17key_provider_export_key\x18\x08 \x01(\x0b\x32*.livekit.proto.KeyProviderExportKeyRequestH\x00\x42\t\n\x07message\"\xb6\x05\n\x0c\x45\x32\x45\x45Response\x12P\n\x18\x65\x32\x65\x65_manager_set_enabled\x18\x01 \x01(\x0b\x32,.livekit.proto.E2EEManagerSetEnabledResponseH\x00\x12]\n\x1f\x65\x32\x65\x65_manager_get_frame_cryptors\x18\x02 \x01(\x0b\x32\x32.livekit.proto.E2EEManagerGetFrameCryptorsResponseH\x00\x12R\n\x19\x66rame_cryptor_set_enabled\x18\x03 \x01(\x0b\x32-.livekit.proto.FrameCryptorSetEnabledResponseH\x00\x12U\n\x1b\x66rame_cryptor_set_key_index\x18\x04 \x01(\x0b\x32..livekit.proto.FrameCryptorSetKeyIndexResponseH\x00\x12U\n\x1bkey_provider_set_shared_key\x18\x05 \x01(\x0b\x32..livekit.proto.KeyProviderSetSharedKeyResponseH\x00\x12H\n\x14key_provider_set_key\x18\x06 \x01(\x0b\x32(.livekit.proto.KeyProviderSetKeyResponseH\x00\x12N\n\x17key_provider_rachet_key\x18\x07 \x01(\x0b\x32+.livekit.proto.KeyProviderRachetKeyResponseH\x00\x12N\n\x17key_provider_export_key\x18\x08 \x01(\x0b\x32+.livekit.proto.KeyProviderExportKeyResponseH\x00\x42\t\n\x07message*/\n\x0e\x45ncryptionType\x12\x08\n\x04None\x10\x00\x12\x07\n\x03Gcm\x10\x01\x12\n\n\x06\x43ustom\x10\x02*\x82\x01\n\tE2EEState\x12\x07\n\x03NEW\x10\x00\x12\x06\n\x02OK\x10\x01\x12\x15\n\x11\x45NCRYPTION_FAILED\x10\x02\x12\x15\n\x11\x44\x45\x43RYPTION_FAILED\x10\x03\x12\x0f\n\x0bMISSING_KEY\x10\x04\x12\x11\n\rKEY_RATCHETED\x10\x05\x12\x12\n\x0eINTERNAL_ERROR\x10\x06\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'e2ee_pb2', globals())
@@ -21,46 +21,50 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\252\002\rLiveKit.Proto'
-  _ENCRYPTIONTYPE._serialized_start=2809
-  _ENCRYPTIONTYPE._serialized_end=2856
-  _E2EESTATE._serialized_start=2859
-  _E2EESTATE._serialized_end=2989
+  _ENCRYPTIONTYPE._serialized_start=2871
+  _ENCRYPTIONTYPE._serialized_end=2918
+  _E2EESTATE._serialized_start=2921
+  _E2EESTATE._serialized_end=3051
   _KEYPROVIDEROPTIONS._serialized_start=29
-  _KEYPROVIDEROPTIONS._serialized_end=131
-  _E2EEOPTIONS._serialized_start=134
-  _E2EEOPTIONS._serialized_end=272
-  _E2EEMANAGERSETENABLEDREQUEST._serialized_start=274
-  _E2EEMANAGERSETENABLEDREQUEST._serialized_end=360
-  _E2EEMANAGERSETENABLEDRESPONSE._serialized_start=362
-  _E2EEMANAGERSETENABLEDRESPONSE._serialized_end=411
-  _E2EEMANAGERSETSHAREDKEYREQUEST._serialized_start=413
-  _E2EEMANAGERSETSHAREDKEYREQUEST._serialized_end=531
-  _E2EEMANAGERSETSHAREDKEYRESPONSE._serialized_start=533
-  _E2EEMANAGERSETSHAREDKEYRESPONSE._serialized_end=584
-  _E2EEMANAGERGETFRAMECRYPTORSREQUEST._serialized_start=586
-  _E2EEMANAGERGETFRAMECRYPTORSREQUEST._serialized_end=661
-  _FRAMECRYPTOR._serialized_start=664
-  _FRAMECRYPTOR._serialized_end=794
-  _E2EEMANAGERGETFRAMECRYPTORSRESPONSE._serialized_start=796
-  _E2EEMANAGERGETFRAMECRYPTORSRESPONSE._serialized_end=904
-  _FRAMECRYPTORSETENABLEDREQUEST._serialized_start=906
-  _FRAMECRYPTORSETENABLEDREQUEST._serialized_end=1017
-  _FRAMECRYPTORSETENABLEDRESPONSE._serialized_start=1019
-  _FRAMECRYPTORSETENABLEDRESPONSE._serialized_end=1069
-  _KEYPROVIDERSETKEYREQUEST._serialized_start=1071
-  _KEYPROVIDERSETKEYREQUEST._serialized_end=1192
-  _KEYPROVIDERSETKEYRESPONSE._serialized_start=1194
-  _KEYPROVIDERSETKEYRESPONSE._serialized_end=1239
-  _KEYPROVIDERRACHETKEYREQUEST._serialized_start=1241
-  _KEYPROVIDERRACHETKEYREQUEST._serialized_end=1352
-  _KEYPROVIDERRACHETKEYRESPONSE._serialized_start=1354
-  _KEYPROVIDERRACHETKEYRESPONSE._serialized_end=1419
-  _KEYPROVIDEREXPORTKEYREQUEST._serialized_start=1421
-  _KEYPROVIDEREXPORTKEYREQUEST._serialized_end=1532
-  _KEYPROVIDEREXPORTKEYRESPONSE._serialized_start=1534
-  _KEYPROVIDEREXPORTKEYRESPONSE._serialized_end=1595
-  _E2EEREQUEST._serialized_start=1598
-  _E2EEREQUEST._serialized_end=2197
-  _E2EERESPONSE._serialized_start=2200
-  _E2EERESPONSE._serialized_end=2807
+  _KEYPROVIDEROPTIONS._serialized_end=151
+  _E2EEOPTIONS._serialized_start=154
+  _E2EEOPTIONS._serialized_end=288
+  _E2EEMANAGERSETENABLEDREQUEST._serialized_start=290
+  _E2EEMANAGERSETENABLEDREQUEST._serialized_end=358
+  _E2EEMANAGERSETENABLEDRESPONSE._serialized_start=360
+  _E2EEMANAGERSETENABLEDRESPONSE._serialized_end=391
+  _E2EEMANAGERGETFRAMECRYPTORSREQUEST._serialized_start=393
+  _E2EEMANAGERGETFRAMECRYPTORSREQUEST._serialized_end=450
+  _FRAMECRYPTOR._serialized_start=453
+  _FRAMECRYPTOR._serialized_end=583
+  _E2EEMANAGERGETFRAMECRYPTORSRESPONSE._serialized_start=585
+  _E2EEMANAGERGETFRAMECRYPTORSRESPONSE._serialized_end=675
+  _FRAMECRYPTORSETENABLEDREQUEST._serialized_start=677
+  _FRAMECRYPTORSETENABLEDREQUEST._serialized_end=770
+  _FRAMECRYPTORSETENABLEDRESPONSE._serialized_start=772
+  _FRAMECRYPTORSETENABLEDRESPONSE._serialized_end=804
+  _FRAMECRYPTORSETKEYINDEXREQUEST._serialized_start=806
+  _FRAMECRYPTORSETKEYINDEXREQUEST._serialized_end=902
+  _FRAMECRYPTORSETKEYINDEXRESPONSE._serialized_start=904
+  _FRAMECRYPTORSETKEYINDEXRESPONSE._serialized_end=937
+  _KEYPROVIDERSETSHAREDKEYREQUEST._serialized_start=939
+  _KEYPROVIDERSETSHAREDKEYREQUEST._serialized_end=1031
+  _KEYPROVIDERSETSHAREDKEYRESPONSE._serialized_start=1033
+  _KEYPROVIDERSETSHAREDKEYRESPONSE._serialized_end=1066
+  _KEYPROVIDERSETKEYREQUEST._serialized_start=1068
+  _KEYPROVIDERSETKEYREQUEST._serialized_end=1171
+  _KEYPROVIDERSETKEYRESPONSE._serialized_start=1173
+  _KEYPROVIDERSETKEYRESPONSE._serialized_end=1200
+  _KEYPROVIDERRACHETKEYREQUEST._serialized_start=1202
+  _KEYPROVIDERRACHETKEYREQUEST._serialized_end=1295
+  _KEYPROVIDERRACHETKEYRESPONSE._serialized_start=1297
+  _KEYPROVIDERRACHETKEYRESPONSE._serialized_end=1344
+  _KEYPROVIDEREXPORTKEYREQUEST._serialized_start=1346
+  _KEYPROVIDEREXPORTKEYREQUEST._serialized_end=1439
+  _KEYPROVIDEREXPORTKEYRESPONSE._serialized_start=1441
+  _KEYPROVIDEREXPORTKEYRESPONSE._serialized_end=1484
+  _E2EEREQUEST._serialized_start=1487
+  _E2EEREQUEST._serialized_end=2172
+  _E2EERESPONSE._serialized_start=2175
+  _E2EERESPONSE._serialized_end=2869
 # @@protoc_insertion_point(module_scope)
