@@ -29,6 +29,15 @@ class EncryptionType(enum.Enum):
     GCM = 1
     CUSTOM = 2
 
+class FrameCryptorState(enum.Enum):
+    NEW = 0
+    OK = 1
+    ENCRYPTION_FAILED = 2
+    DECRYPTION_FAILED = 3
+    MISSING_KEY = 4
+    KEY_RATCHETED = 5
+    INTERNAL_ERROR = 6
+
 class KeyProviderOptions:
     salt: bytes = DEFAULT_RATCHET_SALT
     magic_bytes: bytes = DEFAULT_MAGIC_BYTES

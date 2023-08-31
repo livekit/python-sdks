@@ -76,7 +76,7 @@ async def main():
     @room.listens_to("e2ee_state_changed")
     def on_e2ee_state_changed(participant: livekit.Participant, publication: livekit.TrackPublication, participant_id: str, state: int) -> None:
         logging.info(
-            "e2ee state changed for %s %s, track %s, state: %d, e2ee participant_id %s", participant.sid, participant.identity, publication.sid, state, participant_id)
+            "e2ee state changed for %s %s, track %s, state: %s, e2ee participant_id %s", participant.sid, participant.identity, publication.sid, state, participant_id)
 
     # publish a track
     source = livekit.VideoSource()

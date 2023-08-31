@@ -28,7 +28,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
-from .e2ee import E2EEManager, E2EEOptions
+from .e2ee import E2EEManager, E2EEOptions, FrameCryptorState
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
@@ -287,7 +287,7 @@ class Room(EventEmitter):
             p = self._retrieve_participant(sid)
             publication = p.tracks[event.e2ee_state_changed.track_sid]
             self.emit('e2ee_state_changed',
-                      p, publication, event.e2ee_state_changed.participant_id, event.e2ee_state_changed.state)
+                      p, publication, event.e2ee_state_changed.participant_id, FrameCryptorState(event.e2ee_state_changed.state))
 
     def _retrieve_participant(self, sid: str) -> Participant:
         """ Retrieve a participant by sid, returns the LocalParticipant
