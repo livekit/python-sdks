@@ -39,11 +39,76 @@ class E2EEOptions:
     shared_key: str = True
     key_provider_options: KeyProviderOptions = KeyProviderOptions()
 
+class KeyProvider:
+    def __init__(self, ffi_handle: FfiHandle, options: KeyProviderOptions):
+        self._options = options
+        self.ffi_handle = ffi_handle
+    
+    @property
+    def options(self) -> KeyProviderOptions:
+        return self._options
+    
+    async def set_key(self, key: bytes, key_index: int) -> None:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_set_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_set_key.participant_id = self.partcipant_id
+        req.e2ee.key_provider_set_key.key_index = key_index
+        req.e2ee.key_provider_set_key.key = key
+
+        self.key_index = key_index
+
+        resp = ffi_client.request(req)
+        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
+
+        @ffi_client.on('e2ee')
+        def on_key_provider_set_key_callback(cb: e2ee_pb2.E2EEResponse):
+            if cb.async_id == resp.e2ee.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'e2ee', on_key_provider_set_key_callback)
+
+        await future
+
+    async def export_key(self) -> bytes:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_export_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_export_key.participant_id = self.partcipant_id
+        req.e2ee.key_provider_export_key.key_index = self.key_index
+
+        resp = ffi_client.request(req)
+        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
+
+        @ffi_client.on('e2ee')
+        def on_key_provider_export_key_callback(cb: e2ee_pb2.E2EEResponse):
+            if cb.async_id == resp.e2ee.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'e2ee', on_key_provider_export_key_callback)
+
+        await future
+        return future.result().e2ee.frame_cryptor_export_key.key
+    
+    async def rachet_key(self) -> bytes:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_rachet_key.room_handle = self.ffi_handle()
+        req.e2ee.key_provider_rachet_key.participant_id = self.partcipant_id
+        req.e2ee.key_provider_rachet_key.key_index = self.key_index
+
+        resp = ffi_client.request(req)
+        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
+
+        @ffi_client.on('e2ee')
+        def on_key_provider_rachet_key_callback(cb: e2ee_pb2.E2EEResponse):
+            if cb.async_id == resp.e2ee.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'e2ee', on_key_provider_rachet_key_callback)
+
+        await future
+        return future.result().e2ee.frame_cryptor_rachet_key.new_key
+
+
 class FrameCryptor:
-    partcipant_id: str
-    key_index: int
-    enabled: bool
-    encryption_type: EncryptionType
     def __init__(self, ffi_handle: FfiHandle, partcipant_id: str, key_index: int, enabled: bool, encryption_type: EncryptionType):
         self.ffi_handle = ffi_handle
         self.partcipant_id = partcipant_id
@@ -51,105 +116,73 @@ class FrameCryptor:
         self.enabled = enabled
         self.encryption_type = encryption_type
 
+    @property
+    def partcipant_id(self) -> str:
+        return self.partcipant_id
+    
+    @property
+    def key_index(self) -> int:
+        return self.key_index
+    
+    @property
+    def enabled(self) -> bool:
+        return self.enabled
+    
+    @property
+    def encryption_type(self) -> EncryptionType:
+        return self.encryption_type
+    
     async def set_enabled(self, enabled: bool) -> None:
         req = proto_ffi.FfiRequest()
-        req.e2ee.frame_cryptor_enable.room_handle = self.ffi_handle()
-        req.e2ee.frame_cryptor_enable.participant_id = self.partcipant_id
-        req.e2ee.frame_cryptor_enable.key_index = self.key_index
-        req.e2ee.frame_cryptor_enable.enabled = enabled
+        req.e2ee.frame_cryptor_set_enabled.room_handle = self.ffi_handle()
+        req.e2ee.frame_cryptor_set_enabled.participant_id = self.partcipant_id
+        req.e2ee.frame_cryptor_set_enabled.key_index = self.key_index
+        req.e2ee.frame_cryptor_set_enabled.enabled = enabled
 
         resp = ffi_client.request(req)
         future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
 
         @ffi_client.on('e2ee')
-        def on_frame_cryptor_enabled_callback(cb: e2ee_pb2.E2EEResponse):
+        def on_frame_cryptor_set_enabled_callback(cb: e2ee_pb2.E2EEResponse):
             if cb.async_id == resp.e2ee.async_id:
                 future.set_result(cb)
                 ffi_client.remove_listener(
-                    'e2ee', on_frame_cryptor_enabled_callback)
+                    'e2ee', on_frame_cryptor_set_enabled_callback)
 
         await future
-    
-    async def set_key(self, key: bytes, key_index: int) -> None:
-        req = proto_ffi.FfiRequest()
-        req.e2ee.frame_cryptor_set_key.room_handle = self.ffi_handle()
-        req.e2ee.frame_cryptor_set_key.participant_id = self.partcipant_id
-        req.e2ee.frame_cryptor_set_key.key_index = key_index
-        req.e2ee.frame_cryptor_set_key.key = key
-
-        self.key_index = key_index
-
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_frame_cryptor_set_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_frame_cryptor_set_key_callback)
-
-        await future
-
-    async def export_key(self) -> bytes:
-        req = proto_ffi.FfiRequest()
-        req.e2ee.frame_cryptor_export_key.room_handle = self.ffi_handle()
-        req.e2ee.frame_cryptor_export_key.participant_id = self.partcipant_id
-        req.e2ee.frame_cryptor_export_key.key_index = self.key_index
-
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_frame_cryptor_export_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_frame_cryptor_export_key_callback)
-
-        await future
-        return future.result().e2ee.frame_cryptor_export_key.key
-    
-    async def rachet_key(self) -> bytes:
-        req = proto_ffi.FfiRequest()
-        req.e2ee.frame_cryptor_rachet_key.room_handle = self.ffi_handle()
-        req.e2ee.frame_cryptor_rachet_key.participant_id = self.partcipant_id
-        req.e2ee.frame_cryptor_rachet_key.key_index = self.key_index
-
-        resp = ffi_client.request(req)
-        future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
-
-        @ffi_client.on('e2ee')
-        def on_frame_cryptor_rachet_key_callback(cb: e2ee_pb2.E2EEResponse):
-            if cb.async_id == resp.e2ee.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'e2ee', on_frame_cryptor_rachet_key_callback)
-
-        await future
-        return future.result().e2ee.frame_cryptor_rachet_key.new_key
 
 class E2EEManager:
     def __init__(self, ffi_handle: FfiHandle, options: E2EEOptions):
         self.options = options
         self.ffi_handle = ffi_handle
-    
+        self._enabled = True
+        self._key_provider = KeyProvider(ffi_handle, options.key_provider_options)
+
+    @property
+    def key_provider(self) -> KeyProvider:
+        return self._key_provider
+
+    @property
+    def enabled(self) -> bool:
+        return self._enabled
+
     async def set_enabled(self, enabled: bool) -> None:
         req = proto_ffi.FfiRequest()
-        req.e2ee.e2ee_manager_enable.room_handle = self.ffi_handle()
-        req.e2ee.e2ee_manager_enable.enabled = enabled
+        req.e2ee.e2ee_manager_set_enabled.room_handle = self.ffi_handle()
+        req.e2ee.e2ee_manager_set_enabled.enabled = enabled
 
         resp = ffi_client.request(req)
         future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
 
         @ffi_client.on('e2ee')
-        def on_e2ee_manager_enabled_callback(cb: e2ee_pb2.E2EEResponse):
+        def on_e2ee_manager_set_enabled_callback(cb: e2ee_pb2.E2EEResponse):
             if cb.async_id == resp.e2ee.async_id:
                 future.set_result(cb)
                 ffi_client.remove_listener(
-                    'e2ee', on_e2ee_manager_enabled_callback)
+                    'e2ee', on_e2ee_manager_set_enabled_callback)
 
         await future
+        self.enabled = enabled
     
     async def set_shared_key(self, enabled_shared_key: bool, shared_key: str) -> None:
         req = proto_ffi.FfiRequest()
