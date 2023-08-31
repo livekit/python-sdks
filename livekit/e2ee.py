@@ -48,10 +48,10 @@ class KeyProvider:
     def options(self) -> KeyProviderOptions:
         return self._options
     
-    async def set_key(self, key: bytes, key_index: int) -> None:
+    async def set_key(self, partcipant_id: str, key: bytes, key_index: int) -> None:
         req = proto_ffi.FfiRequest()
         req.e2ee.key_provider_set_key.room_handle = self.ffi_handle()
-        req.e2ee.key_provider_set_key.participant_id = self.partcipant_id
+        req.e2ee.key_provider_set_key.participant_id = partcipant_id
         req.e2ee.key_provider_set_key.key_index = key_index
         req.e2ee.key_provider_set_key.key = key
 
@@ -69,11 +69,11 @@ class KeyProvider:
 
         await future
 
-    async def export_key(self) -> bytes:
+    async def export_key(self, partcipant_id: str, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
         req.e2ee.key_provider_export_key.room_handle = self.ffi_handle()
-        req.e2ee.key_provider_export_key.participant_id = self.partcipant_id
-        req.e2ee.key_provider_export_key.key_index = self.key_index
+        req.e2ee.key_provider_export_key.participant_id = partcipant_id
+        req.e2ee.key_provider_export_key.key_index = key_index
 
         resp = ffi_client.request(req)
         future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
@@ -88,11 +88,11 @@ class KeyProvider:
         await future
         return future.result().e2ee.frame_cryptor_export_key.key
     
-    async def rachet_key(self) -> bytes:
+    async def rachet_key(self, partcipant_id: str, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
         req.e2ee.key_provider_rachet_key.room_handle = self.ffi_handle()
-        req.e2ee.key_provider_rachet_key.participant_id = self.partcipant_id
-        req.e2ee.key_provider_rachet_key.key_index = self.key_index
+        req.e2ee.key_provider_rachet_key.participant_id = partcipant_id
+        req.e2ee.key_provider_rachet_key.key_index = key_index
 
         resp = ffi_client.request(req)
         future: asyncio.Future[e2ee_pb2.E2EEResponse] = asyncio.Future()
@@ -109,12 +109,11 @@ class KeyProvider:
 
 
 class FrameCryptor:
-    def __init__(self, ffi_handle: FfiHandle, partcipant_id: str, key_index: int, enabled: bool, encryption_type: EncryptionType):
+    def __init__(self, ffi_handle: FfiHandle, partcipant_id: str, key_index: int, enabled: bool):
         self.ffi_handle = ffi_handle
         self.partcipant_id = partcipant_id
         self.key_index = key_index
-        self.enabled = enabled
-        self.encryption_type = encryption_type
+        self._enabled = enabled
 
     @property
     def partcipant_id(self) -> str:
@@ -126,7 +125,7 @@ class FrameCryptor:
     
     @property
     def enabled(self) -> bool:
-        return self.enabled
+        return self._enabled
     
     @property
     def encryption_type(self) -> EncryptionType:
@@ -150,6 +149,7 @@ class FrameCryptor:
                     'e2ee', on_frame_cryptor_set_enabled_callback)
 
         await future
+        self._enabled = enabled
 
 class E2EEManager:
     def __init__(self, ffi_handle: FfiHandle, options: E2EEOptions):
@@ -224,7 +224,6 @@ class E2EEManager:
                 ffi_handle=self.ffi_handle,
                 partcipant_id=frame_cryptor.participant_id,
                 key_index=frame_cryptor.key_index,
-                enabled=frame_cryptor.enabled,
-                encryption_type=EncryptionType(frame_cryptor.encryption_type)
+                enabled=frame_cryptor.enabled
             ))
         return frame_cryptors
