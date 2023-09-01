@@ -56,30 +56,44 @@ async def publish_frames(source: livekit.VideoSource):
 
 
 def do_e2ee_test(room: livekit.Room):
-        room.e2ee_manager.key_provider.set_shared_key(b"87654321", 1)
-        key0 = room.e2ee_manager.key_provider.export_key("shared", 0)
+        logging.info("start e2ee api test")
+        room.e2ee_manager.key_provider.set_shared_key(b"12345678", 1)
+        key0 = room.e2ee_manager.key_provider.export_key("shared", 1)
 
         if key0 != b"12345678":
-            logging.info("key0 is not 12345678")
-        
-        key1 = room.e2ee_manager.key_provider.export_key("shared", 1)
+            logging.warning("key0 is not 12345678")
+
+        room.e2ee_manager.key_provider.set_shared_key(b"87654321", 0)
+        key1 = room.e2ee_manager.key_provider.export_key("shared", 0)
 
         if key1 != b"87654321":
-            logging.info("key1 is not 87654321")
+            logging.warning("key1 is not 87654321")
 
         room.e2ee_manager.key_provider.set_shared_key(b"88888888", 3)
         key3 = room.e2ee_manager.key_provider.export_key("shared", 3)
+
+        if key3 != b"88888888":
+            logging.warning("key3 is not 88888888")
+
         room.e2ee_manager.key_provider.rachet_key("shared", 3)
         key4 = room.e2ee_manager.key_provider.export_key("shared", 3)
+
+        if key4 == b"88888888":
+            logging.warning("rachet_key failed")
 
         room.e2ee_manager.key_provider.set_key("participant1", b"11111111", 0)
         key5 = room.e2ee_manager.key_provider.export_key("participant1", 0)
 
+        if key5 != b"11111111":
+            logging.warning("key5 is not 11111111")
+
         room.e2ee_manager.key_provider.set_key("shared", b"22222222", 0)
         key6 = room.e2ee_manager.key_provider.export_key("shared", 0)
 
-
-        room.e2ee_manager.key_provider.set_key("shared", b"12345678", 0)
+        if key6 != b"22222222":
+            logging.warning("key6 is not 22222222")
+        
+        logging.info("end e2ee api test")
 
 async def main():
     room = livekit.Room()
@@ -94,9 +108,10 @@ async def main():
                 key_provider_options= livekit.e2ee.KeyProviderOptions()
             ),
         ))
-        room.e2ee_manager.key_provider.set_shared_key(b"12345678", 0)
         
-        #do_e2ee_test(room)
+        do_e2ee_test(room)
+
+        room.e2ee_manager.key_provider.set_shared_key(b"12345678", 0)
 
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
