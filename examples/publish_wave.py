@@ -1,8 +1,6 @@
 import asyncio
 import logging
 from signal import SIGINT, SIGTERM
-from threading import Thread, Timer
-import time
 
 import numpy as np
 import os
