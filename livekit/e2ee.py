@@ -49,7 +49,7 @@ class KeyProviderOptions:
 @dataclass
 class E2EEOptions:
     key_provider_options: KeyProviderOptions = KeyProviderOptions()
-    encryption_type: EncryptionType = EncryptionType.NONE
+    encryption_type: EncryptionType = EncryptionType.GCM
 
 class KeyProvider:
     def __init__(self, ffi_handle: FfiHandle, options: KeyProviderOptions):
