@@ -68,6 +68,24 @@ class KeyProvider:
 
         ffi_client.request(req)
 
+    def export_shared_key(self, key_index: int) -> bytes:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_export_shared_key.room_handle = self._ffi_handle.handle
+        req.e2ee.key_provider_export_shared_key.key_index = key_index
+        resp = ffi_client.request(req)
+        key =  resp.e2ee.key_provider_export_shared_key.key
+        return key
+
+    def rachet_shared_key(self, key_index: int) -> bytes:
+        req = proto_ffi.FfiRequest()
+        req.e2ee.key_provider_rachet_shared_key.room_handle = self._ffi_handle.handle
+        req.e2ee.key_provider_rachet_shared_key.key_index = key_index
+
+        resp = ffi_client.request(req)
+
+        new_key = resp.e2ee.key_provider_rachet_shared_key.new_key
+        return new_key
+
     def set_key(self, partcipant_id: str, key: bytes, key_index: int) -> None:
         req = proto_ffi.FfiRequest()
         req.e2ee.key_provider_set_key.room_handle = self._ffi_handle.handle
@@ -86,7 +104,7 @@ class KeyProvider:
         resp = ffi_client.request(req)
         key =  resp.e2ee.key_provider_export_key.key
         return key
-    
+
     def rachet_key(self, partcipant_id: str, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
         req.e2ee.key_provider_rachet_key.room_handle = self._ffi_handle.handle
@@ -117,7 +135,7 @@ class FrameCryptor:
     @property
     def enabled(self) -> bool:
         return self._enabled
-    
+
     def set_enabled(self, enabled: bool) -> None:
         req = proto_ffi.FfiRequest()
         req.e2ee.frame_cryptor_set_enabled.room_handle = self._ffi_handle.handle
