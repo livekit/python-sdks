@@ -108,7 +108,7 @@ async def main():
     @room.listens_to("track_published")
     def on_track_published(publication: livekit.RemoteTrackPublication,
                            participant: livekit.RemoteParticipant):
-        # Only subscribe to the audio tracks coming from the microphone
+        # Only subscribe to the video tracks coming from the camera
         if publication.kind == livekit.TrackKind.KIND_VIDEO \
                 and publication.source == livekit.TrackSource.SOURCE_CAMERA:
             logging.info("track published: %s from participant %s (%s), subscribing...",
