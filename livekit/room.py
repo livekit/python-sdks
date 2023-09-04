@@ -36,7 +36,7 @@ from .track_publication import RemoteTrackPublication
 class RoomOptions:
     auto_subscribe: bool = True
     dynacast: bool = True
-    e2ee_options: Optional[E2EEOptions] = None
+    e2ee: Optional[E2EEOptions] = None
 
 
 class ConnectError(Exception):
