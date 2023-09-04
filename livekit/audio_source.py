@@ -31,5 +31,5 @@ class AudioSource:
         req = proto_ffi.FfiRequest()
 
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
-        req.capture_audio_frame.buffer_handle = frame._ffi_handle.handle
+        req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
         ffi_client.request(req)

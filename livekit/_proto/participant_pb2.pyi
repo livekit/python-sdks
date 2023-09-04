@@ -32,13 +32,10 @@ DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 class ParticipantInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: builtins.int
     SID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     IDENTITY_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
-    @property
-    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
@@ -46,13 +43,32 @@ class ParticipantInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        handle: handle_pb2.FfiOwnedHandle | None = ...,
         sid: builtins.str = ...,
         name: builtins.str = ...,
         identity: builtins.str = ...,
         metadata: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "identity", b"identity", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["identity", b"identity", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
+
+@typing_extensions.final
+class OwnedParticipant(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___ParticipantInfo: ...
+    def __init__(
+        self,
+        *,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___ParticipantInfo | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+
+global___OwnedParticipant = OwnedParticipant

@@ -22,10 +22,10 @@ from .track import Track
 
 
 class TrackPublication():
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
-        self._info = info
+    def __init__(self, owned_info: proto_track.OwnedTrackPublication):
+        self._info = owned_info.info
         self.track: Optional[Track] = None
-        self._ffi_handle = handle
+        self._ffi_handle = FfiHandle(owned_info.handle.id)
 
     @property
     def sid(self) -> str:
@@ -65,13 +65,13 @@ class TrackPublication():
 
 
 class LocalTrackPublication(TrackPublication):
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
-        super().__init__(handle, info)
+    def __init__(self, owned_info: proto_track.OwnedTrackPublication):
+        super().__init__(owned_info)
 
 
 class RemoteTrackPublication(TrackPublication):
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackPublicationInfo):
-        super().__init__(handle, info)
+    def __init__(self, owned_info: proto_track.OwnedTrackPublication):
+        super().__init__(owned_info)
         self.subscribed = False
 
     def set_subscribed(self, subscribed: bool):

@@ -28,9 +28,9 @@ class VideoFrame():
 
 
 class VideoFrameBuffer():
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        self._info = info
-        self._ffi_handle = ffi_handle
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        self._info = owned_info.info
+        self._ffi_handle = FfiHandle(owned_info.handle.id)
 
     @property
     def width(self) -> int:
@@ -46,13 +46,10 @@ class VideoFrameBuffer():
 
     def to_i420(self) -> 'I420Buffer':
         req = proto_ffi.FfiRequest()
-        req.to_i420.buffer_handle = self._ffi_handle.handle
+        req.to_i420.yuv_handle = self._ffi_handle.handle
 
         resp = ffi_client.request(req)
-
-        new_info = resp.to_i420.buffer
-        ffi_handle = FfiHandle(new_info.handle.id)
-        return I420Buffer(ffi_handle, new_info)
+        return I420Buffer(resp.to_i420.buffer)
 
     def to_argb(self, dst: 'ArgbFrame') -> None:
         req = proto_ffi.FfiRequest()
@@ -66,37 +63,38 @@ class VideoFrameBuffer():
         ffi_client.request(req)
 
     @staticmethod
-    def create(ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> 'VideoFrameBuffer':
+    def create(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'VideoFrameBuffer':
         """
         Create the right class instance from the VideoFrameBufferInfo
         """
 
+        info = owned_info.info
         if info.buffer_type == VideoFrameBufferType.NATIVE:
-            return NativeVideoFrameBuffer(ffi_handle, info)
+            return NativeVideoFrameBuffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I420:
-            return I420Buffer(ffi_handle, info)
+            return I420Buffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I420A:
-            return I420ABuffer(ffi_handle, info)
+            return I420ABuffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I422:
-            return I422Buffer(ffi_handle, info)
+            return I422Buffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I444:
-            return I444Buffer(ffi_handle, info)
+            return I444Buffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I010:
-            return I010Buffer(ffi_handle, info)
+            return I010Buffer(owned_info)
         elif info.buffer_type == VideoFrameBufferType.NV12:
-            return NV12Buffer(ffi_handle, info)
+            return NV12Buffer(owned_info)
         else:
             raise Exception('Unsupported VideoFrameBufferType')
 
 
 class NativeVideoFrameBuffer(VideoFrameBuffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class PlanarYuvBuffer(VideoFrameBuffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
     @property
     def chroma_width(self) -> int:
@@ -120,8 +118,8 @@ class PlanarYuvBuffer(VideoFrameBuffer):
 
 
 class PlanarYuv8Buffer(PlanarYuvBuffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
     @property
     def data_y(self) -> ctypes.Array[ctypes.c_uint8]:
@@ -143,8 +141,8 @@ class PlanarYuv8Buffer(PlanarYuvBuffer):
 
 
 class PlanarYuv16Buffer(PlanarYuvBuffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
     @property
     def data_y(self) -> ctypes.Array[ctypes.c_uint16]:
@@ -166,8 +164,8 @@ class PlanarYuv16Buffer(PlanarYuvBuffer):
 
 
 class BiplanaraYuv8Buffer(VideoFrameBuffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
     @property
     def data_y(self) -> ctypes.Array[ctypes.c_uint8]:
@@ -183,13 +181,13 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer):
 
 
 class I420Buffer(PlanarYuv8Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class I420ABuffer(PlanarYuv8Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
     @property
     def data_a(self) -> ctypes.Array[ctypes.c_uint8]:
@@ -199,23 +197,23 @@ class I420ABuffer(PlanarYuv8Buffer):
 
 
 class I422Buffer(PlanarYuv8Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class I444Buffer(PlanarYuv8Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class I010Buffer(PlanarYuv16Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class NV12Buffer(BiplanaraYuv8Buffer):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_video_frame.VideoFrameBufferInfo) -> None:
-        super().__init__(ffi_handle, info)
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        super().__init__(owned_info)
 
 
 class ArgbFrame:
@@ -241,9 +239,7 @@ class ArgbFrame:
         req.to_i420.argb.ptr = ctypes.addressof(self.data)
 
         res = ffi_client.request(req)
-        buffer_info = res.to_i420.buffer
-        ffi_handle = FfiHandle(buffer_info.handle.id)
-        return I420Buffer(ffi_handle, buffer_info)
+        return I420Buffer(res.to_i420.buffer)
 
     @property
     def format(self) -> VideoFormatType.ValueType:
