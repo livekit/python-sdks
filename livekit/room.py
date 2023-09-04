@@ -33,7 +33,7 @@ from .track_publication import RemoteTrackPublication
 @dataclass
 class RoomOptions:
     auto_subscribe: bool = True
-    dynacast: bool = True
+    dynacast: bool = False
 
 
 class ConnectError(Exception):
