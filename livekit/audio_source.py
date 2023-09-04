@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
@@ -27,9 +29,22 @@ class AudioSource:
         self._info = resp.new_audio_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
-    def capture_frame(self, frame: AudioFrame) -> None:
+    async def capture_frame(self, frame: AudioFrame) -> None:
         req = proto_ffi.FfiRequest()
 
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
-        ffi_client.request(req)
+        resp = ffi_client.request(req)
+        future: asyncio.Future[proto_audio_frame.CaptureAudioFrameCallback] = \
+            asyncio.Future()
+
+        @ffi_client.on('capture_audio_frame')
+        def on_capture_audio_frame(cb: proto_audio_frame.CaptureAudioFrameCallback):
+            if cb.async_id == resp.capture_audio_frame.async_id:
+                future.set_result(cb)
+                ffi_client.remove_listener(
+                    'capture_audio_frame', on_capture_audio_frame)
+
+        cb = await future
+        if cb.error:
+            raise Exception(cb.error)
