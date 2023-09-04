@@ -9,36 +9,32 @@ import livekit
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
 
+SAMPLE_RATE = 48000
+NUM_CHANNELS = 1
+
 
 async def publish_frames(source: livekit.AudioSource):
-    sample_rate = 48000
     frequency = 440
     amplitude = 32767  # for 16-bit audio
-    num_channels = 1
     samples_per_channel = 480  # 10ms at 48kHz
-    time = np.arange(samples_per_channel) / sample_rate
+    time = np.arange(samples_per_channel) / SAMPLE_RATE
     total_samples = 0
 
     audio_frame = livekit.AudioFrame.create(
-        sample_rate, num_channels, samples_per_channel)
+        SAMPLE_RATE, NUM_CHANNELS, samples_per_channel)
 
     audio_data = np.ctypeslib.as_array(audio_frame.data)
 
     while True:
-        time = (total_samples + np.arange(samples_per_channel)) / sample_rate
+        time = (total_samples + np.arange(samples_per_channel)) / SAMPLE_RATE
 
         sine_wave = (amplitude * np.sin(2 * np.pi *
                      frequency * time)).astype(np.int16)
         np.copyto(audio_data, sine_wave)
 
-        source.capture_frame(audio_frame)
+        await source.capture_frame(audio_frame)
 
         total_samples += samples_per_channel
-
-        try:
-            await asyncio.sleep(1 / 100)  # 10m
-        except asyncio.CancelledError:
-            break
 
 
 async def main() -> None:
@@ -53,7 +49,7 @@ async def main() -> None:
         return
 
     # publish a track
-    source = livekit.AudioSource()
+    source = livekit.AudioSource(SAMPLE_RATE, NUM_CHANNELS)
     source_task = asyncio.create_task(publish_frames(source))
 
     track = livekit.LocalAudioTrack.create_audio_track("sinewave", source)

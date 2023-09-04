@@ -134,19 +134,24 @@ class LocalParticipant(Participant):
         @ffi_client.on('publish_track')
         def on_publish_callback(cb: proto_room.PublishTrackCallback):
             if cb.async_id == resp.publish_track.async_id:
+
+                # we need to directly create the track publication here
+                # otherwise we can run into synchronization issue with the
+                # LocalTrackPublishedEvent
+                if not cb.error:
+                    track_publication = LocalTrackPublication(cb.publication)
+                    track_publication.track = track
+                    self.tracks[track_publication.sid] = track_publication
+
                 future.set_result(cb)
                 ffi_client.remove_listener(
                     'publish_track', on_publish_callback)
 
         cb = await future
-
         if cb.error:
             raise PublishTrackError(cb.error)
 
-        track_publication = LocalTrackPublication(cb.publication)
-        track_publication.track = track
-        self.tracks[track_publication.sid] = track_publication
-        return track_publication
+        return self.tracks[cb.publication.info.sid]
 
     async def unpublish_track(self, track_sid: str) -> None:
         req = proto_ffi.FfiRequest()
