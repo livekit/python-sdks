@@ -16,7 +16,6 @@ import asyncio
 import ctypes
 import os
 import platform
-import threading
 
 import pkg_resources
 from pyee.asyncio import EventEmitter

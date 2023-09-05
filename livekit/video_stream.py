@@ -49,11 +49,10 @@ class VideoStream(EventEmitter):
         which = event.WhichOneof('message')
         if which == 'frame_received':
             frame_info = event.frame_received.frame
-            buffer_info = event.frame_received.buffer
-            ffi_handle = FfiHandle(buffer_info.handle.id)
+            owned_buffer_info = event.frame_received.buffer
 
             frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
-                               VideoFrameBuffer.create(ffi_handle, buffer_info))
+                               VideoFrameBuffer.create(owned_buffer_info))
             stream._on_frame_received(frame)
 
     def __init__(self, track: Track) -> None:

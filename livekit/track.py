@@ -24,9 +24,9 @@ if TYPE_CHECKING:
 
 
 class Track():
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackInfo):
-        self._info = info
-        self._ffi_handle = handle
+    def __init__(self, owned_info: proto_track.OwnedTrack):
+        self._info = owned_info.info
+        self._ffi_handle = FfiHandle(owned_info.handle.id)
 
     @property
     def sid(self) -> str:
@@ -53,8 +53,8 @@ class Track():
 
 
 class LocalAudioTrack(Track):
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackInfo):
-        super().__init__(handle, info)
+    def __init__(self, info: proto_track.OwnedTrack):
+        super().__init__(info)
 
     @staticmethod
     def create_audio_track(name: str, source: 'AudioSource') -> 'LocalAudioTrack':
@@ -63,14 +63,12 @@ class LocalAudioTrack(Track):
         req.create_audio_track.source_handle = source._ffi_handle.handle
 
         resp = ffi_client.request(req)
-        track_info = resp.create_audio_track.track
-        ffi_handle = FfiHandle(track_info.handle.id)
-        return LocalAudioTrack(ffi_handle, track_info)
+        return LocalAudioTrack(resp.create_audio_track.track)
 
 
 class LocalVideoTrack(Track):
-    def __init__(self, handle: FfiHandle, info: proto_track.TrackInfo):
-        super().__init__(handle, info)
+    def __init__(self, info: proto_track.OwnedTrack):
+        super().__init__(info)
 
     @staticmethod
     def create_video_track(name: str, source: 'VideoSource') -> 'LocalVideoTrack':
@@ -79,16 +77,14 @@ class LocalVideoTrack(Track):
         req.create_video_track.source_handle = source._ffi_handle.handle
 
         resp = ffi_client.request(req)
-        track_info = resp.create_video_track.track
-        ffi_handle = FfiHandle(track_info.handle.id)
-        return LocalVideoTrack(ffi_handle, track_info)
+        return LocalVideoTrack(resp.create_video_track.track)
 
 
 class RemoteAudioTrack(Track):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_track.TrackInfo):
-        super().__init__(ffi_handle, info)
+    def __init__(self, info: proto_track.OwnedTrack):
+        super().__init__(info)
 
 
 class RemoteVideoTrack(Track):
-    def __init__(self, ffi_handle: FfiHandle, info: proto_track.TrackInfo):
-        super().__init__(ffi_handle, info)
+    def __init__(self, info: proto_track.OwnedTrack):
+        super().__init__(info)

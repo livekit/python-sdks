@@ -45,9 +45,8 @@ class AudioStream(EventEmitter):
 
         which = event.WhichOneof('message')
         if which == 'frame_received':
-            frame_info = event.frame_received.frame
-            ffi_handle = FfiHandle(frame_info.handle.id)
-            frame = AudioFrame(frame_info, ffi_handle)
+            owned_buffer_info = event.frame_received.frame
+            frame = AudioFrame(owned_buffer_info)
             stream._on_frame_received(frame)
 
     def __init__(self, track: Track) -> None:
