@@ -16,7 +16,6 @@ import asyncio
 import ctypes
 import os
 import platform
-import threading
 
 import pkg_resources
 from pyee.asyncio import EventEmitter
@@ -70,10 +69,7 @@ def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 
-    with ffi_client._lock:
-        loop = ffi_client._event_loop
-
-    loop.call_soon_threadsafe(dispatch_event, event)
+    ffi_client._event_loop.call_soon_threadsafe(dispatch_event, event)
 
 
 def dispatch_event(event: proto_ffi.FfiEvent) -> None:
@@ -84,17 +80,13 @@ def dispatch_event(event: proto_ffi.FfiEvent) -> None:
 class FfiClient(EventEmitter):
     def __init__(self) -> None:
         super().__init__()
-        self._lock = threading.Lock()
+        self._event_loop = asyncio.get_event_loop()
 
         req = proto_ffi.FfiRequest()
         cb_callback = int(ctypes.cast(
             ffi_event_callback, ctypes.c_void_p).value)  # type: ignore
         req.initialize.event_callback_ptr = cb_callback
         self.request(req)
-
-    def set_event_loop(self, loop: asyncio.AbstractEventLoop) -> None:
-        with self._lock:
-            self._event_loop = loop
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
         proto_data = req.SerializeToString()
@@ -125,4 +117,3 @@ class FfiHandle:
 
 
 ffi_client = FfiClient()
-ffi_client.set_event_loop(asyncio.get_event_loop())

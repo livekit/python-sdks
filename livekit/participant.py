@@ -45,10 +45,9 @@ class PublishDataError(Exception):
 
 
 class Participant():
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
-            -> None:
-        self._info = info
-        self._ffi_handle = handle
+    def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
+        self._info = owned_info.info
+        self._ffi_handle = FfiHandle(owned_info.handle.id)
         self.tracks: dict[str, TrackPublication] = {}
 
     @property
@@ -69,9 +68,8 @@ class Participant():
 
 
 class LocalParticipant(Participant):
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
-            -> None:
-        super().__init__(handle, info)
+    def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
+        super().__init__(owned_info)
         self.tracks: dict[str, LocalTrackPublication] = {}  # type: ignore
 
     async def publish_data(self,
@@ -136,21 +134,24 @@ class LocalParticipant(Participant):
         @ffi_client.on('publish_track')
         def on_publish_callback(cb: proto_room.PublishTrackCallback):
             if cb.async_id == resp.publish_track.async_id:
+
+                # we need to directly create the track publication here
+                # otherwise we can run into synchronization issue with the
+                # LocalTrackPublishedEvent
+                if not cb.error:
+                    track_publication = LocalTrackPublication(cb.publication)
+                    track_publication.track = track
+                    self.tracks[track_publication.sid] = track_publication
+
                 future.set_result(cb)
                 ffi_client.remove_listener(
                     'publish_track', on_publish_callback)
 
         cb = await future
-
         if cb.error:
             raise PublishTrackError(cb.error)
 
-        pub_info = cb.publication
-        pub_handle = FfiHandle(pub_info.handle.id)
-        track_publication = LocalTrackPublication(pub_handle, pub_info)
-        track_publication.track = track
-        self.tracks[track_publication.sid] = track_publication
-        return track_publication
+        return self.tracks[cb.publication.info.sid]
 
     async def unpublish_track(self, track_sid: str) -> None:
         req = proto_ffi.FfiRequest()
@@ -178,7 +179,6 @@ class LocalParticipant(Participant):
 
 
 class RemoteParticipant(Participant):
-    def __init__(self, handle: FfiHandle, info: proto_participant.ParticipantInfo) \
-            -> None:
-        super().__init__(handle, info)
+    def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
+        super().__init__(owned_info)
         self.tracks: dict[str, RemoteTrackPublication] = {}  # type: ignore

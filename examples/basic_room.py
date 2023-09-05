@@ -80,6 +80,16 @@ async def main() -> None:
                               participant: livekit.RemoteParticipant):
         logging.info("track unsubscribed: %s", publication.sid)
 
+    @room.listens_to("track_muted")
+    def on_track_muted(publication: livekit.RemoteTrackPublication,
+                       participant: livekit.RemoteParticipant):
+        logging.info("track muted: %s", publication.sid)
+
+    @room.listens_to("track_unmuted")
+    def on_track_unmuted(publication: livekit.RemoteTrackPublication,
+                         participant: livekit.RemoteParticipant):
+        logging.info("track unmuted: %s", publication.sid)
+
     @room.listens_to("data_received")
     def on_data_received(data: bytes,
                          kind: livekit.DataPacketKind,

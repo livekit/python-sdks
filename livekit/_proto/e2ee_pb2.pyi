@@ -37,39 +37,66 @@ class _EncryptionType:
 
 class _EncryptionTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_EncryptionType.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
-    Gcm: _EncryptionType.ValueType  # 1
-    Custom: _EncryptionType.ValueType  # 2
+    NONE: _EncryptionType.ValueType  # 0
+    GCM: _EncryptionType.ValueType  # 1
+    CUSTOM: _EncryptionType.ValueType  # 2
 
-class EncryptionType(_EncryptionType, metaclass=_EncryptionTypeEnumTypeWrapper): ...
+class EncryptionType(_EncryptionType, metaclass=_EncryptionTypeEnumTypeWrapper):
+    """TODO(theomonnom): Should FrameCryptor be stateful on the client side and have their own handle?"""
 
-Gcm: EncryptionType.ValueType  # 1
-Custom: EncryptionType.ValueType  # 2
+NONE: EncryptionType.ValueType  # 0
+GCM: EncryptionType.ValueType  # 1
+CUSTOM: EncryptionType.ValueType  # 2
 global___EncryptionType = EncryptionType
 
-class _E2EEState:
+class _E2eeState:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _E2EEStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_E2EEState.ValueType], builtins.type):
+class _E2eeStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_E2eeState.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
-    NEW: _E2EEState.ValueType  # 0
-    OK: _E2EEState.ValueType  # 1
-    ENCRYPTION_FAILED: _E2EEState.ValueType  # 2
-    DECRYPTION_FAILED: _E2EEState.ValueType  # 3
-    MISSING_KEY: _E2EEState.ValueType  # 4
-    KEY_RATCHETED: _E2EEState.ValueType  # 5
-    INTERNAL_ERROR: _E2EEState.ValueType  # 6
+    NEW: _E2eeState.ValueType  # 0
+    OK: _E2eeState.ValueType  # 1
+    ENCRYPTION_FAILED: _E2eeState.ValueType  # 2
+    DECRYPTION_FAILED: _E2eeState.ValueType  # 3
+    MISSING_KEY: _E2eeState.ValueType  # 4
+    KEY_RATCHETED: _E2eeState.ValueType  # 5
+    INTERNAL_ERROR: _E2eeState.ValueType  # 6
 
-class E2EEState(_E2EEState, metaclass=_E2EEStateEnumTypeWrapper): ...
+class E2eeState(_E2eeState, metaclass=_E2eeStateEnumTypeWrapper): ...
 
-NEW: E2EEState.ValueType  # 0
-OK: E2EEState.ValueType  # 1
-ENCRYPTION_FAILED: E2EEState.ValueType  # 2
-DECRYPTION_FAILED: E2EEState.ValueType  # 3
-MISSING_KEY: E2EEState.ValueType  # 4
-KEY_RATCHETED: E2EEState.ValueType  # 5
-INTERNAL_ERROR: E2EEState.ValueType  # 6
-global___E2EEState = E2EEState
+NEW: E2eeState.ValueType  # 0
+OK: E2eeState.ValueType  # 1
+ENCRYPTION_FAILED: E2eeState.ValueType  # 2
+DECRYPTION_FAILED: E2eeState.ValueType  # 3
+MISSING_KEY: E2eeState.ValueType  # 4
+KEY_RATCHETED: E2eeState.ValueType  # 5
+INTERNAL_ERROR: E2eeState.ValueType  # 6
+global___E2eeState = E2eeState
+
+@typing_extensions.final
+class FrameCryptor(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    KEY_INDEX_FIELD_NUMBER: builtins.int
+    ENABLED_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
+    key_index: builtins.int
+    enabled: builtins.bool
+    def __init__(
+        self,
+        *,
+        participant_identity: builtins.str = ...,
+        track_sid: builtins.str = ...,
+        key_index: builtins.int = ...,
+        enabled: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
+
+global___FrameCryptor = FrameCryptor
 
 @typing_extensions.final
 class KeyProviderOptions(google.protobuf.message.Message):
@@ -79,24 +106,27 @@ class KeyProviderOptions(google.protobuf.message.Message):
     RATCHET_WINDOW_SIZE_FIELD_NUMBER: builtins.int
     RATCHET_SALT_FIELD_NUMBER: builtins.int
     UNCRYPTED_MAGIC_BYTES_FIELD_NUMBER: builtins.int
-    shared_key: builtins.bool
+    shared_key: builtins.bytes
+    """Only specify if you want to use a shared_key"""
     ratchet_window_size: builtins.int
     ratchet_salt: builtins.bytes
     uncrypted_magic_bytes: builtins.bytes
     def __init__(
         self,
         *,
-        shared_key: builtins.bool = ...,
+        shared_key: builtins.bytes | None = ...,
         ratchet_window_size: builtins.int = ...,
         ratchet_salt: builtins.bytes = ...,
         uncrypted_magic_bytes: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key", "uncrypted_magic_bytes", b"uncrypted_magic_bytes"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_shared_key", b"_shared_key", "shared_key", b"shared_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_shared_key", b"_shared_key", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key", "uncrypted_magic_bytes", b"uncrypted_magic_bytes"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_shared_key", b"_shared_key"]) -> typing_extensions.Literal["shared_key"] | None: ...
 
 global___KeyProviderOptions = KeyProviderOptions
 
 @typing_extensions.final
-class E2EEOptions(google.protobuf.message.Message):
+class E2eeOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
@@ -113,77 +143,45 @@ class E2EEOptions(google.protobuf.message.Message):
     def HasField(self, field_name: typing_extensions.Literal["key_provider_options", b"key_provider_options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["encryption_type", b"encryption_type", "key_provider_options", b"key_provider_options"]) -> None: ...
 
-global___E2EEOptions = E2EEOptions
+global___E2eeOptions = E2eeOptions
 
 @typing_extensions.final
-class E2EEManagerSetEnabledRequest(google.protobuf.message.Message):
+class E2eeManagerSetEnabledRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     ENABLED_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
     enabled: builtins.bool
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
         enabled: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled"]) -> None: ...
 
-global___E2EEManagerSetEnabledRequest = E2EEManagerSetEnabledRequest
+global___E2eeManagerSetEnabledRequest = E2eeManagerSetEnabledRequest
 
 @typing_extensions.final
-class E2EEManagerSetEnabledResponse(google.protobuf.message.Message):
+class E2eeManagerSetEnabledResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___E2EEManagerSetEnabledResponse = E2EEManagerSetEnabledResponse
+global___E2eeManagerSetEnabledResponse = E2eeManagerSetEnabledResponse
 
 @typing_extensions.final
-class E2EEManagerGetFrameCryptorsRequest(google.protobuf.message.Message):
+class E2eeManagerGetFrameCryptorsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
     def __init__(
         self,
-        *,
-        room_handle: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["room_handle", b"room_handle"]) -> None: ...
 
-global___E2EEManagerGetFrameCryptorsRequest = E2EEManagerGetFrameCryptorsRequest
+global___E2eeManagerGetFrameCryptorsRequest = E2eeManagerGetFrameCryptorsRequest
 
 @typing_extensions.final
-class FrameCryptor(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
-    ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
-    KEY_INDEX_FIELD_NUMBER: builtins.int
-    ENABLED_FIELD_NUMBER: builtins.int
-    participant_id: builtins.str
-    encryption_type: global___EncryptionType.ValueType
-    key_index: builtins.int
-    enabled: builtins.bool
-    def __init__(
-        self,
-        *,
-        participant_id: builtins.str = ...,
-        encryption_type: global___EncryptionType.ValueType = ...,
-        key_index: builtins.int = ...,
-        enabled: builtins.bool = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "encryption_type", b"encryption_type", "key_index", b"key_index", "participant_id", b"participant_id"]) -> None: ...
-
-global___FrameCryptor = FrameCryptor
-
-@typing_extensions.final
-class E2EEManagerGetFrameCryptorsResponse(google.protobuf.message.Message):
+class E2eeManagerGetFrameCryptorsResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
@@ -196,26 +194,26 @@ class E2EEManagerGetFrameCryptorsResponse(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["frame_cryptors", b"frame_cryptors"]) -> None: ...
 
-global___E2EEManagerGetFrameCryptorsResponse = E2EEManagerGetFrameCryptorsResponse
+global___E2eeManagerGetFrameCryptorsResponse = E2eeManagerGetFrameCryptorsResponse
 
 @typing_extensions.final
 class FrameCryptorSetEnabledRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
     ENABLED_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    participant_id: builtins.str
+    participant_identity: builtins.str
+    track_sid: builtins.str
     enabled: builtins.bool
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        participant_id: builtins.str = ...,
+        participant_identity: builtins.str = ...,
+        track_sid: builtins.str = ...,
         enabled: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "participant_id", b"participant_id", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___FrameCryptorSetEnabledRequest = FrameCryptorSetEnabledRequest
 
@@ -233,20 +231,20 @@ global___FrameCryptorSetEnabledResponse = FrameCryptorSetEnabledResponse
 class FrameCryptorSetKeyIndexRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    participant_id: builtins.str
+    participant_identity: builtins.str
+    track_sid: builtins.str
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        participant_id: builtins.str = ...,
+        participant_identity: builtins.str = ...,
+        track_sid: builtins.str = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_id", b"participant_id", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___FrameCryptorSetKeyIndexRequest = FrameCryptorSetKeyIndexRequest
 
@@ -261,56 +259,50 @@ class FrameCryptorSetKeyIndexResponse(google.protobuf.message.Message):
 global___FrameCryptorSetKeyIndexResponse = FrameCryptorSetKeyIndexResponse
 
 @typing_extensions.final
-class KeyProviderSetSharedKeyRequest(google.protobuf.message.Message):
+class SetSharedKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     SHARED_KEY_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    shared_key: builtins.str
+    shared_key: builtins.bytes
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        shared_key: builtins.str = ...,
+        shared_key: builtins.bytes = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "room_handle", b"room_handle", "shared_key", b"shared_key"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "shared_key", b"shared_key"]) -> None: ...
 
-global___KeyProviderSetSharedKeyRequest = KeyProviderSetSharedKeyRequest
+global___SetSharedKeyRequest = SetSharedKeyRequest
 
 @typing_extensions.final
-class KeyProviderSetSharedKeyResponse(google.protobuf.message.Message):
+class SetSharedKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___KeyProviderSetSharedKeyResponse = KeyProviderSetSharedKeyResponse
+global___SetSharedKeyResponse = SetSharedKeyResponse
 
 @typing_extensions.final
-class KeyProviderRachetSharedKeyRequest(google.protobuf.message.Message):
+class RachetSharedKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index"]) -> None: ...
 
-global___KeyProviderRachetSharedKeyRequest = KeyProviderRachetSharedKeyRequest
+global___RachetSharedKeyRequest = RachetSharedKeyRequest
 
 @typing_extensions.final
-class KeyProviderRachetSharedKeyResponse(google.protobuf.message.Message):
+class RachetSharedKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     NEW_KEY_FIELD_NUMBER: builtins.int
@@ -318,32 +310,31 @@ class KeyProviderRachetSharedKeyResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        new_key: builtins.bytes = ...,
+        new_key: builtins.bytes | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["new_key", b"new_key"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_new_key", b"_new_key", "new_key", b"new_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_new_key", b"_new_key", "new_key", b"new_key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_new_key", b"_new_key"]) -> typing_extensions.Literal["new_key"] | None: ...
 
-global___KeyProviderRachetSharedKeyResponse = KeyProviderRachetSharedKeyResponse
+global___RachetSharedKeyResponse = RachetSharedKeyResponse
 
 @typing_extensions.final
-class KeyProviderExportSharedKeyRequest(google.protobuf.message.Message):
+class GetSharedKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index"]) -> None: ...
 
-global___KeyProviderExportSharedKeyRequest = KeyProviderExportSharedKeyRequest
+global___GetSharedKeyRequest = GetSharedKeyRequest
 
 @typing_extensions.final
-class KeyProviderExportSharedKeyResponse(google.protobuf.message.Message):
+class GetSharedKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     KEY_FIELD_NUMBER: builtins.int
@@ -351,69 +342,65 @@ class KeyProviderExportSharedKeyResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        key: builtins.bytes = ...,
+        key: builtins.bytes | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key", b"key"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_key", b"_key", "key", b"key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_key", b"_key", "key", b"key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_key", b"_key"]) -> typing_extensions.Literal["key"] | None: ...
 
-global___KeyProviderExportSharedKeyResponse = KeyProviderExportSharedKeyResponse
+global___GetSharedKeyResponse = GetSharedKeyResponse
 
 @typing_extensions.final
-class KeyProviderSetKeyRequest(google.protobuf.message.Message):
+class SetKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     KEY_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    participant_id: builtins.str
-    key: builtins.str
+    participant_identity: builtins.str
+    key: builtins.bytes
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        participant_id: builtins.str = ...,
-        key: builtins.str = ...,
+        participant_identity: builtins.str = ...,
+        key: builtins.bytes = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "key_index", b"key_index", "participant_id", b"participant_id", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___KeyProviderSetKeyRequest = KeyProviderSetKeyRequest
+global___SetKeyRequest = SetKeyRequest
 
 @typing_extensions.final
-class KeyProviderSetKeyResponse(google.protobuf.message.Message):
+class SetKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___KeyProviderSetKeyResponse = KeyProviderSetKeyResponse
+global___SetKeyResponse = SetKeyResponse
 
 @typing_extensions.final
-class KeyProviderRachetKeyRequest(google.protobuf.message.Message):
+class RachetKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    participant_id: builtins.str
+    participant_identity: builtins.str
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        participant_id: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_id", b"participant_id", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___KeyProviderRachetKeyRequest = KeyProviderRachetKeyRequest
+global___RachetKeyRequest = RachetKeyRequest
 
 @typing_extensions.final
-class KeyProviderRachetKeyResponse(google.protobuf.message.Message):
+class RachetKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     NEW_KEY_FIELD_NUMBER: builtins.int
@@ -421,35 +408,34 @@ class KeyProviderRachetKeyResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        new_key: builtins.bytes = ...,
+        new_key: builtins.bytes | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["new_key", b"new_key"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_new_key", b"_new_key", "new_key", b"new_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_new_key", b"_new_key", "new_key", b"new_key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_new_key", b"_new_key"]) -> typing_extensions.Literal["new_key"] | None: ...
 
-global___KeyProviderRachetKeyResponse = KeyProviderRachetKeyResponse
+global___RachetKeyResponse = RachetKeyResponse
 
 @typing_extensions.final
-class KeyProviderExportKeyRequest(google.protobuf.message.Message):
+class GetKeyRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: builtins.int
-    PARTICIPANT_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     KEY_INDEX_FIELD_NUMBER: builtins.int
-    room_handle: builtins.int
-    participant_id: builtins.str
+    participant_identity: builtins.str
     key_index: builtins.int
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
-        participant_id: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         key_index: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_id", b"participant_id", "room_handle", b"room_handle"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___KeyProviderExportKeyRequest = KeyProviderExportKeyRequest
+global___GetKeyRequest = GetKeyRequest
 
 @typing_extensions.final
-class KeyProviderExportKeyResponse(google.protobuf.message.Message):
+class GetKeyResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     KEY_FIELD_NUMBER: builtins.int
@@ -457,116 +443,121 @@ class KeyProviderExportKeyResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        key: builtins.bytes = ...,
+        key: builtins.bytes | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["key", b"key"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_key", b"_key", "key", b"key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_key", b"_key", "key", b"key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_key", b"_key"]) -> typing_extensions.Literal["key"] | None: ...
 
-global___KeyProviderExportKeyResponse = KeyProviderExportKeyResponse
+global___GetKeyResponse = GetKeyResponse
 
 @typing_extensions.final
-class E2EERequest(google.protobuf.message.Message):
+class E2eeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    E2EE_MANAGER_SET_ENABLED_FIELD_NUMBER: builtins.int
-    E2EE_MANAGER_GET_FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
-    FRAME_CRYPTOR_SET_ENABLED_FIELD_NUMBER: builtins.int
-    FRAME_CRYPTOR_SET_KEY_INDEX_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_SET_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_RACHET_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_EXPORT_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_SET_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_RACHET_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_EXPORT_KEY_FIELD_NUMBER: builtins.int
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    MANAGER_SET_ENABLED_FIELD_NUMBER: builtins.int
+    MANAGER_GET_FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
+    CRYPTOR_SET_ENABLED_FIELD_NUMBER: builtins.int
+    CRYPTOR_SET_KEY_INDEX_FIELD_NUMBER: builtins.int
+    SET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    RACHET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    GET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    SET_KEY_FIELD_NUMBER: builtins.int
+    RACHET_KEY_FIELD_NUMBER: builtins.int
+    GET_KEY_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
     @property
-    def e2ee_manager_set_enabled(self) -> global___E2EEManagerSetEnabledRequest: ...
+    def manager_set_enabled(self) -> global___E2eeManagerSetEnabledRequest: ...
     @property
-    def e2ee_manager_get_frame_cryptors(self) -> global___E2EEManagerGetFrameCryptorsRequest: ...
+    def manager_get_frame_cryptors(self) -> global___E2eeManagerGetFrameCryptorsRequest: ...
     @property
-    def frame_cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledRequest: ...
+    def cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledRequest: ...
     @property
-    def frame_cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexRequest: ...
+    def cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexRequest: ...
     @property
-    def key_provider_set_shared_key(self) -> global___KeyProviderSetSharedKeyRequest: ...
+    def set_shared_key(self) -> global___SetSharedKeyRequest: ...
     @property
-    def key_provider_rachet_shared_key(self) -> global___KeyProviderRachetSharedKeyRequest: ...
+    def rachet_shared_key(self) -> global___RachetSharedKeyRequest: ...
     @property
-    def key_provider_export_shared_key(self) -> global___KeyProviderExportSharedKeyRequest: ...
+    def get_shared_key(self) -> global___GetSharedKeyRequest: ...
     @property
-    def key_provider_set_key(self) -> global___KeyProviderSetKeyRequest: ...
+    def set_key(self) -> global___SetKeyRequest: ...
     @property
-    def key_provider_rachet_key(self) -> global___KeyProviderRachetKeyRequest: ...
+    def rachet_key(self) -> global___RachetKeyRequest: ...
     @property
-    def key_provider_export_key(self) -> global___KeyProviderExportKeyRequest: ...
+    def get_key(self) -> global___GetKeyRequest: ...
     def __init__(
         self,
         *,
-        e2ee_manager_set_enabled: global___E2EEManagerSetEnabledRequest | None = ...,
-        e2ee_manager_get_frame_cryptors: global___E2EEManagerGetFrameCryptorsRequest | None = ...,
-        frame_cryptor_set_enabled: global___FrameCryptorSetEnabledRequest | None = ...,
-        frame_cryptor_set_key_index: global___FrameCryptorSetKeyIndexRequest | None = ...,
-        key_provider_set_shared_key: global___KeyProviderSetSharedKeyRequest | None = ...,
-        key_provider_rachet_shared_key: global___KeyProviderRachetSharedKeyRequest | None = ...,
-        key_provider_export_shared_key: global___KeyProviderExportSharedKeyRequest | None = ...,
-        key_provider_set_key: global___KeyProviderSetKeyRequest | None = ...,
-        key_provider_rachet_key: global___KeyProviderRachetKeyRequest | None = ...,
-        key_provider_export_key: global___KeyProviderExportKeyRequest | None = ...,
+        room_handle: builtins.int = ...,
+        manager_set_enabled: global___E2eeManagerSetEnabledRequest | None = ...,
+        manager_get_frame_cryptors: global___E2eeManagerGetFrameCryptorsRequest | None = ...,
+        cryptor_set_enabled: global___FrameCryptorSetEnabledRequest | None = ...,
+        cryptor_set_key_index: global___FrameCryptorSetKeyIndexRequest | None = ...,
+        set_shared_key: global___SetSharedKeyRequest | None = ...,
+        rachet_shared_key: global___RachetSharedKeyRequest | None = ...,
+        get_shared_key: global___GetSharedKeyRequest | None = ...,
+        set_key: global___SetKeyRequest | None = ...,
+        rachet_key: global___RachetKeyRequest | None = ...,
+        get_key: global___GetKeyRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["e2ee_manager_get_frame_cryptors", b"e2ee_manager_get_frame_cryptors", "e2ee_manager_set_enabled", b"e2ee_manager_set_enabled", "frame_cryptor_set_enabled", b"frame_cryptor_set_enabled", "frame_cryptor_set_key_index", b"frame_cryptor_set_key_index", "key_provider_export_key", b"key_provider_export_key", "key_provider_export_shared_key", b"key_provider_export_shared_key", "key_provider_rachet_key", b"key_provider_rachet_key", "key_provider_rachet_shared_key", b"key_provider_rachet_shared_key", "key_provider_set_key", b"key_provider_set_key", "key_provider_set_shared_key", b"key_provider_set_shared_key", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["e2ee_manager_get_frame_cryptors", b"e2ee_manager_get_frame_cryptors", "e2ee_manager_set_enabled", b"e2ee_manager_set_enabled", "frame_cryptor_set_enabled", b"frame_cryptor_set_enabled", "frame_cryptor_set_key_index", b"frame_cryptor_set_key_index", "key_provider_export_key", b"key_provider_export_key", "key_provider_export_shared_key", b"key_provider_export_shared_key", "key_provider_rachet_key", b"key_provider_rachet_key", "key_provider_rachet_shared_key", b"key_provider_rachet_shared_key", "key_provider_set_key", b"key_provider_set_key", "key_provider_set_shared_key", b"key_provider_set_shared_key", "message", b"message"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["e2ee_manager_set_enabled", "e2ee_manager_get_frame_cryptors", "frame_cryptor_set_enabled", "frame_cryptor_set_key_index", "key_provider_set_shared_key", "key_provider_rachet_shared_key", "key_provider_export_shared_key", "key_provider_set_key", "key_provider_rachet_key", "key_provider_export_key"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "rachet_key", b"rachet_key", "rachet_shared_key", b"rachet_shared_key", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "rachet_key", b"rachet_key", "rachet_shared_key", b"rachet_shared_key", "room_handle", b"room_handle", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["manager_set_enabled", "manager_get_frame_cryptors", "cryptor_set_enabled", "cryptor_set_key_index", "set_shared_key", "rachet_shared_key", "get_shared_key", "set_key", "rachet_key", "get_key"] | None: ...
 
-global___E2EERequest = E2EERequest
+global___E2eeRequest = E2eeRequest
 
 @typing_extensions.final
-class E2EEResponse(google.protobuf.message.Message):
+class E2eeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    E2EE_MANAGER_SET_ENABLED_FIELD_NUMBER: builtins.int
-    E2EE_MANAGER_GET_FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
-    FRAME_CRYPTOR_SET_ENABLED_FIELD_NUMBER: builtins.int
-    FRAME_CRYPTOR_SET_KEY_INDEX_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_SET_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_RACHET_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_EXPORT_SHARED_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_SET_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_RACHET_KEY_FIELD_NUMBER: builtins.int
-    KEY_PROVIDER_EXPORT_KEY_FIELD_NUMBER: builtins.int
+    MANAGER_SET_ENABLED_FIELD_NUMBER: builtins.int
+    MANAGER_GET_FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
+    CRYPTOR_SET_ENABLED_FIELD_NUMBER: builtins.int
+    CRYPTOR_SET_KEY_INDEX_FIELD_NUMBER: builtins.int
+    SET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    RACHET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    GET_SHARED_KEY_FIELD_NUMBER: builtins.int
+    SET_KEY_FIELD_NUMBER: builtins.int
+    RACHET_KEY_FIELD_NUMBER: builtins.int
+    GET_KEY_FIELD_NUMBER: builtins.int
     @property
-    def e2ee_manager_set_enabled(self) -> global___E2EEManagerSetEnabledResponse: ...
+    def manager_set_enabled(self) -> global___E2eeManagerSetEnabledResponse: ...
     @property
-    def e2ee_manager_get_frame_cryptors(self) -> global___E2EEManagerGetFrameCryptorsResponse: ...
+    def manager_get_frame_cryptors(self) -> global___E2eeManagerGetFrameCryptorsResponse: ...
     @property
-    def frame_cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledResponse: ...
+    def cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledResponse: ...
     @property
-    def frame_cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexResponse: ...
+    def cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexResponse: ...
     @property
-    def key_provider_set_shared_key(self) -> global___KeyProviderSetSharedKeyResponse: ...
+    def set_shared_key(self) -> global___SetSharedKeyResponse: ...
     @property
-    def key_provider_rachet_shared_key(self) -> global___KeyProviderRachetSharedKeyResponse: ...
+    def rachet_shared_key(self) -> global___RachetSharedKeyResponse: ...
     @property
-    def key_provider_export_shared_key(self) -> global___KeyProviderExportSharedKeyResponse: ...
+    def get_shared_key(self) -> global___GetSharedKeyResponse: ...
     @property
-    def key_provider_set_key(self) -> global___KeyProviderSetKeyResponse: ...
+    def set_key(self) -> global___SetKeyResponse: ...
     @property
-    def key_provider_rachet_key(self) -> global___KeyProviderRachetKeyResponse: ...
+    def rachet_key(self) -> global___RachetKeyResponse: ...
     @property
-    def key_provider_export_key(self) -> global___KeyProviderExportKeyResponse: ...
+    def get_key(self) -> global___GetKeyResponse: ...
     def __init__(
         self,
         *,
-        e2ee_manager_set_enabled: global___E2EEManagerSetEnabledResponse | None = ...,
-        e2ee_manager_get_frame_cryptors: global___E2EEManagerGetFrameCryptorsResponse | None = ...,
-        frame_cryptor_set_enabled: global___FrameCryptorSetEnabledResponse | None = ...,
-        frame_cryptor_set_key_index: global___FrameCryptorSetKeyIndexResponse | None = ...,
-        key_provider_set_shared_key: global___KeyProviderSetSharedKeyResponse | None = ...,
-        key_provider_rachet_shared_key: global___KeyProviderRachetSharedKeyResponse | None = ...,
-        key_provider_export_shared_key: global___KeyProviderExportSharedKeyResponse | None = ...,
-        key_provider_set_key: global___KeyProviderSetKeyResponse | None = ...,
-        key_provider_rachet_key: global___KeyProviderRachetKeyResponse | None = ...,
-        key_provider_export_key: global___KeyProviderExportKeyResponse | None = ...,
+        manager_set_enabled: global___E2eeManagerSetEnabledResponse | None = ...,
+        manager_get_frame_cryptors: global___E2eeManagerGetFrameCryptorsResponse | None = ...,
+        cryptor_set_enabled: global___FrameCryptorSetEnabledResponse | None = ...,
+        cryptor_set_key_index: global___FrameCryptorSetKeyIndexResponse | None = ...,
+        set_shared_key: global___SetSharedKeyResponse | None = ...,
+        rachet_shared_key: global___RachetSharedKeyResponse | None = ...,
+        get_shared_key: global___GetSharedKeyResponse | None = ...,
+        set_key: global___SetKeyResponse | None = ...,
+        rachet_key: global___RachetKeyResponse | None = ...,
+        get_key: global___GetKeyResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["e2ee_manager_get_frame_cryptors", b"e2ee_manager_get_frame_cryptors", "e2ee_manager_set_enabled", b"e2ee_manager_set_enabled", "frame_cryptor_set_enabled", b"frame_cryptor_set_enabled", "frame_cryptor_set_key_index", b"frame_cryptor_set_key_index", "key_provider_export_key", b"key_provider_export_key", "key_provider_export_shared_key", b"key_provider_export_shared_key", "key_provider_rachet_key", b"key_provider_rachet_key", "key_provider_rachet_shared_key", b"key_provider_rachet_shared_key", "key_provider_set_key", b"key_provider_set_key", "key_provider_set_shared_key", b"key_provider_set_shared_key", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["e2ee_manager_get_frame_cryptors", b"e2ee_manager_get_frame_cryptors", "e2ee_manager_set_enabled", b"e2ee_manager_set_enabled", "frame_cryptor_set_enabled", b"frame_cryptor_set_enabled", "frame_cryptor_set_key_index", b"frame_cryptor_set_key_index", "key_provider_export_key", b"key_provider_export_key", "key_provider_export_shared_key", b"key_provider_export_shared_key", "key_provider_rachet_key", b"key_provider_rachet_key", "key_provider_rachet_shared_key", b"key_provider_rachet_shared_key", "key_provider_set_key", b"key_provider_set_key", "key_provider_set_shared_key", b"key_provider_set_shared_key", "message", b"message"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["e2ee_manager_set_enabled", "e2ee_manager_get_frame_cryptors", "frame_cryptor_set_enabled", "frame_cryptor_set_key_index", "key_provider_set_shared_key", "key_provider_rachet_shared_key", "key_provider_export_shared_key", "key_provider_set_key", "key_provider_rachet_key", "key_provider_export_key"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "rachet_key", b"rachet_key", "rachet_shared_key", b"rachet_shared_key", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "rachet_key", b"rachet_key", "rachet_shared_key", b"rachet_shared_key", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["manager_set_enabled", "manager_get_frame_cryptors", "cryptor_set_enabled", "cryptor_set_key_index", "set_shared_key", "rachet_shared_key", "get_shared_key", "set_key", "rachet_key", "get_key"] | None: ...
 
-global___E2EEResponse = E2EEResponse
+global___E2eeResponse = E2eeResponse
