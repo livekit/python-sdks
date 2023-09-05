@@ -1,22 +1,15 @@
 import asyncio
 import colorsys
 import logging
-from pathlib import Path
 from signal import SIGINT, SIGTERM
 
 import numpy as np
 
-# get livekit module path, FOR TESTING ONLY
-# import os
-# import sys
-# parent_dir = os.path.dirname(os.path.realpath(__file__))
-# import_dir = os.path.normpath(os.path.join(parent_dir, os.pardir)) 
-# sys.path.append(import_dir)
-
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTUxNzA2OTEsImlzcyI6IkFQSXJramtRYVZRSjVERSIsIm5hbWUiOiJweWUyZWUiLCJuYmYiOjE2OTMzNzA2OTEsInN1YiI6InB5ZTJlZSIsInZpZGVvIjp7InJvb20iOiJsaXZlIiwicm9vbUpvaW4iOnRydWV9fQ.CZnT4fOBjUTxrTlkijxb_D_4HAbZoxljNRjDlCRHNBY'  # noqa
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
+
 
 async def publish_frames(source: livekit.VideoSource):
     argb_frame = livekit.ArgbFrame(
@@ -32,7 +25,7 @@ async def publish_frames(source: livekit.VideoSource):
             0, livekit.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
 
         rgb = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
-        rgb = [(x * 255) for x in rgb] # type: ignore
+        rgb = [(x * 255) for x in rgb]  # type: ignore
 
         argb_color = np.array(rgb + [255], dtype=np.uint8)
         arr.flat[::4] = argb_color[0]
@@ -51,31 +44,30 @@ async def publish_frames(source: livekit.VideoSource):
         except asyncio.CancelledError:
             break
 
+
 async def main():
     room = livekit.Room()
 
-    # listen to e2ee_state_changed event
     @room.listens_to("e2ee_state_changed")
-    def on_e2ee_state_changed(participant: livekit.Participant, publication: livekit.TrackPublication, participant_id: str, state: any) -> None:
-        logging.info(
-            "e2ee state changed for %s %s, track %s, state: %s, e2ee participant_id %s", participant.sid, participant.identity, publication.sid, state, participant_id)
-    
+    def on_e2ee_state_changed(participant: livekit.Participant,
+                              state: livekit.E2eeState) -> None:
+        logging.info("e2ee state changed: %s %s", participant.identity, state)
+
     logging.info("connecting to %s", URL)
     try:
-        await room.connect(URL, TOKEN, options= livekit.RoomOptions(
-            auto_subscribe= True,
-            dynacast= True,
-            e2ee_options= livekit.e2ee.E2EEOptions(),
-        ))
+        e2ee_options = livekit.E2EEOptions()
+        e2ee_options.key_provider_options.shared_key = b"abcdef"  # this is our e2ee key
 
-        # set shared key for room
-        room.e2ee_manager.key_provider.set_shared_key(b"12345678", 0)
+        await room.connect(URL, TOKEN, options=livekit.RoomOptions(
+            auto_subscribe=True,
+            e2ee=e2ee_options
+        ))
 
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
         return False
-    # publish a track
+
     source = livekit.VideoSource()
     source_task = asyncio.create_task(publish_frames(source))
 

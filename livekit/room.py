@@ -20,7 +20,6 @@ from typing import Optional
 from pyee.asyncio import EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
-from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room

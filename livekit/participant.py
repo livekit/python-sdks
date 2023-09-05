@@ -75,7 +75,8 @@ class LocalParticipant(Participant):
     async def publish_data(self,
                            payload: Union[bytes, str],
                            kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
-                           destination_sids: Optional[Union[List[str], List['RemoteParticipant']]] = None) -> None:
+                           destination_sids: Optional[Union[List[str],
+                                                            List['RemoteParticipant']]] = None) -> None:
 
         if isinstance(payload, str):
             payload = payload.encode('utf-8')

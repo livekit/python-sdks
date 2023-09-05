@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 from ._ffi_client import ffi_client
@@ -21,7 +21,7 @@ from ._proto import ffi_pb2 as proto_ffi
 
 DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
 DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
-DEFAULT_RATCHET_WINDOW_SIZE = 16
+DEFAULT_RATCHET_WINDOW_SIZE = 0
 
 
 @dataclass
@@ -34,7 +34,8 @@ class KeyProviderOptions:
 
 @dataclass
 class E2EEOptions:
-    key_provider_options: KeyProviderOptions = KeyProviderOptions()
+    key_provider_options: KeyProviderOptions = field(
+        default_factory=KeyProviderOptions)
     encryption_type: proto_e2ee.EncryptionType.ValueType = proto_e2ee.EncryptionType.GCM
 
 
@@ -52,7 +53,6 @@ class KeyProvider:
         req.e2ee.room_handle = self._room_handle
         req.e2ee.set_shared_key.key_index = key_index
         req.e2ee.set_shared_key.shared_key = key
-
         ffi_client.request(req)
 
     def export_shared_key(self, key_index: int) -> bytes:
