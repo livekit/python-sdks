@@ -17,6 +17,7 @@ from typing import Optional
 from livekit._proto import track_pb2 as proto_track
 
 from ._ffi_client import FfiHandle, ffi_client
+from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from .track import Track
 
@@ -62,6 +63,10 @@ class TrackPublication():
     @property
     def muted(self) -> bool:
         return self._info.muted
+
+    @property
+    def encryption_type(self) -> proto_e2ee.EncryptionType.ValueType:
+        return self._info.encryption_type
 
 
 class LocalTrackPublication(TrackPublication):

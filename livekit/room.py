@@ -25,6 +25,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
+from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
@@ -34,6 +35,7 @@ from .track_publication import RemoteTrackPublication
 class RoomOptions:
     auto_subscribe: bool = True
     dynacast: bool = False
+    e2ee: Optional[E2EEOptions] = None
 
 
 class ConnectError(Exception):
@@ -64,6 +66,9 @@ class Room(EventEmitter):
     def metadata(self) -> str:
         return self._info.metadata
 
+    def e2ee_manager(self) -> E2EEManager:
+        return self._e2ee_manager
+
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and \
             self.connection_state != ConnectionState.CONN_DISCONNECTED
@@ -80,6 +85,18 @@ class Room(EventEmitter):
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
 
+        if options.e2ee:
+            req.connect.options.e2ee.encryption_type = \
+                options.e2ee.encryption_type
+            req.connect.options.e2ee.key_provider_options.shared_key = \
+                options.e2ee.key_provider_options.shared_key  # type: ignore
+            req.connect.options.e2ee.key_provider_options.ratchet_salt = \
+                options.e2ee.key_provider_options.ratchet_salt
+            req.connect.options.e2ee.key_provider_options.uncrypted_magic_bytes = \
+                options.e2ee.key_provider_options.uncrypted_magic_bytes
+            req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
+                options.e2ee.key_provider_options.ratchet_window_size
+
         resp = ffi_client.request(req)
         future: asyncio.Future[proto_room.ConnectCallback] = asyncio.Future()
 
@@ -95,6 +112,10 @@ class Room(EventEmitter):
 
         self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.room.handle.id)
+
+        self._e2ee_manager = E2EEManager(
+            self._ffi_handle.handle, options.e2ee)
+
         self._info = cb.room.info
         self.connection_state = ConnectionState.CONN_CONNECTED
 
@@ -243,9 +264,9 @@ class Room(EventEmitter):
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
         elif which == 'connection_state_changed':
-            state = event.connection_state_changed.state
-            self.connection_state = state
-            self.emit('connection_state_changed', state)
+            connection_state = event.connection_state_changed.state
+            self.connection_state = connection_state
+            self.emit('connection_state_changed', connection_state)
         elif which == 'connected':
             self.emit('connected')
         elif which == 'disconnected':
@@ -254,6 +275,11 @@ class Room(EventEmitter):
             self.emit('reconnecting')
         elif which == 'reconnected':
             self.emit('reconnected')
+        elif which == 'e2ee_state_changed':
+            sid = event.e2ee_state_changed.participant_sid
+            e2ee_state = event.e2ee_state_changed.state
+            self.emit('e2ee_state_changed',
+                      self._retrieve_participant(sid), e2ee_state)
 
     def _retrieve_participant(self, sid: str) -> Participant:
         """ Retrieve a participant by sid, returns the LocalParticipant
