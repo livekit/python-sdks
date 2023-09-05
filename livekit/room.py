@@ -20,13 +20,13 @@ from typing import Optional
 from pyee.asyncio import EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
-from ._proto import e2ee_pb2
+from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
-from .e2ee import E2EEManager, E2EEOptions, FrameCryptorState
+from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
@@ -50,7 +50,6 @@ class Room(EventEmitter):
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
         self._ffi_handle: Optional[FfiHandle] = None
-        self.e2ee_manager: Optional[E2EEManager] = None
         ffi_client.add_listener('room_event', self._on_room_event)
 
     def __del__(self):
@@ -68,11 +67,8 @@ class Room(EventEmitter):
     def metadata(self) -> str:
         return self._info.metadata
 
-    def e2ee_manager(self) -> Optional[E2EEManager]:
-        return self.e2ee_manager
-
-    def ffi_handle(self) -> FfiHandle:
-        return self._ffi_handle
+    def e2ee_manager(self) -> E2EEManager:
+        return self._e2ee_manager
 
     def isconnected(self) -> bool:
         return self._ffi_handle is not None and \
@@ -86,16 +82,21 @@ class Room(EventEmitter):
         req.connect.url = url
         req.connect.token = token
 
-        if options.e2ee_options:
-            req.connect.options.e2ee_options.encryption_type = options.e2ee_options.encryption_type.value
-            req.connect.options.e2ee_options.key_provider_options.shared_key = options.e2ee_options.key_provider_options.shared_key
-            req.connect.options.e2ee_options.key_provider_options.ratchet_salt = options.e2ee_options.key_provider_options.ratchet_salt
-            req.connect.options.e2ee_options.key_provider_options.uncrypted_magic_bytes = options.e2ee_options.key_provider_options.uncrypted_magic_bytes
-            req.connect.options.e2ee_options.key_provider_options.ratchet_window_size = options.e2ee_options.key_provider_options.ratchet_window_size
-
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
+
+        if options.e2ee:
+            req.connect.options.e2ee.encryption_type = \
+                options.e2ee.encryption_type
+            req.connect.options.e2ee.key_provider_options.shared_key = \
+                options.e2ee.key_provider_options.shared_key  # type: ignore
+            req.connect.options.e2ee.key_provider_options.ratchet_salt = \
+                options.e2ee.key_provider_options.ratchet_salt
+            req.connect.options.e2ee.key_provider_options.uncrypted_magic_bytes = \
+                options.e2ee.key_provider_options.uncrypted_magic_bytes
+            req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
+                options.e2ee.key_provider_options.ratchet_window_size
 
         resp = ffi_client.request(req)
         future: asyncio.Future[proto_room.ConnectCallback] = asyncio.Future()
@@ -113,9 +114,8 @@ class Room(EventEmitter):
         self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.room.handle.id)
 
-        if options.e2ee_options:
-            self.e2ee_manager = E2EEManager(
-                self._ffi_handle.handle, options.e2ee_options)
+        self._e2ee_manager = E2EEManager(
+            self._ffi_handle.handle, options.e2ee)
 
         self._info = cb.room.info
         self.connection_state = ConnectionState.CONN_CONNECTED
@@ -265,9 +265,9 @@ class Room(EventEmitter):
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
         elif which == 'connection_state_changed':
-            state = event.connection_state_changed.state
-            self.connection_state = state
-            self.emit('connection_state_changed', state)
+            connection_state = event.connection_state_changed.state
+            self.connection_state = connection_state
+            self.emit('connection_state_changed', connection_state)
         elif which == 'connected':
             self.emit('connected')
         elif which == 'disconnected':
@@ -278,10 +278,9 @@ class Room(EventEmitter):
             self.emit('reconnected')
         elif which == 'e2ee_state_changed':
             sid = event.e2ee_state_changed.participant_sid
-            p = self._retrieve_participant(sid)
-            publication = p.tracks[event.e2ee_state_changed.track_sid]
+            e2ee_state = event.e2ee_state_changed.state
             self.emit('e2ee_state_changed',
-                      p, publication, event.e2ee_state_changed.participant_id, FrameCryptorState(event.e2ee_state_changed.state))
+                      self._retrieve_participant(sid), e2ee_state)
 
     def _retrieve_participant(self, sid: str) -> Participant:
         """ Retrieve a participant by sid, returns the LocalParticipant

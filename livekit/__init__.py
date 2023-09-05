@@ -29,7 +29,6 @@ from .audio_source import AudioSource
 from .audio_stream import AudioStream
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .room import ConnectError, Room, RoomOptions
-from ._proto.e2ee_pb2 import E2EEOptions
 from .track import (
     LocalAudioTrack,
     LocalVideoTrack,
