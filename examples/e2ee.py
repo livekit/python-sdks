@@ -50,7 +50,7 @@ async def main():
 
     @room.listens_to("e2ee_state_changed")
     def on_e2ee_state_changed(participant: livekit.Participant,
-                              state: livekit.E2eeState) -> None:
+                              state: livekit.EncryptionState) -> None:
         logging.info("e2ee state changed: %s %s", participant.identity, state)
 
     logging.info("connecting to %s", URL)
