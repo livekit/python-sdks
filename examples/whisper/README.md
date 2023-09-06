@@ -6,17 +6,9 @@
 
 Change the URL and TOKEN inside the script
 
-Clone whisper.cpp inside this directory
+### Install dependencies:
 
-### Build a shared lib:
-
-```
-gcc -O3 -std=c11 -pthread -mavx -mavx2 -mfma -mf16c -fPIC -c ggml.c
-g++ -O3 -std=c++11 -pthread --shared -fPIC -static-libstdc++ whisper.cpp ggml.o -o libwhisper.so
-```
-
-### Download a model you want to use:
-./download-ggml-model.sh tiny.en
+`pip install whispercpp numpy`
 
 ### Run whisper.py 
 Run the script and connect another participant with a microphone:

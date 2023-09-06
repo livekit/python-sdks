@@ -35,7 +35,7 @@ async def publish_frames(source: livekit.VideoSource):
 
         source.capture_frame(frame)
 
-        hue += framerate/3  # 3s for a full cycle
+        hue += framerate / 3  # 3s for a full cycle
         if hue >= 1.0:
             hue = 0.0
 

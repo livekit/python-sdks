@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 from weakref import WeakValueDictionary
-
-from pyee.asyncio import EventEmitter
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -23,7 +22,7 @@ from .audio_frame import AudioFrame
 from .track import Track
 
 
-class AudioStream(EventEmitter):
+class AudioStream:
     _streams: WeakValueDictionary[int, 'AudioStream'] = WeakValueDictionary()
     _initialized = False
 
@@ -65,9 +64,24 @@ class AudioStream(EventEmitter):
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info
         self._track = track
+        self._queue: asyncio.Queue[AudioFrame] = asyncio.Queue()
 
     def _on_frame_received(self, frame: AudioFrame) -> None:
-        self.emit('frame_received', frame)
+        self._queue.put_nowait(frame)
 
     def __del__(self):
         self._streams.pop(self._ffi_handle.handle, None)
+        while self._queue.not_empty():
+            try:
+                self._queue.get_nowait()
+                self._queue.task_done()
+            except asyncio.QueueEmpty:
+                pass
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        frame = await self._queue.get()
+        self._queue.task_done()
+        return frame
