@@ -43,9 +43,18 @@ class ConnectError(Exception):
         self.message = message
 
 
+async def get_cpu_usage():
+    # async
+    pass
+
+
 class Room(EventEmitter):
-    def __init__(self) -> None:
+    def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__()
+
+        if loop is None:
+            loop = asyncio.get_event_loop()  # default loop
+
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
         self._ffi_handle: Optional[FfiHandle] = None

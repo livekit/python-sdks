@@ -16,9 +16,10 @@ import asyncio
 import ctypes
 import os
 import platform
+import threading
+from typing import Callable, List
 
 import pkg_resources
-from pyee.asyncio import EventEmitter
 
 from ._proto import ffi_pb2 as proto_ffi
 
@@ -68,25 +69,49 @@ def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
-
-    ffi_client._event_loop.call_soon_threadsafe(dispatch_event, event)
-
-
-def dispatch_event(event: proto_ffi.FfiEvent) -> None:
-    which = str(event.WhichOneof('message'))
-    ffi_client.emit(which, getattr(event, which))
+    ffi_client._event_received(event)
 
 
-class FfiClient(EventEmitter):
+class FfiClient:
     def __init__(self) -> None:
         super().__init__()
-        self._event_loop = asyncio.get_event_loop()
 
+        self.subscribers: List[asyncio.Queue[proto_ffi.FfiEvent]] = []
+        self.lock = threading.RLock()
+
+        # initialize request
         req = proto_ffi.FfiRequest()
         cb_callback = int(ctypes.cast(
             ffi_event_callback, ctypes.c_void_p).value)  # type: ignore
         req.initialize.event_callback_ptr = cb_callback
         self.request(req)
+
+    async def wait_for_event(self, fnc: Callable[[proto_ffi.FfiEvent], bool]) \
+            -> proto_ffi.FfiEvent:
+        queue = self.subscribe()
+        try:
+            while True:
+                event = await queue.get()
+                if fnc(event):
+                    return event
+        finally:
+            self.unsubscribe(queue)
+
+    def subscribe(self) -> asyncio.Queue[proto_ffi.FfiEvent]:
+        with self.lock:
+            queue: asyncio.Queue[proto_ffi.FfiEvent] = asyncio.Queue()
+            self.subscribers.append(queue)
+            return queue
+
+    def unsubscribe(self, queue: asyncio.Queue[proto_ffi.FfiEvent]) -> None:
+        with self.lock:
+            self.subscribers.remove(queue)
+
+    def _event_received(self, event: proto_ffi.FfiEvent) -> None:
+        # emit to subscribers (all queue, like a spmc)
+        with self.lock:
+            for queue in self.subscribers:
+                queue.put_nowait(event)
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
         proto_data = req.SerializeToString()
