@@ -22,7 +22,7 @@ from ._proto.room_pb2 import (
     DataPacketKind,
     TrackPublishOptions,
 )
-from ._proto.e2ee_pb2 import (EncryptionType, E2eeState)
+from ._proto.e2ee_pb2 import (EncryptionType, EncryptionState)
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
 from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
 from .audio_frame import AudioFrame

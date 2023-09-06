@@ -49,30 +49,30 @@ GCM: EncryptionType.ValueType  # 1
 CUSTOM: EncryptionType.ValueType  # 2
 global___EncryptionType = EncryptionType
 
-class _E2eeState:
+class _EncryptionState:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _E2eeStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_E2eeState.ValueType], builtins.type):
+class _EncryptionStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_EncryptionState.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
-    NEW: _E2eeState.ValueType  # 0
-    OK: _E2eeState.ValueType  # 1
-    ENCRYPTION_FAILED: _E2eeState.ValueType  # 2
-    DECRYPTION_FAILED: _E2eeState.ValueType  # 3
-    MISSING_KEY: _E2eeState.ValueType  # 4
-    KEY_RATCHETED: _E2eeState.ValueType  # 5
-    INTERNAL_ERROR: _E2eeState.ValueType  # 6
+    NEW: _EncryptionState.ValueType  # 0
+    OK: _EncryptionState.ValueType  # 1
+    ENCRYPTION_FAILED: _EncryptionState.ValueType  # 2
+    DECRYPTION_FAILED: _EncryptionState.ValueType  # 3
+    MISSING_KEY: _EncryptionState.ValueType  # 4
+    KEY_RATCHETED: _EncryptionState.ValueType  # 5
+    INTERNAL_ERROR: _EncryptionState.ValueType  # 6
 
-class E2eeState(_E2eeState, metaclass=_E2eeStateEnumTypeWrapper): ...
+class EncryptionState(_EncryptionState, metaclass=_EncryptionStateEnumTypeWrapper): ...
 
-NEW: E2eeState.ValueType  # 0
-OK: E2eeState.ValueType  # 1
-ENCRYPTION_FAILED: E2eeState.ValueType  # 2
-DECRYPTION_FAILED: E2eeState.ValueType  # 3
-MISSING_KEY: E2eeState.ValueType  # 4
-KEY_RATCHETED: E2eeState.ValueType  # 5
-INTERNAL_ERROR: E2eeState.ValueType  # 6
-global___E2eeState = E2eeState
+NEW: EncryptionState.ValueType  # 0
+OK: EncryptionState.ValueType  # 1
+ENCRYPTION_FAILED: EncryptionState.ValueType  # 2
+DECRYPTION_FAILED: EncryptionState.ValueType  # 3
+MISSING_KEY: EncryptionState.ValueType  # 4
+KEY_RATCHETED: EncryptionState.ValueType  # 5
+INTERNAL_ERROR: EncryptionState.ValueType  # 6
+global___EncryptionState = EncryptionState
 
 @typing_extensions.final
 class FrameCryptor(google.protobuf.message.Message):

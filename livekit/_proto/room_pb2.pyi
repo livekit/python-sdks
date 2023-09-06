@@ -934,12 +934,12 @@ class E2eeStateChanged(google.protobuf.message.Message):
     STATE_FIELD_NUMBER: builtins.int
     participant_sid: builtins.str
     """Using sid instead of identity for ffi communication"""
-    state: e2ee_pb2.E2eeState.ValueType
+    state: e2ee_pb2.EncryptionState.ValueType
     def __init__(
         self,
         *,
         participant_sid: builtins.str = ...,
-        state: e2ee_pb2.E2eeState.ValueType = ...,
+        state: e2ee_pb2.EncryptionState.ValueType = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "state", b"state"]) -> None: ...
 
