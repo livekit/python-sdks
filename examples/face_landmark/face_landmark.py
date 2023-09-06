@@ -1,6 +1,8 @@
 import asyncio
 import os
 from queue import Queue
+import signal
+import threading
 
 import cv2
 import mediapipe as mp
@@ -8,10 +10,8 @@ import numpy as np
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
-import livekit
-
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjM1MTAzOTAsImlzcyI6IkFQSU1teGlMOHJxdUt6dFpFb1pKVjlGYiIsIm5hbWUiOiJ0aGlyZCIsIm5iZiI6MTY4NzUxMDM5MCwic3ViIjoidGhpcmQiLCJ2aWRlbyI6eyJyb29tIjoiZGF2aWRzLXJvb20iLCJyb29tSm9pbiI6dHJ1ZX19.QHw8R5rZVhJx9pWwnnriTc0hp_IvRuVQQWPaCeXt96Y'
 
 frame_queue = Queue()
 argb_frame = None
@@ -29,10 +29,9 @@ options = FaceLandmarkerOptions(
     base_options=BaseOptions(model_asset_path=model_path),
     running_mode=VisionRunningMode.VIDEO)
 
-# from https://github.com/googlesamples/mediapipe/blob/main/examples/face_landmarker/python/%5BMediaPipe_Python_Tasks%5D_Face_Landmarker.ipynb
-
 
 def draw_landmarks_on_image(rgb_image, detection_result):
+    # from https://github.com/googlesamples/mediapipe/blob/main/examples/face_landmarker/python/%5BMediaPipe_Python_Tasks%5D_Face_Landmarker.ipynb
     face_landmarks_list = detection_result.face_landmarks
 
     # Loop through the detected faces to visualize.
@@ -68,17 +67,45 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             .get_default_face_mesh_iris_connections_style())
 
 
-async def room() -> None:
+should_run = True
+room = None  # type: livekit.Room
+
+
+async def handle_room() -> None:
+    # livekit must be imported in the same thread as the event loop
+    import livekit
+    global room
     room = livekit.Room()
-    await room.connect(URL, TOKEN)
+    subscribed_track_id = None
+    print("connecting to room")
+    await room.connect(URL, TOKEN, livekit.RoomOptions(
+        # Unncomment below to enable E2EE
+        # e2ee=livekit.E2EEOptions(
+        #     key_provider_options=livekit.KeyProviderOptions(
+        #         shared_key=b"livekitrocks"
+        #     )
+        # ),
+        auto_subscribe=False,
+    ))
     print("connected to room: " + room.name)
 
     video_stream = None
+
+    @room.on("track_published")
+    def on_track_published(publication: livekit.RemoteTrackPublication,
+                           participant: livekit.RemoteParticipant):
+        nonlocal subscribed_track_id
+        if publication.kind == livekit.TrackKind.KIND_VIDEO and (
+            subscribed_track_id is None or subscribed_track_id == publication.sid
+        ):
+            publication.set_subscribed(True)
+            subscribed_track_id = publication.sid
 
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track,
                             publication: livekit.RemoteTrackPublication,
                             participant: livekit.RemoteParticipant):
+        print("track subscribed: " + publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
             video_stream = livekit.VideoStream(track)
@@ -87,18 +114,35 @@ async def room() -> None:
             def on_video_frame(frame: livekit.VideoFrame):
                 frame_queue.put(frame)
 
-    await room.run()
+    @room.on("track_unsubscribed")
+    def on_track_unsubscribed(publication: livekit.RemoteTrackPublication,
+                              participant: livekit.RemoteParticipant):
+        print("track unsubscribed: " + publication.sid)
+        nonlocal subscribed_track_id
+        if publication.sid == subscribed_track_id:
+            subscribed_track_id = None
+
+    @room.on("disconnected")
+    def on_disconnected():
+        print("disconnected from room")
+        global should_run
+        should_run = False
+        loop.stop()
 
 
 def display_frames() -> None:
     cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
 
-    global argb_frame
+    global argb_frame, should_run
+    import livekit
 
     with FaceLandmarker.create_from_options(options) as landmarker:
-        while True:
-            frame = frame_queue.get()
+        while should_run:
+            try:
+                frame = frame_queue.get(False, 0.1)
+            except:
+                continue
             buffer = frame.buffer
 
             if argb_frame is None or argb_frame.width != buffer.width or argb_frame.height != buffer.height:
@@ -115,7 +159,7 @@ def display_frames() -> None:
                 image_format=mp.ImageFormat.SRGB, data=arr)
 
             detection_result = landmarker.detect_for_video(
-                mp_image, frame.timestamp)
+                mp_image, frame.timestamp_us)
 
             draw_landmarks_on_image(arr, detection_result)
 
@@ -126,14 +170,37 @@ def display_frames() -> None:
                 break
 
     cv2.destroyAllWindows()
+    should_run = False
 
 
-async def main() -> None:
-    loop = asyncio.get_event_loop()
-    future = loop.run_in_executor(None, asyncio.run, room())
+loop = asyncio.new_event_loop()
+
+
+def run_loop() -> None:
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+
+def main() -> None:
+    room_thread = threading.Thread(target=run_loop)
+    room_thread.start()
+
+    future = asyncio.run_coroutine_threadsafe(handle_room(), loop)
+
+    def on_stop(sig=None, frame=None):
+        global should_run
+        should_run = False
+        future.cancel()
+        if room is not None:
+            asyncio.run_coroutine_threadsafe(room.disconnect(), loop)
+
+    signal.signal(signal.SIGINT, on_stop)
+    signal.signal(signal.SIGTERM, on_stop)
 
     display_frames()
-    await future
+    on_stop()
+    loop.stop()
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
