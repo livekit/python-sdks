@@ -20,7 +20,7 @@ from ._proto import video_frame_pb2 as proto_video_frame
 from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
 
 
-class VideoFrame():
+class VideoFrame:
     def __init__(self, timestamp_us: int,
                  rotation: VideoRotation.V,
                  buffer: 'VideoFrameBuffer') -> None:
@@ -29,7 +29,7 @@ class VideoFrame():
         self.rotation = rotation
 
 
-class VideoFrameBuffer():
+class VideoFrameBuffer:
     def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)

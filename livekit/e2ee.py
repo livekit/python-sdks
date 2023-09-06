@@ -63,7 +63,7 @@ class KeyProvider:
         key = resp.e2ee.get_shared_key.key
         return key
 
-    def rachet_shared_key(self, key_index: int) -> bytes:
+    def ratchet_shared_key(self, key_index: int) -> bytes:
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.ratchet_shared_key.key_index = key_index

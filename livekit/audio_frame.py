@@ -19,7 +19,7 @@ from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 
 
-class AudioFrame():
+class AudioFrame:
     def __init__(self, owned_info: proto_audio.OwnedAudioFrameBuffer) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
