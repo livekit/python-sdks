@@ -37,11 +37,11 @@ class TrackPublication():
         return self._info.name
 
     @property
-    def kind(self) -> proto_track.TrackKind.ValueType:
+    def kind(self) -> proto_track.TrackKind.V:
         return self._info.kind
 
     @property
-    def source(self) -> proto_track.TrackSource.ValueType:
+    def source(self) -> proto_track.TrackSource.V:
         return self._info.source
 
     @property
@@ -65,7 +65,7 @@ class TrackPublication():
         return self._info.muted
 
     @property
-    def encryption_type(self) -> proto_e2ee.EncryptionType.ValueType:
+    def encryption_type(self) -> proto_e2ee.EncryptionType.V:
         return self._info.encryption_type
 
 

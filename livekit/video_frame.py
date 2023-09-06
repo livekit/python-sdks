@@ -22,7 +22,7 @@ from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, Video
 
 class VideoFrame():
     def __init__(self, timestamp_us: int,
-                 rotation: VideoRotation.ValueType,
+                 rotation: VideoRotation.V,
                  buffer: 'VideoFrameBuffer') -> None:
         self.buffer = buffer
         self.timestamp_us = timestamp_us
@@ -43,7 +43,7 @@ class VideoFrameBuffer():
         return self._info.height
 
     @property
-    def type(self) -> VideoFrameBufferType.ValueType:
+    def type(self) -> VideoFrameBufferType.V:
         return self._info.buffer_type
 
     def to_i420(self) -> 'I420Buffer':
@@ -232,7 +232,7 @@ class ArgbFrame:
     """
 
     def __init__(self,
-                 format: VideoFormatType.ValueType,
+                 format: VideoFormatType.V,
                  width: int,
                  height: int) -> None:
         self._format = format
@@ -254,5 +254,5 @@ class ArgbFrame:
         return I420Buffer(res.to_i420.buffer)
 
     @property
-    def format(self) -> VideoFormatType.ValueType:
+    def format(self) -> VideoFormatType.V:
         return self._format

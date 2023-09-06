@@ -43,25 +43,18 @@ class ConnectError(Exception):
         self.message = message
 
 
-async def get_cpu_usage():
-    # async
-    pass
-
-
 class Room(EventEmitter):
-    def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         super().__init__()
 
+        # atm the loop is not used, but we may need it in the future
         if loop is None:
-            loop = asyncio.get_event_loop()  # default loop
+            self._loop = asyncio.get_event_loop()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
         self._ffi_handle: Optional[FfiHandle] = None
-        ffi_client.add_listener('room_event', self._on_room_event)
-
-    def __del__(self):
-        ffi_client.remove_listener('room_event', self._on_room_event)
+        self._queue = ffi_client.subscribe()
 
     @property
     def sid(self) -> str:
@@ -161,6 +154,10 @@ class Room(EventEmitter):
             self._close_future.set_result(None)
 
     async def run(self) -> None:
+        while True:
+            event = await self._queue.get()
+            self._on_room_event(event)
+
         await self._close_future
 
     def _on_room_event(self, event: proto_room.RoomEvent):
