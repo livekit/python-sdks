@@ -21,7 +21,7 @@ from ._proto import ffi_pb2 as proto_ffi
 
 DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
 DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
-DEFAULT_RATCHET_WINDOW_SIZE = 0
+DEFAULT_RATCHET_WINDOW_SIZE = 16
 
 
 @dataclass

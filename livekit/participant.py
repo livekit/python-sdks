@@ -98,9 +98,10 @@ class LocalParticipant(Participant):
 
             req.publish_data.destination_sids.extend(sids)
 
-        resp = ffi_client.request(req)
-        cb = await ffi_client.wait_for_event(lambda e: e.publish_data.async_id ==
-                                             resp.publish_data.async_id)
+        with ffi_client.observe() as obs:
+            resp = ffi_client.request(req)
+            cb = await obs.wait_for(lambda e: e.publish_data.async_id ==
+                                    resp.publish_data.async_id)
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
@@ -116,9 +117,10 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        resp = ffi_client.request(req)
-        cb = await ffi_client.wait_for_event(lambda e: e.publish_track.async_id
-                                             == resp.publish_track.async_id)
+        with ffi_client.observe() as obs:
+            resp = ffi_client.request(req)
+            cb = await obs.wait_for(lambda e: e.publish_track.async_id ==
+                                    resp.publish_track.async_id)
 
         if cb.publish_track.error:
             raise PublishTrackError(cb.publish_track.error)
@@ -133,9 +135,10 @@ class LocalParticipant(Participant):
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
 
-        resp = ffi_client.request(req)
-        cb = await ffi_client.wait_for_event(lambda e: e.unpublish_track.async_id
-                                             == resp.unpublish_track.async_id)
+        with ffi_client.observe() as obs:
+            resp = ffi_client.request(req)
+            cb = await obs.wait_for(lambda e: e.unpublish_track.async_id ==
+                                    resp.unpublish_track.async_id)
 
         if cb.unpublish_track.error:
             raise UnpublishTrackError(cb.unpublish_track.error)

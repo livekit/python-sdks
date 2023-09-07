@@ -100,16 +100,13 @@ class Room(EventEmitter):
                 options.e2ee.key_provider_options.ratchet_window_size
 
         resp = ffi_client.request(req)
-        future: asyncio.Future[proto_room.ConnectCallback] = asyncio.Future()
 
-        @ffi_client.listens_to('connect')
-        def on_connect_callback(cb: proto_room.ConnectCallback):
-            if cb.async_id == resp.connect.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener('connect', on_connect_callback)
+        with ffi_client.observe() as obs:
+            resp = ffi_client.request(req)
+            cb = await obs.wait_for(lambda e: e.connect.async_id ==
+                                    resp.connect.async_id)
 
-        cb = await future
-        if cb.error:
+        if cb.connect.error:
             raise ConnectError(cb.error)
 
         self._close_future: asyncio.Future[None] = asyncio.Future()
@@ -139,34 +136,37 @@ class Room(EventEmitter):
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
         resp = ffi_client.request(req)
-        future: asyncio.Future[proto_room.DisconnectCallback] = asyncio.Future(
-        )
 
-        @ffi_client.on('disconnect')
-        def on_disconnect_callback(cb: proto_room.DisconnectCallback):
-            if cb.async_id == resp.disconnect.async_id:
-                future.set_result(cb)
-                ffi_client.remove_listener(
-                    'disconnect', on_disconnect_callback)
+        with ffi_client.observe() as obs:
+            resp = ffi_client.request(req)
+            await obs.wait_for(lambda e: e.disconnect.async_id ==
+                               resp.disconnect.async_id)
 
-        await future
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
     async def run(self) -> None:
-        while True:
-            event = await self._queue.get()
-            self._on_room_event(event)
+        if not self.isconnected():
+            return
 
-        await self._close_future
+        while True:
+            wait_event = self._queue.wait_for(lambda e: e.room_event.room_handle ==
+                                              self._ffi_handle.handle)  # type: ignore
+
+            wait_event_future = asyncio.ensure_future(wait_event)
+
+            await asyncio.wait(
+                [wait_event_future, self._close_future],
+                return_when=asyncio.FIRST_COMPLETED
+            )  # type: ignore
+
+            if self._close_future.done():
+                wait_event_future.cancel()
+                break
+
+            self._on_room_event(wait_event_future.result().room_event)
 
     def _on_room_event(self, event: proto_room.RoomEvent):
-        if self._ffi_handle is None:
-            return
-
-        if event.room_handle != self._ffi_handle.handle:
-            return
-
         which = event.WhichOneof('message')
         if which == 'participant_connected':
             rparticipant = self._create_remote_participant(

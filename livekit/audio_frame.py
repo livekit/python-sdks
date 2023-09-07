@@ -32,7 +32,7 @@ class AudioFrame:
     def create(sample_rate: int, num_channels: int, samples_per_channel: int) \
             -> 'AudioFrame':
         # TODO(theomonnom): There should be no problem to directly
-        # send audio date from a Python created ctypes buffer
+        # send audio data from a Python created ctypes buffer
         req = proto_ffi.FfiRequest()
         req.alloc_audio_buffer.sample_rate = sample_rate
         req.alloc_audio_buffer.num_channels = num_channels
