@@ -41,7 +41,7 @@ class VideoStream:
             and e.video_stream_event.HasField('frame_received')
 
     async def __anext__(self):
-        event = await ffi_client.wait_for_event(self._is_frame)
+        event = await self._queue.wait_for(self._is_frame)
         video_event = event.video_stream_event
 
         frame_info = video_event.frame_received.frame

@@ -41,7 +41,7 @@ class AudioStream:
             and e.audio_stream_event.HasField('frame_received')
 
     async def __anext__(self):
-        event = await ffi_client.wait_for_event(self._is_frame)
+        event = await self._queue.wait_for(self._is_frame)
         audio_event = event.audio_stream_event
 
         owned_buffer_info = audio_event.frame_received.frame
