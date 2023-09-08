@@ -21,11 +21,9 @@ from ._utils import RingQueue
 from .audio_frame import AudioFrame
 from .track import Track
 
-DEFAULT_MAX_SIZE = 48000 * 2 * 5  # 5 second of audio at 48khz stereo (=960kb)
-
 
 class AudioStream:
-    def __init__(self, track: Track, capacity: int = DEFAULT_MAX_SIZE) -> None:
+    def __init__(self, track: Track, capacity: int = 0) -> None:
         self._track = track
         self._ffi_queue = ffi_client.subscribe()
         self._queue: RingQueue[AudioFrame] = RingQueue(capacity)

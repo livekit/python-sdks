@@ -21,12 +21,9 @@ from ._utils import RingQueue
 from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
-# size of a 720p i420 buffer:  1280 * 720 + (640 + 640) * 360 = 1.3824mb
-DEFAULT_MAX_SIZE = 256  # 256 * 720p i420 buffers (=353.8944mb)
-
 
 class VideoStream:
-    def __init__(self, track: Track, capacity: int = DEFAULT_MAX_SIZE) -> None:
+    def __init__(self, track: Track, capacity: int = 0) -> None:
         self._track = track
         self._ffi_queue = ffi_client.subscribe()
         self._queue: RingQueue[VideoFrame] = RingQueue(capacity)
