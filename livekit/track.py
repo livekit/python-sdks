@@ -37,11 +37,11 @@ class Track():
         return self._info.name
 
     @property
-    def kind(self) -> proto_track.TrackKind.V:
+    def kind(self) -> proto_track.TrackKind.ValueType:
         return self._info.kind
 
     @property
-    def stream_state(self) -> proto_track.StreamState.V:
+    def stream_state(self) -> proto_track.StreamState.ValueType:
         return self._info.stream_state
 
     @property

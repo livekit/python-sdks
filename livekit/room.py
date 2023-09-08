@@ -95,8 +95,6 @@ class Room(EventEmitter):
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
 
-        resp = ffi_client.request(req)
-
         with ffi_client.observe() as obs:
             resp = ffi_client.request(req)
             cb = await obs.wait_for(lambda e: e.connect.async_id ==
@@ -137,12 +135,12 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        resp = ffi_client.request(req)
-
         with ffi_client.observe() as obs:
             resp = ffi_client.request(req)
             await obs.wait_for(lambda e: e.disconnect.async_id ==
                                resp.disconnect.async_id)
+
+        print("This is a test")
 
         if not self._close_future.cancelled():
             self._close_future.set_result(None)

@@ -79,7 +79,8 @@ class LocalParticipant(Participant):
 
     async def publish_data(self,
                            payload: Union[bytes, str],
-                           kind: DataPacketKind.V = DataPacketKind.KIND_RELIABLE,
+                           kind: DataPacketKind.ValueType
+                           = DataPacketKind.KIND_RELIABLE,
                            destination_sids: Optional[
                                List[Union[str, 'RemoteParticipant']]] = None) -> None:
         if isinstance(payload, str):

@@ -36,7 +36,7 @@ class KeyProviderOptions:
 class E2EEOptions:
     key_provider_options: KeyProviderOptions = field(
         default_factory=KeyProviderOptions)
-    encryption_type: proto_e2ee.EncryptionType.V = proto_e2ee.EncryptionType.GCM
+    encryption_type: proto_e2ee.EncryptionType.ValueType = proto_e2ee.EncryptionType.GCM
 
 
 class KeyProvider:
