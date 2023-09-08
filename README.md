@@ -15,6 +15,7 @@ The Livekit Python Client provides a convenient interface for integrating Liveki
 Official LiveKit documentation: https://docs.livekit.io/
 
 ## Installation
+
 ```shell
 $ pip install livekit
 ```
@@ -24,8 +25,16 @@ $ pip install livekit
 ```python
 async def main():
     room = livekit.Room()
+    # By default, autosubscribe is enabled. The participant will be subscribed to
+    # all published tracks in the room
     await room.connect(URL, TOKEN)
     logging.info("connected to room %s", room.name)
+
+    # participants and tracks that are already available in the room
+    # participant_connected and track_published events will *not* be emitted for them
+    for participant in room.participants.items():
+        for publication in participant.tracks.items():
+            print("track publication: %s", publication.sid)
 
     @room.on("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant):
@@ -33,6 +42,8 @@ async def main():
             "participant connected: %s %s", participant.sid, participant.identity)
 
     video_stream = None
+
+    # track_subscribed is emitted whenever the local participant is subscribed to a new track
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
@@ -40,9 +51,8 @@ async def main():
             nonlocal video_stream
             video_stream = livekit.VideoStream(track)
 
-            @video_stream.on("frame_received")
-            def on_video_frame(frame: livekit.VideoFrame):
-                # received a video frame from the track
+            async for frame in video_stream:
+                # received a video frame from the track, process it here
                 pass
 
     await room.run()

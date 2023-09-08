@@ -56,7 +56,7 @@ async def main():
     logging.info("connecting to %s", URL)
     try:
         e2ee_options = livekit.E2EEOptions()
-        e2ee_options.key_provider_options.shared_key = b"abcdef"  # this is our e2ee key
+        e2ee_options.key_provider_options.shared_key = b"livekitrocks"  # this is our e2ee key
 
         await room.connect(URL, TOKEN, options=livekit.RoomOptions(
             auto_subscribe=True,
