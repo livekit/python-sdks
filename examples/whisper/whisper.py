@@ -98,56 +98,56 @@ whisper.whisper_full_default_params.restype = WhisperFullParams
 whisper.whisper_full_get_segment_text.restype = ctypes.c_char_p
 ctx = whisper.whisper_init_from_file(fname_model.encode('utf-8'))
 
-data_30_secs = np.zeros(SAMPLES_30_SECS, dtype=np.float32)
-written_samples = 0  # nb. of samples written to data_30_secs for the cur. inference
 
+async def whisper_task(stream: livekit.AudioStream):
+    data_30_secs = np.zeros(SAMPLES_30_SECS, dtype=np.float32)
+    written_samples = 0  # nb. of samples written to data_30_secs for the cur. inference
 
-def on_audio_frame(frame: livekit.AudioFrame):
-    global data_30_secs, written_samples
+    async for frame in stream:
+        # whisper requires 16kHz mono, so resample the data
+        # also convert the samples from int16 to float32
+        frame = frame.remix_and_resample(
+            WHISPER_SAMPLE_RATE, 1)
 
-    # whisper requires 16kHz mono, so resample the data
-    # also convert the samples from int16 to float32
-    frame = frame.remix_and_resample(
-        WHISPER_SAMPLE_RATE, 1)
+        data = np.array(frame.data, dtype=np.float32) / 32768.0
 
-    data = np.array(frame.data, dtype=np.float32) / 32768.0
+        # write the data inside data_30_secs at written_samples
+        data_start = SAMPLES_KEEP + written_samples
+        data_30_secs[data_start:data_start+len(data)] = data
+        written_samples += len(data)
 
-    # write the data inside data_30_secs at written_samples
-    data_start = SAMPLES_KEEP + written_samples
-    data_30_secs[data_start:data_start+len(data)] = data
-    written_samples += len(data)
+        if written_samples >= SAMPLES_STEP:
+            params = whisper.whisper_full_default_params(
+                WhisperSamplingStrategy.WHISPER_SAMPLING_GREEDY)
+            params.print_realtime = False
+            params.print_progress = False
 
-    if written_samples >= SAMPLES_STEP:
-        params = whisper.whisper_full_default_params(
-            WhisperSamplingStrategy.WHISPER_SAMPLING_GREEDY)
-        params.print_realtime = False
-        params.print_progress = False
+            ctx_ptr = ctypes.c_void_p(ctx)
+            data_ptr = data_30_secs.ctypes.data_as(
+                ctypes.POINTER(ctypes.c_float))
+            res = whisper.whisper_full(ctx_ptr,
+                                       params,
+                                       data_ptr,
+                                       written_samples + SAMPLES_KEEP)
 
-        ctx_ptr = ctypes.c_void_p(ctx)
-        data_ptr = data_30_secs.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-        res = whisper.whisper_full(ctx_ptr,
-                                   params,
-                                   data_ptr,
-                                   written_samples + SAMPLES_KEEP)
+            if res != 0:
+                logging.error("error while running inference: %s", res)
+                return
 
-        if res != 0:
-            logging.error("error while running inference: %s", res)
-            return
+            n_segments = whisper.whisper_full_n_segments(ctx_ptr)
+            for i in range(n_segments):
+                t0 = whisper.whisper_full_get_segment_t0(ctx_ptr, i)
+                t1 = whisper.whisper_full_get_segment_t1(ctx_ptr, i)
+                txt = whisper.whisper_full_get_segment_text(ctx_ptr, i)
 
-        n_segments = whisper.whisper_full_n_segments(ctx_ptr)
-        for i in range(n_segments):
-            t0 = whisper.whisper_full_get_segment_t0(ctx_ptr, i)
-            t1 = whisper.whisper_full_get_segment_t1(ctx_ptr, i)
-            txt = whisper.whisper_full_get_segment_text(ctx_ptr, i)
+                logging.info(
+                    f"{t0/1000.0:.3f} - {t1/1000.0:.3f} : {txt.decode('utf-8')}")
 
-            logging.info(
-                f"{t0/1000.0:.3f} - {t1/1000.0:.3f} : {txt.decode('utf-8')}")
-
-        # write old data to the beginning of the buffer (SAMPLES_KEEP)
-        data_30_secs[:SAMPLES_KEEP] = data_30_secs[data_start +
-                                                   written_samples - SAMPLES_KEEP:
-                                                   data_start + written_samples]
-        written_samples = 0
+            # write old data to the beginning of the buffer (SAMPLES_KEEP)
+            data_30_secs[:SAMPLES_KEEP] = data_30_secs[data_start +
+                                                       written_samples - SAMPLES_KEEP:
+                                                       data_start + written_samples]
+            written_samples = 0
 
 
 async def main():
@@ -172,7 +172,7 @@ async def main():
         logging.info("starting listening to: %s", participant.identity)
         nonlocal audio_stream
         audio_stream = livekit.AudioStream(track)
-        audio_stream.add_listener('frame_received', on_audio_frame)
+        asyncio.create_task(whisper_task(audio_stream))
 
     try:
         logging.info("connecting to %s", URL)

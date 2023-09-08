@@ -19,7 +19,7 @@ from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 
 
-class AudioFrame():
+class AudioFrame:
     def __init__(self, owned_info: proto_audio.OwnedAudioFrameBuffer) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
@@ -32,7 +32,7 @@ class AudioFrame():
     def create(sample_rate: int, num_channels: int, samples_per_channel: int) \
             -> 'AudioFrame':
         # TODO(theomonnom): There should be no problem to directly
-        # send audio date from a Python created ctypes buffer
+        # send audio data from a Python created ctypes buffer
         req = proto_ffi.FfiRequest()
         req.alloc_audio_buffer.sample_rate = sample_rate
         req.alloc_audio_buffer.num_channels = num_channels

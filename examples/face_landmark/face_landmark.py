@@ -13,8 +13,7 @@ import livekit
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
 
-frame_queue = Queue()
-argb_frame = None
+tasks = set()
 
 # You can download a face landmark model file from https://developers.google.com/mediapipe/solutions/vision/face_landmarker#models
 model_file = 'face_landmarker.task'
@@ -36,8 +35,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
     face_landmarks_list = detection_result.face_landmarks
 
     # Loop through the detected faces to visualize.
-    for idx in range(len(face_landmarks_list)):
-        face_landmarks = face_landmarks_list[idx]
+    for face_landmarks in face_landmarks_list:
 
         # Draw the face landmarks.
         face_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
@@ -68,7 +66,43 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             .get_default_face_mesh_iris_connections_style())
 
 
-async def room() -> None:
+async def frame_loop(video_stream: livekit.VideoStream) -> None:
+    landmarker = FaceLandmarker.create_from_options(options)
+    argb_frame = None
+    cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
+    cv2.startWindowThread()
+    async for frame in video_stream:
+        buffer = frame.buffer
+
+        if argb_frame is None or argb_frame.width != buffer.width or argb_frame.height != buffer.height:
+            argb_frame = livekit.ArgbFrame(
+                livekit.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
+
+        buffer.to_argb(argb_frame)
+
+        arr = np.ctypeslib.as_array(argb_frame.data)
+        arr = arr.reshape((argb_frame.height, argb_frame.width, 4))
+        arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
+
+        mp_image = mp.Image(
+            image_format=mp.ImageFormat.SRGB, data=arr)
+
+        detection_result = landmarker.detect_for_video(
+            mp_image, frame.timestamp_us)
+
+        draw_landmarks_on_image(arr, detection_result)
+
+        arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
+
+        cv2.imshow('livekit_video', arr)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    landmarker.close()
+    cv2.destroyAllWindows()
+
+
+async def main() -> None:
     room = livekit.Room()
     await room.connect(URL, TOKEN)
     print("connected to room: " + room.name)
@@ -76,64 +110,15 @@ async def room() -> None:
     video_stream = None
 
     @room.on("track_subscribed")
-    def on_track_subscribed(track: livekit.Track,
-                            publication: livekit.RemoteTrackPublication,
-                            participant: livekit.RemoteParticipant):
+    def on_track_subscribed(track: livekit.Track, *_):
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
             video_stream = livekit.VideoStream(track)
-
-            @video_stream.on("frame_received")
-            def on_video_frame(frame: livekit.VideoFrame):
-                frame_queue.put(frame)
+            task = asyncio.create_task(frame_loop(video_stream))
+            tasks.add(task)
+            task.add_done_callback(tasks.remove)
 
     await room.run()
-
-
-def display_frames() -> None:
-    cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
-    cv2.startWindowThread()
-
-    global argb_frame
-
-    with FaceLandmarker.create_from_options(options) as landmarker:
-        while True:
-            frame = frame_queue.get()
-            buffer = frame.buffer
-
-            if argb_frame is None or argb_frame.width != buffer.width or argb_frame.height != buffer.height:
-                argb_frame = livekit.ArgbFrame(
-                    livekit.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
-
-            buffer.to_argb(argb_frame)
-
-            arr = np.ctypeslib.as_array(argb_frame.data)
-            arr = arr.reshape((argb_frame.height, argb_frame.width, 4))
-            arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
-
-            mp_image = mp.Image(
-                image_format=mp.ImageFormat.SRGB, data=arr)
-
-            detection_result = landmarker.detect_for_video(
-                mp_image, frame.timestamp)
-
-            draw_landmarks_on_image(arr, detection_result)
-
-            arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
-
-            cv2.imshow('livekit_video', arr)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    cv2.destroyAllWindows()
-
-
-async def main() -> None:
-    loop = asyncio.get_event_loop()
-    future = loop.run_in_executor(None, asyncio.run, room())
-
-    display_frames()
-    await future
 
 if __name__ == "__main__":
     asyncio.run(main())

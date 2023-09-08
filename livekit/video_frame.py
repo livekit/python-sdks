@@ -20,14 +20,16 @@ from ._proto import video_frame_pb2 as proto_video_frame
 from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
 
 
-class VideoFrame():
-    def __init__(self, timestamp_us: int, rotation: VideoRotation.ValueType, buffer: 'VideoFrameBuffer') -> None:
+class VideoFrame:
+    def __init__(self, timestamp_us: int,
+                 rotation: VideoRotation.ValueType,
+                 buffer: 'VideoFrameBuffer') -> None:
         self.buffer = buffer
         self.timestamp_us = timestamp_us
         self.rotation = rotation
 
 
-class VideoFrameBuffer():
+class VideoFrameBuffer:
     def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
@@ -63,7 +65,8 @@ class VideoFrameBuffer():
         ffi_client.request(req)
 
     @staticmethod
-    def create(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'VideoFrameBuffer':
+    def create(owned_info: proto_video_frame.OwnedVideoFrameBuffer) \
+            -> 'VideoFrameBuffer':
         """
         Create the right class instance from the VideoFrameBufferInfo
         """
@@ -130,13 +133,15 @@ class PlanarYuv8Buffer(PlanarYuvBuffer):
     @property
     def data_u(self) -> ctypes.Array[ctypes.c_uint8]:
         arr = ctypes.cast(self._info.yuv.data_u_ptr, ctypes.POINTER(
-            ctypes.c_uint8 * (self._info.yuv.stride_u * self._info.yuv.chroma_height))).contents
+            ctypes.c_uint8 * (self._info.yuv.stride_u *
+                              self._info.yuv.chroma_height))).contents
         return arr
 
     @property
     def data_v(self) -> ctypes.Array[ctypes.c_uint8]:
         arr = ctypes.cast(self._info.yuv.data_v_ptr, ctypes.POINTER(
-            ctypes.c_uint8 * (self._info.yuv.stride_v * self._info.yuv.chroma_height))).contents
+            ctypes.c_uint8 * (self._info.yuv.stride_v *
+                              self._info.yuv.chroma_height))).contents
         return arr
 
 
@@ -147,19 +152,22 @@ class PlanarYuv16Buffer(PlanarYuvBuffer):
     @property
     def data_y(self) -> ctypes.Array[ctypes.c_uint16]:
         arr = ctypes.cast(self._info.yuv.data_y_ptr, ctypes.POINTER(
-            ctypes.c_uint16 * (self._info.yuv.stride_y // 2 * self._info.height))).contents
+            ctypes.c_uint16 * (self._info.yuv.stride_y // 2 *
+                               self._info.height))).contents
         return arr
 
     @property
     def data_u(self) -> ctypes.Array[ctypes.c_uint16]:
         arr = ctypes.cast(self._info.yuv.data_u_ptr, ctypes.POINTER(
-            ctypes.c_uint16 * (self._info.yuv.stride_u // 2 * self._info.yuv.chroma_height))).contents
+            ctypes.c_uint16 * (self._info.yuv.stride_u // 2 *
+                               self._info.yuv.chroma_height))).contents
         return arr
 
     @property
     def data_v(self) -> ctypes.Array[ctypes.c_uint16]:
         arr = ctypes.cast(self._info.yuv.data_v_ptr, ctypes.POINTER(
-            ctypes.c_uint16 * (self._info.yuv.stride_v // 2 * self._info.yuv.chroma_height))).contents
+            ctypes.c_uint16 * (self._info.yuv.stride_v // 2 *
+                               self._info.yuv.chroma_height))).contents
         return arr
 
 
@@ -176,7 +184,8 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer):
     @property
     def data_uv(self) -> ctypes.Array[ctypes.c_uint8]:
         arr = ctypes.cast(self._info.bi_yuv.data_uv_ptr, ctypes.POINTER(
-            ctypes.c_uint8 * (self._info.bi_yuv.stride_uv * self._info.bi_yuv.chroma_height))).contents
+            ctypes.c_uint8 * (self._info.bi_yuv.stride_uv *
+                              self._info.bi_yuv.chroma_height))).contents
         return arr
 
 
@@ -222,7 +231,10 @@ class ArgbFrame:
     So the users don't need to deal with ctypes
     """
 
-    def __init__(self, format: VideoFormatType.ValueType, width: int, height: int) -> None:
+    def __init__(self,
+                 format: VideoFormatType.ValueType,
+                 width: int,
+                 height: int) -> None:
         self._format = format
         self.width = width
         self.height = height

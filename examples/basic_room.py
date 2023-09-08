@@ -59,20 +59,12 @@ async def main() -> None:
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
             video_stream = livekit.VideoStream(track)
-
-            @video_stream.on("frame_received")
-            def on_video_frame(frame: livekit.VideoFrame):
-                # received a video frame from the track
-                pass
+            # video_stream is an async iterator that yields VideoFrame
         elif track.kind == livekit.TrackKind.KIND_AUDIO:
             print("Subscribed to an Audio Track")
             nonlocal audio_stream
             audio_stream = livekit.AudioStream(track)
-
-            @audio_stream.on('frame_received')
-            def on_audio_frame(frame: livekit.AudioFrame):
-                # received an audio frame from the track
-                pass
+            # audio_stream is an async iterator that yields AudioFrame 
 
     @room.listens_to("track_unsubscribed")
     def on_track_unsubscribed(track: livekit.Track,
