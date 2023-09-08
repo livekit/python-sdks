@@ -65,13 +65,13 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             connection_drawing_spec=mp.solutions.drawing_styles
             .get_default_face_mesh_iris_connections_style())
 
+
 async def frame_loop(video_stream: livekit.VideoStream) -> None:
     landmarker = FaceLandmarker.create_from_options(options)
     argb_frame = None
     cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
-    async for frame_coro in video_stream:
-        frame = await frame_coro
+    async for frame in video_stream:
         buffer = frame.buffer
 
         if argb_frame is None or argb_frame.width != buffer.width or argb_frame.height != buffer.height:
@@ -88,7 +88,7 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
             image_format=mp.ImageFormat.SRGB, data=arr)
 
         detection_result = landmarker.detect_for_video(
-            mp_image, frame.timestamp)
+            mp_image, frame.timestamp_us)
 
         draw_landmarks_on_image(arr, detection_result)
 
