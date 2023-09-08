@@ -1,6 +1,6 @@
 import asyncio
 import os
-from queue import Queue
+import signal
 
 import cv2
 import mediapipe as mp
@@ -104,7 +104,19 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
 
 async def main() -> None:
     room = livekit.Room()
-    await room.connect(URL, TOKEN)
+
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(
+        signal.SIGINT, lambda: exit(0))
+
+    await room.connect(URL, TOKEN, livekit.RoomOptions(
+        # Unncomment below to enable E2EE
+        # e2ee=livekit.E2EEOptions(
+        #     key_provider_options=livekit.KeyProviderOptions(
+        #         shared_key=b"livekitrocks"
+        #     )
+        # ),
+    ))
     print("connected to room: " + room.name)
 
     video_stream = None
@@ -113,6 +125,10 @@ async def main() -> None:
     def on_track_subscribed(track: livekit.Track, *_):
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
+            # only process the first stream received
+            if video_stream is not None:
+                return
+            print("subscribed to track: " + track.name)
             video_stream = livekit.VideoStream(track)
             task = asyncio.create_task(frame_loop(video_stream))
             tasks.add(task)
