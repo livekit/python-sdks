@@ -20,16 +20,24 @@ g++ -O3 -std=c++11 -pthread --shared -fPIC -static-libstdc++ whisper.cpp ggml.o 
 
 ### Step 4: 
 Download a model you want to use, for example:
-`./models/download-ggml-model.sh tiny.en`
+```
+./models/download-ggml-model.sh tiny.en
+```
 
 ### Step 5: 
 Rename the shared object library:
-`mv libwhisper.so libwhisper.dylib`
+```
+mv libwhisper.so libwhisper.dylib
+```
 
 ### Step 6:
 Run the whisper.py script:
-`python3 whisper.py`
+```
+python3 whisper.py
+```
 
 ### Step 7:
 Connect another participant to the room and publish a microphone stream. To do this, you can use our [Meet example](https://meet.livekit.io/?tab=custom) or use the livekit-cli:
-`livekit-cli load-test --room yourroom --audio-publishers 1`
+```
+livekit-cli load-test --room yourroom --audio-publishers 1
+```
