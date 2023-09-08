@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import ctypes
-from typing import List, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -65,10 +65,17 @@ class Participant():
         return self._info.metadata
 
 
+OnTrackPublishedType = Callable[[LocalTrackPublication, Track], Any]
+OnTrackUnpublishedType = Callable[[LocalTrackPublication], Any]
+
+
 class LocalParticipant(Participant):
-    def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
+    def __init__(self, owned_info: proto_participant.OwnedParticipant, ) -> None:
         super().__init__(owned_info)
         self.tracks: dict[str, LocalTrackPublication] = {}  # type: ignore
+
+        self._on_track_published: OnTrackPublishedType = lambda pub, track: None
+        self._on_track_unpublished: OnTrackUnpublishedType = lambda pub: None
 
     async def publish_data(self,
                            payload: Union[bytes, str],
@@ -128,6 +135,8 @@ class LocalParticipant(Participant):
         track_publication = LocalTrackPublication(cb.publish_track.publication)
         track_publication.track = track
         self.tracks[track_publication.sid] = track_publication
+
+        self._on_track_published(track_publication, track)
         return track_publication
 
     async def unpublish_track(self, track_sid: str) -> None:
@@ -145,6 +154,8 @@ class LocalParticipant(Participant):
 
         publication = self.tracks.pop(track_sid)
         publication.track = None
+
+        self._on_track_unpublished(publication)
 
 
 class RemoteParticipant(Participant):

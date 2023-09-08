@@ -44,12 +44,8 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+    def __init__(self) -> None:
         super().__init__()
-
-        # atm the loop is not used, but we may need it in the future
-        if loop is None:
-            self._loop = asyncio.get_event_loop()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
@@ -107,20 +103,26 @@ class Room(EventEmitter):
                                     resp.connect.async_id)
 
         if cb.connect.error:
-            raise ConnectError(cb.error)
+            raise ConnectError(cb.connect.error)
 
         self._close_future: asyncio.Future[None] = asyncio.Future()
-        self._ffi_handle = FfiHandle(cb.room.handle.id)
+        self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
 
         self._e2ee_manager = E2EEManager(
             self._ffi_handle.handle, options.e2ee)
 
-        self._info = cb.room.info
+        self._info = cb.connect.room.info
         self.connection_state = ConnectionState.CONN_CONNECTED
 
-        self.local_participant = LocalParticipant(cb.local_participant)
+        self.local_participant = LocalParticipant(cb.connect.local_participant)
 
-        for pt in cb.participants:
+        self.local_participant._on_track_published = lambda publication, track: \
+            self.emit('local_track_published', publication, track)
+
+        self.local_participant._on_track_unpublished = lambda publication: \
+            self.emit('local_track_unpublished', publication)
+
+        for pt in cb.connect.participants:
             rp = self._create_remote_participant(pt.participant)
 
             # add the initial remote participant tracks
@@ -164,9 +166,9 @@ class Room(EventEmitter):
                 wait_event_future.cancel()
                 break
 
-            self._on_room_event(wait_event_future.result().room_event)
+            await self._on_room_event(wait_event_future.result().room_event)
 
-    def _on_room_event(self, event: proto_room.RoomEvent):
+    async def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof('message')
         if which == 'participant_connected':
             rparticipant = self._create_remote_participant(
@@ -176,17 +178,6 @@ class Room(EventEmitter):
             sid = event.participant_disconnected.participant_sid
             rparticipant = self.participants.pop(sid)
             self.emit('participant_disconnected', rparticipant)
-        elif which == 'local_track_published':
-            sid = event.local_track_published.track_sid
-            # publication is created inside LocalParticipant.publish_track
-            # (This event is called after that)
-            lpublication = self.local_participant.tracks[sid]
-            track = lpublication.track
-            self.emit('local_track_published', lpublication, track)
-        elif which == 'local_track_unpublished':
-            sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.tracks[sid]
-            self.emit('local_track_unpublished', lpublication)
         elif which == 'track_published':
             rparticipant = self.participants[event.track_published.participant_sid]
             rpublication = RemoteTrackPublication(
@@ -269,6 +260,11 @@ class Room(EventEmitter):
             FfiHandle(owned_buffer_info.handle.id)
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
+        elif which == 'e2ee_state_changed':
+            sid = event.e2ee_state_changed.participant_sid
+            e2ee_state = event.e2ee_state_changed.state
+            self.emit('e2ee_state_changed',
+                      self._retrieve_participant(sid), e2ee_state)
         elif which == 'connection_state_changed':
             connection_state = event.connection_state_changed.state
             self.connection_state = connection_state
@@ -281,11 +277,6 @@ class Room(EventEmitter):
             self.emit('reconnecting')
         elif which == 'reconnected':
             self.emit('reconnected')
-        elif which == 'e2ee_state_changed':
-            sid = event.e2ee_state_changed.participant_sid
-            e2ee_state = event.e2ee_state_changed.state
-            self.emit('e2ee_state_changed',
-                      self._retrieve_participant(sid), e2ee_state)
 
     def _retrieve_participant(self, sid: str) -> Participant:
         """ Retrieve a participant by sid, returns the LocalParticipant
