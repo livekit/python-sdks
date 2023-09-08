@@ -58,6 +58,10 @@ class VideoStream:
             elif video_event.HasField('eos'):
                 break
 
+    async def close(self):
+        del self._ffi_handle
+        await self._task
+
     def __aiter__(self):
         return self
 
