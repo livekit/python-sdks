@@ -412,20 +412,24 @@ global___OwnedAudioStream = OwnedAudioStream
 class AudioStreamEvent(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    STREAM_HANDLE_FIELD_NUMBER: builtins.int
     FRAME_RECEIVED_FIELD_NUMBER: builtins.int
-    source_handle: builtins.int
+    EOS_FIELD_NUMBER: builtins.int
+    stream_handle: builtins.int
     @property
     def frame_received(self) -> global___AudioFrameReceived: ...
+    @property
+    def eos(self) -> global___AudioStreamEOS: ...
     def __init__(
         self,
         *,
-        source_handle: builtins.int = ...,
+        stream_handle: builtins.int = ...,
         frame_received: global___AudioFrameReceived | None = ...,
+        eos: global___AudioStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["frame_received", b"frame_received", "message", b"message", "source_handle", b"source_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received", "eos"] | None: ...
 
 global___AudioStreamEvent = AudioStreamEvent
 
@@ -445,6 +449,16 @@ class AudioFrameReceived(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["frame", b"frame"]) -> None: ...
 
 global___AudioFrameReceived = AudioFrameReceived
+
+@typing_extensions.final
+class AudioStreamEOS(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___AudioStreamEOS = AudioStreamEOS
 
 @typing_extensions.final
 class AudioSourceOptions(google.protobuf.message.Message):

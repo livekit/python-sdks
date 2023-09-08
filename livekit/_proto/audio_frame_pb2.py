@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from . import handle_pb2 as handle__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x61udio_frame.proto\x12\rlivekit.proto\x1a\x0chandle.proto\"a\n\x17\x41llocAudioBufferRequest\x12\x13\n\x0bsample_rate\x18\x01 \x01(\r\x12\x14\n\x0cnum_channels\x18\x02 \x01(\r\x12\x1b\n\x13samples_per_channel\x18\x03 \x01(\r\"P\n\x18\x41llocAudioBufferResponse\x12\x34\n\x06\x62uffer\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"[\n\x15NewAudioStreamRequest\x12\x14\n\x0ctrack_handle\x18\x01 \x01(\x04\x12,\n\x04type\x18\x02 \x01(\x0e\x32\x1e.livekit.proto.AudioStreamType\"I\n\x16NewAudioStreamResponse\x12/\n\x06stream\x18\x01 \x01(\x0b\x32\x1f.livekit.proto.OwnedAudioStream\"\xb5\x01\n\x15NewAudioSourceRequest\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.livekit.proto.AudioSourceType\x12\x37\n\x07options\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioSourceOptionsH\x00\x88\x01\x01\x12\x13\n\x0bsample_rate\x18\x03 \x01(\r\x12\x14\n\x0cnum_channels\x18\x04 \x01(\rB\n\n\x08_options\"I\n\x16NewAudioSourceResponse\x12/\n\x06source\x18\x01 \x01(\x0b\x32\x1f.livekit.proto.OwnedAudioSource\"f\n\x18\x43\x61ptureAudioFrameRequest\x12\x15\n\rsource_handle\x18\x01 \x01(\x04\x12\x33\n\x06\x62uffer\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\"-\n\x19\x43\x61ptureAudioFrameResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"K\n\x19\x43\x61ptureAudioFrameCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_error\"\x1a\n\x18NewAudioResamplerRequest\"R\n\x19NewAudioResamplerResponse\x12\x35\n\tresampler\x18\x01 \x01(\x0b\x32\".livekit.proto.OwnedAudioResampler\"\x93\x01\n\x17RemixAndResampleRequest\x12\x18\n\x10resampler_handle\x18\x01 \x01(\x04\x12\x33\n\x06\x62uffer\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\x12\x14\n\x0cnum_channels\x18\x03 \x01(\r\x12\x13\n\x0bsample_rate\x18\x04 \x01(\r\"P\n\x18RemixAndResampleResponse\x12\x34\n\x06\x62uffer\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"p\n\x14\x41udioFrameBufferInfo\x12\x10\n\x08\x64\x61ta_ptr\x18\x01 \x01(\x04\x12\x14\n\x0cnum_channels\x18\x02 \x01(\r\x12\x13\n\x0bsample_rate\x18\x03 \x01(\r\x12\x1b\n\x13samples_per_channel\x18\x04 \x01(\r\"y\n\x15OwnedAudioFrameBuffer\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12\x31\n\x04info\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\"?\n\x0f\x41udioStreamInfo\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.livekit.proto.AudioStreamType\"o\n\x10OwnedAudioStream\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.AudioStreamInfo\"q\n\x10\x41udioStreamEvent\x12\x15\n\rsource_handle\x18\x01 \x01(\x04\x12;\n\x0e\x66rame_received\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioFrameReceivedH\x00\x42\t\n\x07message\"I\n\x12\x41udioFrameReceived\x12\x33\n\x05\x66rame\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"e\n\x12\x41udioSourceOptions\x12\x19\n\x11\x65\x63ho_cancellation\x18\x01 \x01(\x08\x12\x19\n\x11noise_suppression\x18\x02 \x01(\x08\x12\x19\n\x11\x61uto_gain_control\x18\x03 \x01(\x08\"?\n\x0f\x41udioSourceInfo\x12,\n\x04type\x18\x02 \x01(\x0e\x32\x1e.livekit.proto.AudioSourceType\"o\n\x10OwnedAudioSource\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.AudioSourceInfo\"\x14\n\x12\x41udioResamplerInfo\"u\n\x13OwnedAudioResampler\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12/\n\x04info\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioResamplerInfo*A\n\x0f\x41udioStreamType\x12\x17\n\x13\x41UDIO_STREAM_NATIVE\x10\x00\x12\x15\n\x11\x41UDIO_STREAM_HTML\x10\x01**\n\x0f\x41udioSourceType\x12\x17\n\x13\x41UDIO_SOURCE_NATIVE\x10\x00\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x61udio_frame.proto\x12\rlivekit.proto\x1a\x0chandle.proto\"a\n\x17\x41llocAudioBufferRequest\x12\x13\n\x0bsample_rate\x18\x01 \x01(\r\x12\x14\n\x0cnum_channels\x18\x02 \x01(\r\x12\x1b\n\x13samples_per_channel\x18\x03 \x01(\r\"P\n\x18\x41llocAudioBufferResponse\x12\x34\n\x06\x62uffer\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"[\n\x15NewAudioStreamRequest\x12\x14\n\x0ctrack_handle\x18\x01 \x01(\x04\x12,\n\x04type\x18\x02 \x01(\x0e\x32\x1e.livekit.proto.AudioStreamType\"I\n\x16NewAudioStreamResponse\x12/\n\x06stream\x18\x01 \x01(\x0b\x32\x1f.livekit.proto.OwnedAudioStream\"\xb5\x01\n\x15NewAudioSourceRequest\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.livekit.proto.AudioSourceType\x12\x37\n\x07options\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioSourceOptionsH\x00\x88\x01\x01\x12\x13\n\x0bsample_rate\x18\x03 \x01(\r\x12\x14\n\x0cnum_channels\x18\x04 \x01(\rB\n\n\x08_options\"I\n\x16NewAudioSourceResponse\x12/\n\x06source\x18\x01 \x01(\x0b\x32\x1f.livekit.proto.OwnedAudioSource\"f\n\x18\x43\x61ptureAudioFrameRequest\x12\x15\n\rsource_handle\x18\x01 \x01(\x04\x12\x33\n\x06\x62uffer\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\"-\n\x19\x43\x61ptureAudioFrameResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"K\n\x19\x43\x61ptureAudioFrameCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_error\"\x1a\n\x18NewAudioResamplerRequest\"R\n\x19NewAudioResamplerResponse\x12\x35\n\tresampler\x18\x01 \x01(\x0b\x32\".livekit.proto.OwnedAudioResampler\"\x93\x01\n\x17RemixAndResampleRequest\x12\x18\n\x10resampler_handle\x18\x01 \x01(\x04\x12\x33\n\x06\x62uffer\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\x12\x14\n\x0cnum_channels\x18\x03 \x01(\r\x12\x13\n\x0bsample_rate\x18\x04 \x01(\r\"P\n\x18RemixAndResampleResponse\x12\x34\n\x06\x62uffer\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"p\n\x14\x41udioFrameBufferInfo\x12\x10\n\x08\x64\x61ta_ptr\x18\x01 \x01(\x04\x12\x14\n\x0cnum_channels\x18\x02 \x01(\r\x12\x13\n\x0bsample_rate\x18\x03 \x01(\r\x12\x1b\n\x13samples_per_channel\x18\x04 \x01(\r\"y\n\x15OwnedAudioFrameBuffer\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12\x31\n\x04info\x18\x02 \x01(\x0b\x32#.livekit.proto.AudioFrameBufferInfo\"?\n\x0f\x41udioStreamInfo\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.livekit.proto.AudioStreamType\"o\n\x10OwnedAudioStream\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.AudioStreamInfo\"\x9f\x01\n\x10\x41udioStreamEvent\x12\x15\n\rstream_handle\x18\x01 \x01(\x04\x12;\n\x0e\x66rame_received\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioFrameReceivedH\x00\x12,\n\x03\x65os\x18\x03 \x01(\x0b\x32\x1d.livekit.proto.AudioStreamEOSH\x00\x42\t\n\x07message\"I\n\x12\x41udioFrameReceived\x12\x33\n\x05\x66rame\x18\x01 \x01(\x0b\x32$.livekit.proto.OwnedAudioFrameBuffer\"\x10\n\x0e\x41udioStreamEOS\"e\n\x12\x41udioSourceOptions\x12\x19\n\x11\x65\x63ho_cancellation\x18\x01 \x01(\x08\x12\x19\n\x11noise_suppression\x18\x02 \x01(\x08\x12\x19\n\x11\x61uto_gain_control\x18\x03 \x01(\x08\"?\n\x0f\x41udioSourceInfo\x12,\n\x04type\x18\x02 \x01(\x0e\x32\x1e.livekit.proto.AudioSourceType\"o\n\x10OwnedAudioSource\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.AudioSourceInfo\"\x14\n\x12\x41udioResamplerInfo\"u\n\x13OwnedAudioResampler\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12/\n\x04info\x18\x02 \x01(\x0b\x32!.livekit.proto.AudioResamplerInfo*A\n\x0f\x41udioStreamType\x12\x17\n\x13\x41UDIO_STREAM_NATIVE\x10\x00\x12\x15\n\x11\x41UDIO_STREAM_HTML\x10\x01**\n\x0f\x41udioSourceType\x12\x17\n\x13\x41UDIO_SOURCE_NATIVE\x10\x00\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,10 +23,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_AUDIOSTREAMTYPE']._serialized_start=2257
-  _globals['_AUDIOSTREAMTYPE']._serialized_end=2322
-  _globals['_AUDIOSOURCETYPE']._serialized_start=2324
-  _globals['_AUDIOSOURCETYPE']._serialized_end=2366
+  _globals['_AUDIOSTREAMTYPE']._serialized_start=2322
+  _globals['_AUDIOSTREAMTYPE']._serialized_end=2387
+  _globals['_AUDIOSOURCETYPE']._serialized_start=2389
+  _globals['_AUDIOSOURCETYPE']._serialized_end=2431
   _globals['_ALLOCAUDIOBUFFERREQUEST']._serialized_start=50
   _globals['_ALLOCAUDIOBUFFERREQUEST']._serialized_end=147
   _globals['_ALLOCAUDIOBUFFERRESPONSE']._serialized_start=149
@@ -61,18 +61,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_AUDIOSTREAMINFO']._serialized_end=1530
   _globals['_OWNEDAUDIOSTREAM']._serialized_start=1532
   _globals['_OWNEDAUDIOSTREAM']._serialized_end=1643
-  _globals['_AUDIOSTREAMEVENT']._serialized_start=1645
-  _globals['_AUDIOSTREAMEVENT']._serialized_end=1758
-  _globals['_AUDIOFRAMERECEIVED']._serialized_start=1760
-  _globals['_AUDIOFRAMERECEIVED']._serialized_end=1833
-  _globals['_AUDIOSOURCEOPTIONS']._serialized_start=1835
-  _globals['_AUDIOSOURCEOPTIONS']._serialized_end=1936
-  _globals['_AUDIOSOURCEINFO']._serialized_start=1938
-  _globals['_AUDIOSOURCEINFO']._serialized_end=2001
-  _globals['_OWNEDAUDIOSOURCE']._serialized_start=2003
-  _globals['_OWNEDAUDIOSOURCE']._serialized_end=2114
-  _globals['_AUDIORESAMPLERINFO']._serialized_start=2116
-  _globals['_AUDIORESAMPLERINFO']._serialized_end=2136
-  _globals['_OWNEDAUDIORESAMPLER']._serialized_start=2138
-  _globals['_OWNEDAUDIORESAMPLER']._serialized_end=2255
+  _globals['_AUDIOSTREAMEVENT']._serialized_start=1646
+  _globals['_AUDIOSTREAMEVENT']._serialized_end=1805
+  _globals['_AUDIOFRAMERECEIVED']._serialized_start=1807
+  _globals['_AUDIOFRAMERECEIVED']._serialized_end=1880
+  _globals['_AUDIOSTREAMEOS']._serialized_start=1882
+  _globals['_AUDIOSTREAMEOS']._serialized_end=1898
+  _globals['_AUDIOSOURCEOPTIONS']._serialized_start=1900
+  _globals['_AUDIOSOURCEOPTIONS']._serialized_end=2001
+  _globals['_AUDIOSOURCEINFO']._serialized_start=2003
+  _globals['_AUDIOSOURCEINFO']._serialized_end=2066
+  _globals['_OWNEDAUDIOSOURCE']._serialized_start=2068
+  _globals['_OWNEDAUDIOSOURCE']._serialized_end=2179
+  _globals['_AUDIORESAMPLERINFO']._serialized_start=2181
+  _globals['_AUDIORESAMPLERINFO']._serialized_end=2201
+  _globals['_OWNEDAUDIORESAMPLER']._serialized_start=2203
+  _globals['_OWNEDAUDIORESAMPLER']._serialized_end=2320
 # @@protoc_insertion_point(module_scope)

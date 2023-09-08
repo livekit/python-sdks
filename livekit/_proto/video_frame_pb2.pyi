@@ -650,18 +650,22 @@ class VideoStreamEvent(google.protobuf.message.Message):
 
     STREAM_HANDLE_FIELD_NUMBER: builtins.int
     FRAME_RECEIVED_FIELD_NUMBER: builtins.int
+    EOS_FIELD_NUMBER: builtins.int
     stream_handle: builtins.int
     @property
     def frame_received(self) -> global___VideoFrameReceived: ...
+    @property
+    def eos(self) -> global___VideoStreamEOS: ...
     def __init__(
         self,
         *,
         stream_handle: builtins.int = ...,
         frame_received: global___VideoFrameReceived | None = ...,
+        eos: global___VideoStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received", "eos"] | None: ...
 
 global___VideoStreamEvent = VideoStreamEvent
 
@@ -685,6 +689,16 @@ class VideoFrameReceived(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "frame", b"frame"]) -> None: ...
 
 global___VideoFrameReceived = VideoFrameReceived
+
+@typing_extensions.final
+class VideoStreamEOS(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___VideoStreamEOS = VideoStreamEOS
 
 @typing_extensions.final
 class VideoSourceResolution(google.protobuf.message.Message):

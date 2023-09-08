@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
+
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
+from ._utils import RingQueue
 from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream:
-    def __init__(self, track: Track) -> None:
+    def __init__(self, track: Track, capacity: int = 0) -> None:
+        self._track = track
+        self._ffi_queue = ffi_client.subscribe()
+        self._queue: RingQueue[VideoFrame] = RingQueue(capacity)
+
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
         new_video_stream.track_handle = track._ffi_handle.handle
@@ -30,23 +37,35 @@ class VideoStream:
         stream_info = resp.new_video_stream.stream
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info.info
-        self._track = track
-        self._queue = ffi_client.subscribe()
+
+        self._task = asyncio.create_task(self._run())
+
+    async def _run(self):
+        while True:
+            event = await self._ffi_queue.wait_for(self._is_event)
+            video_event = event.video_stream_event
+
+            if video_event.HasField('frame_received'):
+                frame_info = video_event.frame_received.frame
+                owned_buffer_info = video_event.frame_received.buffer
+
+                frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
+                                   VideoFrameBuffer.create(owned_buffer_info))
+                self._queue.put(frame)
+            elif video_event.HasField('eos'):
+                break
+
+    async def close(self):
+        del self._ffi_handle
+        await self._task
 
     def __aiter__(self):
         return self
 
-    def _is_frame(self, e: proto_ffi.FfiEvent):
-        return e.video_stream_event.stream_handle == self._ffi_handle.handle \
-            and e.video_stream_event.HasField('frame_received')
+    def _is_event(self, e: proto_ffi.FfiEvent):
+        return e.video_stream_event.stream_handle == self._ffi_handle.handle
 
     async def __anext__(self):
-        event = await self._queue.wait_for(self._is_frame)
-        video_event = event.video_stream_event
-
-        frame_info = video_event.frame_received.frame
-        owned_buffer_info = video_event.frame_received.buffer
-
-        frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
-                           VideoFrameBuffer.create(owned_buffer_info))
-        return frame
+        if self._task.done():
+            raise StopAsyncIteration
+        return await self._queue.get()
