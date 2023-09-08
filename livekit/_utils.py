@@ -18,6 +18,7 @@ class RingQueue(Generic[T]):
         self._event.set()
 
     async def get(self) -> T:
-        while not self._queue:
+        while len(self._queue) == 0:
             await self._event.wait()
+        self._event.clear()
         return self._queue.popleft()
