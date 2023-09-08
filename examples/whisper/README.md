@@ -25,10 +25,9 @@ Download a model you want to use, for example:
 ```
 
 ### Step 5: 
-Rename the shared object library:
-```
-mv libwhisper.so libwhisper.dylib
-```
+Rename the shared object library if you're on Windows or macOS:
+1. If Windows, rename `libwhisper.so` to `libwhisper.dll`
+2. If macOS, rename `libwhisper.so` to `libwhisper.dylib`
 
 ### Step 6:
 Run the whisper.py script:
