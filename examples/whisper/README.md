@@ -2,24 +2,34 @@
 
 [Whisper](https://github.com/openai/whisper) is a speech-to-text model from OpenAI. It ordinarily requires 30s of input data for transcription, making it challenging to use in real-time applications. We work around this by limitation by padding shorter bursts of speech with silent audio packets.
 
-## Run the demo
+## How to run the demo
 
-Change the URL and TOKEN inside the script
+### Step 1:
+Change the URL and TOKEN inside the whisper.py script to use your LiveKit websocket URL and a valid session token
 
-Clone whisper.cpp inside this directory
+### Step 2:
+Clone [whisper.cpp](https://github.com/ggerganov/whisper.cpp) inside this directory
 
-### Build a shared lib:
-
+### Step 3:
+Build a shared library:
 ```
+cd whisper.cpp
 gcc -O3 -std=c11 -pthread -mavx -mavx2 -mfma -mf16c -fPIC -c ggml.c
 g++ -O3 -std=c++11 -pthread --shared -fPIC -static-libstdc++ whisper.cpp ggml.o -o libwhisper.so
 ```
 
-### Download a model you want to use:
-./download-ggml-model.sh tiny.en
+### Step 4: 
+Download a model you want to use, for example:
+`./models/download-ggml-model.sh tiny.en`
 
-### Run whisper.py 
-Run the script and connect another participant with a microphone:
+### Step 5: 
+Rename the shared object library:
+`mv libwhisper.so libwhisper.dylib`
 
-You can use our Meet example or use the livekit-cli:
-e.g: `livekit-cli load-test --room yourroom --audio-publishers 1`
+### Step 6:
+Run the whisper.py script:
+`python3 whisper.py`
+
+### Step 7:
+Connect another participant to the room and publish a microphone stream. To do this, you can use our [Meet example](https://meet.livekit.io/?tab=custom) or use the livekit-cli:
+`livekit-cli load-test --room yourroom --audio-publishers 1`
