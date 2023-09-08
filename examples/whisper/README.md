@@ -36,7 +36,7 @@ python3 whisper.py
 ```
 
 ### Step 7:
-Connect another participant to the room and publish a microphone stream. To do this, you can use our [Meet example](https://meet.livekit.io/?tab=custom) or use the [livekit-cli](https://github.com/livekit/livekit-cli):
+Connect another participant to the room and publish a microphone stream. To do this quickly, you can use our [Meet example](https://meet.livekit.io/?tab=custom) or use the [livekit-cli](https://github.com/livekit/livekit-cli):
 ```
 livekit-cli load-test --room yourroom --audio-publishers 1
 ```
