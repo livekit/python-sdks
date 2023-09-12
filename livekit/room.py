@@ -51,10 +51,7 @@ class Room(EventEmitter):
         self._ffi_handle: Optional[FfiHandle] = None
         self._loop = loop or asyncio.get_event_loop()
         self._channel = ffi_client.channel.subscribe(self._loop)
-
-        # the purpose of the room_queue, is to keep the order of events
-        # from the FfiServer
-        self._queue = BroadcastQueue()
+        self._room_queue = BroadcastQueue()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
@@ -121,7 +118,7 @@ class Room(EventEmitter):
         self.connection_state = ConnectionState.CONN_CONNECTED
 
         self.local_participant = LocalParticipant(
-            self._queue, cb.connect.local_participant)
+            self._room_queue, cb.connect.local_participant)
 
         for pt in cb.connect.participants:
             rp = self._create_remote_participant(pt.participant)
@@ -150,6 +147,7 @@ class Room(EventEmitter):
         if not self.isconnected():
             return
 
+        # listen to incoming room events
         while True:
             wait_event_future = asyncio.ensure_future(self._channel.get())
             await asyncio.wait(
@@ -166,13 +164,13 @@ class Room(EventEmitter):
             if event.room_event.room_handle == self._ffi_handle.handle:
                 self._on_room_event(event)
 
-            # notify all subscribers
-            self._queue.put_nowait(event)
+            if self._room_queue.len_subscribers() > 0:
+                self._room_queue.put_nowait(event)
 
-            # it is important to wait for the queue to be empty
-            # so we can keep the order of events from the FfiServer
-            # (avoid scenario where the participant.py code handles events too late)
-            await self._queue.join()
+                # wait for the queue to be empty
+                # so we can keep the order of events from the FfiServer
+                # (avoid scenario where the participant.py code handles events too late)
+                await self._room_queue.join()
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof('message')

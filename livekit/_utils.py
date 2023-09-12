@@ -30,6 +30,9 @@ class BroadcastQueue(Generic[T]):
     def __init__(self) -> None:
         self._subscribers: List[asyncio.Queue[T]] = []
 
+    def len_subscribers(self) -> int:
+        return len(self._subscribers)
+
     def put_nowait(self, item: T) -> None:
         for queue in self._subscribers:
             queue.put_nowait(item)
