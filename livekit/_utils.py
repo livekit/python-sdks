@@ -1,8 +1,6 @@
 import asyncio
-import threading
 from collections import deque
-from contextlib import contextmanager
-from typing import Callable, Generic, List, Optional, TypeVar
+from typing import Callable, Generic, List, TypeVar
 
 T = TypeVar('T')
 
@@ -27,15 +25,31 @@ class RingQueue(Generic[T]):
 
 
 class Queue(asyncio.Queue[T]):
-    def __init__(self,
-                 loop: Optional[asyncio.AbstractEventLoop] = None,
-                 maxsize: int = 0) -> None:
+    """ asyncio.Queue with utility functions. """
+
+    def __init__(self, maxsize: int = 0) -> None:
         super().__init__(maxsize)
-        self._loop = loop or asyncio.get_event_loop()
+
+    async def wait_for(self, fnc: Callable[[T], bool]) \
+            -> T:
+        """ Wait for an event that matches the given function.
+        The previous events are discarded.
+        """
+
+        while True:
+            event = await self.get()
+            if fnc(event):
+                # task_done must be manually called for the returned item
+                return event
+
+            self.task_done()
 
 
 class BroadcastQueue(Generic[T]):
+    """ Queue with multiple subscribers. """
+
     def __init__(self) -> None:
+        self._lock = asyncio.Lock()
         self._subscribers: List[Queue[T]] = []
 
     def len_subscribers(self) -> int:
@@ -53,58 +67,8 @@ class BroadcastQueue(Generic[T]):
     def unsubscribe(self, queue: Queue[T]) -> None:
         self._subscribers.remove(queue)
 
-    @contextmanager
-    def observe(self):
-        queue = self.subscribe()
-        try:
-            yield queue
-        finally:
-            self.unsubscribe(queue)
-
     async def join(self) -> None:
-        for queue in self._subscribers:
-            await queue.join()
-
-
-class ThreadsafeBroadcastQueue(Generic[T]):
-    def __init__(self) -> None:
-        self._lock = threading.RLock()
-        self._subscribers: List[Queue[T]] = []
-
-    def put(self, item: T) -> None:
-        with self._lock:
-            for queue in self._subscribers:
-                queue._loop.call_soon_threadsafe(queue.put_nowait, item)
-
-    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> Queue[T]:
-        with self._lock:
-            queue = Queue[T](loop)
-            self._subscribers.append(queue)
-            return queue
-
-    def unsubscribe(self, queue: Queue[T]) -> None:
-        with self._lock:
-            self._subscribers.remove(queue)
-
-    @contextmanager
-    def observe(self):
-        queue = self.subscribe()
-        try:
-            yield queue
-        finally:
-            self.unsubscribe(queue)
-
-
-async def wait_for(queue: asyncio.Queue[T], fnc: Callable[[T], bool]) \
-        -> T:
-    """ Wait for an event that matches the given function.
-    The previous events are discarded.
-    """
-
-    while True:
-        event = await queue.get()
-        if fnc(event):
-            # task_done must be manually called for the returned item
-            return event
-
-        queue.task_done()
+        async with self._lock:
+            subs = self._subscribers.copy()
+            for queue in subs:
+                await queue.join()

@@ -50,8 +50,9 @@ class Room(EventEmitter):
 
         self._ffi_handle: Optional[FfiHandle] = None
         self._loop = loop or asyncio.get_event_loop()
-        self._channel = ffi_client.channel.subscribe(self._loop)
+        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
+        self._info = proto_room.RoomInfo()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
@@ -100,10 +101,13 @@ class Room(EventEmitter):
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
 
-        with ffi_client.channel.observe() as obs:
+        try:
+            queue = ffi_client.queue.subscribe(self._loop)
             resp = ffi_client.request(req)
-            cb = await obs.wait_for(lambda e: e.connect.async_id ==
-                                    resp.connect.async_id)
+            cb = await queue.wait_for(lambda e: e.connect.async_id ==
+                                      resp.connect.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
 
         if cb.connect.error:
             raise ConnectError(cb.connect.error)
@@ -135,10 +139,13 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        with ffi_client.channel.observe() as obs:
+        try:
+            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
-            await obs.wait_for(lambda e: e.disconnect.async_id ==
-                               resp.disconnect.async_id)
+            await queue.wait_for(lambda e: e.disconnect.async_id ==
+                                 resp.disconnect.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
 
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
@@ -149,7 +156,7 @@ class Room(EventEmitter):
 
         # listen to incoming room events
         while True:
-            wait_event_future = asyncio.ensure_future(self._channel.get())
+            wait_event_future = asyncio.ensure_future(self._ffi_queue.get())
             await asyncio.wait(
                 [wait_event_future, self._close_future],
                 return_when=asyncio.FIRST_COMPLETED
@@ -160,7 +167,6 @@ class Room(EventEmitter):
                 break
 
             event = wait_event_future.result()
-
             if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
                 self._on_room_event(event.room_event)
 

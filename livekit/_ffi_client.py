@@ -12,15 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import ctypes
 import os
 import platform
 import threading
+from typing import Generic, List, Optional, TypeVar
 
 import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
-from ._utils import ThreadsafeBroadcastQueue
+from ._utils import Queue
 
 
 def get_ffi_lib_path():
@@ -72,19 +74,50 @@ class FfiHandle:
                 ctypes.c_uint64(self.handle))
 
 
+T = TypeVar('T')
+
+
+class FfiQueue(Generic[T]):
+    def __init__(self) -> None:
+        self._lock = threading.RLock()
+        self._subscribers: List[tuple[
+            Queue[T], asyncio.AbstractEventLoop]] = []
+
+    def put(self, item: T) -> None:
+        with self._lock:
+            for queue, loop in self._subscribers:
+                loop.call_soon_threadsafe(queue.put_nowait, item)
+
+    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) \
+            -> Queue[T]:
+        with self._lock:
+            queue = Queue[T]()
+            loop = loop or asyncio.get_event_loop()
+            self._subscribers.append((queue, loop))
+            return queue
+
+    def unsubscribe(self, queue: Queue[T]) -> None:
+        with self._lock:
+            # looping here is ok, since we don't expect a lot of subscribers
+            for i, (q, _) in enumerate(self._subscribers):
+                if q == queue:
+                    self._subscribers.pop(i)
+                    break
+
+
 @ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
                        data_len: ctypes.c_size_t) -> None:
     event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
-    ffi_client.channel.put(event)
+    ffi_client.queue.put(event)
 
 
 class FfiClient:
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._channel = ThreadsafeBroadcastQueue[proto_ffi.FfiEvent]()
+        self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         # initialize request
         req = proto_ffi.FfiRequest()
@@ -94,8 +127,8 @@ class FfiClient:
         self.request(req)
 
     @property
-    def channel(self) -> ThreadsafeBroadcastQueue[proto_ffi.FfiEvent]:
-        return self._channel
+    def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
+        return self._queue
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
         proto_data = req.SerializeToString()

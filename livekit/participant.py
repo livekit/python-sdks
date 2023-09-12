@@ -19,7 +19,7 @@ from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
-from ._utils import BroadcastQueue, wait_for
+from ._utils import BroadcastQueue
 from .track import LocalAudioTrack, LocalVideoTrack, Track
 from .track_publication import (
     LocalTrackPublication,
@@ -68,7 +68,7 @@ class Participant:
 
 class LocalParticipant(Participant):
     def __init__(self,
-                 room_queue: BroadcastQueue,
+                 room_queue: BroadcastQueue[proto_ffi.FfiEvent],
                  owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
@@ -102,11 +102,14 @@ class LocalParticipant(Participant):
 
             req.publish_data.destination_sids.extend(sids)
 
-        with self._room_queue.observe() as obs:
+        try:
+            queue = self._room_queue.subscribe()
             resp = ffi_client.request(req)
-            cb = await wait_for(obs, lambda e: e.publish_data.async_id ==
-                                resp.publish_data.async_id)
-            obs.task_done()
+            cb = await queue.wait_for(lambda e: e.publish_data.async_id ==
+                                      resp.publish_data.async_id)
+            queue.task_done()
+        finally:
+            self._room_queue.unsubscribe(queue)
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
@@ -122,10 +125,11 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        with self._room_queue.observe() as obs:
+        try:
+            queue = self._room_queue.subscribe()
             resp = ffi_client.request(req)
-            cb = await wait_for(obs, lambda e: e.publish_track.async_id ==
-                                resp.publish_track.async_id)
+            cb = await queue.wait_for(lambda e: e.publish_track.async_id ==
+                                      resp.publish_track.async_id)
 
             if cb.publish_track.error:
                 raise PublishTrackError(cb.publish_track.error)
@@ -135,25 +139,30 @@ class LocalParticipant(Participant):
             track_publication.track = track
             self.tracks[track_publication.sid] = track_publication
 
-            obs.task_done()
+            queue.task_done()
             return track_publication
+        finally:
+            self._room_queue.unsubscribe(queue)
 
     async def unpublish_track(self, track_sid: str) -> None:
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
 
-        with self._room_queue.observe() as obs:
+        try:
+            queue = self._room_queue.subscribe()
             resp = ffi_client.request(req)
-            cb = await wait_for(obs, lambda e: e.unpublish_track.async_id ==
-                                resp.unpublish_track.async_id)
+            cb = await queue.wait_for(lambda e: e.unpublish_track.async_id ==
+                                      resp.unpublish_track.async_id)
 
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
             publication = self.tracks.pop(track_sid)
             publication.track = None
-            obs.task_done()
+            queue.task_done()
+        finally:
+            self._room_queue.unsubscribe(queue)
 
 
 class RemoteParticipant(Participant):
