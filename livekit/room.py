@@ -167,9 +167,8 @@ class Room(EventEmitter):
             if self._room_queue.len_subscribers() > 0:
                 self._room_queue.put_nowait(event)
 
-                # wait for the queue to be empty
-                # so we can keep the order of events from the FfiServer
-                # (avoid scenario where the participant.py code handles events too late)
+                # wait for the subscribers to process the event
+                # before processing the next one
                 await self._room_queue.join()
 
     def _on_room_event(self, event: proto_room.RoomEvent):
