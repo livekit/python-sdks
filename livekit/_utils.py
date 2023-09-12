@@ -26,9 +26,17 @@ class RingQueue(Generic[T]):
         return self._queue.popleft()
 
 
+class Queue(asyncio.Queue[T]):
+    def __init__(self,
+                 loop: Optional[asyncio.AbstractEventLoop] = None,
+                 maxsize: int = 0) -> None:
+        super().__init__(maxsize)
+        self._loop = loop or asyncio.get_event_loop()
+
+
 class BroadcastQueue(Generic[T]):
     def __init__(self) -> None:
-        self._subscribers: List[asyncio.Queue[T]] = []
+        self._subscribers: List[Queue[T]] = []
 
     def len_subscribers(self) -> int:
         return len(self._subscribers)
@@ -37,12 +45,12 @@ class BroadcastQueue(Generic[T]):
         for queue in self._subscribers:
             queue.put_nowait(item)
 
-    def subscribe(self) -> asyncio.Queue[T]:
-        queue = asyncio.Queue[T]()
+    def subscribe(self) -> Queue[T]:
+        queue = Queue[T]()
         self._subscribers.append(queue)
         return queue
 
-    def unsubscribe(self, queue: asyncio.Queue[T]) -> None:
+    def unsubscribe(self, queue: Queue[T]) -> None:
         self._subscribers.remove(queue)
 
     @contextmanager
@@ -64,23 +72,20 @@ class BroadcastQueue(Generic[T]):
 class BroadcastChannel(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._subscribers: List[asyncio.Queue[T]] = []
+        self._subscribers: List[Queue[T]] = []
 
     def put(self, item: T) -> None:
         with self._lock:
             for queue in self._subscribers:
-                loop: asyncio.AbstractEventLoop = queue._loop
-                loop.call_soon_threadsafe(queue.put_nowait, item)
+                queue._loop.call_soon_threadsafe(queue.put_nowait, item)
 
-    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) \
-            -> asyncio.Queue[T]:
+    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> Queue[T]:
         with self._lock:
-            queue = asyncio.Queue[T]()
-            queue._loop = loop or asyncio.get_event_loop()
+            queue = Queue[T](loop)
             self._subscribers.append(queue)
             return queue
 
-    def unsubscribe(self, queue: asyncio.Queue[T]) -> None:
+    def unsubscribe(self, queue: Queue[T]) -> None:
         with self._lock:
             self._subscribers.remove(queue)
 

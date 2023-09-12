@@ -18,9 +18,9 @@ import platform
 import threading
 
 import pkg_resources
-from _utils import BroadcastChannel
 
 from ._proto import ffi_pb2 as proto_ffi
+from ._utils import BroadcastChannel
 
 
 def get_ffi_lib_path():
