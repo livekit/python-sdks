@@ -20,7 +20,7 @@ import threading
 import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
-from ._utils import BroadcastChannel
+from ._utils import ThreadsafeBroadcastQueue
 
 
 def get_ffi_lib_path():
@@ -84,7 +84,7 @@ def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
 class FfiClient:
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._channel = BroadcastChannel[proto_ffi.FfiEvent]()
+        self._channel = ThreadsafeBroadcastQueue[proto_ffi.FfiEvent]()
 
         # initialize request
         req = proto_ffi.FfiRequest()
@@ -94,7 +94,7 @@ class FfiClient:
         self.request(req)
 
     @property
-    def channel(self) -> BroadcastChannel[proto_ffi.FfiEvent]:
+    def channel(self) -> ThreadsafeBroadcastQueue[proto_ffi.FfiEvent]:
         return self._channel
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:

@@ -66,10 +66,7 @@ class BroadcastQueue(Generic[T]):
             await queue.join()
 
 
-# thread safe variant of BroadcastQueue (lock + call_soon_threadsafe)
-# used by the FFI client to send events from a unknown thread to the corresponding
-# asyncio event loop
-class BroadcastChannel(Generic[T]):
+class ThreadsafeBroadcastQueue(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._subscribers: List[Queue[T]] = []
