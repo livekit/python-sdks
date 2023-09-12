@@ -29,7 +29,7 @@ class AudioStream:
                  capacity: int = 0) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = ffi_client.subscribe(self._loop)
+        self._ffi_queue = ffi_client.channel.subscribe(self._loop)
         self._queue: RingQueue[AudioFrame] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()

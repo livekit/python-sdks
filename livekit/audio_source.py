@@ -36,7 +36,7 @@ class AudioSource:
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
 
-        with ffi_client.observe() as obs:
+        with ffi_client.channel.observe() as obs:
             resp = ffi_client.request(req)
             cb = await obs.wait_for(lambda e: e.capture_audio_frame.async_id ==
                                     resp.capture_audio_frame.async_id)

@@ -124,8 +124,8 @@ class LocalParticipant(Participant):
 
         with self._room_queue.observe() as obs:
             resp = ffi_client.request(req)
-            cb = wait_for(obs, lambda e: e.publish_track.async_id ==
-                          resp.publish_track.async_id)
+            cb = await wait_for(obs, lambda e: e.publish_track.async_id ==
+                                resp.publish_track.async_id)
 
             if cb.publish_track.error:
                 raise PublishTrackError(cb.publish_track.error)

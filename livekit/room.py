@@ -51,7 +51,7 @@ class Room(EventEmitter):
         self._ffi_handle: Optional[FfiHandle] = None
         self._loop = loop or asyncio.get_event_loop()
         self._channel = ffi_client.channel.subscribe(self._loop)
-        self._room_queue = BroadcastQueue()
+        self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
@@ -100,7 +100,7 @@ class Room(EventEmitter):
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
 
-        with ffi_client.observe() as obs:
+        with ffi_client.channel.observe() as obs:
             resp = ffi_client.request(req)
             cb = await obs.wait_for(lambda e: e.connect.async_id ==
                                     resp.connect.async_id)
@@ -135,7 +135,7 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        with ffi_client.observe() as obs:
+        with ffi_client.channel.observe() as obs:
             resp = ffi_client.request(req)
             await obs.wait_for(lambda e: e.disconnect.async_id ==
                                resp.disconnect.async_id)
@@ -161,8 +161,8 @@ class Room(EventEmitter):
 
             event = wait_event_future.result()
 
-            if event.room_event.room_handle == self._ffi_handle.handle:
-                self._on_room_event(event)
+            if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
+                self._on_room_event(event.room_event)
 
             if self._room_queue.len_subscribers() > 0:
                 self._room_queue.put_nowait(event)
