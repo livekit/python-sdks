@@ -25,6 +25,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
+from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
@@ -44,13 +45,19 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter):
-    def __init__(self) -> None:
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         super().__init__()
+
+        self._ffi_handle: Optional[FfiHandle] = None
+        self._loop = loop or asyncio.get_event_loop()
+        self._channel = ffi_client.channel.subscribe(self._loop)
+
+        # the purpose of the room_queue, is to keep the order of events
+        # from the FfiServer
+        self._queue = BroadcastQueue()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
-        self._ffi_handle: Optional[FfiHandle] = None
-        self._queue = ffi_client.subscribe()
 
     @property
     def sid(self) -> str:
@@ -64,6 +71,7 @@ class Room(EventEmitter):
     def metadata(self) -> str:
         return self._info.metadata
 
+    @property
     def e2ee_manager(self) -> E2EEManager:
         return self._e2ee_manager
 
@@ -112,13 +120,8 @@ class Room(EventEmitter):
         self._info = cb.connect.room.info
         self.connection_state = ConnectionState.CONN_CONNECTED
 
-        self.local_participant = LocalParticipant(cb.connect.local_participant)
-
-        self.local_participant._on_track_published = lambda publication, track: \
-            self.emit('local_track_published', publication, track)
-
-        self.local_participant._on_track_unpublished = lambda publication: \
-            self.emit('local_track_unpublished', publication)
+        self.local_participant = LocalParticipant(
+            self._queue, cb.connect.local_participant)
 
         for pt in cb.connect.participants:
             rp = self._create_remote_participant(pt.participant)
@@ -140,8 +143,6 @@ class Room(EventEmitter):
             await obs.wait_for(lambda e: e.disconnect.async_id ==
                                resp.disconnect.async_id)
 
-        print("This is a test")
-
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
@@ -150,11 +151,7 @@ class Room(EventEmitter):
             return
 
         while True:
-            wait_event = self._queue.wait_for(lambda e: e.room_event.room_handle ==
-                                              self._ffi_handle.handle)  # type: ignore
-
-            wait_event_future = asyncio.ensure_future(wait_event)
-
+            wait_event_future = asyncio.ensure_future(self._channel.get())
             await asyncio.wait(
                 [wait_event_future, self._close_future],
                 return_when=asyncio.FIRST_COMPLETED
@@ -164,9 +161,20 @@ class Room(EventEmitter):
                 wait_event_future.cancel()
                 break
 
-            await self._on_room_event(wait_event_future.result().room_event)
+            event = wait_event_future.result()
 
-    async def _on_room_event(self, event: proto_room.RoomEvent):
+            if event.room_event.room_handle == self._ffi_handle.handle:
+                self._on_room_event(event)
+
+            # notify all subscribers
+            self._queue.put_nowait(event)
+
+            # it is important to wait for the queue to be empty
+            # so we can keep the order of events from the FfiServer
+            # (avoid scenario where the participant.py code handles events too late)
+            await self._queue.join()
+
+    def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof('message')
         if which == 'participant_connected':
             rparticipant = self._create_remote_participant(
@@ -176,6 +184,15 @@ class Room(EventEmitter):
             sid = event.participant_disconnected.participant_sid
             rparticipant = self.participants.pop(sid)
             self.emit('participant_disconnected', rparticipant)
+        elif which == 'local_track_published':
+            sid = event.local_track_published.track_sid
+            lpublication = self.local_participant.tracks[sid]
+            track = lpublication.track
+            self.emit('local_track_published', lpublication, track)
+        elif which == 'local_track_unpublished':
+            sid = event.local_track_unpublished.publication_sid
+            lpublication = self.local_participant.tracks[sid]
+            self.emit('local_track_unpublished', lpublication)
         elif which == 'track_published':
             rparticipant = self.participants[event.track_published.participant_sid]
             rpublication = RemoteTrackPublication(
