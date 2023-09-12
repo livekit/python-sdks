@@ -14,6 +14,7 @@
 
 import asyncio
 import ctypes
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
@@ -132,6 +133,9 @@ class Room(EventEmitter):
                 publication = RemoteTrackPublication(owned_publication_info)
                 rp.tracks[publication.sid] = publication
 
+        # start listening to room events
+        self._task = self._loop.create_task(self._listen_task())
+
     async def disconnect(self) -> None:
         if not self.isconnected():
             return
@@ -150,10 +154,12 @@ class Room(EventEmitter):
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
-    async def run(self) -> None:
-        if not self.isconnected():
-            return
+        try:
+            await self._task
+        except asyncio.CancelledError:
+            pass
 
+    async def _listen_task(self) -> None:
         # listen to incoming room events
         while True:
             wait_event_future = asyncio.ensure_future(self._ffi_queue.get())
@@ -170,12 +176,10 @@ class Room(EventEmitter):
             if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
                 self._on_room_event(event.room_event)
 
-            if self._room_queue.len_subscribers() > 0:
-                self._room_queue.put_nowait(event)
-
-                # wait for the subscribers to process the event
-                # before processing the next one
-                await self._room_queue.join()
+            # wait for the subscribers to process the event
+            # before processing the next one
+            self._room_queue.put_nowait(event)
+            await self._room_queue.join()
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof('message')

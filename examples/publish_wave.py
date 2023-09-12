@@ -50,21 +50,13 @@ async def main() -> None:
 
     # publish a track
     source = livekit.AudioSource(SAMPLE_RATE, NUM_CHANNELS)
-    source_task = asyncio.create_task(publish_frames(source))
-
     track = livekit.LocalAudioTrack.create_audio_track("sinewave", source)
     options = livekit.TrackPublishOptions()
     options.source = livekit.TrackSource.SOURCE_MICROPHONE
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
-    try:
-        await room.run()
-    except asyncio.CancelledError:
-        logging.info("closing the room")
-        source_task.cancel()
-        await source_task
-        await room.disconnect()
+    asyncio.ensure_future(publish_frames(source))
 
 
 if __name__ == "__main__":
@@ -72,10 +64,10 @@ if __name__ == "__main__":
                         logging.FileHandler("publish_wave.log"), logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    main_task = asyncio.ensure_future(main())
+    asyncio.ensure_future(main())
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, main_task.cancel)
+        loop.add_signal_handler(signal, loop.stop)
     try:
-        loop.run_until_complete(main_task)
+        loop.run_forever()
     finally:
         loop.close()
