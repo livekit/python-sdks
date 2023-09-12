@@ -106,6 +106,7 @@ class LocalParticipant(Participant):
             resp = ffi_client.request(req)
             cb = await wait_for(obs, lambda e: e.publish_data.async_id ==
                                 resp.publish_data.async_id)
+            obs.task_done()
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
@@ -126,15 +127,16 @@ class LocalParticipant(Participant):
             cb = wait_for(obs, lambda e: e.publish_track.async_id ==
                           resp.publish_track.async_id)
 
-        if cb.publish_track.error:
-            raise PublishTrackError(cb.publish_track.error)
+            if cb.publish_track.error:
+                raise PublishTrackError(cb.publish_track.error)
 
-        track_publication = LocalTrackPublication(cb.publish_track.publication)
-        track_publication.track = track
-        self.tracks[track_publication.sid] = track_publication
+            track_publication = LocalTrackPublication(
+                cb.publish_track.publication)
+            track_publication.track = track
+            self.tracks[track_publication.sid] = track_publication
 
-        self._on_track_published(track_publication, track)
-        return track_publication
+            obs.task_done()
+            return track_publication
 
     async def unpublish_track(self, track_sid: str) -> None:
         req = proto_ffi.FfiRequest()
@@ -146,13 +148,12 @@ class LocalParticipant(Participant):
             cb = await wait_for(obs, lambda e: e.unpublish_track.async_id ==
                                 resp.unpublish_track.async_id)
 
-        if cb.unpublish_track.error:
-            raise UnpublishTrackError(cb.unpublish_track.error)
+            if cb.unpublish_track.error:
+                raise UnpublishTrackError(cb.unpublish_track.error)
 
-        publication = self.tracks.pop(track_sid)
-        publication.track = None
-
-        self._on_track_unpublished(publication)
+            publication = self.tracks.pop(track_sid)
+            publication.track = None
+            obs.task_done()
 
 
 class RemoteParticipant(Participant):
