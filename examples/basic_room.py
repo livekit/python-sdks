@@ -6,7 +6,7 @@ from typing import Union
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 
 async def main() -> None:
@@ -53,11 +53,11 @@ async def main() -> None:
                             participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
-            video_stream = livekit.VideoStream(track)
+            _video_stream = livekit.VideoStream(track)
             # video_stream is an async iterator that yields VideoFrame
         elif track.kind == livekit.TrackKind.KIND_AUDIO:
             print("Subscribed to an Audio Track")
-            audio_stream = livekit.AudioStream(track)
+            _audio_stream = livekit.AudioStream(track)
             # audio_stream is an async iterator that yields AudioFrame
 
     @room.listens_to("track_unsubscribed")

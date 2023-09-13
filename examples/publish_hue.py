@@ -65,7 +65,8 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("publish_hue.log"), logging.StreamHandler()])
+                        logging.FileHandler("publish_hue.log"),
+                        logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
     asyncio.ensure_future(main())
