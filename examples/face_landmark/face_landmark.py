@@ -1,6 +1,7 @@
 import asyncio
+import logging
 import os
-import signal
+from signal import SIGINT, SIGTERM
 
 import cv2
 import mediapipe as mp
@@ -11,7 +12,7 @@ from mediapipe.framework.formats import landmark_pb2
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 tasks = set()
 
@@ -40,7 +41,9 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         # Draw the face landmarks.
         face_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         face_landmarks_proto.landmark.extend([
-            landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in face_landmarks
+            landmark_pb2.NormalizedLandmark(
+                x=landmark.x, y=landmark.y, z=landmark.z)
+            for landmark in face_landmarks
         ])
 
         solutions.drawing_utils.draw_landmarks(
@@ -74,7 +77,8 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
     async for frame in video_stream:
         buffer = frame.buffer
 
-        if argb_frame is None or argb_frame.width != buffer.width or argb_frame.height != buffer.height:
+        if argb_frame is None or argb_frame.width != buffer.width \
+                or argb_frame.height != buffer.height:
             argb_frame = livekit.ArgbFrame(
                 livekit.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
 
@@ -105,36 +109,36 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
 async def main() -> None:
     room = livekit.Room()
 
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(
-        signal.SIGINT, lambda: exit(0))
-
-    await room.connect(URL, TOKEN, livekit.RoomOptions(
-        # Unncomment below to enable E2EE
-        # e2ee=livekit.E2EEOptions(
-        #     key_provider_options=livekit.KeyProviderOptions(
-        #         shared_key=b"livekitrocks"
-        #     )
-        # ),
-    ))
-    print("connected to room: " + room.name)
-
     video_stream = None
 
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track, *_):
         if track.kind == livekit.TrackKind.KIND_VIDEO:
             nonlocal video_stream
-            # only process the first stream received
             if video_stream is not None:
+                # only process the first stream received
                 return
+
             print("subscribed to track: " + track.name)
             video_stream = livekit.VideoStream(track)
             task = asyncio.create_task(frame_loop(video_stream))
             tasks.add(task)
             task.add_done_callback(tasks.remove)
 
-    await room.run()
+    await room.connect(URL, TOKEN)
+    print("connected to room: " + room.name)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    logging.basicConfig(level=logging.INFO, handlers=[
+                        logging.FileHandler("face_landmark.log"),
+                        logging.StreamHandler()])
+
+    loop = asyncio.get_event_loop()
+    asyncio.ensure_future(main())
+    for signal in [SIGINT, SIGTERM]:
+        loop.add_signal_handler(signal, loop.stop)
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
