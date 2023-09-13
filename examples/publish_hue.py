@@ -11,7 +11,7 @@ URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 
-async def publish_frames(source: livekit.VideoSource):
+async def draw_color_cycle(source: livekit.VideoSource):
     argb_frame = livekit.ArgbFrame(
         livekit.VideoFormatType.FORMAT_ARGB, 1280, 720)
 
@@ -21,8 +21,7 @@ async def publish_frames(source: livekit.VideoSource):
     hue = 0.0
 
     while True:
-        frame = livekit.VideoFrame(
-            0, livekit.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
+        start_time = asyncio.get_event_loop().time()
 
         rgb = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
         rgb = [(x * 255) for x in rgb]  # type: ignore
@@ -33,16 +32,13 @@ async def publish_frames(source: livekit.VideoSource):
         arr.flat[2::4] = argb_color[2]
         arr.flat[3::4] = argb_color[3]
 
+        frame = livekit.VideoFrame(
+            0, livekit.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
         source.capture_frame(frame)
+        hue = (hue + framerate / 3) % 1.0
 
-        hue += framerate / 3  # 3s for a full cycle
-        if hue >= 1.0:
-            hue = 0.0
-
-        try:
-            await asyncio.sleep(framerate)
-        except asyncio.CancelledError:
-            break
+        code_duration = asyncio.get_event_loop().time() - start_time
+        await asyncio.sleep(1 / 30 - code_duration)
 
 
 async def main():
@@ -54,7 +50,7 @@ async def main():
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
-        return False
+        return
 
     # publish a track
     source = livekit.VideoSource()
@@ -64,7 +60,7 @@ async def main():
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
-    asyncio.ensure_future(publish_frames(source))
+    asyncio.ensure_future(draw_color_cycle(source))
 
 
 if __name__ == "__main__":
