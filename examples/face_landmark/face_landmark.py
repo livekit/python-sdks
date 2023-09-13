@@ -106,9 +106,7 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
     cv2.destroyAllWindows()
 
 
-async def main() -> None:
-    room = livekit.Room()
-
+async def main(room: livekit.Room) -> None:
     video_stream = None
 
     @room.on("track_subscribed")
@@ -135,9 +133,17 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, loop.stop)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
         loop.run_forever()
     finally:

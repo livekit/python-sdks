@@ -57,9 +57,7 @@ async def draw_cube(source: livekit.VideoSource):
         await asyncio.sleep(1 / 30 - code_duration)
 
 
-async def main():
-    room = livekit.Room()
-
+async def main(room: livekit.Room):
     @room.listens_to("e2ee_state_changed")
     def on_e2ee_state_changed(participant: livekit.Participant,
                               state: livekit.EncryptionState) -> None:
@@ -92,12 +90,21 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("e2ee.log"), logging.StreamHandler()])
+                        logging.FileHandler("e2ee.log"),
+                        logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, loop.stop)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
         loop.run_forever()
     finally:

@@ -41,9 +41,7 @@ async def draw_color_cycle(source: livekit.VideoSource):
         await asyncio.sleep(1 / 30 - code_duration)
 
 
-async def main():
-    room = livekit.Room()
-
+async def main(room: livekit.Room):
     logging.info("connecting to %s", URL)
     try:
         await room.connect(URL, TOKEN)
@@ -69,9 +67,17 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, loop.stop)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
         loop.run_forever()
     finally:

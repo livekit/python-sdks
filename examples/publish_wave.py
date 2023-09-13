@@ -37,9 +37,7 @@ async def publish_frames(source: livekit.AudioSource):
         total_samples += samples_per_channel
 
 
-async def main() -> None:
-    room = livekit.Room()
-
+async def main(room: livekit.Room) -> None:
     logging.info("connecting to %s", URL)
     try:
         await room.connect(URL, TOKEN)
@@ -65,9 +63,17 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, loop.stop)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
         loop.run_forever()
     finally:

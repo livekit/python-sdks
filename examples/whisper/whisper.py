@@ -150,9 +150,7 @@ async def whisper_task(stream: livekit.AudioStream):
             written_samples = 0
 
 
-async def main():
-    room = livekit.Room()
-
+async def main(room: livekit.Room):
     @room.listens_to("track_published")
     def on_track_published(publication: livekit.RemoteTrackPublication,
                            participant: livekit.RemoteParticipant):
@@ -189,11 +187,18 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, loop.stop)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
         loop.run_forever()
     finally:
         loop.close()
-        whisper.whisper_free(ctypes.c_void_p(ctx))
