@@ -114,21 +114,12 @@ async def main() -> None:
     def on_reconnected() -> None:
         logging.info("reconnected")
 
-    try:
-        logging.info("connecting to %s", URL)
-        await room.connect(URL, TOKEN)
-        logging.info("connected to room %s", room.name)
+    await room.connect(URL, TOKEN)
+    logging.info("connected to room %s", room.name)
+    logging.info("participants: %s", room.participants)
 
-        await room.local_participant.publish_data("hello world")
-
-        logging.info("participants: %s", room.participants)
-
-        await room.run()
-    except livekit.ConnectError as e:
-        logging.error("failed to connect to the room: %s", e)
-    except asyncio.CancelledError:
-        logging.info("closing the room")
-        await room.disconnect()
+    await asyncio.sleep(2)
+    await room.local_participant.publish_data("hello world")
 
 
 if __name__ == "__main__":
