@@ -47,24 +47,18 @@ async def main() -> None:
                              participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
 
-    # Keep a reference to the streams, otherwise they will be disposed
-    audio_stream = None
-    video_stream = None
-
     @room.listens_to("track_subscribed")
     def on_track_subscribed(track: livekit.Track,
                             publication: livekit.RemoteTrackPublication,
                             participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
-            nonlocal video_stream
             video_stream = livekit.VideoStream(track)
             # video_stream is an async iterator that yields VideoFrame
         elif track.kind == livekit.TrackKind.KIND_AUDIO:
             print("Subscribed to an Audio Track")
-            nonlocal audio_stream
             audio_stream = livekit.AudioStream(track)
-            # audio_stream is an async iterator that yields AudioFrame 
+            # audio_stream is an async iterator that yields AudioFrame
 
     @room.listens_to("track_unsubscribed")
     def on_track_unsubscribed(track: livekit.Track,
@@ -142,10 +136,10 @@ if __name__ == "__main__":
                         logging.FileHandler("basic_room.log"), logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    main_task = asyncio.ensure_future(main())
+    asyncio.ensure_future(main())
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, main_task.cancel)
+        loop.add_signal_handler(signal, loop.stop)
     try:
-        loop.run_until_complete(main_task)
+        loop.run_forever()
     finally:
         loop.close()
