@@ -6,11 +6,10 @@ from typing import Union
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 
-async def main() -> None:
-    room = livekit.Room()
+async def main(room: livekit.Room) -> None:
 
     @room.listens_to("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant) -> None:
@@ -47,24 +46,18 @@ async def main() -> None:
                              participant: livekit.RemoteParticipant):
         logging.info("track unpublished: %s", publication.sid)
 
-    # Keep a reference to the streams, otherwise they will be disposed
-    audio_stream = None
-    video_stream = None
-
     @room.listens_to("track_subscribed")
     def on_track_subscribed(track: livekit.Track,
                             publication: livekit.RemoteTrackPublication,
                             participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
-            nonlocal video_stream
-            video_stream = livekit.VideoStream(track)
+            _video_stream = livekit.VideoStream(track)
             # video_stream is an async iterator that yields VideoFrame
         elif track.kind == livekit.TrackKind.KIND_AUDIO:
             print("Subscribed to an Audio Track")
-            nonlocal audio_stream
-            audio_stream = livekit.AudioStream(track)
-            # audio_stream is an async iterator that yields AudioFrame 
+            _audio_stream = livekit.AudioStream(track)
+            # audio_stream is an async iterator that yields AudioFrame
 
     @room.listens_to("track_unsubscribed")
     def on_track_unsubscribed(track: livekit.Track,
@@ -120,32 +113,32 @@ async def main() -> None:
     def on_reconnected() -> None:
         logging.info("reconnected")
 
-    try:
-        logging.info("connecting to %s", URL)
-        await room.connect(URL, TOKEN)
-        logging.info("connected to room %s", room.name)
+    await room.connect(URL, TOKEN)
+    logging.info("connected to room %s", room.name)
+    logging.info("participants: %s", room.participants)
 
-        await room.local_participant.publish_data("hello world")
-
-        logging.info("participants: %s", room.participants)
-
-        await room.run()
-    except livekit.ConnectError as e:
-        logging.error("failed to connect to the room: %s", e)
-    except asyncio.CancelledError:
-        logging.info("closing the room")
-        await room.disconnect()
+    await asyncio.sleep(2)
+    await room.local_participant.publish_data("hello world")
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("basic_room.log"), logging.StreamHandler()])
+                        logging.FileHandler("basic_room.log"),
+                        logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    main_task = asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, main_task.cancel)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
-        loop.run_until_complete(main_task)
+        loop.run_forever()
     finally:
         loop.close()

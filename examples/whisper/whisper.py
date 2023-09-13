@@ -150,10 +150,7 @@ async def whisper_task(stream: livekit.AudioStream):
             written_samples = 0
 
 
-async def main():
-    room = livekit.Room()
-    audio_stream = None
-
+async def main(room: livekit.Room):
     @room.listens_to("track_published")
     def on_track_published(publication: livekit.RemoteTrackPublication,
                            participant: livekit.RemoteParticipant):
@@ -170,41 +167,38 @@ async def main():
                             publication: livekit.RemoteTrackPublication,
                             participant: livekit.RemoteParticipant):
         logging.info("starting listening to: %s", participant.identity)
-        nonlocal audio_stream
         audio_stream = livekit.AudioStream(track)
         asyncio.create_task(whisper_task(audio_stream))
 
-    try:
-        logging.info("connecting to %s", URL)
-        await room.connect(URL, TOKEN, livekit.RoomOptions(auto_subscribe=False))
-        logging.info("connected to room %s", room.name)
+    await room.connect(URL, TOKEN, livekit.RoomOptions(auto_subscribe=False))
+    logging.info("connected to room %s", room.name)
 
-        # check if there are already published audio tracks
-        for participant in room.participants.values():
-            for track in participant.tracks.values():
-                if track.kind == livekit.TrackKind.KIND_AUDIO \
-                        and track.source == livekit.TrackSource.SOURCE_MICROPHONE:
-                    track.set_subscribed(True)
-
-        await room.run()
-    except livekit.ConnectError as e:
-        logging.error("failed to connect to the room: %s", e)
-    except asyncio.CancelledError:
-        logging.info("closing the room")
-        await room.disconnect()
+    # check if there are already published audio tracks
+    for participant in room.participants.values():
+        for track in participant.tracks.values():
+            if track.kind == livekit.TrackKind.KIND_AUDIO \
+                    and track.source == livekit.TrackSource.SOURCE_MICROPHONE:
+                track.set_subscribed(True)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("whisper.log"), logging.StreamHandler()])
+                        logging.FileHandler("whisper.log"),
+                        logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    main_task = asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, main_task.cancel)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
-        loop.run_until_complete(main_task)
+        loop.run_forever()
     finally:
         loop.close()
-
-    whisper.whisper_free(ctypes.c_void_p(ctx))

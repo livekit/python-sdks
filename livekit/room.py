@@ -14,6 +14,7 @@
 
 import asyncio
 import ctypes
+import logging
 from dataclasses import dataclass
 from typing import Optional
 
@@ -25,6 +26,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
+from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
@@ -44,13 +46,17 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter):
-    def __init__(self) -> None:
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         super().__init__()
+
+        self._ffi_handle: Optional[FfiHandle] = None
+        self._loop = loop or asyncio.get_event_loop()
+        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
+        self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
+        self._info = proto_room.RoomInfo()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
-        self._ffi_handle: Optional[FfiHandle] = None
-        self._queue = ffi_client.subscribe()
 
     @property
     def sid(self) -> str:
@@ -64,6 +70,7 @@ class Room(EventEmitter):
     def metadata(self) -> str:
         return self._info.metadata
 
+    @property
     def e2ee_manager(self) -> E2EEManager:
         return self._e2ee_manager
 
@@ -95,10 +102,13 @@ class Room(EventEmitter):
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
 
-        with ffi_client.observe() as obs:
+        try:
+            queue = ffi_client.queue.subscribe(self._loop)
             resp = ffi_client.request(req)
-            cb = await obs.wait_for(lambda e: e.connect.async_id ==
-                                    resp.connect.async_id)
+            cb = await queue.wait_for(lambda e: e.connect.async_id ==
+                                      resp.connect.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
 
         if cb.connect.error:
             raise ConnectError(cb.connect.error)
@@ -112,13 +122,8 @@ class Room(EventEmitter):
         self._info = cb.connect.room.info
         self.connection_state = ConnectionState.CONN_CONNECTED
 
-        self.local_participant = LocalParticipant(cb.connect.local_participant)
-
-        self.local_participant._on_track_published = lambda publication, track: \
-            self.emit('local_track_published', publication, track)
-
-        self.local_participant._on_track_unpublished = lambda publication: \
-            self.emit('local_track_unpublished', publication)
+        self.local_participant = LocalParticipant(
+            self._room_queue, cb.connect.local_participant)
 
         for pt in cb.connect.participants:
             rp = self._create_remote_participant(pt.participant)
@@ -128,6 +133,9 @@ class Room(EventEmitter):
                 publication = RemoteTrackPublication(owned_publication_info)
                 rp.tracks[publication.sid] = publication
 
+        # start listening to room events
+        self._task = self._loop.create_task(self._listen_task())
+
     async def disconnect(self) -> None:
         if not self.isconnected():
             return
@@ -135,26 +143,26 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        with ffi_client.observe() as obs:
+        try:
+            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
-            await obs.wait_for(lambda e: e.disconnect.async_id ==
-                               resp.disconnect.async_id)
-
-        print("This is a test")
+            await queue.wait_for(lambda e: e.disconnect.async_id ==
+                                 resp.disconnect.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
 
         if not self._close_future.cancelled():
             self._close_future.set_result(None)
 
-    async def run(self) -> None:
-        if not self.isconnected():
-            return
+        try:
+            await self._task
+        except asyncio.CancelledError:
+            pass
 
+    async def _listen_task(self) -> None:
+        # listen to incoming room events
         while True:
-            wait_event = self._queue.wait_for(lambda e: e.room_event.room_handle ==
-                                              self._ffi_handle.handle)  # type: ignore
-
-            wait_event_future = asyncio.ensure_future(wait_event)
-
+            wait_event_future = asyncio.ensure_future(self._ffi_queue.get())
             await asyncio.wait(
                 [wait_event_future, self._close_future],
                 return_when=asyncio.FIRST_COMPLETED
@@ -164,9 +172,16 @@ class Room(EventEmitter):
                 wait_event_future.cancel()
                 break
 
-            await self._on_room_event(wait_event_future.result().room_event)
+            event = wait_event_future.result()
+            if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
+                self._on_room_event(event.room_event)
 
-    async def _on_room_event(self, event: proto_room.RoomEvent):
+            # wait for the subscribers to process the event
+            # before processing the next one
+            self._room_queue.put_nowait(event)
+            await self._room_queue.join()
+
+    def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof('message')
         if which == 'participant_connected':
             rparticipant = self._create_remote_participant(
@@ -176,6 +191,15 @@ class Room(EventEmitter):
             sid = event.participant_disconnected.participant_sid
             rparticipant = self.participants.pop(sid)
             self.emit('participant_disconnected', rparticipant)
+        elif which == 'local_track_published':
+            sid = event.local_track_published.track_sid
+            lpublication = self.local_participant.tracks[sid]
+            track = lpublication.track
+            self.emit('local_track_published', lpublication, track)
+        elif which == 'local_track_unpublished':
+            sid = event.local_track_unpublished.publication_sid
+            lpublication = self.local_participant.tracks[sid]
+            self.emit('local_track_unpublished', lpublication)
         elif which == 'track_published':
             rparticipant = self.participants[event.track_published.participant_sid]
             rpublication = RemoteTrackPublication(

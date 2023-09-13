@@ -7,7 +7,7 @@ import numpy as np
 import livekit
 
 URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'
+TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 SAMPLE_RATE = 48000
 NUM_CHANNELS = 1
@@ -37,9 +37,7 @@ async def publish_frames(source: livekit.AudioSource):
         total_samples += samples_per_channel
 
 
-async def main() -> None:
-    room = livekit.Room()
-
+async def main(room: livekit.Room) -> None:
     logging.info("connecting to %s", URL)
     try:
         await room.connect(URL, TOKEN)
@@ -50,32 +48,33 @@ async def main() -> None:
 
     # publish a track
     source = livekit.AudioSource(SAMPLE_RATE, NUM_CHANNELS)
-    source_task = asyncio.create_task(publish_frames(source))
-
     track = livekit.LocalAudioTrack.create_audio_track("sinewave", source)
     options = livekit.TrackPublishOptions()
     options.source = livekit.TrackSource.SOURCE_MICROPHONE
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
-    try:
-        await room.run()
-    except asyncio.CancelledError:
-        logging.info("closing the room")
-        source_task.cancel()
-        await source_task
-        await room.disconnect()
+    asyncio.ensure_future(publish_frames(source))
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("publish_wave.log"), logging.StreamHandler()])
+                        logging.FileHandler("publish_wave.log"),
+                        logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    main_task = asyncio.ensure_future(main())
+    room = livekit.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, main_task.cancel)
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
+
     try:
-        loop.run_until_complete(main_task)
+        loop.run_forever()
     finally:
         loop.close()

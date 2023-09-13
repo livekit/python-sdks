@@ -25,10 +25,6 @@ $ pip install livekit
 ```python
 async def main():
     room = livekit.Room()
-    # By default, autosubscribe is enabled. The participant will be subscribed to
-    # all published tracks in the room
-    await room.connect(URL, TOKEN)
-    logging.info("connected to room %s", room.name)
 
     # participants and tracks that are already available in the room
     # participant_connected and track_published events will *not* be emitted for them
@@ -41,21 +37,23 @@ async def main():
         logging.info(
             "participant connected: %s %s", participant.sid, participant.identity)
 
-    video_stream = None
+    async def receive_frames(stream: livekit.VideoStream):
+        async for frame in video_stream:
+            # received a video frame from the track, process it here
+            pass
 
     # track_subscribed is emitted whenever the local participant is subscribed to a new track
     @room.on("track_subscribed")
     def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == livekit.TrackKind.KIND_VIDEO:
-            nonlocal video_stream
             video_stream = livekit.VideoStream(track)
+            asyncio.ensure_future(receive_frames(video_stream))
 
-            async for frame in video_stream:
-                # received a video frame from the track, process it here
-                pass
-
-    await room.run()
+    # By default, autosubscribe is enabled. The participant will be subscribed to
+    # all published tracks in the room
+    await room.connect(URL, TOKEN)
+    logging.info("connected to room %s", room.name)
 ```
 
 ## Examples

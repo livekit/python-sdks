@@ -17,12 +17,12 @@ import ctypes
 import os
 import platform
 import threading
-from contextlib import contextmanager
-from typing import Callable, Generic, List, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
 import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
+from ._utils import Queue
 
 
 def get_ffi_lib_path():
@@ -78,33 +78,31 @@ T = TypeVar('T')
 
 
 class FfiQueue(Generic[T]):
-    """ Queue where we can push events from another thread and 
-    pop them from an event_loop."""
+    def __init__(self) -> None:
+        self._lock = threading.RLock()
+        self._subscribers: List[tuple[
+            Queue[T], asyncio.AbstractEventLoop]] = []
 
-    def __init__(self, maxsize: int = 0) -> None:
-        # Get the current event loop where the queue is created
-        self._loop = asyncio.get_running_loop()
-        self._queue = asyncio.Queue[T](maxsize=maxsize)
+    def put(self, item: T) -> None:
+        with self._lock:
+            for queue, loop in self._subscribers:
+                loop.call_soon_threadsafe(queue.put_nowait, item)
 
-    def put(self, item: T):
-        self._loop.call_soon_threadsafe(self._queue.put_nowait, item)
+    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) \
+            -> Queue[T]:
+        with self._lock:
+            queue = Queue[T]()
+            loop = loop or asyncio.get_event_loop()
+            self._subscribers.append((queue, loop))
+            return queue
 
-    async def get(self) -> T:
-        if self._loop != asyncio.get_running_loop():
-            raise RuntimeError(f'{self!r} is bound to a different event loop')
-
-        return await self._queue.get()
-
-    async def wait_for(self, fnc: Callable[[T], bool]) \
-            -> T:
-        """ Wait for an event that matches the given function.
-        The previous events are discarded.
-        """
-
-        while True:
-            event = await self.get()
-            if fnc(event):
-                return event
+    def unsubscribe(self, queue: Queue[T]) -> None:
+        with self._lock:
+            # looping here is ok, since we don't expect a lot of subscribers
+            for i, (q, _) in enumerate(self._subscribers):
+                if q == queue:
+                    self._subscribers.pop(i)
+                    break
 
 
 @ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
@@ -113,13 +111,13 @@ def ffi_event_callback(data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     event_data = bytes(data_ptr[:int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
-    ffi_client._push_event(event)
+    ffi_client.queue.put(event)
 
 
 class FfiClient:
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._subscribers: List[FfiQueue[proto_ffi.FfiEvent]] = []
+        self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         # initialize request
         req = proto_ffi.FfiRequest()
@@ -128,30 +126,9 @@ class FfiClient:
         req.initialize.event_callback_ptr = cb_callback
         self.request(req)
 
-    def subscribe(self) -> FfiQueue[proto_ffi.FfiEvent]:
-        with self._lock:
-            queue = FfiQueue[proto_ffi.FfiEvent]()
-            self._subscribers.append(queue)
-            return queue
-
-    def unsubscribe(self, queue: FfiQueue[proto_ffi.FfiEvent]) -> None:
-        with self._lock:
-            self._subscribers.remove(queue)
-
-    @contextmanager
-    def observe(self):
-        queue = self.subscribe()
-        try:
-            yield queue
-        finally:
-            self.unsubscribe(queue)
-
-    def _push_event(self, event: proto_ffi.FfiEvent) -> None:
-        # emit to subscribers (all queue, like a spmc)
-        # this function is called from an undefined thread (from the Rust Tokio runtime)
-        with self._lock:
-            for queue in self._subscribers:
-                queue.put(event)
+    @property
+    def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
+        return self._queue
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
         proto_data = req.SerializeToString()

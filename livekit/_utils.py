@@ -1,6 +1,6 @@
 import asyncio
 from collections import deque
-from typing import Generic, TypeVar
+from typing import Callable, Generic, List, TypeVar
 
 T = TypeVar('T')
 
@@ -22,3 +22,53 @@ class RingQueue(Generic[T]):
             await self._event.wait()
         self._event.clear()
         return self._queue.popleft()
+
+
+class Queue(asyncio.Queue[T]):
+    """ asyncio.Queue with utility functions. """
+
+    def __init__(self, maxsize: int = 0) -> None:
+        super().__init__(maxsize)
+
+    async def wait_for(self, fnc: Callable[[T], bool]) \
+            -> T:
+        """ Wait for an event that matches the given function.
+        The previous events are discarded.
+        """
+
+        while True:
+            event = await self.get()
+            if fnc(event):
+                # task_done must be manually called for the returned item
+                return event
+
+            self.task_done()
+
+
+class BroadcastQueue(Generic[T]):
+    """ Queue with multiple subscribers. """
+
+    def __init__(self) -> None:
+        self._lock = asyncio.Lock()
+        self._subscribers: List[Queue[T]] = []
+
+    def len_subscribers(self) -> int:
+        return len(self._subscribers)
+
+    def put_nowait(self, item: T) -> None:
+        for queue in self._subscribers:
+            queue.put_nowait(item)
+
+    def subscribe(self) -> Queue[T]:
+        queue = Queue[T]()
+        self._subscribers.append(queue)
+        return queue
+
+    def unsubscribe(self, queue: Queue[T]) -> None:
+        self._subscribers.remove(queue)
+
+    async def join(self) -> None:
+        async with self._lock:
+            subs = self._subscribers.copy()
+            for queue in subs:
+                await queue.join()

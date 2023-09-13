@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+from typing import Optional
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
@@ -23,9 +24,12 @@ from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream:
-    def __init__(self, track: Track, capacity: int = 0) -> None:
+    def __init__(self, track: Track,
+                 loop: Optional[asyncio.AbstractEventLoop] = None,
+                 capacity: int = 0) -> None:
         self._track = track
-        self._ffi_queue = ffi_client.subscribe()
+        self._loop = loop or asyncio.get_event_loop()
+        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._queue: RingQueue[VideoFrame] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()
@@ -38,7 +42,7 @@ class VideoStream:
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info.info
 
-        self._task = asyncio.create_task(self._run())
+        self._task = self._loop.create_task(self._run())
 
     async def _run(self):
         while True:
