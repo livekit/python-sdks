@@ -48,6 +48,7 @@ setuptools.setup(
     packages=["livekit"],
     python_requires=">=3.7.0",
     install_requires=["pyjwt>=2.0.0",
+                      "aiohttp>=3.8.0",
                       "protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
     project_urls={

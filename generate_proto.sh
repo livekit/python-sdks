@@ -17,12 +17,17 @@
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
 
 FFI_PROTOCOL=./client-sdk-rust/livekit-ffi/protocol
-OUT_PYTHON=./livekit/_proto
+FFI_OUT_PYTHON=./livekit/rtc/_proto
 
+API_PROTOCOL=./client-sdk-rust/livekit-protocol/protocol
+API_OUT_PYTHON=./livekit/api/_proto
+ 
+
+# ffi
 protoc \
     -I=$FFI_PROTOCOL \
-    --python_out=$OUT_PYTHON \
-    --mypy_out=$OUT_PYTHON \
+    --python_out=$FFI_OUT_PYTHON \
+    --mypy_out=$FFI_OUT_PYTHON \
     $FFI_PROTOCOL/audio_frame.proto \
     $FFI_PROTOCOL/ffi.proto \
     $FFI_PROTOCOL/handle.proto \
@@ -32,9 +37,27 @@ protoc \
     $FFI_PROTOCOL/video_frame.proto \
     $FFI_PROTOCOL/e2ee.proto
 
-touch -a "$OUT_PYTHON/__init__.py"
+touch -a "$FFI_OUT_PYTHON/__init__.py"
 
-for f in "$OUT_PYTHON"/*.py "$OUT_PYTHON"/*.pyi; do
+for f in "$FFI_OUT_PYTHON"/*.py "$FFI_OUT_PYTHON"/*.pyi; do
     perl -i -pe 's|^(import (audio_frame_pb2\|ffi_pb2\|handle_pb2\|participant_pb2\|room_pb2\|track_pb2\|video_frame_pb2\|e2ee_pb2))|from . $1|g' "$f"
 done
 
+# api
+
+protoc \
+    -I=$API_PROTOCOL \
+    --python_out=$API_OUT_PYTHON \
+    --mypy_out=$API_OUT_PYTHON \
+    $API_PROTOCOL/livekit_egress.proto \
+    $API_PROTOCOL/livekit_room.proto \
+    $API_PROTOCOL/livekit_webhook.proto \
+    $API_PROTOCOL/livekit_ingress.proto \
+    $API_PROTOCOL/livekit_models.proto
+
+
+touch -a "$API_OUT_PYTHON/__init__.py"
+
+for f in "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi; do
+    perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2))|from . $1|g' "$f"
+done
