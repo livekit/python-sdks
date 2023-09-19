@@ -174,7 +174,12 @@ class Room(EventEmitter):
 
             event = wait_event_future.result()
             if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
-                self._on_room_event(event.room_event)
+                try:
+                    self._on_room_event(event.room_event)
+                except Exception as e:
+                    logging.error(
+                        'error running user callback for %s: %s',
+                        event.room_event.WhichOneof('message'), e)
 
             # wait for the subscribers to process the event
             # before processing the next one
