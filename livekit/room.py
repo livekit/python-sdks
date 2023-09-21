@@ -97,8 +97,8 @@ class Room(EventEmitter):
                 options.e2ee.key_provider_options.shared_key  # type: ignore
             req.connect.options.e2ee.key_provider_options.ratchet_salt = \
                 options.e2ee.key_provider_options.ratchet_salt
-            req.connect.options.e2ee.key_provider_options.uncrypted_magic_bytes = \
-                options.e2ee.key_provider_options.uncrypted_magic_bytes
+            req.connect.options.e2ee.key_provider_options.failure_tolerance = \
+                options.e2ee.key_provider_options.failure_tolerance
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
 

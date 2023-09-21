@@ -105,22 +105,23 @@ class KeyProviderOptions(google.protobuf.message.Message):
     SHARED_KEY_FIELD_NUMBER: builtins.int
     RATCHET_WINDOW_SIZE_FIELD_NUMBER: builtins.int
     RATCHET_SALT_FIELD_NUMBER: builtins.int
-    UNCRYPTED_MAGIC_BYTES_FIELD_NUMBER: builtins.int
+    FAILURE_TOLERANCE_FIELD_NUMBER: builtins.int
     shared_key: builtins.bytes
     """Only specify if you want to use a shared_key"""
     ratchet_window_size: builtins.int
     ratchet_salt: builtins.bytes
-    uncrypted_magic_bytes: builtins.bytes
+    failure_tolerance: builtins.int
+    """-1 = no tolerence"""
     def __init__(
         self,
         *,
         shared_key: builtins.bytes | None = ...,
         ratchet_window_size: builtins.int = ...,
         ratchet_salt: builtins.bytes = ...,
-        uncrypted_magic_bytes: builtins.bytes = ...,
+        failure_tolerance: builtins.int = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_shared_key", b"_shared_key", "shared_key", b"shared_key"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_shared_key", b"_shared_key", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key", "uncrypted_magic_bytes", b"uncrypted_magic_bytes"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_shared_key", b"_shared_key", "failure_tolerance", b"failure_tolerance", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_shared_key", b"_shared_key"]) -> typing_extensions.Literal["shared_key"] | None: ...
 
 global___KeyProviderOptions = KeyProviderOptions

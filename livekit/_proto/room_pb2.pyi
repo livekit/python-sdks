@@ -36,6 +36,25 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _IceTransportPolicy:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _IceTransportPolicyEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceTransportPolicy.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    TRANSPORT_NONE: _IceTransportPolicy.ValueType  # 0
+    TRANSPORT_RELAY: _IceTransportPolicy.ValueType  # 1
+    TRANSPORT_NOHOST: _IceTransportPolicy.ValueType  # 2
+    TRANSPORT_ALL: _IceTransportPolicy.ValueType  # 3
+
+class IceTransportPolicy(_IceTransportPolicy, metaclass=_IceTransportPolicyEnumTypeWrapper): ...
+
+TRANSPORT_NONE: IceTransportPolicy.ValueType  # 0
+TRANSPORT_RELAY: IceTransportPolicy.ValueType  # 1
+TRANSPORT_NOHOST: IceTransportPolicy.ValueType  # 2
+TRANSPORT_ALL: IceTransportPolicy.ValueType  # 3
+global___IceTransportPolicy = IceTransportPolicy
+
 class _ConnectionQuality:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -522,6 +541,47 @@ class TrackPublishOptions(google.protobuf.message.Message):
 global___TrackPublishOptions = TrackPublishOptions
 
 @typing_extensions.final
+class IceServer(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    URLS_FIELD_NUMBER: builtins.int
+    USERNAME_FIELD_NUMBER: builtins.int
+    CREDENTIAL_FIELD_NUMBER: builtins.int
+    @property
+    def urls(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    username: builtins.str
+    credential: builtins.str
+    def __init__(
+        self,
+        *,
+        urls: collections.abc.Iterable[builtins.str] | None = ...,
+        username: builtins.str = ...,
+        credential: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credential", b"credential", "urls", b"urls", "username", b"username"]) -> None: ...
+
+global___IceServer = IceServer
+
+@typing_extensions.final
+class RtcConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ICE_TRANSPORT_POLICY_FIELD_NUMBER: builtins.int
+    ICE_SERVERS_FIELD_NUMBER: builtins.int
+    ice_transport_policy: global___IceTransportPolicy.ValueType
+    @property
+    def ice_servers(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___IceServer]: ...
+    def __init__(
+        self,
+        *,
+        ice_transport_policy: global___IceTransportPolicy.ValueType = ...,
+        ice_servers: collections.abc.Iterable[global___IceServer] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["ice_servers", b"ice_servers", "ice_transport_policy", b"ice_transport_policy"]) -> None: ...
+
+global___RtcConfig = RtcConfig
+
+@typing_extensions.final
 class RoomOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -529,11 +589,15 @@ class RoomOptions(google.protobuf.message.Message):
     ADAPTIVE_STREAM_FIELD_NUMBER: builtins.int
     DYNACAST_FIELD_NUMBER: builtins.int
     E2EE_FIELD_NUMBER: builtins.int
+    RTC_CONFIG_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
     @property
     def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
+    @property
+    def rtc_config(self) -> global___RtcConfig:
+        """allow to setup a custom RtcConfiguration"""
     def __init__(
         self,
         *,
@@ -541,10 +605,14 @@ class RoomOptions(google.protobuf.message.Message):
         adaptive_stream: builtins.bool = ...,
         dynacast: builtins.bool = ...,
         e2ee: e2ee_pb2.E2eeOptions | None = ...,
+        rtc_config: global___RtcConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "e2ee", b"e2ee"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "e2ee", b"e2ee", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "rtc_config", b"rtc_config"]) -> None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_e2ee", b"_e2ee"]) -> typing_extensions.Literal["e2ee"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_rtc_config", b"_rtc_config"]) -> typing_extensions.Literal["rtc_config"] | None: ...
 
 global___RoomOptions = RoomOptions
 
