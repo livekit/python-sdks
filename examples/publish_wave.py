@@ -13,8 +13,7 @@ SAMPLE_RATE = 48000
 NUM_CHANNELS = 1
 
 
-async def publish_frames(source: livekit.AudioSource):
-    frequency = 440
+async def publish_frames(source: livekit.AudioSource, frequency: int):
     amplitude = 32767  # for 16-bit audio
     samples_per_channel = 480  # 10ms at 48kHz
     time = np.arange(samples_per_channel) / SAMPLE_RATE
@@ -38,9 +37,20 @@ async def publish_frames(source: livekit.AudioSource):
 
 
 async def main(room: livekit.Room) -> None:
+
+    @room.on("participant_disconnected")
+    def on_participant_disconnect(participant: livekit.Participant, *_):
+        logging.info("participant disconnected: %s", participant.identity)
+
     logging.info("connecting to %s", URL)
     try:
-        await room.connect(URL, TOKEN)
+        e2ee_options = livekit.E2EEOptions()
+        e2ee_options.key_provider_options.shared_key = b"password"
+
+        await room.connect(URL, TOKEN, options=livekit.RoomOptions(
+            auto_subscribe=True,
+            e2ee=e2ee_options
+        ))
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
@@ -54,7 +64,7 @@ async def main(room: livekit.Room) -> None:
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
-    asyncio.ensure_future(publish_frames(source))
+    asyncio.ensure_future(publish_frames(source, 440))
 
 
 if __name__ == "__main__":
