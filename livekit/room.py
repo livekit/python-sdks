@@ -54,6 +54,7 @@ class Room(EventEmitter):
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
+        self._disconnecting = False
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
@@ -140,6 +141,10 @@ class Room(EventEmitter):
         if not self.isconnected():
             return
 
+        if self._disconnecting:
+            return
+
+        self._disconnecting = True
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
@@ -151,13 +156,15 @@ class Room(EventEmitter):
         finally:
             ffi_client.queue.unsubscribe(queue)
 
-        if not self._close_future.cancelled():
+        if not self._close_future.done():
             self._close_future.set_result(None)
 
         try:
             await self._task
         except asyncio.CancelledError:
             pass
+        finally:
+            self._disconnecting = False
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
