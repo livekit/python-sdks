@@ -21,6 +21,9 @@ from ._proto.room_pb2 import (
     ConnectionState,
     DataPacketKind,
     TrackPublishOptions,
+    IceTransportType,
+    ContinualGatheringPolicy,
+    IceServer
 )
 from ._proto.e2ee_pb2 import (EncryptionType, EncryptionState)
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
@@ -29,7 +32,7 @@ from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioStream
 from .participant import LocalParticipant, Participant, RemoteParticipant
-from .room import ConnectError, Room, RoomOptions
+from .room import ConnectError, Room, RoomOptions, RtcConfiguration
 from .track import (
     LocalAudioTrack,
     LocalVideoTrack,

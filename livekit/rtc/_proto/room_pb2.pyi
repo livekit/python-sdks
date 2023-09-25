@@ -36,6 +36,38 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _IceTransportType:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _IceTransportTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceTransportType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    TRANSPORT_RELAY: _IceTransportType.ValueType  # 0
+    TRANSPORT_NOHOST: _IceTransportType.ValueType  # 1
+    TRANSPORT_ALL: _IceTransportType.ValueType  # 2
+
+class IceTransportType(_IceTransportType, metaclass=_IceTransportTypeEnumTypeWrapper): ...
+
+TRANSPORT_RELAY: IceTransportType.ValueType  # 0
+TRANSPORT_NOHOST: IceTransportType.ValueType  # 1
+TRANSPORT_ALL: IceTransportType.ValueType  # 2
+global___IceTransportType = IceTransportType
+
+class _ContinualGatheringPolicy:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ContinualGatheringPolicyEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ContinualGatheringPolicy.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    GATHER_ONCE: _ContinualGatheringPolicy.ValueType  # 0
+    GATHER_CONTINUALLY: _ContinualGatheringPolicy.ValueType  # 1
+
+class ContinualGatheringPolicy(_ContinualGatheringPolicy, metaclass=_ContinualGatheringPolicyEnumTypeWrapper): ...
+
+GATHER_ONCE: ContinualGatheringPolicy.ValueType  # 0
+GATHER_CONTINUALLY: ContinualGatheringPolicy.ValueType  # 1
+global___ContinualGatheringPolicy = ContinualGatheringPolicy
+
 class _ConnectionQuality:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -522,6 +554,56 @@ class TrackPublishOptions(google.protobuf.message.Message):
 global___TrackPublishOptions = TrackPublishOptions
 
 @typing_extensions.final
+class IceServer(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    URLS_FIELD_NUMBER: builtins.int
+    USERNAME_FIELD_NUMBER: builtins.int
+    PASSWORD_FIELD_NUMBER: builtins.int
+    @property
+    def urls(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    username: builtins.str
+    password: builtins.str
+    def __init__(
+        self,
+        *,
+        urls: collections.abc.Iterable[builtins.str] | None = ...,
+        username: builtins.str = ...,
+        password: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["password", b"password", "urls", b"urls", "username", b"username"]) -> None: ...
+
+global___IceServer = IceServer
+
+@typing_extensions.final
+class RtcConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ICE_TRANSPORT_TYPE_FIELD_NUMBER: builtins.int
+    CONTINUAL_GATHERING_POLICY_FIELD_NUMBER: builtins.int
+    ICE_SERVERS_FIELD_NUMBER: builtins.int
+    ice_transport_type: global___IceTransportType.ValueType
+    continual_gathering_policy: global___ContinualGatheringPolicy.ValueType
+    @property
+    def ice_servers(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___IceServer]:
+        """empty fallback to default"""
+    def __init__(
+        self,
+        *,
+        ice_transport_type: global___IceTransportType.ValueType | None = ...,
+        continual_gathering_policy: global___ContinualGatheringPolicy.ValueType | None = ...,
+        ice_servers: collections.abc.Iterable[global___IceServer] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_continual_gathering_policy", b"_continual_gathering_policy", "_ice_transport_type", b"_ice_transport_type", "continual_gathering_policy", b"continual_gathering_policy", "ice_transport_type", b"ice_transport_type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_continual_gathering_policy", b"_continual_gathering_policy", "_ice_transport_type", b"_ice_transport_type", "continual_gathering_policy", b"continual_gathering_policy", "ice_servers", b"ice_servers", "ice_transport_type", b"ice_transport_type"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_continual_gathering_policy", b"_continual_gathering_policy"]) -> typing_extensions.Literal["continual_gathering_policy"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_ice_transport_type", b"_ice_transport_type"]) -> typing_extensions.Literal["ice_transport_type"] | None: ...
+
+global___RtcConfig = RtcConfig
+
+@typing_extensions.final
 class RoomOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -529,11 +611,15 @@ class RoomOptions(google.protobuf.message.Message):
     ADAPTIVE_STREAM_FIELD_NUMBER: builtins.int
     DYNACAST_FIELD_NUMBER: builtins.int
     E2EE_FIELD_NUMBER: builtins.int
+    RTC_CONFIG_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
     @property
     def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
+    @property
+    def rtc_config(self) -> global___RtcConfig:
+        """allow to setup a custom RtcConfiguration"""
     def __init__(
         self,
         *,
@@ -541,10 +627,14 @@ class RoomOptions(google.protobuf.message.Message):
         adaptive_stream: builtins.bool = ...,
         dynacast: builtins.bool = ...,
         e2ee: e2ee_pb2.E2eeOptions | None = ...,
+        rtc_config: global___RtcConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "e2ee", b"e2ee"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "e2ee", b"e2ee", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "rtc_config", b"rtc_config"]) -> None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_e2ee", b"_e2ee"]) -> typing_extensions.Literal["e2ee"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_rtc_config", b"_rtc_config"]) -> typing_extensions.Literal["rtc_config"] | None: ...
 
 global___RoomOptions = RoomOptions
 
@@ -611,6 +701,7 @@ class RoomEvent(google.protobuf.message.Message):
     RECONNECTING_FIELD_NUMBER: builtins.int
     RECONNECTED_FIELD_NUMBER: builtins.int
     E2EE_STATE_CHANGED_FIELD_NUMBER: builtins.int
+    EOS_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -651,6 +742,9 @@ class RoomEvent(google.protobuf.message.Message):
     def reconnected(self) -> global___Reconnected: ...
     @property
     def e2ee_state_changed(self) -> global___E2eeStateChanged: ...
+    @property
+    def eos(self) -> global___RoomEOS:
+        """The stream of room events has ended"""
     def __init__(
         self,
         *,
@@ -674,10 +768,11 @@ class RoomEvent(google.protobuf.message.Message):
         reconnecting: global___Reconnecting | None = ...,
         reconnected: global___Reconnected | None = ...,
         e2ee_state_changed: global___E2eeStateChanged | None = ...,
+        eos: global___RoomEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_received", b"data_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_received", b"data_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "connection_quality_changed", "data_received", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_received", b"data_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_received", b"data_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "connection_quality_changed", "data_received", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1058,3 +1153,13 @@ class Reconnected(google.protobuf.message.Message):
     ) -> None: ...
 
 global___Reconnected = Reconnected
+
+@typing_extensions.final
+class RoomEOS(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___RoomEOS = RoomEOS

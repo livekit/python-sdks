@@ -15,7 +15,7 @@
 import asyncio
 import ctypes
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from pyee.asyncio import EventEmitter
@@ -34,10 +34,20 @@ from .track_publication import RemoteTrackPublication
 
 
 @dataclass
+class RtcConfiguration:
+    ice_transport_type: proto_room.IceTransportType = \
+        proto_room.IceTransportType.TRANSPORT_ALL
+    continual_gathering_policy: proto_room.ContinualGatheringPolicy = \
+        proto_room.ContinualGatheringPolicy.GATHER_CONTINUALLY
+    ice_servers: list[proto_room.IceServer] = field(default_factory=list)
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     dynacast: bool = False
     e2ee: Optional[E2EEOptions] = None
+    rtc_config: Optional[RtcConfiguration] = None
 
 
 class ConnectError(Exception):
@@ -97,10 +107,18 @@ class Room(EventEmitter):
                 options.e2ee.key_provider_options.shared_key  # type: ignore
             req.connect.options.e2ee.key_provider_options.ratchet_salt = \
                 options.e2ee.key_provider_options.ratchet_salt
-            req.connect.options.e2ee.key_provider_options.uncrypted_magic_bytes = \
-                options.e2ee.key_provider_options.uncrypted_magic_bytes
+            req.connect.options.e2ee.key_provider_options.failure_tolerance = \
+                options.e2ee.key_provider_options.failure_tolerance
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
+
+        if options.rtc_config:
+            req.connect.options.rtc_config.ice_transport_type = \
+                options.rtc_config.ice_transport_type  # type: ignore
+            req.connect.options.rtc_config.continual_gathering_policy = \
+                options.rtc_config.continual_gathering_policy  # type: ignore
+            req.connect.options.rtc_config.ice_servers.extend(
+                options.rtc_config.ice_servers)
 
         try:
             queue = ffi_client.queue.subscribe(self._loop)
@@ -113,7 +131,6 @@ class Room(EventEmitter):
         if cb.connect.error:
             raise ConnectError(cb.connect.error)
 
-        self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
 
         self._e2ee_manager = E2EEManager(
@@ -151,30 +168,22 @@ class Room(EventEmitter):
         finally:
             ffi_client.queue.unsubscribe(queue)
 
-        if not self._close_future.cancelled():
-            self._close_future.set_result(None)
-
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
+        await self._task
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
         while True:
-            wait_event_future = asyncio.ensure_future(self._ffi_queue.get())
-            await asyncio.wait(
-                [wait_event_future, self._close_future],
-                return_when=asyncio.FIRST_COMPLETED
-            )  # type: ignore
-
-            if self._close_future.done():
-                wait_event_future.cancel()
-                break
-
-            event = wait_event_future.result()
+            event = await self._ffi_queue.get()
             if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
-                self._on_room_event(event.room_event)
+                if event.room_event.HasField('eos'):
+                    break
+
+                try:
+                    self._on_room_event(event.room_event)
+                except Exception as e:
+                    logging.error(
+                        'error running user callback for %s: %s',
+                        event.room_event.WhichOneof('message'), e)
 
             # wait for the subscribers to process the event
             # before processing the next one

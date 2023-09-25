@@ -20,16 +20,16 @@ from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 
 DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
-DEFAULT_MAGIC_BYTES = b"LK-ROCKS"
 DEFAULT_RATCHET_WINDOW_SIZE = 16
+DEFAULT_FAILURE_TOLERANCE = -1
 
 
 @dataclass
 class KeyProviderOptions:
     shared_key: Optional[bytes] = None
     ratchet_salt: bytes = DEFAULT_RATCHET_SALT
-    uncrypted_magic_bytes: bytes = DEFAULT_MAGIC_BYTES
     ratchet_window_size: int = DEFAULT_RATCHET_WINDOW_SIZE
+    failure_tolerance: int = DEFAULT_FAILURE_TOLERANCE
 
 
 @dataclass
