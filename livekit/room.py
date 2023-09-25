@@ -15,7 +15,7 @@
 import asyncio
 import ctypes
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from pyee.asyncio import EventEmitter
@@ -37,7 +37,7 @@ from .track_publication import RemoteTrackPublication
 class RtcConfiguration:
     ice_transport_type: Optional[proto_room.IceTransportType] = None
     continual_gathering_policy: Optional[proto_room.ContinualGatheringPolicy] = None
-    ice_servers: list[proto_room.IceServer] = []
+    ice_servers: list[proto_room.IceServer] = field(default_factory=list)
 
 
 @dataclass
