@@ -34,10 +34,18 @@ from .track_publication import RemoteTrackPublication
 
 
 @dataclass
+class RtcConfiguration:
+    ice_transport_type: Optional[proto_room.IceTransportType] = None
+    continual_gathering_policy: Optional[proto_room.ContinualGatheringPolicy] = None
+    ice_servers: list[proto_room.IceServer] = []
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     dynacast: bool = False
     e2ee: Optional[E2EEOptions] = None
+    rtc_config: Optional[RtcConfiguration] = None
 
 
 class ConnectError(Exception):
@@ -101,6 +109,14 @@ class Room(EventEmitter):
                 options.e2ee.key_provider_options.failure_tolerance
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = \
                 options.e2ee.key_provider_options.ratchet_window_size
+
+        if options.rtc_config:
+            req.connect.options.rtc_config.ice_transport_type = \
+                options.rtc_config.ice_transport_type  # type: ignore
+            req.connect.options.rtc_config.continual_gathering_policy = \
+                options.rtc_config.continual_gathering_policy  # type: ignore
+            req.connect.options.rtc_config.ice_servers.extend(
+                options.rtc_config.ice_servers)
 
         try:
             queue = ffi_client.queue.subscribe(self._loop)
