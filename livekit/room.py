@@ -35,8 +35,10 @@ from .track_publication import RemoteTrackPublication
 
 @dataclass
 class RtcConfiguration:
-    ice_transport_type: Optional[proto_room.IceTransportType] = None
-    continual_gathering_policy: Optional[proto_room.ContinualGatheringPolicy] = None
+    ice_transport_type: proto_room.IceTransportType = \
+        proto_room.IceTransportType.TRANSPORT_ALL
+    continual_gathering_policy: proto_room.ContinualGatheringPolicy = \
+        proto_room.ContinualGatheringPolicy.GATHER_CONTINUALLY
     ice_servers: list[proto_room.IceServer] = field(default_factory=list)
 
 
