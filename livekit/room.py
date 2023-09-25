@@ -151,10 +151,7 @@ class Room(EventEmitter):
         finally:
             ffi_client.queue.unsubscribe(queue)
 
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
+        await self._task
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
