@@ -54,7 +54,6 @@ class Room(EventEmitter):
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
-        self._disconnecting = False
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
