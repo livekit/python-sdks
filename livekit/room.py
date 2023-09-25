@@ -113,7 +113,6 @@ class Room(EventEmitter):
         if cb.connect.error:
             raise ConnectError(cb.connect.error)
 
-        self._close_future: asyncio.Future[None] = asyncio.Future()
         self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
 
         self._e2ee_manager = E2EEManager(
@@ -151,29 +150,16 @@ class Room(EventEmitter):
         finally:
             ffi_client.queue.unsubscribe(queue)
 
-        if not self._close_future.cancelled():
-            self._close_future.set_result(None)
-
-        try:
-            await self._task
-        except asyncio.CancelledError:
-            pass
+        await self._task
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
         while True:
-            wait_event_future = asyncio.ensure_future(self._ffi_queue.get())
-            await asyncio.wait(
-                [wait_event_future, self._close_future],
-                return_when=asyncio.FIRST_COMPLETED
-            )  # type: ignore
-
-            if self._close_future.done():
-                wait_event_future.cancel()
-                break
-
-            event = wait_event_future.result()
+            event = await self._ffi_queue.get()
             if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
+                if event.room_event.HasField('eos'):
+                    break
+
                 try:
                     self._on_room_event(event.room_event)
                 except Exception as e:
