@@ -44,7 +44,7 @@ class AudioStream:
 
         self._task = self._loop.create_task(self._run())
 
-    def __del__(self):
+    def __del__(self) -> None:
         ffi_client.queue.unsubscribe(self._ffi_queue)
 
     async def _run(self):
