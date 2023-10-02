@@ -68,7 +68,8 @@ class Room(EventEmitter):
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
     def __del__(self) -> None:
-        ffi_client.queue.unsubscribe(self._ffi_queue)
+        if self._ffi_handle is not None:
+            ffi_client.queue.unsubscribe(self._ffi_queue)
 
     @property
     def sid(self) -> str:
