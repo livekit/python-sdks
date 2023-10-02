@@ -298,14 +298,16 @@ class Room(EventEmitter):
             self.emit('connection_quality_changed',
                       participant, event.connection_quality_changed.quality)
         elif which == 'data_received':
-            rparticipant = self.participants[event.data_received.participant_sid]
             owned_buffer_info = event.data_received.data
             buffer_info = owned_buffer_info.data
             native_data = ctypes.cast(buffer_info.data_ptr,
                                       ctypes.POINTER(ctypes.c_byte
                                                      * buffer_info.data_len)).contents
+            
             data = bytearray(native_data)
             FfiHandle(owned_buffer_info.handle.id)
+            if event.data_received.participant_sid:
+                rparticipant = self.participants[event.data_received.participant_sid]
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
         elif which == 'e2ee_state_changed':
