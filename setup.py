@@ -39,7 +39,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 
     def run(self):
 
-        download_script = here / 'client-sdk-rust' / 'download_ffi.py'
+        download_script = here / 'rust-sdks' / 'download_ffi.py'
         cmd = ['python3', download_script.absolute(), '--output',
                'livekit/resources']
 
