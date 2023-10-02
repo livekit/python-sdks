@@ -61,7 +61,6 @@ class Room(EventEmitter):
 
         self._ffi_handle: Optional[FfiHandle] = None
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
@@ -123,8 +122,11 @@ class Room(EventEmitter):
             req.connect.options.rtc_config.ice_servers.extend(
                 options.rtc_config.ice_servers)
 
+        # subscribe before connecting so we don't miss any events
+        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
+
         try:
-            queue = ffi_client.queue.subscribe(self._loop)
+            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.connect.async_id ==
                                       resp.connect.async_id)
@@ -132,6 +134,7 @@ class Room(EventEmitter):
             ffi_client.queue.unsubscribe(queue)
 
         if cb.connect.error:
+            ffi_client.queue.unsubscribe(self._ffi_queue)
             raise ConnectError(cb.connect.error)
 
         self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
@@ -172,6 +175,7 @@ class Room(EventEmitter):
             ffi_client.queue.unsubscribe(queue)
 
         await self._task
+        ffi_client.queue.unsubscribe(self._ffi_queue)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events

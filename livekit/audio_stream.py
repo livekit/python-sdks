@@ -60,6 +60,7 @@ class AudioStream:
                 break
 
     async def close(self):
+        ffi_client.queue.unsubscribe(self._ffi_queue)
         del self._ffi_handle
         await self._task
 
