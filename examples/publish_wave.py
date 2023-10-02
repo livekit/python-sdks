@@ -1,4 +1,5 @@
 import asyncio
+import time
 import logging
 from signal import SIGINT, SIGTERM
 
@@ -12,29 +13,21 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 SAMPLE_RATE = 48000
 NUM_CHANNELS = 1
 
-
 async def publish_frames(source: livekit.AudioSource, frequency: int):
     amplitude = 32767  # for 16-bit audio
     samples_per_channel = 480  # 10ms at 48kHz
     time = np.arange(samples_per_channel) / SAMPLE_RATE
     total_samples = 0
-
     audio_frame = livekit.AudioFrame.create(
         SAMPLE_RATE, NUM_CHANNELS, samples_per_channel)
-
     audio_data = np.ctypeslib.as_array(audio_frame.data)
-
     while True:
         time = (total_samples + np.arange(samples_per_channel)) / SAMPLE_RATE
-
         sine_wave = (amplitude * np.sin(2 * np.pi *
                      frequency * time)).astype(np.int16)
         np.copyto(audio_data, sine_wave)
-
         await source.capture_frame(audio_frame)
-
         total_samples += samples_per_channel
-
 
 async def main(room: livekit.Room) -> None:
 
@@ -45,11 +38,9 @@ async def main(room: livekit.Room) -> None:
     logging.info("connecting to %s", URL)
     try:
         e2ee_options = livekit.E2EEOptions()
-        e2ee_options.key_provider_options.shared_key = b"password"
 
         await room.connect(URL, TOKEN, options=livekit.RoomOptions(
             auto_subscribe=True,
-            e2ee=e2ee_options
         ))
         logging.info("connected to room %s", room.name)
     except livekit.ConnectError as e:

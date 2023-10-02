@@ -68,6 +68,9 @@ class Room(EventEmitter):
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
+    def __del__(self) -> None:
+        ffi_client.queue.unsubscribe(self._ffi_queue)
+
     @property
     def sid(self) -> str:
         return self._info.sid
