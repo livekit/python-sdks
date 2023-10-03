@@ -25,7 +25,9 @@ jobs:
       - uses: actions/setup-python@v4
 
       - name: Build wheel
-        run: python3 -m build --wheel
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
