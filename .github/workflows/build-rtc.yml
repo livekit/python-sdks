@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  working-directory: ./livekit-rtc
+  PACKAGE_DIR: ./livekit-rtc
 
 jobs:
   build_wheels:
@@ -40,13 +40,13 @@ jobs:
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: rtc-release
           path: dist/*.whl
@@ -60,11 +60,11 @@ jobs:
           submodules: true
 
       - name: Build SDist
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: rtc-release
           path: dist/*.tar.gz

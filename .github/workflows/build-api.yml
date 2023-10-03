@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  working-directory: ./livekit-api
+  PACKAGE_DIR: ./livekit-api
 
 jobs:
   build_wheels:
@@ -23,17 +23,17 @@ jobs:
 
       - name: Build wheel
         run: python3 -m build --wheel
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
       - name: Build SDist
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.working-directory }}
+        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: api-release
           path: |
