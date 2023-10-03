@@ -44,7 +44,6 @@ jobs:
         run: python3 -m cibuildwheel --output-dir dist
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
-          CIBW_SKIP: "*-musllinux_*"
 
       - uses: actions/upload-artifact@v3
         with:

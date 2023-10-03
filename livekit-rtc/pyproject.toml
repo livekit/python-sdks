@@ -8,6 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 build = "cp37-*"
+skip = "*-musllinux_*" # not supported (libwebrtc is using glibc)
 
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-i686-image = "manylinux_2_28"
