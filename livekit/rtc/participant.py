@@ -103,16 +103,42 @@ class LocalParticipant(Participant):
             req.publish_data.destination_sids.extend(sids)
 
         try:
-            queue = self._room_queue.subscribe()
+            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.publish_data.async_id ==
                                       resp.publish_data.async_id)
-            queue.task_done()
         finally:
-            self._room_queue.unsubscribe(queue)
+            ffi_client.queue.unsubscribe(queue)
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
+
+    async def update_metadata(self, metadata: str) -> None:
+        req = proto_ffi.FfiRequest()
+        req.update_local_metadata.local_participant_handle = self._ffi_handle.handle
+        req.update_local_metadata.metadata = metadata
+
+        try:
+            queue = ffi_client.queue.subscribe()
+            resp = ffi_client.request(req)
+            cb = await queue.wait_for(lambda e: e.update_local_metadata.async_id ==
+                                    resp.update_local_metadata.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
+
+    async def update_name(self, name: str) -> None:
+        req = proto_ffi.FfiRequest()
+        req.update_local_name.local_participant_handle = self._ffi_handle.handle
+        req.update_local_name.name = name
+
+        try:
+            queue = ffi_client.queue.subscribe()
+            resp = ffi_client.request(req)
+            cb = await queue.wait_for(lambda e: e.update_local_name.async_id ==
+                                    resp.update_local_name.async_id)
+        finally:
+            ffi_client.queue.unsubscribe(queue)
+
 
     async def publish_track(self, track: Track, options: TrackPublishOptions) \
             -> TrackPublication:

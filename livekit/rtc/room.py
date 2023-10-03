@@ -35,9 +35,9 @@ from .track_publication import RemoteTrackPublication
 
 @dataclass
 class RtcConfiguration:
-    ice_transport_type: proto_room.IceTransportType = \
+    ice_transport_type: proto_room.IceTransportType.ValueType = \
         proto_room.IceTransportType.TRANSPORT_ALL
-    continual_gathering_policy: proto_room.ContinualGatheringPolicy = \
+    continual_gathering_policy: proto_room.ContinualGatheringPolicy.ValueType = \
         proto_room.ContinualGatheringPolicy.GATHER_CONTINUALLY
     ice_servers: list[proto_room.IceServer] = field(default_factory=list)
 
@@ -61,12 +61,15 @@ class Room(EventEmitter):
 
         self._ffi_handle: Optional[FfiHandle] = None
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
         self.participants: dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
+
+    def __del__(self) -> None:
+        if self._ffi_handle is not None:
+            ffi_client.queue.unsubscribe(self._ffi_queue)
 
     @property
     def sid(self) -> str:
@@ -120,8 +123,11 @@ class Room(EventEmitter):
             req.connect.options.rtc_config.ice_servers.extend(
                 options.rtc_config.ice_servers)
 
+        # subscribe before connecting so we don't miss any events
+        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
+
         try:
-            queue = ffi_client.queue.subscribe(self._loop)
+            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.connect.async_id ==
                                       resp.connect.async_id)
@@ -129,6 +135,7 @@ class Room(EventEmitter):
             ffi_client.queue.unsubscribe(queue)
 
         if cb.connect.error:
+            ffi_client.queue.unsubscribe(self._ffi_queue)
             raise ConnectError(cb.connect.error)
 
         self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
@@ -169,6 +176,7 @@ class Room(EventEmitter):
             ffi_client.queue.unsubscribe(queue)
 
         await self._task
+        ffi_client.queue.unsubscribe(self._ffi_queue)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
@@ -180,10 +188,10 @@ class Room(EventEmitter):
 
                 try:
                     self._on_room_event(event.room_event)
-                except Exception as e:
-                    logging.error(
+                except Exception:
+                    logging.exception(
                         'error running user callback for %s: %s',
-                        event.room_event.WhichOneof('message'), e)
+                        event.room_event.WhichOneof('message'), event.room_event)
 
             # wait for the subscribers to process the event
             # before processing the next one
@@ -274,21 +282,41 @@ class Room(EventEmitter):
                 speakers.append(self._retrieve_participant(sid))
 
             self.emit('active_speakers_changed', speakers)
+        elif which == 'room_metadata_changed':
+            old_metadata = self.metadata
+            self._info.metadata = event.room_metadata_changed.metadata
+            self.emit('room_metadata_changed', old_metadata, self.metadata)
+        elif which == 'participant_metadata_changed':
+            sid = event.participant_metadata_changed.participant_sid
+            participant = self._retrieve_participant(sid)
+            old_metadata = participant.metadata
+            participant._info.metadata = event.participant_metadata_changed.metadata
+            self.emit('participant_metadata_changed',
+                      participant, old_metadata, participant.metadata)
+        elif which == 'participant_name_changed':
+            sid = event.participant_name_changed.participant_sid
+            participant = self._retrieve_participant(sid)
+            old_name = participant.name
+            participant._info.name = event.participant_name_changed.name
+            self.emit('participant_name_changed',
+                      participant, old_name, participant.name)
         elif which == 'connection_quality_changed':
             sid = event.connection_quality_changed.participant_sid
-            p = self._retrieve_participant(sid)
-
+            participant = self._retrieve_participant(sid)
             self.emit('connection_quality_changed',
-                      p, event.connection_quality_changed.quality)
+                      participant, event.connection_quality_changed.quality)
         elif which == 'data_received':
-            rparticipant = self.participants[event.data_received.participant_sid]
             owned_buffer_info = event.data_received.data
             buffer_info = owned_buffer_info.data
             native_data = ctypes.cast(buffer_info.data_ptr,
                                       ctypes.POINTER(ctypes.c_byte
                                                      * buffer_info.data_len)).contents
+            
             data = bytearray(native_data)
             FfiHandle(owned_buffer_info.handle.id)
+            rparticipant = None
+            if event.data_received.participant_sid:
+                rparticipant = self.participants[event.data_received.participant_sid]
             self.emit('data_received', data,
                       event.data_received.kind, rparticipant)
         elif which == 'e2ee_state_changed':

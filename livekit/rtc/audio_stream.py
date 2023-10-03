@@ -44,6 +44,9 @@ class AudioStream:
 
         self._task = self._loop.create_task(self._run())
 
+    def __del__(self) -> None:
+        ffi_client.queue.unsubscribe(self._ffi_queue)
+
     async def _run(self):
         while True:
             event = await self._ffi_queue.wait_for(self._is_event)
@@ -57,6 +60,7 @@ class AudioStream:
                 break
 
     async def close(self):
+        ffi_client.queue.unsubscribe(self._ffi_queue)
         del self._ffi_handle
         await self._task
 

@@ -1,3 +1,3 @@
 [submodule "client-sdk-rust"]
-	path = client-sdk-rust
-	url = https://github.com/livekit/client-sdk-rust
+	path = rust-sdks
+	url = https://github.com/livekit/rust-sdks
