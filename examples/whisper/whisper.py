@@ -6,7 +6,7 @@ import platform
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-import livekit.rtc as rtc
+from livekit import rtc
 
 os = platform.system().lower()
 if os == "windows":
