@@ -39,8 +39,8 @@ jobs:
         with:
           name: api-release
           path: |
-            dist/*.whl
-            dist/*.tar.gz
+            livekit-api/dist/*.whl
+            livekit-api/dist/*.tar.gz
 
   publish:
     name: Publish API release

@@ -48,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: rtc-release
-          path: dist/*.whl
+          path: livekit-rtc/dist/*.whl
 
   make_sdist:
     name: Make RTC sdist
@@ -67,7 +67,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: rtc-release
-          path: dist/*.tar.gz
+          path: livekit-rtc/dist/*.tar.gz
 
   publish:
     name: Publish RTC release
