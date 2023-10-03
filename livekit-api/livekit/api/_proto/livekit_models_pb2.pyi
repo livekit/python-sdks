@@ -70,6 +70,21 @@ H264_HIGH: VideoCodec.ValueType  # 3
 VP8: VideoCodec.ValueType  # 4
 global___VideoCodec = VideoCodec
 
+class _ImageCodec:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ImageCodecEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ImageCodec.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    IC_DEFAULT: _ImageCodec.ValueType  # 0
+    IC_JPEG: _ImageCodec.ValueType  # 1
+
+class ImageCodec(_ImageCodec, metaclass=_ImageCodecEnumTypeWrapper): ...
+
+IC_DEFAULT: ImageCodec.ValueType  # 0
+IC_JPEG: ImageCodec.ValueType  # 1
+global___ImageCodec = ImageCodec
+
 class _TrackType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -241,7 +256,6 @@ class Room(google.protobuf.message.Message):
     NUM_PARTICIPANTS_FIELD_NUMBER: builtins.int
     NUM_PUBLISHERS_FIELD_NUMBER: builtins.int
     ACTIVE_RECORDING_FIELD_NUMBER: builtins.int
-    PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     empty_timeout: builtins.int
@@ -254,8 +268,6 @@ class Room(google.protobuf.message.Message):
     num_participants: builtins.int
     num_publishers: builtins.int
     active_recording: builtins.bool
-    @property
-    def playout_delay(self) -> global___PlayoutDelay: ...
     def __init__(
         self,
         *,
@@ -270,10 +282,8 @@ class Room(google.protobuf.message.Message):
         num_participants: builtins.int = ...,
         num_publishers: builtins.int = ...,
         active_recording: builtins.bool = ...,
-        playout_delay: global___PlayoutDelay | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["playout_delay", b"playout_delay"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "empty_timeout", b"empty_timeout", "enabled_codecs", b"enabled_codecs", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "playout_delay", b"playout_delay", "sid", b"sid", "turn_password", b"turn_password"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "empty_timeout", b"empty_timeout", "enabled_codecs", b"enabled_codecs", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "sid", b"sid", "turn_password", b"turn_password"]) -> None: ...
 
 global___Room = Room
 

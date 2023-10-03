@@ -43,6 +43,7 @@ class CreateRoomRequest(google.protobuf.message.Message):
     EGRESS_FIELD_NUMBER: builtins.int
     MIN_PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
+    SYNC_STREAMS_FIELD_NUMBER: builtins.int
     name: builtins.str
     """name of the room"""
     empty_timeout: builtins.int
@@ -59,6 +60,10 @@ class CreateRoomRequest(google.protobuf.message.Message):
     min_playout_delay: builtins.int
     """playout delay of subscriber"""
     max_playout_delay: builtins.int
+    sync_streams: builtins.bool
+    """improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use 
+    so not recommended for rooms with frequent subscription changes
+    """
     def __init__(
         self,
         *,
@@ -70,9 +75,10 @@ class CreateRoomRequest(google.protobuf.message.Message):
         egress: global___RoomEgress | None = ...,
         min_playout_delay: builtins.int = ...,
         max_playout_delay: builtins.int = ...,
+        sync_streams: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["egress", b"egress"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["egress", b"egress", "empty_timeout", b"empty_timeout", "max_participants", b"max_participants", "max_playout_delay", b"max_playout_delay", "metadata", b"metadata", "min_playout_delay", b"min_playout_delay", "name", b"name", "node_id", b"node_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["egress", b"egress", "empty_timeout", b"empty_timeout", "max_participants", b"max_participants", "max_playout_delay", b"max_playout_delay", "metadata", b"metadata", "min_playout_delay", b"min_playout_delay", "name", b"name", "node_id", b"node_id", "sync_streams", b"sync_streams"]) -> None: ...
 
 global___CreateRoomRequest = CreateRoomRequest
 

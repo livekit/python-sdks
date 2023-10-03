@@ -81,6 +81,21 @@ INDEX: SegmentedFileSuffix.ValueType  # 0
 TIMESTAMP: SegmentedFileSuffix.ValueType  # 1
 global___SegmentedFileSuffix = SegmentedFileSuffix
 
+class _ImageFileSuffix:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ImageFileSuffixEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ImageFileSuffix.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    IMAGE_SUFFIX_INDEX: _ImageFileSuffix.ValueType  # 0
+    IMAGE_SUFFIX_TIMESTAMP: _ImageFileSuffix.ValueType  # 1
+
+class ImageFileSuffix(_ImageFileSuffix, metaclass=_ImageFileSuffixEnumTypeWrapper): ...
+
+IMAGE_SUFFIX_INDEX: ImageFileSuffix.ValueType  # 0
+IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix.ValueType  # 1
+global___ImageFileSuffix = ImageFileSuffix
+
 class _StreamProtocol:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -185,6 +200,7 @@ class RoomCompositeEgressRequest(google.protobuf.message.Message):
     FILE_OUTPUTS_FIELD_NUMBER: builtins.int
     STREAM_OUTPUTS_FIELD_NUMBER: builtins.int
     SEGMENT_OUTPUTS_FIELD_NUMBER: builtins.int
+    IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
     room_name: builtins.str
     """required"""
     layout: builtins.str
@@ -212,6 +228,8 @@ class RoomCompositeEgressRequest(google.protobuf.message.Message):
     def stream_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___StreamOutput]: ...
     @property
     def segment_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SegmentedFileOutput]: ...
+    @property
+    def image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
     def __init__(
         self,
         *,
@@ -228,9 +246,10 @@ class RoomCompositeEgressRequest(google.protobuf.message.Message):
         file_outputs: collections.abc.Iterable[global___EncodedFileOutput] | None = ...,
         stream_outputs: collections.abc.Iterable[global___StreamOutput] | None = ...,
         segment_outputs: collections.abc.Iterable[global___SegmentedFileOutput] | None = ...,
+        image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "file", b"file", "options", b"options", "output", b"output", "preset", b"preset", "segments", b"segments", "stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_only", b"audio_only", "custom_base_url", b"custom_base_url", "file", b"file", "file_outputs", b"file_outputs", "layout", b"layout", "options", b"options", "output", b"output", "preset", b"preset", "room_name", b"room_name", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "video_only", b"video_only"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_only", b"audio_only", "custom_base_url", b"custom_base_url", "file", b"file", "file_outputs", b"file_outputs", "image_outputs", b"image_outputs", "layout", b"layout", "options", b"options", "output", b"output", "preset", b"preset", "room_name", b"room_name", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "video_only", b"video_only"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["options", b"options"]) -> typing_extensions.Literal["preset", "advanced"] | None: ...
     @typing.overload
@@ -256,6 +275,7 @@ class WebEgressRequest(google.protobuf.message.Message):
     FILE_OUTPUTS_FIELD_NUMBER: builtins.int
     STREAM_OUTPUTS_FIELD_NUMBER: builtins.int
     SEGMENT_OUTPUTS_FIELD_NUMBER: builtins.int
+    IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
     url: builtins.str
     audio_only: builtins.bool
     video_only: builtins.bool
@@ -275,6 +295,8 @@ class WebEgressRequest(google.protobuf.message.Message):
     def stream_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___StreamOutput]: ...
     @property
     def segment_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SegmentedFileOutput]: ...
+    @property
+    def image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
     def __init__(
         self,
         *,
@@ -290,9 +312,10 @@ class WebEgressRequest(google.protobuf.message.Message):
         file_outputs: collections.abc.Iterable[global___EncodedFileOutput] | None = ...,
         stream_outputs: collections.abc.Iterable[global___StreamOutput] | None = ...,
         segment_outputs: collections.abc.Iterable[global___SegmentedFileOutput] | None = ...,
+        image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "file", b"file", "options", b"options", "output", b"output", "preset", b"preset", "segments", b"segments", "stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_only", b"audio_only", "await_start_signal", b"await_start_signal", "file", b"file", "file_outputs", b"file_outputs", "options", b"options", "output", b"output", "preset", b"preset", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "url", b"url", "video_only", b"video_only"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_only", b"audio_only", "await_start_signal", b"await_start_signal", "file", b"file", "file_outputs", b"file_outputs", "image_outputs", b"image_outputs", "options", b"options", "output", b"output", "preset", b"preset", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "url", b"url", "video_only", b"video_only"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["options", b"options"]) -> typing_extensions.Literal["preset", "advanced"] | None: ...
     @typing.overload
@@ -314,6 +337,7 @@ class ParticipantEgressRequest(google.protobuf.message.Message):
     FILE_OUTPUTS_FIELD_NUMBER: builtins.int
     STREAM_OUTPUTS_FIELD_NUMBER: builtins.int
     SEGMENT_OUTPUTS_FIELD_NUMBER: builtins.int
+    IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
     room_name: builtins.str
     """required"""
     identity: builtins.str
@@ -331,6 +355,8 @@ class ParticipantEgressRequest(google.protobuf.message.Message):
     def stream_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___StreamOutput]: ...
     @property
     def segment_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SegmentedFileOutput]: ...
+    @property
+    def image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
     def __init__(
         self,
         *,
@@ -342,9 +368,10 @@ class ParticipantEgressRequest(google.protobuf.message.Message):
         file_outputs: collections.abc.Iterable[global___EncodedFileOutput] | None = ...,
         stream_outputs: collections.abc.Iterable[global___StreamOutput] | None = ...,
         segment_outputs: collections.abc.Iterable[global___SegmentedFileOutput] | None = ...,
+        image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "options", b"options", "preset", b"preset"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "file_outputs", b"file_outputs", "identity", b"identity", "options", b"options", "preset", b"preset", "room_name", b"room_name", "screen_share", b"screen_share", "segment_outputs", b"segment_outputs", "stream_outputs", b"stream_outputs"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "file_outputs", b"file_outputs", "identity", b"identity", "image_outputs", b"image_outputs", "options", b"options", "preset", b"preset", "room_name", b"room_name", "screen_share", b"screen_share", "segment_outputs", b"segment_outputs", "stream_outputs", b"stream_outputs"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["options", b"options"]) -> typing_extensions.Literal["preset", "advanced"] | None: ...
 
 global___ParticipantEgressRequest = ParticipantEgressRequest
@@ -366,6 +393,7 @@ class TrackCompositeEgressRequest(google.protobuf.message.Message):
     FILE_OUTPUTS_FIELD_NUMBER: builtins.int
     STREAM_OUTPUTS_FIELD_NUMBER: builtins.int
     SEGMENT_OUTPUTS_FIELD_NUMBER: builtins.int
+    IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
     room_name: builtins.str
     """required"""
     audio_track_id: builtins.str
@@ -389,6 +417,8 @@ class TrackCompositeEgressRequest(google.protobuf.message.Message):
     def stream_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___StreamOutput]: ...
     @property
     def segment_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SegmentedFileOutput]: ...
+    @property
+    def image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
     def __init__(
         self,
         *,
@@ -403,9 +433,10 @@ class TrackCompositeEgressRequest(google.protobuf.message.Message):
         file_outputs: collections.abc.Iterable[global___EncodedFileOutput] | None = ...,
         stream_outputs: collections.abc.Iterable[global___StreamOutput] | None = ...,
         segment_outputs: collections.abc.Iterable[global___SegmentedFileOutput] | None = ...,
+        image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "file", b"file", "options", b"options", "output", b"output", "preset", b"preset", "segments", b"segments", "stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_track_id", b"audio_track_id", "file", b"file", "file_outputs", b"file_outputs", "options", b"options", "output", b"output", "preset", b"preset", "room_name", b"room_name", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "video_track_id", b"video_track_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["advanced", b"advanced", "audio_track_id", b"audio_track_id", "file", b"file", "file_outputs", b"file_outputs", "image_outputs", b"image_outputs", "options", b"options", "output", b"output", "preset", b"preset", "room_name", b"room_name", "segment_outputs", b"segment_outputs", "segments", b"segments", "stream", b"stream", "stream_outputs", b"stream_outputs", "video_track_id", b"video_track_id"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["options", b"options"]) -> typing_extensions.Literal["preset", "advanced"] | None: ...
     @typing.overload
@@ -583,6 +614,64 @@ class DirectFileOutput(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing_extensions.Literal["output", b"output"]) -> typing_extensions.Literal["s3", "gcp", "azure", "aliOSS"] | None: ...
 
 global___DirectFileOutput = DirectFileOutput
+
+@typing_extensions.final
+class ImageOutput(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CAPTURE_INTERVAL_FIELD_NUMBER: builtins.int
+    WIDTH_FIELD_NUMBER: builtins.int
+    HEIGHT_FIELD_NUMBER: builtins.int
+    FILENAME_PREFIX_FIELD_NUMBER: builtins.int
+    FILENAME_SUFFIX_FIELD_NUMBER: builtins.int
+    IMAGE_CODEC_FIELD_NUMBER: builtins.int
+    DISABLE_MANIFEST_FIELD_NUMBER: builtins.int
+    S3_FIELD_NUMBER: builtins.int
+    GCP_FIELD_NUMBER: builtins.int
+    AZURE_FIELD_NUMBER: builtins.int
+    ALIOSS_FIELD_NUMBER: builtins.int
+    capture_interval: builtins.int
+    """in seconds (required)"""
+    width: builtins.int
+    """(optional, defaults to track width)"""
+    height: builtins.int
+    """(optional, defaults to track height)"""
+    filename_prefix: builtins.str
+    """(optional)"""
+    filename_suffix: global___ImageFileSuffix.ValueType
+    """(optional, default INDEX)"""
+    image_codec: livekit_models_pb2.ImageCodec.ValueType
+    """(optional)"""
+    disable_manifest: builtins.bool
+    """disable upload of manifest file (default false)"""
+    @property
+    def s3(self) -> global___S3Upload: ...
+    @property
+    def gcp(self) -> global___GCPUpload: ...
+    @property
+    def azure(self) -> global___AzureBlobUpload: ...
+    @property
+    def aliOSS(self) -> global___AliOSSUpload: ...
+    def __init__(
+        self,
+        *,
+        capture_interval: builtins.int = ...,
+        width: builtins.int = ...,
+        height: builtins.int = ...,
+        filename_prefix: builtins.str = ...,
+        filename_suffix: global___ImageFileSuffix.ValueType = ...,
+        image_codec: livekit_models_pb2.ImageCodec.ValueType = ...,
+        disable_manifest: builtins.bool = ...,
+        s3: global___S3Upload | None = ...,
+        gcp: global___GCPUpload | None = ...,
+        azure: global___AzureBlobUpload | None = ...,
+        aliOSS: global___AliOSSUpload | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["aliOSS", b"aliOSS", "azure", b"azure", "gcp", b"gcp", "output", b"output", "s3", b"s3"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["aliOSS", b"aliOSS", "azure", b"azure", "capture_interval", b"capture_interval", "disable_manifest", b"disable_manifest", "filename_prefix", b"filename_prefix", "filename_suffix", b"filename_suffix", "gcp", b"gcp", "height", b"height", "image_codec", b"image_codec", "output", b"output", "s3", b"s3", "width", b"width"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["output", b"output"]) -> typing_extensions.Literal["s3", "gcp", "azure", "aliOSS"] | None: ...
+
+global___ImageOutput = ImageOutput
 
 @typing_extensions.final
 class S3Upload(google.protobuf.message.Message):
@@ -818,6 +907,29 @@ class UpdateStreamRequest(google.protobuf.message.Message):
 global___UpdateStreamRequest = UpdateStreamRequest
 
 @typing_extensions.final
+class UpdateOutputsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    EGRESS_ID_FIELD_NUMBER: builtins.int
+    ADD_IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
+    REMOVE_IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
+    egress_id: builtins.str
+    @property
+    def add_image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
+    @property
+    def remove_image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
+    def __init__(
+        self,
+        *,
+        egress_id: builtins.str = ...,
+        add_image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
+        remove_image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["add_image_outputs", b"add_image_outputs", "egress_id", b"egress_id", "remove_image_outputs", b"remove_image_outputs"]) -> None: ...
+
+global___UpdateOutputsRequest = UpdateOutputsRequest
+
+@typing_extensions.final
 class ListEgressRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -895,6 +1007,7 @@ class EgressInfo(google.protobuf.message.Message):
     STREAM_RESULTS_FIELD_NUMBER: builtins.int
     FILE_RESULTS_FIELD_NUMBER: builtins.int
     SEGMENT_RESULTS_FIELD_NUMBER: builtins.int
+    IMAGE_RESULTS_FIELD_NUMBER: builtins.int
     egress_id: builtins.str
     room_id: builtins.str
     room_name: builtins.str
@@ -925,6 +1038,8 @@ class EgressInfo(google.protobuf.message.Message):
     def file_results(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___FileInfo]: ...
     @property
     def segment_results(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___SegmentsInfo]: ...
+    @property
+    def image_results(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImagesInfo]: ...
     def __init__(
         self,
         *,
@@ -947,9 +1062,10 @@ class EgressInfo(google.protobuf.message.Message):
         stream_results: collections.abc.Iterable[global___StreamInfo] | None = ...,
         file_results: collections.abc.Iterable[global___FileInfo] | None = ...,
         segment_results: collections.abc.Iterable[global___SegmentsInfo] | None = ...,
+        image_results: collections.abc.Iterable[global___ImagesInfo] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["file", b"file", "participant", b"participant", "request", b"request", "result", b"result", "room_composite", b"room_composite", "segments", b"segments", "stream", b"stream", "track", b"track", "track_composite", b"track_composite", "web", b"web"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["egress_id", b"egress_id", "ended_at", b"ended_at", "error", b"error", "file", b"file", "file_results", b"file_results", "participant", b"participant", "request", b"request", "result", b"result", "room_composite", b"room_composite", "room_id", b"room_id", "room_name", b"room_name", "segment_results", b"segment_results", "segments", b"segments", "started_at", b"started_at", "status", b"status", "stream", b"stream", "stream_results", b"stream_results", "track", b"track", "track_composite", b"track_composite", "updated_at", b"updated_at", "web", b"web"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["egress_id", b"egress_id", "ended_at", b"ended_at", "error", b"error", "file", b"file", "file_results", b"file_results", "image_results", b"image_results", "participant", b"participant", "request", b"request", "result", b"result", "room_composite", b"room_composite", "room_id", b"room_id", "room_name", b"room_name", "segment_results", b"segment_results", "segments", b"segments", "started_at", b"started_at", "status", b"status", "stream", b"stream", "stream_results", b"stream_results", "track", b"track", "track_composite", b"track_composite", "updated_at", b"updated_at", "web", b"web"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["room_composite", "web", "participant", "track_composite", "track"] | None: ...
     @typing.overload
@@ -1086,6 +1202,27 @@ class SegmentsInfo(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["duration", b"duration", "ended_at", b"ended_at", "live_playlist_location", b"live_playlist_location", "live_playlist_name", b"live_playlist_name", "playlist_location", b"playlist_location", "playlist_name", b"playlist_name", "segment_count", b"segment_count", "size", b"size", "started_at", b"started_at"]) -> None: ...
 
 global___SegmentsInfo = SegmentsInfo
+
+@typing_extensions.final
+class ImagesInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    IMAGE_COUNT_FIELD_NUMBER: builtins.int
+    STARTED_AT_FIELD_NUMBER: builtins.int
+    ENDED_AT_FIELD_NUMBER: builtins.int
+    image_count: builtins.int
+    started_at: builtins.int
+    ended_at: builtins.int
+    def __init__(
+        self,
+        *,
+        image_count: builtins.int = ...,
+        started_at: builtins.int = ...,
+        ended_at: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["ended_at", b"ended_at", "image_count", b"image_count", "started_at", b"started_at"]) -> None: ...
+
+global___ImagesInfo = ImagesInfo
 
 @typing_extensions.final
 class AutoParticipantEgress(google.protobuf.message.Message):
