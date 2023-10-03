@@ -12,7 +12,7 @@ env:
 
 jobs:
   build_wheels:
-    name: Build rtc wheels (${{ matrix.archs }})
+    name: Build RTC wheels (${{ matrix.archs }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -61,7 +61,7 @@ jobs:
           path: dist/*.whl
 
   make_sdist:
-    name: Make rtc sdist
+    name: Make RTC sdist
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -80,7 +80,7 @@ jobs:
           path: dist/*.tar.gz
 
   publish:
-    name: Publish rtc release
+    name: Publish RTC release
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
     permissions:
