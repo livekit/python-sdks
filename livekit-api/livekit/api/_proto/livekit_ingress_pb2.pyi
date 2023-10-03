@@ -40,19 +40,15 @@ class _IngressInputEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._E
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     RTMP_INPUT: _IngressInput.ValueType  # 0
     WHIP_INPUT: _IngressInput.ValueType  # 1
-    """ FILE_INPUT = 2;
-     SRT_INPUT = 3;
-     URL_INPUT = 4;
-    """
+    URL_INPUT: _IngressInput.ValueType  # 2
+    """Pull from the provided URL. Only HTTP url are supported, serving either a single media file or a HLS stream"""
 
 class IngressInput(_IngressInput, metaclass=_IngressInputEnumTypeWrapper): ...
 
 RTMP_INPUT: IngressInput.ValueType  # 0
 WHIP_INPUT: IngressInput.ValueType  # 1
-""" FILE_INPUT = 2;
- SRT_INPUT = 3;
- URL_INPUT = 4;
-"""
+URL_INPUT: IngressInput.ValueType  # 2
+"""Pull from the provided URL. Only HTTP url are supported, serving either a single media file or a HLS stream"""
 global___IngressInput = IngressInput
 
 class _IngressAudioEncodingPreset:
@@ -81,28 +77,48 @@ class _IngressVideoEncodingPreset:
 class _IngressVideoEncodingPresetEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IngressVideoEncodingPreset.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     H264_720P_30FPS_3_LAYERS: _IngressVideoEncodingPreset.ValueType  # 0
-    """1280x720,  30fps, 1700kbps main layer, 3 layers total"""
+    """1280x720,  30fps, 1900kbps main layer, 3 layers total"""
     H264_1080P_30FPS_3_LAYERS: _IngressVideoEncodingPreset.ValueType  # 1
-    """1980x1080, 30fps, 3000kbps main layer, 3 layers total"""
+    """1980x1080, 30fps, 3500kbps main layer, 3 layers total"""
     H264_540P_25FPS_2_LAYERS: _IngressVideoEncodingPreset.ValueType  # 2
-    """ 960x540,  25fps, 600kbps  main layer, 2 layers total"""
+    """ 960x540,  25fps, 1000kbps  main layer, 2 layers total"""
     H264_720P_30FPS_1_LAYER: _IngressVideoEncodingPreset.ValueType  # 3
-    """1280x720,  30fps, 1700kbps, no simulcast"""
+    """1280x720,  30fps, 1900kbps, no simulcast"""
     H264_1080P_30FPS_1_LAYER: _IngressVideoEncodingPreset.ValueType  # 4
-    """1980x1080, 30fps, 3000kbps, no simulcast"""
+    """1980x1080, 30fps, 3500kbps, no simulcast"""
+    H264_720P_30FPS_3_LAYERS_HIGH_MOTION: _IngressVideoEncodingPreset.ValueType  # 5
+    """1280x720,  30fps, 2500kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content"""
+    H264_1080P_30FPS_3_LAYERS_HIGH_MOTION: _IngressVideoEncodingPreset.ValueType  # 6
+    """1980x1080, 30fps, 4500kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content"""
+    H264_540P_25FPS_2_LAYERS_HIGH_MOTION: _IngressVideoEncodingPreset.ValueType  # 7
+    """ 960x540,  25fps, 1300kbps  main layer, 2 layers total, higher bitrate for high motion, harder to encode content"""
+    H264_720P_30FPS_1_LAYER_HIGH_MOTION: _IngressVideoEncodingPreset.ValueType  # 8
+    """1280x720,  30fps, 2500kbps, no simulcast, higher bitrate for high motion, harder to encode content"""
+    H264_1080P_30FPS_1_LAYER_HIGH_MOTION: _IngressVideoEncodingPreset.ValueType  # 9
+    """1980x1080, 30fps, 4500kbps, no simulcast, higher bitrate for high motion, harder to encode content"""
 
 class IngressVideoEncodingPreset(_IngressVideoEncodingPreset, metaclass=_IngressVideoEncodingPresetEnumTypeWrapper): ...
 
 H264_720P_30FPS_3_LAYERS: IngressVideoEncodingPreset.ValueType  # 0
-"""1280x720,  30fps, 1700kbps main layer, 3 layers total"""
+"""1280x720,  30fps, 1900kbps main layer, 3 layers total"""
 H264_1080P_30FPS_3_LAYERS: IngressVideoEncodingPreset.ValueType  # 1
-"""1980x1080, 30fps, 3000kbps main layer, 3 layers total"""
+"""1980x1080, 30fps, 3500kbps main layer, 3 layers total"""
 H264_540P_25FPS_2_LAYERS: IngressVideoEncodingPreset.ValueType  # 2
-""" 960x540,  25fps, 600kbps  main layer, 2 layers total"""
+""" 960x540,  25fps, 1000kbps  main layer, 2 layers total"""
 H264_720P_30FPS_1_LAYER: IngressVideoEncodingPreset.ValueType  # 3
-"""1280x720,  30fps, 1700kbps, no simulcast"""
+"""1280x720,  30fps, 1900kbps, no simulcast"""
 H264_1080P_30FPS_1_LAYER: IngressVideoEncodingPreset.ValueType  # 4
-"""1980x1080, 30fps, 3000kbps, no simulcast"""
+"""1980x1080, 30fps, 3500kbps, no simulcast"""
+H264_720P_30FPS_3_LAYERS_HIGH_MOTION: IngressVideoEncodingPreset.ValueType  # 5
+"""1280x720,  30fps, 2500kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content"""
+H264_1080P_30FPS_3_LAYERS_HIGH_MOTION: IngressVideoEncodingPreset.ValueType  # 6
+"""1980x1080, 30fps, 4500kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content"""
+H264_540P_25FPS_2_LAYERS_HIGH_MOTION: IngressVideoEncodingPreset.ValueType  # 7
+""" 960x540,  25fps, 1300kbps  main layer, 2 layers total, higher bitrate for high motion, harder to encode content"""
+H264_720P_30FPS_1_LAYER_HIGH_MOTION: IngressVideoEncodingPreset.ValueType  # 8
+"""1280x720,  30fps, 2500kbps, no simulcast, higher bitrate for high motion, harder to encode content"""
+H264_1080P_30FPS_1_LAYER_HIGH_MOTION: IngressVideoEncodingPreset.ValueType  # 9
+"""1980x1080, 30fps, 4500kbps, no simulcast, higher bitrate for high motion, harder to encode content"""
 global___IngressVideoEncodingPreset = IngressVideoEncodingPreset
 
 @typing_extensions.final
@@ -110,6 +126,7 @@ class CreateIngressRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     INPUT_TYPE_FIELD_NUMBER: builtins.int
+    URL_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     ROOM_NAME_FIELD_NUMBER: builtins.int
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
@@ -118,6 +135,8 @@ class CreateIngressRequest(google.protobuf.message.Message):
     AUDIO_FIELD_NUMBER: builtins.int
     VIDEO_FIELD_NUMBER: builtins.int
     input_type: global___IngressInput.ValueType
+    url: builtins.str
+    """Where to pull media from, only for URL input type"""
     name: builtins.str
     """User provided identifier for the ingress"""
     room_name: builtins.str
@@ -136,6 +155,7 @@ class CreateIngressRequest(google.protobuf.message.Message):
         self,
         *,
         input_type: global___IngressInput.ValueType = ...,
+        url: builtins.str = ...,
         name: builtins.str = ...,
         room_name: builtins.str = ...,
         participant_identity: builtins.str = ...,
@@ -145,7 +165,7 @@ class CreateIngressRequest(google.protobuf.message.Message):
         video: global___IngressVideoOptions | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["audio", b"audio", "video", b"video"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio", b"audio", "bypass_transcoding", b"bypass_transcoding", "input_type", b"input_type", "name", b"name", "participant_identity", b"participant_identity", "participant_name", b"participant_name", "room_name", b"room_name", "video", b"video"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio", b"audio", "bypass_transcoding", b"bypass_transcoding", "input_type", b"input_type", "name", b"name", "participant_identity", b"participant_identity", "participant_name", b"participant_name", "room_name", b"room_name", "url", b"url", "video", b"video"]) -> None: ...
 
 global___CreateIngressRequest = CreateIngressRequest
 
@@ -273,6 +293,7 @@ class IngressInfo(google.protobuf.message.Message):
     name: builtins.str
     stream_key: builtins.str
     url: builtins.str
+    """URL to point the encoder to for push (RTMP, WHIP), or location to pull media from for pull (URL)"""
     input_type: global___IngressInput.ValueType
     """for RTMP input, it'll be a rtmp:// URL
     for FILE input, it'll be a http:// URL
@@ -326,12 +347,14 @@ class IngressState(google.protobuf.message.Message):
         ENDPOINT_BUFFERING: IngressState._Status.ValueType  # 1
         ENDPOINT_PUBLISHING: IngressState._Status.ValueType  # 2
         ENDPOINT_ERROR: IngressState._Status.ValueType  # 3
+        ENDPOINT_COMPLETE: IngressState._Status.ValueType  # 4
 
     class Status(_Status, metaclass=_StatusEnumTypeWrapper): ...
     ENDPOINT_INACTIVE: IngressState.Status.ValueType  # 0
     ENDPOINT_BUFFERING: IngressState.Status.ValueType  # 1
     ENDPOINT_PUBLISHING: IngressState.Status.ValueType  # 2
     ENDPOINT_ERROR: IngressState.Status.ValueType  # 3
+    ENDPOINT_COMPLETE: IngressState.Status.ValueType  # 4
 
     STATUS_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int

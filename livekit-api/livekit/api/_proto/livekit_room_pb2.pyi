@@ -41,6 +41,8 @@ class CreateRoomRequest(google.protobuf.message.Message):
     NODE_ID_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
     EGRESS_FIELD_NUMBER: builtins.int
+    MIN_PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
+    MAX_PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
     name: builtins.str
     """name of the room"""
     empty_timeout: builtins.int
@@ -54,6 +56,9 @@ class CreateRoomRequest(google.protobuf.message.Message):
     @property
     def egress(self) -> global___RoomEgress:
         """egress"""
+    min_playout_delay: builtins.int
+    """playout delay of subscriber"""
+    max_playout_delay: builtins.int
     def __init__(
         self,
         *,
@@ -63,9 +68,11 @@ class CreateRoomRequest(google.protobuf.message.Message):
         node_id: builtins.str = ...,
         metadata: builtins.str = ...,
         egress: global___RoomEgress | None = ...,
+        min_playout_delay: builtins.int = ...,
+        max_playout_delay: builtins.int = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["egress", b"egress"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["egress", b"egress", "empty_timeout", b"empty_timeout", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "node_id", b"node_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["egress", b"egress", "empty_timeout", b"empty_timeout", "max_participants", b"max_participants", "max_playout_delay", b"max_playout_delay", "metadata", b"metadata", "min_playout_delay", b"min_playout_delay", "name", b"name", "node_id", b"node_id"]) -> None: ...
 
 global___CreateRoomRequest = CreateRoomRequest
 
@@ -74,19 +81,23 @@ class RoomEgress(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ROOM_FIELD_NUMBER: builtins.int
+    PARTICIPANT_FIELD_NUMBER: builtins.int
     TRACKS_FIELD_NUMBER: builtins.int
     @property
     def room(self) -> livekit_egress_pb2.RoomCompositeEgressRequest: ...
+    @property
+    def participant(self) -> livekit_egress_pb2.AutoParticipantEgress: ...
     @property
     def tracks(self) -> livekit_egress_pb2.AutoTrackEgress: ...
     def __init__(
         self,
         *,
         room: livekit_egress_pb2.RoomCompositeEgressRequest | None = ...,
+        participant: livekit_egress_pb2.AutoParticipantEgress | None = ...,
         tracks: livekit_egress_pb2.AutoTrackEgress | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["room", b"room", "tracks", b"tracks"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["room", b"room", "tracks", b"tracks"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["participant", b"participant", "room", b"room", "tracks", b"tracks"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant", b"participant", "room", b"room", "tracks", b"tracks"]) -> None: ...
 
 global___RoomEgress = RoomEgress
 
@@ -339,12 +350,17 @@ class SendDataRequest(google.protobuf.message.Message):
     DATA_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
     DESTINATION_SIDS_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
     TOPIC_FIELD_NUMBER: builtins.int
     room: builtins.str
     data: builtins.bytes
     kind: livekit_models_pb2.DataPacket.Kind.ValueType
     @property
-    def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """mark deprecated"""
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """when set, only forward to these identities"""
     topic: builtins.str
     def __init__(
         self,
@@ -353,10 +369,11 @@ class SendDataRequest(google.protobuf.message.Message):
         data: builtins.bytes = ...,
         kind: livekit_models_pb2.DataPacket.Kind.ValueType = ...,
         destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         topic: builtins.str | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "topic", b"topic"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "data", b"data", "destination_sids", b"destination_sids", "kind", b"kind", "room", b"room", "topic", b"topic"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "data", b"data", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "kind", b"kind", "room", b"room", "topic", b"topic"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_topic", b"_topic"]) -> typing_extensions.Literal["topic"] | None: ...
 
 global___SendDataRequest = SendDataRequest

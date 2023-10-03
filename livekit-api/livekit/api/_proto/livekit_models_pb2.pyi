@@ -673,28 +673,36 @@ class UserPacket(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     PAYLOAD_FIELD_NUMBER: builtins.int
     DESTINATION_SIDS_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
     TOPIC_FIELD_NUMBER: builtins.int
     participant_sid: builtins.str
     """participant ID of user that sent the message"""
+    participant_identity: builtins.str
     payload: builtins.bytes
     """user defined payload"""
     @property
     def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
-        """the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)"""
+        """the ID of the participants who will receive the message (sent to all by default)"""
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """identities of participants who will receive the message (sent to all by default)"""
     topic: builtins.str
     """topic under which the message was published"""
     def __init__(
         self,
         *,
         participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         payload: builtins.bytes = ...,
         destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         topic: builtins.str | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "topic", b"topic"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "destination_sids", b"destination_sids", "participant_sid", b"participant_sid", "payload", b"payload", "topic", b"topic"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "participant_identity", b"participant_identity", "participant_sid", b"participant_sid", "payload", b"payload", "topic", b"topic"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_topic", b"_topic"]) -> typing_extensions.Literal["topic"] | None: ...
 
 global___UserPacket = UserPacket
@@ -786,6 +794,8 @@ class ClientInfo(google.protobuf.message.Message):
         UNITY: ClientInfo._SDK.ValueType  # 6
         REACT_NATIVE: ClientInfo._SDK.ValueType  # 7
         RUST: ClientInfo._SDK.ValueType  # 8
+        PYTHON: ClientInfo._SDK.ValueType  # 9
+        CPP: ClientInfo._SDK.ValueType  # 10
 
     class SDK(_SDK, metaclass=_SDKEnumTypeWrapper): ...
     UNKNOWN: ClientInfo.SDK.ValueType  # 0
@@ -797,6 +807,8 @@ class ClientInfo(google.protobuf.message.Message):
     UNITY: ClientInfo.SDK.ValueType  # 6
     REACT_NATIVE: ClientInfo.SDK.ValueType  # 7
     RUST: ClientInfo.SDK.ValueType  # 8
+    PYTHON: ClientInfo.SDK.ValueType  # 9
+    CPP: ClientInfo.SDK.ValueType  # 10
 
     SDK_FIELD_NUMBER: builtins.int
     VERSION_FIELD_NUMBER: builtins.int
@@ -908,6 +920,48 @@ class DisabledCodecs(google.protobuf.message.Message):
 global___DisabledCodecs = DisabledCodecs
 
 @typing_extensions.final
+class RTPDrift(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    START_TIME_FIELD_NUMBER: builtins.int
+    END_TIME_FIELD_NUMBER: builtins.int
+    DURATION_FIELD_NUMBER: builtins.int
+    START_TIMESTAMP_FIELD_NUMBER: builtins.int
+    END_TIMESTAMP_FIELD_NUMBER: builtins.int
+    RTP_CLOCK_TICKS_FIELD_NUMBER: builtins.int
+    DRIFT_SAMPLES_FIELD_NUMBER: builtins.int
+    DRIFT_MS_FIELD_NUMBER: builtins.int
+    CLOCK_RATE_FIELD_NUMBER: builtins.int
+    @property
+    def start_time(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
+    @property
+    def end_time(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
+    duration: builtins.float
+    start_timestamp: builtins.int
+    end_timestamp: builtins.int
+    rtp_clock_ticks: builtins.int
+    drift_samples: builtins.int
+    drift_ms: builtins.float
+    clock_rate: builtins.float
+    def __init__(
+        self,
+        *,
+        start_time: google.protobuf.timestamp_pb2.Timestamp | None = ...,
+        end_time: google.protobuf.timestamp_pb2.Timestamp | None = ...,
+        duration: builtins.float = ...,
+        start_timestamp: builtins.int = ...,
+        end_timestamp: builtins.int = ...,
+        rtp_clock_ticks: builtins.int = ...,
+        drift_samples: builtins.int = ...,
+        drift_ms: builtins.float = ...,
+        clock_rate: builtins.float = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["end_time", b"end_time", "start_time", b"start_time"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["clock_rate", b"clock_rate", "drift_ms", b"drift_ms", "drift_samples", b"drift_samples", "duration", b"duration", "end_time", b"end_time", "end_timestamp", b"end_timestamp", "rtp_clock_ticks", b"rtp_clock_ticks", "start_time", b"start_time", "start_timestamp", b"start_timestamp"]) -> None: ...
+
+global___RTPDrift = RTPDrift
+
+@typing_extensions.final
 class RTPStats(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -968,8 +1022,8 @@ class RTPStats(google.protobuf.message.Message):
     LAST_KEY_FRAME_FIELD_NUMBER: builtins.int
     LAYER_LOCK_PLIS_FIELD_NUMBER: builtins.int
     LAST_LAYER_LOCK_PLI_FIELD_NUMBER: builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: builtins.int
-    DRIFT_MS_FIELD_NUMBER: builtins.int
+    PACKET_DRIFT_FIELD_NUMBER: builtins.int
+    REPORT_DRIFT_FIELD_NUMBER: builtins.int
     @property
     def start_time(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
     @property
@@ -1018,9 +1072,11 @@ class RTPStats(google.protobuf.message.Message):
     layer_lock_plis: builtins.int
     @property
     def last_layer_lock_pli(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
-    sample_rate: builtins.float
-    drift_ms: builtins.float
-    """NEXT_ID: 44"""
+    @property
+    def packet_drift(self) -> global___RTPDrift: ...
+    @property
+    def report_drift(self) -> global___RTPDrift:
+        """NEXT_ID: 46"""
     def __init__(
         self,
         *,
@@ -1065,11 +1121,11 @@ class RTPStats(google.protobuf.message.Message):
         last_key_frame: google.protobuf.timestamp_pb2.Timestamp | None = ...,
         layer_lock_plis: builtins.int = ...,
         last_layer_lock_pli: google.protobuf.timestamp_pb2.Timestamp | None = ...,
-        sample_rate: builtins.float = ...,
-        drift_ms: builtins.float = ...,
+        packet_drift: global___RTPDrift | None = ...,
+        report_drift: global___RTPDrift | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["end_time", b"end_time", "last_fir", b"last_fir", "last_key_frame", b"last_key_frame", "last_layer_lock_pli", b"last_layer_lock_pli", "last_pli", b"last_pli", "start_time", b"start_time"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["bitrate", b"bitrate", "bitrate_duplicate", b"bitrate_duplicate", "bitrate_padding", b"bitrate_padding", "bytes", b"bytes", "bytes_duplicate", b"bytes_duplicate", "bytes_padding", b"bytes_padding", "drift_ms", b"drift_ms", "duration", b"duration", "end_time", b"end_time", "firs", b"firs", "frame_rate", b"frame_rate", "frames", b"frames", "gap_histogram", b"gap_histogram", "header_bytes", b"header_bytes", "header_bytes_duplicate", b"header_bytes_duplicate", "header_bytes_padding", b"header_bytes_padding", "jitter_current", b"jitter_current", "jitter_max", b"jitter_max", "key_frames", b"key_frames", "last_fir", b"last_fir", "last_key_frame", b"last_key_frame", "last_layer_lock_pli", b"last_layer_lock_pli", "last_pli", b"last_pli", "layer_lock_plis", b"layer_lock_plis", "nack_acks", b"nack_acks", "nack_misses", b"nack_misses", "nack_repeated", b"nack_repeated", "nacks", b"nacks", "packet_duplicate_rate", b"packet_duplicate_rate", "packet_loss_percentage", b"packet_loss_percentage", "packet_loss_rate", b"packet_loss_rate", "packet_padding_rate", b"packet_padding_rate", "packet_rate", b"packet_rate", "packets", b"packets", "packets_duplicate", b"packets_duplicate", "packets_lost", b"packets_lost", "packets_out_of_order", b"packets_out_of_order", "packets_padding", b"packets_padding", "plis", b"plis", "rtt_current", b"rtt_current", "rtt_max", b"rtt_max", "sample_rate", b"sample_rate", "start_time", b"start_time"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["end_time", b"end_time", "last_fir", b"last_fir", "last_key_frame", b"last_key_frame", "last_layer_lock_pli", b"last_layer_lock_pli", "last_pli", b"last_pli", "packet_drift", b"packet_drift", "report_drift", b"report_drift", "start_time", b"start_time"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["bitrate", b"bitrate", "bitrate_duplicate", b"bitrate_duplicate", "bitrate_padding", b"bitrate_padding", "bytes", b"bytes", "bytes_duplicate", b"bytes_duplicate", "bytes_padding", b"bytes_padding", "duration", b"duration", "end_time", b"end_time", "firs", b"firs", "frame_rate", b"frame_rate", "frames", b"frames", "gap_histogram", b"gap_histogram", "header_bytes", b"header_bytes", "header_bytes_duplicate", b"header_bytes_duplicate", "header_bytes_padding", b"header_bytes_padding", "jitter_current", b"jitter_current", "jitter_max", b"jitter_max", "key_frames", b"key_frames", "last_fir", b"last_fir", "last_key_frame", b"last_key_frame", "last_layer_lock_pli", b"last_layer_lock_pli", "last_pli", b"last_pli", "layer_lock_plis", b"layer_lock_plis", "nack_acks", b"nack_acks", "nack_misses", b"nack_misses", "nack_repeated", b"nack_repeated", "nacks", b"nacks", "packet_drift", b"packet_drift", "packet_duplicate_rate", b"packet_duplicate_rate", "packet_loss_percentage", b"packet_loss_percentage", "packet_loss_rate", b"packet_loss_rate", "packet_padding_rate", b"packet_padding_rate", "packet_rate", b"packet_rate", "packets", b"packets", "packets_duplicate", b"packets_duplicate", "packets_lost", b"packets_lost", "packets_out_of_order", b"packets_out_of_order", "packets_padding", b"packets_padding", "plis", b"plis", "report_drift", b"report_drift", "rtt_current", b"rtt_current", "rtt_max", b"rtt_max", "start_time", b"start_time"]) -> None: ...
 
 global___RTPStats = RTPStats
 

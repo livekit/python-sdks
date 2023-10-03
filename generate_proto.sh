@@ -17,10 +17,10 @@
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
 
 FFI_PROTOCOL=./rust-sdks/livekit-ffi/protocol
-OUT_PYTHON=./livekit/rtc/_proto
+FFI_OUT_PYTHON=./livekit-rtc/livekit/rtc/_proto
 
-API_PROTOCOL=./client-sdk-rust/livekit-protocol/protocol
-API_OUT_PYTHON=./livekit/api/_proto
+API_PROTOCOL=./rust-sdks/livekit-protocol/protocol
+API_OUT_PYTHON=./livekit-api/livekit/api/_proto
  
 
 # ffi
