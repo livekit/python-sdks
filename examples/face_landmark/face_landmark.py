@@ -98,7 +98,7 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
 
         arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
 
-        cv2.imshow('rtc_video', arr)
+        cv2.imshow('livekit_video', arr)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
