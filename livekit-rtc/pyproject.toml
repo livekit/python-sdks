@@ -6,19 +6,8 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.ruff]
-select = [
-    "E",  # pycodestyle
-    "F",  # pyflakes
-    "I",  # isort
-]
-exclude = [
-    'examples/whisper/whisper.cpp',
-    'livekit/_proto',
-]
-
 [tool.cibuildwheel]
-build = "cp39-*"
+build = "cp37-*"
 
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-i686-image = "manylinux_2_28"
