@@ -27,7 +27,9 @@ jobs:
             archs: AMD64 # ignore windows arm64 for now
           - os: macos-latest
             archs: x86_64 arm64
-
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -40,13 +42,11 @@ jobs:
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
-        working-directory: ${{ env.PACKAGE_DIR }}
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: rtc-release
           path: dist/*.whl
@@ -54,17 +54,18 @@ jobs:
   make_sdist:
     name: Make rtc sdist
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
 
       - name: Build SDist
-        working-directory: ${{ env.PACKAGE_DIR }}
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: rtc-release
           path: dist/*.tar.gz

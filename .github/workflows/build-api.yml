@@ -14,6 +14,9 @@ jobs:
   build_wheels:
     name: Build api wheel
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,17 +26,14 @@ jobs:
 
       - name: Build wheel
         run: python3 -m build --wheel
-        working-directory: ${{ env.PACKAGE_DIR }}
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
       - name: Build SDist
-        working-directory: ${{ env.PACKAGE_DIR }}
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v3
-        working-directory: ${{ env.PACKAGE_DIR }}
         with:
           name: api-release
           path: |
