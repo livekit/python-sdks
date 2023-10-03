@@ -89,7 +89,6 @@ setuptools.setup(
     license="Apache-2.0",
     packages=["livekit"],
     python_requires=">=3.7.0",
-    setup_requires=["wheel", "requests"],
     install_requires=["pyee>=11.0.0",
                       "protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
