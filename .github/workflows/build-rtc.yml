@@ -3,13 +3,16 @@ name: Build
 on:
   push:
     branches: ["main"]
-    tags: ["v*"]
+    tags: ["rtc-v*"]
   pull_request:
   workflow_dispatch:
 
+env:
+  working-directory: ./livekit-rtc
+
 jobs:
   build_wheels:
-    name: Build wheels (${{ matrix.archs }})
+    name: Build rtc wheels (${{ matrix.archs }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -37,17 +40,19 @@ jobs:
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
+        working-directory: ${{ env.working-directory }}
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
       - uses: actions/upload-artifact@v3
+        working-directory: ${{ env.working-directory }}
         with:
-          name: release
+          name: rtc-release
           path: dist/*.whl
 
   make_sdist:
-    name: Make SDist
+    name: Make rtc sdist
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,25 +60,26 @@ jobs:
           submodules: true
 
       - name: Build SDist
+        working-directory: ${{ env.working-directory }}
         run: pipx run build --sdist
 
       - uses: actions/upload-artifact@v3
+        working-directory: ${{ env.working-directory }}
         with:
-          name: release
+          name: rtc-release
           path: dist/*.tar.gz
 
   publish:
-    name: Publish
+    name: Publish rtc release
     needs: [build_wheels, make_sdist]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-    # only execute on tag push v1 or workflow_dispatch
-    if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/rtc-v')
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: release
+          name: rtc-release
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1
