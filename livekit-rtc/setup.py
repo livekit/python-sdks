@@ -52,15 +52,6 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
         subprocess.run(cmd, check=True)
         setuptools.command.build_py.build_py.run(self)
 
-
-if platform.system() == "Linux":
-    libname = "liblivekit_ffi.so"
-elif platform.system() == "Darwin":
-    libname = "liblivekit_ffi.dylib"
-elif platform.system() == "Windows":
-    libname = "livekit_ffi.dll"
-
-
 setuptools.setup(
     name="livekit",
     version=about['__version__'],
@@ -87,14 +78,14 @@ setuptools.setup(
     ],
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
-    packages=find_packages(),
+    packages=['livekit.rtc'],
     namespace_packages=['livekit'],
     python_requires=">=3.7.0",
     install_requires=["pyee>=11.0.0",
                       "protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
     package_data={
-        "livekit.rtc": [f'livekit/rtc/resources/{libname}', '_proto/*.py'],
+        "livekit.rtc": ['resources/*', '_proto/*.py'],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
