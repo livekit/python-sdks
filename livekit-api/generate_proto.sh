@@ -16,25 +16,24 @@
 
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
 
-FFI_PROTOCOL=./rust-sdks/livekit-ffi/protocol
-OUT_PYTHON=./livekit/_proto
+API_PROTOCOL=./protocol
+API_OUT_PYTHON=./livekit/api/_proto
+ 
+# api
 
 protoc \
-    -I=$FFI_PROTOCOL \
-    --python_out=$OUT_PYTHON \
-    --mypy_out=$OUT_PYTHON \
-    $FFI_PROTOCOL/audio_frame.proto \
-    $FFI_PROTOCOL/ffi.proto \
-    $FFI_PROTOCOL/handle.proto \
-    $FFI_PROTOCOL/participant.proto \
-    $FFI_PROTOCOL/room.proto \
-    $FFI_PROTOCOL/track.proto \
-    $FFI_PROTOCOL/video_frame.proto \
-    $FFI_PROTOCOL/e2ee.proto
+    -I=$API_PROTOCOL \
+    --python_out=$API_OUT_PYTHON \
+    --mypy_out=$API_OUT_PYTHON \
+    $API_PROTOCOL/livekit_egress.proto \
+    $API_PROTOCOL/livekit_room.proto \
+    $API_PROTOCOL/livekit_webhook.proto \
+    $API_PROTOCOL/livekit_ingress.proto \
+    $API_PROTOCOL/livekit_models.proto
 
-touch -a "$OUT_PYTHON/__init__.py"
 
-for f in "$OUT_PYTHON"/*.py "$OUT_PYTHON"/*.pyi; do
-    perl -i -pe 's|^(import (audio_frame_pb2\|ffi_pb2\|handle_pb2\|participant_pb2\|room_pb2\|track_pb2\|video_frame_pb2\|e2ee_pb2))|from . $1|g' "$f"
+touch -a "$API_OUT_PYTHON/__init__.py"
+
+for f in "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi; do
+    perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2))|from . $1|g' "$f"
 done
-

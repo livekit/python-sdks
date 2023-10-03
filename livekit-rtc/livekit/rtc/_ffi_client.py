@@ -43,7 +43,7 @@ def get_ffi_lib_path():
                 Set LIVEKIT_LIB_PATH to specify a the lib path")
 
     libpath = pkg_resources.resource_filename(
-        'livekit', os.path.join('resources', libname))
+        'livekit.rtc', os.path.join('resources', libname))
     return libpath
 
 

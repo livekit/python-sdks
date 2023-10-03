@@ -3,17 +3,16 @@ import logging
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-
-import livekit
+from livekit import rtc
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 # ("livekitrocks") this is our shared key, it must match the one used by your clients
-SHARED_KEY = b"livekitrocks"
+SHARED_KEY = b"liveitrocks"
 
 
-async def draw_cube(source: livekit.VideoSource):
+async def draw_cube(source: rtc.VideoSource):
     W, H, MID_W, MID_H = 1280, 720, 640, 360
     cube_size = 60
     vertices = (np.array([[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
@@ -21,7 +20,7 @@ async def draw_cube(source: livekit.VideoSource):
     edges = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6],
              [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]]
 
-    frame = livekit.ArgbFrame(livekit.VideoFormatType.FORMAT_ARGB, W, H)
+    frame = rtc.ArgbFrame(livekit.VideoFormatType.FORMAT_ARGB, W, H)
     arr = np.ctypeslib.as_array(frame.data)
     angle = 0
 
@@ -48,8 +47,8 @@ async def draw_cube(source: livekit.VideoSource):
                             idx = (y + dy) * W * 4 + (x + dx) * 4
                             arr[idx:idx+4] = [255, 255, 255, 255]
 
-        f = livekit.VideoFrame(
-            0, livekit.VideoRotation.VIDEO_ROTATION_0, frame.to_i420())
+        f = rtc.VideoFrame(
+            0, rtc.VideoRotation.VIDEO_ROTATION_0, frame.to_i420())
         source.capture_frame(f)
         angle += 0.02
 
@@ -57,32 +56,32 @@ async def draw_cube(source: livekit.VideoSource):
         await asyncio.sleep(1 / 30 - code_duration)
 
 
-async def main(room: livekit.Room):
+async def main(room: rtc.Room):
     @room.listens_to("e2ee_state_changed")
-    def on_e2ee_state_changed(participant: livekit.Participant,
-                              state: livekit.EncryptionState) -> None:
+    def on_e2ee_state_changed(participant: rtc.Participant,
+                              state: rtc.EncryptionState) -> None:
         logging.info("e2ee state changed: %s %s", participant.identity, state)
 
     logging.info("connecting to %s", URL)
     try:
-        e2ee_options = livekit.E2EEOptions()
+        e2ee_options = rtc.E2EEOptions()
         e2ee_options.key_provider_options.shared_key = SHARED_KEY
 
-        await room.connect(URL, TOKEN, options=livekit.RoomOptions(
+        await room.connect(URL, TOKEN, options=rtc.RoomOptions(
             auto_subscribe=True,
             e2ee=e2ee_options
         ))
 
         logging.info("connected to room %s", room.name)
-    except livekit.ConnectError as e:
+    except rtc.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
         return False
 
     # publish a track
-    source = livekit.VideoSource()
-    track = livekit.LocalVideoTrack.create_video_track("cube", source)
-    options = livekit.TrackPublishOptions()
-    options.source = livekit.TrackSource.SOURCE_CAMERA
+    source = rtc.VideoSource()
+    track = rtc.LocalVideoTrack.create_video_track("cube", source)
+    options = rtc.TrackPublishOptions()
+    options.source = rtc.TrackSource.SOURCE_CAMERA
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
@@ -94,7 +93,7 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    room = livekit.Room(loop=loop)
+    room = rtc.Room(loop=loop)
 
     async def cleanup():
         await room.disconnect()

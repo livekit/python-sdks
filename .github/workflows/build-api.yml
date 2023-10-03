@@ -1,0 +1,63 @@
+name: Build API
+
+on:
+  push:
+    paths:
+      - livekit-api/**
+  pull_request:
+    paths:
+      - livekit-api/**
+  workflow_dispatch:
+
+env:
+  PACKAGE_DIR: ./livekit-api
+
+jobs:
+  build_wheels:
+    name: Build API wheel/sdist
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+
+      - name: Build wheel
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel
+        env:
+          CIBW_ARCHS: ${{ matrix.archs }}
+          CIBW_SKIP: "*-musllinux_*"
+
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: api-release
+          path: |
+            livekit-api/dist/*.whl
+            livekit-api/dist/*.tar.gz
+
+  publish:
+    name: Publish API release
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    if: startsWith(github.ref, 'refs/tags/api-v')
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: api-release
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+ 

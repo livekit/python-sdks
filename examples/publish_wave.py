@@ -4,8 +4,7 @@ import logging
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-
-import livekit
+from livekit import rtc
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
@@ -13,12 +12,12 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 SAMPLE_RATE = 48000
 NUM_CHANNELS = 1
 
-async def publish_frames(source: livekit.AudioSource, frequency: int):
+async def publish_frames(source: rtc.AudioSource, frequency: int):
     amplitude = 32767  # for 16-bit audio
     samples_per_channel = 480  # 10ms at 48kHz
     time = np.arange(samples_per_channel) / SAMPLE_RATE
     total_samples = 0
-    audio_frame = livekit.AudioFrame.create(
+    audio_frame = rtc.AudioFrame.create(
         SAMPLE_RATE, NUM_CHANNELS, samples_per_channel)
     audio_data = np.ctypeslib.as_array(audio_frame.data)
     while True:
@@ -29,29 +28,27 @@ async def publish_frames(source: livekit.AudioSource, frequency: int):
         await source.capture_frame(audio_frame)
         total_samples += samples_per_channel
 
-async def main(room: livekit.Room) -> None:
+async def main(room: rtc.Room) -> None:
 
     @room.on("participant_disconnected")
-    def on_participant_disconnect(participant: livekit.Participant, *_):
+    def on_participant_disconnect(participant: rtc.Participant, *_):
         logging.info("participant disconnected: %s", participant.identity)
 
     logging.info("connecting to %s", URL)
     try:
-        e2ee_options = livekit.E2EEOptions()
-
-        await room.connect(URL, TOKEN, options=livekit.RoomOptions(
+        await room.connect(URL, TOKEN, options=rtc.RoomOptions(
             auto_subscribe=True,
         ))
         logging.info("connected to room %s", room.name)
-    except livekit.ConnectError as e:
+    except rtc.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
         return
 
     # publish a track
-    source = livekit.AudioSource(SAMPLE_RATE, NUM_CHANNELS)
-    track = livekit.LocalAudioTrack.create_audio_track("sinewave", source)
-    options = livekit.TrackPublishOptions()
-    options.source = livekit.TrackSource.SOURCE_MICROPHONE
+    source = rtc.AudioSource(SAMPLE_RATE, NUM_CHANNELS)
+    track = rtc.LocalAudioTrack.create_audio_track("sinewave", source)
+    options = rtc.TrackPublishOptions()
+    options.source = rtc.TrackSource.SOURCE_MICROPHONE
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
@@ -64,7 +61,7 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    room = livekit.Room(loop=loop)
+    room = rtc.Room(loop=loop)
 
     async def cleanup():
         await room.disconnect()

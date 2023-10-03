@@ -14,11 +14,10 @@
 
 from typing import Optional
 
-from livekit._proto import track_pb2 as proto_track
-
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
+from ._proto import track_pb2 as proto_track
 from .track import Track
 
 
