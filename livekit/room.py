@@ -314,6 +314,7 @@ class Room(EventEmitter):
             
             data = bytearray(native_data)
             FfiHandle(owned_buffer_info.handle.id)
+            rparticipant = None
             if event.data_received.participant_sid:
                 rparticipant = self.participants[event.data_received.participant_sid]
             self.emit('data_received', data,
