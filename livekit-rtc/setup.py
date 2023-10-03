@@ -49,7 +49,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
                 and "arm64" in os.environ.get("ARCHFLAGS", ""):
             cmd += ['--arch', 'arm64']
 
-        subprocess.run(cmd, capture_output=True, check=True)
+        subprocess.run(cmd, check=True)
         setuptools.command.build_py.build_py.run(self)
 
 
