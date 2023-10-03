@@ -4,16 +4,15 @@ import logging
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-
-import livekit
+import livekit.rtc as rtc
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
 
 
-async def draw_color_cycle(source: livekit.VideoSource):
-    argb_frame = livekit.ArgbFrame(
-        livekit.VideoFormatType.FORMAT_ARGB, 1280, 720)
+async def draw_color_cycle(source: rtc.VideoSource):
+    argb_frame = rtc.ArgbFrame(
+        rtc.VideoFormatType.FORMAT_ARGB, 1280, 720)
 
     arr = np.ctypeslib.as_array(argb_frame.data)
 
@@ -32,8 +31,8 @@ async def draw_color_cycle(source: livekit.VideoSource):
         arr.flat[2::4] = argb_color[2]
         arr.flat[3::4] = argb_color[3]
 
-        frame = livekit.VideoFrame(
-            0, livekit.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
+        frame = rtc.VideoFrame(
+            0, rtc.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
         source.capture_frame(frame)
         hue = (hue + framerate / 3) % 1.0
 
@@ -41,20 +40,20 @@ async def draw_color_cycle(source: livekit.VideoSource):
         await asyncio.sleep(1 / 30 - code_duration)
 
 
-async def main(room: livekit.Room):
+async def main(room: rtc.Room):
     logging.info("connecting to %s", URL)
     try:
         await room.connect(URL, TOKEN)
         logging.info("connected to room %s", room.name)
-    except livekit.ConnectError as e:
+    except rtc.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
         return
 
     # publish a track
-    source = livekit.VideoSource()
-    track = livekit.LocalVideoTrack.create_video_track("hue", source)
-    options = livekit.TrackPublishOptions()
-    options.source = livekit.TrackSource.SOURCE_CAMERA
+    source = rtc.VideoSource()
+    track = rtc.LocalVideoTrack.create_video_track("hue", source)
+    options = rtc.TrackPublishOptions()
+    options.source = rtc.TrackSource.SOURCE_CAMERA
     publication = await room.local_participant.publish_track(track, options)
     logging.info("published track %s", publication.sid)
 
@@ -67,7 +66,7 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    room = livekit.Room(loop=loop)
+    room = rtc.Room(loop=loop)
 
     async def cleanup():
         await room.disconnect()

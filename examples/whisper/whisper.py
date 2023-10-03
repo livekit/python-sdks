@@ -6,8 +6,7 @@ import platform
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-
-import livekit
+import livekit.rtc as rtc
 
 os = platform.system().lower()
 if os == "windows":
@@ -99,7 +98,7 @@ whisper.whisper_full_get_segment_text.restype = ctypes.c_char_p
 ctx = whisper.whisper_init_from_file(fname_model.encode('utf-8'))
 
 
-async def whisper_task(stream: livekit.AudioStream):
+async def whisper_task(stream: rtc.AudioStream):
     data_30_secs = np.zeros(SAMPLES_30_SECS, dtype=np.float32)
     written_samples = 0  # nb. of samples written to data_30_secs for the cur. inference
 
@@ -150,34 +149,34 @@ async def whisper_task(stream: livekit.AudioStream):
             written_samples = 0
 
 
-async def main(room: livekit.Room):
+async def main(room: rtc.Room):
     @room.listens_to("track_published")
-    def on_track_published(publication: livekit.RemoteTrackPublication,
-                           participant: livekit.RemoteParticipant):
+    def on_track_published(publication: rtc.RemoteTrackPublication,
+                           participant: rtc.RemoteParticipant):
         # Only subscribe to the audio tracks coming from the microphone
-        if publication.kind == livekit.TrackKind.KIND_AUDIO \
-                and publication.source == livekit.TrackSource.SOURCE_MICROPHONE:
+        if publication.kind == rtc.TrackKind.KIND_AUDIO \
+                and publication.source == rtc.TrackSource.SOURCE_MICROPHONE:
             logging.info("track published: %s from participant %s (%s), subscribing...",
                          publication.sid, participant.sid, participant.identity)
 
             publication.set_subscribed(True)
 
     @room.listens_to("track_subscribed")
-    def on_track_subscribed(track: livekit.Track,
-                            publication: livekit.RemoteTrackPublication,
-                            participant: livekit.RemoteParticipant):
+    def on_track_subscribed(track: rtc.Track,
+                            publication: rtc.RemoteTrackPublication,
+                            participant: rtc.RemoteParticipant):
         logging.info("starting listening to: %s", participant.identity)
-        audio_stream = livekit.AudioStream(track)
+        audio_stream = rtc.AudioStream(track)
         asyncio.create_task(whisper_task(audio_stream))
 
-    await room.connect(URL, TOKEN, livekit.RoomOptions(auto_subscribe=False))
+    await room.connect(URL, TOKEN, rtc.RoomOptions(auto_subscribe=False))
     logging.info("connected to room %s", room.name)
 
     # check if there are already published audio tracks
     for participant in room.participants.values():
         for track in participant.tracks.values():
-            if track.kind == livekit.TrackKind.KIND_AUDIO \
-                    and track.source == livekit.TrackSource.SOURCE_MICROPHONE:
+            if track.kind == rtc.TrackKind.KIND_AUDIO \
+                    and track.source == rtc.TrackSource.SOURCE_MICROPHONE:
                 track.set_subscribed(True)
 
 
@@ -187,7 +186,7 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    room = livekit.Room(loop=loop)
+    room = rtc.Room(loop=loop)
 
     async def cleanup():
         await room.disconnect()

@@ -9,7 +9,7 @@ import numpy as np
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
-import livekit
+import livekit.rtc as rtc
 
 URL = 'ws://localhost:7880'
 TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
@@ -69,18 +69,18 @@ def draw_landmarks_on_image(rgb_image, detection_result):
             .get_default_face_mesh_iris_connections_style())
 
 
-async def frame_loop(video_stream: livekit.VideoStream) -> None:
+async def frame_loop(video_stream: rtc.VideoStream) -> None:
     landmarker = FaceLandmarker.create_from_options(options)
     argb_frame = None
-    cv2.namedWindow('livekit_video', cv2.WINDOW_AUTOSIZE)
+    cv2.namedWindow('rtc_video', cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
     async for frame in video_stream:
         buffer = frame.buffer
 
         if argb_frame is None or argb_frame.width != buffer.width \
                 or argb_frame.height != buffer.height:
-            argb_frame = livekit.ArgbFrame(
-                livekit.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
+            argb_frame = rtc.ArgbFrame(
+                rtc.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
 
         buffer.to_argb(argb_frame)
 
@@ -98,7 +98,7 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
 
         arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
 
-        cv2.imshow('livekit_video', arr)
+        cv2.imshow('rtc_video', arr)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -106,19 +106,19 @@ async def frame_loop(video_stream: livekit.VideoStream) -> None:
     cv2.destroyAllWindows()
 
 
-async def main(room: livekit.Room) -> None:
+async def main(room: rtc.Room) -> None:
     video_stream = None
 
     @room.on("track_subscribed")
-    def on_track_subscribed(track: livekit.Track, *_):
-        if track.kind == livekit.TrackKind.KIND_VIDEO:
+    def on_track_subscribed(track: rtc.Track, *_):
+        if track.kind == rtc.TrackKind.KIND_VIDEO:
             nonlocal video_stream
             if video_stream is not None:
                 # only process the first stream received
                 return
 
             print("subscribed to track: " + track.name)
-            video_stream = livekit.VideoStream(track)
+            video_stream = rtc.VideoStream(track)
             task = asyncio.create_task(frame_loop(video_stream))
             tasks.add(task)
             task.add_done_callback(tasks.remove)
@@ -133,7 +133,7 @@ if __name__ == "__main__":
                         logging.StreamHandler()])
 
     loop = asyncio.get_event_loop()
-    room = livekit.Room(loop=loop)
+    room = rtc.Room(loop=loop)
 
     async def cleanup():
         await room.disconnect()

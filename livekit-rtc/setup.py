@@ -93,7 +93,7 @@ setuptools.setup(
                       "protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
     package_data={
-        "livekit": [f'resources/{libname}', '_proto/*.py'],
+        "livekit.rtc": [f'resources/{libname}', '_proto/*.py'],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
