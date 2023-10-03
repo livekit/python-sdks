@@ -43,6 +43,15 @@ jobs:
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
         env:
+          CIBW_BUILD: cp37-*
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_I686_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_PPC64LE_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_S390X_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_PYPY_X86_64_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_PYPY_I686_IMAGE: manylinux_2_28
+          CIBW_MANYLINUX_PYPY_AARCH64_IMAGE: manylinux_2_28
           CIBW_ARCHS: ${{ matrix.archs }}
           CIBW_SKIP: "*-musllinux_*"
 
