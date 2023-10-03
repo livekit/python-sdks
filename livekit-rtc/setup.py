@@ -41,7 +41,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 
         download_script = here / 'rust-sdks' / 'download_ffi.py'
         output = here / 'livekit' / 'rtc' / 'resources'
-        cmd = ['python3', download_script.absolute(), '--output', output.absolute()]
+        cmd = ['python3', str(download_script.absolute()), '--output', str(output.absolute())]
 
         # cibuildwheel is crosscompiling to arm64 on macos, make sure we download the
         # right binary (kind of a hack here...)
@@ -49,7 +49,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
                 and "arm64" in os.environ.get("ARCHFLAGS", ""):
             cmd += ['--arch', 'arm64']
 
-        subprocess.run(cmd, check=True, shell=True)
+        subprocess.run(cmd, check=True)
         setuptools.command.build_py.build_py.run(self)
 
 setuptools.setup(
