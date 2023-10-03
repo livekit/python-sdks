@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LiveKit Server SDK
+"""LiveKit API SDK
 """
 
+# flake8: noqa
 from .version import __version__
+from .access_token import VideoGrants, AccessToken
+from .room_service import RoomService

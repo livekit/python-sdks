@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LiveKit Client SDK
+"""LiveKit RTC SDK
 """
 
 # flake8: noqa
