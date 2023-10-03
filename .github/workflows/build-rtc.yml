@@ -2,9 +2,11 @@ name: Build RTC
 
 on:
   push:
-    branches: ["main"]
-    tags: ["rtc-v*"]
+    paths:
+      - livekit-rtc/**
   pull_request:
+    paths:
+      - livekit-rtc/**
   workflow_dispatch:
 
 env:
