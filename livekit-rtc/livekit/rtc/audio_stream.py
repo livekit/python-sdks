@@ -59,7 +59,7 @@ class AudioStream:
             elif audio_event.HasField('eos'):
                 break
 
-    async def close(self):
+    async def aclose(self):
         ffi_client.queue.unsubscribe(self._ffi_queue)
         del self._ffi_handle
         await self._task

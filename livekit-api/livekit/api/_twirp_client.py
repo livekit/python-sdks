@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Optional, Type, TypeVar
+from typing import Dict, Type, TypeVar
 
 import aiohttp
 from google.protobuf.message import Message
@@ -47,7 +47,7 @@ class TwirpErrorCode:
     DATA_LOSS = "dataloss"
 
 
-T = TypeVar('T', bound=Message, type=None)
+T = TypeVar('T', bound=Message)
 
 
 class TwirpClient:
@@ -63,7 +63,7 @@ class TwirpClient:
         method: str,
         data: Message,
         headers: Dict[str, str],
-        response_class: Type[T] = None
+        response_class: Type[T],
     ) -> T:
         url = f"{self.host}/{self.prefix}/{self.pkg}.{service}/{method}"
         headers["Content-Type"] = "application/protobuf"
@@ -79,5 +79,5 @@ class TwirpClient:
                 error_data = await resp.json()
                 raise TwirpError(error_data["code"], error_data["msg"])
 
-    async def close(self):
+    async def aclose(self):
         await self.session.close()

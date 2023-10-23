@@ -41,7 +41,7 @@ class VideoGrants:
     # TrackSource types that a participant may publish.
     # When set, it supercedes CanPublish. Only sources explicitly set here can be
     # published
-    can_publish_sources: list[str] = []  # keys keep track of each source
+    can_publish_sources: list[str] = dataclasses.field(default_factory=list)
 
     # by default, a participant is not allowed to update its own metadata
     can_update_own_metadata: bool = False
@@ -99,14 +99,27 @@ class AccessToken:
         return self
 
     def to_jwt(self) -> str:
-        claims = {
+
+        def camel_case_dict(data) -> dict:
+            return {
+                "".join(
+                    word if i == 0 else word.title() for i, word in enumerate(key.split("_"))
+                ): value
+                for key, value in data
+                if value is not None
+            }
+
+        claims = dataclasses.asdict(self.claims)
+        claims.update({
             'sub': self.identity,
             "iss": self.api_key,
             "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
             "exp": calendar.timegm(
                 (datetime.datetime.utcnow() + self.ttl).utctimetuple()
             ),
-        }
+            "video":  dataclasses.asdict(
+                self.claims.video, dict_factory=camel_case_dict
+            ),
+        })
 
-        claims.update(dataclasses.asdict(self.claims))
         return jwt.encode(claims, self.api_secret, algorithm='HS256')

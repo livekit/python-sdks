@@ -53,13 +53,13 @@ class RoomService(Service):
         return await self._client.request(SVC, "GetParticipant", get,
                                           self._auth_header(
                                               VideoGrants(room_admin=True,
-                                                          jroom=get.room)),
+                                                          room=get.room)),
                                           proto_models.ParticipantInfo)
 
     async def remove_participant(self, remove: proto_room.RoomParticipantIdentity) \
-            -> None:
+            -> proto_room.RemoveParticipantResponse:
         return await self._client.request(SVC, "remove_participant", remove,
                                           self._auth_header(
                                               VideoGrants(room_admin=True,
                                                           room=remove.room)),
-                                          None)
+                                          proto_room.RemoveParticipantResponse)
