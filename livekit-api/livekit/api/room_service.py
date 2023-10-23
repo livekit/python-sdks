@@ -1,4 +1,3 @@
-
 from ._proto import livekit_models_pb2 as proto_models
 from ._proto import livekit_room_pb2 as proto_room
 from ._service import Service

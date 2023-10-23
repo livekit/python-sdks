@@ -1,13 +1,12 @@
-
 from typing import Dict
-
+from abc import ABC
 from ._twirp_client import TwirpClient
 from .access_token import AccessToken, VideoGrants
 
 AUTHORIZATION = "authorization"
 
 
-class Service:
+class Service(ABC):
     def __init__(self, host: str, api_key: str, api_secret: str):
         self._client = TwirpClient(host, "livekit")
         self.api_key = api_key
@@ -20,3 +19,6 @@ class Service:
         headers = {}
         headers[AUTHORIZATION] = "Bearer {}".format(token)
         return headers
+
+    async def aclose(self):
+        await self._client.aclose()
