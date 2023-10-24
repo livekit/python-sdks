@@ -16,10 +16,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
-
-from pyee.asyncio import EventEmitter
-
+from typing import Dict, Optional, Literal
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
@@ -27,10 +24,17 @@ from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
 from ._utils import BroadcastQueue
+from ._event_emitter import EventEmitter
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
+from .participant import RemoteParticipant, Participant
+
+EventTypes = Literal['participant_connected', 'participant_disconnected', 'local_track_published', 'local_track_unpublished', 'track_published', 'track_unpublished',
+                     'track_subscribed', 'track_unsubscribed', 'track_subscription_failed', 'track_muted', 'track_unmuted', 'active_speakers_changed', 'room_metadata_changed',
+                     'participant_metadata_changed', 'participant_name_changed', 'connection_quality_changed', 'data_received', 'e2ee_state_changed', 'connection_state_changed',
+                     'connected', 'disconnected', 'reconnecting', 'reconnected']
 
 
 @dataclass
@@ -55,7 +59,7 @@ class ConnectError(Exception):
         self.message = message
 
 
-class Room(EventEmitter):
+class Room(EventEmitter[EventTypes]):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
         super().__init__()
 
@@ -64,7 +68,7 @@ class Room(EventEmitter):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
-        self.participants: dict[str, RemoteParticipant] = {}
+        self.participants: Dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
     def __del__(self) -> None:
@@ -126,8 +130,8 @@ class Room(EventEmitter):
         # subscribe before connecting so we don't miss any events
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.connect.async_id ==
                                       resp.connect.async_id)
@@ -167,8 +171,8 @@ class Room(EventEmitter):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             await queue.wait_for(lambda e: e.disconnect.async_id ==
                                  resp.disconnect.async_id)
@@ -311,8 +315,8 @@ class Room(EventEmitter):
             native_data = ctypes.cast(buffer_info.data_ptr,
                                       ctypes.POINTER(ctypes.c_byte
                                                      * buffer_info.data_len)).contents
-            
-            data = bytearray(native_data)
+
+            data = bytes(native_data)
             FfiHandle(owned_buffer_info.handle.id)
             rparticipant = None
             if event.data_received.participant_sid:

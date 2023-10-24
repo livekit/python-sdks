@@ -14,7 +14,6 @@
 
 import os
 import pathlib
-import platform
 import subprocess
 
 import setuptools
@@ -41,7 +40,8 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 
         download_script = here / 'rust-sdks' / 'download_ffi.py'
         output = here / 'livekit' / 'rtc' / 'resources'
-        cmd = ['python3', str(download_script.absolute()), '--output', str(output.absolute())]
+        cmd = ['python3', str(download_script.absolute()),
+               '--output', str(output.absolute())]
 
         # cibuildwheel is crosscompiling to arm64 on macos, make sure we download the
         # right binary (kind of a hack here...)
@@ -51,6 +51,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 
         subprocess.run(cmd, check=True)
         setuptools.command.build_py.build_py.run(self)
+
 
 setuptools.setup(
     name="livekit",
@@ -70,8 +71,6 @@ setuptools.setup(
         "Topic :: Multimedia :: Video",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
@@ -79,9 +78,8 @@ setuptools.setup(
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
     packages=setuptools.find_namespace_packages(include=['livekit.*']),
-    python_requires=">=3.7.0",
-    install_requires=["pyee>=11.0.0",
-                      "protobuf>=3.1.0",
+    python_requires=">=3.9.0",
+    install_requires=["protobuf>=3.1.0",
                       "types-protobuf>=3.1.0"],
     package_data={
         "livekit.rtc": ['resources/*', '_proto/*.py'],
