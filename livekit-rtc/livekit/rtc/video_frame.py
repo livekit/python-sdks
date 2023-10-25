@@ -296,6 +296,12 @@ class I420ABuffer(PlanarYuv8Buffer):
                  stride_u: int,
                  stride_v: int,
                  stride_a: int) -> None:
+
+        if len(data) < I420ABuffer.calc_data_size(height, stride_y, stride_u, stride_v, stride_a):
+            raise ValueError(
+                'buffer too small for I420A data. Expected {} bytes, got {}.'.format(
+                    I420ABuffer.calc_data_size(height, stride_y, stride_u, stride_v, stride_a), len(data)))
+
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
         super().__init__(data, width, height, VideoFrameBufferType.I420A,
@@ -329,6 +335,12 @@ class I422Buffer(PlanarYuv8Buffer):
                  stride_y: int,
                  stride_u: int,
                  stride_v: int) -> None:
+
+        if len(data) < I422Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
+            raise ValueError(
+                'buffer too small for I422 data. Expected {} bytes, got {}.'.format(
+                    I422Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+
         chroma_width = (width + 1) // 2
         chroma_height = height
         super().__init__(data, width, height, VideoFrameBufferType.I422,
@@ -339,7 +351,6 @@ class I422Buffer(PlanarYuv8Buffer):
         return stride_y * height + stride_u * height + stride_v * height
 
 
-
 class I444Buffer(PlanarYuv8Buffer):
     def __init__(self,
                  data: bytearray,
@@ -348,6 +359,12 @@ class I444Buffer(PlanarYuv8Buffer):
                  stride_y: int,
                  stride_u: int,
                  stride_v: int) -> None:
+
+        if len(data) < I444Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
+            raise ValueError(
+                'buffer too small for I444 data. Expected {} bytes, got {}.'.format(
+                    I444Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+
         chroma_width = width
         chroma_height = height
         super().__init__(data, width, height, VideoFrameBufferType.I444,
@@ -365,6 +382,12 @@ class I010Buffer(PlanarYuv16Buffer):
                  stride_y: int,
                  stride_u: int,
                  stride_v: int) -> None:
+
+        if len(data) < I010Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
+            raise ValueError(
+                'buffer too small for I010 data. Expected {} bytes, got {}.'.format(
+                    I010Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
         super().__init__(data, width, height, VideoFrameBufferType.I010,
@@ -375,13 +398,18 @@ class I010Buffer(PlanarYuv16Buffer):
         return stride_y * height * 2 + stride_u * ((height + 1) // 2) * 2 + stride_v * ((height + 1) // 2) * 2
 
 
-
 class NV12Buffer(BiplanaraYuv8Buffer):
     def __init__(self, data: bytearray,
                  width: int,
                  height: int,
                  stride_y: int,
                  stride_uv: int) -> None:
+
+        if len(data) < NV12Buffer.calc_data_size(height, stride_y, stride_uv):
+            raise ValueError(
+                'buffer too small for NV12 data. Expected {} bytes, got {}.'.format(
+                    NV12Buffer.calc_data_size(height, stride_y, stride_uv), len(data)))
+
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
         super().__init__(data, width, height, VideoFrameBufferType.NV12,
@@ -390,7 +418,6 @@ class NV12Buffer(BiplanaraYuv8Buffer):
     @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_uv: int) -> int:
         return stride_y * height + stride_uv * ((height + 1) // 2)
-
 
 
 class ArgbFrame:
