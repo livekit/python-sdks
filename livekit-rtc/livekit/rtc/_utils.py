@@ -7,12 +7,7 @@ import numpy
 
 def get_address(data: bytearray) -> int:
     """ Get the address of a buffer using ctypes """
-
-    view = memoryview(data)
-    if not view.c_contiguous:
-        raise ValueError('data must be contiguous')
-
-    buffer = (ctypes.c_int8 * view.nbytes).from_buffer(view)
+    buffer = (ctypes.c_int8 * len(data)).from_buffer(data)
     return ctypes.addressof(buffer)
 
 

@@ -90,6 +90,7 @@ class VideoFrameBuffer:
             raise Exception('Unsupported VideoFrameBufferType')
 
 
+# TODO(theomonnom): Ability to get GPU texture directly
 class NativeVideoFrameBuffer(VideoFrameBuffer):
     def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
         super().__init__(owned_info)
