@@ -1,6 +1,20 @@
 import asyncio
 from collections import deque
+import ctypes
 from typing import Callable, Generic, List, TypeVar
+from typing_extensions import Buffer
+import numpy
+
+def get_address(data: bytearray) -> int:
+    """ Get the address of a buffer using ctypes """
+
+    view = memoryview(data)
+    if not view.c_contiguous:
+        raise ValueError('data must be contiguous')
+
+    buffer = (ctypes.c_int8 * view.nbytes).from_buffer(view)
+    return ctypes.addressof(buffer)
+
 
 T = TypeVar('T')
 
