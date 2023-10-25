@@ -54,7 +54,7 @@ class AudioStream:
 
             if audio_event.HasField('frame_received'):
                 owned_buffer_info = audio_event.frame_received.frame
-                frame = AudioFrame(owned_buffer_info)
+                frame = AudioFrame._from_owned_info(owned_buffer_info)
                 self._queue.put(frame)
             elif audio_event.HasField('eos'):
                 break

@@ -40,6 +40,14 @@ class AudioFrame:
         data = bytearray(size)
         return AudioFrame(data, sample_rate, num_channels, samples_per_channel)
 
+    @staticmethod
+    def _from_owned_info(owned_info: proto_audio.OwnedAudioFrameBuffer) -> 'AudioFrame':
+        info = owned_info.info
+        size = info.num_channels * info.samples_per_channel * ctypes.sizeof(ctypes.c_int16)
+        data = (ctypes.c_int16 * size).from_address(info.data_ptr)
+        FfiHandle(owned_info.handle.id)
+        return AudioFrame(bytearray(data), info.sample_rate, info.num_channels, info.samples_per_channel)
+
     def remix_and_resample(self, sample_rate: int, num_channels: int) -> 'AudioFrame':
         """ Resample the audio frame to the given sample rate and number of channels."""
 
@@ -58,12 +66,7 @@ class AudioFrame:
         resample_req.remix_and_resample.num_channels = num_channels
 
         resp = ffi_client.request(resample_req)
-        
-        size = num_channels * self.samples_per_channel * ctypes.sizeof(ctypes.c_int16)
-        data_ptr = resp.remix_and_resample.buffer.info.data_ptr
-        data = (ctypes.c_int16 * size).from_address(data_ptr)
-
-        return AudioFrame(bytearray(data), sample_rate, num_channels, self.samples_per_channel)
+        return AudioFrame._from_owned_info(resp.remix_and_resample.buffer)
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:
         audio_info = proto_audio.AudioFrameBufferInfo()
