@@ -132,7 +132,6 @@ class NativeVideoBuffer(VideoFrameBuffer):
         self.to_i420().to_argb(dst)
 
 
-
 class PlanarYuvBuffer(VideoFrameBuffer, ABC):
     def __init__(self,
                  data: bytearray,
@@ -153,12 +152,14 @@ class PlanarYuvBuffer(VideoFrameBuffer, ABC):
 
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         info = proto_video_frame.VideoFrameBufferInfo()
-        info.width = self._width
-        info.height = self._height
-        info.buffer_type = self._buffer_type
-        info.yuv.stride_y = self._stride_y
-        info.yuv.stride_u = self._stride_u
-        info.yuv.stride_v = self._stride_v
+        info.width = self.width
+        info.height = self.height
+        info.yuv.chroma_width = self.chroma_width
+        info.yuv.chroma_height = self.chroma_height
+        info.buffer_type = self.type
+        info.yuv.stride_y = self.stride_y
+        info.yuv.stride_u = self.stride_u
+        info.yuv.stride_v = self.stride_v
         return info
 
     @property
@@ -193,8 +194,8 @@ class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
                  stride_v: int,
                  chroma_width: int,
                  chroma_height: int) -> None:
-        super().__init__(data, width, height, buffer_type, stride_u,
-                         stride_y, stride_v, chroma_width, chroma_height)
+        super().__init__(data, width, height, buffer_type, stride_y,
+                         stride_u, stride_v, chroma_width, chroma_height)
 
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         info = super()._proto_info()
@@ -282,6 +283,8 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
         info = proto_video_frame.VideoFrameBufferInfo()
         info.width = self._width
         info.height = self._height
+        info.bi_yuv.chroma_width = self.chroma_width
+        info.bi_yuv.chroma_height = self.chroma_height
         info.buffer_type = self._buffer_type
         info.bi_yuv.stride_y = self._stride_y
         info.bi_yuv.stride_uv = self._stride_uv
@@ -575,8 +578,12 @@ class ArgbFrame:
         self._height = height
         self._stride = stride
 
+    @staticmethod
+    def create(format: VideoFormatType.ValueType, width: int, height: int) -> 'ArgbFrame':
+        data = bytearray(width * height * ctypes.sizeof(ctypes.c_uint32))
+        return ArgbFrame(data, format, width, height)
+
     def to_i420(self) -> I420Buffer:
-        # TODO(theomonnom): avoid unnecessary buffer allocation
         req = proto_ffi.FfiRequest()
         req.to_i420.argb.format = self.format
         req.to_i420.argb.width = self.width

@@ -3,6 +3,8 @@ import colorsys
 import logging
 from signal import SIGINT, SIGTERM
 
+import cv2
+
 import numpy as np
 from livekit import rtc
 
@@ -11,10 +13,9 @@ TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 
 
 async def draw_color_cycle(source: rtc.VideoSource):
-    argb_frame = rtc.ArgbFrame(
+    argb_frame = rtc.ArgbFrame.create(
         rtc.VideoFormatType.FORMAT_ARGB, 1280, 720)
-
-    arr = np.ctypeslib.as_array(argb_frame.data)
+    arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
 
     framerate = 1 / 30
     hue = 0.0
@@ -33,6 +34,7 @@ async def draw_color_cycle(source: rtc.VideoSource):
 
         frame = rtc.VideoFrame(
             0, rtc.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
+
         source.capture_frame(frame)
         hue = (hue + framerate / 3) % 1.0
 
