@@ -39,6 +39,10 @@ from .track import (
     RemoteAudioTrack,
     RemoteVideoTrack,
     Track,
+    LocalTrack,
+    RemoteTrack,
+    AudioTrack,
+    VideoTrack
 )
 from .e2ee import (
     E2EEManager,
