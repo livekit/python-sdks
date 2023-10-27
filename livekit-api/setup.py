@@ -19,14 +19,14 @@ import setuptools
 
 here = pathlib.Path(__file__).parent.resolve()
 about = {}
-with open(os.path.join(here, 'livekit', 'api', 'version.py'), 'r') as f:
+with open(os.path.join(here, "livekit", "api", "version.py"), "r") as f:
     exec(f.read(), about)
 
 
 setuptools.setup(
     name="livekit-api",
-    version=about['__version__'],
-    description="LiveKit Python Server for LiveKit",
+    version=about["__version__"],
+    description="Python Server SDK for LiveKit",
     long_description=(here / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
     url="https://github.com/livekit/client-sdk-python",
@@ -45,15 +45,20 @@ setuptools.setup(
     ],
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
-    packages=setuptools.find_namespace_packages(include=['livekit.*']),
+    packages=setuptools.find_namespace_packages(include=["livekit.*"]),
     python_requires=">=3.7.0",
-    install_requires=["pyjwt>=2.0.0",
-                      "aiohttp>=3.8.0",
-                      "protobuf>=3.1.0",
-                      "types-protobuf>=3.1.0"],
+    install_requires=[
+        "pyjwt>=2.0.0",
+        "aiohttp>=3.8.0",
+        "protobuf>=3.1.0",
+        "types-protobuf>=3.1.0",
+    ],
+    package_data={
+        "livekit.api": ["_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"],
+    },
     project_urls={
         "Documentation": "https://docs.livekit.io",
         "Website": "https://livekit.io/",
-        "Source": "https://github.com/livekit/client-sdk-python/",
+        "Source": "https://github.com/livekit/python-sdks/",
     },
 )

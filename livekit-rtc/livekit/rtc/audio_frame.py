@@ -20,13 +20,19 @@ from ._utils import get_address
 
 
 class AudioFrame:
-    def __init__(self, data: bytearray,
-                 sample_rate: int,
-                 num_channels: int,
-                 samples_per_channel: int) -> None:
-        if len(data) < num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16):
+    def __init__(
+        self,
+        data: bytearray,
+        sample_rate: int,
+        num_channels: int,
+        samples_per_channel: int,
+    ) -> None:
+        if len(data) < num_channels * samples_per_channel * ctypes.sizeof(
+            ctypes.c_int16
+        ):
             raise ValueError(
-                'data length must be >= num_channels * samples_per_channel * sizeof(int16)')
+                "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
+            )
 
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -34,31 +40,32 @@ class AudioFrame:
         self._data = data
 
     @staticmethod
-    def create(sample_rate: int, num_channels: int, samples_per_channel: int) -> 'AudioFrame':
-        size = num_channels * samples_per_channel * \
-            ctypes.sizeof(ctypes.c_int16)
+    def create(
+        sample_rate: int, num_channels: int, samples_per_channel: int
+    ) -> "AudioFrame":
+        size = num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16)
         data = bytearray(size)
         return AudioFrame(data, sample_rate, num_channels, samples_per_channel)
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_audio.OwnedAudioFrameBuffer) -> 'AudioFrame':
+    def _from_owned_info(owned_info: proto_audio.OwnedAudioFrameBuffer) -> "AudioFrame":
         info = owned_info.info
         size = info.num_channels * info.samples_per_channel
         cdata = (ctypes.c_int16 * size).from_address(info.data_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
-        return AudioFrame(data, info.sample_rate, info.num_channels, info.samples_per_channel)
+        return AudioFrame(
+            data, info.sample_rate, info.num_channels, info.samples_per_channel
+        )
 
-    def remix_and_resample(self, sample_rate: int, num_channels: int) -> 'AudioFrame':
-        """ Resample the audio frame to the given sample rate and number of channels."""
+    def remix_and_resample(self, sample_rate: int, num_channels: int) -> "AudioFrame":
+        """Resample the audio frame to the given sample rate and number of channels."""
 
         req = proto_ffi.FfiRequest()
-        req.new_audio_resampler.CopyFrom(
-            proto_audio.NewAudioResamplerRequest())
+        req.new_audio_resampler.CopyFrom(proto_audio.NewAudioResamplerRequest())
 
         resp = ffi_client.request(req)
-        resampler_handle = FfiHandle(
-            resp.new_audio_resampler.resampler.handle.id)
+        resampler_handle = FfiHandle(resp.new_audio_resampler.resampler.handle.id)
 
         resample_req = proto_ffi.FfiRequest()
         resample_req.remix_and_resample.resampler_handle = resampler_handle.handle
@@ -79,7 +86,7 @@ class AudioFrame:
 
     @property
     def data(self) -> memoryview:
-        return memoryview(self._data).cast('h')
+        return memoryview(self._data).cast("h")
 
     @property
     def sample_rate(self) -> int:

@@ -21,7 +21,7 @@ from ._proto import track_pb2 as proto_track
 from .track import Track
 
 
-class TrackPublication():
+class TrackPublication:
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):
         self._info = owned_info.info
         self.track: Optional[Track] = None

@@ -20,4 +20,3 @@ from ._proto import livekit_room_pb2 as proto_room
 from .version import __version__
 from .access_token import VideoGrants, AccessToken
 from .room_service import RoomService
-

@@ -6,13 +6,12 @@ from signal import SIGINT, SIGTERM
 import numpy as np
 from livekit import rtc
 
-URL = 'ws://localhost:7880'
-TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY'  # noqa
+URL = "ws://localhost:7880"
+TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
 
 
 async def draw_color_cycle(source: rtc.VideoSource):
-    argb_frame = rtc.ArgbFrame.create(
-        rtc.VideoFormatType.FORMAT_ARGB, 1280, 720)
+    argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, 1280, 720)
     arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
 
     framerate = 1 / 30
@@ -31,7 +30,8 @@ async def draw_color_cycle(source: rtc.VideoSource):
         arr.flat[3::4] = argb_color[3]
 
         frame = rtc.VideoFrame(
-            0, rtc.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420())
+            0, rtc.VideoRotation.VIDEO_ROTATION_0, argb_frame.to_i420()
+        )
 
         source.capture_frame(frame)
         hue = (hue + framerate / 3) % 1.0
@@ -61,9 +61,10 @@ async def main(room: rtc.Room):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, handlers=[
-                        logging.FileHandler("publish_hue.log"),
-                        logging.StreamHandler()])
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[logging.FileHandler("publish_hue.log"), logging.StreamHandler()],
+    )
 
     loop = asyncio.get_event_loop()
     room = rtc.Room(loop=loop)
@@ -74,8 +75,7 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(
-            signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()

@@ -34,8 +34,7 @@ class KeyProviderOptions:
 
 @dataclass
 class E2EEOptions:
-    key_provider_options: KeyProviderOptions = field(
-        default_factory=KeyProviderOptions)
+    key_provider_options: KeyProviderOptions = field(default_factory=KeyProviderOptions)
     encryption_type: proto_e2ee.EncryptionType.ValueType = proto_e2ee.EncryptionType.GCM
 
 
@@ -104,10 +103,9 @@ class KeyProvider:
 
 
 class FrameCryptor:
-    def __init__(self, room_handle: int,
-                 participant_identity: str,
-                 key_index: int,
-                 enabled: bool):
+    def __init__(
+        self, room_handle: int, participant_identity: str, key_index: int, enabled: bool
+    ):
         self._room_handle = room_handle
         self._enabled = enabled
         self._participant_identity = participant_identity
@@ -150,7 +148,8 @@ class E2EEManager:
 
         if options is not None:
             self._key_provider = KeyProvider(
-                self._room_handle, options.key_provider_options)
+                self._room_handle, options.key_provider_options
+            )
 
     @property
     def key_provider(self) -> Optional[KeyProvider]:
@@ -174,10 +173,12 @@ class E2EEManager:
         resp = ffi_client.request(req)
         frame_cryptors = []
         for frame_cryptor in resp.e2ee.manager_get_frame_cryptors.frame_cryptors:
-            frame_cryptors.append(FrameCryptor(
-                self._room_handle,
-                frame_cryptor.participant_identity,
-                frame_cryptor.key_index,
-                frame_cryptor.enabled
-            ))
+            frame_cryptors.append(
+                FrameCryptor(
+                    self._room_handle,
+                    frame_cryptor.participant_identity,
+                    frame_cryptor.key_index,
+                    frame_cryptor.enabled,
+                )
+            )
         return frame_cryptors

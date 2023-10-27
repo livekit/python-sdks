@@ -47,7 +47,7 @@ class TwirpErrorCode:
     DATA_LOSS = "dataloss"
 
 
-T = TypeVar('T', bound=Message)
+T = TypeVar("T", bound=Message)
 
 
 class TwirpClient:
@@ -69,9 +69,9 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        async with self.session.post(url,
-                                     headers=headers,
-                                     data=serialized_data) as resp:
+        async with self.session.post(
+            url, headers=headers, data=serialized_data
+        ) as resp:
             if resp.status == 200:
                 return response_class.FromString(await resp.read())
             else:

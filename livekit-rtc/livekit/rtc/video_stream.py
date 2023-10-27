@@ -24,9 +24,12 @@ from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream:
-    def __init__(self, track: Track,
-                 loop: Optional[asyncio.AbstractEventLoop] = None,
-                 capacity: int = 0) -> None:
+    def __init__(
+        self,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
@@ -51,14 +54,17 @@ class VideoStream:
             event = await self._ffi_queue.wait_for(self._is_event)
             video_event = event.video_stream_event
 
-            if video_event.HasField('frame_received'):
+            if video_event.HasField("frame_received"):
                 frame_info = video_event.frame_received.frame
                 owned_buffer_info = video_event.frame_received.buffer
 
-                frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
-                                   VideoFrameBuffer._from_owned_info(owned_buffer_info))
+                frame = VideoFrame(
+                    frame_info.timestamp_us,
+                    frame_info.rotation,
+                    VideoFrameBuffer._from_owned_info(owned_buffer_info),
+                )
                 self._queue.put(frame)
-            elif video_event.HasField('eos'):
+            elif video_event.HasField("eos"):
                 break
 
         ffi_client.queue.unsubscribe(self._ffi_queue)

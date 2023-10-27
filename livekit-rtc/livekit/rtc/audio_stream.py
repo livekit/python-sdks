@@ -24,9 +24,12 @@ from .track import Track
 
 
 class AudioStream:
-    def __init__(self, track: Track,
-                 loop: Optional[asyncio.AbstractEventLoop] = None,
-                 capacity: int = 0) -> None:
+    def __init__(
+        self,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
@@ -52,11 +55,11 @@ class AudioStream:
             event = await self._ffi_queue.wait_for(self._is_event)
             audio_event = event.audio_stream_event
 
-            if audio_event.HasField('frame_received'):
+            if audio_event.HasField("frame_received"):
                 owned_buffer_info = audio_event.frame_received.frame
                 frame = AudioFrame._from_owned_info(owned_buffer_info)
                 self._queue.put(frame)
-            elif audio_event.HasField('eos'):
+            elif audio_event.HasField("eos"):
                 break
 
         ffi_client.queue.unsubscribe(self._ffi_queue)

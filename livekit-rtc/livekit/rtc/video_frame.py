@@ -24,21 +24,25 @@ from abc import ABC, abstractmethod
 
 
 class VideoFrame:
-    def __init__(self, timestamp_us: int,
-                 rotation: VideoRotation.ValueType,
-                 buffer: 'VideoFrameBuffer') -> None:
+    def __init__(
+        self,
+        timestamp_us: int,
+        rotation: VideoRotation.ValueType,
+        buffer: "VideoFrameBuffer",
+    ) -> None:
         self.buffer = buffer
         self.timestamp_us = timestamp_us
         self.rotation = rotation
 
 
 class VideoFrameBuffer(ABC):
-
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 buffer_type: VideoFrameBufferType.ValueType) -> None:
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        buffer_type: VideoFrameBufferType.ValueType,
+    ) -> None:
         self._data = data
         self._width = width
         self._height = height
@@ -64,13 +68,13 @@ class VideoFrameBuffer(ABC):
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         pass
 
-    def to_i420(self) -> 'I420Buffer':
+    def to_i420(self) -> "I420Buffer":
         req = proto_ffi.FfiRequest()
         req.to_i420.buffer.CopyFrom(self._proto_info())
         resp = ffi_client.request(req)
         return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
-    def to_argb(self, dst: 'ArgbFrame') -> None:
+    def to_argb(self, dst: "ArgbFrame") -> None:
         req = proto_ffi.FfiRequest()
         req.to_argb.buffer.CopyFrom(self._proto_info())
         req.to_argb.dst_ptr = get_address(memoryview(dst.data))
@@ -81,8 +85,9 @@ class VideoFrameBuffer(ABC):
         ffi_client.request(req)
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) \
-            -> 'VideoFrameBuffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "VideoFrameBuffer":
         """
         Create the right class instance from the VideoFrameBufferInfo
         """
@@ -103,7 +108,7 @@ class VideoFrameBuffer(ABC):
         elif info.buffer_type == VideoFrameBufferType.NV12:
             return NV12Buffer._from_owned_info(owned_info)
         else:
-            raise Exception('Unsupported VideoFrameBufferType')
+            raise Exception("Unsupported VideoFrameBufferType")
 
 
 # TODO(theomonnom): Ability to get GPU texture directly
@@ -111,38 +116,45 @@ class NativeVideoBuffer(VideoFrameBuffer):
     def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        super().__init__(bytearray(), self._info.width,
-                         self._info.height, VideoFrameBufferType.NATIVE)
+        super().__init__(
+            bytearray(),
+            self._info.width,
+            self._info.height,
+            VideoFrameBufferType.NATIVE,
+        )
 
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         return self._info
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) \
-            -> 'NativeVideoBuffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "NativeVideoBuffer":
         return NativeVideoBuffer(owned_info)
 
-    def to_i420(self) -> 'I420Buffer':
+    def to_i420(self) -> "I420Buffer":
         req = proto_ffi.FfiRequest()
         req.to_i420.handle = self._ffi_handle.handle
         resp = ffi_client.request(req)
         return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
-    def to_argb(self, dst: 'ArgbFrame') -> None:
+    def to_argb(self, dst: "ArgbFrame") -> None:
         self.to_i420().to_argb(dst)
 
 
 class PlanarYuvBuffer(VideoFrameBuffer, ABC):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 buffer_type: VideoFrameBufferType.ValueType,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int,
-                 chroma_width: int,
-                 chroma_height: int) -> None:
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        buffer_type: VideoFrameBufferType.ValueType,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+        chroma_width: int,
+        chroma_height: int,
+    ) -> None:
         super().__init__(data, width, height, buffer_type)
         self._stride_y = stride_y
         self._stride_u = stride_u
@@ -184,18 +196,29 @@ class PlanarYuvBuffer(VideoFrameBuffer, ABC):
 
 
 class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 buffer_type: VideoFrameBufferType.ValueType,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int,
-                 chroma_width: int,
-                 chroma_height: int) -> None:
-        super().__init__(data, width, height, buffer_type, stride_y,
-                         stride_u, stride_v, chroma_width, chroma_height)
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        buffer_type: VideoFrameBufferType.ValueType,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+        chroma_width: int,
+        chroma_height: int,
+    ) -> None:
+        super().__init__(
+            data,
+            width,
+            height,
+            buffer_type,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         info = super()._proto_info()
@@ -206,36 +229,49 @@ class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
 
     @property
     def data_y(self) -> memoryview:
-        return memoryview(self._data)[0:self._stride_y * self._height]
+        return memoryview(self._data)[0 : self._stride_y * self._height]
 
     @property
     def data_u(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height:
-                                      self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height]
+        return memoryview(self._data)[
+            self._stride_y * self._height : self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+        ]
 
     @property
     def data_v(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height:
-                                      self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height +
-                                      self._stride_v * self._chroma_height]
+        return memoryview(self._data)[
+            self._stride_y * self._height
+            + self._stride_u * self._chroma_height : self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+            + self._stride_v * self._chroma_height
+        ]
 
 
 class PlanarYuv16Buffer(PlanarYuvBuffer, ABC):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 buffer_type: VideoFrameBufferType.ValueType,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int,
-                 chroma_width: int,
-                 chroma_height: int) -> None:
-        super().__init__(data, width, height, buffer_type, stride_y,
-                         stride_u, stride_v, chroma_width, chroma_height)
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        buffer_type: VideoFrameBufferType.ValueType,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+        chroma_width: int,
+        chroma_height: int,
+    ) -> None:
+        super().__init__(
+            data,
+            width,
+            height,
+            buffer_type,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
         info = super()._proto_info()
@@ -246,33 +282,37 @@ class PlanarYuv16Buffer(PlanarYuvBuffer, ABC):
 
     @property
     def data_y(self) -> memoryview:
-        return memoryview(self._data)[0:self._stride_y * self._height].cast('H')
+        return memoryview(self._data)[0 : self._stride_y * self._height].cast("H")
 
     @property
     def data_u(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height:
-                                      self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height].cast('H')
+        return memoryview(self._data)[
+            self._stride_y * self._height : self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+        ].cast("H")
 
     @property
     def data_v(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height:
-                                      self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height +
-                                      self._stride_v * self._chroma_height].cast('H')
+        return memoryview(self._data)[
+            self._stride_y * self._height
+            + self._stride_u * self._chroma_height : self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+            + self._stride_v * self._chroma_height
+        ].cast("H")
 
 
 class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 buffer_type: VideoFrameBufferType.ValueType,
-                 stride_y: int,
-                 stride_uv: int,
-                 chroma_width: int,
-                 chroma_height: int) -> None:
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        buffer_type: VideoFrameBufferType.ValueType,
+        stride_y: int,
+        stride_uv: int,
+        chroma_width: int,
+        chroma_height: int,
+    ) -> None:
         super().__init__(data, width, height, buffer_type)
         self._stride_y = stride_y
         self._stride_uv = stride_uv
@@ -310,42 +350,57 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
 
     @property
     def data_y(self) -> memoryview:
-        return memoryview(self._data)[0:self._stride_y * self._height]
+        return memoryview(self._data)[0 : self._stride_y * self._height]
 
     @property
     def data_uv(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height:
-                                      self._stride_y * self._height +
-                                      self._stride_uv * self._chroma_height]
+        return memoryview(self._data)[
+            self._stride_y * self._height : self._stride_y * self._height
+            + self._stride_uv * self._chroma_height
+        ]
 
 
 class I420Buffer(PlanarYuv8Buffer):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int) -> None:
-
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+    ) -> None:
         if len(data) < I420Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
             raise ValueError(
-                'buffer too small for I420 data. Expected {} bytes, got {}.'.format(
-                    I420Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+                "buffer too small for I420 data. Expected {} bytes, got {}.".format(
+                    I420Buffer.calc_data_size(height, stride_y, stride_u, stride_v),
+                    len(data),
+                )
+            )
 
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        super().__init__(data, width, height,
-                         VideoFrameBufferType.I420, stride_y, stride_u, stride_v, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.I420,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I420Buffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "I420Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        nbytes = I420Buffer.calc_data_size(
-            info.height, stride_y, stride_u, stride_v)
+        nbytes = I420Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
         cdata = (ctypes.c_uint8 * nbytes).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
@@ -356,53 +411,81 @@ class I420Buffer(PlanarYuv8Buffer):
         return stride_y * height + (stride_u + stride_v) * ((height + 1) // 2)
 
     @staticmethod
-    def create(width: int, height: int) -> 'I420Buffer':
+    def create(width: int, height: int) -> "I420Buffer":
         stride_y = width
         stride_u = (width + 1) // 2
         stride_v = (width + 1) // 2
-        data_size = I420Buffer.calc_data_size(
-            height, stride_y, stride_u, stride_v)
+        data_size = I420Buffer.calc_data_size(height, stride_y, stride_u, stride_v)
         data = bytearray(data_size)
         return I420Buffer(data, width, height, stride_y, stride_u, stride_v)
 
 
 class I420ABuffer(PlanarYuv8Buffer):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int,
-                 stride_a: int) -> None:
-
-        if len(data) < I420ABuffer.calc_data_size(height, stride_y, stride_u, stride_v, stride_a):
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+        stride_a: int,
+    ) -> None:
+        if len(data) < I420ABuffer.calc_data_size(
+            height, stride_y, stride_u, stride_v, stride_a
+        ):
             raise ValueError(
-                'buffer too small for I420A data. Expected {} bytes, got {}.'.format(
-                    I420ABuffer.calc_data_size(height, stride_y, stride_u, stride_v, stride_a), len(data)))
+                "buffer too small for I420A data. Expected {} bytes, got {}.".format(
+                    I420ABuffer.calc_data_size(
+                        height, stride_y, stride_u, stride_v, stride_a
+                    ),
+                    len(data),
+                )
+            )
 
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        super().__init__(data, width, height, VideoFrameBufferType.I420A,
-                         stride_y, stride_u, stride_v, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.I420A,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
         self._stride_a = stride_a
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I420ABuffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "I420ABuffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
         stride_a = info.yuv.stride_a
-        cdata = (ctypes.c_uint8 * I420ABuffer.calc_data_size(info.height,
-                 stride_y, stride_u, stride_v, stride_a)).from_address(info.yuv.data_y_ptr)
+        cdata = (
+            ctypes.c_uint8
+            * I420ABuffer.calc_data_size(
+                info.height, stride_y, stride_u, stride_v, stride_a
+            )
+        ).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
-        return I420ABuffer(data, info.width, info.height, stride_y, stride_u, stride_v, stride_a)
+        return I420ABuffer(
+            data, info.width, info.height, stride_y, stride_u, stride_v, stride_a
+        )
 
     @staticmethod
-    def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int, stride_a: int) -> int:
-        return (stride_y + stride_a) * height + (stride_u + stride_v) * ((height + 1) // 2)
+    def calc_data_size(
+        height: int, stride_y: int, stride_u: int, stride_v: int, stride_a: int
+    ) -> int:
+        return (stride_y + stride_a) * height + (stride_u + stride_v) * (
+            (height + 1) // 2
+        )
 
     @property
     def stride_a(self) -> int:
@@ -410,42 +493,60 @@ class I420ABuffer(PlanarYuv8Buffer):
 
     @property
     def data_a(self) -> memoryview:
-        return memoryview(self._data)[self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height +
-                                      self._stride_v * self._chroma_height:
-                                      self._stride_y * self._height +
-                                      self._stride_u * self._chroma_height +
-                                      self._stride_v * self._chroma_height +
-                                      self._stride_a * self._height]
+        return memoryview(self._data)[
+            self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+            + self._stride_v * self._chroma_height : self._stride_y * self._height
+            + self._stride_u * self._chroma_height
+            + self._stride_v * self._chroma_height
+            + self._stride_a * self._height
+        ]
 
 
 class I422Buffer(PlanarYuv8Buffer):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int) -> None:
-
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+    ) -> None:
         if len(data) < I422Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
             raise ValueError(
-                'buffer too small for I422 data. Expected {} bytes, got {}.'.format(
-                    I422Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+                "buffer too small for I422 data. Expected {} bytes, got {}.".format(
+                    I422Buffer.calc_data_size(height, stride_y, stride_u, stride_v),
+                    len(data),
+                )
+            )
 
         chroma_width = (width + 1) // 2
         chroma_height = height
-        super().__init__(data, width, height, VideoFrameBufferType.I422,
-                         stride_y, stride_u, stride_v, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.I422,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I422Buffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "I422Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        cdata = (ctypes.c_uint8 * I422Buffer.calc_data_size(info.height,
-                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        cdata = (
+            ctypes.c_uint8
+            * I422Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
+        ).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return I422Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
@@ -456,32 +557,49 @@ class I422Buffer(PlanarYuv8Buffer):
 
 
 class I444Buffer(PlanarYuv8Buffer):
-    def __init__(self,
-                 data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int) -> None:
-
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+    ) -> None:
         if len(data) < I444Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
             raise ValueError(
-                'buffer too small for I444 data. Expected {} bytes, got {}.'.format(
-                    I444Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+                "buffer too small for I444 data. Expected {} bytes, got {}.".format(
+                    I444Buffer.calc_data_size(height, stride_y, stride_u, stride_v),
+                    len(data),
+                )
+            )
 
         chroma_width = width
         chroma_height = height
-        super().__init__(data, width, height, VideoFrameBufferType.I444,
-                         stride_y, stride_u, stride_v, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.I444,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I444Buffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "I444Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        cdata = (ctypes.c_uint8 * I444Buffer.calc_data_size(info.height,
-                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        cdata = (
+            ctypes.c_uint8
+            * I444Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
+        ).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return I444Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
@@ -492,64 +610,96 @@ class I444Buffer(PlanarYuv8Buffer):
 
 
 class I010Buffer(PlanarYuv16Buffer):
-    def __init__(self, data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_u: int,
-                 stride_v: int) -> None:
-
+    def __init__(
+        self,
+        data: bytearray,
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_u: int,
+        stride_v: int,
+    ) -> None:
         if len(data) < I010Buffer.calc_data_size(height, stride_y, stride_u, stride_v):
             raise ValueError(
-                'buffer too small for I010 data. Expected {} bytes, got {}.'.format(
-                    I010Buffer.calc_data_size(height, stride_y, stride_u, stride_v), len(data)))
+                "buffer too small for I010 data. Expected {} bytes, got {}.".format(
+                    I010Buffer.calc_data_size(height, stride_y, stride_u, stride_v),
+                    len(data),
+                )
+            )
 
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        super().__init__(data, width, height, VideoFrameBufferType.I010,
-                         stride_y, stride_u, stride_v, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.I010,
+            stride_y,
+            stride_u,
+            stride_v,
+            chroma_width,
+            chroma_height,
+        )
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I010Buffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "I010Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        cdata = (ctypes.c_uint8 * I010Buffer.calc_data_size(info.height,
-                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        cdata = (
+            ctypes.c_uint8
+            * I010Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
+        ).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return I010Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
 
     @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int) -> int:
-        return stride_y * height * 2 + stride_u * ((height + 1) // 2) * 2 + stride_v * ((height + 1) // 2) * 2
+        return (
+            stride_y * height * 2
+            + stride_u * ((height + 1) // 2) * 2
+            + stride_v * ((height + 1) // 2) * 2
+        )
 
 
 class NV12Buffer(BiplanaraYuv8Buffer):
-    def __init__(self, data: bytearray,
-                 width: int,
-                 height: int,
-                 stride_y: int,
-                 stride_uv: int) -> None:
-
+    def __init__(
+        self, data: bytearray, width: int, height: int, stride_y: int, stride_uv: int
+    ) -> None:
         if len(data) < NV12Buffer.calc_data_size(height, stride_y, stride_uv):
             raise ValueError(
-                'buffer too small for NV12 data. Expected {} bytes, got {}.'.format(
-                    NV12Buffer.calc_data_size(height, stride_y, stride_uv), len(data)))
+                "buffer too small for NV12 data. Expected {} bytes, got {}.".format(
+                    NV12Buffer.calc_data_size(height, stride_y, stride_uv), len(data)
+                )
+            )
 
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        super().__init__(data, width, height, VideoFrameBufferType.NV12,
-                         stride_y, stride_uv, chroma_width, chroma_height)
+        super().__init__(
+            data,
+            width,
+            height,
+            VideoFrameBufferType.NV12,
+            stride_y,
+            stride_uv,
+            chroma_width,
+            chroma_height,
+        )
 
     @staticmethod
-    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'NV12Buffer':
+    def _from_owned_info(
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+    ) -> "NV12Buffer":
         info = owned_info.info
         stride_y = info.bi_yuv.stride_y
         stride_uv = info.bi_yuv.stride_uv
-        cdata = (ctypes.c_uint8 * NV12Buffer.calc_data_size(info.height,
-                 stride_y, stride_uv)).from_address(info.yuv.data_y_ptr)
+        cdata = (
+            ctypes.c_uint8 * NV12Buffer.calc_data_size(info.height, stride_y, stride_uv)
+        ).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return NV12Buffer(data, info.width, info.height, stride_y, stride_uv)
@@ -560,13 +710,14 @@ class NV12Buffer(BiplanaraYuv8Buffer):
 
 
 class ArgbFrame:
-    def __init__(self,
-                 data: Union[bytes, bytearray, memoryview],
-                 format: VideoFormatType.ValueType,
-                 width: int,
-                 height: int,
-                 stride: int = 0) -> None:
-
+    def __init__(
+        self,
+        data: Union[bytes, bytearray, memoryview],
+        format: VideoFormatType.ValueType,
+        width: int,
+        height: int,
+        stride: int = 0,
+    ) -> None:
         if stride == 0:
             stride = width * ctypes.sizeof(ctypes.c_uint32)
 
@@ -580,7 +731,9 @@ class ArgbFrame:
         self._stride = stride
 
     @staticmethod
-    def create(format: VideoFormatType.ValueType, width: int, height: int) -> 'ArgbFrame':
+    def create(
+        format: VideoFormatType.ValueType, width: int, height: int
+    ) -> "ArgbFrame":
         data = bytearray(width * height * ctypes.sizeof(ctypes.c_uint32))
         return ArgbFrame(data, format, width, height)
 

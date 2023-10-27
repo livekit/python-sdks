@@ -1,0 +1,23 @@
+name: Ruff - Checks
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Ruff livekit-api
+        run: ruff check --output-format=github livekit-api/
+
+      - name: Ruff livekit-rtc
+        run: ruff check --output-format=github livekit-rtc/

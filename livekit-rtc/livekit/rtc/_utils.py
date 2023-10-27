@@ -3,14 +3,15 @@ from collections import deque
 import ctypes
 from typing import Callable, Generic, List, TypeVar
 
+
 def get_address(data: memoryview) -> int:
-    """ Get the address of a buffer using ctypes """
+    """Get the address of a buffer using ctypes"""
     nbytes = data.nbytes
     buffer = (ctypes.c_int8 * nbytes).from_buffer(data)
     return ctypes.addressof(buffer)
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class RingQueue(Generic[T]):
@@ -33,14 +34,13 @@ class RingQueue(Generic[T]):
 
 
 class Queue(asyncio.Queue[T]):
-    """ asyncio.Queue with utility functions. """
+    """asyncio.Queue with utility functions."""
 
     def __init__(self, maxsize: int = 0) -> None:
         super().__init__(maxsize)
 
-    async def wait_for(self, fnc: Callable[[T], bool]) \
-            -> T:
-        """ Wait for an event that matches the given function.
+    async def wait_for(self, fnc: Callable[[T], bool]) -> T:
+        """Wait for an event that matches the given function.
         The previous events are discarded.
         """
 
@@ -54,7 +54,7 @@ class Queue(asyncio.Queue[T]):
 
 
 class BroadcastQueue(Generic[T]):
-    """ Queue with multiple subscribers. """
+    """Queue with multiple subscribers."""
 
     def __init__(self) -> None:
         self._lock = asyncio.Lock()

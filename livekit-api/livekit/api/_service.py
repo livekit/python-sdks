@@ -13,8 +13,7 @@ class Service(ABC):
         self.api_secret = api_secret
 
     def _auth_header(self, grants: VideoGrants) -> Dict[str, str]:
-        token = AccessToken(
-            self.api_key, self.api_secret).with_grants(grants).to_jwt()
+        token = AccessToken(self.api_key, self.api_secret).with_grants(grants).to_jwt()
 
         headers = {}
         headers[AUTHORIZATION] = "Bearer {}".format(token)
