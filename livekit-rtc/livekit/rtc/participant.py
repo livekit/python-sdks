@@ -151,7 +151,7 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        queue = ffi_client.queue.subscribe()
+        queue = self._room_queue.subscribe()
         try:
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.publish_track.async_id ==
