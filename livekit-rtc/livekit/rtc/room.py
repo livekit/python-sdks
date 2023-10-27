@@ -133,8 +133,8 @@ class Room(EventEmitter[EventTypes]):
         if options.e2ee:
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
             req.connect.options.e2ee.key_provider_options.shared_key = (
-                options.e2ee.key_provider_options.shared_key
-            )  # type: ignore
+                options.e2ee.key_provider_options.shared_key  # type: ignore
+            )
             req.connect.options.e2ee.key_provider_options.ratchet_salt = (
                 options.e2ee.key_provider_options.ratchet_salt
             )

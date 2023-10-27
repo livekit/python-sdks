@@ -17,12 +17,13 @@ from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
+from typing import Union
 
 
 class AudioFrame:
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         sample_rate: int,
         num_channels: int,
         samples_per_channel: int,
@@ -34,10 +35,10 @@ class AudioFrame:
                 "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
             )
 
+        self._data = bytearray(data)
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._samples_per_channel = samples_per_channel
-        self._data = data
 
     @staticmethod
     def create(

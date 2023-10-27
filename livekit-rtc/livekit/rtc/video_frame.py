@@ -38,12 +38,16 @@ class VideoFrame:
 class VideoFrameBuffer(ABC):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         buffer_type: VideoFrameBufferType.ValueType,
     ) -> None:
-        self._data = data
+        view = memoryview(data)
+        if not view.c_contiguous:
+            raise ValueError("data must be contiguous")
+
+        self._data = bytearray(data)
         self._width = width
         self._height = height
         self._buffer_type = buffer_type
@@ -145,7 +149,7 @@ class NativeVideoBuffer(VideoFrameBuffer):
 class PlanarYuvBuffer(VideoFrameBuffer, ABC):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         buffer_type: VideoFrameBufferType.ValueType,
@@ -198,7 +202,7 @@ class PlanarYuvBuffer(VideoFrameBuffer, ABC):
 class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         buffer_type: VideoFrameBufferType.ValueType,
@@ -251,7 +255,7 @@ class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
 class PlanarYuv16Buffer(PlanarYuvBuffer, ABC):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         buffer_type: VideoFrameBufferType.ValueType,
@@ -304,7 +308,7 @@ class PlanarYuv16Buffer(PlanarYuvBuffer, ABC):
 class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         buffer_type: VideoFrameBufferType.ValueType,
@@ -363,7 +367,7 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
 class I420Buffer(PlanarYuv8Buffer):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         stride_y: int,
@@ -423,7 +427,7 @@ class I420Buffer(PlanarYuv8Buffer):
 class I420ABuffer(PlanarYuv8Buffer):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         stride_y: int,
@@ -506,7 +510,7 @@ class I420ABuffer(PlanarYuv8Buffer):
 class I422Buffer(PlanarYuv8Buffer):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         stride_y: int,
@@ -520,6 +524,10 @@ class I422Buffer(PlanarYuv8Buffer):
                     len(data),
                 )
             )
+
+        view = memoryview(data)
+        if not view.c_contiguous:
+            raise ValueError("data must be contiguous")
 
         chroma_width = (width + 1) // 2
         chroma_height = height
@@ -559,7 +567,7 @@ class I422Buffer(PlanarYuv8Buffer):
 class I444Buffer(PlanarYuv8Buffer):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         stride_y: int,
@@ -612,7 +620,7 @@ class I444Buffer(PlanarYuv8Buffer):
 class I010Buffer(PlanarYuv16Buffer):
     def __init__(
         self,
-        data: bytearray,
+        data: Union[bytes, bytearray, memoryview],
         width: int,
         height: int,
         stride_y: int,
@@ -668,7 +676,12 @@ class I010Buffer(PlanarYuv16Buffer):
 
 class NV12Buffer(BiplanaraYuv8Buffer):
     def __init__(
-        self, data: bytearray, width: int, height: int, stride_y: int, stride_uv: int
+        self,
+        data: Union[bytes, bytearray, memoryview],
+        width: int,
+        height: int,
+        stride_y: int,
+        stride_uv: int,
     ) -> None:
         if len(data) < NV12Buffer.calc_data_size(height, stride_y, stride_uv):
             raise ValueError(
@@ -759,8 +772,8 @@ class ArgbFrame:
         return I420Buffer._from_owned_info(res.to_i420.buffer)
 
     @property
-    def data(self) -> bytearray:
-        return self._data
+    def data(self) -> memoryview:
+        return memoryview(self._data)
 
     @property
     def width(self) -> int:
