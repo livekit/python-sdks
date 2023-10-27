@@ -69,10 +69,13 @@ class FfiHandle:
         self.handle = handle
 
     def __del__(self):
+        self.dispose()
+
+    def dispose(self) -> None:
         if self.handle != INVALID_HANDLE:
             assert ffi_lib.livekit_ffi_drop_handle(
                 ctypes.c_uint64(self.handle))
-
+            self.handle = INVALID_HANDLE
 
 T = TypeVar('T')
 
