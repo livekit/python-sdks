@@ -3,8 +3,6 @@ import colorsys
 import logging
 from signal import SIGINT, SIGTERM
 
-import cv2
-
 import numpy as np
 from livekit import rtc
 

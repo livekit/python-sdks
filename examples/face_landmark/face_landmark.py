@@ -79,12 +79,12 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
 
         if argb_frame is None or argb_frame.width != buffer.width \
                 or argb_frame.height != buffer.height:
-            argb_frame = rtc.ArgbFrame(
+            argb_frame = rtc.ArgbFrame.create(
                 rtc.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height)
 
         buffer.to_argb(argb_frame)
 
-        arr = np.ctypeslib.as_array(argb_frame.data)
+        arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
         arr = arr.reshape((argb_frame.height, argb_frame.width, 4))
         arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
 

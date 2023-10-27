@@ -73,7 +73,7 @@ class VideoFrameBuffer(ABC):
     def to_argb(self, dst: 'ArgbFrame') -> None:
         req = proto_ffi.FfiRequest()
         req.to_argb.buffer.CopyFrom(self._proto_info())
-        req.to_argb.dst_ptr = get_address(memoryview(self._data))
+        req.to_argb.dst_ptr = get_address(memoryview(dst.data))
         req.to_argb.dst_format = dst.format
         req.to_argb.dst_stride = dst.stride
         req.to_argb.dst_width = dst.width
@@ -344,8 +344,8 @@ class I420Buffer(PlanarYuv8Buffer):
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        cdata = (ctypes.c_uint8 * I420Buffer.calc_data_size(info.height,
-                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        nbytes = I420Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
+        cdata = (ctypes.c_uint8 * nbytes).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return I420Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
