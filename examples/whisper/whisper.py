@@ -105,10 +105,11 @@ async def whisper_task(stream: rtc.AudioStream):
     async for frame in stream:
         # whisper requires 16kHz mono, so resample the data
         # also convert the samples from int16 to float32
+
         frame = frame.remix_and_resample(
             WHISPER_SAMPLE_RATE, 1)
 
-        data = np.array(frame.data, dtype=np.float32) / 32768.0
+        data = np.frombuffer(frame.data, dtype=np.int16).astype(np.float32) / 32768.0
 
         # write the data inside data_30_secs at written_samples
         data_start = SAMPLES_KEEP + written_samples
@@ -150,7 +151,7 @@ async def whisper_task(stream: rtc.AudioStream):
 
 
 async def main(room: rtc.Room):
-    @room.listens_to("track_published")
+    @room.on("track_published")
     def on_track_published(publication: rtc.RemoteTrackPublication,
                            participant: rtc.RemoteParticipant):
         # Only subscribe to the audio tracks coming from the microphone
@@ -161,7 +162,7 @@ async def main(room: rtc.Room):
 
             publication.set_subscribed(True)
 
-    @room.listens_to("track_subscribed")
+    @room.on("track_subscribed")
     def on_track_subscribed(track: rtc.Track,
                             publication: rtc.RemoteTrackPublication,
                             participant: rtc.RemoteParticipant):

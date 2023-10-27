@@ -43,10 +43,11 @@ class AudioFrame:
     @staticmethod
     def _from_owned_info(owned_info: proto_audio.OwnedAudioFrameBuffer) -> 'AudioFrame':
         info = owned_info.info
-        size = info.num_channels * info.samples_per_channel * ctypes.sizeof(ctypes.c_int16)
-        data = (ctypes.c_int16 * size).from_address(info.data_ptr)
+        size = info.num_channels * info.samples_per_channel
+        cdata = (ctypes.c_int16 * size).from_address(info.data_ptr)
+        data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
-        return AudioFrame(bytearray(data), info.sample_rate, info.num_channels, info.samples_per_channel)
+        return AudioFrame(data, info.sample_rate, info.num_channels, info.samples_per_channel)
 
     def remix_and_resample(self, sample_rate: int, num_channels: int) -> 'AudioFrame':
         """ Resample the audio frame to the given sample rate and number of channels."""
@@ -77,8 +78,8 @@ class AudioFrame:
         return audio_info
 
     @property
-    def data(self) -> bytearray:
-        return self._data
+    def data(self) -> memoryview:
+        return memoryview(self._data).cast('h')
 
     @property
     def sample_rate(self) -> int:
