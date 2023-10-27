@@ -17,7 +17,8 @@ jobs:
           pip install ruff
 
       - name: Ruff livekit-api
-        run: ruff check --output-format=github livekit-api/
+        run: ruff check --output-format=github .
 
-      - name: Ruff livekit-rtc
-        run: ruff check --output-format=github livekit-rtc/
+      - name: Check format
+        run: ruff format --check .
+
