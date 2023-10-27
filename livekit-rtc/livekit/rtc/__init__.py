@@ -42,7 +42,7 @@ from .track import (
     LocalTrack,
     RemoteTrack,
     AudioTrack,
-    VideoTrack
+    VideoTrack,
 )
 from .e2ee import (
     E2EEManager,

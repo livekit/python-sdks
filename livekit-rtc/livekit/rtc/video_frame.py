@@ -718,6 +718,17 @@ class ArgbFrame:
         height: int,
         stride: int = 0,
     ) -> None:
+        """
+        Create a new ArgbFrame.
+
+        Args:
+            data: The data for the frame. Must be at least width * height * sizeof(uint32) bytes.
+            format: The format of the data.
+            width: The width of the frame.
+            height: The height of the frame.
+            stride: The stride of the frame. If 0, the stride will be set to width * sizeof(uint32).
+        """
+
         if stride == 0:
             stride = width * ctypes.sizeof(ctypes.c_uint32)
 
