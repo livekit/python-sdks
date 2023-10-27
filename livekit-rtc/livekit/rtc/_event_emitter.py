@@ -11,7 +11,7 @@ class EventEmitter(Generic[T]):
             for callback in self._events[event]:
                 callback(*args, **kwargs)
 
-    def once(self, event: T, callback: Optional[Callable]) -> Callable:
+    def once(self, event: T, callback: Optional[Callable] = None) -> Callable:
         if callback is not None:
             def once_callback(*args, **kwargs):
                 self.off(event, once_callback)
@@ -23,7 +23,7 @@ class EventEmitter(Generic[T]):
                 return callback
             return decorator
 
-    def on(self, event: T, callback: Optional[Callable]) -> Callable:
+    def on(self, event: T, callback: Optional[Callable] = None) -> Callable:
         if callback is not None:
             if event not in self._events:
                 self._events[event] = set()

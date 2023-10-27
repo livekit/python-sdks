@@ -19,7 +19,7 @@ async def publish_frames(source: rtc.AudioSource, frequency: int):
     total_samples = 0
     audio_frame = rtc.AudioFrame.create(
         SAMPLE_RATE, NUM_CHANNELS, samples_per_channel)
-    audio_data = np.ctypeslib.as_array(audio_frame.data)
+    audio_data = np.frombuffer(audio_frame.data, dtype=np.int16)
     while True:
         time = (total_samples + np.arange(samples_per_channel)) / SAMPLE_RATE
         sine_wave = (amplitude * np.sin(2 * np.pi *

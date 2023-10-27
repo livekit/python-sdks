@@ -58,7 +58,7 @@ from .video_frame import (
     I420ABuffer,
     I420Buffer,
     I422Buffer,
-    NativeVideoFrameBuffer,
+    NativeVideoBuffer,
     NV12Buffer,
     PlanarYuv8Buffer,
     PlanarYuv16Buffer,
