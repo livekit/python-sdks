@@ -1,7 +1,5 @@
 name: Ruff - Checks
-
-on: [push, pull_request]
-
+on: push
 jobs:
   build:
     runs-on: ubuntu-latest

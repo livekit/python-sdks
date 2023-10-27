@@ -29,7 +29,6 @@ from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication
-from .participant import RemoteParticipant, Participant
 
 EventTypes = Literal[
     "participant_connected",
