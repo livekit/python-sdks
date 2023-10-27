@@ -102,8 +102,8 @@ class LocalParticipant(Participant):
 
             req.publish_data.destination_sids.extend(sids)
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.publish_data.async_id ==
                                       resp.publish_data.async_id)
@@ -118,10 +118,10 @@ class LocalParticipant(Participant):
         req.update_local_metadata.local_participant_handle = self._ffi_handle.handle
         req.update_local_metadata.metadata = metadata
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
-            cb = await queue.wait_for(lambda e: e.update_local_metadata.async_id ==
+            await queue.wait_for(lambda e: e.update_local_metadata.async_id ==
                                     resp.update_local_metadata.async_id)
         finally:
             ffi_client.queue.unsubscribe(queue)
@@ -131,10 +131,10 @@ class LocalParticipant(Participant):
         req.update_local_name.local_participant_handle = self._ffi_handle.handle
         req.update_local_name.name = name
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = ffi_client.queue.subscribe()
             resp = ffi_client.request(req)
-            cb = await queue.wait_for(lambda e: e.update_local_name.async_id ==
+            await queue.wait_for(lambda e: e.update_local_name.async_id ==
                                     resp.update_local_name.async_id)
         finally:
             ffi_client.queue.unsubscribe(queue)
@@ -151,8 +151,8 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
+        queue = ffi_client.queue.subscribe()
         try:
-            queue = self._room_queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.publish_track.async_id ==
                                       resp.publish_track.async_id)
@@ -175,8 +175,8 @@ class LocalParticipant(Participant):
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
 
+        queue = self._room_queue.subscribe()
         try:
-            queue = self._room_queue.subscribe()
             resp = ffi_client.request(req)
             cb = await queue.wait_for(lambda e: e.unpublish_track.async_id ==
                                       resp.unpublish_track.async_id)
