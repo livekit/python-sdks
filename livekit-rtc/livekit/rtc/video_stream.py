@@ -24,9 +24,12 @@ from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream:
-    def __init__(self, track: Track,
-                 loop: Optional[asyncio.AbstractEventLoop] = None,
-                 capacity: int = 0) -> None:
+    def __init__(
+        self,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = ffi_client.queue.subscribe(self._loop)
@@ -41,7 +44,6 @@ class VideoStream:
         stream_info = resp.new_video_stream.stream
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info.info
-
         self._task = self._loop.create_task(self._run())
 
     def __del__(self) -> None:
@@ -52,19 +54,23 @@ class VideoStream:
             event = await self._ffi_queue.wait_for(self._is_event)
             video_event = event.video_stream_event
 
-            if video_event.HasField('frame_received'):
+            if video_event.HasField("frame_received"):
                 frame_info = video_event.frame_received.frame
                 owned_buffer_info = video_event.frame_received.buffer
 
-                frame = VideoFrame(frame_info.timestamp_us, frame_info.rotation,
-                                   VideoFrameBuffer.create(owned_buffer_info))
+                frame = VideoFrame(
+                    frame_info.timestamp_us,
+                    frame_info.rotation,
+                    VideoFrameBuffer._from_owned_info(owned_buffer_info),
+                )
                 self._queue.put(frame)
-            elif video_event.HasField('eos'):
+            elif video_event.HasField("eos"):
                 break
 
-    async def close(self):
         ffi_client.queue.unsubscribe(self._ffi_queue)
-        del self._ffi_handle
+
+    async def aclose(self):
+        self._ffi_handle.dispose()
         await self._task
 
     def __aiter__(self):

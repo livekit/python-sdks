@@ -41,7 +41,7 @@ class VideoGrants:
     # TrackSource types that a participant may publish.
     # When set, it supercedes CanPublish. Only sources explicitly set here can be
     # published
-    can_publish_sources: list[str] = []  # keys keep track of each source
+    can_publish_sources: list[str] = dataclasses.field(default_factory=list)
 
     # by default, a participant is not allowed to update its own metadata
     can_update_own_metadata: bool = False
@@ -74,39 +74,54 @@ class AccessToken:
         self.identity = ""  # sub
         self.ttl = DEFAULT_TTL  # exp
 
-    def with_ttl(self, ttl: datetime.timedelta) -> 'AccessToken':
+    def with_ttl(self, ttl: datetime.timedelta) -> "AccessToken":
         self.ttl = ttl
         return self
 
-    def with_grants(self, grants: VideoGrants) -> 'AccessToken':
+    def with_grants(self, grants: VideoGrants) -> "AccessToken":
         self.claims.video = grants
         return self
 
-    def with_identity(self, identity: str) -> 'AccessToken':
+    def with_identity(self, identity: str) -> "AccessToken":
         self.identity = identity
         return self
 
-    def with_name(self, name: str) -> 'AccessToken':
+    def with_name(self, name: str) -> "AccessToken":
         self.claims.name = name
         return self
 
-    def with_metadata(self, metadata: str) -> 'AccessToken':
+    def with_metadata(self, metadata: str) -> "AccessToken":
         self.claims.metadata = metadata
         return self
 
-    def with_sha256(self, sha256: str) -> 'AccessToken':
+    def with_sha256(self, sha256: str) -> "AccessToken":
         self.claims.sha256 = sha256
         return self
 
     def to_jwt(self) -> str:
-        claims = {
-            'sub': self.identity,
-            "iss": self.api_key,
-            "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
-            "exp": calendar.timegm(
-                (datetime.datetime.utcnow() + self.ttl).utctimetuple()
-            ),
-        }
+        def camel_case_dict(data) -> dict:
+            return {
+                "".join(
+                    word if i == 0 else word.title()
+                    for i, word in enumerate(key.split("_"))
+                ): value
+                for key, value in data
+                if value is not None
+            }
 
-        claims.update(dataclasses.asdict(self.claims))
-        return jwt.encode(claims, self.api_secret, algorithm='HS256')
+        claims = dataclasses.asdict(self.claims)
+        claims.update(
+            {
+                "sub": self.identity,
+                "iss": self.api_key,
+                "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
+                "exp": calendar.timegm(
+                    (datetime.datetime.utcnow() + self.ttl).utctimetuple()
+                ),
+                "video": dataclasses.asdict(
+                    self.claims.video, dict_factory=camel_case_dict
+                ),
+            }
+        )
+
+        return jwt.encode(claims, self.api_secret, algorithm="HS256")

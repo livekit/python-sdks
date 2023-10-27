@@ -23,9 +23,9 @@ from ._proto.room_pb2 import (
     TrackPublishOptions,
     IceTransportType,
     ContinualGatheringPolicy,
-    IceServer
+    IceServer,
 )
-from ._proto.e2ee_pb2 import (EncryptionType, EncryptionState)
+from ._proto.e2ee_pb2 import EncryptionType, EncryptionState
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
 from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
 from .audio_frame import AudioFrame
@@ -39,13 +39,17 @@ from .track import (
     RemoteAudioTrack,
     RemoteVideoTrack,
     Track,
+    LocalTrack,
+    RemoteTrack,
+    AudioTrack,
+    VideoTrack,
 )
 from .e2ee import (
     E2EEManager,
     E2EEOptions,
     KeyProviderOptions,
     KeyProvider,
-    FrameCryptor
+    FrameCryptor,
 )
 from .track_publication import (
     LocalTrackPublication,
@@ -58,7 +62,7 @@ from .video_frame import (
     I420ABuffer,
     I420Buffer,
     I422Buffer,
-    NativeVideoFrameBuffer,
+    NativeVideoBuffer,
     NV12Buffer,
     PlanarYuv8Buffer,
     PlanarYuv16Buffer,

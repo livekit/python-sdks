@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Union
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
     from .video_source import VideoSource
 
 
-class Track():
+class Track:
     def __init__(self, owned_info: proto_track.OwnedTrack):
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
@@ -57,7 +56,7 @@ class LocalAudioTrack(Track):
         super().__init__(info)
 
     @staticmethod
-    def create_audio_track(name: str, source: 'AudioSource') -> 'LocalAudioTrack':
+    def create_audio_track(name: str, source: "AudioSource") -> "LocalAudioTrack":
         req = proto_ffi.FfiRequest()
         req.create_audio_track.name = name
         req.create_audio_track.source_handle = source._ffi_handle.handle
@@ -71,7 +70,7 @@ class LocalVideoTrack(Track):
         super().__init__(info)
 
     @staticmethod
-    def create_video_track(name: str, source: 'VideoSource') -> 'LocalVideoTrack':
+    def create_video_track(name: str, source: "VideoSource") -> "LocalVideoTrack":
         req = proto_ffi.FfiRequest()
         req.create_video_track.name = name
         req.create_video_track.source_handle = source._ffi_handle.handle
@@ -88,3 +87,9 @@ class RemoteAudioTrack(Track):
 class RemoteVideoTrack(Track):
     def __init__(self, info: proto_track.OwnedTrack):
         super().__init__(info)
+
+
+LocalTrack = Union[LocalVideoTrack, LocalAudioTrack]
+RemoteTrack = Union[RemoteVideoTrack, RemoteAudioTrack]
+AudioTrack = Union[LocalAudioTrack, RemoteAudioTrack]
+VideoTrack = Union[LocalVideoTrack, RemoteVideoTrack]
