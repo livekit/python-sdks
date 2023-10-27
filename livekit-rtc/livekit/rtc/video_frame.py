@@ -308,11 +308,11 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
     def stride_uv(self) -> int:
         return self._stride_uv
 
-    @ property
+    @property
     def data_y(self) -> memoryview:
         return memoryview(self._data)[0:self._stride_y * self._height]
 
-    @ property
+    @property
     def data_uv(self) -> memoryview:
         return memoryview(self._data)[self._stride_y * self._height:
                                       self._stride_y * self._height +
@@ -344,7 +344,8 @@ class I420Buffer(PlanarYuv8Buffer):
         stride_y = info.yuv.stride_y
         stride_u = info.yuv.stride_u
         stride_v = info.yuv.stride_v
-        nbytes = I420Buffer.calc_data_size(info.height, stride_y, stride_u, stride_v)
+        nbytes = I420Buffer.calc_data_size(
+            info.height, stride_y, stride_u, stride_v)
         cdata = (ctypes.c_uint8 * nbytes).from_address(info.yuv.data_y_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)

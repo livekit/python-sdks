@@ -67,15 +67,21 @@ INVALID_HANDLE = 0
 class FfiHandle:
     def __init__(self, handle: int) -> None:
         self.handle = handle
+        self._disposed = False
 
     def __del__(self):
         self.dispose()
 
+    @property
+    def disposed(self) -> bool:
+        return self._disposed
+
     def dispose(self) -> None:
-        if self.handle != INVALID_HANDLE:
+        if self.handle != INVALID_HANDLE and not self._disposed:
+            self._disposed = True
             assert ffi_lib.livekit_ffi_drop_handle(
                 ctypes.c_uint64(self.handle))
-            self.handle = INVALID_HANDLE
+
 
 T = TypeVar('T')
 

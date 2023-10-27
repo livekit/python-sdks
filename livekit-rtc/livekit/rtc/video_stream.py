@@ -41,7 +41,6 @@ class VideoStream:
         stream_info = resp.new_video_stream.stream
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info.info
-
         self._task = self._loop.create_task(self._run())
 
     def __del__(self) -> None:
