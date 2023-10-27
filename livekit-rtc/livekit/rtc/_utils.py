@@ -2,12 +2,11 @@ import asyncio
 from collections import deque
 import ctypes
 from typing import Callable, Generic, List, TypeVar
-from typing_extensions import Buffer
-import numpy
 
-def get_address(data: bytearray) -> int:
+def get_address(data: memoryview) -> int:
     """ Get the address of a buffer using ctypes """
-    buffer = (ctypes.c_int8 * len(data)).from_buffer(data)
+    nbytes = data.nbytes
+    buffer = (ctypes.c_int8 * nbytes).from_buffer(data)
     return ctypes.addressof(buffer)
 
 

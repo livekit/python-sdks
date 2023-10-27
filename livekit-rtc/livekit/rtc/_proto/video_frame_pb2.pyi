@@ -275,20 +275,25 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
 
     SOURCE_HANDLE_FIELD_NUMBER: builtins.int
     FRAME_FIELD_NUMBER: builtins.int
-    BUFFER_HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    HANDLE_FIELD_NUMBER: builtins.int
     source_handle: builtins.int
     @property
     def frame(self) -> global___VideoFrameInfo: ...
-    buffer_handle: builtins.int
+    @property
+    def info(self) -> global___VideoFrameBufferInfo: ...
+    handle: builtins.int
     def __init__(
         self,
         *,
         source_handle: builtins.int = ...,
         frame: global___VideoFrameInfo | None = ...,
-        buffer_handle: builtins.int = ...,
+        info: global___VideoFrameBufferInfo | None = ...,
+        handle: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["frame", b"frame"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["buffer_handle", b"buffer_handle", "frame", b"frame", "source_handle", b"source_handle"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["frame", b"frame", "from", b"from", "handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["frame", b"frame", "from", b"from", "handle", b"handle", "info", b"info", "source_handle", b"source_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["from", b"from"]) -> typing_extensions.Literal["info", "handle"] | None: ...
 
 global___CaptureVideoFrameRequest = CaptureVideoFrameRequest
 
@@ -312,22 +317,25 @@ class ToI420Request(google.protobuf.message.Message):
 
     FLIP_Y_FIELD_NUMBER: builtins.int
     ARGB_FIELD_NUMBER: builtins.int
-    YUV_HANDLE_FIELD_NUMBER: builtins.int
+    BUFFER_FIELD_NUMBER: builtins.int
+    HANDLE_FIELD_NUMBER: builtins.int
     flip_y: builtins.bool
     @property
     def argb(self) -> global___ArgbBufferInfo: ...
-    yuv_handle: builtins.int
-    """Another yuv buffer"""
+    @property
+    def buffer(self) -> global___VideoFrameBufferInfo: ...
+    handle: builtins.int
     def __init__(
         self,
         *,
         flip_y: builtins.bool = ...,
         argb: global___ArgbBufferInfo | None = ...,
-        yuv_handle: builtins.int = ...,
+        buffer: global___VideoFrameBufferInfo | None = ...,
+        handle: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["argb", b"argb", "from", b"from", "yuv_handle", b"yuv_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["argb", b"argb", "flip_y", b"flip_y", "from", b"from", "yuv_handle", b"yuv_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["from", b"from"]) -> typing_extensions.Literal["argb", "yuv_handle"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["argb", b"argb", "buffer", b"buffer", "from", b"from", "handle", b"handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["argb", b"argb", "buffer", b"buffer", "flip_y", b"flip_y", "from", b"from", "handle", b"handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["from", b"from"]) -> typing_extensions.Literal["argb", "buffer", "handle"] | None: ...
 
 global___ToI420Request = ToI420Request
 
@@ -356,14 +364,15 @@ class ToArgbRequest(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    BUFFER_HANDLE_FIELD_NUMBER: builtins.int
+    BUFFER_FIELD_NUMBER: builtins.int
     DST_PTR_FIELD_NUMBER: builtins.int
     DST_FORMAT_FIELD_NUMBER: builtins.int
     DST_STRIDE_FIELD_NUMBER: builtins.int
     DST_WIDTH_FIELD_NUMBER: builtins.int
     DST_HEIGHT_FIELD_NUMBER: builtins.int
     FLIP_Y_FIELD_NUMBER: builtins.int
-    buffer_handle: builtins.int
+    @property
+    def buffer(self) -> global___VideoFrameBufferInfo: ...
     dst_ptr: builtins.int
     dst_format: global___VideoFormatType.ValueType
     dst_stride: builtins.int
@@ -373,7 +382,7 @@ class ToArgbRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        buffer_handle: builtins.int = ...,
+        buffer: global___VideoFrameBufferInfo | None = ...,
         dst_ptr: builtins.int = ...,
         dst_format: global___VideoFormatType.ValueType = ...,
         dst_stride: builtins.int = ...,
@@ -381,7 +390,8 @@ class ToArgbRequest(google.protobuf.message.Message):
         dst_height: builtins.int = ...,
         flip_y: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["buffer_handle", b"buffer_handle", "dst_format", b"dst_format", "dst_height", b"dst_height", "dst_ptr", b"dst_ptr", "dst_stride", b"dst_stride", "dst_width", b"dst_width", "flip_y", b"flip_y"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "dst_format", b"dst_format", "dst_height", b"dst_height", "dst_ptr", b"dst_ptr", "dst_stride", b"dst_stride", "dst_width", b"dst_width", "flip_y", b"flip_y"]) -> None: ...
 
 global___ToArgbRequest = ToArgbRequest
 

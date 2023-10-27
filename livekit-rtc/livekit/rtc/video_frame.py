@@ -17,9 +17,10 @@ from typing import Union
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
+from ._utils import get_address
 from ._proto import video_frame_pb2 as proto_video_frame
-from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoFrameReceived, VideoRotation
-from abc import ABC
+from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
+from abc import ABC, abstractmethod
 
 
 class VideoFrame:
@@ -52,23 +53,29 @@ class VideoFrameBuffer(ABC):
         return self._height
 
     @property
+    def data(self) -> bytearray:
+        return self._data
+
+    @property
     def type(self) -> VideoFrameBufferType.ValueType:
         return self._buffer_type
 
-    # TODO(theomonnom): Need Rust modification
+    @abstractmethod
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        pass
+
     def to_i420(self) -> 'I420Buffer':
         req = proto_ffi.FfiRequest()
-        req.to_i420.yuv_handle = self._ffi_handle.handle
+        req.to_i420.buffer.CopyFrom(self._proto_info())
         resp = ffi_client.request(req)
-        return I420Buffer(resp.to_i420.buffer)
+        return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
-    # TODO(theomonnom): Need Rust modification
     def to_argb(self, dst: 'ArgbFrame') -> None:
         req = proto_ffi.FfiRequest()
-        req.to_argb.buffer_handle = self._ffi_handle.handle
-        req.to_argb.dst_ptr = ctypes.addressof(dst.data)
+        req.to_argb.buffer.CopyFrom(self._proto_info())
+        req.to_argb.dst_ptr = get_address(memoryview(self._data))
         req.to_argb.dst_format = dst.format
-        req.to_argb.dst_stride = dst.width * 4
+        req.to_argb.dst_stride = dst.stride
         req.to_argb.dst_width = dst.width
         req.to_argb.dst_height = dst.height
         ffi_client.request(req)
@@ -82,27 +89,48 @@ class VideoFrameBuffer(ABC):
 
         info = owned_info.info
         if info.buffer_type == VideoFrameBufferType.NATIVE:
-            return NativeVideoFrameBuffer(owned_info)
+            return NativeVideoBuffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I420:
-            return I420Buffer(owned_info)
+            return I420Buffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I420A:
-            return I420ABuffer(owned_info)
+            return I420ABuffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I422:
-            return I422Buffer(owned_info)
+            return I422Buffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I444:
-            return I444Buffer(owned_info)
+            return I444Buffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.I010:
-            return I010Buffer(owned_info)
+            return I010Buffer._from_owned_info(owned_info)
         elif info.buffer_type == VideoFrameBufferType.NV12:
-            return NV12Buffer(owned_info)
+            return NV12Buffer._from_owned_info(owned_info)
         else:
             raise Exception('Unsupported VideoFrameBufferType')
 
 
 # TODO(theomonnom): Ability to get GPU texture directly
-class NativeVideoFrameBuffer(VideoFrameBuffer):
-    def __init__(self, width: int, height: int) -> None:
-        super().__init__(bytearray(), width, height, VideoFrameBufferType.NATIVE)
+class NativeVideoBuffer(VideoFrameBuffer):
+    def __init__(self, owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> None:
+        self._info = owned_info.info
+        self._ffi_handle = FfiHandle(owned_info.handle.id)
+        super().__init__(bytearray(), self._info.width,
+                         self._info.height, VideoFrameBufferType.NATIVE)
+
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        return self._info
+
+    @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) \
+            -> 'NativeVideoBuffer':
+        return NativeVideoBuffer(owned_info)
+
+    def to_i420(self) -> 'I420Buffer':
+        req = proto_ffi.FfiRequest()
+        req.to_i420.handle = self._ffi_handle.handle
+        resp = ffi_client.request(req)
+        return I420Buffer._from_owned_info(resp.to_i420.buffer)
+
+    def to_argb(self, dst: 'ArgbFrame') -> None:
+        self.to_i420().to_argb(dst)
+
 
 
 class PlanarYuvBuffer(VideoFrameBuffer, ABC):
@@ -122,6 +150,16 @@ class PlanarYuvBuffer(VideoFrameBuffer, ABC):
         self._stride_v = stride_v
         self._chroma_width = chroma_width
         self._chroma_height = chroma_height
+
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        info = proto_video_frame.VideoFrameBufferInfo()
+        info.width = self._width
+        info.height = self._height
+        info.buffer_type = self._buffer_type
+        info.yuv.stride_y = self._stride_y
+        info.yuv.stride_u = self._stride_u
+        info.yuv.stride_v = self._stride_v
+        return info
 
     @property
     def chroma_width(self) -> int:
@@ -158,6 +196,13 @@ class PlanarYuv8Buffer(PlanarYuvBuffer, ABC):
         super().__init__(data, width, height, buffer_type, stride_u,
                          stride_y, stride_v, chroma_width, chroma_height)
 
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        info = super()._proto_info()
+        info.yuv.data_y_ptr = get_address(self.data_y)
+        info.yuv.data_u_ptr = get_address(self.data_u)
+        info.yuv.data_v_ptr = get_address(self.data_v)
+        return info
+
     @property
     def data_y(self) -> memoryview:
         return memoryview(self._data)[0:self._stride_y * self._height]
@@ -190,6 +235,13 @@ class PlanarYuv16Buffer(PlanarYuvBuffer, ABC):
                  chroma_height: int) -> None:
         super().__init__(data, width, height, buffer_type, stride_y,
                          stride_u, stride_v, chroma_width, chroma_height)
+
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        info = super()._proto_info()
+        info.yuv.data_y_ptr = get_address(self.data_y)
+        info.yuv.data_u_ptr = get_address(self.data_u)
+        info.yuv.data_v_ptr = get_address(self.data_v)
+        return info
 
     @property
     def data_y(self) -> memoryview:
@@ -225,6 +277,17 @@ class BiplanaraYuv8Buffer(VideoFrameBuffer, ABC):
         self._stride_uv = stride_uv
         self._chroma_width = chroma_width
         self._chroma_height = chroma_height
+
+    def _proto_info(self) -> proto_video_frame.VideoFrameBufferInfo:
+        info = proto_video_frame.VideoFrameBufferInfo()
+        info.width = self._width
+        info.height = self._height
+        info.buffer_type = self._buffer_type
+        info.bi_yuv.stride_y = self._stride_y
+        info.bi_yuv.stride_uv = self._stride_uv
+        info.bi_yuv.data_y_ptr = get_address(self.data_y)
+        info.bi_yuv.data_uv_ptr = get_address(self.data_uv)
+        return info
 
     @property
     def chroma_width(self) -> int:
@@ -273,6 +336,18 @@ class I420Buffer(PlanarYuv8Buffer):
                          VideoFrameBufferType.I420, stride_y, stride_u, stride_v, chroma_width, chroma_height)
 
     @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I420Buffer':
+        info = owned_info.info
+        stride_y = info.yuv.stride_y
+        stride_u = info.yuv.stride_u
+        stride_v = info.yuv.stride_v
+        cdata = (ctypes.c_uint8 * I420Buffer.calc_data_size(info.height,
+                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return I420Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
+
+    @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int) -> int:
         return stride_y * height + (stride_u + stride_v) * ((height + 1) // 2)
 
@@ -307,6 +382,19 @@ class I420ABuffer(PlanarYuv8Buffer):
         super().__init__(data, width, height, VideoFrameBufferType.I420A,
                          stride_y, stride_u, stride_v, chroma_width, chroma_height)
         self._stride_a = stride_a
+
+    @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I420ABuffer':
+        info = owned_info.info
+        stride_y = info.yuv.stride_y
+        stride_u = info.yuv.stride_u
+        stride_v = info.yuv.stride_v
+        stride_a = info.yuv.stride_a
+        cdata = (ctypes.c_uint8 * I420ABuffer.calc_data_size(info.height,
+                 stride_y, stride_u, stride_v, stride_a)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return I420ABuffer(data, info.width, info.height, stride_y, stride_u, stride_v, stride_a)
 
     @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int, stride_a: int) -> int:
@@ -347,6 +435,18 @@ class I422Buffer(PlanarYuv8Buffer):
                          stride_y, stride_u, stride_v, chroma_width, chroma_height)
 
     @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I422Buffer':
+        info = owned_info.info
+        stride_y = info.yuv.stride_y
+        stride_u = info.yuv.stride_u
+        stride_v = info.yuv.stride_v
+        cdata = (ctypes.c_uint8 * I422Buffer.calc_data_size(info.height,
+                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return I422Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
+
+    @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int) -> int:
         return stride_y * height + stride_u * height + stride_v * height
 
@@ -369,6 +469,18 @@ class I444Buffer(PlanarYuv8Buffer):
         chroma_height = height
         super().__init__(data, width, height, VideoFrameBufferType.I444,
                          stride_y, stride_u, stride_v, chroma_width, chroma_height)
+
+    @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I444Buffer':
+        info = owned_info.info
+        stride_y = info.yuv.stride_y
+        stride_u = info.yuv.stride_u
+        stride_v = info.yuv.stride_v
+        cdata = (ctypes.c_uint8 * I444Buffer.calc_data_size(info.height,
+                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return I444Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
 
     @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int) -> int:
@@ -394,6 +506,18 @@ class I010Buffer(PlanarYuv16Buffer):
                          stride_y, stride_u, stride_v, chroma_width, chroma_height)
 
     @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'I010Buffer':
+        info = owned_info.info
+        stride_y = info.yuv.stride_y
+        stride_u = info.yuv.stride_u
+        stride_v = info.yuv.stride_v
+        cdata = (ctypes.c_uint8 * I010Buffer.calc_data_size(info.height,
+                 stride_y, stride_u, stride_v)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return I010Buffer(data, info.width, info.height, stride_y, stride_u, stride_v)
+
+    @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_u: int, stride_v: int) -> int:
         return stride_y * height * 2 + stride_u * ((height + 1) // 2) * 2 + stride_v * ((height + 1) // 2) * 2
 
@@ -414,6 +538,17 @@ class NV12Buffer(BiplanaraYuv8Buffer):
         chroma_height = (height + 1) // 2
         super().__init__(data, width, height, VideoFrameBufferType.NV12,
                          stride_y, stride_uv, chroma_width, chroma_height)
+
+    @staticmethod
+    def _from_owned_info(owned_info: proto_video_frame.OwnedVideoFrameBuffer) -> 'NV12Buffer':
+        info = owned_info.info
+        stride_y = info.bi_yuv.stride_y
+        stride_uv = info.bi_yuv.stride_uv
+        cdata = (ctypes.c_uint8 * NV12Buffer.calc_data_size(info.height,
+                 stride_y, stride_uv)).from_address(info.yuv.data_y_ptr)
+        data = bytearray(cdata)
+        FfiHandle(owned_info.handle.id)
+        return NV12Buffer(data, info.width, info.height, stride_y, stride_uv)
 
     @staticmethod
     def calc_data_size(height: int, stride_y: int, stride_uv: int) -> int:
@@ -443,15 +578,30 @@ class ArgbFrame:
     def to_i420(self) -> I420Buffer:
         # TODO(theomonnom): avoid unnecessary buffer allocation
         req = proto_ffi.FfiRequest()
-        req.to_i420.argb.format = self._format
+        req.to_i420.argb.format = self.format
         req.to_i420.argb.width = self.width
         req.to_i420.argb.height = self.height
-        req.to_i420.argb.stride = self.width * 4
-        req.to_i420.argb.ptr = ctypes.addressof(self.data)
-
+        req.to_i420.argb.stride = self.stride
+        req.to_i420.argb.ptr = get_address(memoryview(self._data))
         res = ffi_client.request(req)
-        return I420Buffer(res.to_i420.buffer)
+        return I420Buffer._from_owned_info(res.to_i420.buffer)
 
-    @ property
+    @property
+    def data(self) -> bytearray:
+        return self._data
+
+    @property
+    def width(self) -> int:
+        return self._width
+
+    @property
+    def height(self) -> int:
+        return self._height
+
+    @property
+    def stride(self) -> int:
+        return self._stride
+
+    @property
     def format(self) -> VideoFormatType.ValueType:
         return self._format
