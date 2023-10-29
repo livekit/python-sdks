@@ -9,7 +9,7 @@ URL = "ws://localhost:7880"
 TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
 
 # ("livekitrocks") this is our shared key, it must match the one used by your clients
-SHARED_KEY = b"liveitrocks"
+SHARED_KEY = b"livekitrocks"
 
 
 async def draw_cube(source: rtc.VideoSource):
@@ -45,8 +45,8 @@ async def draw_cube(source: rtc.VideoSource):
         [3, 7],
     ]
 
-    frame = rtc.ArgbFrame(rtc.VideoFormatType.FORMAT_ARGB, W, H)
-    arr = np.ctypeslib.as_array(frame.data)
+    frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, W, H)
+    arr = np.frombuffer(frame.data, dtype=np.uint8)
     angle = 0
 
     while True:
@@ -95,7 +95,7 @@ async def draw_cube(source: rtc.VideoSource):
 
 
 async def main(room: rtc.Room):
-    @room.listens_to("e2ee_state_changed")
+    @room.on("e2ee_state_changed")
     def on_e2ee_state_changed(
         participant: rtc.Participant, state: rtc.EncryptionState
     ) -> None:
