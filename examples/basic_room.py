@@ -10,7 +10,6 @@ TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 
 
 async def main(room: rtc.Room) -> None:
-
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant) -> None:
         logging.info(
@@ -106,8 +105,7 @@ async def main(room: rtc.Room) -> None:
     def on_track_subscription_failed(
         participant: rtc.RemoteParticipant, track_sid: str, error: str
     ):
-        logging.info("track subscription failed: %s %s",
-                     participant.identity, error)
+        logging.info("track subscription failed: %s %s", participant.identity, error)
 
     @room.on("connection_state_changed")
     def on_connection_state_changed(state: rtc.ConnectionState):
@@ -140,8 +138,7 @@ async def main(room: rtc.Room) -> None:
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler(
-            "basic_room.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
     )
 
     loop = asyncio.get_event_loop()
@@ -153,8 +150,7 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(
-            signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()
