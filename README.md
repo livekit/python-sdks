@@ -16,8 +16,14 @@ Official LiveKit documentation: https://docs.livekit.io/
 
 ## Installation
 
+Rtc Client
 ```shell
 $ pip install livekit
+```
+
+Api
+```shell
+$ pip install livekit-rtc
 ```
 
 ## Connecting to a room
@@ -25,12 +31,6 @@ $ pip install livekit
 ```python
 async def main():
     room = livekit.Room()
-
-    # participants and tracks that are already available in the room
-    # participant_connected and track_published events will *not* be emitted for them
-    for participant in room.participants.items():
-        for publication in participant.tracks.items():
-            print("track publication: %s", publication.sid)
 
     @room.on("participant_connected")
     def on_participant_connected(participant: livekit.RemoteParticipant):
@@ -54,6 +54,12 @@ async def main():
     # all published tracks in the room
     await room.connect(URL, TOKEN)
     logging.info("connected to room %s", room.name)
+
+    # participants and tracks that are already available in the room
+    # participant_connected and track_published events will *not* be emitted for them
+    for participant in room.participants.items():
+        for publication in participant.tracks.items():
+            print("track publication: %s", publication.sid)
 ```
 
 ## Examples
