@@ -23,7 +23,7 @@ $ pip install livekit
 
 API / Server SDK:
 ```shell
-$ pip install livekit-rtc
+$ pip install livekit-api
 ```
 
 ## Connecting to a room
@@ -66,7 +66,7 @@ async def main():
 
 ## Create a new access token
 
-```
+```python
 from livekit import api
 
 token = api.AccessToken("API_KEY", "SECRET_KEY")
