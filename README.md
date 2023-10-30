@@ -16,12 +16,12 @@ Official LiveKit documentation: https://docs.livekit.io/
 
 ## Installation
 
-RTC Client
+RTC Client:
 ```shell
 $ pip install livekit
 ```
 
-API / Server SDK
+API / Server SDK:
 ```shell
 $ pip install livekit-rtc
 ```
@@ -29,25 +29,27 @@ $ pip install livekit-rtc
 ## Connecting to a room
 
 ```python
+from livekit import rtc
+
 async def main():
-    room = livekit.Room()
+    room = rtc.Room()
 
     @room.on("participant_connected")
-    def on_participant_connected(participant: livekit.RemoteParticipant):
+    def on_participant_connected(participant: rtc.RemoteParticipant):
         logging.info(
             "participant connected: %s %s", participant.sid, participant.identity)
 
-    async def receive_frames(stream: livekit.VideoStream):
+    async def receive_frames(stream: rtc.VideoStream):
         async for frame in video_stream:
             # received a video frame from the track, process it here
             pass
 
     # track_subscribed is emitted whenever the local participant is subscribed to a new track
     @room.on("track_subscribed")
-    def on_track_subscribed(track: livekit.Track, publication: livekit.RemoteTrackPublication, participant: livekit.RemoteParticipant):
+    def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
         logging.info("track subscribed: %s", publication.sid)
-        if track.kind == livekit.TrackKind.KIND_VIDEO:
-            video_stream = livekit.VideoStream(track)
+        if track.kind == rtc.TrackKind.KIND_VIDEO:
+            video_stream = rtc.VideoStream(track)
             asyncio.ensure_future(receive_frames(video_stream))
 
     # By default, autosubscribe is enabled. The participant will be subscribed to
