@@ -16,12 +16,12 @@ Official LiveKit documentation: https://docs.livekit.io/
 
 ## Installation
 
-Rtc Client
+RTC Client
 ```shell
 $ pip install livekit
 ```
 
-Api
+API / Server SDK
 ```shell
 $ pip install livekit-rtc
 ```
