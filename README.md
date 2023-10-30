@@ -64,6 +64,21 @@ async def main():
             print("track publication: %s", publication.sid)
 ```
 
+## Create a new access token
+
+```
+from livekit import api
+
+token = api.AccessToken("API_KEY", "SECRET_KEY")
+token = AccessToken()
+jwt = (
+    token.with_identity("user1")
+    .with_name("user1")
+    .with_grants(VideoGrants(room_join=True, room="room1"))
+    .to_jwt()
+)
+```
+
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/client-sdk-python/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
