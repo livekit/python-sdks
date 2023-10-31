@@ -54,7 +54,11 @@ T = TypeVar("T", bound=Message)
 class TwirpClient:
     def __init__(self, host: str, pkg: str, prefix: str = DEFAULT_PREFIX) -> None:
         parse_res = urlparse(host)
-        host = f"http://{parse_res.netloc}/{parse_res.path}"
+        scheme = parse_res.scheme
+        if scheme.startswith("ws"):
+            scheme = scheme.replace("ws", "http")
+
+        host = f"{scheme}://{parse_res.netloc}/{parse_res.path}"
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
