@@ -16,8 +16,9 @@ from typing import Dict, Type, TypeVar
 
 import aiohttp
 from google.protobuf.message import Message
+from urllib.parse import urlparse
 
-DEFAULT_PREFIX = "/twirp"
+DEFAULT_PREFIX = "twirp"
 
 
 class TwirpError(Exception):
@@ -52,7 +53,10 @@ T = TypeVar("T", bound=Message)
 
 class TwirpClient:
     def __init__(self, host: str, pkg: str, prefix: str = DEFAULT_PREFIX) -> None:
-        self.host = host
+        parse_res = urlparse(host)
+        path = parse_res.path.strip("/")
+        host = f"http://{parse_res.netloc}/{parse_res.path}"
+        self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
         self.session = aiohttp.ClientSession()
@@ -69,8 +73,8 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        async with self.session.post(
-            url, headers=headers, data=serialized_data
+        async with self.session.request(
+            "post", url, headers=headers, data=serialized_data
         ) as resp:
             if resp.status == 200:
                 return response_class.FromString(await resp.read())
