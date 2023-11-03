@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, List, Union
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
+from ._proto import stats_pb2 as proto_stats
 
 if TYPE_CHECKING:
     from .audio_source import AudioSource
@@ -47,8 +48,20 @@ class Track:
     def muted(self) -> bool:
         return self._info.muted
 
-    def update_info(self, info: proto_track.TrackInfo):
-        self._info = info
+    async def get_stats(self) -> List[proto_stats.RtcStats]:
+        req = proto_ffi.FfiRequest()
+        req.get_stats.track_handle = self._ffi_handle.handle
+
+        queue = ffi_client.queue.subscribe()
+        try:
+            resp = ffi_client.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.get_stats.async_id == resp.get_stats.async_id
+            )
+        finally:
+            ffi_client.queue.unsubscribe(queue)
+
+        return list(cb.get_stats.stats)
 
 
 class LocalAudioTrack(Track):
