@@ -28,6 +28,7 @@ from ._proto.room_pb2 import (
 from ._proto.e2ee_pb2 import EncryptionType, EncryptionState
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
 from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
+from ._proto import stats_pb2 as stats
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioStream
