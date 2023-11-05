@@ -16,11 +16,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import builtins
+import collections.abc
 from . import e2ee_pb2
 import google.protobuf.descriptor
+import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
+from . import stats_pb2
 import sys
 import typing
 
@@ -159,6 +162,60 @@ class CreateAudioTrackResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["track", b"track"]) -> None: ...
 
 global___CreateAudioTrackResponse = CreateAudioTrackResponse
+
+@typing_extensions.final
+class GetStatsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        track_handle: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["track_handle", b"track_handle"]) -> None: ...
+
+global___GetStatsRequest = GetStatsRequest
+
+@typing_extensions.final
+class GetStatsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+
+global___GetStatsResponse = GetStatsResponse
+
+@typing_extensions.final
+class GetStatsCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    STATS_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+        stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+
+global___GetStatsCallback = GetStatsCallback
 
 @typing_extensions.final
 class TrackEvent(google.protobuf.message.Message):
