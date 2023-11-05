@@ -55,6 +55,10 @@ class VideoGrants:
     # indicates to the room that current participant is a recorder
     recorder: bool = False
 
+    # indicates that the holder can register as an Agent framework worker
+    # it is also set on all participants that are joining as Agent
+    agent: bool = False
+
 
 @dataclasses.dataclass
 class Claims:
