@@ -61,6 +61,9 @@ class Track:
         finally:
             ffi_client.queue.unsubscribe(queue)
 
+        if cb.get_stats.error:
+            raise Exception(cb.get_stats.error)
+
         return list(cb.get_stats.stats)
 
 
