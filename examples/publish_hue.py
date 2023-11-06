@@ -9,9 +9,10 @@ from livekit import rtc
 URL = "ws://localhost:7880"
 TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
 
+WIDTH, HEIGHT = 1280, 720
 
 async def draw_color_cycle(source: rtc.VideoSource):
-    argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, 1280, 720)
+    argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
     arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
 
     framerate = 1 / 30
@@ -50,7 +51,7 @@ async def main(room: rtc.Room):
         return
 
     # publish a track
-    source = rtc.VideoSource()
+    source = rtc.VideoSource(WIDTH, HEIGHT)
     track = rtc.LocalVideoTrack.create_video_track("hue", source)
     options = rtc.TrackPublishOptions()
     options.source = rtc.TrackSource.SOURCE_CAMERA

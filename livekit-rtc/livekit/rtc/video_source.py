@@ -19,11 +19,13 @@ from .video_frame import VideoFrame
 
 
 class VideoSource:
-    def __init__(self) -> None:
+    def __init__(self, width: int, height: int) -> None:
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = (
             proto_video_frame.VideoSourceType.VIDEO_SOURCE_NATIVE
         )
+        req.new_video_source.resolution.width = width
+        req.new_video_source.resolution.height = height
 
         resp = ffi_client.request(req)
         self._info = resp.new_video_source.source
