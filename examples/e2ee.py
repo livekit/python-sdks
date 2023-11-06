@@ -11,9 +11,10 @@ TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 # ("livekitrocks") this is our shared key, it must match the one used by your clients
 SHARED_KEY = b"livekitrocks"
 
+WIDTH, HEIGHT = 1280, 720
 
 async def draw_cube(source: rtc.VideoSource):
-    W, H, MID_W, MID_H = 1280, 720, 640, 360
+    MID_W, MID_H = 640, 360
     cube_size = 60
     vertices = (
         np.array(
@@ -45,7 +46,7 @@ async def draw_cube(source: rtc.VideoSource):
         [3, 7],
     ]
 
-    frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, W, H)
+    frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
     arr = np.frombuffer(frame.data, dtype=np.uint8)
     angle = 0
 
@@ -82,8 +83,8 @@ async def draw_cube(source: rtc.VideoSource):
                 )
                 for dx in [-1, 0, 1]:
                     for dy in [-1, 0, 1]:
-                        if 0 <= x + dx < W and 0 <= y + dy < H:
-                            idx = (y + dy) * W * 4 + (x + dx) * 4
+                        if 0 <= x + dx < WIDTH and 0 <= y + dy < HEIGHT:
+                            idx = (y + dy) * WIDTH * 4 + (x + dx) * 4
                             arr[idx : idx + 4] = [255, 255, 255, 255]
 
         f = rtc.VideoFrame(0, rtc.VideoRotation.VIDEO_ROTATION_0, frame.to_i420())
@@ -116,7 +117,7 @@ async def main(room: rtc.Room):
         return False
 
     # publish a track
-    source = rtc.VideoSource()
+    source = rtc.VideoSource(WIDTH, HEIGHT)
     track = rtc.LocalVideoTrack.create_video_track("cube", source)
     options = rtc.TrackPublishOptions()
     options.source = rtc.TrackSource.SOURCE_CAMERA
