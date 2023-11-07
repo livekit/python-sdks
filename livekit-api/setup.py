@@ -52,9 +52,10 @@ setuptools.setup(
         "aiohttp>=3.8.0",
         "protobuf>=3.1.0",
         "types-protobuf>=3.1.0",
+        "livekit-protocol>=0.1.0",
     ],
     package_data={
-        "livekit.api": ["_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"],
+        "livekit.api": ["py.typed", "*.pyi", "**/*.pyi"],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
