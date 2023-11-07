@@ -1,5 +1,5 @@
 exclude = [
-  "_proto"
+  "livekit-protocol/livekit/protocol"
 ]
 
 line-length = 88
