@@ -20,6 +20,7 @@ from ._proto.livekit_egress_pb2 import *
 from ._proto.livekit_models_pb2 import *
 from ._proto.livekit_room_pb2 import *
 from ._proto.livekit_ingress_pb2 import *
-from .version import __version__
 from .access_token import VideoGrants, AccessToken
 from .room_service import RoomService
+
+from .version import __version__
