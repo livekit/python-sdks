@@ -17,10 +17,8 @@
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
 
 API_PROTOCOL=./protocol
-API_OUT_PYTHON=./livekit/api/_proto
+API_OUT_PYTHON=./livekit/protocol
  
-# api
-
 protoc \
     -I=$API_PROTOCOL \
     --python_out=$API_OUT_PYTHON \
@@ -29,11 +27,12 @@ protoc \
     $API_PROTOCOL/livekit_room.proto \
     $API_PROTOCOL/livekit_webhook.proto \
     $API_PROTOCOL/livekit_ingress.proto \
-    $API_PROTOCOL/livekit_models.proto
+    $API_PROTOCOL/livekit_models.proto \
+    $API_PROTOCOL/livekit_agent.proto
 
 
 touch -a "$API_OUT_PYTHON/__init__.py"
 
 for f in "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi; do
-    perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2))|from . $1|g' "$f"
+    perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2))|from . $1|g' "$f"
 done
