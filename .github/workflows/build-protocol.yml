@@ -1,4 +1,4 @@
-name: Build API
+name: Build Protocol
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   build_wheels:
-    name: Build API wheel/sdist
+    name: Build Protocol wheel/sdist
     runs-on: ubuntu-latest
     defaults:
       run:
