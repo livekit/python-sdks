@@ -3,14 +3,14 @@ name: Build API
 on:
   push:
     paths:
-      - livekit-api/**
+      - livekit-protocol/**
   pull_request:
     paths:
-      - livekit-api/**
+      - livekit-protocol/**
   workflow_dispatch:
 
 env:
-  PACKAGE_DIR: ./livekit-api
+  PACKAGE_DIR: ./livekit-protocol
 
 jobs:
   build_wheels:
@@ -36,22 +36,22 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: api-release
+          name: protocol-release
           path: |
-            livekit-api/dist/*.whl
-            livekit-api/dist/*.tar.gz
+            livekit-protocol/dist/*.whl
+            livekit-protocol/dist/*.tar.gz
 
   publish:
-    name: Publish API release
+    name: Publish Protocol release
     needs: build_wheels
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-    if: startsWith(github.ref, 'refs/tags/api-v')
+    if: startsWith(github.ref, 'refs/tags/protocol-v')
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: api-release
+          name: protocol-release
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1
