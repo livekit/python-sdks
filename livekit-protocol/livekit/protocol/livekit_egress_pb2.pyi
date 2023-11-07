@@ -823,9 +823,11 @@ class EncodingOptions(google.protobuf.message.Message):
     FRAMERATE_FIELD_NUMBER: builtins.int
     AUDIO_CODEC_FIELD_NUMBER: builtins.int
     AUDIO_BITRATE_FIELD_NUMBER: builtins.int
+    AUDIO_QUALITY_FIELD_NUMBER: builtins.int
     AUDIO_FREQUENCY_FIELD_NUMBER: builtins.int
     VIDEO_CODEC_FIELD_NUMBER: builtins.int
     VIDEO_BITRATE_FIELD_NUMBER: builtins.int
+    VIDEO_QUALITY_FIELD_NUMBER: builtins.int
     KEY_FRAME_INTERVAL_FIELD_NUMBER: builtins.int
     width: builtins.int
     """(default 1920)"""
@@ -839,12 +841,16 @@ class EncodingOptions(google.protobuf.message.Message):
     """(default OPUS)"""
     audio_bitrate: builtins.int
     """(default 128)"""
+    audio_quality: builtins.int
+    """quality setting on audio encoder"""
     audio_frequency: builtins.int
     """(default 44100)"""
     video_codec: livekit_models_pb2.VideoCodec.ValueType
     """(default H264_MAIN)"""
     video_bitrate: builtins.int
     """(default 4500)"""
+    video_quality: builtins.int
+    """quality setting on video encoder"""
     key_frame_interval: builtins.float
     """in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)"""
     def __init__(
@@ -856,12 +862,14 @@ class EncodingOptions(google.protobuf.message.Message):
         framerate: builtins.int = ...,
         audio_codec: livekit_models_pb2.AudioCodec.ValueType = ...,
         audio_bitrate: builtins.int = ...,
+        audio_quality: builtins.int = ...,
         audio_frequency: builtins.int = ...,
         video_codec: livekit_models_pb2.VideoCodec.ValueType = ...,
         video_bitrate: builtins.int = ...,
+        video_quality: builtins.int = ...,
         key_frame_interval: builtins.float = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_bitrate", b"audio_bitrate", "audio_codec", b"audio_codec", "audio_frequency", b"audio_frequency", "depth", b"depth", "framerate", b"framerate", "height", b"height", "key_frame_interval", b"key_frame_interval", "video_bitrate", b"video_bitrate", "video_codec", b"video_codec", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_bitrate", b"audio_bitrate", "audio_codec", b"audio_codec", "audio_frequency", b"audio_frequency", "audio_quality", b"audio_quality", "depth", b"depth", "framerate", b"framerate", "height", b"height", "key_frame_interval", b"key_frame_interval", "video_bitrate", b"video_bitrate", "video_codec", b"video_codec", "video_quality", b"video_quality", "width", b"width"]) -> None: ...
 
 global___EncodingOptions = EncodingOptions
 
@@ -905,29 +913,6 @@ class UpdateStreamRequest(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["add_output_urls", b"add_output_urls", "egress_id", b"egress_id", "remove_output_urls", b"remove_output_urls"]) -> None: ...
 
 global___UpdateStreamRequest = UpdateStreamRequest
-
-@typing_extensions.final
-class UpdateOutputsRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    EGRESS_ID_FIELD_NUMBER: builtins.int
-    ADD_IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
-    REMOVE_IMAGE_OUTPUTS_FIELD_NUMBER: builtins.int
-    egress_id: builtins.str
-    @property
-    def add_image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
-    @property
-    def remove_image_outputs(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ImageOutput]: ...
-    def __init__(
-        self,
-        *,
-        egress_id: builtins.str = ...,
-        add_image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
-        remove_image_outputs: collections.abc.Iterable[global___ImageOutput] | None = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["add_image_outputs", b"add_image_outputs", "egress_id", b"egress_id", "remove_image_outputs", b"remove_image_outputs"]) -> None: ...
-
-global___UpdateOutputsRequest = UpdateOutputsRequest
 
 @typing_extensions.final
 class ListEgressRequest(google.protobuf.message.Message):

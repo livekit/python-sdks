@@ -337,6 +337,7 @@ class ParticipantPermission(google.protobuf.message.Message):
     HIDDEN_FIELD_NUMBER: builtins.int
     RECORDER_FIELD_NUMBER: builtins.int
     CAN_UPDATE_METADATA_FIELD_NUMBER: builtins.int
+    AGENT_FIELD_NUMBER: builtins.int
     can_subscribe: builtins.bool
     """allow participant to subscribe to other tracks in the room"""
     can_publish: builtins.bool
@@ -352,6 +353,8 @@ class ParticipantPermission(google.protobuf.message.Message):
     """indicates it's a recorder instance"""
     can_update_metadata: builtins.bool
     """indicates that participant can update own metadata"""
+    agent: builtins.bool
+    """indicates that participant is an agent"""
     def __init__(
         self,
         *,
@@ -362,8 +365,9 @@ class ParticipantPermission(google.protobuf.message.Message):
         hidden: builtins.bool = ...,
         recorder: builtins.bool = ...,
         can_update_metadata: builtins.bool = ...,
+        agent: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["can_publish", b"can_publish", "can_publish_data", b"can_publish_data", "can_publish_sources", b"can_publish_sources", "can_subscribe", b"can_subscribe", "can_update_metadata", b"can_update_metadata", "hidden", b"hidden", "recorder", b"recorder"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["agent", b"agent", "can_publish", b"can_publish", "can_publish_data", b"can_publish_data", "can_publish_sources", b"can_publish_sources", "can_subscribe", b"can_subscribe", "can_update_metadata", b"can_update_metadata", "hidden", b"hidden", "recorder", b"recorder"]) -> None: ...
 
 global___ParticipantPermission = ParticipantPermission
 

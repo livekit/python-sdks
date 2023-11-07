@@ -13,6 +13,7 @@ SHARED_KEY = b"livekitrocks"
 
 WIDTH, HEIGHT = 1280, 720
 
+
 async def draw_cube(source: rtc.VideoSource):
     MID_W, MID_H = 640, 360
     cube_size = 60

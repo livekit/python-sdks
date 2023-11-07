@@ -11,6 +11,7 @@ TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6Ik
 
 WIDTH, HEIGHT = 1280, 720
 
+
 async def draw_color_cycle(source: rtc.VideoSource):
     argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
     arr = np.frombuffer(argb_frame.data, dtype=np.uint8)

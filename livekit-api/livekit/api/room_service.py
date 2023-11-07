@@ -1,5 +1,5 @@
-from ._proto import livekit_models_pb2 as proto_models
-from ._proto import livekit_room_pb2 as proto_room
+from livekit.protocol import room as proto_room
+from livekit.protocol import models as proto_models
 from ._service import Service
 from .access_token import VideoGrants
 
