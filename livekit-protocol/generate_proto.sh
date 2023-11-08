@@ -33,6 +33,28 @@ protoc \
 
 touch -a "$API_OUT_PYTHON/__init__.py"
 
-for f in "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi; do
-    perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2))|from . $1|g' "$f"
-done
+
+# Patch the proto stubs
+
+# 1. rename the files
+# 2. change the imports to relative imports
+# 3. add __init__.py to the directory
+# 4. remove livekit_ prefix
+# 5. remove _pb2 suffix
+
+mv "$API_OUT_PYTHON/livekit_egress_pb2.py" "$API_OUT_PYTHON/egress.py"
+mv "$API_OUT_PYTHON/livekit_egress_pb2.pyi" "$API_OUT_PYTHON/egress.pyi"
+mv "$API_OUT_PYTHON/livekit_room_pb2.py" "$API_OUT_PYTHON/room.py"
+mv "$API_OUT_PYTHON/livekit_room_pb2.pyi" "$API_OUT_PYTHON/room.pyi"
+mv "$API_OUT_PYTHON/livekit_webhook_pb2.py" "$API_OUT_PYTHON/webhook.py"
+mv "$API_OUT_PYTHON/livekit_webhook_pb2.pyi" "$API_OUT_PYTHON/webhook.pyi"
+mv "$API_OUT_PYTHON/livekit_ingress_pb2.py" "$API_OUT_PYTHON/ingress.py"
+mv "$API_OUT_PYTHON/livekit_ingress_pb2.pyi" "$API_OUT_PYTHON/ingress.pyi"
+mv "$API_OUT_PYTHON/livekit_models_pb2.py" "$API_OUT_PYTHON/models.py"
+mv "$API_OUT_PYTHON/livekit_models_pb2.pyi" "$API_OUT_PYTHON/models.pyi"
+mv "$API_OUT_PYTHON/livekit_agent_pb2.py" "$API_OUT_PYTHON/agent.py"
+mv "$API_OUT_PYTHON/livekit_agent_pb2.pyi" "$API_OUT_PYTHON/agent.pyi"
+
+perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2))|from . $1|g' "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi
+
+perl -i -pe 's|livekit_(\w+)_pb2|${1}|g' "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi

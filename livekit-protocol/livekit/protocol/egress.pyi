@@ -21,7 +21,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
-from . import livekit_models_pb2
+from . import models
 import sys
 import typing
 
@@ -640,7 +640,7 @@ class ImageOutput(google.protobuf.message.Message):
     """(optional)"""
     filename_suffix: global___ImageFileSuffix.ValueType
     """(optional, default INDEX)"""
-    image_codec: livekit_models_pb2.ImageCodec.ValueType
+    image_codec: models.ImageCodec.ValueType
     """(optional)"""
     disable_manifest: builtins.bool
     """disable upload of manifest file (default false)"""
@@ -660,7 +660,7 @@ class ImageOutput(google.protobuf.message.Message):
         height: builtins.int = ...,
         filename_prefix: builtins.str = ...,
         filename_suffix: global___ImageFileSuffix.ValueType = ...,
-        image_codec: livekit_models_pb2.ImageCodec.ValueType = ...,
+        image_codec: models.ImageCodec.ValueType = ...,
         disable_manifest: builtins.bool = ...,
         s3: global___S3Upload | None = ...,
         gcp: global___GCPUpload | None = ...,
@@ -837,7 +837,7 @@ class EncodingOptions(google.protobuf.message.Message):
     """(default 24)"""
     framerate: builtins.int
     """(default 30)"""
-    audio_codec: livekit_models_pb2.AudioCodec.ValueType
+    audio_codec: models.AudioCodec.ValueType
     """(default OPUS)"""
     audio_bitrate: builtins.int
     """(default 128)"""
@@ -845,7 +845,7 @@ class EncodingOptions(google.protobuf.message.Message):
     """quality setting on audio encoder"""
     audio_frequency: builtins.int
     """(default 44100)"""
-    video_codec: livekit_models_pb2.VideoCodec.ValueType
+    video_codec: models.VideoCodec.ValueType
     """(default H264_MAIN)"""
     video_bitrate: builtins.int
     """(default 4500)"""
@@ -860,11 +860,11 @@ class EncodingOptions(google.protobuf.message.Message):
         height: builtins.int = ...,
         depth: builtins.int = ...,
         framerate: builtins.int = ...,
-        audio_codec: livekit_models_pb2.AudioCodec.ValueType = ...,
+        audio_codec: models.AudioCodec.ValueType = ...,
         audio_bitrate: builtins.int = ...,
         audio_quality: builtins.int = ...,
         audio_frequency: builtins.int = ...,
-        video_codec: livekit_models_pb2.VideoCodec.ValueType = ...,
+        video_codec: models.VideoCodec.ValueType = ...,
         video_bitrate: builtins.int = ...,
         video_quality: builtins.int = ...,
         key_frame_interval: builtins.float = ...,
@@ -1082,7 +1082,7 @@ class StreamInfo(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _StatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[StreamInfo._Status.ValueType], builtins.type):  # noqa: F821
+    class _StatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[StreamInfo._Status.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         ACTIVE: StreamInfo._Status.ValueType  # 0
         FINISHED: StreamInfo._Status.ValueType  # 1

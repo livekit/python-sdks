@@ -18,9 +18,9 @@ limitations under the License.
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
-from . import livekit_egress_pb2
-from . import livekit_ingress_pb2
-from . import livekit_models_pb2
+from . import egress
+from . import ingress
+from . import models
 import sys
 
 if sys.version_info >= (3, 8):
@@ -49,18 +49,18 @@ class WebhookEvent(google.protobuf.message.Message):
     ingress_started, ingress_ended
     """
     @property
-    def room(self) -> livekit_models_pb2.Room: ...
+    def room(self) -> models.Room: ...
     @property
-    def participant(self) -> livekit_models_pb2.ParticipantInfo:
+    def participant(self) -> models.ParticipantInfo:
         """set when event is participant_* or track_*"""
     @property
-    def egress_info(self) -> livekit_egress_pb2.EgressInfo:
+    def egress_info(self) -> egress.EgressInfo:
         """set when event is egress_*"""
     @property
-    def ingress_info(self) -> livekit_ingress_pb2.IngressInfo:
+    def ingress_info(self) -> ingress.IngressInfo:
         """set when event is ingress_*"""
     @property
-    def track(self) -> livekit_models_pb2.TrackInfo:
+    def track(self) -> models.TrackInfo:
         """set when event is track_*"""
     id: builtins.str
     """unique event uuid"""
@@ -71,11 +71,11 @@ class WebhookEvent(google.protobuf.message.Message):
         self,
         *,
         event: builtins.str = ...,
-        room: livekit_models_pb2.Room | None = ...,
-        participant: livekit_models_pb2.ParticipantInfo | None = ...,
-        egress_info: livekit_egress_pb2.EgressInfo | None = ...,
-        ingress_info: livekit_ingress_pb2.IngressInfo | None = ...,
-        track: livekit_models_pb2.TrackInfo | None = ...,
+        room: models.Room | None = ...,
+        participant: models.ParticipantInfo | None = ...,
+        egress_info: egress.EgressInfo | None = ...,
+        ingress_info: ingress.IngressInfo | None = ...,
+        track: models.TrackInfo | None = ...,
         id: builtins.str = ...,
         created_at: builtins.int = ...,
         num_dropped: builtins.int = ...,

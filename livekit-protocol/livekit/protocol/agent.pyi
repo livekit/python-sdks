@@ -19,7 +19,7 @@ import builtins
 import google.protobuf.descriptor
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
-from . import livekit_models_pb2
+from . import models
 import sys
 import typing
 
@@ -109,16 +109,16 @@ class Job(google.protobuf.message.Message):
     id: builtins.str
     type: global___JobType.ValueType
     @property
-    def room(self) -> livekit_models_pb2.Room: ...
+    def room(self) -> models.Room: ...
     @property
-    def participant(self) -> livekit_models_pb2.ParticipantInfo: ...
+    def participant(self) -> models.ParticipantInfo: ...
     def __init__(
         self,
         *,
         id: builtins.str = ...,
         type: global___JobType.ValueType = ...,
-        room: livekit_models_pb2.Room | None = ...,
-        participant: livekit_models_pb2.ParticipantInfo | None = ...,
+        room: models.Room | None = ...,
+        participant: models.ParticipantInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_participant", b"_participant", "participant", b"participant", "room", b"room"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["_participant", b"_participant", "id", b"id", "participant", b"participant", "room", b"room", "type", b"type"]) -> None: ...

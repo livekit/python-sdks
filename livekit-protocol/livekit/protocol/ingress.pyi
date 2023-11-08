@@ -21,7 +21,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
-from . import livekit_models_pb2
+from . import models
 import sys
 import typing
 
@@ -178,7 +178,7 @@ class IngressAudioOptions(google.protobuf.message.Message):
     PRESET_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     name: builtins.str
-    source: livekit_models_pb2.TrackSource.ValueType
+    source: models.TrackSource.ValueType
     preset: global___IngressAudioEncodingPreset.ValueType
     @property
     def options(self) -> global___IngressAudioEncodingOptions: ...
@@ -186,7 +186,7 @@ class IngressAudioOptions(google.protobuf.message.Message):
         self,
         *,
         name: builtins.str = ...,
-        source: livekit_models_pb2.TrackSource.ValueType = ...,
+        source: models.TrackSource.ValueType = ...,
         preset: global___IngressAudioEncodingPreset.ValueType = ...,
         options: global___IngressAudioEncodingOptions | None = ...,
     ) -> None: ...
@@ -205,7 +205,7 @@ class IngressVideoOptions(google.protobuf.message.Message):
     PRESET_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     name: builtins.str
-    source: livekit_models_pb2.TrackSource.ValueType
+    source: models.TrackSource.ValueType
     preset: global___IngressVideoEncodingPreset.ValueType
     @property
     def options(self) -> global___IngressVideoEncodingOptions: ...
@@ -213,7 +213,7 @@ class IngressVideoOptions(google.protobuf.message.Message):
         self,
         *,
         name: builtins.str = ...,
-        source: livekit_models_pb2.TrackSource.ValueType = ...,
+        source: models.TrackSource.ValueType = ...,
         preset: global___IngressVideoEncodingPreset.ValueType = ...,
         options: global___IngressVideoEncodingOptions | None = ...,
     ) -> None: ...
@@ -231,7 +231,7 @@ class IngressAudioEncodingOptions(google.protobuf.message.Message):
     BITRATE_FIELD_NUMBER: builtins.int
     DISABLE_DTX_FIELD_NUMBER: builtins.int
     CHANNELS_FIELD_NUMBER: builtins.int
-    audio_codec: livekit_models_pb2.AudioCodec.ValueType
+    audio_codec: models.AudioCodec.ValueType
     """desired audio codec to publish to room"""
     bitrate: builtins.int
     disable_dtx: builtins.bool
@@ -239,7 +239,7 @@ class IngressAudioEncodingOptions(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        audio_codec: livekit_models_pb2.AudioCodec.ValueType = ...,
+        audio_codec: models.AudioCodec.ValueType = ...,
         bitrate: builtins.int = ...,
         disable_dtx: builtins.bool = ...,
         channels: builtins.int = ...,
@@ -255,18 +255,18 @@ class IngressVideoEncodingOptions(google.protobuf.message.Message):
     VIDEO_CODEC_FIELD_NUMBER: builtins.int
     FRAME_RATE_FIELD_NUMBER: builtins.int
     LAYERS_FIELD_NUMBER: builtins.int
-    video_codec: livekit_models_pb2.VideoCodec.ValueType
+    video_codec: models.VideoCodec.ValueType
     """desired codec to publish to room"""
     frame_rate: builtins.float
     @property
-    def layers(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[livekit_models_pb2.VideoLayer]:
+    def layers(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[models.VideoLayer]:
         """simulcast layers to publish, when empty, should usually be set to layers at 1/2 and 1/4 of the dimensions"""
     def __init__(
         self,
         *,
-        video_codec: livekit_models_pb2.VideoCodec.ValueType = ...,
+        video_codec: models.VideoCodec.ValueType = ...,
         frame_rate: builtins.float = ...,
-        layers: collections.abc.Iterable[livekit_models_pb2.VideoLayer] | None = ...,
+        layers: collections.abc.Iterable[models.VideoLayer] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["frame_rate", b"frame_rate", "layers", b"layers", "video_codec", b"video_codec"]) -> None: ...
 
@@ -341,7 +341,7 @@ class IngressState(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _StatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[IngressState._Status.ValueType], builtins.type):  # noqa: F821
+    class _StatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[IngressState._Status.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         ENDPOINT_INACTIVE: IngressState._Status.ValueType  # 0
         ENDPOINT_BUFFERING: IngressState._Status.ValueType  # 1
@@ -378,7 +378,7 @@ class IngressState(google.protobuf.message.Message):
     ended_at: builtins.int
     resource_id: builtins.str
     @property
-    def tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[livekit_models_pb2.TrackInfo]: ...
+    def tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[models.TrackInfo]: ...
     def __init__(
         self,
         *,
@@ -390,7 +390,7 @@ class IngressState(google.protobuf.message.Message):
         started_at: builtins.int = ...,
         ended_at: builtins.int = ...,
         resource_id: builtins.str = ...,
-        tracks: collections.abc.Iterable[livekit_models_pb2.TrackInfo] | None = ...,
+        tracks: collections.abc.Iterable[models.TrackInfo] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["audio", b"audio", "video", b"video"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["audio", b"audio", "ended_at", b"ended_at", "error", b"error", "resource_id", b"resource_id", "room_id", b"room_id", "started_at", b"started_at", "status", b"status", "tracks", b"tracks", "video", b"video"]) -> None: ...
