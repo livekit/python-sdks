@@ -379,7 +379,7 @@ class ParticipantInfo(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _StateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ParticipantInfo._State.ValueType], builtins.type):  # noqa: F821
+    class _StateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ParticipantInfo._State.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         JOINING: ParticipantInfo._State.ValueType  # 0
         """websocket' connected, but not offered yet"""
@@ -456,7 +456,7 @@ class Encryption(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _TypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Encryption._Type.ValueType], builtins.type):  # noqa: F821
+    class _TypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Encryption._Type.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         NONE: Encryption._Type.ValueType  # 0
         GCM: Encryption._Type.ValueType  # 1
@@ -613,7 +613,7 @@ class DataPacket(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _KindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataPacket._Kind.ValueType], builtins.type):  # noqa: F821
+    class _KindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataPacket._Kind.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         RELIABLE: DataPacket._Kind.ValueType  # 0
         LOSSY: DataPacket._Kind.ValueType  # 1
@@ -751,7 +751,7 @@ class ServerInfo(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _EditionEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ServerInfo._Edition.ValueType], builtins.type):  # noqa: F821
+    class _EditionEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ServerInfo._Edition.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         Standard: ServerInfo._Edition.ValueType  # 0
         Cloud: ServerInfo._Edition.ValueType  # 1
@@ -797,7 +797,7 @@ class ClientInfo(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _SDKEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ClientInfo._SDK.ValueType], builtins.type):  # noqa: F821
+    class _SDKEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ClientInfo._SDK.ValueType], builtins.type):
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         UNKNOWN: ClientInfo._SDK.ValueType  # 0
         JS: ClientInfo._SDK.ValueType  # 1

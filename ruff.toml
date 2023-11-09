@@ -1,4 +1,5 @@
 exclude = [
+  "_proto",
   "livekit-protocol/livekit/protocol"
 ]
 

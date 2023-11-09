@@ -20,8 +20,8 @@ import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
-from . import livekit_egress_pb2
-from . import livekit_models_pb2
+from . import egress
+from . import models
 import sys
 
 if sys.version_info >= (3, 8):
@@ -90,17 +90,17 @@ class RoomEgress(google.protobuf.message.Message):
     PARTICIPANT_FIELD_NUMBER: builtins.int
     TRACKS_FIELD_NUMBER: builtins.int
     @property
-    def room(self) -> livekit_egress_pb2.RoomCompositeEgressRequest: ...
+    def room(self) -> egress.RoomCompositeEgressRequest: ...
     @property
-    def participant(self) -> livekit_egress_pb2.AutoParticipantEgress: ...
+    def participant(self) -> egress.AutoParticipantEgress: ...
     @property
-    def tracks(self) -> livekit_egress_pb2.AutoTrackEgress: ...
+    def tracks(self) -> egress.AutoTrackEgress: ...
     def __init__(
         self,
         *,
-        room: livekit_egress_pb2.RoomCompositeEgressRequest | None = ...,
-        participant: livekit_egress_pb2.AutoParticipantEgress | None = ...,
-        tracks: livekit_egress_pb2.AutoTrackEgress | None = ...,
+        room: egress.RoomCompositeEgressRequest | None = ...,
+        participant: egress.AutoParticipantEgress | None = ...,
+        tracks: egress.AutoTrackEgress | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["participant", b"participant", "room", b"room", "tracks", b"tracks"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["participant", b"participant", "room", b"room", "tracks", b"tracks"]) -> None: ...
@@ -130,11 +130,11 @@ class ListRoomsResponse(google.protobuf.message.Message):
 
     ROOMS_FIELD_NUMBER: builtins.int
     @property
-    def rooms(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[livekit_models_pb2.Room]: ...
+    def rooms(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[models.Room]: ...
     def __init__(
         self,
         *,
-        rooms: collections.abc.Iterable[livekit_models_pb2.Room] | None = ...,
+        rooms: collections.abc.Iterable[models.Room] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["rooms", b"rooms"]) -> None: ...
 
@@ -188,11 +188,11 @@ class ListParticipantsResponse(google.protobuf.message.Message):
 
     PARTICIPANTS_FIELD_NUMBER: builtins.int
     @property
-    def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[livekit_models_pb2.ParticipantInfo]: ...
+    def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[models.ParticipantInfo]: ...
     def __init__(
         self,
         *,
-        participants: collections.abc.Iterable[livekit_models_pb2.ParticipantInfo] | None = ...,
+        participants: collections.abc.Iterable[models.ParticipantInfo] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["participants", b"participants"]) -> None: ...
 
@@ -261,11 +261,11 @@ class MuteRoomTrackResponse(google.protobuf.message.Message):
 
     TRACK_FIELD_NUMBER: builtins.int
     @property
-    def track(self) -> livekit_models_pb2.TrackInfo: ...
+    def track(self) -> models.TrackInfo: ...
     def __init__(
         self,
         *,
-        track: livekit_models_pb2.TrackInfo | None = ...,
+        track: models.TrackInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["track", b"track"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["track", b"track"]) -> None: ...
@@ -286,7 +286,7 @@ class UpdateParticipantRequest(google.protobuf.message.Message):
     metadata: builtins.str
     """metadata to update. skipping updates if left empty"""
     @property
-    def permission(self) -> livekit_models_pb2.ParticipantPermission:
+    def permission(self) -> models.ParticipantPermission:
         """set to update the participant's permissions"""
     name: builtins.str
     """display name to update"""
@@ -296,7 +296,7 @@ class UpdateParticipantRequest(google.protobuf.message.Message):
         room: builtins.str = ...,
         identity: builtins.str = ...,
         metadata: builtins.str = ...,
-        permission: livekit_models_pb2.ParticipantPermission | None = ...,
+        permission: models.ParticipantPermission | None = ...,
         name: builtins.str = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["permission", b"permission"]) -> builtins.bool: ...
@@ -321,7 +321,7 @@ class UpdateSubscriptionsRequest(google.protobuf.message.Message):
     subscribe: builtins.bool
     """set to true to subscribe, false to unsubscribe from tracks"""
     @property
-    def participant_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[livekit_models_pb2.ParticipantTracks]:
+    def participant_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[models.ParticipantTracks]:
         """list of participants and their tracks"""
     def __init__(
         self,
@@ -330,7 +330,7 @@ class UpdateSubscriptionsRequest(google.protobuf.message.Message):
         identity: builtins.str = ...,
         track_sids: collections.abc.Iterable[builtins.str] | None = ...,
         subscribe: builtins.bool = ...,
-        participant_tracks: collections.abc.Iterable[livekit_models_pb2.ParticipantTracks] | None = ...,
+        participant_tracks: collections.abc.Iterable[models.ParticipantTracks] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["identity", b"identity", "participant_tracks", b"participant_tracks", "room", b"room", "subscribe", b"subscribe", "track_sids", b"track_sids"]) -> None: ...
 
@@ -360,7 +360,7 @@ class SendDataRequest(google.protobuf.message.Message):
     TOPIC_FIELD_NUMBER: builtins.int
     room: builtins.str
     data: builtins.bytes
-    kind: livekit_models_pb2.DataPacket.Kind.ValueType
+    kind: models.DataPacket.Kind.ValueType
     @property
     def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """mark deprecated"""
@@ -373,7 +373,7 @@ class SendDataRequest(google.protobuf.message.Message):
         *,
         room: builtins.str = ...,
         data: builtins.bytes = ...,
-        kind: livekit_models_pb2.DataPacket.Kind.ValueType = ...,
+        kind: models.DataPacket.Kind.ValueType = ...,
         destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         topic: builtins.str | None = ...,
