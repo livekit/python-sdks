@@ -7,8 +7,8 @@ SVC = "RoomService"
 
 
 class RoomService(Service):
-    def __init__(self, host: str, api_key: str, api_secret: str):
-        super().__init__(host, api_key, api_secret)
+    def __init__(self, url: str, api_key: str, api_secret: str):
+        super().__init__(url, api_key, api_secret)
 
     async def create_room(
         self, create: proto_room.CreateRoomRequest
