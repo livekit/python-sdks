@@ -72,13 +72,13 @@ class Claims:
 class AccessToken:
     def __init__(
         self,
-        api_key: str = os.getenv("LIVEKIT_API_KEY"),
-        api_secret: str = os.getenv("LIVEKIT_API_SECRET"),
+        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
+        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
     ) -> None:
         self.api_key = api_key  # iss
         self.api_secret = api_secret
         self.claims = Claims()
-        if api_key is None or api_secret is None:
+        if not api_key or not api_secret :
             raise ValueError("api_key and api_secret must be set")
 
         # default jwt claims
