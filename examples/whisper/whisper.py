@@ -4,15 +4,15 @@ import logging
 import pathlib
 import platform
 from signal import SIGINT, SIGTERM
-import os
+from os import getenv
 
 import numpy as np
 from livekit import api, rtc
 
-os = platform.system().lower()
-if os == "windows":
+platform = platform.system().lower()
+if platform == "windows":
     lib_file = "whisper.dll"
-elif os == "darwin":
+elif platform == "darwin":
     lib_file = "libwhisper.dylib"
 else:
     lib_file = "libwhisper.so"
@@ -124,7 +124,7 @@ async def main(room: rtc.Room):
         audio_stream = rtc.AudioStream(track)
         asyncio.create_task(whisper_task(audio_stream))
 
-    url = os.getenv("LIVEKIT_URL")
+    url = getenv("LIVEKIT_URL")
     token = (
         api.AccessToken()
         .with_identity("python-bot")
