@@ -16,10 +16,11 @@
 """
 
 # flake8: noqa
-from livekit.protocol.egress import *
-from livekit.protocol.ingress import *
-from livekit.protocol.models import *
-from livekit.protocol.room import *
+# re-export packages from protocol
+from livekit.protocol import egress
+from livekit.protocol import ingress
+from livekit.protocol import models
+from livekit.protocol import room
 
 from .access_token import VideoGrants, AccessToken
 from .room_service import RoomService

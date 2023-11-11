@@ -8,25 +8,72 @@
 
 [![pypi-v](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
 
-# 📹🎙️🐍 Python Client SDK for LiveKit
+# 📹🎙️🐍 Python SDK for LiveKit
 
-The Livekit Python Client provides a convenient interface for integrating Livekit's real-time video and audio capabilities into your Python applications. With this library, developers can easily leverage Livekit's WebRTC functionalities, allowing them to focus on building their AI models or other application logic without worrying about the complexities of WebRTC.
+<!--BEGIN_DESCRIPTION-->
 
-Official LiveKit documentation: https://docs.livekit.io/
+The LiveKit Python SDK provides a convenient interface for integrating LiveKit's real-time video and audio capabilities into your Python applications. With it, developers can easily leverage LiveKit's WebRTC functionalities, allowing them to focus on building their AI models or other application logic without worrying about the complexities of WebRTC.
 
-## Installation
+<!--END_DESCRIPTION-->
 
-RTC Client:
-```shell
-$ pip install livekit
-```
+This repo contains two packages
 
-API / Server SDK:
+- [livekit](https://pypi.org/project/livekit/): Real-time SDK for connecting to LiveKit as a participant
+- [livekit-api](https://pypi.org/project/livekit-api/): Access token generation and server APIs
+
+## Using Server API
+
 ```shell
 $ pip install livekit-api
 ```
 
-## Connecting to a room
+### Generating an access token
+
+```python
+from livekit import api
+import os
+
+token = api.AccessToken(os.getenv('LIVEKIT_API_KEY'), os.getenv('LIVEKIT_API_SECRET')) \
+    .with_identity("python-bot") \
+    .with_name("Python Bot") \
+    .with_grants(api.VideoGrants(
+        room_join=True,
+        room="my-room",
+    )).to_jwt()
+```
+
+### Creating a room
+
+RoomService uses asyncio and aiohttp to make API calls. It needs to be used with an event loop.
+
+```python
+from livekit import api
+import asyncio
+
+async def main():
+    room_service = api.RoomService(
+        'http://localhost:7880',
+        'devkey',
+        'secret',
+    )
+    room_info = await room_service.create_room(
+        api.room.CreateRoomRequest(name="my-room"),
+    )
+    print(room_info)
+    results = await room_service.list_rooms(api.room.ListRoomsRequest())
+    print(results)
+    await room_service.aclose()
+
+asyncio.get_event_loop().run_until_complete(main())
+```
+
+## Using Real-time SDK
+
+```shell
+$ pip install livekit
+```
+
+### Connecting to a room
 
 ```python
 from livekit import rtc
@@ -62,21 +109,6 @@ async def main():
     for participant in room.participants.items():
         for publication in participant.tracks.items():
             print("track publication: %s", publication.sid)
-```
-
-## Create a new access token
-
-```python
-from livekit import api
-
-token = api.AccessToken("API_KEY", "SECRET_KEY")
-token = AccessToken()
-jwt = (
-    token.with_identity("user1")
-    .with_name("user1")
-    .with_grants(VideoGrants(room_join=True, room="room1"))
-    .to_jwt()
-)
 ```
 
 ## Examples

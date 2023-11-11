@@ -15,6 +15,7 @@
 import calendar
 import dataclasses
 import datetime
+import os
 
 import jwt
 
@@ -69,10 +70,16 @@ class Claims:
 
 
 class AccessToken:
-    def __init__(self, api_key: str, api_secret: str) -> None:
+    def __init__(
+        self,
+        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
+        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+    ) -> None:
         self.api_key = api_key  # iss
         self.api_secret = api_secret
         self.claims = Claims()
+        if not api_key or not api_secret:
+            raise ValueError("api_key and api_secret must be set")
 
         # default jwt claims
         self.identity = ""  # sub

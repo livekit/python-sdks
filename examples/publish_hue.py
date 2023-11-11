@@ -1,15 +1,49 @@
 import asyncio
 import colorsys
 import logging
+import os
 from signal import SIGINT, SIGTERM
 
 import numpy as np
-from livekit import rtc
-
-URL = "ws://localhost:7880"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
+from livekit import api, rtc
 
 WIDTH, HEIGHT = 1280, 720
+
+
+# ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
+
+
+async def main(room: rtc.Room):
+    token = (
+        api.AccessToken()
+        .with_identity("python-publisher")
+        .with_name("Python Publisher")
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room="my-room",
+            )
+        )
+        .to_jwt()
+    )
+    url = os.getenv("LIVEKIT_URL")
+    logging.info("connecting to %s", url)
+    try:
+        await room.connect(url, token)
+        logging.info("connected to room %s", room.name)
+    except rtc.ConnectError as e:
+        logging.error("failed to connect to the room: %s", e)
+        return
+
+    # publish a track
+    source = rtc.VideoSource(WIDTH, HEIGHT)
+    track = rtc.LocalVideoTrack.create_video_track("hue", source)
+    options = rtc.TrackPublishOptions()
+    options.source = rtc.TrackSource.SOURCE_CAMERA
+    publication = await room.local_participant.publish_track(track, options)
+    logging.info("published track %s", publication.sid)
+
+    asyncio.ensure_future(draw_color_cycle(source))
 
 
 async def draw_color_cycle(source: rtc.VideoSource):
@@ -40,26 +74,6 @@ async def draw_color_cycle(source: rtc.VideoSource):
 
         code_duration = asyncio.get_event_loop().time() - start_time
         await asyncio.sleep(1 / 30 - code_duration)
-
-
-async def main(room: rtc.Room):
-    logging.info("connecting to %s", URL)
-    try:
-        await room.connect(URL, TOKEN)
-        logging.info("connected to room %s", room.name)
-    except rtc.ConnectError as e:
-        logging.error("failed to connect to the room: %s", e)
-        return
-
-    # publish a track
-    source = rtc.VideoSource(WIDTH, HEIGHT)
-    track = rtc.LocalVideoTrack.create_video_track("hue", source)
-    options = rtc.TrackPublishOptions()
-    options.source = rtc.TrackSource.SOURCE_CAMERA
-    publication = await room.local_participant.publish_track(track, options)
-    logging.info("published track %s", publication.sid)
-
-    asyncio.ensure_future(draw_color_cycle(source))
 
 
 if __name__ == "__main__":

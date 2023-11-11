@@ -9,10 +9,9 @@ import numpy as np
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
-from livekit import rtc
+from livekit import api, rtc
 
-URL = "ws://localhost:7880"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
+# ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
 
 tasks = set()
 
@@ -30,10 +29,41 @@ options = FaceLandmarkerOptions(
     running_mode=VisionRunningMode.VIDEO,
 )
 
-# from https://github.com/googlesamples/mediapipe/blob/main/examples/face_landmarker/python/%5BMediaPipe_Python_Tasks%5D_Face_Landmarker.ipynb
+
+async def main(room: rtc.Room) -> None:
+    video_stream = None
+
+    @room.on("track_subscribed")
+    def on_track_subscribed(track: rtc.Track, *_):
+        if track.kind == rtc.TrackKind.KIND_VIDEO:
+            nonlocal video_stream
+            if video_stream is not None:
+                # only process the first stream received
+                return
+
+            print("subscribed to track: " + track.name)
+            video_stream = rtc.VideoStream(track)
+            task = asyncio.create_task(frame_loop(video_stream))
+            tasks.add(task)
+            task.add_done_callback(tasks.remove)
+
+    token = (
+        api.AccessToken()
+        .with_identity("python-bot")
+        .with_name("Python Bot")
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room="my-room",
+            )
+        )
+    )
+    await room.connect(os.getenv("LIVEKIT_URL"), token.to_jwt())
+    print("connected to room: " + room.name)
 
 
 def draw_landmarks_on_image(rgb_image, detection_result):
+    # from https://github.com/googlesamples/mediapipe/blob/main/examples/face_landmarker/python/%5BMediaPipe_Python_Tasks%5D_Face_Landmarker.ipynb
     face_landmarks_list = detection_result.face_landmarks
 
     # Loop through the detected faces to visualize.
@@ -109,27 +139,6 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
 
     landmarker.close()
     cv2.destroyAllWindows()
-
-
-async def main(room: rtc.Room) -> None:
-    video_stream = None
-
-    @room.on("track_subscribed")
-    def on_track_subscribed(track: rtc.Track, *_):
-        if track.kind == rtc.TrackKind.KIND_VIDEO:
-            nonlocal video_stream
-            if video_stream is not None:
-                # only process the first stream received
-                return
-
-            print("subscribed to track: " + track.name)
-            video_stream = rtc.VideoStream(track)
-            task = asyncio.create_task(frame_loop(video_stream))
-            tasks.add(task)
-            task.add_done_callback(tasks.remove)
-
-    await room.connect(URL, TOKEN)
-    print("connected to room: " + room.name)
 
 
 if __name__ == "__main__":
