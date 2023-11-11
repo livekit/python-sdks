@@ -31,8 +31,9 @@ $ pip install livekit-api
 
 ```python
 from livekit import api
+import os
 
-token = api.AccessToken(info.api_key, info.api_secret) \
+token = api.AccessToken(os.getenv('LIVEKIT_API_KEY'), os.getenv('LIVEKIT_API_SECRET')) \
     .with_identity("python-bot") \
     .with_name("Python Bot") \
     .with_grants(api.VideoGrants(
