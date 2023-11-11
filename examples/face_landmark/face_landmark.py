@@ -47,15 +47,18 @@ async def main(room: rtc.Room) -> None:
             tasks.add(task)
             task.add_done_callback(tasks.remove)
 
-    info = api.ConnectionInfo()
-    token = api.AccessToken(info.api_key, info.api_secret) \
-        .with_identity("python-bot") \
-        .with_name("Python Bot") \
-        .with_grants(api.VideoGrants(
-            room_join=True,
-            room="my-room",
-        )).to_jwt()
-    await room.connect(info.websocket_url(), token)
+    token = (
+        api.AccessToken()
+        .with_identity("python-bot")
+        .with_name("Python Bot")
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room="my-room",
+            )
+        )
+    )
+    await room.connect(os.getenv("LIVEKIT_URL"), token.to_jwt())
     print("connected to room: " + room.name)
 
 
@@ -124,8 +127,7 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
 
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
 
-        detection_result = landmarker.detect_for_video(
-            mp_image, frame.timestamp_us)
+        detection_result = landmarker.detect_for_video(mp_image, frame.timestamp_us)
 
         draw_landmarks_on_image(arr, detection_result)
 
@@ -142,8 +144,7 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler(
-            "face_landmark.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler("face_landmark.log"), logging.StreamHandler()],
     )
 
     loop = asyncio.get_event_loop()
@@ -155,8 +156,7 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(
-            signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()

@@ -1,6 +1,7 @@
 import asyncio
 import colorsys
 import logging
+import os
 from signal import SIGINT, SIGTERM
 
 import numpy as np
@@ -13,17 +14,22 @@ WIDTH, HEIGHT = 1280, 720
 
 
 async def main(room: rtc.Room):
-    info = api.ConnectionInfo()
-    token = api.AccessToken(info.api_key, info.api_secret) \
-        .with_identity("python-publisher") \
-        .with_name("Python Publisher") \
-        .with_grants(api.VideoGrants(
-            room_join=True,
-            room="my-room",
-        )).to_jwt()
-    logging.info("connecting to %s", info.websocket_url())
+    token = (
+        api.AccessToken()
+        .with_identity("python-publisher")
+        .with_name("Python Publisher")
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room="my-room",
+            )
+        )
+        .to_jwt()
+    )
+    url = os.getenv("LIVEKIT_URL")
+    logging.info("connecting to %s", url)
     try:
-        await room.connect(info.websocket_url(), token)
+        await room.connect(url, token)
         logging.info("connected to room %s", room.name)
     except rtc.ConnectError as e:
         logging.error("failed to connect to the room: %s", e)
@@ -41,8 +47,7 @@ async def main(room: rtc.Room):
 
 
 async def draw_color_cycle(source: rtc.VideoSource):
-    argb_frame = rtc.ArgbFrame.create(
-        rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
+    argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
     arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
 
     framerate = 1 / 30
@@ -74,8 +79,7 @@ async def draw_color_cycle(source: rtc.VideoSource):
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler(
-            "publish_hue.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler("publish_hue.log"), logging.StreamHandler()],
     )
 
     loop = asyncio.get_event_loop()
@@ -87,8 +91,7 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(
-            signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()

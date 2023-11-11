@@ -2,6 +2,7 @@ import asyncio
 import logging
 from signal import SIGINT, SIGTERM
 from typing import Union
+import os
 
 from livekit import api, rtc
 
@@ -104,8 +105,7 @@ async def main(room: rtc.Room) -> None:
     def on_track_subscription_failed(
         participant: rtc.RemoteParticipant, track_sid: str, error: str
     ):
-        logging.info("track subscription failed: %s %s",
-                     participant.identity, error)
+        logging.info("track subscription failed: %s %s", participant.identity, error)
 
     @room.on("connection_state_changed")
     def on_connection_state_changed(state: rtc.ConnectionState):
@@ -127,15 +127,19 @@ async def main(room: rtc.Room) -> None:
     def on_reconnected() -> None:
         logging.info("reconnected")
 
-    info = api.ConnectionInfo()
-    token = api.AccessToken(info.api_key, info.api_secret) \
-        .with_identity("python-bot") \
-        .with_name("Python Bot") \
-        .with_grants(api.VideoGrants(
-            room_join=True,
-            room="my-room",
-        )).to_jwt()
-    await room.connect(info.websocket_url(), token)
+    token = (
+        api.AccessToken()
+        .with_identity("python-bot")
+        .with_name("Python Bot")
+        .with_grants(
+            api.VideoGrants(
+                room_join=True,
+                room="my-room",
+            )
+        )
+        .to_jwt()
+    )
+    await room.connect(os.getenv("LIVEKIT_URL"), token)
     logging.info("connected to room %s", room.name)
     logging.info("participants: %s", room.participants)
 
@@ -146,8 +150,7 @@ async def main(room: rtc.Room) -> None:
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler(
-            "basic_room.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
     )
 
     loop = asyncio.get_event_loop()
@@ -159,8 +162,7 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(
-            signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()

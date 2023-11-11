@@ -50,13 +50,10 @@ from livekit import api
 import asyncio
 
 async def main():
-    # loads connection info from environment variables
-    # LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET
-    info = api.ConnectionInfo()
     room_service = api.RoomService(
-        info.http_url(),
-        info.api_key,
-        info.api_secret,
+        'http://localhost:7880',
+        'devkey',
+        'secret',
     )
     room_info = await room_service.create_room(
         api.room.CreateRoomRequest(name="my-room"),
