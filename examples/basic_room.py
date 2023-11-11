@@ -3,10 +3,9 @@ import logging
 from signal import SIGINT, SIGTERM
 from typing import Union
 
-from livekit import rtc
+from livekit import api, rtc
 
-URL = "ws://localhost:7880"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
+# ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
 
 
 async def main(room: rtc.Room) -> None:
@@ -105,7 +104,8 @@ async def main(room: rtc.Room) -> None:
     def on_track_subscription_failed(
         participant: rtc.RemoteParticipant, track_sid: str, error: str
     ):
-        logging.info("track subscription failed: %s %s", participant.identity, error)
+        logging.info("track subscription failed: %s %s",
+                     participant.identity, error)
 
     @room.on("connection_state_changed")
     def on_connection_state_changed(state: rtc.ConnectionState):
@@ -127,7 +127,15 @@ async def main(room: rtc.Room) -> None:
     def on_reconnected() -> None:
         logging.info("reconnected")
 
-    await room.connect(URL, TOKEN)
+    info = api.ConnectionInfo()
+    token = api.AccessToken(info.api_key, info.api_secret) \
+        .with_identity("python-bot") \
+        .with_name("Python Bot") \
+        .with_grants(api.VideoGrants(
+            room_join=True,
+            room="my-room",
+        )).to_jwt()
+    await room.connect(info.websocket_url(), token)
     logging.info("connected to room %s", room.name)
     logging.info("participants: %s", room.participants)
 
@@ -138,7 +146,8 @@ async def main(room: rtc.Room) -> None:
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
+        handlers=[logging.FileHandler(
+            "basic_room.log"), logging.StreamHandler()],
     )
 
     loop = asyncio.get_event_loop()
@@ -150,7 +159,8 @@ if __name__ == "__main__":
 
     asyncio.ensure_future(main(room))
     for signal in [SIGINT, SIGTERM]:
-        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
+        loop.add_signal_handler(
+            signal, lambda: asyncio.ensure_future(cleanup()))
 
     try:
         loop.run_forever()
