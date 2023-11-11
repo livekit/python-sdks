@@ -78,7 +78,7 @@ class AccessToken:
         self.api_key = api_key  # iss
         self.api_secret = api_secret
         self.claims = Claims()
-        if not api_key or not api_secret :
+        if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
 
         # default jwt claims
