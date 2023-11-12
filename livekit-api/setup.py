@@ -26,10 +26,10 @@ with open(os.path.join(here, "livekit", "api", "version.py"), "r") as f:
 setuptools.setup(
     name="livekit-api",
     version=about["__version__"],
-    description="Python Server SDK for LiveKit",
+    description="Python Server API for LiveKit",
     long_description=(here / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
-    url="https://github.com/livekit/client-sdk-python",
+    url="https://github.com/livekit/python-sdks",
     classifiers=[
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",

@@ -60,10 +60,10 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 setuptools.setup(
     name="livekit",
     version=about["__version__"],
-    description="Python Client SDK for LiveKit",
+    description="Python Real-time SDK for LiveKit",
     long_description=(here / "README.md").read_text(encoding="utf-8"),
     long_description_content_type="text/markdown",
-    url="https://github.com/livekit/client-sdk-python",
+    url="https://github.com/livekit/python-sdks",
     cmdclass={
         "bdist_wheel": bdist_wheel,
         "build_py": BuildPyCommand,
