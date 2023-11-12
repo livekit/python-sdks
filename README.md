@@ -2,7 +2,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="/.github/banner_dark.png">
   <source media="(prefers-color-scheme: light)" srcset="/.github/banner_light.png">
-  <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/client-sdk-python/main/.github/banner_light.png">
+  <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/python-sdks/main/.github/banner_light.png">
 </picture>
 <!--END_BANNER_IMAGE-->
 
@@ -113,11 +113,11 @@ async def main():
 
 ## Examples
 
-- [Facelandmark](https://github.com/livekit/client-sdk-python/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
-- [Whisper](https://github.com/livekit/client-sdk-python/tree/main/examples/whisper): Transcribe an audio track using OpenAI whisper
-- [Basic room](https://github.com/livekit/client-sdk-python/blob/main/examples/basic_room.py): Connect to a room
-- [Publish hue](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a rainbow video track
-- [Publish wave](https://github.com/livekit/client-sdk-python/blob/main/examples/publish_hue.py): Publish a sine wave
+- [Facelandmark](https://github.com/livekit/python-sdks/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
+- [Whisper](https://github.com/livekit/python-sdks/tree/main/examples/whisper): Transcribe an audio track using OpenAI whisper
+- [Basic room](https://github.com/livekit/python-sdks/blob/main/examples/basic_room.py): Connect to a room
+- [Publish hue](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a rainbow video track
+- [Publish wave](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a sine wave
 
 ## Getting help / Contributing
 
