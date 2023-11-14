@@ -14,9 +14,9 @@
 
 import calendar
 import dataclasses
+import re
 import datetime
 import os
-
 import jwt
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
@@ -64,6 +64,11 @@ class VideoGrants:
 
 @dataclasses.dataclass
 class Claims:
+    exp: int = 0
+    iss: str = "" # api key
+    nbf: int = 0
+    sub: str = "" # identity
+
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
     metadata: str = ""
@@ -111,17 +116,12 @@ class AccessToken:
         return self
 
     def to_jwt(self) -> str:
-        def camel_case_dict(data) -> dict:
-            return {
-                "".join(
-                    word if i == 0 else word.title()
-                    for i, word in enumerate(key.split("_"))
-                ): value
-                for key, value in data
-                if value is not None
-            }
+        video = self.claims.video
+        if video.room_join and (not self.identity or not video.room):
+            raise ValueError("identity and room must be set when joining a room")
 
         claims = dataclasses.asdict(self.claims)
+        claims = {camel_to_snake(k): v for k, v in claims.items()}
         claims.update(
             {
                 "sub": self.identity,
@@ -129,9 +129,6 @@ class AccessToken:
                 "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
                 "exp": calendar.timegm(
                     (datetime.datetime.utcnow() + self.ttl).utctimetuple()
-                ),
-                "video": dataclasses.asdict(
-                    self.claims.video, dict_factory=camel_case_dict
                 ),
             }
         )
@@ -144,9 +141,12 @@ class TokenVerifier:
         self,
         api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
         api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+        *,
+        leeway: datetime.timedelta = DEFAULT_LEEWAY,
     ) -> None:
         self.api_key = api_key
         self.api_secret = api_secret
+        self._leeway = leeway
 
     def verify(self, token: str) -> Claims:
         claims = jwt.decode(
@@ -154,6 +154,18 @@ class TokenVerifier:
             self.api_secret,
             issuer=self.api_key,
             algorithms=["HS256"],
-            leeway=DEFAULT_LEEWAY.total_seconds(),
+            leeway=self._leeway.total_seconds(),
         )
-        return Claims(**claims)
+        c = Claims(**claims)
+
+        video = claims["video"]
+        video = {camel_to_snake(k): v for k, v in video.items()}
+        c.video = VideoGrants(**video)
+        return c
+
+
+def camel_to_snake(str):
+   return re.sub(r'(?<!^)(?=[A-Z])', '_', str).lower()
+
+def snake_to_camel(str):
+    return ''.join(word.title() for word in name.split('_'))

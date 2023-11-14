@@ -13,7 +13,7 @@ class EgressService(Service):
         super().__init__(session, url, api_key, api_secret)
 
     async def start_room_composite_egress(
-        self, start: proto_egress.StartRoomCompositeEgressRequest
+        self, start: proto_egress.RoomCompositeEgressRequest
     ) -> proto_egress.EgressInfo:
         return await self._client.request(
             SVC,
@@ -24,7 +24,7 @@ class EgressService(Service):
         )
 
     async def start_web_egress(
-        self, start: proto_egress.StartWebEgressRequest
+        self, start: proto_egress.WebEgressRequest
     ) -> proto_egress.EgressInfo:
         return await self._client.request(
             SVC,
