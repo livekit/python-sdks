@@ -24,7 +24,7 @@ async def main(room: rtc.Room) -> None:
         .with_grants(
             api.VideoGrants(
                 room_join=True,
-                room="my-room",
+                room="test",
             )
         )
         .to_jwt()
