@@ -45,7 +45,7 @@ def test_verify_token_expired():
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")
-        .with_ttl(datetime.timedelta(seconds=0))
+        .with_ttl(datetime.timedelta(seconds=-1))
         .to_jwt()
     )
 
