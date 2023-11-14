@@ -17,11 +17,13 @@
 
 # flake8: noqa
 # re-export packages from protocol
-from livekit.protocol import egress
-from livekit.protocol import ingress
-from livekit.protocol import models
-from livekit.protocol import room
+from livekit.protocol.egress import *
+from livekit.protocol.ingress import *
+from livekit.protocol.models import *
+from livekit.protocol.room import *
+from livekit.protocol.webhook import *
 
-from .access_token import VideoGrants, AccessToken
-from .room_service import RoomService
+from .livekit_api import LiveKitAPI
+from .access_token import VideoGrants, AccessToken, TokenVerifier
+from .webhook import WebhookReceiver
 from .version import __version__
