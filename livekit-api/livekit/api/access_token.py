@@ -20,6 +20,7 @@ import os
 import jwt
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
+DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
 
 
 @dataclasses.dataclass
@@ -136,3 +137,23 @@ class AccessToken:
         )
 
         return jwt.encode(claims, self.api_secret, algorithm="HS256")
+
+
+class TokenVerifier:
+    def __init__(
+        self,
+        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
+        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+    ) -> None:
+        self.api_key = api_key
+        self.api_secret = api_secret
+
+    def verify(self, token: str) -> Claims:
+        claims = jwt.decode(
+            token,
+            self.api_secret,
+            issuer=self.api_key,
+            algorithms=["HS256"],
+            leeway=DEFAULT_LEEWAY.total_seconds(),
+        )
+        return claims
