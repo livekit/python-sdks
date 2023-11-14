@@ -33,7 +33,8 @@ $ pip install livekit-api
 from livekit import api
 import os
 
-token = api.AccessToken(os.getenv('LIVEKIT_API_KEY'), os.getenv('LIVEKIT_API_SECRET')) \
+# will automatically use the LIVEKIT_API_KEY and LIVEKIT_API_SECRET env vars
+token = api.AccessToken() \
     .with_identity("python-bot") \
     .with_name("Python Bot") \
     .with_grants(api.VideoGrants(
@@ -51,18 +52,16 @@ from livekit import api
 import asyncio
 
 async def main():
-    room_service = api.RoomService(
+    lkapi = api.LiveKitAPI(
         'http://localhost:7880',
-        'devkey',
-        'secret',
     )
-    room_info = await room_service.create_room(
-        api.room.CreateRoomRequest(name="my-room"),
+    room_info = await lkapi.room.create_room(
+        api.CreateRoomRequest(name="my-room"),
     )
     print(room_info)
-    results = await room_service.list_rooms(api.room.ListRoomsRequest())
+    results = await lkapi.room.list_rooms(api.room.ListRoomsRequest())
     print(results)
-    await room_service.aclose()
+    await lkapi.aclose()
 
 asyncio.get_event_loop().run_until_complete(main())
 ```
