@@ -52,7 +52,15 @@ T = TypeVar("T", bound=Message)
 
 
 class TwirpClient:
-    def __init__(self, host: str, pkg: str, prefix: str = DEFAULT_PREFIX) -> None:
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        host: str,
+        pkg: str,
+        prefix: str = DEFAULT_PREFIX,
+    ) -> None:
+        self._session = aiohttp.ClientSession()
+
         parse_res = urlparse(host)
         scheme = parse_res.scheme
         if scheme.startswith("ws"):
@@ -62,7 +70,6 @@ class TwirpClient:
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
-        self.session = aiohttp.ClientSession()
 
     async def request(
         self,
@@ -76,7 +83,7 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        async with self.session.request(
+        async with self._session.request(
             "post", url, headers=headers, data=serialized_data
         ) as resp:
             if resp.status == 200:
@@ -85,6 +92,3 @@ class TwirpClient:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
                 raise TwirpError(error_data["code"], error_data["msg"])
-
-    async def aclose(self):
-        await self.session.close()

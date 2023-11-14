@@ -7,8 +7,10 @@ AUTHORIZATION = "authorization"
 
 
 class Service(ABC):
-    def __init__(self, host: str, api_key: str, api_secret: str):
-        self._client = TwirpClient(host, "livekit")
+    def __init__(
+        self, host: str, api_key: str, api_secret: str, session: aiohttp.ClientSession
+    ):
+        self._client = TwirpClient(session, host, "livekit")
         self.api_key = api_key
         self.api_secret = api_secret
 
@@ -18,6 +20,3 @@ class Service(ABC):
         headers = {}
         headers[AUTHORIZATION] = "Bearer {}".format(token)
         return headers
-
-    async def aclose(self):
-        await self._client.aclose()

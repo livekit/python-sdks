@@ -22,6 +22,6 @@ from livekit.protocol import ingress
 from livekit.protocol import models
 from livekit.protocol import room
 
+from .api import LivekitAPI
 from .access_token import VideoGrants, AccessToken
-from .room_service import RoomService
 from .version import __version__

@@ -1,3 +1,4 @@
+import aiohttp
 from livekit.protocol import room as proto_room
 from livekit.protocol import models as proto_models
 from ._service import Service
@@ -7,8 +8,10 @@ SVC = "RoomService"
 
 
 class RoomService(Service):
-    def __init__(self, url: str, api_key: str, api_secret: str):
-        super().__init__(url, api_key, api_secret)
+    def __init__(
+        self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
+    ):
+        super().__init__(session, url, api_key, api_secret)
 
     async def create_room(
         self, create: proto_room.CreateRoomRequest
@@ -81,8 +84,64 @@ class RoomService(Service):
     ) -> proto_room.RemoveParticipantResponse:
         return await self._client.request(
             SVC,
-            "remove_participant",
+            "RemoveParticipant",
             remove,
             self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
             proto_room.RemoveParticipantResponse,
+        )
+
+    async def mute_published_track(
+        self,
+        update: proto_room.MuteRoomTrackRequest,
+    ) -> proto_room.MuteRoomTrackResponse:
+        return await self._client.request(
+            SVC,
+            "MutePublishedTrack",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=room)),
+            proto_room.MuteRoomTrackResponse,
+        )
+
+    async def update_participant(
+        self, update: proto_room.UpdateParticipantRequest
+    ) -> proto_models.ParticipantInfo:
+        return await self._client.request(
+            SVC,
+            "UpdateParticipant",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_models.ParticipantInfo,
+        )
+
+    async def update_subscriptions(
+        self, update: proto_room.UpdateSubscriptionsRequest
+    ) -> proto_room.UpdateSubscriptionsResponse:
+        return await self._client.request(
+            SVC,
+            "UpdateSubscriptions",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_room.UpdateSubscriptionsResponse,
+        )
+
+    async def send_data(
+        self, send: proto_room.SendDataRequest
+    ) -> proto_room.SendDataResponse:
+        return await self._client.request(
+            SVC,
+            "SendData",
+            send,
+            self._auth_header(VideoGrants(room_admin=True, room=send.room)),
+            proto_room.SendDataResponse,
+        )
+
+    async def update_room_metadata(
+        self, update: proto_room.UpdateRoomMetadataRequest
+    ) -> proto_room.Room:
+        return await self._client.request(
+            SVC,
+            "UpdateRoomMetadata",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_room.Room,
         )
