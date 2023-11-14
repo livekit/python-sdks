@@ -59,7 +59,7 @@ async def main():
         api.CreateRoomRequest(name="my-room"),
     )
     print(room_info)
-    results = await lkapi.room.list_rooms(api.room.ListRoomsRequest())
+    results = await lkapi.room.list_rooms(api.ListRoomsRequest())
     print(results)
     await lkapi.aclose()
 
