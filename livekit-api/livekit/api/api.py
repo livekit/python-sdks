@@ -1,15 +1,19 @@
 import aiohttp
 import os
+import asyncio
 
 
-class LivekitAPI:
+class LiveKitAPI:
     def __init__(
         self,
         url: str = os.getenv("LIVEKIT_URL", "http://localhost:7880"),
         api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
         api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+        *,
+        loop: Optional[asyncio.AbstractEventLoop] = asyncio.get_event_loop(),
+        timeout: float = 60,  # 1 minutes by default
     ):
-        self._session = aiohttp.ClientSession()
+        self._session = aiohttp.ClientSession(timeout=timeout, loop=loop)
         self._room = RoomService(url, api_key, api_secret, self._session)
         self._ingress = IngressService(url, api_key, api_secret, self._session)
         self._egress = EgressService(url, api_key, api_secret, self._session)

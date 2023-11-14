@@ -83,8 +83,8 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        async with self._session.request(
-            "post", url, headers=headers, data=serialized_data
+        async with self._session.post(
+            url, headers=headers, data=serialized_data
         ) as resp:
             if resp.status == 200:
                 return response_class.FromString(await resp.read())
