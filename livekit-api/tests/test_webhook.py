@@ -52,7 +52,7 @@ def test_webhook_receiver():
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET)
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
-    event = receiver.receive(TEST_EVENT, jwt)
+    receiver.receive(TEST_EVENT, jwt)
 
 
 def test_bad_hash():
