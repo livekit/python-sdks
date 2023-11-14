@@ -5,7 +5,7 @@ import base64
 
 TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"
-TEST_EVENT = '''
+TEST_EVENT = """
 {
   "event": "room_started",
   "room": {
@@ -41,7 +41,8 @@ TEST_EVENT = '''
   "id": "EV_eugWmGhovZmm",
   "createdAt": "1692985556"
 }
-'''
+"""
+
 
 def test_webhook_receiver():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
@@ -52,6 +53,7 @@ def test_webhook_receiver():
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
     event = receiver.receive(TEST_EVENT, jwt)
+
 
 def test_bad_hash():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
