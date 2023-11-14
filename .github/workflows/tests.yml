@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Run tests 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+      - name: Run tests
+        run: |
+          pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc
+          pytest . --ignore=livekit-rtc/rust-sks
+
