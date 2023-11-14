@@ -20,7 +20,7 @@ def test_verify_token():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     claims = token_verifier.verify(token)
 
-    assert claims.sub == "test_identity"
+    assert claims.identity == "test_identity"
     assert claims.metadata == "test_metadata"
     assert claims.video == grants
 
