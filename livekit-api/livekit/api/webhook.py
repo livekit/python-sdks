@@ -9,13 +9,13 @@ class WebhookReceiver:
     def __init__(self, token_verifier: TokenVerifier):
         self._verifier = token_verifier
 
-    def receive(self, body: str, auth_token: str):
+    def receive(self, body: str, auth_token: str) -> proto_webhook.WebhookEvent:
         claims = self._verifier.verify(auth_token)
 
-        body_hash = hashlib.sha256(body).digest()
+        body_hash = hashlib.sha256(body.encode()).digest()
         claims_hash = base64.b64decode(claims.sha256)
 
         if body_hash != claims_hash:
             raise Exception("hash mismatch")
 
-        Parse(body, proto_webhook.WebhookEvent())
+        return Parse(body, proto_webhook.WebhookEvent())
