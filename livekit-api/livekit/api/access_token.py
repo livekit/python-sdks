@@ -156,4 +156,4 @@ class TokenVerifier:
             algorithms=["HS256"],
             leeway=DEFAULT_LEEWAY.total_seconds(),
         )
-        return claims
+        return Claims(**claims)
