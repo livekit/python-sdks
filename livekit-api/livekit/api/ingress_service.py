@@ -1,6 +1,5 @@
 import aiohttp
 from livekit.protocol import ingress as proto_ingress
-from livekit.protocol import models as proto_models
 from ._service import Service
 from .access_token import VideoGrants
 

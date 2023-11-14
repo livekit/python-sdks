@@ -98,7 +98,7 @@ class RoomService(Service):
             SVC,
             "MutePublishedTrack",
             update,
-            self._auth_header(VideoGrants(room_admin=True, room=room)),
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             proto_room.MuteRoomTrackResponse,
         )
 
@@ -135,13 +135,3 @@ class RoomService(Service):
             proto_room.SendDataResponse,
         )
 
-    async def update_room_metadata(
-        self, update: proto_room.UpdateRoomMetadataRequest
-    ) -> proto_room.Room:
-        return await self._client.request(
-            SVC,
-            "UpdateRoomMetadata",
-            update,
-            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
-            proto_room.Room,
-        )

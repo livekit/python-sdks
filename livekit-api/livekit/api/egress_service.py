@@ -1,6 +1,5 @@
 import aiohttp
 from livekit.protocol import egress as proto_egress
-from livekit.protocol import models as proto_models
 from ._service import Service
 from .access_token import VideoGrants
 
