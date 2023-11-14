@@ -116,8 +116,10 @@ class AccessToken:
         if video.room_join and (not self.identity or not video.room):
             raise ValueError("identity and room must be set when joining a room")
 
-        claims = dataclasses.asdict(self.claims)
-        claims = {snake_to_lower_camel(k): v for k, v in claims.items()}
+        claims = dataclasses.asdict(
+            self.claims,
+            dict_factory=lambda items: {snake_to_lower_camel(k): v for k, v in items},
+        )
         claims.update(
             {
                 "sub": self.identity,
@@ -153,9 +155,10 @@ class TokenVerifier:
             leeway=self._leeway.total_seconds(),
         )
 
-
         video_dict = {camel_to_snake(k): v for k, v in claims["video"].items()}
-        video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
+        video_dict = {
+            k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__
+        }
         video = VideoGrants(**video_dict)
 
         c = Claims(
@@ -173,7 +176,7 @@ def camel_to_snake(t: str):
     return re.sub(r"(?<!^)(?=[A-Z])", "_", t).lower()
 
 
-def snake_to_lower_camel(s):
+def snake_to_lower_camel(t: str):
     return "".join(
-        word.capitalize() if i else word for i, word in enumerate(s.split("_"))
+        word.capitalize() if i else word for i, word in enumerate(t.split("_"))
     )
