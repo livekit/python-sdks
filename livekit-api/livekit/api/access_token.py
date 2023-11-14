@@ -64,11 +64,7 @@ class VideoGrants:
 
 @dataclasses.dataclass
 class Claims:
-    exp: int = 0
-    iss: str = ""  # api key
-    nbf: int = 0
-    sub: str = ""  # identity
-
+    identity: str = ""
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
     metadata: str = ""
@@ -121,7 +117,7 @@ class AccessToken:
             raise ValueError("identity and room must be set when joining a room")
 
         claims = dataclasses.asdict(self.claims)
-        claims = {camel_to_snake(k): v for k, v in claims.items()}
+        claims = {snake_to_lower_camel(k): v for k, v in claims.items()}
         claims.update(
             {
                 "sub": self.identity,
@@ -156,11 +152,20 @@ class TokenVerifier:
             algorithms=["HS256"],
             leeway=self._leeway.total_seconds(),
         )
-        c = Claims(**claims)
 
-        video = claims["video"]
-        video = {camel_to_snake(k): v for k, v in video.items()}
-        c.video = VideoGrants(**video)
+
+        video_dict = {camel_to_snake(k): v for k, v in claims["video"].items()}
+        video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
+        video = VideoGrants(**video_dict)
+
+        c = Claims(
+            identity=claims["sub"],
+            name=claims["name"],
+            video=video,
+            metadata=claims["metadata"],
+            sha256=claims["sha256"],
+        )
+        c.identity = claims["sub"]
         return c
 
 
@@ -168,5 +173,7 @@ def camel_to_snake(t: str):
     return re.sub(r"(?<!^)(?=[A-Z])", "_", t).lower()
 
 
-def snake_to_camel(t: str):
-    return "".join(x.title() for x in t.split("_"))
+def snake_to_lower_camel(s):
+    return "".join(
+        word.capitalize() if i else word for i, word in enumerate(s.split("_"))
+    )
