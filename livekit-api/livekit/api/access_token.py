@@ -65,9 +65,9 @@ class VideoGrants:
 @dataclasses.dataclass
 class Claims:
     exp: int = 0
-    iss: str = "" # api key
+    iss: str = ""  # api key
     nbf: int = 0
-    sub: str = "" # identity
+    sub: str = ""  # identity
 
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
@@ -165,7 +165,8 @@ class TokenVerifier:
 
 
 def camel_to_snake(str):
-   return re.sub(r'(?<!^)(?=[A-Z])', '_', str).lower()
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", str).lower()
+
 
 def snake_to_camel(str):
-    return ''.join(word.title() for word in name.split('_'))
+    return "".join(word.title() for word in name.split("_"))
