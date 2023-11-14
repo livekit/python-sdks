@@ -134,4 +134,3 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=send.room)),
             proto_room.SendDataResponse,
         )
-
