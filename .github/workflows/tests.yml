@@ -18,5 +18,5 @@ jobs:
       - name: Run tests
         run: |
           pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc
-          pytest .
+          pytest . --ignore=livekit-rtc/rust-sks
 
