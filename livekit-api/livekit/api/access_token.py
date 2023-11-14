@@ -155,21 +155,20 @@ class TokenVerifier:
             leeway=self._leeway.total_seconds(),
         )
 
-        video_dict = {camel_to_snake(k): v for k, v in claims["video"].items()}
+        video_dict = claims.get("video", dict())
+        video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
         video_dict = {
             k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__
         }
         video = VideoGrants(**video_dict)
 
-        c = Claims(
-            identity=claims["sub"],
-            name=claims["name"],
+        return Claims(
+            identity=claims.get("sub", ""),
+            name=claims.get("name", ""),
             video=video,
-            metadata=claims["metadata"],
-            sha256=claims["sha256"],
+            metadata=claims.get("metadata", ""),
+            sha256=claims.get("sha256", ""),
         )
-        c.identity = claims["sub"]
-        return c
 
 
 def camel_to_snake(t: str):
