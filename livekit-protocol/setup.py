@@ -27,6 +27,8 @@ setuptools.setup(
     name="livekit-protocol",
     version=about["__version__"],
     description="Python protocol stubs for LiveKit",
+    long_description="Python protocol stubs for LiveKit",
+    long_description_content_type="text/markdown",
     url="https://github.com/livekit/python-sdks",
     classifiers=[
         "Intended Audience :: Developers",
