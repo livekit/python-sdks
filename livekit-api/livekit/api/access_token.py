@@ -164,9 +164,9 @@ class TokenVerifier:
         return c
 
 
-def camel_to_snake(str):
-    return re.sub(r"(?<!^)(?=[A-Z])", "_", str).lower()
+def camel_to_snake(t: str):
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", t).lower()
 
 
-def snake_to_camel(str):
-    return "".join(word.title() for word in name.split("_"))
+def snake_to_camel(t: str):
+    return "".join(x.title() for x in t.split("_"))

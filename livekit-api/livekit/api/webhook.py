@@ -6,11 +6,11 @@ import base64
 
 
 class WebhookReceiver:
-    def __init__(token_verifier: TokenVerifier):
-        self.token_verifier = token_verifier
+    def __init__(self, token_verifier: TokenVerifier):
+        self._verifier = token_verifier
 
     def receive(self, body: str, auth_token: str):
-        claims = self.token_verifier.verify(auth_token)
+        claims = self._verifier.verify(auth_token)
 
         body_hash = hashlib.sha256(body).digest()
         claims_hash = base64.b64decode(claims.sha256)
