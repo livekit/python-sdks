@@ -1,6 +1,6 @@
 ## Whisper example
 
-[Whisper](https://github.com/openai/whisper) is a speech-to-text model from OpenAI. It ordinarily requires 30s of input data for transcription, making it challenging to use in real-time applications. We work around this by limitation by padding shorter bursts of speech with silent audio packets.
+[Whisper](https://github.com/openai/whisper) is a speech-to-text model from OpenAI. It ordinarily requires 30s of input data for transcription, making it challenging to use in real-time applications. We work around this limitation by padding shorter bursts of speech with silent audio packets.
 
 ## How to run the demo
 
