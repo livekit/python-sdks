@@ -17,20 +17,45 @@ limitations under the License.
 """
 from . import audio_frame_pb2
 import builtins
+import collections.abc
 from . import e2ee_pb2
 import google.protobuf.descriptor
+import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import room_pb2
 import sys
 from . import track_pb2
+import typing
 from . import video_frame_pb2
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 10):
     import typing as typing_extensions
 else:
     import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
+class _LogLevel:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _LogLevelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_LogLevel.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    LOG_ERROR: _LogLevel.ValueType  # 0
+    LOG_WARN: _LogLevel.ValueType  # 1
+    LOG_INFO: _LogLevel.ValueType  # 2
+    LOG_DEBUG: _LogLevel.ValueType  # 3
+    LOG_TRACE: _LogLevel.ValueType  # 4
+
+class LogLevel(_LogLevel, metaclass=_LogLevelEnumTypeWrapper): ...
+
+LOG_ERROR: LogLevel.ValueType  # 0
+LOG_WARN: LogLevel.ValueType  # 1
+LOG_INFO: LogLevel.ValueType  # 2
+LOG_DEBUG: LogLevel.ValueType  # 3
+LOG_TRACE: LogLevel.ValueType  # 4
+global___LogLevel = LogLevel
 
 @typing_extensions.final
 class FfiRequest(google.protobuf.message.Message):
@@ -331,6 +356,7 @@ class FfiEvent(google.protobuf.message.Message):
     UPDATE_LOCAL_METADATA_FIELD_NUMBER: builtins.int
     UPDATE_LOCAL_NAME_FIELD_NUMBER: builtins.int
     GET_STATS_FIELD_NUMBER: builtins.int
+    LOGS_FIELD_NUMBER: builtins.int
     @property
     def room_event(self) -> room_pb2.RoomEvent: ...
     @property
@@ -359,6 +385,8 @@ class FfiEvent(google.protobuf.message.Message):
     def update_local_name(self) -> room_pb2.UpdateLocalNameCallback: ...
     @property
     def get_stats(self) -> track_pb2.GetStatsCallback: ...
+    @property
+    def logs(self) -> global___LogBatch: ...
     def __init__(
         self,
         *,
@@ -376,10 +404,11 @@ class FfiEvent(google.protobuf.message.Message):
         update_local_metadata: room_pb2.UpdateLocalMetadataCallback | None = ...,
         update_local_name: room_pb2.UpdateLocalNameCallback | None = ...,
         get_stats: track_pb2.GetStatsCallback | None = ...,
+        logs: global___LogBatch | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_stats", b"get_stats", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_stats", b"get_stats", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "capture_audio_frame", "update_local_metadata", "update_local_name", "get_stats"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "capture_audio_frame", "update_local_metadata", "update_local_name", "get_stats", "logs"] | None: ...
 
 global___FfiEvent = FfiEvent
 
@@ -392,13 +421,17 @@ class InitializeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     EVENT_CALLBACK_PTR_FIELD_NUMBER: builtins.int
+    CAPTURE_LOGS_FIELD_NUMBER: builtins.int
     event_callback_ptr: builtins.int
+    capture_logs: builtins.bool
+    """When true, the FfiServer will forward logs using LogRecord"""
     def __init__(
         self,
         *,
         event_callback_ptr: builtins.int = ...,
+        capture_logs: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["event_callback_ptr", b"event_callback_ptr"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["capture_logs", b"capture_logs", "event_callback_ptr", b"event_callback_ptr"]) -> None: ...
 
 global___InitializeRequest = InitializeRequest
 
@@ -461,3 +494,57 @@ class DisposeCallback(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
 
 global___DisposeCallback = DisposeCallback
+
+@typing_extensions.final
+class LogRecord(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LEVEL_FIELD_NUMBER: builtins.int
+    TARGET_FIELD_NUMBER: builtins.int
+    MODULE_PATH_FIELD_NUMBER: builtins.int
+    FILE_FIELD_NUMBER: builtins.int
+    LINE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    level: global___LogLevel.ValueType
+    target: builtins.str
+    """e.g "livekit", "libwebrtc", "tokio-tungstenite", etc..."""
+    module_path: builtins.str
+    file: builtins.str
+    line: builtins.int
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        level: global___LogLevel.ValueType = ...,
+        target: builtins.str = ...,
+        module_path: builtins.str | None = ...,
+        file: builtins.str | None = ...,
+        line: builtins.int | None = ...,
+        message: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "line", b"line", "module_path", b"module_path"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_file", b"_file"]) -> typing_extensions.Literal["file"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_line", b"_line"]) -> typing_extensions.Literal["line"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_module_path", b"_module_path"]) -> typing_extensions.Literal["module_path"] | None: ...
+
+global___LogRecord = LogRecord
+
+@typing_extensions.final
+class LogBatch(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RECORDS_FIELD_NUMBER: builtins.int
+    @property
+    def records(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___LogRecord]: ...
+    def __init__(
+        self,
+        *,
+        records: collections.abc.Iterable[global___LogRecord] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["records", b"records"]) -> None: ...
+
+global___LogBatch = LogBatch

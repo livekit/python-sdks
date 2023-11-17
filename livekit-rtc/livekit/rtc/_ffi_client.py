@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+import logging
 import ctypes
 import os
 import platform
@@ -23,6 +24,8 @@ import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue
+
+logger = logging.getLogger("livekit")
 
 
 def get_ffi_lib_path():
@@ -121,7 +124,37 @@ def ffi_event_callback(
     event_data = bytes(data_ptr[: int(data_len)])
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
+
+    which = event.WhichOneof("message")
+    if which == "logs":
+        for record in event.logs.records:
+            logger.log(
+                to_python_level(record.level),
+                "%s:%s:%s - %s",
+                record.target,
+                record.line,
+                record.module_path,
+                record.message,
+            )
+
+        return  # no need to queue the logs
+
     ffi_client.queue.put(event)
+
+
+def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
+    if level == proto_ffi.LogLevel.LOG_ERROR:
+        return logging.ERROR
+    elif level == proto_ffi.LogLevel.LOG_WARN:
+        return logging.WARN
+    elif level == proto_ffi.LogLevel.LOG_INFO:
+        return logging.INFO
+    elif level == proto_ffi.LogLevel.LOG_DEBUG:
+        return logging.DEBUG
+    elif level == proto_ffi.LogLevel.LOG_TRACE:
+        return logging.DEBUG
+
+    raise Exception("unreachable")
 
 
 class FfiClient:
@@ -133,6 +166,7 @@ class FfiClient:
         req = proto_ffi.FfiRequest()
         cb_callback = int(ctypes.cast(ffi_event_callback, ctypes.c_void_p).value)  # type: ignore
         req.initialize.event_callback_ptr = cb_callback
+        req.initialize.capture_logs = True  # capture logs on Python
         self.request(req)
 
     @property
