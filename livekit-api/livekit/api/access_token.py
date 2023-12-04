@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Optional
+from typing import Optional, List
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
@@ -44,7 +44,7 @@ class VideoGrants:
     # TrackSource types that a participant may publish.
     # When set, it supercedes CanPublish. Only sources explicitly set here can be
     # published
-    can_publish_sources: list[str] = dataclasses.field(default_factory=list)
+    can_publish_sources: List[str] = dataclasses.field(default_factory=list)
 
     # by default, a participant is not allowed to update its own metadata
     can_update_own_metadata: bool = False
