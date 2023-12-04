@@ -370,7 +370,13 @@ class Room(EventEmitter[EventTypes]):
             rparticipant = None
             if event.data_received.participant_sid:
                 rparticipant = self.participants[event.data_received.participant_sid]
-            self.emit("data_received", data, event.data_received.kind, rparticipant)
+            self.emit(
+                "data_received",
+                data,
+                event.data_received.kind,
+                rparticipant,
+                event.data_received.topic,
+            )
         elif which == "e2ee_state_changed":
             sid = event.e2ee_state_changed.participant_sid
             e2ee_state = event.e2ee_state_changed.state

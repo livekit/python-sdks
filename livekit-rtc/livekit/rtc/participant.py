@@ -20,7 +20,7 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
 from ._utils import BroadcastQueue
-from .track import LocalAudioTrack, LocalVideoTrack, Track
+from .track import LocalAudioTrack, LocalTrack, LocalVideoTrack, Track
 from .track_publication import (
     LocalTrackPublication,
     RemoteTrackPublication,
@@ -80,7 +80,8 @@ class LocalParticipant(Participant):
         self,
         payload: Union[bytes, str],
         kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
-        destination_sids: Optional[List[Union[str, "RemoteParticipant"]]] = None,
+        destination_sids: List[Union[str, "RemoteParticipant"]] = [],
+        topic: str = "",
     ) -> None:
         if isinstance(payload, str):
             payload = payload.encode("utf-8")
@@ -93,16 +94,16 @@ class LocalParticipant(Participant):
         req.publish_data.data_ptr = ctypes.addressof(cdata)
         req.publish_data.data_len = data_len
         req.publish_data.kind = kind
+        req.publish_data.topic = topic
 
-        if destination_sids is not None:
-            sids = []
-            for p in destination_sids:
-                if isinstance(p, RemoteParticipant):
-                    sids.append(p.sid)
-                else:
-                    sids.append(p)
+        sids = []
+        for p in destination_sids:
+            if isinstance(p, RemoteParticipant):
+                sids.append(p.sid)
+            else:
+                sids.append(p)
 
-            req.publish_data.destination_sids.extend(sids)
+        req.publish_data.destination_sids.extend(sids)
 
         queue = ffi_client.queue.subscribe()
         try:
@@ -147,13 +148,8 @@ class LocalParticipant(Participant):
             ffi_client.queue.unsubscribe(queue)
 
     async def publish_track(
-        self, track: Track, options: TrackPublishOptions
-    ) -> TrackPublication:
-        if not isinstance(track, LocalAudioTrack) and not isinstance(
-            track, LocalVideoTrack
-        ):
-            raise Exception("cannot publish a remote track")
-
+        self, track: LocalTrack, options: TrackPublishOptions
+    ) -> LocalTrackPublication:
         req = proto_ffi.FfiRequest()
         req.publish_track.track_handle = track._ffi_handle.handle
         req.publish_track.local_participant_handle = self._ffi_handle.handle
