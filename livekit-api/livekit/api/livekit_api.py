@@ -16,13 +16,13 @@ class LiveKitAPI:
         timeout: float = 60,  # 1 minutes by default
     ):
         if not url:
-            url = os.getenv("LIVEKIT_URL", "")
+            url = os.getenv("LIVEKIT_URL")
 
         if not api_key:
-            api_key = os.getenv("LIVEKIT_API_KEY", "")
+            api_key = os.getenv("LIVEKIT_API_KEY")
 
         if not api_secret:
-            api_secret = os.getenv("LIVEKIT_API_SECRET", "")
+            api_secret = os.getenv("LIVEKIT_API_SECRET")
 
         if not url:
             raise ValueError("url must be set")
