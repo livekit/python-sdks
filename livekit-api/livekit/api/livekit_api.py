@@ -3,17 +3,28 @@ import os
 from .room_service import RoomService
 from .egress_service import EgressService
 from .ingress_service import IngressService
+from typing import Optional
 
 
 class LiveKitAPI:
     def __init__(
         self,
-        url: str = os.getenv("LIVEKIT_URL", "http://localhost:7880"),
-        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
-        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+        url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        api_secret: Optional[str] = None,
         *,
         timeout: float = 60,  # 1 minutes by default
     ):
+        url = url or os.getenv("LIVEKIT_URL")
+        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
+        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
+
+        if not url:
+            raise ValueError("url must be set")
+
+        if not api_key or not api_secret:
+            raise ValueError("api_key and api_secret must be set")
+
         self._session = aiohttp.ClientSession(timeout=timeout)
         self._room = RoomService(url, api_key, api_secret, self._session)
         self._ingress = IngressService(url, api_key, api_secret, self._session)
