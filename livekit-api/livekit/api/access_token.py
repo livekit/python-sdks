@@ -78,11 +78,8 @@ class AccessToken:
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
     ) -> None:
-        if not api_key:
-            api_key = os.getenv("LIVEKIT_API_KEY")
-
-        if not api_secret:
-            api_secret = os.getenv("LIVEKIT_API_SECRET")
+        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
+        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
 
         if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
@@ -150,11 +147,8 @@ class TokenVerifier:
         *,
         leeway: datetime.timedelta = DEFAULT_LEEWAY,
     ) -> None:
-        if not api_key:
-            api_key = os.getenv("LIVEKIT_API_KEY")
-
-        if not api_secret:
-            api_secret = os.getenv("LIVEKIT_API_SECRET")
+        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
+        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
 
         if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
