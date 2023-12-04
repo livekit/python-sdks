@@ -18,6 +18,7 @@ import re
 import datetime
 import os
 import jwt
+from typing import Optional
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
@@ -74,14 +75,18 @@ class Claims:
 class AccessToken:
     def __init__(
         self,
-        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
-        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+        api_key: Optional[str] = None,
+        api_secret: Optional[str] = None,
     ) -> None:
+        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
+        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
+
+        if not api_key or not api_secret:
+            raise ValueError("api_key and api_secret must be set")
+
         self.api_key = api_key  # iss
         self.api_secret = api_secret
         self.claims = Claims()
-        if not api_key or not api_secret:
-            raise ValueError("api_key and api_secret must be set")
 
         # default jwt claims
         self.identity = ""  # sub
@@ -137,11 +142,17 @@ class AccessToken:
 class TokenVerifier:
     def __init__(
         self,
-        api_key: str = os.getenv("LIVEKIT_API_KEY", ""),
-        api_secret: str = os.getenv("LIVEKIT_API_SECRET", ""),
+        api_key: Optional[str] = None,
+        api_secret: Optional[str] = None,
         *,
         leeway: datetime.timedelta = DEFAULT_LEEWAY,
     ) -> None:
+        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
+        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
+
+        if not api_key or not api_secret:
+            raise ValueError("api_key and api_secret must be set")
+
         self.api_key = api_key
         self.api_secret = api_secret
         self._leeway = leeway
