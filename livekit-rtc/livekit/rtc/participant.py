@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import ctypes
-from typing import List, Optional, Union
+from typing import List, Union
 
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
 from ._utils import BroadcastQueue
-from .track import LocalAudioTrack, LocalTrack, LocalVideoTrack, Track
+from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
     RemoteTrackPublication,
