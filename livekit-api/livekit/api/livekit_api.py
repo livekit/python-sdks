@@ -13,7 +13,7 @@ class LiveKitAPI:
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
         *,
-        timeout: float = 60,  # 1 minutes by default
+        timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=60),  # 60 seconds
     ):
         url = url or os.getenv("LIVEKIT_URL")
         api_key = api_key or os.getenv("LIVEKIT_API_KEY")
