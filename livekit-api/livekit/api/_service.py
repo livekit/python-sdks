@@ -9,7 +9,7 @@ AUTHORIZATION = "authorization"
 
 class Service(ABC):
     def __init__(
-        self, host: str, api_key: str, api_secret: str, session: aiohttp.ClientSession
+        self, session: aiohttp.ClientSession, host: str, api_key: str, api_secret: str
     ):
         self._client = TwirpClient(session, host, "livekit")
         self.api_key = api_key

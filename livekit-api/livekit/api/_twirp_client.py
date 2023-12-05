@@ -59,8 +59,6 @@ class TwirpClient:
         pkg: str,
         prefix: str = DEFAULT_PREFIX,
     ) -> None:
-        self._session = aiohttp.ClientSession()
-
         parse_res = urlparse(host)
         scheme = parse_res.scheme
         if scheme.startswith("ws"):
@@ -70,6 +68,7 @@ class TwirpClient:
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
+        self._session = session
 
     async def request(
         self,

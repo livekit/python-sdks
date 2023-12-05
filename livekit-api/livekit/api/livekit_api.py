@@ -26,9 +26,9 @@ class LiveKitAPI:
             raise ValueError("api_key and api_secret must be set")
 
         self._session = aiohttp.ClientSession(timeout=timeout)
-        self._room = RoomService(url, api_key, api_secret, self._session)
-        self._ingress = IngressService(url, api_key, api_secret, self._session)
-        self._egress = EgressService(url, api_key, api_secret, self._session)
+        self._room = RoomService(self._session, url, api_key, api_secret)
+        self._ingress = IngressService(self._session, url, api_key, api_secret)
+        self._egress = EgressService(self._session, url, api_key, api_secret)
 
     @property
     def room(self):
