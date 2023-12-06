@@ -90,7 +90,7 @@ class VideoFrameBuffer(ABC):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "VideoFrameBuffer":
         """
         Create the right class instance from the VideoFrameBufferInfo
@@ -132,7 +132,7 @@ class NativeVideoBuffer(VideoFrameBuffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "NativeVideoBuffer":
         return NativeVideoBuffer(owned_info)
 
@@ -398,7 +398,7 @@ class I420Buffer(PlanarYuv8Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "I420Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
@@ -464,7 +464,7 @@ class I420ABuffer(PlanarYuv8Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "I420ABuffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
@@ -545,7 +545,7 @@ class I422Buffer(PlanarYuv8Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "I422Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
@@ -598,7 +598,7 @@ class I444Buffer(PlanarYuv8Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "I444Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
@@ -651,7 +651,7 @@ class I010Buffer(PlanarYuv16Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "I010Buffer":
         info = owned_info.info
         stride_y = info.yuv.stride_y
@@ -705,7 +705,7 @@ class NV12Buffer(BiplanaraYuv8Buffer):
 
     @staticmethod
     def _from_owned_info(
-        owned_info: proto_video_frame.OwnedVideoFrameBuffer
+        owned_info: proto_video_frame.OwnedVideoFrameBuffer,
     ) -> "NV12Buffer":
         info = owned_info.info
         stride_y = info.bi_yuv.stride_y
