@@ -53,8 +53,11 @@ def get_ffi_lib_path():
 
 
 ffi_lib = ctypes.CDLL(get_ffi_lib_path())
+ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 
 # C function types
+ffi_lib.livekit_ffi_initialize.argtypes = [ffi_cb_fnc, ctypes.c_bool]
+
 ffi_lib.livekit_ffi_request.argtypes = [
     ctypes.POINTER(ctypes.c_ubyte),
     ctypes.c_size_t,
@@ -116,7 +119,7 @@ class FfiQueue(Generic[T]):
                     break
 
 
-@ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
+@ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 def ffi_event_callback(
     data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     data_len: ctypes.c_size_t,
@@ -162,12 +165,7 @@ class FfiClient:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
-        # initialize request
-        req = proto_ffi.FfiRequest()
-        cb_callback = int(ctypes.cast(ffi_event_callback, ctypes.c_void_p).value)  # type: ignore
-        req.initialize.event_callback_ptr = cb_callback
-        req.initialize.capture_logs = True  # capture logs on Python
-        self.request(req)
+        ffi_lib.livekit_ffi_initialize(ffi_event_callback, True)
 
     @property
     def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
