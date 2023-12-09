@@ -24,6 +24,7 @@ import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
 from . import participant_pb2
+from . import stats_pb2
 import sys
 from . import track_pb2
 import typing
@@ -394,6 +395,7 @@ class PublishDataRequest(google.protobuf.message.Message):
     DATA_LEN_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
     DESTINATION_SIDS_FIELD_NUMBER: builtins.int
+    TOPIC_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     data_ptr: builtins.int
     data_len: builtins.int
@@ -401,6 +403,7 @@ class PublishDataRequest(google.protobuf.message.Message):
     @property
     def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """destination"""
+    topic: builtins.str
     def __init__(
         self,
         *,
@@ -409,8 +412,11 @@ class PublishDataRequest(google.protobuf.message.Message):
         data_len: builtins.int = ...,
         kind: global___DataPacketKind.ValueType = ...,
         destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
+        topic: builtins.str | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "destination_sids", b"destination_sids", "kind", b"kind", "local_participant_handle", b"local_participant_handle"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_topic", b"_topic", "data_len", b"data_len", "data_ptr", b"data_ptr", "destination_sids", b"destination_sids", "kind", b"kind", "local_participant_handle", b"local_participant_handle", "topic", b"topic"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_topic", b"_topic"]) -> typing_extensions.Literal["topic"] | None: ...
 
 global___PublishDataRequest = PublishDataRequest
 
@@ -578,6 +584,64 @@ class SetSubscribedResponse(google.protobuf.message.Message):
     ) -> None: ...
 
 global___SetSubscribedResponse = SetSubscribedResponse
+
+@typing_extensions.final
+class GetSessionStatsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["room_handle", b"room_handle"]) -> None: ...
+
+global___GetSessionStatsRequest = GetSessionStatsRequest
+
+@typing_extensions.final
+class GetSessionStatsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+
+global___GetSessionStatsResponse = GetSessionStatsResponse
+
+@typing_extensions.final
+class GetSessionStatsCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    PUBLISHER_STATS_FIELD_NUMBER: builtins.int
+    SUBSCRIBER_STATS_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def publisher_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+    @property
+    def subscriber_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+        publisher_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+        subscriber_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "publisher_stats", b"publisher_stats", "subscriber_stats", b"subscriber_stats"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+
+global___GetSessionStatsCallback = GetSessionStatsCallback
 
 @typing_extensions.final
 class VideoEncoding(google.protobuf.message.Message):
@@ -1247,21 +1311,27 @@ class DataReceived(google.protobuf.message.Message):
     DATA_FIELD_NUMBER: builtins.int
     PARTICIPANT_SID_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
+    TOPIC_FIELD_NUMBER: builtins.int
     @property
     def data(self) -> global___OwnedBuffer: ...
     participant_sid: builtins.str
     """Can be empty if the data is sent a server SDK"""
     kind: global___DataPacketKind.ValueType
+    topic: builtins.str
     def __init__(
         self,
         *,
         data: global___OwnedBuffer | None = ...,
         participant_sid: builtins.str | None = ...,
         kind: global___DataPacketKind.ValueType = ...,
+        topic: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "data", b"data", "participant_sid", b"participant_sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "data", b"data", "kind", b"kind", "participant_sid", b"participant_sid"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "_topic", b"_topic", "data", b"data", "participant_sid", b"participant_sid", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "_topic", b"_topic", "data", b"data", "kind", b"kind", "participant_sid", b"participant_sid", "topic", b"topic"]) -> None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_participant_sid", b"_participant_sid"]) -> typing_extensions.Literal["participant_sid"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_topic", b"_topic"]) -> typing_extensions.Literal["topic"] | None: ...
 
 global___DataReceived = DataReceived
 

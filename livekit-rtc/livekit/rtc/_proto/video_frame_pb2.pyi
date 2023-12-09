@@ -39,12 +39,14 @@ class _VideoCodecEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._Enu
     VP8: _VideoCodec.ValueType  # 0
     H264: _VideoCodec.ValueType  # 1
     AV1: _VideoCodec.ValueType  # 2
+    VP9: _VideoCodec.ValueType  # 3
 
 class VideoCodec(_VideoCodec, metaclass=_VideoCodecEnumTypeWrapper): ...
 
 VP8: VideoCodec.ValueType  # 0
 H264: VideoCodec.ValueType  # 1
 AV1: VideoCodec.ValueType  # 2
+VP9: VideoCodec.ValueType  # 3
 global___VideoCodec = VideoCodec
 
 class _VideoRotation:
