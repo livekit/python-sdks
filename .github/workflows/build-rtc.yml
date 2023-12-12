@@ -88,3 +88,11 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+
+  docs:
+    needs: [publish]
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: 'livekit-rtc'
+      docs_entrypoint: 'livekit-rtc/livekit/rtc'
+    secrets: inherit
