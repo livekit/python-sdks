@@ -83,7 +83,7 @@ setuptools.setup(
     license="Apache-2.0",
     packages=setuptools.find_namespace_packages(include=["livekit.*"]),
     python_requires=">=3.9.0",
-    install_requires=["protobuf>=3.1.0", "types-protobuf>=3.1.0"],
+    install_requires=["protobuf>=4", "types-protobuf>=4"],
     package_data={
         "livekit.rtc": ["resources/*", "_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"],
     },

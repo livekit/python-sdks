@@ -18,7 +18,7 @@ from typing import Optional
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
-from ._utils import RingQueue
+from ._utils import RingQueue, task_done_logger
 from .track import Track
 from .video_frame import VideoFrame, VideoFrameBuffer
 
@@ -45,6 +45,7 @@ class VideoStream:
         self._ffi_handle = FfiHandle(stream_info.handle.id)
         self._info = stream_info.info
         self._task = self._loop.create_task(self._run())
+        self._task.add_done_callback(task_done_logger)
 
     def __del__(self) -> None:
         ffi_client.queue.unsubscribe(self._ffi_queue)
