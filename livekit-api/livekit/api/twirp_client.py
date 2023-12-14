@@ -34,6 +34,7 @@ class TwirpError(Exception):
     def message(self) -> str:
         return self._msg
 
+
 class TwirpErrorCode:
     CANCELED = "canceled"
     UNKNOWN = "unknown"
