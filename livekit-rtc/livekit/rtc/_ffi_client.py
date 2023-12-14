@@ -160,16 +160,14 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
     raise Exception("unreachable")
 
 
-_ffi_instance: Optional["FfiClient"] = None
-
-
 class FfiClient:
+    _instance: Optional["FfiClient"] = None
+
     @classproperty
     def instance(self):
-        global _ffi_instance
-        if _ffi_instance is None:
-            _ffi_instance = FfiClient()
-        return _ffi_instance
+        if self._instance is None:
+            self._instance = FfiClient()
+        return self._instance
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
