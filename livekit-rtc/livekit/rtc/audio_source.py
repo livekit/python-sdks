@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
 from .audio_frame import AudioFrame
@@ -27,7 +27,7 @@ class AudioSource:
         req.new_audio_source.sample_rate = sample_rate
         req.new_audio_source.num_channels = num_channels
 
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         self._info = resp.new_audio_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
@@ -37,15 +37,15 @@ class AudioSource:
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
 
-        queue = ffi_client.queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = ffi_client.request(req)
+            resp = FfiClient.instance.request(req)
             cb = await queue.wait_for(
                 lambda e: e.capture_audio_frame.async_id
                 == resp.capture_audio_frame.async_id
             )
         finally:
-            ffi_client.queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.capture_audio_frame.error:
             raise Exception(cb.capture_audio_frame.error)

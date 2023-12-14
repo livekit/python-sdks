@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from typing import TYPE_CHECKING, List, Union
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
 from ._proto import stats_pb2 as proto_stats
@@ -52,14 +52,14 @@ class Track:
         req = proto_ffi.FfiRequest()
         req.get_stats.track_handle = self._ffi_handle.handle
 
-        queue = ffi_client.queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = ffi_client.request(req)
+            resp = FfiClient.instance.request(req)
             cb = await queue.wait_for(
                 lambda e: e.get_stats.async_id == resp.get_stats.async_id
             )
         finally:
-            ffi_client.queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.get_stats.error:
             raise Exception(cb.get_stats.error)
@@ -77,7 +77,7 @@ class LocalAudioTrack(Track):
         req.create_audio_track.name = name
         req.create_audio_track.source_handle = source._ffi_handle.handle
 
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         return LocalAudioTrack(resp.create_audio_track.track)
 
 
@@ -91,7 +91,7 @@ class LocalVideoTrack(Track):
         req.create_video_track.name = name
         req.create_video_track.source_handle = source._ffi_handle.handle
 
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         return LocalVideoTrack(resp.create_video_track.track)
 
 

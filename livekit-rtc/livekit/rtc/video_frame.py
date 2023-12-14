@@ -15,7 +15,7 @@
 import ctypes
 from typing import Union
 
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
 from ._proto import video_frame_pb2 as proto_video_frame
@@ -75,7 +75,7 @@ class VideoFrameBuffer(ABC):
     def to_i420(self) -> "I420Buffer":
         req = proto_ffi.FfiRequest()
         req.to_i420.buffer.CopyFrom(self._proto_info())
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
     def to_argb(self, dst: "ArgbFrame") -> None:
@@ -86,7 +86,7 @@ class VideoFrameBuffer(ABC):
         req.to_argb.dst_stride = dst.stride
         req.to_argb.dst_width = dst.width
         req.to_argb.dst_height = dst.height
-        ffi_client.request(req)
+        FfiClient.instance.request(req)
 
     @staticmethod
     def _from_owned_info(
@@ -139,7 +139,7 @@ class NativeVideoBuffer(VideoFrameBuffer):
     def to_i420(self) -> "I420Buffer":
         req = proto_ffi.FfiRequest()
         req.to_i420.handle = self._ffi_handle.handle
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
     def to_argb(self, dst: "ArgbFrame") -> None:
@@ -768,7 +768,7 @@ class ArgbFrame:
         req.to_i420.argb.height = self.height
         req.to_i420.argb.stride = self.stride
         req.to_i420.argb.ptr = get_address(memoryview(self._data))
-        res = ffi_client.request(req)
+        res = FfiClient.instance.request(req)
         return I420Buffer._from_owned_info(res.to_i420.buffer)
 
     @property

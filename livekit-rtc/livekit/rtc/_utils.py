@@ -7,6 +7,14 @@ from typing import Callable, Generic, List, TypeVar
 logger = logging.getLogger("livekit")
 
 
+class classproperty(object):
+    def __init__(self, f):
+        self.f = classmethod(f)
+
+    def __get__(self, *a):
+        return self.f.__get__(*a)()
+
+
 def task_done_logger(task: asyncio.Task) -> None:
     if task.cancelled():
         logger.info("task cancelled: %s", task)

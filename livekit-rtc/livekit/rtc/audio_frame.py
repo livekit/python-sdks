@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import ctypes
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
@@ -65,7 +65,7 @@ class AudioFrame:
         req = proto_ffi.FfiRequest()
         req.new_audio_resampler.CopyFrom(proto_audio.NewAudioResamplerRequest())
 
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
         resampler_handle = FfiHandle(resp.new_audio_resampler.resampler.handle.id)
 
         resample_req = proto_ffi.FfiRequest()
@@ -74,7 +74,7 @@ class AudioFrame:
         resample_req.remix_and_resample.sample_rate = sample_rate
         resample_req.remix_and_resample.num_channels = num_channels
 
-        resp = ffi_client.request(resample_req)
+        resp = FfiClient.instance.request(resample_req)
         return AudioFrame._from_owned_info(resp.remix_and_resample.buffer)
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:
