@@ -23,9 +23,16 @@ DEFAULT_PREFIX = "twirp"
 
 class TwirpError(Exception):
     def __init__(self, code: str, msg: str) -> None:
-        self.code = code
-        self.msg = msg
+        self._code = code
+        self._msg = msg
 
+    @property
+    def code(self) -> str:
+        return self._code
+
+    @property
+    def message(self) -> str:
+        return self._msg
 
 class TwirpErrorCode:
     CANCELED = "canceled"
