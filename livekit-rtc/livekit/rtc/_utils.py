@@ -1,7 +1,20 @@
 import asyncio
+import logging
 from collections import deque
 import ctypes
 from typing import Callable, Generic, List, TypeVar
+
+logger = logging.getLogger("livekit")
+
+
+def task_done_logger(task: asyncio.Task) -> None:
+    if task.cancelled():
+        logger.info("task cancelled: %s", task)
+        return
+
+    if task.exception():
+        logger.error("task exception: %s", task, exc_info=task.exception())
+        return
 
 
 def get_address(data: memoryview) -> int:

@@ -18,7 +18,7 @@ from typing import Optional
 from ._ffi_client import FfiHandle, ffi_client
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
-from ._utils import RingQueue
+from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .track import Track
 
@@ -46,6 +46,7 @@ class AudioStream:
         self._info = stream_info
 
         self._task = self._loop.create_task(self._run())
+        self._task.add_done_callback(task_done_logger)
 
     def __del__(self) -> None:
         ffi_client.queue.unsubscribe(self._ffi_queue)
