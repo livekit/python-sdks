@@ -26,13 +26,10 @@ jobs:
 
       - uses: actions/setup-python@v4
 
-      - name: Build wheel
+      - name: Build wheel & sdist
         run: |
           pip3 install build wheel
-          python3 -m build --wheel
-
-      - name: Build SDist
-        run: pipx run build --sdist
+          python3 -m build --wheel --sdist
 
       - uses: actions/upload-artifact@v3
         with:

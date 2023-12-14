@@ -23,6 +23,7 @@ from livekit.protocol.models import *
 from livekit.protocol.room import *
 from livekit.protocol.webhook import *
 
+from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
 from .access_token import VideoGrants, AccessToken, TokenVerifier
 from .webhook import WebhookReceiver

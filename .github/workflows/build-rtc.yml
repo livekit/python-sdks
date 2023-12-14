@@ -63,8 +63,10 @@ jobs:
         with:
           submodules: true
 
-      - name: Build SDist
-        run: pipx run build --sdist
+      - name: Build sdist
+        run: |
+          pip3 install build
+          python3 -m build --sdist
 
       - uses: actions/upload-artifact@v3
         with:

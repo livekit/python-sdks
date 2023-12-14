@@ -1,7 +1,7 @@
 from typing import Dict
 import aiohttp
 from abc import ABC
-from ._twirp_client import TwirpClient
+from .twirp_client import TwirpClient
 from .access_token import AccessToken, VideoGrants
 
 AUTHORIZATION = "authorization"
