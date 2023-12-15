@@ -23,7 +23,7 @@ from typing import Generic, List, Optional, TypeVar
 import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
-from ._utils import Queue
+from ._utils import Queue, classproperty
 
 logger = logging.getLogger("livekit")
 
@@ -142,7 +142,7 @@ def ffi_event_callback(
 
         return  # no need to queue the logs
 
-    ffi_client.queue.put(event)
+    FfiClient.instance.queue.put(event)
 
 
 def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
@@ -161,6 +161,14 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
 
 
 class FfiClient:
+    _instance: Optional["FfiClient"] = None
+
+    @classproperty
+    def instance(self):
+        if self._instance is None:
+            self._instance = FfiClient()
+        return self._instance
+
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
@@ -188,6 +196,3 @@ class FfiClient:
 
         FfiHandle(handle)
         return resp
-
-
-ffi_client = FfiClient()

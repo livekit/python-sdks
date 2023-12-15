@@ -14,7 +14,7 @@
 
 from typing import Optional
 
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
@@ -82,4 +82,4 @@ class RemoteTrackPublication(TrackPublication):
         req = proto_ffi.FfiRequest()
         req.set_subscribed.subscribe = subscribed
         req.set_subscribed.publication_handle = self._ffi_handle.handle
-        ffi_client.request(req)
+        FfiClient.instance.request(req)

@@ -17,7 +17,7 @@ import ctypes
 import logging
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Literal
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
@@ -95,7 +95,7 @@ class Room(EventEmitter[EventTypes]):
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
-            ffi_client.queue.unsubscribe(self._ffi_queue)
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     @property
     def sid(self) -> str:
@@ -157,19 +157,19 @@ class Room(EventEmitter[EventTypes]):
             )
 
         # subscribe before connecting so we don't miss any events
-        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
+        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
 
-        queue = ffi_client.queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = ffi_client.request(req)
+            resp = FfiClient.instance.request(req)
             cb = await queue.wait_for(
                 lambda e: e.connect.async_id == resp.connect.async_id
             )
         finally:
-            ffi_client.queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.connect.error:
-            ffi_client.queue.unsubscribe(self._ffi_queue)
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
             raise ConnectError(cb.connect.error)
 
         self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
@@ -201,17 +201,17 @@ class Room(EventEmitter[EventTypes]):
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        queue = ffi_client.queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = ffi_client.request(req)
+            resp = FfiClient.instance.request(req)
             await queue.wait_for(
                 lambda e: e.disconnect.async_id == resp.disconnect.async_id
             )
         finally:
-            ffi_client.queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
         await self._task
-        ffi_client.queue.unsubscribe(self._ffi_queue)
+        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events

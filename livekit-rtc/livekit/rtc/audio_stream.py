@@ -15,7 +15,7 @@
 import asyncio
 from typing import Optional
 
-from ._ffi_client import FfiHandle, ffi_client
+from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import RingQueue, task_done_logger
@@ -32,14 +32,14 @@ class AudioStream:
     ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = ffi_client.queue.subscribe(self._loop)
+        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrame] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()
         new_audio_stream = req.new_audio_stream
         new_audio_stream.track_handle = track._ffi_handle.handle
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
-        resp = ffi_client.request(req)
+        resp = FfiClient.instance.request(req)
 
         stream_info = resp.new_audio_stream.stream
         self._ffi_handle = FfiHandle(stream_info.handle.id)
@@ -49,7 +49,7 @@ class AudioStream:
         self._task.add_done_callback(task_done_logger)
 
     def __del__(self) -> None:
-        ffi_client.queue.unsubscribe(self._ffi_queue)
+        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def _run(self):
         while True:
@@ -63,7 +63,7 @@ class AudioStream:
             elif audio_event.HasField("eos"):
                 break
 
-        ffi_client.queue.unsubscribe(self._ffi_queue)
+        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def aclose(self):
         self._ffi_handle.dispose()
