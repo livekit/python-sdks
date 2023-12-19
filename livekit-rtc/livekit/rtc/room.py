@@ -76,6 +76,16 @@ class RoomOptions:
     rtc_config: Optional[RtcConfiguration] = None
 
 
+@dataclass
+class DataPacket:
+    data: bytes
+    kind: proto_room.DataPacketKind.ValueType
+    participant: Optional[
+        RemoteParticipant
+    ] = None  # None when the data has been sent by a server SDK
+    topic: Optional[str] = None
+
+
 class ConnectError(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -372,10 +382,12 @@ class Room(EventEmitter[EventTypes]):
                 rparticipant = self.participants[event.data_received.participant_sid]
             self.emit(
                 "data_received",
-                data,
-                event.data_received.kind,
-                rparticipant,
-                event.data_received.topic,
+                DataPacket(
+                    data=data,
+                    kind=event.data_received.kind,
+                    participant=rparticipant,
+                    topic=event.data_received.topic,
+                ),
             )
         elif which == "e2ee_state_changed":
             sid = event.e2ee_state_changed.participant_sid
