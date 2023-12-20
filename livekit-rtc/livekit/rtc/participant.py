@@ -167,6 +167,7 @@ class LocalParticipant(Participant):
 
             track_publication = LocalTrackPublication(cb.publish_track.publication)
             track_publication.track = track
+            track._info.sid = track_publication.sid
             self.tracks[track_publication.sid] = track_publication
 
             queue.task_done()
