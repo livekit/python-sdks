@@ -13,14 +13,15 @@
 # limitations under the License.
 
 import asyncio
-import logging
 import ctypes
+import importlib.resources
+import logging
 import os
 import platform
+import shutil
+import tempfile
 import threading
 from typing import Generic, List, Optional, TypeVar
-
-import pkg_resources
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
@@ -28,7 +29,7 @@ from ._utils import Queue, classproperty
 logger = logging.getLogger("livekit")
 
 
-def get_ffi_lib_path():
+def get_ffi_lib():
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
     if libpath:
@@ -46,13 +47,12 @@ def get_ffi_lib_path():
                 Set LIVEKIT_LIB_PATH to specify a the lib path"
         )
 
-    libpath = pkg_resources.resource_filename(
-        "livekit.rtc", os.path.join("resources", libname)
-    )
-    return libpath
+    with importlib.resources.path("livekit.rtc.resources", libname) as resource_path:
+        ffi_lib = ctypes.CDLL(resource_path)
+        return ffi_lib
 
 
-ffi_lib = ctypes.CDLL(get_ffi_lib_path())
+ffi_lib = get_ffi_lib()
 ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 
 # C function types
