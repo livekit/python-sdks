@@ -18,8 +18,6 @@ import importlib.resources
 import logging
 import os
 import platform
-import shutil
-import tempfile
 import threading
 from typing import Generic, List, Optional, TypeVar
 
