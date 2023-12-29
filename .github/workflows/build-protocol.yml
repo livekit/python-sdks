@@ -2,9 +2,13 @@ name: Build Protocol
 
 on:
   push:
+    branches:
+      - main
     paths:
       - livekit-protocol/**
   pull_request:
+    branches:
+      - main
     paths:
       - livekit-protocol/**
   workflow_dispatch:
@@ -60,7 +64,6 @@ jobs:
     needs: [publish]
     uses: ./.github/workflows/build-docs.yml
     with:
-      package_dir: 'livekit-protocol'
-      docs_entrypoint: 'livekit-protocol/livekit/protocol'
+      package_dir: "livekit-protocol"
+      docs_entrypoint: "livekit-protocol/livekit/protocol"
     secrets: inherit
- 

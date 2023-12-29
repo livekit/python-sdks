@@ -2,9 +2,13 @@ name: Build RTC
 
 on:
   push:
+    branches:
+      - main
     paths:
       - livekit-rtc/**
   pull_request:
+    branches:
+      - main
     paths:
       - livekit-rtc/**
   workflow_dispatch:
@@ -95,6 +99,6 @@ jobs:
     needs: [publish]
     uses: ./.github/workflows/build-docs.yml
     with:
-      package_dir: 'livekit-rtc'
-      docs_entrypoint: 'livekit-rtc/livekit/rtc'
+      package_dir: "livekit-rtc"
+      docs_entrypoint: "livekit-rtc/livekit/rtc"
     secrets: inherit
