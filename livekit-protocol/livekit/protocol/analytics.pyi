@@ -402,3 +402,86 @@ class AnalyticsEvents(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["events", b"events"]) -> None: ...
 
 global___AnalyticsEvents = AnalyticsEvents
+
+@typing_extensions.final
+class AnalyticsRoomParticipant(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    IDENTITY_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    STATE_FIELD_NUMBER: builtins.int
+    JOINED_AT_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    identity: builtins.str
+    name: builtins.str
+    state: models.ParticipantInfo.State.ValueType
+    @property
+    def joined_at(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
+    def __init__(
+        self,
+        *,
+        id: builtins.str = ...,
+        identity: builtins.str = ...,
+        name: builtins.str = ...,
+        state: models.ParticipantInfo.State.ValueType = ...,
+        joined_at: google.protobuf.timestamp_pb2.Timestamp | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["joined_at", b"joined_at"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id", "identity", b"identity", "joined_at", b"joined_at", "name", b"name", "state", b"state"]) -> None: ...
+
+global___AnalyticsRoomParticipant = AnalyticsRoomParticipant
+
+@typing_extensions.final
+class AnalyticsRoom(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    CREATED_AT_FIELD_NUMBER: builtins.int
+    PARTICIPANTS_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    name: builtins.str
+    @property
+    def created_at(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
+    @property
+    def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AnalyticsRoomParticipant]: ...
+    def __init__(
+        self,
+        *,
+        id: builtins.str = ...,
+        name: builtins.str = ...,
+        created_at: google.protobuf.timestamp_pb2.Timestamp | None = ...,
+        participants: collections.abc.Iterable[global___AnalyticsRoomParticipant] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["created_at", b"created_at"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["created_at", b"created_at", "id", b"id", "name", b"name", "participants", b"participants"]) -> None: ...
+
+global___AnalyticsRoom = AnalyticsRoom
+
+@typing_extensions.final
+class AnalyticsNodeRooms(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    NODE_ID_FIELD_NUMBER: builtins.int
+    SEQUENCE_NUMBER_FIELD_NUMBER: builtins.int
+    TIMESTAMP_FIELD_NUMBER: builtins.int
+    ROOMS_FIELD_NUMBER: builtins.int
+    node_id: builtins.str
+    sequence_number: builtins.int
+    @property
+    def timestamp(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
+    @property
+    def rooms(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AnalyticsRoom]: ...
+    def __init__(
+        self,
+        *,
+        node_id: builtins.str = ...,
+        sequence_number: builtins.int = ...,
+        timestamp: google.protobuf.timestamp_pb2.Timestamp | None = ...,
+        rooms: collections.abc.Iterable[global___AnalyticsRoom] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["timestamp", b"timestamp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["node_id", b"node_id", "rooms", b"rooms", "sequence_number", b"sequence_number", "timestamp", b"timestamp"]) -> None: ...
+
+global___AnalyticsNodeRooms = AnalyticsNodeRooms
