@@ -151,12 +151,14 @@ class _ConnectionQualityEnumTypeWrapper(google.protobuf.internal.enum_type_wrapp
     POOR: _ConnectionQuality.ValueType  # 0
     GOOD: _ConnectionQuality.ValueType  # 1
     EXCELLENT: _ConnectionQuality.ValueType  # 2
+    LOST: _ConnectionQuality.ValueType  # 3
 
 class ConnectionQuality(_ConnectionQuality, metaclass=_ConnectionQualityEnumTypeWrapper): ...
 
 POOR: ConnectionQuality.ValueType  # 0
 GOOD: ConnectionQuality.ValueType  # 1
 EXCELLENT: ConnectionQuality.ValueType  # 2
+LOST: ConnectionQuality.ValueType  # 3
 global___ConnectionQuality = ConnectionQuality
 
 class _ClientConfigSetting:
@@ -400,6 +402,35 @@ class ParticipantInfo(google.protobuf.message.Message):
     DISCONNECTED: ParticipantInfo.State.ValueType  # 3
     """WS disconnected"""
 
+    class _Kind:
+        ValueType = typing.NewType("ValueType", builtins.int)
+        V: typing_extensions.TypeAlias = ValueType
+
+    class _KindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ParticipantInfo._Kind.ValueType], builtins.type):
+        DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+        STANDARD: ParticipantInfo._Kind.ValueType  # 0
+        """standard participants, e.g. web clients"""
+        INGRESS: ParticipantInfo._Kind.ValueType  # 1
+        """only ingests streams"""
+        EGRESS: ParticipantInfo._Kind.ValueType  # 2
+        """only consumes streams"""
+        SIP: ParticipantInfo._Kind.ValueType  # 3
+        """SIP participants"""
+        AGENT: ParticipantInfo._Kind.ValueType  # 4
+        """LiveKit agents"""
+
+    class Kind(_Kind, metaclass=_KindEnumTypeWrapper): ...
+    STANDARD: ParticipantInfo.Kind.ValueType  # 0
+    """standard participants, e.g. web clients"""
+    INGRESS: ParticipantInfo.Kind.ValueType  # 1
+    """only ingests streams"""
+    EGRESS: ParticipantInfo.Kind.ValueType  # 2
+    """only consumes streams"""
+    SIP: ParticipantInfo.Kind.ValueType  # 3
+    """SIP participants"""
+    AGENT: ParticipantInfo.Kind.ValueType  # 4
+    """LiveKit agents"""
+
     SID_FIELD_NUMBER: builtins.int
     IDENTITY_FIELD_NUMBER: builtins.int
     STATE_FIELD_NUMBER: builtins.int
@@ -411,6 +442,7 @@ class ParticipantInfo(google.protobuf.message.Message):
     PERMISSION_FIELD_NUMBER: builtins.int
     REGION_FIELD_NUMBER: builtins.int
     IS_PUBLISHER_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
     sid: builtins.str
     identity: builtins.str
     state: global___ParticipantInfo.State.ValueType
@@ -428,6 +460,7 @@ class ParticipantInfo(google.protobuf.message.Message):
     """indicates the participant has an active publisher connection
     and can publish to the server
     """
+    kind: global___ParticipantInfo.Kind.ValueType
     def __init__(
         self,
         *,
@@ -442,9 +475,10 @@ class ParticipantInfo(google.protobuf.message.Message):
         permission: global___ParticipantPermission | None = ...,
         region: builtins.str = ...,
         is_publisher: builtins.bool = ...,
+        kind: global___ParticipantInfo.Kind.ValueType = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["permission", b"permission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["identity", b"identity", "is_publisher", b"is_publisher", "joined_at", b"joined_at", "metadata", b"metadata", "name", b"name", "permission", b"permission", "region", b"region", "sid", b"sid", "state", b"state", "tracks", b"tracks", "version", b"version"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["identity", b"identity", "is_publisher", b"is_publisher", "joined_at", b"joined_at", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "region", b"region", "sid", b"sid", "state", b"state", "tracks", b"tracks", "version", b"version"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 
@@ -519,6 +553,7 @@ class TrackInfo(google.protobuf.message.Message):
     DISABLE_RED_FIELD_NUMBER: builtins.int
     ENCRYPTION_FIELD_NUMBER: builtins.int
     STREAM_FIELD_NUMBER: builtins.int
+    VERSION_FIELD_NUMBER: builtins.int
     sid: builtins.str
     type: global___TrackType.ValueType
     name: builtins.str
@@ -547,6 +582,8 @@ class TrackInfo(google.protobuf.message.Message):
     """true if RED (Redundant Encoding) is disabled for audio"""
     encryption: global___Encryption.Type.ValueType
     stream: builtins.str
+    @property
+    def version(self) -> global___TimedVersion: ...
     def __init__(
         self,
         *,
@@ -567,8 +604,10 @@ class TrackInfo(google.protobuf.message.Message):
         disable_red: builtins.bool = ...,
         encryption: global___Encryption.Type.ValueType = ...,
         stream: builtins.str = ...,
+        version: global___TimedVersion | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["codecs", b"codecs", "disable_dtx", b"disable_dtx", "disable_red", b"disable_red", "encryption", b"encryption", "height", b"height", "layers", b"layers", "mid", b"mid", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "sid", b"sid", "simulcast", b"simulcast", "source", b"source", "stereo", b"stereo", "stream", b"stream", "type", b"type", "width", b"width"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["version", b"version"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["codecs", b"codecs", "disable_dtx", b"disable_dtx", "disable_red", b"disable_red", "encryption", b"encryption", "height", b"height", "layers", b"layers", "mid", b"mid", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "sid", b"sid", "simulcast", b"simulcast", "source", b"source", "stereo", b"stereo", "stream", b"stream", "type", b"type", "version", b"version", "width", b"width"]) -> None: ...
 
 global___TrackInfo = TrackInfo
 

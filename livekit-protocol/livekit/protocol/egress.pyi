@@ -701,6 +701,7 @@ class S3Upload(google.protobuf.message.Message):
     FORCE_PATH_STYLE_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
     TAGGING_FIELD_NUMBER: builtins.int
+    CONTENT_DISPOSITION_FIELD_NUMBER: builtins.int
     access_key: builtins.str
     secret: builtins.str
     region: builtins.str
@@ -710,6 +711,8 @@ class S3Upload(google.protobuf.message.Message):
     @property
     def metadata(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     tagging: builtins.str
+    content_disposition: builtins.str
+    """Content-Disposition header"""
     def __init__(
         self,
         *,
@@ -721,8 +724,9 @@ class S3Upload(google.protobuf.message.Message):
         force_path_style: builtins.bool = ...,
         metadata: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         tagging: builtins.str = ...,
+        content_disposition: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["access_key", b"access_key", "bucket", b"bucket", "endpoint", b"endpoint", "force_path_style", b"force_path_style", "metadata", b"metadata", "region", b"region", "secret", b"secret", "tagging", b"tagging"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["access_key", b"access_key", "bucket", b"bucket", "content_disposition", b"content_disposition", "endpoint", b"endpoint", "force_path_style", b"force_path_style", "metadata", b"metadata", "region", b"region", "secret", b"secret", "tagging", b"tagging"]) -> None: ...
 
 global___S3Upload = S3Upload
 
@@ -733,6 +737,7 @@ class GCPUpload(google.protobuf.message.Message):
     CREDENTIALS_FIELD_NUMBER: builtins.int
     BUCKET_FIELD_NUMBER: builtins.int
     credentials: builtins.str
+    """service account credentials serialized in JSON "credentials.json" """
     bucket: builtins.str
     def __init__(
         self,
