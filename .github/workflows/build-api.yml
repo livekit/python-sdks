@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - livekit-api/**
+    tags:
+      - "api-v*.*.*"
   pull_request:
     branches:
       - main
