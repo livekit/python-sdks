@@ -2,9 +2,15 @@ name: Build API
 
 on:
   push:
+    branches:
+      - main
     paths:
       - livekit-api/**
+    tags:
+      - "api-v*.*.*"
   pull_request:
+    branches:
+      - main
     paths:
       - livekit-api/**
   workflow_dispatch:
@@ -60,7 +66,6 @@ jobs:
     needs: [publish]
     uses: ./.github/workflows/build-docs.yml
     with:
-      package_dir: 'livekit-api'
-      docs_entrypoint: 'livekit-api/livekit/api'
+      package_dir: "livekit-api"
+      docs_entrypoint: "livekit-api/livekit/api"
     secrets: inherit
- 
