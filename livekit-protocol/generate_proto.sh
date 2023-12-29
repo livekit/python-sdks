@@ -18,7 +18,7 @@
 
 API_PROTOCOL=./protocol
 API_OUT_PYTHON=./livekit/protocol
- 
+
 protoc \
     -I=$API_PROTOCOL \
     --python_out=$API_OUT_PYTHON \
@@ -28,7 +28,8 @@ protoc \
     $API_PROTOCOL/livekit_webhook.proto \
     $API_PROTOCOL/livekit_ingress.proto \
     $API_PROTOCOL/livekit_models.proto \
-    $API_PROTOCOL/livekit_agent.proto
+    $API_PROTOCOL/livekit_agent.proto \
+    $API_PROTOCOL/livekit_analytics.proto
 
 
 touch -a "$API_OUT_PYTHON/__init__.py"
@@ -54,7 +55,9 @@ mv "$API_OUT_PYTHON/livekit_models_pb2.py" "$API_OUT_PYTHON/models.py"
 mv "$API_OUT_PYTHON/livekit_models_pb2.pyi" "$API_OUT_PYTHON/models.pyi"
 mv "$API_OUT_PYTHON/livekit_agent_pb2.py" "$API_OUT_PYTHON/agent.py"
 mv "$API_OUT_PYTHON/livekit_agent_pb2.pyi" "$API_OUT_PYTHON/agent.pyi"
+mv "$API_OUT_PYTHON/livekit_analytics_pb2.py" "$API_OUT_PYTHON/analytics.py"
+mv "$API_OUT_PYTHON/livekit_analytics_pb2.pyi" "$API_OUT_PYTHON/analytics.pyi"
 
-perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2))|from . $1|g' "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi
+perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_analytics_pb2))|from . $1|g' "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi
 
 perl -i -pe 's|livekit_(\w+)_pb2|${1}|g' "$API_OUT_PYTHON"/*.py "$API_OUT_PYTHON"/*.pyi
