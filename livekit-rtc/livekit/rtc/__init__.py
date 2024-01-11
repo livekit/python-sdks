@@ -33,7 +33,7 @@ from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioStream
 from .participant import LocalParticipant, Participant, RemoteParticipant
-from .room import ConnectError, Room, RoomOptions, RtcConfiguration
+from .room import ConnectError, Room, RoomOptions, RtcConfiguration, DataPacket
 from .track import (
     LocalAudioTrack,
     LocalVideoTrack,
