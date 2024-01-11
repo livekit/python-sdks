@@ -9,10 +9,14 @@
 name: Build Docs 
 
 on:
-  call-publish-workflow:
-    with:
-      package_dir: 'livekit-rtc'
-      package_name: 'livekit'
+  workflow_dispatch:
+    inputs:
+      package_dir:
+        required: true
+        type: string
+      package_name:
+        required: true
+        type: string
     secrets: inherit
   workflow_call:
     inputs:
