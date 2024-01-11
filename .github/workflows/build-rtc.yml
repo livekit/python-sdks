@@ -98,7 +98,6 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
   docs:
-    needs: [publish]
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: "livekit-rtc"

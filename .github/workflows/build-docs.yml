@@ -17,7 +17,6 @@ on:
       package_name:
         required: true
         type: string
-    secrets: inherit
   workflow_call:
     inputs:
       package_dir:
