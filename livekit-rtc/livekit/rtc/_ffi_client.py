@@ -45,8 +45,11 @@ def get_ffi_lib():
                 Set LIVEKIT_LIB_PATH to specify a the lib path"
         )
 
-    with importlib.resources.path("livekit.rtc.resources", libname) as resource_path:
-        ffi_lib = ctypes.CDLL(resource_path)
+    with importlib.resources.files("livekit.rtc.resources").joinpath(
+        libname
+    ) as lib_path:
+        # Convert the Traversable object to a string path for ctypes
+        ffi_lib = ctypes.CDLL(str(lib_path))
         return ffi_lib
 
 
