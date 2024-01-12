@@ -48,20 +48,17 @@ jobs:
     - name: Virtual Env
       run: python -m venv venv
 
-    - name: Source Virtual Env
-      run: source venv/bin/activate
+    - name: Install Package to Document
+      run: source venv/bin/activate && python -m pip install ${{ inputs.package_dir }}/
 
     - name: Log Env
-      run: env
-
-    - name: Install Package to Document
-      run: venv/bin/python -m pip install ${{ inputs.package_dir }}/
+      run: source venv/bin/activate && pip list
 
     - name: Install pdoc 
-      run: venv/bin/python -m pip install --upgrade pdoc
+      run: source venv/bin/activate && pip install --upgrade pdoc
 
     - name: Build Docs
-      run: venv/bin/python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
+      run: source venv/bin/activate && python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
 
     - name: S3 Upload
       run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
