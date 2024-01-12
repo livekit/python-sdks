@@ -51,12 +51,6 @@ jobs:
     - name: Install Package to Document
       run: source venv/bin/activate && python -m pip install ${{ inputs.package_dir }}/
 
-    - name: Log Env
-      run: source venv/bin/activate && pip list
-
-    - name: Download ffi
-      run: source venv/bin/activate && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output venv/lib/python3.10/site-packages/livekit/rtc/resources
-
     - name: Install pdoc 
       run: source venv/bin/activate && pip install --upgrade pdoc
 

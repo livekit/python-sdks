@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 build = "cp39-*"
-skip = "*-musllinux_*" # not supported (libwebrtc is using glibc)
+# skip = "*-musllinux_*" # not supported (libwebrtc is using glibc)
 
 before-build = "pip install requests && python rust-sdks/download_ffi.py --output livekit/rtc/resources"
 
