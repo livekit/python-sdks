@@ -54,6 +54,12 @@ jobs:
     - name: Log Env
       run: source venv/bin/activate && pip list
 
+    - name: List Files
+      run: ls venv/lib/python3.10/site-packages/livekit/rtc/resources
+
+    - name: List Files Up One
+      run: ls venv/lib/python3.10/site-packages
+
     - name: Install pdoc 
       run: source venv/bin/activate && pip install --upgrade pdoc
 
