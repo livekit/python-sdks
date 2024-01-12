@@ -61,7 +61,7 @@ jobs:
       run: ls venv/lib/python3.10/site-packages
 
     - name: Find ffi
-      run: find . | grep liblivekit_ffi.so
+      run: find .
 
     - name: Install pdoc 
       run: source venv/bin/activate && pip install --upgrade pdoc
