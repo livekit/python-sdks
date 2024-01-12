@@ -31,8 +31,8 @@ jobs:
             archs: x86_64
           - os: buildjet-4vcpu-ubuntu-2204-arm
             archs: aarch64
-          #- os: windows-latest
-          #  archs: AMD64 # ignore windows arm64 for now
+          - os: windows-latest
+            archs: AMD64
           - os: macos-latest
             archs: x86_64 arm64
     defaults:
