@@ -48,6 +48,12 @@ jobs:
     - name: Virtual Env
       run: python -m venv venv
 
+    - name: Source Virtual Env
+      run: source venv/bin/activate
+
+    - name: Log Env
+      run: env
+
     - name: Install Package to Document
       run: venv/bin/python -m pip install ${{ inputs.package_dir }}/
 
