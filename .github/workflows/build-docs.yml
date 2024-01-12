@@ -48,14 +48,15 @@ jobs:
     - name: Install Package to Document
       run: python -m pip install ${{ inputs.package_dir }}/
 
+    # Needed because we don't build the wheel to generate docs and importing livekit.rtc will look for the ffi 
     - name: Download ffi
-      run: pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
+      run: [[ ${{ inputs.package_name }} = 'livekit.rtc' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
 
     - name: Install pdoc 
       run: pip install --upgrade pdoc
 
     - name: Build Docs
-      run: python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
+      run:  python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
 
     - name: S3 Upload
       run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive

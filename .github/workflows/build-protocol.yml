@@ -67,5 +67,5 @@ jobs:
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: "livekit-protocol"
-      docs_entrypoint: "livekit-protocol/livekit/protocol"
+      package_name: "livekit.protocol"
     secrets: inherit
