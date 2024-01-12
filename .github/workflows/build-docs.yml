@@ -55,10 +55,7 @@ jobs:
       run: source venv/bin/activate && pip list
 
     - name: List Files
-      run: ls venv/lib/python3.10/site-packages/livekit/rtc/resources
-
-    - name: List Files Up One
-      run: ls venv/lib/python3.10/site-packages
+      run: ls livekit-rtc/rust-sdks
 
     - name: Download ffi
       run: source venv/bin/activate && python livekit-rtc/rust-sdks/download-ffi.py --output venv/lib/python3.10/site-packages/livekit/rtc/resources
