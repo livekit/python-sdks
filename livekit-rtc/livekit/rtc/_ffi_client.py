@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import asyncio
+from contextlib import ExitStack
 import ctypes
 import importlib.resources
 import logging
 import os
 import platform
+import atexit
 import threading
 from typing import Generic, List, Optional, TypeVar
 
@@ -25,6 +27,9 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
 
 logger = logging.getLogger("livekit")
+
+_resource_files = ExitStack()
+atexit.register(_resource_files.close)
 
 
 def get_ffi_lib():
@@ -45,12 +50,10 @@ def get_ffi_lib():
                 Set LIVEKIT_LIB_PATH to specify a the lib path"
         )
 
-    with importlib.resources.files("livekit.rtc.resources").joinpath(
-        libname
-    ) as lib_path:
-        # Convert the Traversable object to a string path for ctypes
-        ffi_lib = ctypes.CDLL(str(lib_path))
-        return ffi_lib
+    res = importlib.resources.files("livekit.rtc.resources") / libname
+    ctx = importlib.resources.as_file(res)
+    path = _resource_files.enter_context(ctx)
+    return ctypes.CDLL(str(path))
 
 
 ffi_lib = get_ffi_lib()
