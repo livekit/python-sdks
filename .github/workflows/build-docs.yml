@@ -9,6 +9,14 @@
 name: Build Docs 
 
 on:
+  workflow_dispatch:
+    inputs:
+      package_dir:
+        required: true
+        type: string
+      package_name:
+        required: true
+        type: string
   workflow_call:
     inputs:
       package_dir:
