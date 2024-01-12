@@ -10,6 +10,8 @@ build-backend = "setuptools.build_meta"
 build = "cp39-*"
 skip = "*-musllinux_*" # not supported (libwebrtc is using glibc)
 
+before-build = "python rust-sdks/download_ffi.py --output livekit/rtc/resources"
+
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-i686-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"

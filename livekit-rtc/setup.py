@@ -32,31 +32,6 @@ class bdist_wheel(_bdist_wheel):
         self.plat_name = get_platform(None)  # force a platform tag
         _bdist_wheel.finalize_options(self)
 
-
-class BuildPyCommand(setuptools.command.build_py.build_py):
-    """Download a prebuilt version of livekit_ffi"""
-
-    def run(self):
-        download_script = here / "rust-sdks" / "download_ffi.py"
-        output = here / "livekit" / "rtc" / "resources"
-        cmd = [
-            "python3",
-            str(download_script.absolute()),
-            "--output",
-            str(output.absolute()),
-        ]
-
-        # cibuildwheel is crosscompiling to arm64 on macos, make sure we download the
-        # right binary (kind of a hack here...)
-        if os.environ.get("CIBUILDWHEEL") == "1" and "arm64" in os.environ.get(
-            "ARCHFLAGS", ""
-        ):
-            cmd += ["--arch", "arm64"]
-
-        subprocess.run(cmd, check=True)
-        setuptools.command.build_py.build_py.run(self)
-
-
 setuptools.setup(
     name="livekit",
     version=about["__version__"],
@@ -66,7 +41,6 @@ setuptools.setup(
     url="https://github.com/livekit/python-sdks",
     cmdclass={
         "bdist_wheel": bdist_wheel,
-        "build_py": BuildPyCommand,
     },
     classifiers=[
         "Intended Audience :: Developers",
