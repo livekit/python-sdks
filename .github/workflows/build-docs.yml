@@ -60,8 +60,8 @@ jobs:
     - name: List Files Up One
       run: ls venv/lib/python3.10/site-packages
 
-    - name: Find ffi
-      run: find .
+    - name: Download ffi
+      run: source venv/bin/activate && python livekit-rtc/rust-sdks/download-ffi.sh --output venv/lib/python3.10/site-packages/livekit/rtc/resources
 
     - name: Install pdoc 
       run: source venv/bin/activate && pip install --upgrade pdoc
