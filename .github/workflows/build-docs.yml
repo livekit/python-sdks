@@ -45,14 +45,17 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Virtual Env
-      run: python -m venv venv
-
-    - name: Install Package to Document
-      run: source venv/bin/activate && python -m pip install ${{ inputs.package_dir }}/
-
     - name: Install pdoc 
-      run: source venv/bin/activate && pip install --upgrade pdoc
+      run: python -m pip install --upgrade pdoc
+
+    - name: Build Wheel
+      run: python -m cibuildwheel --output-dir dist --platform linux ./$ {{ inputs.package_dir }}}
+
+    - name: List Dist
+      run: ls dist
+
+    - name: Install Wheel  
+      run: python -m pip install dist/*.whl
 
     - name: Build Docs
       run: source venv/bin/activate && python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
