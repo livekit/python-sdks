@@ -53,7 +53,7 @@ jobs:
       run: python -m pip install ${{ inputs.package_dir }}/
 
     - name: Download ffi
-      run: '[[ ${{ inputs.package_name }} = \'livekit.rtc\' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources'
+      run: "[[ ${{ inputs.package_name }} = \'livekit.rtc\' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources"
 
     - name: Install pdoc 
       run: pip install --upgrade pdoc
