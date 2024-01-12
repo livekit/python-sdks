@@ -45,6 +45,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Virtual Env
+      run: python -m venv venv
+
     - name: Install Package to Document
       run: python -m pip install ${{ inputs.package_dir }}/
 
