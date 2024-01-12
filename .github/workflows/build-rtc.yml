@@ -102,5 +102,5 @@ jobs:
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: "livekit-rtc"
-      package_name: "livekit"
+      package_name: "livekit.rtc"
     secrets: inherit
