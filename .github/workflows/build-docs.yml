@@ -45,23 +45,23 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Virtual Env
+      run: python -m venv venv
+
+    - name: Install Package to Document
+      run: source venv/bin/activate && python -m pip install ${{ inputs.package_dir }}/
+
+    - name: Log Env
+      run: source venv/bin/activate && pip list
+
+    - name: Download ffi
+      run: source venv/bin/activate && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
+
     - name: Install pdoc 
-      run: python -m pip install --upgrade pdoc
-
-    - name: Install cibuildwheel
-      run: python -m pip install cibuildwheel
-
-    - name: Build Wheel
-      run: python -m cibuildwheel --output-dir dist --platform linux ./${{ inputs.package_dir }}
-
-    - name: List Dist
-      run: ls dist
-
-    - name: Install Wheel  
-      run: python -m pip install dist/*.whl
+      run: source venv/bin/activate && pip install --upgrade pdoc
 
     - name: Build Docs
-      run: python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
+      run: source venv/bin/activate && python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
 
     - name: S3 Upload
       run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
