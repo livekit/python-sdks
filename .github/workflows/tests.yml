@@ -22,6 +22,6 @@ jobs:
       - uses: actions/setup-python@v4
       - name: Run tests
         run: |
+          python3 ./livekit-rtc/rust-sdks/download_ffi.py --output livekit/rtc/resources
           pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc
-          python3 ./livekit-rtc/rust-sdks/download_ffi.py
           pytest . --ignore=livekit-rtc/rust-sks
