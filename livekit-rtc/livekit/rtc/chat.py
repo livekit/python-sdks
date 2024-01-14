@@ -96,8 +96,7 @@ class ChatManager:
                 if self._callback:
                     self._callback(msg)
             except Exception as e:
-                logging.warning(
-                    "failed to parse chat message: %s", e, exc_info=e)
+                logging.warning("failed to parse chat message: %s", e, exc_info=e)
 
 
 @dataclass
