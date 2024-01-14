@@ -72,6 +72,7 @@ from .video_frame import (
 )
 from .video_source import VideoSource
 from .video_stream import VideoStream
+from .chat import ChatManager, ChatMessage
 
 from .version import __version__
 
@@ -134,5 +135,7 @@ __all__ = [
     "VideoFrameBuffer",
     "VideoSource",
     "VideoStream",
+    "ChatManager",
+    "ChatMessage",
     "__version__",
 ]
