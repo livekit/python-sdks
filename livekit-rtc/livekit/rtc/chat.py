@@ -17,7 +17,6 @@ from datetime import datetime
 import json
 import logging
 from typing import Any, Callable, Dict, Optional
-import uuid
 
 from .room import Room, Participant, DataPacket
 from ._proto.room_pb2 import DataPacketKind
@@ -96,7 +95,8 @@ class ChatManager:
                 if self._callback:
                     self._callback(msg)
             except Exception as e:
-                logging.warning("failed to parse chat message: %s", e, exc_info=e)
+                logging.warning(
+                    "failed to parse chat message: %s", e, exc_info=e)
 
 
 @dataclass
