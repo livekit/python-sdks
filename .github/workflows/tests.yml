@@ -17,9 +17,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
+          lfs: true
 
       - uses: actions/setup-python@v4
       - name: Run tests
         run: |
+          python3 ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
           pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc
-          pytest . --ignore=livekit-rtc/rust-sks
+          pytest . --ignore=livekit-rtc/rust-sdks

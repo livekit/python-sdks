@@ -1,7 +1,22 @@
+# Copyright 2023 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import asyncio
 import logging
 from collections import deque
 import ctypes
+import random
 from typing import Callable, Generic, List, TypeVar
 
 logger = logging.getLogger("livekit")
@@ -101,3 +116,17 @@ class BroadcastQueue(Generic[T]):
             subs = self._subscribers.copy()
             for queue in subs:
                 await queue.join()
+
+
+_base62_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def generate_random_base62(length=12):
+    """
+    Generate a random base62 encoded string of a specified length.
+
+    :param length: The desired length of the base62 encoded string.
+    :return: A base62 encoded string.
+    """
+    global _base62_characters
+    return "".join(random.choice(_base62_characters) for _ in range(length))
