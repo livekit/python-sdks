@@ -193,6 +193,7 @@ class FfiClient:
         handle = ffi_lib.livekit_ffi_request(
             data, proto_len, ctypes.byref(resp_ptr), ctypes.byref(resp_len)
         )
+        assert handle != INVALID_HANDLE
 
         resp_data = bytes(resp_ptr[: resp_len.value])
         resp = proto_ffi.FfiResponse()
