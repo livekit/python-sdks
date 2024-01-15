@@ -114,7 +114,7 @@ class ChatMessage:
         id = d.get("id") or generate_random_base62()
         timestamp = datetime.now()
         if d.get("timestamp"):
-            timestamp = datetime.fromtimestamp(d.get("timestamp") / 1000.0)
+            timestamp = datetime.fromtimestamp(d.get("timestamp", 0) / 1000.0)
         msg = cls(
             id=id,
             timestamp=timestamp,
