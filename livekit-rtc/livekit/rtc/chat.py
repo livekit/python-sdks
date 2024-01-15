@@ -36,6 +36,7 @@ class ChatManager(EventEmitter[EventTypes]):
     """
 
     def __init__(self, room: Room):
+        super().__init__()
         self._lp = room.local_participant
         self._room = room
 
