@@ -24,6 +24,8 @@ from .track import Track
 
 
 class AudioStream:
+    """AudioStream is a stream of audio frames received from a RemoteTrack."""
+
     def __init__(
         self,
         track: Track,

@@ -32,6 +32,12 @@ class AudioSource:
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
     async def capture_frame(self, frame: AudioFrame) -> None:
+        """Captures an AudioFrame.
+
+        Used to push new audio data into the published Track. Audio data will
+        be pushed in chunks of 10ms. It'll return only when all of the data in
+        the buffer has been pushed.
+        """
         req = proto_ffi.FfiRequest()
 
         req.capture_audio_frame.source_handle = self._ffi_handle.handle

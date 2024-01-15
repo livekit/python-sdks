@@ -26,10 +26,18 @@ from abc import ABC, abstractmethod
 class VideoFrame:
     def __init__(
         self,
-        timestamp_us: int,
-        rotation: VideoRotation.ValueType,
         buffer: "VideoFrameBuffer",
+        *,
+        timestamp_us: int = 0,
+        rotation: VideoRotation.ValueType = VideoRotation.VIDEO_ROTATION_0,
     ) -> None:
+        """Creates a new VideoFrame.
+
+        Args:
+            buffer: The VideoFrameBuffer to use
+            timestamp_us: The timestamp of the frame in microseconds. When it's 0, the framework will use current time
+            rotation: Degrees of rotation for the frame, defaults to 0
+        """
         self.buffer = buffer
         self.timestamp_us = timestamp_us
         self.rotation = rotation
@@ -79,6 +87,7 @@ class VideoFrameBuffer(ABC):
         return I420Buffer._from_owned_info(resp.to_i420.buffer)
 
     def to_argb(self, dst: "ArgbFrame") -> None:
+        """Convert and copy frame buffer to an RGBA frame at `dst`"""
         req = proto_ffi.FfiRequest()
         req.to_argb.buffer.CopyFrom(self._proto_info())
         req.to_argb.dst_ptr = get_address(memoryview(dst.data))
@@ -762,6 +771,7 @@ class ArgbFrame:
         return ArgbFrame(data, format, width, height)
 
     def to_i420(self) -> I420Buffer:
+        """Converts the frame to an I420 VideoFrameBuffer for use with VideoFrame"""
         req = proto_ffi.FfiRequest()
         req.to_i420.argb.format = self.format
         req.to_i420.argb.width = self.width
