@@ -98,7 +98,7 @@ class ChatManager(EventEmitter[EventTypes]):
 
 @dataclass
 class ChatMessage:
-    message: str = None
+    message: Optional[str] = None
     id: str = field(default_factory=generate_random_base62)
     timestamp: datetime = field(default_factory=datetime.now)
     deleted: bool = field(default=False)
