@@ -148,7 +148,7 @@ class LocalParticipant(Participant):
             FfiClient.instance.queue.unsubscribe(queue)
 
     async def publish_track(
-        self, track: LocalTrack, options: TrackPublishOptions
+        self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
     ) -> LocalTrackPublication:
         req = proto_ffi.FfiRequest()
         req.publish_track.track_handle = track._ffi_handle.handle

@@ -24,6 +24,8 @@ from .video_frame import VideoFrame, VideoFrameBuffer
 
 
 class VideoStream:
+    """VideoStream is a stream of video frames received from a RemoteTrack."""
+
     def __init__(
         self,
         track: Track,
@@ -60,9 +62,9 @@ class VideoStream:
                 owned_buffer_info = video_event.frame_received.buffer
 
                 frame = VideoFrame(
-                    frame_info.timestamp_us,
-                    frame_info.rotation,
                     VideoFrameBuffer._from_owned_info(owned_buffer_info),
+                    timestamp_us=frame_info.timestamp_us,
+                    rotation=frame_info.rotation,
                 )
                 self._queue.put(frame)
             elif video_event.HasField("eos"):
