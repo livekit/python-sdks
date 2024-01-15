@@ -16,32 +16,30 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import json
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
+from ._event_emitter import EventEmitter
 from ._proto.room_pb2 import DataPacketKind
 from ._utils import generate_random_base62
 
 _CHAT_TOPIC = "lk-chat-topic"
 _CHAT_UPDATE_TOPIC = "lk-chat-update-topic"
 
+EventTypes = Literal["message_received",]
 
-class ChatManager:
+
+class ChatManager(EventEmitter[EventTypes]):
     """A utility class that sends and receives chat messages in the active session.
 
     It implements LiveKit Chat Protocol, and serializes data to/from JSON data packets.
     """
 
-    def __init__(
-        self, room: Room, *, on_message: Callable[["ChatMessage"], None] = None
-    ):
+    def __init__(self, room: Room):
         self._lp = room.local_participant
         self._room = room
-        self._callback: Callable[["ChatMessage"], None] = None
 
         room.on("data_received", self._on_data_received)
-        if on_message:
-            self.on_message(on_message)
 
     def close(self):
         self._room.off("data_received", self._on_data_received)
@@ -92,8 +90,7 @@ class ChatManager:
                 msg = ChatMessage.from_jsondict(parsed)
                 if dp.participant:
                     msg.participant = dp.participant
-                if self._callback:
-                    self._callback(msg)
+                self.emit("message_received", msg)
             except Exception as e:
                 logging.warning("failed to parse chat message: %s", e, exc_info=e)
 
