@@ -40,9 +40,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: generate python stubs
-        run: |
-          ls -la
-          ./generate-protos.sh
+        run: ./generate-protos.sh
 
       - name: Add changes
         uses: EndBug/add-and-commit@v9
