@@ -18,4 +18,4 @@ class WebhookReceiver:
         if body_hash != claims_hash:
             raise Exception("hash mismatch")
 
-        return Parse(body, proto_webhook.WebhookEvent())
+        return Parse(body, proto_webhook.WebhookEvent(), ignore_unknown_fields=True)
