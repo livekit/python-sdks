@@ -40,8 +40,9 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: generate python stubs
-        working-directory: ./livekit-protocol
-        run: ./generate-protos.sh
+        run: |
+          ls -la
+          ./generate-protos.sh
 
       - name: Add changes
         uses: EndBug/add-and-commit@v9
