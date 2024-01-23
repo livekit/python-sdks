@@ -19,6 +19,37 @@ env:
   PACKAGE_DIR: ./livekit-protocol
 
 jobs:
+  generate_protobuf:
+    runs-on: ubuntu-latest
+    name: Generating protobuf
+    if: github.event_name == 'pull_request'
+
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: generate python stubs
+        working-directory: ./livekit-protocol
+        run: ./generate-protos.sh
+
+      - name: Add changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '["livekit-protocol/"]'
+          default_author: github_actions
+          message: generated protobuf
+
   build_wheels:
     name: Build Protocol wheel/sdist
     runs-on: ubuntu-latest
