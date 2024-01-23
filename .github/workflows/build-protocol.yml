@@ -39,6 +39,9 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: install mypy-protobuf
+        run: pip3 install mypy-protobuf
+
       - name: generate python stubs
         run: ./generate_proto.sh
 
