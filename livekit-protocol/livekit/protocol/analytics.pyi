@@ -216,6 +216,7 @@ class AnalyticsStat(google.protobuf.message.Message):
     MIME_FIELD_NUMBER: builtins.int
     MIN_SCORE_FIELD_NUMBER: builtins.int
     MEDIAN_SCORE_FIELD_NUMBER: builtins.int
+    PROJECT_ID_FIELD_NUMBER: builtins.int
     analytics_key: builtins.str
     kind: global___StreamType.ValueType
     @property
@@ -232,6 +233,7 @@ class AnalyticsStat(google.protobuf.message.Message):
     mime: builtins.str
     min_score: builtins.float
     median_score: builtins.float
+    project_id: builtins.str
     def __init__(
         self,
         *,
@@ -248,9 +250,10 @@ class AnalyticsStat(google.protobuf.message.Message):
         mime: builtins.str = ...,
         min_score: builtins.float = ...,
         median_score: builtins.float = ...,
+        project_id: builtins.str = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["time_stamp", b"time_stamp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["analytics_key", b"analytics_key", "kind", b"kind", "median_score", b"median_score", "mime", b"mime", "min_score", b"min_score", "node", b"node", "participant_id", b"participant_id", "room_id", b"room_id", "room_name", b"room_name", "score", b"score", "streams", b"streams", "time_stamp", b"time_stamp", "track_id", b"track_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["analytics_key", b"analytics_key", "kind", b"kind", "median_score", b"median_score", "mime", b"mime", "min_score", b"min_score", "node", b"node", "participant_id", b"participant_id", "project_id", b"project_id", "room_id", b"room_id", "room_name", b"room_name", "score", b"score", "streams", b"streams", "time_stamp", b"time_stamp", "track_id", b"track_id"]) -> None: ...
 
 global___AnalyticsStat = AnalyticsStat
 
@@ -326,6 +329,7 @@ class AnalyticsEvent(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     RTP_STATS_FIELD_NUMBER: builtins.int
     VIDEO_LAYER_FIELD_NUMBER: builtins.int
+    PROJECT_ID_FIELD_NUMBER: builtins.int
     type: global___AnalyticsEventType.ValueType
     @property
     def timestamp(self) -> google.protobuf.timestamp_pb2.Timestamp: ...
@@ -357,6 +361,7 @@ class AnalyticsEvent(google.protobuf.message.Message):
     @property
     def rtp_stats(self) -> models.RTPStats: ...
     video_layer: builtins.int
+    project_id: builtins.str
     def __init__(
         self,
         *,
@@ -381,9 +386,10 @@ class AnalyticsEvent(google.protobuf.message.Message):
         error: builtins.str = ...,
         rtp_stats: models.RTPStats | None = ...,
         video_layer: builtins.int = ...,
+        project_id: builtins.str = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["client_info", b"client_info", "client_meta", b"client_meta", "egress", b"egress", "ingress", b"ingress", "participant", b"participant", "publisher", b"publisher", "room", b"room", "rtp_stats", b"rtp_stats", "timestamp", b"timestamp", "track", b"track"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["analytics_key", b"analytics_key", "client_info", b"client_info", "client_meta", b"client_meta", "egress", b"egress", "egress_id", b"egress_id", "error", b"error", "ingress", b"ingress", "ingress_id", b"ingress_id", "max_subscribed_video_quality", b"max_subscribed_video_quality", "mime", b"mime", "participant", b"participant", "participant_id", b"participant_id", "publisher", b"publisher", "room", b"room", "room_id", b"room_id", "rtp_stats", b"rtp_stats", "timestamp", b"timestamp", "track", b"track", "track_id", b"track_id", "type", b"type", "video_layer", b"video_layer"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["analytics_key", b"analytics_key", "client_info", b"client_info", "client_meta", b"client_meta", "egress", b"egress", "egress_id", b"egress_id", "error", b"error", "ingress", b"ingress", "ingress_id", b"ingress_id", "max_subscribed_video_quality", b"max_subscribed_video_quality", "mime", b"mime", "participant", b"participant", "participant_id", b"participant_id", "project_id", b"project_id", "publisher", b"publisher", "room", b"room", "room_id", b"room_id", "rtp_stats", b"rtp_stats", "timestamp", b"timestamp", "track", b"track", "track_id", b"track_id", "type", b"type", "video_layer", b"video_layer"]) -> None: ...
 
 global___AnalyticsEvent = AnalyticsEvent
 
