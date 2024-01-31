@@ -36,7 +36,7 @@ def get_ffi_lib():
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
     if libpath:
-        return libpath
+        return ctypes.CDLL(libpath)
 
     if platform.system() == "Linux":
         libname = "liblivekit_ffi.so"
