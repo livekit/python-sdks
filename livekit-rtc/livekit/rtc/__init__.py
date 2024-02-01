@@ -30,7 +30,7 @@ from ._proto.video_frame_pb2 import VideoBufferType, VideoRotation
 from ._proto import stats_pb2 as stats
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
-from .audio_stream import AudioStream
+from .audio_stream import AudioStream, AudioFrameEvent
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .room import ConnectError, Room, RoomOptions, RtcConfiguration, DataPacket
 from .track import (
@@ -60,7 +60,7 @@ from .video_frame import (
     VideoFrame,
 )
 from .video_source import VideoSource
-from .video_stream import VideoStream
+from .video_stream import VideoStream, VideoFrameEvent
 from .chat import ChatManager, ChatMessage
 
 from .version import __version__
@@ -84,6 +84,7 @@ __all__ = [
     "AudioFrame",
     "AudioSource",
     "AudioStream",
+    "AudioFrameEvent",
     "LocalParticipant",
     "Participant",
     "RemoteParticipant",
@@ -112,6 +113,7 @@ __all__ = [
     "VideoFrame",
     "VideoSource",
     "VideoStream",
+    "VideoFrameEvent",
     "ChatManager",
     "ChatMessage",
     "__version__",
