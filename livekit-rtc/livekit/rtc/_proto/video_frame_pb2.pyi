@@ -147,19 +147,23 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
     TRACK_HANDLE_FIELD_NUMBER: builtins.int
     TYPE_FIELD_NUMBER: builtins.int
     FORMAT_FIELD_NUMBER: builtins.int
+    NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___VideoStreamType.ValueType
     format: global___VideoBufferType.ValueType
     """Get the frame on a specific format"""
+    normalize_stride: builtins.bool
+    """if true, stride will be set to width/chroma_width"""
     def __init__(
         self,
         *,
         track_handle: builtins.int = ...,
         type: global___VideoStreamType.ValueType = ...,
         format: global___VideoBufferType.ValueType | None = ...,
+        normalize_stride: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_format", b"_format", "format", b"format"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_format", b"_format", "format", b"format", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_format", b"_format", "format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_format", b"_format"]) -> typing_extensions.Literal["format"] | None: ...
 
 global___NewVideoStreamRequest = NewVideoStreamRequest
@@ -361,12 +365,15 @@ class VideoBufferInfo(google.protobuf.message.Message):
     HEIGHT_FIELD_NUMBER: builtins.int
     DATA_PTR_FIELD_NUMBER: builtins.int
     DATA_LEN_FIELD_NUMBER: builtins.int
+    STRIDE_FIELD_NUMBER: builtins.int
     COMPONENTS_FIELD_NUMBER: builtins.int
     type: global___VideoBufferType.ValueType
     width: builtins.int
     height: builtins.int
     data_ptr: builtins.int
     data_len: builtins.int
+    stride: builtins.int
+    """for packed formats"""
     @property
     def components(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___VideoBufferInfo.ComponentInfo]: ...
     def __init__(
@@ -377,9 +384,10 @@ class VideoBufferInfo(google.protobuf.message.Message):
         height: builtins.int = ...,
         data_ptr: builtins.int = ...,
         data_len: builtins.int = ...,
+        stride: builtins.int = ...,
         components: collections.abc.Iterable[global___VideoBufferInfo.ComponentInfo] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["components", b"components", "data_len", b"data_len", "data_ptr", b"data_ptr", "height", b"height", "type", b"type", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["components", b"components", "data_len", b"data_len", "data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> None: ...
 
 global___VideoBufferInfo = VideoBufferInfo
 
