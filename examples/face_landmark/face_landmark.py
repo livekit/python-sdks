@@ -111,14 +111,15 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
         buffer = frame_event.frame
         buffer = buffer.convert(rtc.VideoBufferType.RGBA)
 
-
         arr = np.frombuffer(buffer.data, dtype=np.uint8)
         arr = arr.reshape((buffer.height, buffer.width, 4))
         arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
 
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
 
-        detection_result = landmarker.detect_for_video(mp_image, frame_event.timestamp_us)
+        detection_result = landmarker.detect_for_video(
+            mp_image, frame_event.timestamp_us
+        )
 
         draw_landmarks_on_image(arr, detection_result)
 

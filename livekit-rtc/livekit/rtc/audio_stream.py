@@ -29,7 +29,6 @@ class AudioFrameEvent:
     frame: AudioFrame
 
 
-
 class AudioStream:
     """AudioStream is a stream of audio frames received from a RemoteTrack."""
 
