@@ -37,6 +37,7 @@ class VideoStream:
     def __init__(
         self,
         track: Track,
+        *,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
         format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,

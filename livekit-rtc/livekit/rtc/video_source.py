@@ -32,6 +32,7 @@ class VideoSource:
     def capture_frame(
         self,
         frame: VideoFrame,
+        *,
         timestamp_us: int = 0,
         rotation: proto_video.VideoRotation.ValueType = proto_video.VideoRotation.VIDEO_ROTATION_0,
     ) -> None:

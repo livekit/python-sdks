@@ -111,6 +111,7 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
         buffer = frame_event.frame
         buffer = buffer.convert(rtc.VideoBufferType.RGBA)
 
+
         arr = np.frombuffer(buffer.data, dtype=np.uint8)
         arr = arr.reshape((buffer.height, buffer.width, 4))
         arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
