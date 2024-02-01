@@ -16,6 +16,8 @@
 
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
 
+set -e
+
 API_PROTOCOL=./protocol
 API_OUT_PYTHON=./livekit/protocol
 

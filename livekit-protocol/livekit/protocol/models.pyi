@@ -258,6 +258,7 @@ class Room(google.protobuf.message.Message):
     NUM_PARTICIPANTS_FIELD_NUMBER: builtins.int
     NUM_PUBLISHERS_FIELD_NUMBER: builtins.int
     ACTIVE_RECORDING_FIELD_NUMBER: builtins.int
+    VERSION_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     empty_timeout: builtins.int
@@ -270,6 +271,8 @@ class Room(google.protobuf.message.Message):
     num_participants: builtins.int
     num_publishers: builtins.int
     active_recording: builtins.bool
+    @property
+    def version(self) -> global___TimedVersion: ...
     def __init__(
         self,
         *,
@@ -284,8 +287,10 @@ class Room(google.protobuf.message.Message):
         num_participants: builtins.int = ...,
         num_publishers: builtins.int = ...,
         active_recording: builtins.bool = ...,
+        version: global___TimedVersion | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "empty_timeout", b"empty_timeout", "enabled_codecs", b"enabled_codecs", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "sid", b"sid", "turn_password", b"turn_password"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["version", b"version"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "empty_timeout", b"empty_timeout", "enabled_codecs", b"enabled_codecs", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "sid", b"sid", "turn_password", b"turn_password", "version", b"version"]) -> None: ...
 
 global___Room = Room
 
