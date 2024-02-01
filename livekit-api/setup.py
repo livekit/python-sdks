@@ -50,7 +50,7 @@ setuptools.setup(
     install_requires=[
         "pyjwt>=2.0.0",
         "aiohttp>=3.9.0",
-        "protobuf>=4,<5",
+        "protobuf>=3",
         "types-protobuf>=4,<5",
         "livekit-protocol~=0.3.0",
     ],

@@ -44,7 +44,7 @@ setuptools.setup(
     packages=setuptools.find_namespace_packages(include=["livekit.*"]),
     python_requires=">=3.7.0",
     install_requires=[
-        "protobuf>=4,<5",
+        "protobuf>=3",
         "types-protobuf>=4,<5",
     ],
     package_data={
