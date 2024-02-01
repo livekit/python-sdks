@@ -240,10 +240,10 @@ class Room(EventEmitter[EventTypes]):
                         event.room_event,
                     )
 
-                # wait for the subscribers to process the event
-                # before processing the next one
-                self._room_queue.put_nowait(event)
-                await self._room_queue.join()
+            # wait for the subscribers to process the event
+            # before processing the next one
+            self._room_queue.put_nowait(event)
+            await self._room_queue.join()
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof("message")

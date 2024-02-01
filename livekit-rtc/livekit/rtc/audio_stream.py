@@ -21,6 +21,13 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .track import Track
+from dataclasses import dataclass
+
+
+@dataclass
+class AudioFrameEvent:
+    frame: AudioFrame
+
 
 
 class AudioStream:
@@ -35,7 +42,7 @@ class AudioStream:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
-        self._queue: RingQueue[AudioFrame] = RingQueue(capacity)
+        self._queue: RingQueue[AudioFrameEvent] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()
         new_audio_stream = req.new_audio_stream
@@ -61,23 +68,24 @@ class AudioStream:
             if audio_event.HasField("frame_received"):
                 owned_buffer_info = audio_event.frame_received.frame
                 frame = AudioFrame._from_owned_info(owned_buffer_info)
-                self._queue.put(frame)
+                event = AudioFrameEvent(frame)
+                self._queue.put(event)
             elif audio_event.HasField("eos"):
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         self._ffi_handle.dispose()
         await self._task
 
-    def __aiter__(self):
+    def __aiter__(self) -> "AudioStream":
         return self
 
-    def _is_event(self, e: proto_ffi.FfiEvent):
+    def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.audio_stream_event.stream_handle == self._ffi_handle.handle
 
-    async def __anext__(self):
+    async def __anext__(self) -> AudioFrameEvent:
         if self._task.done():
             raise StopAsyncIteration
         return await self._queue.get()

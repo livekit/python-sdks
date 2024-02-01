@@ -25,7 +25,7 @@ from .video_frame import VideoFrame
 
 
 @dataclass
-class VideoFrameReceived:
+class VideoFrameEvent:
     frame: VideoFrame
     timestamp_us: int
     rotation: proto_video_frame.VideoRotation
@@ -44,7 +44,7 @@ class VideoStream:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
-        self._queue: RingQueue[VideoFrameReceived] = RingQueue(capacity)
+        self._queue: RingQueue[VideoFrameEvent] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
@@ -52,6 +52,7 @@ class VideoStream:
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
         if format:
             new_video_stream.format = format
+        new_video_stream.normalize_stride = True
 
         resp = FfiClient.instance.request(req)
 
@@ -73,7 +74,7 @@ class VideoStream:
                 owned_buffer_info = video_event.frame_received.buffer
                 frame = VideoFrame._from_owned_info(owned_buffer_info)
 
-                event = VideoFrameReceived(
+                event = VideoFrameEvent(
                     frame=frame,
                     timestamp_us=video_event.frame_received.timestamp_us,
                     rotation=video_event.frame_received.rotation,
@@ -95,7 +96,7 @@ class VideoStream:
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.video_stream_event.stream_handle == self._ffi_handle.handle
 
-    async def __anext__(self) -> VideoFrameReceived:
+    async def __anext__(self) -> VideoFrameEvent:
         if self._task.done():
             raise StopAsyncIteration
         return await self._queue.get()

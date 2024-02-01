@@ -47,8 +47,8 @@ async def main(room: rtc.Room):
 
 
 async def draw_color_cycle(source: rtc.VideoSource):
-    argb_frame = rtc.ArgbFrame.create(rtc.VideoFormatType.FORMAT_ARGB, WIDTH, HEIGHT)
-    arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
+    argb_frame = bytearray(WIDTH * HEIGHT * 4)
+    arr = np.frombuffer(argb_frame, dtype=np.uint8)
 
     framerate = 1 / 30
     hue = 0.0
@@ -65,8 +65,7 @@ async def draw_color_cycle(source: rtc.VideoSource):
         arr.flat[2::4] = argb_color[2]
         arr.flat[3::4] = argb_color[3]
 
-        frame = rtc.VideoFrame(argb_frame.to_i420())
-
+        frame = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.ARGB, argb_frame)
         source.capture_frame(frame)
         hue = (hue + framerate / 3) % 1.0
 

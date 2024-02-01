@@ -73,6 +73,17 @@ class VideoFrame:
         info.type = self.type
         info.data_ptr = get_address(self.data)
         info.data_len = len(self.data)
+
+        if self.type in [
+            proto_video.VideoBufferType.ARGB,
+            proto_video.VideoBufferType.ABGR,
+            proto_video.VideoBufferType.RGBA,
+            proto_video.VideoBufferType.BGRA,
+        ]:
+            info.stride = self.width * 4
+        elif self.type == proto_video.VideoBufferType.RGB24:
+            info.stride = self.width * 3
+
         return info
 
     def get_plane(self, plane_nth: int) -> Optional[memoryview]:

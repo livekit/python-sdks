@@ -26,7 +26,7 @@ from ._proto.room_pb2 import (
 )
 from ._proto.e2ee_pb2 import EncryptionType, EncryptionState
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
-from ._proto.video_frame_pb2 import VideoFormatType, VideoFrameBufferType, VideoRotation
+from ._proto.video_frame_pb2 import VideoBufferType, VideoRotation
 from ._proto import stats_pb2 as stats
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
@@ -57,18 +57,7 @@ from .track_publication import (
     TrackPublication,
 )
 from .video_frame import (
-    ArgbFrame,
-    I010Buffer,
-    I420ABuffer,
-    I420Buffer,
-    I422Buffer,
-    NativeVideoBuffer,
-    NV12Buffer,
-    PlanarYuv8Buffer,
-    PlanarYuv16Buffer,
-    PlanarYuvBuffer,
     VideoFrame,
-    VideoFrameBuffer,
 )
 from .video_source import VideoSource
 from .video_stream import VideoStream
@@ -89,8 +78,7 @@ __all__ = [
     "StreamState",
     "TrackKind",
     "TrackSource",
-    "VideoFormatType",
-    "VideoFrameBufferType",
+    "VideoBufferType",
     "VideoRotation",
     "stats",
     "AudioFrame",
@@ -121,18 +109,7 @@ __all__ = [
     "LocalTrackPublication",
     "RemoteTrackPublication",
     "TrackPublication",
-    "ArgbFrame",
-    "I010Buffer",
-    "I420ABuffer",
-    "I420Buffer",
-    "I422Buffer",
-    "NativeVideoBuffer",
-    "NV12Buffer",
-    "PlanarYuv8Buffer",
-    "PlanarYuv16Buffer",
-    "PlanarYuvBuffer",
     "VideoFrame",
-    "VideoFrameBuffer",
     "VideoSource",
     "VideoStream",
     "ChatManager",
