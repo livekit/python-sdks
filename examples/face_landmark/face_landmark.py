@@ -107,27 +107,17 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
     argb_frame = None
     cv2.namedWindow("livekit_video", cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
-    async for frame in video_stream:
-        buffer = frame.buffer
+    async for frame_event in video_stream:
+        buffer = frame_event.frame
+        buffer = buffer.convert(rtc.VideoBufferType.RGBA)
 
-        if (
-            argb_frame is None
-            or argb_frame.width != buffer.width
-            or argb_frame.height != buffer.height
-        ):
-            argb_frame = rtc.ArgbFrame.create(
-                rtc.VideoFormatType.FORMAT_ABGR, buffer.width, buffer.height
-            )
-
-        buffer.to_argb(argb_frame)
-
-        arr = np.frombuffer(argb_frame.data, dtype=np.uint8)
-        arr = arr.reshape((argb_frame.height, argb_frame.width, 4))
+        arr = np.frombuffer(buffer.data, dtype=np.uint8)
+        arr = arr.reshape((buffer.height, buffer.width, 4))
         arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
 
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
 
-        detection_result = landmarker.detect_for_video(mp_image, frame.timestamp_us)
+        detection_result = landmarker.detect_for_video(mp_image, frame_event.timestamp_us)
 
         draw_landmarks_on_image(arr, detection_result)
 

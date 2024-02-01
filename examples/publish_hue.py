@@ -65,7 +65,7 @@ async def draw_color_cycle(source: rtc.VideoSource):
         arr.flat[2::4] = argb_color[2]
         arr.flat[3::4] = argb_color[3]
 
-        frame = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.ARGB, argb_frame)
+        frame = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.RGBA, argb_frame)
         source.capture_frame(frame)
         hue = (hue + framerate / 3) % 1.0
 

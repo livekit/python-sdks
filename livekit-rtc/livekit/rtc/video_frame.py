@@ -107,7 +107,7 @@ class VideoFrame:
         if resp.video_convert.error:
             raise Exception(resp.video_convert.error)
 
-        return VideoFrame._from_owned_info(resp.video_convert)
+        return VideoFrame._from_owned_info(resp.video_convert.buffer)
 
 
 def _component_info(
