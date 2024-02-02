@@ -62,49 +62,6 @@ AUDIO_SOURCE_NATIVE: AudioSourceType.ValueType  # 0
 global___AudioSourceType = AudioSourceType
 
 @typing_extensions.final
-class AllocAudioBufferRequest(google.protobuf.message.Message):
-    """Allocate a new AudioFrameBuffer
-    This is not necessary required because the data structure is fairly simple
-    But keep the API consistent with VideoFrame
-    """
-
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    SAMPLE_RATE_FIELD_NUMBER: builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: builtins.int
-    SAMPLES_PER_CHANNEL_FIELD_NUMBER: builtins.int
-    sample_rate: builtins.int
-    num_channels: builtins.int
-    samples_per_channel: builtins.int
-    def __init__(
-        self,
-        *,
-        sample_rate: builtins.int = ...,
-        num_channels: builtins.int = ...,
-        samples_per_channel: builtins.int = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]) -> None: ...
-
-global___AllocAudioBufferRequest = AllocAudioBufferRequest
-
-@typing_extensions.final
-class AllocAudioBufferResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    BUFFER_FIELD_NUMBER: builtins.int
-    @property
-    def buffer(self) -> global___OwnedAudioFrameBuffer: ...
-    def __init__(
-        self,
-        *,
-        buffer: global___OwnedAudioFrameBuffer | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> None: ...
-
-global___AllocAudioBufferResponse = AllocAudioBufferResponse
-
-@typing_extensions.final
 class NewAudioStreamRequest(google.protobuf.message.Message):
     """Create a new AudioStream
     AudioStream is used to receive audio frames from a track

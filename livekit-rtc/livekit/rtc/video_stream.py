@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+from dataclasses import dataclass
 from typing import Optional
 
 from ._ffi_client import FfiHandle, FfiClient
@@ -20,7 +21,14 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video_frame
 from ._utils import RingQueue, task_done_logger
 from .track import Track
-from .video_frame import VideoFrame, VideoFrameBuffer
+from .video_frame import VideoFrame
+
+
+@dataclass
+class VideoFrameEvent:
+    frame: VideoFrame
+    timestamp_us: int
+    rotation: proto_video_frame.VideoRotation
 
 
 class VideoStream:
@@ -29,18 +37,24 @@ class VideoStream:
     def __init__(
         self,
         track: Track,
+        *,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
+        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
     ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
-        self._queue: RingQueue[VideoFrame] = RingQueue(capacity)
+        self._queue: RingQueue[VideoFrameEvent] = RingQueue(capacity)
 
         req = proto_ffi.FfiRequest()
         new_video_stream = req.new_video_stream
         new_video_stream.track_handle = track._ffi_handle.handle
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
+        if format is not None:
+            new_video_stream.format = format
+        new_video_stream.normalize_stride = True
+
         resp = FfiClient.instance.request(req)
 
         stream_info = resp.new_video_stream.stream
@@ -52,37 +66,38 @@ class VideoStream:
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    async def _run(self):
+    async def _run(self) -> None:
         while True:
             event = await self._ffi_queue.wait_for(self._is_event)
             video_event = event.video_stream_event
 
             if video_event.HasField("frame_received"):
-                frame_info = video_event.frame_received.frame
                 owned_buffer_info = video_event.frame_received.buffer
+                frame = VideoFrame._from_owned_info(owned_buffer_info)
 
-                frame = VideoFrame(
-                    VideoFrameBuffer._from_owned_info(owned_buffer_info),
-                    timestamp_us=frame_info.timestamp_us,
-                    rotation=frame_info.rotation,
+                event = VideoFrameEvent(
+                    frame=frame,
+                    timestamp_us=video_event.frame_received.timestamp_us,
+                    rotation=video_event.frame_received.rotation,
                 )
-                self._queue.put(frame)
+
+                self._queue.put(event)
             elif video_event.HasField("eos"):
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         self._ffi_handle.dispose()
         await self._task
 
-    def __aiter__(self):
+    def __aiter__(self) -> "VideoStream":
         return self
 
-    def _is_event(self, e: proto_ffi.FfiEvent):
+    def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.video_stream_event.stream_handle == self._ffi_handle.handle
 
-    async def __anext__(self):
+    async def __anext__(self) -> VideoFrameEvent:
         if self._task.done():
             raise StopAsyncIteration
         return await self._queue.get()

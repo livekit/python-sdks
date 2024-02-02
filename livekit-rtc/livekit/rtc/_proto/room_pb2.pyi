@@ -78,6 +78,7 @@ class _ConnectionQualityEnumTypeWrapper(google.protobuf.internal.enum_type_wrapp
     QUALITY_POOR: _ConnectionQuality.ValueType  # 0
     QUALITY_GOOD: _ConnectionQuality.ValueType  # 1
     QUALITY_EXCELLENT: _ConnectionQuality.ValueType  # 2
+    QUALITY_LOST: _ConnectionQuality.ValueType  # 3
 
 class ConnectionQuality(_ConnectionQuality, metaclass=_ConnectionQualityEnumTypeWrapper):
     """
@@ -87,6 +88,7 @@ class ConnectionQuality(_ConnectionQuality, metaclass=_ConnectionQualityEnumType
 QUALITY_POOR: ConnectionQuality.ValueType  # 0
 QUALITY_GOOD: ConnectionQuality.ValueType  # 1
 QUALITY_EXCELLENT: ConnectionQuality.ValueType  # 2
+QUALITY_LOST: ConnectionQuality.ValueType  # 3
 global___ConnectionQuality = ConnectionQuality
 
 class _ConnectionState:
