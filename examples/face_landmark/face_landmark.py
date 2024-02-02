@@ -104,7 +104,6 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
 async def frame_loop(video_stream: rtc.VideoStream) -> None:
     landmarker = FaceLandmarker.create_from_options(options)
-    argb_frame = None
     cv2.namedWindow("livekit_video", cv2.WINDOW_AUTOSIZE)
     cv2.startWindowThread()
     async for frame_event in video_stream:
