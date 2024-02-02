@@ -16,7 +16,6 @@ import ctypes
 from typing import Union
 from ._proto import video_frame_pb2 as proto_video
 from ._proto import ffi_pb2 as proto
-from dataclasses import dataclass
 from typing import List, Optional
 from ._ffi_client import FfiClient, FfiHandle
 from ._utils import get_address
