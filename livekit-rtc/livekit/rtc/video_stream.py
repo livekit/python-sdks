@@ -51,7 +51,7 @@ class VideoStream:
         new_video_stream = req.new_video_stream
         new_video_stream.track_handle = track._ffi_handle.handle
         new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
-        if format:
+        if format is not None:
             new_video_stream.format = format
         new_video_stream.normalize_stride = True
 

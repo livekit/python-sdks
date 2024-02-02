@@ -42,7 +42,7 @@ async def main(room: rtc.Room) -> None:
                 return
 
             print("subscribed to track: " + track.name)
-            video_stream = rtc.VideoStream(track)
+            video_stream = rtc.VideoStream(track, format=rtc.VideoBufferType.RGB24)
             task = asyncio.create_task(frame_loop(video_stream))
             tasks.add(task)
             task.add_done_callback(tasks.remove)
@@ -109,14 +109,11 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
     cv2.startWindowThread()
     async for frame_event in video_stream:
         buffer = frame_event.frame
-        buffer = buffer.convert(rtc.VideoBufferType.RGBA)
 
         arr = np.frombuffer(buffer.data, dtype=np.uint8)
-        arr = arr.reshape((buffer.height, buffer.width, 4))
-        arr = cv2.cvtColor(arr, cv2.COLOR_RGBA2RGB)
+        arr = arr.reshape((buffer.height, buffer.width, 3))
 
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
-
         detection_result = landmarker.detect_for_video(
             mp_image, frame_event.timestamp_us
         )
@@ -124,7 +121,6 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
         draw_landmarks_on_image(arr, detection_result)
 
         arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
-
         cv2.imshow("livekit_video", arr)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
