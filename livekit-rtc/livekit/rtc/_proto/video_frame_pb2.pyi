@@ -345,35 +345,33 @@ class VideoBufferInfo(google.protobuf.message.Message):
     class ComponentInfo(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        OFFSET_FIELD_NUMBER: builtins.int
+        DATA_PTR_FIELD_NUMBER: builtins.int
         STRIDE_FIELD_NUMBER: builtins.int
         SIZE_FIELD_NUMBER: builtins.int
-        offset: builtins.int
+        data_ptr: builtins.int
         stride: builtins.int
         size: builtins.int
         def __init__(
             self,
             *,
-            offset: builtins.int = ...,
+            data_ptr: builtins.int = ...,
             stride: builtins.int = ...,
             size: builtins.int = ...,
         ) -> None: ...
-        def ClearField(self, field_name: typing_extensions.Literal["offset", b"offset", "size", b"size", "stride", b"stride"]) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["data_ptr", b"data_ptr", "size", b"size", "stride", b"stride"]) -> None: ...
 
     TYPE_FIELD_NUMBER: builtins.int
     WIDTH_FIELD_NUMBER: builtins.int
     HEIGHT_FIELD_NUMBER: builtins.int
     DATA_PTR_FIELD_NUMBER: builtins.int
-    DATA_LEN_FIELD_NUMBER: builtins.int
     STRIDE_FIELD_NUMBER: builtins.int
     COMPONENTS_FIELD_NUMBER: builtins.int
     type: global___VideoBufferType.ValueType
     width: builtins.int
     height: builtins.int
     data_ptr: builtins.int
-    data_len: builtins.int
     stride: builtins.int
-    """for packed formats"""
+    """only for packed formats"""
     @property
     def components(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___VideoBufferInfo.ComponentInfo]: ...
     def __init__(
@@ -383,11 +381,10 @@ class VideoBufferInfo(google.protobuf.message.Message):
         width: builtins.int = ...,
         height: builtins.int = ...,
         data_ptr: builtins.int = ...,
-        data_len: builtins.int = ...,
         stride: builtins.int = ...,
         components: collections.abc.Iterable[global___VideoBufferInfo.ComponentInfo] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["components", b"components", "data_len", b"data_len", "data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["components", b"components", "data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> None: ...
 
 global___VideoBufferInfo = VideoBufferInfo
 

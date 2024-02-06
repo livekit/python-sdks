@@ -53,7 +53,8 @@ class VideoFrame:
     @staticmethod
     def _from_owned_info(owned_info: proto_video.OwnedVideoBuffer) -> "VideoFrame":
         info = owned_info.info
-        cdata = (ctypes.c_uint8 * info.data_len).from_address(info.data_ptr)
+        data_len = _get_plane_length(info.type, info.width, info.height)
+        cdata = (ctypes.c_uint8 * data_len).from_address(info.data_ptr)
         data = bytearray(cdata)
         frame = VideoFrame(
             width=info.width,
@@ -66,12 +67,14 @@ class VideoFrame:
 
     def _proto_info(self) -> proto_video.VideoBufferInfo:
         info = proto_video.VideoBufferInfo()
-        info.components.extend(_get_plane_infos(self.type, self.width, self.height))
+        addr = get_address(self.data)
+        info.components.extend(
+            _get_plane_infos(addr, self.type, self.width, self.height)
+        )
         info.width = self.width
         info.height = self.height
         info.type = self.type
-        info.data_ptr = get_address(self.data)
-        info.data_len = len(self.data)
+        info.data_ptr = addr
 
         if self.type in [
             proto_video.VideoBufferType.ARGB,
@@ -86,14 +89,15 @@ class VideoFrame:
         return info
 
     def get_plane(self, plane_nth: int) -> Optional[memoryview]:
-        plane_infos = _get_plane_infos(self.type, self.width, self.height)
+        plane_infos = _get_plane_infos(
+            get_address(self.data), self.type, self.width, self.height
+        )
         if plane_nth >= len(plane_infos):
             return None
 
         plane_info = plane_infos[plane_nth]
-        return memoryview(self.data)[
-            plane_info.offset : plane_info.offset + plane_info.size
-        ]
+        cdata = (ctypes.c_uint8 * plane_info.size).from_address(plane_info.data_ptr)
+        return memoryview(cdata)
 
     def convert(
         self, type: proto_video.VideoBufferType.ValueType, *, flip_y: bool = False
@@ -110,63 +114,110 @@ class VideoFrame:
 
 
 def _component_info(
-    offset: int, stride: int, size: int
+    data_ptr: int, stride: int, size: int
 ) -> proto_video.VideoBufferInfo.ComponentInfo:
     cmpt = proto_video.VideoBufferInfo.ComponentInfo()
-    cmpt.offset = offset
+    cmpt.data_ptr = data_ptr
     cmpt.stride = stride
     cmpt.size = size
     return cmpt
 
 
-def _get_plane_infos(
+def _get_plane_length(
     type: proto_video.VideoBufferType.ValueType, width: int, height: int
+) -> int:
+    """
+    Return the size in bytes of a participar video buffer type based on its size (This ignore the strides)
+    """
+    if type in [
+        proto_video.VideoBufferType.ARGB,
+        proto_video.VideoBufferType.ABGR,
+        proto_video.VideoBufferType.RGBA,
+        proto_video.VideoBufferType.BGRA,
+    ]:
+        return width * height * 4
+    elif type == proto_video.VideoBufferType.RGB24:
+        return width * height * 3
+    elif type == proto_video.VideoBufferType.I420:
+        chroma_width = (width + 1) // 2
+        chroma_height = (height + 1) // 2
+        return width * height + chroma_width * chroma_height * 2
+    elif type == proto_video.VideoBufferType.I420A:
+        chroma_width = (width + 1) // 2
+        return width * height * 2 + chroma_width * chroma_width * 2
+    elif type == proto_video.VideoBufferType.I422:
+        chroma_width = (width + 1) // 2
+        return width * height + chroma_width * height * 2
+    elif type == proto_video.VideoBufferType.I444:
+        return width * height * 3
+    elif type == proto_video.VideoBufferType.I010:
+        chroma_width = (width + 1) // 2
+        chroma_height = (height + 1) // 2
+        return width * height * 2 + chroma_width * chroma_height * 4
+    elif type == proto_video.VideoBufferType.NV12:
+        chroma_width = (width + 1) // 2
+        chroma_height = (height + 1) // 2
+        return width * height + chroma_width * chroma_width * 2
+
+    raise Exception(f"unsupported video buffer type: {type}")
+
+
+def _get_plane_infos(
+    addr: int, type: proto_video.VideoBufferType.ValueType, width: int, height: int
 ) -> List[proto_video.VideoBufferInfo.ComponentInfo]:
     if type == proto_video.VideoBufferType.I420:
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        y = _component_info(0, width, width * height)
-        u = _component_info(y.size, chroma_width, chroma_width * chroma_height)
+        y = _component_info(addr, width, width * height)
+        u = _component_info(
+            y.data_ptr + y.size, chroma_width, chroma_width * chroma_height
+        )
         v = _component_info(
-            u.offset + u.size, chroma_width, chroma_width * chroma_height
+            u.data_ptr + u.size, chroma_width, chroma_width * chroma_height
         )
         return [y, u, v]
     elif type == proto_video.VideoBufferType.I420A:
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        y = _component_info(0, width, width * height)
-        u = _component_info(y.size, chroma_width, chroma_width * chroma_height)
-        v = _component_info(
-            u.offset + u.size, chroma_width, chroma_width * chroma_height
+        y = _component_info(addr, width, width * height)
+        u = _component_info(
+            y.data_ptr + y.size, chroma_width, chroma_width * chroma_height
         )
-        a = _component_info(v.offset + v.size, width, width * height)
+        v = _component_info(
+            u.data_ptr + u.size, chroma_width, chroma_width * chroma_height
+        )
+        a = _component_info(v.data_ptr + v.size, width, width * height)
         return [y, u, v, a]
     elif type == proto_video.VideoBufferType.I422:
         chroma_width = (width + 1) // 2
-        y = _component_info(0, width, width * height)
-        u = _component_info(y.size, chroma_width, chroma_width * height)
-        v = _component_info(u.offset + u.size, chroma_width, chroma_width * height)
+        y = _component_info(addr, width, width * height)
+        u = _component_info(y.data_ptr + y.size, chroma_width, chroma_width * height)
+        v = _component_info(
+            u.data_ptr + u.size + u.size, chroma_width, chroma_width * height
+        )
         return [y, u, v]
     elif type == proto_video.VideoBufferType.I444:
-        y = _component_info(0, width, width * height)
-        u = _component_info(y.size, width, width * height)
-        v = _component_info(u.offset + u.size, width, width * height)
+        y = _component_info(addr, width, width * height)
+        u = _component_info(y.data_ptr + y.size, width, width * height)
+        v = _component_info(u.data_ptr + u.size, width, width * height)
         return [y, u, v]
     elif type == proto_video.VideoBufferType.I010:
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        y = _component_info(0, width * 2, width * height * 2)
-        u = _component_info(y.size, chroma_width * 2, chroma_width * chroma_height * 2)
+        y = _component_info(addr, width * 2, width * height * 2)
+        u = _component_info(
+            y.data_ptr + y.size, chroma_width * 2, chroma_width * chroma_height * 2
+        )
         v = _component_info(
-            u.offset + u.size, chroma_width * 2, chroma_width * chroma_height * 2
+            u.data_ptr + u.size, chroma_width * 2, chroma_width * chroma_height * 2
         )
         return [y, u, v]
     elif type == proto_video.VideoBufferType.NV12:
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        y = _component_info(0, width, width * height)
+        y = _component_info(addr, width, width * height)
         uv = _component_info(
-            y.stride * height, chroma_width * 2, chroma_width * chroma_height * 2
+            y.data_ptr + y.size, chroma_width * 2, chroma_width * chroma_height * 2
         )
         return [y, uv]
 
