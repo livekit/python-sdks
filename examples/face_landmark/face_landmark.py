@@ -15,6 +15,20 @@ from livekit import api, rtc
 
 tasks = set()
 
+# You can download a face landmark model file from https://developers.google.com/mediapipe/solutions/vision/face_landmarker#models
+model_file = "face_landmarker.task"
+model_path = os.path.dirname(os.path.realpath(__file__)) + "/" + model_file
+
+BaseOptions = mp.tasks.BaseOptions
+FaceLandmarker = mp.tasks.vision.FaceLandmarker
+FaceLandmarkerOptions = mp.tasks.vision.FaceLandmarkerOptions
+VisionRunningMode = mp.tasks.vision.RunningMode
+
+options = FaceLandmarkerOptions(
+    base_options=BaseOptions(model_asset_path=model_path),
+    running_mode=VisionRunningMode.VIDEO,
+)
+
 
 async def main(room: rtc.Room) -> None:
     video_stream = None
@@ -97,11 +111,19 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
         arr = np.frombuffer(buffer.data, dtype=np.uint8)
         arr = arr.reshape((buffer.height, buffer.width, 3))
 
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
+        detection_result = landmarker.detect_for_video(
+            mp_image, frame_event.timestamp_us
+        )
+
+        draw_landmarks_on_image(arr, detection_result)
+
         arr = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
         cv2.imshow("livekit_video", arr)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
+    landmarker.close()
     cv2.destroyAllWindows()
 
 
