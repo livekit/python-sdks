@@ -334,6 +334,7 @@ class FfiEvent(google.protobuf.message.Message):
     GET_STATS_FIELD_NUMBER: builtins.int
     LOGS_FIELD_NUMBER: builtins.int
     GET_SESSION_STATS_FIELD_NUMBER: builtins.int
+    PANIC_FIELD_NUMBER: builtins.int
     @property
     def room_event(self) -> room_pb2.RoomEvent: ...
     @property
@@ -366,6 +367,8 @@ class FfiEvent(google.protobuf.message.Message):
     def logs(self) -> global___LogBatch: ...
     @property
     def get_session_stats(self) -> room_pb2.GetSessionStatsCallback: ...
+    @property
+    def panic(self) -> global___Panic: ...
     def __init__(
         self,
         *,
@@ -385,10 +388,11 @@ class FfiEvent(google.protobuf.message.Message):
         get_stats: track_pb2.GetStatsCallback | None = ...,
         logs: global___LogBatch | None = ...,
         get_session_stats: room_pb2.GetSessionStatsCallback | None = ...,
+        panic: global___Panic | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "capture_audio_frame", "update_local_metadata", "update_local_name", "get_stats", "logs", "get_session_stats"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_track", b"publish_track", "room_event", b"room_event", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "update_local_metadata", b"update_local_metadata", "update_local_name", b"update_local_name", "video_stream_event", b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "capture_audio_frame", "update_local_metadata", "update_local_name", "get_stats", "logs", "get_session_stats", "panic"] | None: ...
 
 global___FfiEvent = FfiEvent
 
@@ -495,3 +499,18 @@ class LogBatch(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["records", b"records"]) -> None: ...
 
 global___LogBatch = LogBatch
+
+@typing_extensions.final
+class Panic(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MESSAGE_FIELD_NUMBER: builtins.int
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        message: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["message", b"message"]) -> None: ...
+
+global___Panic = Panic
