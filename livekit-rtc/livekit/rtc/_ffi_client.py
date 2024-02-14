@@ -169,7 +169,7 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
     elif level == proto_ffi.LogLevel.LOG_DEBUG:
         return logging.DEBUG
     elif level == proto_ffi.LogLevel.LOG_TRACE:
-        # Don't show TRACE bug inside DEBUG, it is too verbos
+        # Don't show TRACE logs inside DEBUG, it is too verbos
         # Python's logging doesn't have a TRACE level
         # return logging.DEBUG
         pass
