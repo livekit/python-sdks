@@ -135,21 +135,31 @@ def ffi_event_callback(
     which = event.WhichOneof("message")
     if which == "logs":
         for record in event.logs.records:
-            logger.log(
-                to_python_level(record.level),
-                "%s:%s:%s - %s",
-                record.target,
-                record.line,
-                record.module_path,
-                record.message,
-            )
+            level = to_python_level(record.level)
+            rtc_debug = os.environ.get("LIVEKIT_WEBRTC_DEBUG", "").strip()
+            if (
+                record.target == "libwebrtc"
+                and level == logging.DEBUG
+                and rtc_debug.lower() not in ("true", "1")
+            ):
+                continue
+
+            if level is not None:
+                logger.log(
+                    level,
+                    "%s:%s:%s - %s",
+                    record.target,
+                    record.line,
+                    record.module_path,
+                    record.message,
+                )
 
         return  # no need to queue the logs
 
     FfiClient.instance.queue.put(event)
 
 
-def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
+def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
     if level == proto_ffi.LogLevel.LOG_ERROR:
         return logging.ERROR
     elif level == proto_ffi.LogLevel.LOG_WARN:
@@ -159,9 +169,12 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
     elif level == proto_ffi.LogLevel.LOG_DEBUG:
         return logging.DEBUG
     elif level == proto_ffi.LogLevel.LOG_TRACE:
-        return logging.DEBUG
+        # Don't show TRACE bug inside DEBUG, it is too verbos
+        # Python's logging doesn't have a TRACE level
+        # return logging.DEBUG
+        pass
 
-    raise Exception("unreachable")
+    return None
 
 
 class FfiClient:

@@ -147,7 +147,7 @@ async def main(room: rtc.Room) -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
     )
 
