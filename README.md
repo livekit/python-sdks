@@ -113,7 +113,6 @@ async def main():
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
-- [Whisper](https://github.com/livekit/python-sdks/tree/main/examples/whisper): Transcribe an audio track using OpenAI whisper
 - [Basic room](https://github.com/livekit/python-sdks/blob/main/examples/basic_room.py): Connect to a room
 - [Publish hue](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a rainbow video track
 - [Publish wave](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a sine wave
