@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import signal
 import asyncio
 from contextlib import ExitStack
 import ctypes
@@ -155,6 +156,11 @@ def ffi_event_callback(
                 )
 
         return  # no need to queue the logs
+    elif which == "panic":
+        logger.critical("Panic: %s", event.panic.message)
+        # We are in a unrecoverable state, terminate the process
+        os.kill(os.getpid(), signal.SIGTERM)
+        return
 
     FfiClient.instance.queue.put(event)
 
