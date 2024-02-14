@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import signal
 import asyncio
 from contextlib import ExitStack
 import ctypes
@@ -135,21 +136,36 @@ def ffi_event_callback(
     which = event.WhichOneof("message")
     if which == "logs":
         for record in event.logs.records:
-            logger.log(
-                to_python_level(record.level),
-                "%s:%s:%s - %s",
-                record.target,
-                record.line,
-                record.module_path,
-                record.message,
-            )
+            level = to_python_level(record.level)
+            rtc_debug = os.environ.get("LIVEKIT_WEBRTC_DEBUG", "").strip()
+            if (
+                record.target == "libwebrtc"
+                and level == logging.DEBUG
+                and rtc_debug.lower() not in ("true", "1")
+            ):
+                continue
+
+            if level is not None:
+                logger.log(
+                    level,
+                    "%s:%s:%s - %s",
+                    record.target,
+                    record.line,
+                    record.module_path,
+                    record.message,
+                )
 
         return  # no need to queue the logs
+    elif which == "panic":
+        logger.critical("Panic: %s", event.panic.message)
+        # We are in a unrecoverable state, terminate the process
+        os.kill(os.getpid(), signal.SIGTERM)
+        return
 
     FfiClient.instance.queue.put(event)
 
 
-def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
+def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
     if level == proto_ffi.LogLevel.LOG_ERROR:
         return logging.ERROR
     elif level == proto_ffi.LogLevel.LOG_WARN:
@@ -159,9 +175,12 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> int:
     elif level == proto_ffi.LogLevel.LOG_DEBUG:
         return logging.DEBUG
     elif level == proto_ffi.LogLevel.LOG_TRACE:
-        return logging.DEBUG
+        # Don't show TRACE logs inside DEBUG, it is too verbos
+        # Python's logging doesn't have a TRACE level
+        # return logging.DEBUG
+        pass
 
-    raise Exception("unreachable")
+    return None
 
 
 class FfiClient:
