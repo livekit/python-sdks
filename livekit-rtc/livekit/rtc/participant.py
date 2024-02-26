@@ -155,7 +155,7 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        queue = self._room_queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
             cb = await queue.wait_for(
@@ -173,14 +173,14 @@ class LocalParticipant(Participant):
             queue.task_done()
             return track_publication
         finally:
-            self._room_queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
     async def unpublish_track(self, track_sid: str) -> None:
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
 
-        queue = self._room_queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
             cb = await queue.wait_for(
@@ -194,7 +194,7 @@ class LocalParticipant(Participant):
             publication.track = None
             queue.task_done()
         finally:
-            self._room_queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
 
 class RemoteParticipant(Participant):
