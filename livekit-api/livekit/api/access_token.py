@@ -20,8 +20,6 @@ import os
 import jwt
 from typing import Optional, List
 
-bad_type: str = 5
-
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
 

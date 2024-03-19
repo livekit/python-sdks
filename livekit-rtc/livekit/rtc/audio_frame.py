@@ -19,8 +19,6 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
 from typing import Union
 
-bad_type: str = 5
-
 
 class AudioFrame:
     def __init__(
