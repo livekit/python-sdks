@@ -14,11 +14,12 @@
 
 import os
 import pathlib
+from typing import Any, Dict
 
 import setuptools  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
-about = {}
+about: Dict[Any, Any] = {}
 with open(os.path.join(here, "livekit", "protocol", "version.py"), "r") as f:
     exec(f.read(), about)
 
