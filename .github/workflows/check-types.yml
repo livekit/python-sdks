@@ -1,10 +1,10 @@
 name: Check Types 
 
 on:
-  pull_request:
-    branches: [main, master]
-  push:
-    branches: [main, master]
+  workflow_run:
+    workflows: ["Build Protocol"]
+    types:
+      - completed
 
 jobs:
   type-check:
@@ -21,7 +21,7 @@ jobs:
         python-version: 3.9
 
     - name: Download ffi
-      run: "[[ ${{ inputs.package_name }} = 'livekit.rtc' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources"
+      run: pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
 
     - name: Install mypy 
       run: pip install --upgrade mypy 

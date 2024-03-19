@@ -38,11 +38,8 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v2
         with:
-          version: "25.2"
+          version: "25.3"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: install mypy-protobuf
-        run: pip3 install mypy-protobuf
 
       - name: generate python stubs
         run: ./generate_proto.sh
