@@ -24,7 +24,7 @@ API_OUT_PYTHON=./livekit/protocol
 protoc \
     -I=$API_PROTOCOL \
     --python_out=$API_OUT_PYTHON \
-    --mypy_out=$API_OUT_PYTHON \
+    --pyi_out=$API_OUT_PYTHON \
     $API_PROTOCOL/livekit_egress.proto \
     $API_PROTOCOL/livekit_room.proto \
     $API_PROTOCOL/livekit_webhook.proto \
