@@ -6,6 +6,8 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+bad_type: str = 5
+
 class JobType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     JT_ROOM: _ClassVar[JobType]

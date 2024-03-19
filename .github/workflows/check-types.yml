@@ -32,4 +32,4 @@ jobs:
       run: python -m pip install ./livekit-api ./livekit-protocol ./livekit-rtc
 
     - name: Check Types 
-      run: python -m mypy -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
+      run: python -m mypy --install-type --non-interactive -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
