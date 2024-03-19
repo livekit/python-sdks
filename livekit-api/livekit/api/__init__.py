@@ -16,11 +16,11 @@
 
 # flake8: noqa
 # re-export packages from protocol
-from livekit.protocol.egress import *  # type: ignore
-from livekit.protocol.ingress import *  # type: ignore
-from livekit.protocol.models import *  # type: ignore
-from livekit.protocol.room import *  # type: ignore
-from livekit.protocol.webhook import *  # type: ignore
+from livekit.protocol.egress import *
+from livekit.protocol.ingress import *
+from livekit.protocol.models import *
+from livekit.protocol.room import *
+from livekit.protocol.webhook import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
