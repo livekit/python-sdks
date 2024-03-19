@@ -48,7 +48,7 @@ setuptools.setup(
         "types-protobuf>=4,<5",
     ],
     package_data={
-        "livekit.protocol": ["*.pyi", "**/*.pyi"],
+        "livekit.protocol": ["*.pyi", "**/*.pyi", "py.typed"],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",

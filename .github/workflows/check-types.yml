@@ -35,4 +35,4 @@ jobs:
       run: python3 -m pip list
 
     - name: Check Types 
-      run: python3 -m mypy --module='livekit.protocol' --module='livekit.api' --module 'livekit.rtc'
+      run: python3 -m mypy -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
