@@ -1,10 +1,9 @@
 name: Check Types 
 
 on:
-  workflow_run:
-    workflows: ["Build Protocol"]
-    types:
-      - completed
+  pull_request:
+    branches:
+      - main
 
 jobs:
   type-check:
