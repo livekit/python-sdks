@@ -1,0 +1,33 @@
+name: Check Types 
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Download ffi
+      run: "[[ ${{ inputs.package_name }} = 'livekit.rtc' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources"
+
+    - name: Install mypy 
+      run: pip install --upgrade mypy 
+
+    - name: Install packages 
+      run: pip install ./livekit-api ./livekit-protocol ./livekit-rtc
+
+    - name: Check Types 
+      run:  python -m mypy -m livekit.protocol -m livekit.api -m livekit.rtc 
