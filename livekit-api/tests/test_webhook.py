@@ -1,7 +1,8 @@
-import pytest
-from livekit.api import WebhookReceiver, TokenVerifier, AccessToken
-import hashlib
 import base64
+import hashlib
+
+import pytest  # type: ignore
+from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
 
 TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"

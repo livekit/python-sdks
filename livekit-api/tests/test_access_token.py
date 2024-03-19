@@ -1,5 +1,6 @@
-import pytest
 import datetime
+
+import pytest  # type: ignore
 from livekit.api import AccessToken, TokenVerifier, VideoGrants
 
 TEST_API_KEY = "myapikey"

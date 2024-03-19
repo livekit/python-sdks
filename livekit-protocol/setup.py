@@ -15,7 +15,7 @@
 import os
 import pathlib
 
-import setuptools
+import setuptools  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
 about = {}

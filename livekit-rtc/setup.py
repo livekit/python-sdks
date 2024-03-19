@@ -14,13 +14,15 @@
 
 import os
 import pathlib
+from typing import Dict
+
 import setuptools  # type: ignore
 import setuptools.command.build_py  # type: ignore
 from wheel.bdist_wheel import bdist_wheel as _bdist_wheel  # type: ignore
 from wheel.bdist_wheel import get_platform  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
-about = {}
+about: Dict[any, any] = {}
 with open(os.path.join(here, "livekit", "rtc", "version.py"), "r") as f:
     exec(f.read(), about)
 
