@@ -80,7 +80,7 @@ class RoomOptions:
 @dataclass
 class DataPacket:
     data: bytes
-    kind: proto_room.DataPacket.Kind.ValueType
+    kind: proto_room.DataPacketKind.ValueType
     participant: Optional[RemoteParticipant] = (
         None  # None when the data has been sent by a server SDK
     )
