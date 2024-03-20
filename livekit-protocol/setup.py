@@ -14,11 +14,12 @@
 
 import os
 import pathlib
+from typing import Any, Dict
 
-import setuptools
+import setuptools  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
-about = {}
+about: Dict[Any, Any] = {}
 with open(os.path.join(here, "livekit", "protocol", "version.py"), "r") as f:
     exec(f.read(), about)
 
@@ -48,7 +49,7 @@ setuptools.setup(
         "types-protobuf>=4,<5",
     ],
     package_data={
-        "livekit.protocol": ["*.pyi", "**/*.pyi"],
+        "livekit.protocol": ["*.pyi", "**/*.pyi", "py.typed"],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
