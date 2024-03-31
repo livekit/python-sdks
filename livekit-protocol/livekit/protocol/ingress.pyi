@@ -47,13 +47,14 @@ H264_720P_30FPS_1_LAYER_HIGH_MOTION: IngressVideoEncodingPreset
 H264_1080P_30FPS_1_LAYER_HIGH_MOTION: IngressVideoEncodingPreset
 
 class CreateIngressRequest(_message.Message):
-    __slots__ = ("input_type", "url", "name", "room_name", "participant_identity", "participant_name", "bypass_transcoding", "audio", "video")
+    __slots__ = ("input_type", "url", "name", "room_name", "participant_identity", "participant_name", "participant_metadata", "bypass_transcoding", "audio", "video")
     INPUT_TYPE_FIELD_NUMBER: _ClassVar[int]
     URL_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_NAME_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_METADATA_FIELD_NUMBER: _ClassVar[int]
     BYPASS_TRANSCODING_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FIELD_NUMBER: _ClassVar[int]
     VIDEO_FIELD_NUMBER: _ClassVar[int]
@@ -63,10 +64,11 @@ class CreateIngressRequest(_message.Message):
     room_name: str
     participant_identity: str
     participant_name: str
+    participant_metadata: str
     bypass_transcoding: bool
     audio: IngressAudioOptions
     video: IngressVideoOptions
-    def __init__(self, input_type: _Optional[_Union[IngressInput, str]] = ..., url: _Optional[str] = ..., name: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ...) -> None: ...
+    def __init__(self, input_type: _Optional[_Union[IngressInput, str]] = ..., url: _Optional[str] = ..., name: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ...) -> None: ...
 
 class IngressAudioOptions(_message.Message):
     __slots__ = ("name", "source", "preset", "options")
@@ -115,7 +117,7 @@ class IngressVideoEncodingOptions(_message.Message):
     def __init__(self, video_codec: _Optional[_Union[_models.VideoCodec, str]] = ..., frame_rate: _Optional[float] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ...) -> None: ...
 
 class IngressInfo(_message.Message):
-    __slots__ = ("ingress_id", "name", "stream_key", "url", "input_type", "bypass_transcoding", "audio", "video", "room_name", "participant_identity", "participant_name", "reusable", "state")
+    __slots__ = ("ingress_id", "name", "stream_key", "url", "input_type", "bypass_transcoding", "audio", "video", "room_name", "participant_identity", "participant_name", "participant_metadata", "reusable", "state")
     INGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STREAM_KEY_FIELD_NUMBER: _ClassVar[int]
@@ -127,6 +129,7 @@ class IngressInfo(_message.Message):
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_NAME_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_METADATA_FIELD_NUMBER: _ClassVar[int]
     REUSABLE_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     ingress_id: str
@@ -140,9 +143,10 @@ class IngressInfo(_message.Message):
     room_name: str
     participant_identity: str
     participant_name: str
+    participant_metadata: str
     reusable: bool
     state: IngressState
-    def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., stream_key: _Optional[str] = ..., url: _Optional[str] = ..., input_type: _Optional[_Union[IngressInput, str]] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., reusable: bool = ..., state: _Optional[_Union[IngressState, _Mapping]] = ...) -> None: ...
+    def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., stream_key: _Optional[str] = ..., url: _Optional[str] = ..., input_type: _Optional[_Union[IngressInput, str]] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., reusable: bool = ..., state: _Optional[_Union[IngressState, _Mapping]] = ...) -> None: ...
 
 class IngressState(_message.Message):
     __slots__ = ("status", "error", "video", "audio", "room_id", "started_at", "ended_at", "resource_id", "tracks")
@@ -205,12 +209,13 @@ class InputAudioState(_message.Message):
     def __init__(self, mime_type: _Optional[str] = ..., average_bitrate: _Optional[int] = ..., channels: _Optional[int] = ..., sample_rate: _Optional[int] = ...) -> None: ...
 
 class UpdateIngressRequest(_message.Message):
-    __slots__ = ("ingress_id", "name", "room_name", "participant_identity", "participant_name", "bypass_transcoding", "audio", "video")
+    __slots__ = ("ingress_id", "name", "room_name", "participant_identity", "participant_name", "participant_metadata", "bypass_transcoding", "audio", "video")
     INGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_NAME_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_METADATA_FIELD_NUMBER: _ClassVar[int]
     BYPASS_TRANSCODING_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FIELD_NUMBER: _ClassVar[int]
     VIDEO_FIELD_NUMBER: _ClassVar[int]
@@ -219,10 +224,11 @@ class UpdateIngressRequest(_message.Message):
     room_name: str
     participant_identity: str
     participant_name: str
+    participant_metadata: str
     bypass_transcoding: bool
     audio: IngressAudioOptions
     video: IngressVideoOptions
-    def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ...) -> None: ...
+    def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ...) -> None: ...
 
 class ListIngressRequest(_message.Message):
     __slots__ = ("room_name", "ingress_id")

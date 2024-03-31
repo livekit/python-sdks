@@ -8,9 +8,10 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateRoomRequest(_message.Message):
-    __slots__ = ("name", "empty_timeout", "max_participants", "node_id", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams")
+    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams")
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
+    DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -20,6 +21,7 @@ class CreateRoomRequest(_message.Message):
     SYNC_STREAMS_FIELD_NUMBER: _ClassVar[int]
     name: str
     empty_timeout: int
+    departure_timeout: int
     max_participants: int
     node_id: str
     metadata: str
@@ -27,7 +29,7 @@ class CreateRoomRequest(_message.Message):
     min_playout_delay: int
     max_playout_delay: int
     sync_streams: bool
-    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ...) -> None: ...
 
 class RoomEgress(_message.Message):
     __slots__ = ("room", "participant", "tracks")
