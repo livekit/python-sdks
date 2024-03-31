@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright 2023 LiveKit, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +18,13 @@
 
 set -e
 
-API_PROTOCOL=./protocol
+API_PROTOCOL=./protocol/protobufs
 API_OUT_PYTHON=./livekit/protocol
 
 protoc \
     -I=$API_PROTOCOL \
     --python_out=$API_OUT_PYTHON \
-    --mypy_out=$API_OUT_PYTHON \
+    --pyi_out=$API_OUT_PYTHON \
     $API_PROTOCOL/livekit_egress.proto \
     $API_PROTOCOL/livekit_room.proto \
     $API_PROTOCOL/livekit_webhook.proto \

@@ -14,13 +14,15 @@
 
 import os
 import pathlib
-import setuptools
-import setuptools.command.build_py
-from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
-from wheel.bdist_wheel import get_platform
+from typing import Any, Dict
+
+import setuptools  # type: ignore
+import setuptools.command.build_py  # type: ignore
+from wheel.bdist_wheel import bdist_wheel as _bdist_wheel  # type: ignore
+from wheel.bdist_wheel import get_platform  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
-about = {}
+about: Dict[Any, Any] = {}
 with open(os.path.join(here, "livekit", "rtc", "version.py"), "r") as f:
     exec(f.read(), about)
 

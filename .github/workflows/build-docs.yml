@@ -9,12 +9,24 @@
 name: Build Docs 
 
 on:
+  workflow_dispatch:
+    inputs:
+      package_dir:
+        required: true
+        type: string
+      package_name:
+        required: true
+        type: string
+      test:
+        required: false
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       package_dir:
         required: true
         type: string
-      docs_entrypoint:
+      package_name:
         required: true
         type: string
     secrets:
@@ -34,36 +46,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
-    - name: Generate Egg Info
-      run: python ${{ inputs.package_dir }}/setup.py egg_info
-
-    - name: Find requires.txt
-      run: |
-          # Search for requirements.txt file and store its content in an environment variable
-          REQUIREMENTS_FILE=$(find . -type f -name "requires.txt")
-          echo "Found requires.txt file at: $REQUIREMENTS_FILE"
-
-          if [ -n "$REQUIREMENTS_FILE" ]; then
-            echo "REQUIREMENTS_FILE=$REQUIREMENTS_FILE" >> $GITHUB_ENV
-          else
-            echo "No requiress.txt file found."
-          fi
-
-    - name: Debug
-      run: echo $REQUIREMENTS_FILE
-
-    - name: Install Requirements From Egg Info
-      run: python -m pip install -r $REQUIREMENTS_FILE
+      with:
+        submodules: recursive
 
     - name: Install Package to Document
-      run: python -m pip install -e ${{ inputs.package_dir }}
+      run: python -m pip install ${{ inputs.package_dir }}/
+
+    - name: Download ffi
+      run: "[[ ${{ inputs.package_name }} = 'livekit.rtc' ]] && pip install requests && python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources"
 
     - name: Install pdoc 
-      run: python -m pip install --upgrade pdoc
+      run: pip install --upgrade pdoc
 
     - name: Build Docs
-      run: python -m pdoc ${{ inputs.docs_entrypoint }} --docformat=google --output-dir docs
+      run:  python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
 
     - name: S3 Upload
       run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
