@@ -18,7 +18,7 @@
 
 set -e
 
-API_PROTOCOL=./protocol
+API_PROTOCOL=./protocol/protobufs
 API_OUT_PYTHON=./livekit/protocol
 
 protoc \
