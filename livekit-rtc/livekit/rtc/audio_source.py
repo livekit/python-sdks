@@ -27,9 +27,20 @@ class AudioSource:
         req.new_audio_source.sample_rate = sample_rate
         req.new_audio_source.num_channels = num_channels
 
+        self._sample_rate = sample_rate
+        self._num_channels = num_channels
+
         resp = FfiClient.instance.request(req)
         self._info = resp.new_audio_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
+
+    @property
+    def sample_rate(self) -> int:
+        return self._sample_rate
+
+    @property
+    def num_channels(self) -> int:
+        return self._num_channels
 
     async def capture_frame(self, frame: AudioFrame) -> None:
         """Captures an AudioFrame.
