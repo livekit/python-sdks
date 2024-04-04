@@ -90,7 +90,7 @@ class AnalyticsVideoLayer(_message.Message):
     def __init__(self, layer: _Optional[int] = ..., packets: _Optional[int] = ..., bytes: _Optional[int] = ..., frames: _Optional[int] = ...) -> None: ...
 
 class AnalyticsStream(_message.Message):
-    __slots__ = ("ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers")
+    __slots__ = ("ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers", "start_time", "end_time")
     SSRC_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_PACKETS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_BYTES_FIELD_NUMBER: _ClassVar[int]
@@ -106,6 +106,8 @@ class AnalyticsStream(_message.Message):
     PLIS_FIELD_NUMBER: _ClassVar[int]
     FIRS_FIELD_NUMBER: _ClassVar[int]
     VIDEO_LAYERS_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
     ssrc: int
     primary_packets: int
     primary_bytes: int
@@ -121,7 +123,9 @@ class AnalyticsStream(_message.Message):
     plis: int
     firs: int
     video_layers: _containers.RepeatedCompositeFieldContainer[AnalyticsVideoLayer]
-    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ...) -> None: ...
+    start_time: _timestamp_pb2.Timestamp
+    end_time: _timestamp_pb2.Timestamp
+    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AnalyticsStat(_message.Message):
     __slots__ = ("analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
