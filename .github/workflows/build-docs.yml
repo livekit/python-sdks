@@ -54,7 +54,7 @@ jobs:
 
     - name: Download ffi
       run: |
-        if [[ ${{ inputs.package_name }} = 'livekit.rtc' ]]; then
+        if [[ '${{ inputs.package_name }}' = 'livekit.rtc' ]]; then
           pip install requests
           python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
         fi
