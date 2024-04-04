@@ -416,7 +416,7 @@ class ParticipantTracks(_message.Message):
     def __init__(self, participant_sid: _Optional[str] = ..., track_sids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ServerInfo(_message.Message):
-    __slots__ = ("edition", "version", "protocol", "region", "node_id", "debug_info")
+    __slots__ = ("edition", "version", "protocol", "region", "node_id", "debug_info", "agent_protocol")
     class Edition(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         Standard: _ClassVar[ServerInfo.Edition]
@@ -429,13 +429,15 @@ class ServerInfo(_message.Message):
     REGION_FIELD_NUMBER: _ClassVar[int]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     DEBUG_INFO_FIELD_NUMBER: _ClassVar[int]
+    AGENT_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
     edition: ServerInfo.Edition
     version: str
     protocol: int
     region: str
     node_id: str
     debug_info: str
-    def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ...) -> None: ...
+    agent_protocol: int
+    def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ..., agent_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientInfo(_message.Message):
     __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network")
