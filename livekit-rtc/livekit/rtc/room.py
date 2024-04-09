@@ -49,6 +49,7 @@ EventTypes = Literal[
     "participant_name_changed",
     "connection_quality_changed",
     "data_received",
+    "sip_dtmf_received",
     "e2ee_state_changed",
     "connection_state_changed",
     "connected",
@@ -87,6 +88,15 @@ class DataPacket:
     topic: Optional[str] = None
 
 
+@dataclass
+class SipDTMF:
+    code: int
+    digit: str
+    participant: Optional[RemoteParticipant] = (
+        None  # None when the data has been sent by a server SDK
+    )
+
+
 class ConnectError(Exception):
     def __init__(self, message: str):
         self.message = message
@@ -102,6 +112,7 @@ class Room(EventEmitter[EventTypes]):
         self._info = proto_room.RoomInfo()
 
         self.participants: Dict[str, RemoteParticipant] = {}
+        self.participants_by_identity: Dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
 
     def __del__(self) -> None:
@@ -256,6 +267,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "participant_disconnected":
             sid = event.participant_disconnected.participant_sid
             rparticipant = self.participants.pop(sid)
+            self.participants_by_identity.pop(rparticipant.identity)
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
@@ -315,7 +327,8 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "track_muted":
             sid = event.track_muted.participant_sid
-            participant = self._retrieve_participant(sid)
+            # TODO: pass participant identity
+            participant = self._retrieve_participant(sid, "")
             publication = participant.tracks[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
@@ -324,7 +337,8 @@ class Room(EventEmitter[EventTypes]):
             self.emit("track_muted", participant, publication)
         elif which == "track_unmuted":
             sid = event.track_unmuted.participant_sid
-            participant = self._retrieve_participant(sid)
+            # TODO: pass participant identity
+            participant = self._retrieve_participant(sid, "")
             publication = participant.tracks[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
@@ -333,8 +347,9 @@ class Room(EventEmitter[EventTypes]):
             self.emit("track_unmuted", participant, publication)
         elif which == "active_speakers_changed":
             speakers: list[Participant] = []
+            # TODO: pass participant identity
             for sid in event.active_speakers_changed.participant_sids:
-                speakers.append(self._retrieve_participant(sid))
+                speakers.append(self._retrieve_participant(sid, ""))
 
             self.emit("active_speakers_changed", speakers)
         elif which == "room_metadata_changed":
@@ -343,7 +358,8 @@ class Room(EventEmitter[EventTypes]):
             self.emit("room_metadata_changed", old_metadata, self.metadata)
         elif which == "participant_metadata_changed":
             sid = event.participant_metadata_changed.participant_sid
-            participant = self._retrieve_participant(sid)
+            # TODO: pass participant identity
+            participant = self._retrieve_participant(sid, "")
             old_metadata = participant.metadata
             participant._info.metadata = event.participant_metadata_changed.metadata
             self.emit(
@@ -354,7 +370,8 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "participant_name_changed":
             sid = event.participant_name_changed.participant_sid
-            participant = self._retrieve_participant(sid)
+            # TODO: pass participant identity
+            participant = self._retrieve_participant(sid, "")
             old_name = participant.name
             participant._info.name = event.participant_name_changed.name
             self.emit(
@@ -362,38 +379,58 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "connection_quality_changed":
             sid = event.connection_quality_changed.participant_sid
-            participant = self._retrieve_participant(sid)
+            # TODO: pass participant identity
+            participant = self._retrieve_participant(sid, "")
             self.emit(
                 "connection_quality_changed",
                 participant,
                 event.connection_quality_changed.quality,
             )
-        elif which == "data_received":
-            owned_buffer_info = event.data_received.data
-            buffer_info = owned_buffer_info.data
-            native_data = ctypes.cast(
-                buffer_info.data_ptr,
-                ctypes.POINTER(ctypes.c_byte * buffer_info.data_len),
-            ).contents
+        elif which == "data_packet_received":
+            packet = event.data_packet_received
+            which_val = packet.WhichOneof("value")
+            if which_val == "user":
+                owned_buffer_info = packet.user.data
+                buffer_info = owned_buffer_info.data
+                native_data = ctypes.cast(
+                    buffer_info.data_ptr,
+                    ctypes.POINTER(ctypes.c_byte * buffer_info.data_len),
+                ).contents
 
-            data = bytes(native_data)
-            FfiHandle(owned_buffer_info.handle.id)
-            rparticipant = None
-            if event.data_received.participant_sid:
-                rparticipant = self.participants[event.data_received.participant_sid]
-            self.emit(
-                "data_received",
-                DataPacket(
-                    data=data,
-                    kind=event.data_received.kind,
-                    participant=rparticipant,
-                    topic=event.data_received.topic,
-                ),
-            )
+                data = bytes(native_data)
+                FfiHandle(owned_buffer_info.handle.id)
+                rparticipant = self._retrieve_remote_participant(
+                    packet.participant_sid, packet.participant_identity
+                )
+                self.emit(
+                    "data_received",
+                    DataPacket(
+                        data=data,
+                        kind=packet.kind,
+                        participant=rparticipant,
+                        topic=packet.user.topic,
+                    ),
+                )
+            elif which_val == "sip_dtmf":
+                rparticipant = self._retrieve_remote_participant(
+                    packet.participant_sid, packet.participant_identity
+                )
+                self.emit(
+                    "sip_dtmf_received",
+                    SipDTMF(
+                        code=packet.sip_dtmf.code,
+                        digit=packet.sip_dtmf.digit,
+                        participant=rparticipant,
+                    ),
+                )
+
         elif which == "e2ee_state_changed":
             sid = event.e2ee_state_changed.participant_sid
             e2ee_state = event.e2ee_state_changed.state
-            self.emit("e2ee_state_changed", self._retrieve_participant(sid), e2ee_state)
+            # TODO: pass participant identity
+            self.emit(
+                "e2ee_state_changed", self._retrieve_participant(sid, ""), e2ee_state
+            )
         elif which == "connection_state_changed":
             connection_state = event.connection_state_changed.state
             self.connection_state = connection_state
@@ -407,20 +444,36 @@ class Room(EventEmitter[EventTypes]):
         elif which == "reconnected":
             self.emit("reconnected")
 
-    def _retrieve_participant(self, sid: str) -> Participant:
-        """Retrieve a participant by sid, returns the LocalParticipant
-        if sid matches"""
-        if sid == self.local_participant.sid:
+    def _retrieve_remote_participant(
+        self, sid: str, identity: str
+    ) -> RemoteParticipant:
+        """Retrieve a remote participant by sid or identity"""
+        participant = None
+        if identity:
+            participant = self.participants_by_identity[identity]
+        if not participant:
+            participant = self.participants[sid]
+        return participant
+
+    def _retrieve_participant(self, sid: str, identity: str) -> Participant:
+        """Retrieve a participant by sid or identity,
+        returns the LocalParticipant if sid or identity matches"""
+        if identity and identity == self.local_participant.identity:
+            return self.local_participant
+        if sid and sid == self.local_participant.sid:
             return self.local_participant
         else:
-            return self.participants[sid]
+            return self._retrieve_remote_participant(sid, identity)
 
     def _create_remote_participant(
         self, owned_info: proto_participant.OwnedParticipant
     ) -> RemoteParticipant:
         if owned_info.info.sid in self.participants:
             raise Exception("participant already exists")
+        if owned_info.info.identity in self.participants_by_identity:
+            raise Exception("participant already exists")
 
         participant = RemoteParticipant(owned_info)
         self.participants[participant.sid] = participant
+        self.participants_by_identity[participant.identity] = participant
         return participant
