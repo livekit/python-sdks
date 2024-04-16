@@ -39,7 +39,7 @@ from .e2ee import (
     KeyProviderOptions,
 )
 from .participant import LocalParticipant, Participant, RemoteParticipant
-from .room import ConnectError, DataPacket, Room, RoomOptions, RtcConfiguration
+from .room import ConnectError, DataPacket, Room, RoomOptions, RtcConfiguration, SipDTMF
 from .track import (
     AudioTrack,
     LocalAudioTrack,
@@ -90,6 +90,7 @@ __all__ = [
     "Room",
     "RoomOptions",
     "RtcConfiguration",
+    "SipDTMF",
     "DataPacket",
     "LocalAudioTrack",
     "LocalVideoTrack",
