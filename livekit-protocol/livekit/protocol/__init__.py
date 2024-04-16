@@ -5,4 +5,5 @@ from . import ingress
 from . import models
 from . import room
 from . import webhook
+from . import sip
 from .version import __version__

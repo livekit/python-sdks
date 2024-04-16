@@ -3,6 +3,7 @@ import os
 from .room_service import RoomService
 from .egress_service import EgressService
 from .ingress_service import IngressService
+from .sip_service import SipService
 from typing import Optional
 
 
@@ -29,6 +30,7 @@ class LiveKitAPI:
         self._room = RoomService(self._session, url, api_key, api_secret)
         self._ingress = IngressService(self._session, url, api_key, api_secret)
         self._egress = EgressService(self._session, url, api_key, api_secret)
+        self._sip = SipService(self._session, url, api_key, api_secret)
 
     @property
     def room(self):
@@ -41,6 +43,10 @@ class LiveKitAPI:
     @property
     def egress(self):
         return self._egress
+
+    @property
+    def sip(self):
+        return self._sip
 
     async def aclose(self):
         await self._session.close()

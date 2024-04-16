@@ -21,6 +21,7 @@ from livekit.protocol.ingress import *
 from livekit.protocol.models import *
 from livekit.protocol.room import *
 from livekit.protocol.webhook import *
+from livekit.protocol.sip import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
