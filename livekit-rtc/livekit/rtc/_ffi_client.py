@@ -137,13 +137,13 @@ def ffi_event_callback(
     if which == "logs":
         for record in event.logs.records:
             level = to_python_level(record.level)
-            rtc_debug = os.environ.get("LIVEKIT_WEBRTC_DEBUG", "").strip()
-            if (
-                record.target == "libwebrtc"
-                and level == logging.DEBUG
-                and rtc_debug.lower() not in ("true", "1")
-            ):
-                continue
+            debug_env = os.environ.get("LIVEKIT_RTC_DEBUG", "").strip().lower()
+            rtc_debug = debug_env in ("true", "1")
+
+            if level == logging.DEBUG and not rtc_debug:
+                # ignore the rtc debug logs by default
+                if record.target in ("libwebrtc", "livekit")
+                    continue
 
             if level is not None:
                 logger.log(
