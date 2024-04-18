@@ -346,7 +346,7 @@ class VideoLayer(_message.Message):
     def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf")
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
@@ -359,13 +359,15 @@ class DataPacket(_message.Message):
     USER_FIELD_NUMBER: _ClassVar[int]
     SPEAKER_FIELD_NUMBER: _ClassVar[int]
     SIP_DTMF_FIELD_NUMBER: _ClassVar[int]
+    TRANSCRIPTION_FIELD_NUMBER: _ClassVar[int]
     kind: DataPacket.Kind
     participant_identity: str
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
     user: UserPacket
     speaker: ActiveSpeakerUpdate
     sip_dtmf: SipDTMF
-    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ...) -> None: ...
+    transcription: Transcription
+    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
     __slots__ = ("speakers",)
@@ -384,20 +386,26 @@ class SpeakerInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., level: _Optional[float] = ..., active: bool = ...) -> None: ...
 
 class UserPacket(_message.Message):
-    __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic")
+    __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time")
     PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_SIDS_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_IDENTITIES_FIELD_NUMBER: _ClassVar[int]
     TOPIC_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
     participant_sid: str
     participant_identity: str
     payload: bytes
     destination_sids: _containers.RepeatedScalarFieldContainer[str]
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
     topic: str
-    def __init__(self, participant_sid: _Optional[str] = ..., participant_identity: _Optional[str] = ..., payload: _Optional[bytes] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ...) -> None: ...
+    id: str
+    start_time: int
+    end_time: int
+    def __init__(self, participant_sid: _Optional[str] = ..., participant_identity: _Optional[str] = ..., payload: _Optional[bytes] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ..., id: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ...) -> None: ...
 
 class SipDTMF(_message.Message):
     __slots__ = ("code", "digit")
@@ -406,6 +414,32 @@ class SipDTMF(_message.Message):
     code: int
     digit: str
     def __init__(self, code: _Optional[int] = ..., digit: _Optional[str] = ...) -> None: ...
+
+class Transcription(_message.Message):
+    __slots__ = ("participant_identity", "track_id", "segments", "language")
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    SEGMENTS_FIELD_NUMBER: _ClassVar[int]
+    LANGUAGE_FIELD_NUMBER: _ClassVar[int]
+    participant_identity: str
+    track_id: str
+    segments: _containers.RepeatedCompositeFieldContainer[TranscriptionSegment]
+    language: str
+    def __init__(self, participant_identity: _Optional[str] = ..., track_id: _Optional[str] = ..., segments: _Optional[_Iterable[_Union[TranscriptionSegment, _Mapping]]] = ..., language: _Optional[str] = ...) -> None: ...
+
+class TranscriptionSegment(_message.Message):
+    __slots__ = ("id", "text", "start_time", "end_time", "final")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
+    FINAL_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    text: str
+    start_time: int
+    end_time: int
+    final: bool
+    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ...) -> None: ...
 
 class ParticipantTracks(_message.Message):
     __slots__ = ("participant_sid", "track_sids")
