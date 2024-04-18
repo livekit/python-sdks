@@ -149,7 +149,7 @@ class IngressInfo(_message.Message):
     def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., stream_key: _Optional[str] = ..., url: _Optional[str] = ..., input_type: _Optional[_Union[IngressInput, str]] = ..., bypass_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., reusable: bool = ..., state: _Optional[_Union[IngressState, _Mapping]] = ...) -> None: ...
 
 class IngressState(_message.Message):
-    __slots__ = ("status", "error", "video", "audio", "room_id", "started_at", "ended_at", "resource_id", "tracks")
+    __slots__ = ("status", "error", "video", "audio", "room_id", "started_at", "ended_at", "updated_at", "resource_id", "tracks")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         ENDPOINT_INACTIVE: _ClassVar[IngressState.Status]
@@ -169,6 +169,7 @@ class IngressState(_message.Message):
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_ID_FIELD_NUMBER: _ClassVar[int]
     TRACKS_FIELD_NUMBER: _ClassVar[int]
     status: IngressState.Status
@@ -178,9 +179,10 @@ class IngressState(_message.Message):
     room_id: str
     started_at: int
     ended_at: int
+    updated_at: int
     resource_id: str
     tracks: _containers.RepeatedCompositeFieldContainer[_models.TrackInfo]
-    def __init__(self, status: _Optional[_Union[IngressState.Status, str]] = ..., error: _Optional[str] = ..., video: _Optional[_Union[InputVideoState, _Mapping]] = ..., audio: _Optional[_Union[InputAudioState, _Mapping]] = ..., room_id: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., resource_id: _Optional[str] = ..., tracks: _Optional[_Iterable[_Union[_models.TrackInfo, _Mapping]]] = ...) -> None: ...
+    def __init__(self, status: _Optional[_Union[IngressState.Status, str]] = ..., error: _Optional[str] = ..., video: _Optional[_Union[InputVideoState, _Mapping]] = ..., audio: _Optional[_Union[InputAudioState, _Mapping]] = ..., room_id: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., resource_id: _Optional[str] = ..., tracks: _Optional[_Iterable[_Union[_models.TrackInfo, _Mapping]]] = ...) -> None: ...
 
 class InputVideoState(_message.Message):
     __slots__ = ("mime_type", "average_bitrate", "width", "height", "framerate")

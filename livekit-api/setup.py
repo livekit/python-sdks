@@ -47,13 +47,13 @@ setuptools.setup(
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
     license="Apache-2.0",
     packages=setuptools.find_namespace_packages(include=["livekit.*"]),
-    python_requires=">=3.8.0",
+    python_requires=">=3.9.0",
     install_requires=[
         "pyjwt>=2.0.0",
         "aiohttp>=3.9.0",
         "protobuf>=3",
         "types-protobuf>=4,<5",
-        "livekit-protocol>=0.3.0,<1",
+        "livekit-protocol>=0.5.0,<1",
     ],
     package_data={
         "livekit.api": ["py.typed", "*.pyi", "**/*.pyi"],
