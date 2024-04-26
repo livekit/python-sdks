@@ -20,7 +20,13 @@ from typing import List, Union
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
-from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
+from ._proto.room_pb2 import (
+    DataPacketKind,
+    TrackPublishOptions,
+)
+from ._proto.room_pb2 import (
+    TranscriptionSegment as ProtoTranscriptionSegment,
+)
 from ._utils import BroadcastQueue
 from .track import LocalTrack
 from .track_publication import (
@@ -134,7 +140,7 @@ class LocalParticipant(Participant):
     ) -> None:
         req = proto_ffi.FfiRequest()
         proto_segments = [
-            proto_ffi.room_pb2.TranscriptionSegment(
+            ProtoTranscriptionSegment(
                 id=s.id,
                 text=s.text,
                 start_time=s.start_time,
