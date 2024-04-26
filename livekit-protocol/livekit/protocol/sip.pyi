@@ -130,22 +130,20 @@ class DeleteSIPDispatchRuleRequest(_message.Message):
     def __init__(self, sip_dispatch_rule_id: _Optional[str] = ...) -> None: ...
 
 class CreateSIPParticipantRequest(_message.Message):
-    __slots__ = ("sip_trunk_id", "sip_call_to", "room_name", "participant_identity", "participant_name", "dtmf", "play_ringtone")
+    __slots__ = ("sip_trunk_id", "sip_call_to", "room_name", "participant_identity", "dtmf", "play_ringtone")
     SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
     SIP_CALL_TO_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
-    PARTICIPANT_NAME_FIELD_NUMBER: _ClassVar[int]
     DTMF_FIELD_NUMBER: _ClassVar[int]
     PLAY_RINGTONE_FIELD_NUMBER: _ClassVar[int]
     sip_trunk_id: str
     sip_call_to: str
     room_name: str
     participant_identity: str
-    participant_name: str
     dtmf: str
     play_ringtone: bool
-    def __init__(self, sip_trunk_id: _Optional[str] = ..., sip_call_to: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., dtmf: _Optional[str] = ..., play_ringtone: bool = ...) -> None: ...
+    def __init__(self, sip_trunk_id: _Optional[str] = ..., sip_call_to: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., dtmf: _Optional[str] = ..., play_ringtone: bool = ...) -> None: ...
 
 class SIPParticipantInfo(_message.Message):
     __slots__ = ("participant_id", "participant_identity", "room_name")
