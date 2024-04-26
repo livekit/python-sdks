@@ -56,6 +56,7 @@ from .track_publication import (
     RemoteTrackPublication,
     TrackPublication,
 )
+from .transcription import TranscriptionSegment
 from .version import __version__
 from .video_frame import (
     VideoFrame,
@@ -109,6 +110,7 @@ __all__ = [
     "LocalTrackPublication",
     "RemoteTrackPublication",
     "TrackPublication",
+    "TranscriptionSegment",
     "VideoFrame",
     "VideoSource",
     "VideoStream",

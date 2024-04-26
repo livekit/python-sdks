@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import ctypes
 from typing import List, Union
 
-from ._ffi_client import FfiHandle, FfiClient
+from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import DataPacketKind, TrackPublishOptions
@@ -26,6 +28,7 @@ from .track_publication import (
     RemoteTrackPublication,
     TrackPublication,
 )
+from .transcription import TranscriptionSegment
 
 
 class PublishTrackError(Exception):
@@ -39,6 +42,11 @@ class UnpublishTrackError(Exception):
 
 
 class PublishDataError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
+class PublishTranscriptionError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -116,6 +124,42 @@ class LocalParticipant(Participant):
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
+
+    async def publish_transcription(
+        self,
+        participant_identity: str,
+        track_id: str,
+        segments: List[TranscriptionSegment],
+        language: str,
+    ) -> None:
+        req = proto_ffi.FfiRequest()
+        proto_segments = [
+            proto_ffi.room_pb2.TranscriptionSegment(
+                id=s.id,
+                text=s.text,
+                start_time=s.start_time,
+                end_time=s.end_time,
+                final=s.final,
+            )
+            for s in segments
+        ]
+        req.publish_transcription.local_participant_handle = self._ffi_handle.handle
+        req.publish_transcription.participant_identity = participant_identity
+        req.publish_transcription.segments = proto_segments
+        req.publish_transcription.track_id = track_id
+        req.publish_transcription.language = language
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.publish_transcription.async_id
+                == resp.publish_transcription.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.publish_transcription.error:
+            raise PublishTranscriptionError(cb.publish_transcription.error)
 
     async def update_metadata(self, metadata: str) -> None:
         req = proto_ffi.FfiRequest()
