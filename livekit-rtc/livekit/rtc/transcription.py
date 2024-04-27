@@ -1,4 +1,13 @@
+from typing import List
 from dataclasses import dataclass
+
+
+@dataclass
+class Transcription:
+    participant_identity: str
+    track_id: str
+    segments: List["TranscriptionSegment"]
+    language: str
 
 
 @dataclass

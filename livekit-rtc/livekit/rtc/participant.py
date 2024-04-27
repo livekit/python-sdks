@@ -34,7 +34,7 @@ from .track_publication import (
     RemoteTrackPublication,
     TrackPublication,
 )
-from .transcription import TranscriptionSegment
+from .transcription import Transcription
 
 
 class PublishTrackError(Exception):
@@ -131,13 +131,7 @@ class LocalParticipant(Participant):
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
 
-    async def publish_transcription(
-        self,
-        participant_identity: str,
-        track_id: str,
-        segments: List[TranscriptionSegment],
-        language: str,
-    ) -> None:
+    async def publish_transcription(self, transcription: Transcription) -> None:
         req = proto_ffi.FfiRequest()
         proto_segments = [
             ProtoTranscriptionSegment(
@@ -147,13 +141,15 @@ class LocalParticipant(Participant):
                 end_time=s.end_time,
                 final=s.final,
             )
-            for s in segments
+            for s in transcription.segments
         ]
+        # fmt: off
         req.publish_transcription.local_participant_handle = self._ffi_handle.handle
-        req.publish_transcription.participant_identity = participant_identity
+        req.publish_transcription.participant_identity = transcription.participant_identity
         req.publish_transcription.segments.extend(proto_segments)
-        req.publish_transcription.track_id = track_id
-        req.publish_transcription.language = language
+        req.publish_transcription.track_id = transcription.track_id
+        req.publish_transcription.language = transcription.language
+        # fmt: on
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
