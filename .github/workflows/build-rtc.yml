@@ -44,11 +44,9 @@ jobs:
           submodules: true
 
       - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
 
       - name: Install cibuildwheel
-        run: python3 -m pip install cibuildwheel==2.15.0
+        run: python3 -m pip install --break-system-packages cibuildwheel==2.15.0
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
