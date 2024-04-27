@@ -46,12 +46,12 @@ jobs:
       - uses: actions/setup-python@v4
 
       - name: Install cibuildwheel
-        run: |
-          if [ "${{ matrix.os }}" = "macos-latest" ]; then
-            python -m pip install --break-system-packages cibuildwheel==2.15.0
-          else
-            python3 -m pip install cibuildwheel==2.15.0
-          fi
+        if: runner.os != 'macOS'
+        run: python3 -m pip install cibuildwheel==2.15.0
+      
+      - name: Install cibuildwheel on macOS
+        if: runner.os == 'macOS'
+        run: python3 -m pip install --break-system-packages cibuildwheel==2.15.0
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
