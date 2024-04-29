@@ -142,7 +142,7 @@ def ffi_event_callback(
 
             if level == logging.DEBUG and not rtc_debug:
                 # ignore the rtc debug logs by default
-                if record.target in ("libwebrtc", "livekit"):
+                if record.target == "libwebrtc" or record.target.startswith("livekit"):
                     continue
 
             if level is not None:
