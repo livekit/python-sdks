@@ -47,11 +47,11 @@ jobs:
 
       - name: Install cibuildwheel
         if: runner.os != 'macOS'
-        run: python3 -m pip install cibuildwheel==2.15.0
+        run: python3 -m pip install cibuildwheel==2.17.0
       
       - name: Install cibuildwheel on macOS
         if: runner.os == 'macOS'
-        run: python3 -m pip install --break-system-packages cibuildwheel==2.15.0
+        run: python3 -m pip install --break-system-packages cibuildwheel==2.17.0
 
       - name: Build wheels
         run: python3 -m cibuildwheel --output-dir dist
