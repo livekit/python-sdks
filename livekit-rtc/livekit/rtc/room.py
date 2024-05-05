@@ -222,7 +222,7 @@ class Room(EventEmitter[EventTypes]):
             if self._task is not None:
                 with contextlib.suppress(asyncio.CancelledError):
                     await self._task
-            
+
             if self._ffi_queue is not None:
                 FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
