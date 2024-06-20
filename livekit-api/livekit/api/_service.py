@@ -2,7 +2,7 @@ from typing import Dict
 import aiohttp
 from abc import ABC
 from .twirp_client import TwirpClient
-from .access_token import AccessToken, VideoGrants
+from .access_token import AccessToken, VideoGrants, SIPGrants
 
 AUTHORIZATION = "authorization"
 
@@ -15,8 +15,14 @@ class Service(ABC):
         self.api_key = api_key
         self.api_secret = api_secret
 
-    def _auth_header(self, grants: VideoGrants) -> Dict[str, str]:
-        token = AccessToken(self.api_key, self.api_secret).with_grants(grants).to_jwt()
+    def _auth_header(
+        self, grants: VideoGrants, sip: SIPGrants = None
+    ) -> Dict[str, str]:
+        tok = AccessToken(self.api_key, self.api_secret).with_grants(grants)
+        if sip is not None:
+            tok = tok.with_sip_grants(sip)
+
+        token = tok.to_jwt()
 
         headers = {}
         headers[AUTHORIZATION] = "Bearer {}".format(token)

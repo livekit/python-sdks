@@ -8,7 +8,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WebhookEvent(_message.Message):
-    __slots__ = ("event", "room", "participant", "egress_info", "ingress_info", "track", "id", "created_at", "num_dropped")
+    __slots__ = ["event", "room", "participant", "egress_info", "ingress_info", "track", "id", "created_at", "num_dropped"]
     EVENT_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
