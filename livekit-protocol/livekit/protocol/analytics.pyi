@@ -11,12 +11,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class StreamType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     UPSTREAM: _ClassVar[StreamType]
     DOWNSTREAM: _ClassVar[StreamType]
 
 class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     ROOM_CREATED: _ClassVar[AnalyticsEventType]
     ROOM_ENDED: _ClassVar[AnalyticsEventType]
     PARTICIPANT_JOINED: _ClassVar[AnalyticsEventType]
@@ -77,7 +77,7 @@ INGRESS_ENDED: AnalyticsEventType
 INGRESS_UPDATED: AnalyticsEventType
 
 class AnalyticsVideoLayer(_message.Message):
-    __slots__ = ["layer", "packets", "bytes", "frames"]
+    __slots__ = ("layer", "packets", "bytes", "frames")
     LAYER_FIELD_NUMBER: _ClassVar[int]
     PACKETS_FIELD_NUMBER: _ClassVar[int]
     BYTES_FIELD_NUMBER: _ClassVar[int]
@@ -89,7 +89,7 @@ class AnalyticsVideoLayer(_message.Message):
     def __init__(self, layer: _Optional[int] = ..., packets: _Optional[int] = ..., bytes: _Optional[int] = ..., frames: _Optional[int] = ...) -> None: ...
 
 class AnalyticsStream(_message.Message):
-    __slots__ = ["ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers", "start_time", "end_time"]
+    __slots__ = ("ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers", "start_time", "end_time")
     SSRC_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_PACKETS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_BYTES_FIELD_NUMBER: _ClassVar[int]
@@ -127,7 +127,7 @@ class AnalyticsStream(_message.Message):
     def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AnalyticsStat(_message.Message):
-    __slots__ = ["id", "analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score"]
+    __slots__ = ("id", "analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
     ID_FIELD_NUMBER: _ClassVar[int]
     ANALYTICS_KEY_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
@@ -159,13 +159,13 @@ class AnalyticsStat(_message.Message):
     def __init__(self, id: _Optional[str] = ..., analytics_key: _Optional[str] = ..., kind: _Optional[_Union[StreamType, str]] = ..., time_stamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., node: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., score: _Optional[float] = ..., streams: _Optional[_Iterable[_Union[AnalyticsStream, _Mapping]]] = ..., mime: _Optional[str] = ..., min_score: _Optional[float] = ..., median_score: _Optional[float] = ...) -> None: ...
 
 class AnalyticsStats(_message.Message):
-    __slots__ = ["stats"]
+    __slots__ = ("stats",)
     STATS_FIELD_NUMBER: _ClassVar[int]
     stats: _containers.RepeatedCompositeFieldContainer[AnalyticsStat]
     def __init__(self, stats: _Optional[_Iterable[_Union[AnalyticsStat, _Mapping]]] = ...) -> None: ...
 
 class AnalyticsClientMeta(_message.Message):
-    __slots__ = ["region", "node", "client_addr", "client_connect_time", "connection_type", "reconnect_reason", "geo_hash", "country", "isp_asn"]
+    __slots__ = ("region", "node", "client_addr", "client_connect_time", "connection_type", "reconnect_reason", "geo_hash", "country", "isp_asn")
     REGION_FIELD_NUMBER: _ClassVar[int]
     NODE_FIELD_NUMBER: _ClassVar[int]
     CLIENT_ADDR_FIELD_NUMBER: _ClassVar[int]
@@ -187,7 +187,7 @@ class AnalyticsClientMeta(_message.Message):
     def __init__(self, region: _Optional[str] = ..., node: _Optional[str] = ..., client_addr: _Optional[str] = ..., client_connect_time: _Optional[int] = ..., connection_type: _Optional[str] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., geo_hash: _Optional[str] = ..., country: _Optional[str] = ..., isp_asn: _Optional[int] = ...) -> None: ...
 
 class AnalyticsEvent(_message.Message):
-    __slots__ = ["id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id"]
+    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id")
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -237,13 +237,13 @@ class AnalyticsEvent(_message.Message):
     def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
-    __slots__ = ["events"]
+    __slots__ = ("events",)
     EVENTS_FIELD_NUMBER: _ClassVar[int]
     events: _containers.RepeatedCompositeFieldContainer[AnalyticsEvent]
     def __init__(self, events: _Optional[_Iterable[_Union[AnalyticsEvent, _Mapping]]] = ...) -> None: ...
 
 class AnalyticsRoomParticipant(_message.Message):
-    __slots__ = ["id", "identity", "name", "state", "joined_at"]
+    __slots__ = ("id", "identity", "name", "state", "joined_at")
     ID_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -257,7 +257,7 @@ class AnalyticsRoomParticipant(_message.Message):
     def __init__(self, id: _Optional[str] = ..., identity: _Optional[str] = ..., name: _Optional[str] = ..., state: _Optional[_Union[_models.ParticipantInfo.State, str]] = ..., joined_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AnalyticsRoom(_message.Message):
-    __slots__ = ["id", "name", "project_id", "created_at", "participants"]
+    __slots__ = ("id", "name", "project_id", "created_at", "participants")
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -271,7 +271,7 @@ class AnalyticsRoom(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., project_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[AnalyticsRoomParticipant, _Mapping]]] = ...) -> None: ...
 
 class AnalyticsNodeRooms(_message.Message):
-    __slots__ = ["node_id", "sequence_number", "timestamp", "rooms"]
+    __slots__ = ("node_id", "sequence_number", "timestamp", "rooms")
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     SEQUENCE_NUMBER_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]

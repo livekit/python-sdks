@@ -8,13 +8,13 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class AudioCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     DEFAULT_AC: _ClassVar[AudioCodec]
     OPUS: _ClassVar[AudioCodec]
     AAC: _ClassVar[AudioCodec]
 
 class VideoCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     DEFAULT_VC: _ClassVar[VideoCodec]
     H264_BASELINE: _ClassVar[VideoCodec]
     H264_MAIN: _ClassVar[VideoCodec]
@@ -22,18 +22,18 @@ class VideoCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     VP8: _ClassVar[VideoCodec]
 
 class ImageCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     IC_DEFAULT: _ClassVar[ImageCodec]
     IC_JPEG: _ClassVar[ImageCodec]
 
 class TrackType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     AUDIO: _ClassVar[TrackType]
     VIDEO: _ClassVar[TrackType]
     DATA: _ClassVar[TrackType]
 
 class TrackSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     UNKNOWN: _ClassVar[TrackSource]
     CAMERA: _ClassVar[TrackSource]
     MICROPHONE: _ClassVar[TrackSource]
@@ -41,27 +41,27 @@ class TrackSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     SCREEN_SHARE_AUDIO: _ClassVar[TrackSource]
 
 class VideoQuality(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     LOW: _ClassVar[VideoQuality]
     MEDIUM: _ClassVar[VideoQuality]
     HIGH: _ClassVar[VideoQuality]
     OFF: _ClassVar[VideoQuality]
 
 class ConnectionQuality(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     POOR: _ClassVar[ConnectionQuality]
     GOOD: _ClassVar[ConnectionQuality]
     EXCELLENT: _ClassVar[ConnectionQuality]
     LOST: _ClassVar[ConnectionQuality]
 
 class ClientConfigSetting(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     UNSET: _ClassVar[ClientConfigSetting]
     DISABLED: _ClassVar[ClientConfigSetting]
     ENABLED: _ClassVar[ClientConfigSetting]
 
 class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     UNKNOWN_REASON: _ClassVar[DisconnectReason]
     CLIENT_INITIATED: _ClassVar[DisconnectReason]
     DUPLICATE_IDENTITY: _ClassVar[DisconnectReason]
@@ -74,7 +74,7 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     SIGNAL_CLOSE: _ClassVar[DisconnectReason]
 
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     RR_UNKNOWN: _ClassVar[ReconnectReason]
     RR_SIGNAL_DISCONNECTED: _ClassVar[ReconnectReason]
     RR_PUBLISHER_FAILED: _ClassVar[ReconnectReason]
@@ -82,13 +82,13 @@ class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RR_SWITCH_CANDIDATE: _ClassVar[ReconnectReason]
 
 class SubscriptionError(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     SE_UNKNOWN: _ClassVar[SubscriptionError]
     SE_CODEC_UNSUPPORTED: _ClassVar[SubscriptionError]
     SE_TRACK_NOTFOUND: _ClassVar[SubscriptionError]
 
 class AudioTrackFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     TF_STEREO: _ClassVar[AudioTrackFeature]
     TF_NO_DTX: _ClassVar[AudioTrackFeature]
     TF_AUTO_GAIN_CONTROL: _ClassVar[AudioTrackFeature]
@@ -150,7 +150,7 @@ TF_NOISE_SUPPRESSION: AudioTrackFeature
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature
 
 class Room(_message.Message):
-    __slots__ = ["sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version"]
+    __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
     SID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
@@ -180,7 +180,7 @@ class Room(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., creation_time: _Optional[int] = ..., turn_password: _Optional[str] = ..., enabled_codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., metadata: _Optional[str] = ..., num_participants: _Optional[int] = ..., num_publishers: _Optional[int] = ..., active_recording: bool = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
 
 class Codec(_message.Message):
-    __slots__ = ["mime", "fmtp_line"]
+    __slots__ = ("mime", "fmtp_line")
     MIME_FIELD_NUMBER: _ClassVar[int]
     FMTP_LINE_FIELD_NUMBER: _ClassVar[int]
     mime: str
@@ -188,7 +188,7 @@ class Codec(_message.Message):
     def __init__(self, mime: _Optional[str] = ..., fmtp_line: _Optional[str] = ...) -> None: ...
 
 class PlayoutDelay(_message.Message):
-    __slots__ = ["enabled", "min", "max"]
+    __slots__ = ("enabled", "min", "max")
     ENABLED_FIELD_NUMBER: _ClassVar[int]
     MIN_FIELD_NUMBER: _ClassVar[int]
     MAX_FIELD_NUMBER: _ClassVar[int]
@@ -198,7 +198,7 @@ class PlayoutDelay(_message.Message):
     def __init__(self, enabled: bool = ..., min: _Optional[int] = ..., max: _Optional[int] = ...) -> None: ...
 
 class ParticipantPermission(_message.Message):
-    __slots__ = ["can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent"]
+    __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent")
     CAN_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -218,9 +218,9 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ["sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes"]
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
         JOINED: _ClassVar[ParticipantInfo.State]
         ACTIVE: _ClassVar[ParticipantInfo.State]
@@ -230,7 +230,7 @@ class ParticipantInfo(_message.Message):
     ACTIVE: ParticipantInfo.State
     DISCONNECTED: ParticipantInfo.State
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         STANDARD: _ClassVar[ParticipantInfo.Kind]
         INGRESS: _ClassVar[ParticipantInfo.Kind]
         EGRESS: _ClassVar[ParticipantInfo.Kind]
@@ -242,7 +242,7 @@ class ParticipantInfo(_message.Message):
     SIP: ParticipantInfo.Kind
     AGENT: ParticipantInfo.Kind
     class AttributesEntry(_message.Message):
-        __slots__ = ["key", "value"]
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -277,9 +277,9 @@ class ParticipantInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class Encryption(_message.Message):
-    __slots__ = []
+    __slots__ = ()
     class Type(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         NONE: _ClassVar[Encryption.Type]
         GCM: _ClassVar[Encryption.Type]
         CUSTOM: _ClassVar[Encryption.Type]
@@ -289,7 +289,7 @@ class Encryption(_message.Message):
     def __init__(self) -> None: ...
 
 class SimulcastCodecInfo(_message.Message):
-    __slots__ = ["mime_type", "mid", "cid", "layers"]
+    __slots__ = ("mime_type", "mid", "cid", "layers")
     MIME_TYPE_FIELD_NUMBER: _ClassVar[int]
     MID_FIELD_NUMBER: _ClassVar[int]
     CID_FIELD_NUMBER: _ClassVar[int]
@@ -301,7 +301,7 @@ class SimulcastCodecInfo(_message.Message):
     def __init__(self, mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ...) -> None: ...
 
 class TrackInfo(_message.Message):
-    __slots__ = ["sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features"]
+    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features")
     SID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -343,7 +343,7 @@ class TrackInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ...) -> None: ...
 
 class VideoLayer(_message.Message):
-    __slots__ = ["quality", "width", "height", "bitrate", "ssrc"]
+    __slots__ = ("quality", "width", "height", "bitrate", "ssrc")
     QUALITY_FIELD_NUMBER: _ClassVar[int]
     WIDTH_FIELD_NUMBER: _ClassVar[int]
     HEIGHT_FIELD_NUMBER: _ClassVar[int]
@@ -357,9 +357,9 @@ class VideoLayer(_message.Message):
     def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ["kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription"]
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
         LOSSY: _ClassVar[DataPacket.Kind]
     RELIABLE: DataPacket.Kind
@@ -381,13 +381,13 @@ class DataPacket(_message.Message):
     def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
-    __slots__ = ["speakers"]
+    __slots__ = ("speakers",)
     SPEAKERS_FIELD_NUMBER: _ClassVar[int]
     speakers: _containers.RepeatedCompositeFieldContainer[SpeakerInfo]
     def __init__(self, speakers: _Optional[_Iterable[_Union[SpeakerInfo, _Mapping]]] = ...) -> None: ...
 
 class SpeakerInfo(_message.Message):
-    __slots__ = ["sid", "level", "active"]
+    __slots__ = ("sid", "level", "active")
     SID_FIELD_NUMBER: _ClassVar[int]
     LEVEL_FIELD_NUMBER: _ClassVar[int]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
@@ -397,7 +397,7 @@ class SpeakerInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., level: _Optional[float] = ..., active: bool = ...) -> None: ...
 
 class UserPacket(_message.Message):
-    __slots__ = ["participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time"]
+    __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time")
     PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
@@ -419,7 +419,7 @@ class UserPacket(_message.Message):
     def __init__(self, participant_sid: _Optional[str] = ..., participant_identity: _Optional[str] = ..., payload: _Optional[bytes] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ..., id: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ...) -> None: ...
 
 class SipDTMF(_message.Message):
-    __slots__ = ["code", "digit"]
+    __slots__ = ("code", "digit")
     CODE_FIELD_NUMBER: _ClassVar[int]
     DIGIT_FIELD_NUMBER: _ClassVar[int]
     code: int
@@ -427,7 +427,7 @@ class SipDTMF(_message.Message):
     def __init__(self, code: _Optional[int] = ..., digit: _Optional[str] = ...) -> None: ...
 
 class Transcription(_message.Message):
-    __slots__ = ["transcribed_participant_identity", "track_id", "segments"]
+    __slots__ = ("transcribed_participant_identity", "track_id", "segments")
     TRANSCRIBED_PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     SEGMENTS_FIELD_NUMBER: _ClassVar[int]
@@ -437,7 +437,7 @@ class Transcription(_message.Message):
     def __init__(self, transcribed_participant_identity: _Optional[str] = ..., track_id: _Optional[str] = ..., segments: _Optional[_Iterable[_Union[TranscriptionSegment, _Mapping]]] = ...) -> None: ...
 
 class TranscriptionSegment(_message.Message):
-    __slots__ = ["id", "text", "start_time", "end_time", "final", "language"]
+    __slots__ = ("id", "text", "start_time", "end_time", "final", "language")
     ID_FIELD_NUMBER: _ClassVar[int]
     TEXT_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
@@ -453,7 +453,7 @@ class TranscriptionSegment(_message.Message):
     def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ..., language: _Optional[str] = ...) -> None: ...
 
 class ParticipantTracks(_message.Message):
-    __slots__ = ["participant_sid", "track_sids"]
+    __slots__ = ("participant_sid", "track_sids")
     PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     TRACK_SIDS_FIELD_NUMBER: _ClassVar[int]
     participant_sid: str
@@ -461,9 +461,9 @@ class ParticipantTracks(_message.Message):
     def __init__(self, participant_sid: _Optional[str] = ..., track_sids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ServerInfo(_message.Message):
-    __slots__ = ["edition", "version", "protocol", "region", "node_id", "debug_info", "agent_protocol"]
+    __slots__ = ("edition", "version", "protocol", "region", "node_id", "debug_info", "agent_protocol")
     class Edition(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         Standard: _ClassVar[ServerInfo.Edition]
         Cloud: _ClassVar[ServerInfo.Edition]
     Standard: ServerInfo.Edition
@@ -485,9 +485,9 @@ class ServerInfo(_message.Message):
     def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ..., agent_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientInfo(_message.Message):
-    __slots__ = ["sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network"]
+    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network")
     class SDK(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         UNKNOWN: _ClassVar[ClientInfo.SDK]
         JS: _ClassVar[ClientInfo.SDK]
         SWIFT: _ClassVar[ClientInfo.SDK]
@@ -533,7 +533,7 @@ class ClientInfo(_message.Message):
     def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ...) -> None: ...
 
 class ClientConfiguration(_message.Message):
-    __slots__ = ["video", "screen", "resume_connection", "disabled_codecs", "force_relay"]
+    __slots__ = ("video", "screen", "resume_connection", "disabled_codecs", "force_relay")
     VIDEO_FIELD_NUMBER: _ClassVar[int]
     SCREEN_FIELD_NUMBER: _ClassVar[int]
     RESUME_CONNECTION_FIELD_NUMBER: _ClassVar[int]
@@ -547,13 +547,13 @@ class ClientConfiguration(_message.Message):
     def __init__(self, video: _Optional[_Union[VideoConfiguration, _Mapping]] = ..., screen: _Optional[_Union[VideoConfiguration, _Mapping]] = ..., resume_connection: _Optional[_Union[ClientConfigSetting, str]] = ..., disabled_codecs: _Optional[_Union[DisabledCodecs, _Mapping]] = ..., force_relay: _Optional[_Union[ClientConfigSetting, str]] = ...) -> None: ...
 
 class VideoConfiguration(_message.Message):
-    __slots__ = ["hardware_encoder"]
+    __slots__ = ("hardware_encoder",)
     HARDWARE_ENCODER_FIELD_NUMBER: _ClassVar[int]
     hardware_encoder: ClientConfigSetting
     def __init__(self, hardware_encoder: _Optional[_Union[ClientConfigSetting, str]] = ...) -> None: ...
 
 class DisabledCodecs(_message.Message):
-    __slots__ = ["codecs", "publish"]
+    __slots__ = ("codecs", "publish")
     CODECS_FIELD_NUMBER: _ClassVar[int]
     PUBLISH_FIELD_NUMBER: _ClassVar[int]
     codecs: _containers.RepeatedCompositeFieldContainer[Codec]
@@ -561,7 +561,7 @@ class DisabledCodecs(_message.Message):
     def __init__(self, codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., publish: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ...) -> None: ...
 
 class RTPDrift(_message.Message):
-    __slots__ = ["start_time", "end_time", "duration", "start_timestamp", "end_timestamp", "rtp_clock_ticks", "drift_samples", "drift_ms", "clock_rate"]
+    __slots__ = ("start_time", "end_time", "duration", "start_timestamp", "end_timestamp", "rtp_clock_ticks", "drift_samples", "drift_ms", "clock_rate")
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
@@ -583,9 +583,9 @@ class RTPDrift(_message.Message):
     def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., start_timestamp: _Optional[int] = ..., end_timestamp: _Optional[int] = ..., rtp_clock_ticks: _Optional[int] = ..., drift_samples: _Optional[int] = ..., drift_ms: _Optional[float] = ..., clock_rate: _Optional[float] = ...) -> None: ...
 
 class RTPStats(_message.Message):
-    __slots__ = ["start_time", "end_time", "duration", "packets", "packet_rate", "bytes", "header_bytes", "bitrate", "packets_lost", "packet_loss_rate", "packet_loss_percentage", "packets_duplicate", "packet_duplicate_rate", "bytes_duplicate", "header_bytes_duplicate", "bitrate_duplicate", "packets_padding", "packet_padding_rate", "bytes_padding", "header_bytes_padding", "bitrate_padding", "packets_out_of_order", "frames", "frame_rate", "jitter_current", "jitter_max", "gap_histogram", "nacks", "nack_acks", "nack_misses", "nack_repeated", "plis", "last_pli", "firs", "last_fir", "rtt_current", "rtt_max", "key_frames", "last_key_frame", "layer_lock_plis", "last_layer_lock_pli", "packet_drift", "report_drift", "rebased_report_drift"]
+    __slots__ = ("start_time", "end_time", "duration", "packets", "packet_rate", "bytes", "header_bytes", "bitrate", "packets_lost", "packet_loss_rate", "packet_loss_percentage", "packets_duplicate", "packet_duplicate_rate", "bytes_duplicate", "header_bytes_duplicate", "bitrate_duplicate", "packets_padding", "packet_padding_rate", "bytes_padding", "header_bytes_padding", "bitrate_padding", "packets_out_of_order", "frames", "frame_rate", "jitter_current", "jitter_max", "gap_histogram", "nacks", "nack_acks", "nack_misses", "nack_repeated", "plis", "last_pli", "firs", "last_fir", "rtt_current", "rtt_max", "key_frames", "last_key_frame", "layer_lock_plis", "last_layer_lock_pli", "packet_drift", "report_drift", "rebased_report_drift")
     class GapHistogramEntry(_message.Message):
-        __slots__ = ["key", "value"]
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: int
@@ -682,7 +682,7 @@ class RTPStats(_message.Message):
     def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
 
 class TimedVersion(_message.Message):
-    __slots__ = ["unix_micro", "ticks"]
+    __slots__ = ("unix_micro", "ticks")
     UNIX_MICRO_FIELD_NUMBER: _ClassVar[int]
     TICKS_FIELD_NUMBER: _ClassVar[int]
     unix_micro: int

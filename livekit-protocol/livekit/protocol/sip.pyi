@@ -7,7 +7,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class SIPTransport(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
+    __slots__ = ()
     SIP_TRANSPORT_AUTO: _ClassVar[SIPTransport]
     SIP_TRANSPORT_UDP: _ClassVar[SIPTransport]
     SIP_TRANSPORT_TCP: _ClassVar[SIPTransport]
@@ -18,7 +18,7 @@ SIP_TRANSPORT_TCP: SIPTransport
 SIP_TRANSPORT_TLS: SIPTransport
 
 class CreateSIPTrunkRequest(_message.Message):
-    __slots__ = ["inbound_addresses", "outbound_address", "outbound_number", "inbound_numbers_regex", "inbound_numbers", "inbound_username", "inbound_password", "outbound_username", "outbound_password", "name", "metadata"]
+    __slots__ = ("inbound_addresses", "outbound_address", "outbound_number", "inbound_numbers_regex", "inbound_numbers", "inbound_username", "inbound_password", "outbound_username", "outbound_password", "name", "metadata")
     INBOUND_ADDRESSES_FIELD_NUMBER: _ClassVar[int]
     OUTBOUND_ADDRESS_FIELD_NUMBER: _ClassVar[int]
     OUTBOUND_NUMBER_FIELD_NUMBER: _ClassVar[int]
@@ -44,9 +44,9 @@ class CreateSIPTrunkRequest(_message.Message):
     def __init__(self, inbound_addresses: _Optional[_Iterable[str]] = ..., outbound_address: _Optional[str] = ..., outbound_number: _Optional[str] = ..., inbound_numbers_regex: _Optional[_Iterable[str]] = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., inbound_username: _Optional[str] = ..., inbound_password: _Optional[str] = ..., outbound_username: _Optional[str] = ..., outbound_password: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class SIPTrunkInfo(_message.Message):
-    __slots__ = ["sip_trunk_id", "kind", "inbound_addresses", "outbound_address", "outbound_number", "transport", "inbound_numbers_regex", "inbound_numbers", "inbound_username", "inbound_password", "outbound_username", "outbound_password", "name", "metadata"]
+    __slots__ = ("sip_trunk_id", "kind", "inbound_addresses", "outbound_address", "outbound_number", "transport", "inbound_numbers_regex", "inbound_numbers", "inbound_username", "inbound_password", "outbound_username", "outbound_password", "name", "metadata")
     class TrunkKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
+        __slots__ = ()
         TRUNK_LEGACY: _ClassVar[SIPTrunkInfo.TrunkKind]
         TRUNK_INBOUND: _ClassVar[SIPTrunkInfo.TrunkKind]
         TRUNK_OUTBOUND: _ClassVar[SIPTrunkInfo.TrunkKind]
@@ -84,13 +84,13 @@ class SIPTrunkInfo(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., kind: _Optional[_Union[SIPTrunkInfo.TrunkKind, str]] = ..., inbound_addresses: _Optional[_Iterable[str]] = ..., outbound_address: _Optional[str] = ..., outbound_number: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., inbound_numbers_regex: _Optional[_Iterable[str]] = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., inbound_username: _Optional[str] = ..., inbound_password: _Optional[str] = ..., outbound_username: _Optional[str] = ..., outbound_password: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class CreateSIPInboundTrunkRequest(_message.Message):
-    __slots__ = ["trunk"]
+    __slots__ = ("trunk",)
     TRUNK_FIELD_NUMBER: _ClassVar[int]
     trunk: SIPInboundTrunkInfo
     def __init__(self, trunk: _Optional[_Union[SIPInboundTrunkInfo, _Mapping]] = ...) -> None: ...
 
 class SIPInboundTrunkInfo(_message.Message):
-    __slots__ = ["sip_trunk_id", "name", "metadata", "numbers", "allowed_addresses", "allowed_numbers", "auth_username", "auth_password"]
+    __slots__ = ("sip_trunk_id", "name", "metadata", "numbers", "allowed_addresses", "allowed_numbers", "auth_username", "auth_password")
     SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -110,13 +110,13 @@ class SIPInboundTrunkInfo(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., numbers: _Optional[_Iterable[str]] = ..., allowed_addresses: _Optional[_Iterable[str]] = ..., allowed_numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ...) -> None: ...
 
 class CreateSIPOutboundTrunkRequest(_message.Message):
-    __slots__ = ["trunk"]
+    __slots__ = ("trunk",)
     TRUNK_FIELD_NUMBER: _ClassVar[int]
     trunk: SIPOutboundTrunkInfo
     def __init__(self, trunk: _Optional[_Union[SIPOutboundTrunkInfo, _Mapping]] = ...) -> None: ...
 
 class SIPOutboundTrunkInfo(_message.Message):
-    __slots__ = ["sip_trunk_id", "name", "metadata", "address", "transport", "numbers", "auth_username", "auth_password"]
+    __slots__ = ("sip_trunk_id", "name", "metadata", "address", "transport", "numbers", "auth_username", "auth_password")
     SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -136,43 +136,43 @@ class SIPOutboundTrunkInfo(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., address: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ...) -> None: ...
 
 class ListSIPTrunkRequest(_message.Message):
-    __slots__ = []
+    __slots__ = ()
     def __init__(self) -> None: ...
 
 class ListSIPTrunkResponse(_message.Message):
-    __slots__ = ["items"]
+    __slots__ = ("items",)
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[SIPTrunkInfo]
     def __init__(self, items: _Optional[_Iterable[_Union[SIPTrunkInfo, _Mapping]]] = ...) -> None: ...
 
 class ListSIPInboundTrunkRequest(_message.Message):
-    __slots__ = []
+    __slots__ = ()
     def __init__(self) -> None: ...
 
 class ListSIPInboundTrunkResponse(_message.Message):
-    __slots__ = ["items"]
+    __slots__ = ("items",)
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[SIPInboundTrunkInfo]
     def __init__(self, items: _Optional[_Iterable[_Union[SIPInboundTrunkInfo, _Mapping]]] = ...) -> None: ...
 
 class ListSIPOutboundTrunkRequest(_message.Message):
-    __slots__ = []
+    __slots__ = ()
     def __init__(self) -> None: ...
 
 class ListSIPOutboundTrunkResponse(_message.Message):
-    __slots__ = ["items"]
+    __slots__ = ("items",)
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[SIPOutboundTrunkInfo]
     def __init__(self, items: _Optional[_Iterable[_Union[SIPOutboundTrunkInfo, _Mapping]]] = ...) -> None: ...
 
 class DeleteSIPTrunkRequest(_message.Message):
-    __slots__ = ["sip_trunk_id"]
+    __slots__ = ("sip_trunk_id",)
     SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
     sip_trunk_id: str
     def __init__(self, sip_trunk_id: _Optional[str] = ...) -> None: ...
 
 class SIPDispatchRuleDirect(_message.Message):
-    __slots__ = ["room_name", "pin"]
+    __slots__ = ("room_name", "pin")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     PIN_FIELD_NUMBER: _ClassVar[int]
     room_name: str
@@ -180,7 +180,7 @@ class SIPDispatchRuleDirect(_message.Message):
     def __init__(self, room_name: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
 
 class SIPDispatchRuleIndividual(_message.Message):
-    __slots__ = ["room_prefix", "pin"]
+    __slots__ = ("room_prefix", "pin")
     ROOM_PREFIX_FIELD_NUMBER: _ClassVar[int]
     PIN_FIELD_NUMBER: _ClassVar[int]
     room_prefix: str
@@ -188,7 +188,7 @@ class SIPDispatchRuleIndividual(_message.Message):
     def __init__(self, room_prefix: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
 
 class SIPDispatchRule(_message.Message):
-    __slots__ = ["dispatch_rule_direct", "dispatch_rule_individual"]
+    __slots__ = ("dispatch_rule_direct", "dispatch_rule_individual")
     DISPATCH_RULE_DIRECT_FIELD_NUMBER: _ClassVar[int]
     DISPATCH_RULE_INDIVIDUAL_FIELD_NUMBER: _ClassVar[int]
     dispatch_rule_direct: SIPDispatchRuleDirect
@@ -196,9 +196,9 @@ class SIPDispatchRule(_message.Message):
     def __init__(self, dispatch_rule_direct: _Optional[_Union[SIPDispatchRuleDirect, _Mapping]] = ..., dispatch_rule_individual: _Optional[_Union[SIPDispatchRuleIndividual, _Mapping]] = ...) -> None: ...
 
 class CreateSIPDispatchRuleRequest(_message.Message):
-    __slots__ = ["rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "name", "metadata", "attributes"]
+    __slots__ = ("rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "name", "metadata", "attributes")
     class AttributesEntry(_message.Message):
-        __slots__ = ["key", "value"]
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -221,9 +221,9 @@ class CreateSIPDispatchRuleRequest(_message.Message):
     def __init__(self, rule: _Optional[_Union[SIPDispatchRule, _Mapping]] = ..., trunk_ids: _Optional[_Iterable[str]] = ..., hide_phone_number: bool = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class SIPDispatchRuleInfo(_message.Message):
-    __slots__ = ["sip_dispatch_rule_id", "rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "name", "metadata", "attributes"]
+    __slots__ = ("sip_dispatch_rule_id", "rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "name", "metadata", "attributes")
     class AttributesEntry(_message.Message):
-        __slots__ = ["key", "value"]
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -248,25 +248,25 @@ class SIPDispatchRuleInfo(_message.Message):
     def __init__(self, sip_dispatch_rule_id: _Optional[str] = ..., rule: _Optional[_Union[SIPDispatchRule, _Mapping]] = ..., trunk_ids: _Optional[_Iterable[str]] = ..., hide_phone_number: bool = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ListSIPDispatchRuleRequest(_message.Message):
-    __slots__ = []
+    __slots__ = ()
     def __init__(self) -> None: ...
 
 class ListSIPDispatchRuleResponse(_message.Message):
-    __slots__ = ["items"]
+    __slots__ = ("items",)
     ITEMS_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[SIPDispatchRuleInfo]
     def __init__(self, items: _Optional[_Iterable[_Union[SIPDispatchRuleInfo, _Mapping]]] = ...) -> None: ...
 
 class DeleteSIPDispatchRuleRequest(_message.Message):
-    __slots__ = ["sip_dispatch_rule_id"]
+    __slots__ = ("sip_dispatch_rule_id",)
     SIP_DISPATCH_RULE_ID_FIELD_NUMBER: _ClassVar[int]
     sip_dispatch_rule_id: str
     def __init__(self, sip_dispatch_rule_id: _Optional[str] = ...) -> None: ...
 
 class CreateSIPParticipantRequest(_message.Message):
-    __slots__ = ["sip_trunk_id", "sip_call_to", "room_name", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "dtmf", "play_ringtone", "hide_phone_number"]
+    __slots__ = ("sip_trunk_id", "sip_call_to", "room_name", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "dtmf", "play_ringtone", "hide_phone_number")
     class ParticipantAttributesEntry(_message.Message):
-        __slots__ = ["key", "value"]
+        __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -295,7 +295,7 @@ class CreateSIPParticipantRequest(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., sip_call_to: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., dtmf: _Optional[str] = ..., play_ringtone: bool = ..., hide_phone_number: bool = ...) -> None: ...
 
 class SIPParticipantInfo(_message.Message):
-    __slots__ = ["participant_id", "participant_identity", "room_name", "sip_call_id"]
+    __slots__ = ("participant_id", "participant_identity", "room_name", "sip_call_id")
     PARTICIPANT_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
