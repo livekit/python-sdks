@@ -16,7 +16,7 @@ class Service(ABC):
         self.api_secret = api_secret
 
     def _auth_header(
-        self, grants: VideoGrants, sip: SIPGrants = None
+        self, grants: VideoGrants, sip: SIPGrants | None = None
     ) -> Dict[str, str]:
         tok = AccessToken(self.api_key, self.api_secret).with_grants(grants)
         if sip is not None:
