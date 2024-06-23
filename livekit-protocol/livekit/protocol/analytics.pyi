@@ -1,4 +1,3 @@
-from google.protobuf import empty_pb2 as _empty_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import models as _models
 from . import egress as _egress
@@ -128,7 +127,8 @@ class AnalyticsStream(_message.Message):
     def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AnalyticsStat(_message.Message):
-    __slots__ = ("analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
+    __slots__ = ("id", "analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
+    ID_FIELD_NUMBER: _ClassVar[int]
     ANALYTICS_KEY_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     TIME_STAMP_FIELD_NUMBER: _ClassVar[int]
@@ -142,6 +142,7 @@ class AnalyticsStat(_message.Message):
     MIME_FIELD_NUMBER: _ClassVar[int]
     MIN_SCORE_FIELD_NUMBER: _ClassVar[int]
     MEDIAN_SCORE_FIELD_NUMBER: _ClassVar[int]
+    id: str
     analytics_key: str
     kind: StreamType
     time_stamp: _timestamp_pb2.Timestamp
@@ -155,7 +156,7 @@ class AnalyticsStat(_message.Message):
     mime: str
     min_score: float
     median_score: float
-    def __init__(self, analytics_key: _Optional[str] = ..., kind: _Optional[_Union[StreamType, str]] = ..., time_stamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., node: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., score: _Optional[float] = ..., streams: _Optional[_Iterable[_Union[AnalyticsStream, _Mapping]]] = ..., mime: _Optional[str] = ..., min_score: _Optional[float] = ..., median_score: _Optional[float] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., analytics_key: _Optional[str] = ..., kind: _Optional[_Union[StreamType, str]] = ..., time_stamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., node: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., score: _Optional[float] = ..., streams: _Optional[_Iterable[_Union[AnalyticsStream, _Mapping]]] = ..., mime: _Optional[str] = ..., min_score: _Optional[float] = ..., median_score: _Optional[float] = ...) -> None: ...
 
 class AnalyticsStats(_message.Message):
     __slots__ = ("stats",)
@@ -186,7 +187,8 @@ class AnalyticsClientMeta(_message.Message):
     def __init__(self, region: _Optional[str] = ..., node: _Optional[str] = ..., client_addr: _Optional[str] = ..., client_connect_time: _Optional[int] = ..., connection_type: _Optional[str] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., geo_hash: _Optional[str] = ..., country: _Optional[str] = ..., isp_asn: _Optional[int] = ...) -> None: ...
 
 class AnalyticsEvent(_message.Message):
-    __slots__ = ("type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer")
+    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id")
+    ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
@@ -208,6 +210,8 @@ class AnalyticsEvent(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     RTP_STATS_FIELD_NUMBER: _ClassVar[int]
     VIDEO_LAYER_FIELD_NUMBER: _ClassVar[int]
+    NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
     type: AnalyticsEventType
     timestamp: _timestamp_pb2.Timestamp
     room_id: str
@@ -229,7 +233,8 @@ class AnalyticsEvent(_message.Message):
     error: str
     rtp_stats: _models.RTPStats
     video_layer: int
-    def __init__(self, type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ...) -> None: ...
+    node_id: str
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
     __slots__ = ("events",)

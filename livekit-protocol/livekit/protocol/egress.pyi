@@ -291,7 +291,7 @@ class ImageOutput(_message.Message):
     def __init__(self, capture_interval: _Optional[int] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., filename_prefix: _Optional[str] = ..., filename_suffix: _Optional[_Union[ImageFileSuffix, str]] = ..., image_codec: _Optional[_Union[_models.ImageCodec, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
 
 class S3Upload(_message.Message):
-    __slots__ = ("access_key", "secret", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
+    __slots__ = ("access_key", "secret", "session_token", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
     class MetadataEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -301,6 +301,7 @@ class S3Upload(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
     SECRET_FIELD_NUMBER: _ClassVar[int]
+    SESSION_TOKEN_FIELD_NUMBER: _ClassVar[int]
     REGION_FIELD_NUMBER: _ClassVar[int]
     ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     BUCKET_FIELD_NUMBER: _ClassVar[int]
@@ -311,6 +312,7 @@ class S3Upload(_message.Message):
     PROXY_FIELD_NUMBER: _ClassVar[int]
     access_key: str
     secret: str
+    session_token: str
     region: str
     endpoint: str
     bucket: str
@@ -319,7 +321,7 @@ class S3Upload(_message.Message):
     tagging: str
     content_disposition: str
     proxy: ProxyConfig
-    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
+    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., session_token: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
 
 class GCPUpload(_message.Message):
     __slots__ = ("credentials", "bucket", "proxy")
@@ -442,7 +444,7 @@ class StopEgressRequest(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
 
 class EgressInfo(_message.Message):
-    __slots__ = ("egress_id", "room_id", "room_name", "status", "started_at", "ended_at", "updated_at", "details", "error", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results")
+    __slots__ = ("egress_id", "room_id", "room_name", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results")
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -452,6 +454,7 @@ class EgressInfo(_message.Message):
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     DETAILS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    ERROR_CODE_FIELD_NUMBER: _ClassVar[int]
     ROOM_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
     WEB_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
@@ -473,6 +476,7 @@ class EgressInfo(_message.Message):
     updated_at: int
     details: str
     error: str
+    error_code: int
     room_composite: RoomCompositeEgressRequest
     web: WebEgressRequest
     participant: ParticipantEgressRequest
@@ -485,7 +489,7 @@ class EgressInfo(_message.Message):
     file_results: _containers.RepeatedCompositeFieldContainer[FileInfo]
     segment_results: _containers.RepeatedCompositeFieldContainer[SegmentsInfo]
     image_results: _containers.RepeatedCompositeFieldContainer[ImagesInfo]
-    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ...) -> None: ...
+    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ...) -> None: ...
 
 class StreamInfoList(_message.Message):
     __slots__ = ("info",)
@@ -578,15 +582,17 @@ class AutoParticipantEgress(_message.Message):
     def __init__(self, preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ...) -> None: ...
 
 class AutoTrackEgress(_message.Message):
-    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure")
+    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
     FILEPATH_FIELD_NUMBER: _ClassVar[int]
     DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
     S3_FIELD_NUMBER: _ClassVar[int]
     GCP_FIELD_NUMBER: _ClassVar[int]
     AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
     filepath: str
     disable_manifest: bool
     s3: S3Upload
     gcp: GCPUpload
     azure: AzureBlobUpload
-    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ...) -> None: ...
+    aliOSS: AliOSSUpload
+    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...

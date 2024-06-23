@@ -64,10 +64,19 @@ class VideoGrants:
 
 
 @dataclasses.dataclass
+class SIPGrants:
+    # manage sip resources
+    admin: bool = False
+    # make outbound calls
+    call: bool = False
+
+
+@dataclasses.dataclass
 class Claims:
     identity: str = ""
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
+    sip: SIPGrants = dataclasses.field(default_factory=SIPGrants)
     metadata: str = ""
     sha256: str = ""
 
@@ -98,6 +107,10 @@ class AccessToken:
 
     def with_grants(self, grants: VideoGrants) -> "AccessToken":
         self.claims.video = grants
+        return self
+
+    def with_sip_grants(self, grants: SIPGrants) -> "AccessToken":
+        self.claims.sip = grants
         return self
 
     def with_identity(self, identity: str) -> "AccessToken":
@@ -173,10 +186,18 @@ class TokenVerifier:
         }
         video = VideoGrants(**video_dict)
 
+        sip_dict = claims.get("sip", dict())
+        sip_dict = {camel_to_snake(k): v for k, v in sip_dict.items()}
+        sip_dict = {
+            k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__
+        }
+        sip = SIPGrants(**sip_dict)
+
         return Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
             video=video,
+            sip=sip,
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
         )

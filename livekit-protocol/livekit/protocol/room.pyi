@@ -106,18 +106,27 @@ class MuteRoomTrackResponse(_message.Message):
     def __init__(self, track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ...) -> None: ...
 
 class UpdateParticipantRequest(_message.Message):
-    __slots__ = ("room", "identity", "metadata", "permission", "name")
+    __slots__ = ("room", "identity", "metadata", "permission", "name", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     PERMISSION_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     room: str
     identity: str
     metadata: str
     permission: _models.ParticipantPermission
     name: str
-    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., metadata: _Optional[str] = ..., permission: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ..., name: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., metadata: _Optional[str] = ..., permission: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ..., name: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpdateSubscriptionsRequest(_message.Message):
     __slots__ = ("room", "identity", "track_sids", "subscribe", "participant_tracks")

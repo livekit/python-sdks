@@ -25,6 +25,6 @@ from livekit.protocol.sip import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
-from .access_token import VideoGrants, AccessToken, TokenVerifier
+from .access_token import VideoGrants, SIPGrants, AccessToken, TokenVerifier
 from .webhook import WebhookReceiver
 from .version import __version__

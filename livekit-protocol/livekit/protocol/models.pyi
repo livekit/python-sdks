@@ -218,7 +218,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -241,6 +241,13 @@ class ParticipantInfo(_message.Message):
     EGRESS: ParticipantInfo.Kind
     SIP: ParticipantInfo.Kind
     AGENT: ParticipantInfo.Kind
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     SID_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -253,6 +260,7 @@ class ParticipantInfo(_message.Message):
     REGION_FIELD_NUMBER: _ClassVar[int]
     IS_PUBLISHER_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     sid: str
     identity: str
     state: ParticipantInfo.State
@@ -265,7 +273,8 @@ class ParticipantInfo(_message.Message):
     region: str
     is_publisher: bool
     kind: ParticipantInfo.Kind
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
@@ -292,7 +301,7 @@ class SimulcastCodecInfo(_message.Message):
     def __init__(self, mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ...) -> None: ...
 
 class TrackInfo(_message.Message):
-    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version")
+    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features")
     SID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -311,6 +320,7 @@ class TrackInfo(_message.Message):
     ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
     STREAM_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_FEATURES_FIELD_NUMBER: _ClassVar[int]
     sid: str
     type: TrackType
     name: str
@@ -329,7 +339,8 @@ class TrackInfo(_message.Message):
     encryption: Encryption.Type
     stream: str
     version: TimedVersion
-    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
+    audio_features: _containers.RepeatedScalarFieldContainer[AudioTrackFeature]
+    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ...) -> None: ...
 
 class VideoLayer(_message.Message):
     __slots__ = ("quality", "width", "height", "bitrate", "ssrc")
@@ -416,30 +427,30 @@ class SipDTMF(_message.Message):
     def __init__(self, code: _Optional[int] = ..., digit: _Optional[str] = ...) -> None: ...
 
 class Transcription(_message.Message):
-    __slots__ = ("participant_identity", "track_id", "segments", "language")
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("transcribed_participant_identity", "track_id", "segments")
+    TRANSCRIBED_PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     SEGMENTS_FIELD_NUMBER: _ClassVar[int]
-    LANGUAGE_FIELD_NUMBER: _ClassVar[int]
-    participant_identity: str
+    transcribed_participant_identity: str
     track_id: str
     segments: _containers.RepeatedCompositeFieldContainer[TranscriptionSegment]
-    language: str
-    def __init__(self, participant_identity: _Optional[str] = ..., track_id: _Optional[str] = ..., segments: _Optional[_Iterable[_Union[TranscriptionSegment, _Mapping]]] = ..., language: _Optional[str] = ...) -> None: ...
+    def __init__(self, transcribed_participant_identity: _Optional[str] = ..., track_id: _Optional[str] = ..., segments: _Optional[_Iterable[_Union[TranscriptionSegment, _Mapping]]] = ...) -> None: ...
 
 class TranscriptionSegment(_message.Message):
-    __slots__ = ("id", "text", "start_time", "end_time", "final")
+    __slots__ = ("id", "text", "start_time", "end_time", "final", "language")
     ID_FIELD_NUMBER: _ClassVar[int]
     TEXT_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     FINAL_FIELD_NUMBER: _ClassVar[int]
+    LANGUAGE_FIELD_NUMBER: _ClassVar[int]
     id: str
     text: str
     start_time: int
     end_time: int
     final: bool
-    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ...) -> None: ...
+    language: str
+    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ..., language: _Optional[str] = ...) -> None: ...
 
 class ParticipantTracks(_message.Message):
     __slots__ = ("participant_sid", "track_sids")

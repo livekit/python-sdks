@@ -1,7 +1,7 @@
 import datetime
 
 import pytest  # type: ignore
-from livekit.api import AccessToken, TokenVerifier, VideoGrants
+from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
 
 TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"
@@ -9,12 +9,14 @@ TEST_API_SECRET = "thiskeyistotallyunsafe"
 
 def test_verify_token():
     grants = VideoGrants(room_join=True, room="test_room")
+    sip = SIPGrants(admin=True)
 
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")
         .with_metadata("test_metadata")
         .with_grants(grants)
+        .with_sip_grants(sip)
         .to_jwt()
     )
 
@@ -24,6 +26,7 @@ def test_verify_token():
     assert claims.identity == "test_identity"
     assert claims.metadata == "test_metadata"
     assert claims.video == grants
+    assert claims.sip == sip
 
 
 def test_verify_token_invalid():
