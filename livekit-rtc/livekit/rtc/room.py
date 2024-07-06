@@ -329,6 +329,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.track_muted.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             publication = participant.tracks[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
@@ -339,6 +340,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.track_unmuted.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             publication = participant.tracks[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
@@ -349,7 +351,9 @@ class Room(EventEmitter[EventTypes]):
             speakers: list[Participant] = []
             # TODO: pass participant identity
             for sid in event.active_speakers_changed.participant_sids:
-                speakers.append(self._retrieve_participant(sid, ""))
+                participant = self._retrieve_participant(sid, "")
+                assert isinstance(participant, Participant)
+                speakers.append(participant)
 
             self.emit("active_speakers_changed", speakers)
         elif which == "room_metadata_changed":
@@ -360,6 +364,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.participant_metadata_changed.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             old_metadata = participant.metadata
             participant._info.metadata = event.participant_metadata_changed.metadata
             self.emit(
@@ -372,6 +377,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.participant_name_changed.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             old_name = participant.name
             participant._info.name = event.participant_name_changed.name
             self.emit(
@@ -402,6 +408,7 @@ class Room(EventEmitter[EventTypes]):
                 rparticipant = self._retrieve_remote_participant(
                     packet.participant_sid, packet.participant_identity
                 )
+                assert isinstance(rparticipant, RemoteParticipant)
                 self.emit(
                     "data_received",
                     DataPacket(
@@ -415,6 +422,7 @@ class Room(EventEmitter[EventTypes]):
                 rparticipant = self._retrieve_remote_participant(
                     packet.participant_sid, packet.participant_identity
                 )
+                assert isinstance(rparticipant, RemoteParticipant)
                 self.emit(
                     "sip_dtmf_received",
                     SipDTMF(
