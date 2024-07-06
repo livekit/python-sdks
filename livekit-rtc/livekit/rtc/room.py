@@ -16,7 +16,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Literal, Optional
+from typing import Dict, Literal, Optional, cast
 
 from ._event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -329,6 +329,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.track_muted.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             publication = participant.tracks[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
@@ -339,6 +340,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.track_unmuted.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             publication = participant.tracks[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
@@ -349,7 +351,9 @@ class Room(EventEmitter[EventTypes]):
             speakers: list[Participant] = []
             # TODO: pass participant identity
             for sid in event.active_speakers_changed.participant_sids:
-                speakers.append(self._retrieve_participant(sid, ""))
+                participant = self._retrieve_participant(sid, "")
+                assert isinstance(participant, Participant)
+                speakers.append(participant)
 
             self.emit("active_speakers_changed", speakers)
         elif which == "room_metadata_changed":
@@ -360,6 +364,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.participant_metadata_changed.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             old_metadata = participant.metadata
             participant._info.metadata = event.participant_metadata_changed.metadata
             self.emit(
@@ -372,6 +377,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.participant_name_changed.participant_sid
             # TODO: pass participant identity
             participant = self._retrieve_participant(sid, "")
+            assert isinstance(participant, Participant)
             old_name = participant.name
             participant._info.name = event.participant_name_changed.name
             self.emit(
@@ -399,8 +405,11 @@ class Room(EventEmitter[EventTypes]):
 
                 data = bytes(native_data)
                 FfiHandle(owned_buffer_info.handle.id)
-                rparticipant = self._retrieve_remote_participant(
-                    packet.participant_sid, packet.participant_identity
+                rparticipant = cast(
+                    RemoteParticipant,
+                    self._retrieve_remote_participant(
+                        packet.participant_sid, packet.participant_identity
+                    ),
                 )
                 self.emit(
                     "data_received",
@@ -412,8 +421,11 @@ class Room(EventEmitter[EventTypes]):
                     ),
                 )
             elif which_val == "sip_dtmf":
-                rparticipant = self._retrieve_remote_participant(
-                    packet.participant_sid, packet.participant_identity
+                rparticipant = cast(
+                    RemoteParticipant,
+                    self._retrieve_remote_participant(
+                        packet.participant_sid, packet.participant_identity
+                    ),
                 )
                 self.emit(
                     "sip_dtmf_received",
@@ -446,16 +458,16 @@ class Room(EventEmitter[EventTypes]):
 
     def _retrieve_remote_participant(
         self, sid: str, identity: str
-    ) -> RemoteParticipant:
+    ) -> Optional[RemoteParticipant]:
         """Retrieve a remote participant by sid or identity"""
         participant = None
         if identity:
             participant = self.participants_by_identity[identity]
-        if not participant:
+        if not participant and sid in self.participants:
             participant = self.participants[sid]
         return participant
 
-    def _retrieve_participant(self, sid: str, identity: str) -> Participant:
+    def _retrieve_participant(self, sid: str, identity: str) -> Optional[Participant]:
         """Retrieve a participant by sid or identity,
         returns the LocalParticipant if sid or identity matches"""
         if identity and identity == self.local_participant.identity:
