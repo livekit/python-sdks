@@ -405,9 +405,12 @@ class Room(EventEmitter[EventTypes]):
 
                 data = bytes(native_data)
                 FfiHandle(owned_buffer_info.handle.id)
-                rparticipant = cast(RemoteParticipant, self._retrieve_remote_participant(
-                    packet.participant_sid, packet.participant_identity
-                ))
+                rparticipant = cast(
+                    RemoteParticipant,
+                    self._retrieve_remote_participant(
+                        packet.participant_sid, packet.participant_identity
+                    ),
+                )
                 self.emit(
                     "data_received",
                     DataPacket(
@@ -418,9 +421,12 @@ class Room(EventEmitter[EventTypes]):
                     ),
                 )
             elif which_val == "sip_dtmf":
-                rparticipant = cast(RemoteParticipant, self._retrieve_remote_participant(
-                    packet.participant_sid, packet.participant_identity
-                ))
+                rparticipant = cast(
+                    RemoteParticipant,
+                    self._retrieve_remote_participant(
+                        packet.participant_sid, packet.participant_identity
+                    ),
+                )
                 self.emit(
                     "sip_dtmf_received",
                     SipDTMF(
