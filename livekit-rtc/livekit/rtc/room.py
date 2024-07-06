@@ -446,16 +446,16 @@ class Room(EventEmitter[EventTypes]):
 
     def _retrieve_remote_participant(
         self, sid: str, identity: str
-    ) -> RemoteParticipant:
+    ) -> Optional[RemoteParticipant]:
         """Retrieve a remote participant by sid or identity"""
         participant = None
         if identity:
             participant = self.participants_by_identity[identity]
-        if not participant:
+        if not participant and sid in self.participants:
             participant = self.participants[sid]
         return participant
 
-    def _retrieve_participant(self, sid: str, identity: str) -> Participant:
+    def _retrieve_participant(self, sid: str, identity: str) -> Optional[Participant]:
         """Retrieve a participant by sid or identity,
         returns the LocalParticipant if sid or identity matches"""
         if identity and identity == self.local_participant.identity:
