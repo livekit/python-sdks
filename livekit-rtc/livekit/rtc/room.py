@@ -16,7 +16,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Dict, Literal, Optional
+from typing import Dict, Literal, Optional, cast
 
 from ._event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -405,10 +405,9 @@ class Room(EventEmitter[EventTypes]):
 
                 data = bytes(native_data)
                 FfiHandle(owned_buffer_info.handle.id)
-                rparticipant = self._retrieve_remote_participant(
+                rparticipant = cast(RemoteParticipant, self._retrieve_remote_participant(
                     packet.participant_sid, packet.participant_identity
-                )
-                assert isinstance(rparticipant, RemoteParticipant)
+                ))
                 self.emit(
                     "data_received",
                     DataPacket(
@@ -419,10 +418,9 @@ class Room(EventEmitter[EventTypes]):
                     ),
                 )
             elif which_val == "sip_dtmf":
-                rparticipant = self._retrieve_remote_participant(
+                rparticipant = cast(RemoteParticipant, self._retrieve_remote_participant(
                     packet.participant_sid, packet.participant_identity
-                )
-                assert isinstance(rparticipant, RemoteParticipant)
+                ))
                 self.emit(
                     "sip_dtmf_received",
                     SipDTMF(
