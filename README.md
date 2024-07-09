@@ -115,7 +115,7 @@ async def main():
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
 - [Basic room](https://github.com/livekit/python-sdks/blob/main/examples/basic_room.py): Connect to a room
 - [Publish hue](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a rainbow video track
-- [Publish wave](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a sine wave
+- [Publish wave](https://github.com/livekit/python-sdks/blob/main/examples/publish_wave.py): Publish a sine wave
 
 ## Getting help / Contributing
 
