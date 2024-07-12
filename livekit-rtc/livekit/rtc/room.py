@@ -45,6 +45,7 @@ EventTypes = Literal[
     "track_unmuted",
     "active_speakers_changed",
     "room_metadata_changed",
+    "room_sid_changed",
     "participant_metadata_changed",
     "participant_name_changed",
     "connection_quality_changed",
@@ -360,6 +361,10 @@ class Room(EventEmitter[EventTypes]):
             old_metadata = self.metadata
             self._info.metadata = event.room_metadata_changed.metadata
             self.emit("room_metadata_changed", old_metadata, self.metadata)
+        elif which == "room_sid_changed":
+            old_sid = self.sid
+            self._info.sid = event.room_sid_changed.sid
+            self.emit("room_sid_changed", old_sid, self.sid)
         elif which == "participant_metadata_changed":
             sid = event.participant_metadata_changed.participant_sid
             # TODO: pass participant identity

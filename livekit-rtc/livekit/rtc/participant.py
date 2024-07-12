@@ -93,7 +93,7 @@ class LocalParticipant(Participant):
         self,
         payload: Union[bytes, str],
         reliable: bool = True,
-        destination_sids: List[Union[str, "RemoteParticipant"]] = [],
+        destination_identities: List[Union[str, "RemoteParticipant"]] = [],
         topic: str = "",
     ) -> None:
         if isinstance(payload, str):
@@ -110,13 +110,13 @@ class LocalParticipant(Participant):
         req.publish_data.topic = topic
 
         sids = []
-        for p in destination_sids:
+        for p in destination_identities:
             if isinstance(p, RemoteParticipant):
                 sids.append(p.sid)
             else:
                 sids.append(p)
 
-        req.publish_data.destination_sids.extend(sids)
+        req.publish_data.destination_identities.extend(sids)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
