@@ -13,7 +13,9 @@
 # 📹🎙️🐍 Python SDK for LiveKit
 
 <!--BEGIN_DESCRIPTION-->
+
 Use this SDK to add real-time video, audio and data features to your Python app. By connecting to a self- or cloud-hosted <a href="https://livekit.io/">LiveKit</a> server, you can quickly build applications like interactive live streaming or video calls with just a few lines of code.
+
 <!--END_DESCRIPTION-->
 
 This repo contains two packages
@@ -110,6 +112,24 @@ async def main():
             print("track publication: %s", publication.sid)
 ```
 
+### Sending and receiving chat
+
+```python
+
+room = rtc.Room()
+...
+
+chat = rtc.ChatManager(room)
+
+# receiving chat
+@chat.on("message_received")
+def on_message_received(msg: rtc.ChatMessage):
+    print(f"message received: {msg.participant.identity}: {msg.message}")
+
+# sending chat
+await chat.send_message("hello world")
+```
+
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
@@ -122,7 +142,9 @@ async def main():
 Please join us on [Slack](https://livekit.io/join-slack) to get help from our devs / community members. We welcome your contributions(PRs) and details can be discussed there.
 
 <!--BEGIN_REPO_NAV-->
+
 <br/><table>
+
 <thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
 <tbody>
 <tr><td>Real-time SDKs</td><td><a href="https://github.com/livekit/components-js">React Components</a> · <a href="https://github.com/livekit/client-sdk-js">Browser</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <a href="https://github.com/livekit/client-sdk-react-native">React Native</a> · <a href="https://github.com/livekit/rust-sdks">Rust</a> · <a href="https://github.com/livekit/node-sdks">Node.js</a> · <b>Python</b> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (web)</a> · <a href="https://github.com/livekit/client-sdk-unity">Unity (beta)</a></td></tr><tr></tr>
