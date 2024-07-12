@@ -61,7 +61,7 @@ class ChatManager(EventEmitter[EventTypes]):
         )
         await self._lp.publish_data(
             payload=json.dumps(msg.asjsondict()),
-            kind=DataPacketKind.KIND_RELIABLE,
+            reliable=True,
             topic=_CHAT_TOPIC,
         )
         return msg
@@ -74,7 +74,7 @@ class ChatManager(EventEmitter[EventTypes]):
         """
         await self._lp.publish_data(
             payload=json.dumps(message.asjsondict()),
-            kind=DataPacketKind.KIND_RELIABLE,
+            reliable=True,
             topic=_CHAT_UPDATE_TOPIC,
         )
 
