@@ -89,8 +89,7 @@ class ChatManager(EventEmitter[EventTypes]):
                     msg.participant = dp.participant
                 self.emit("message_received", msg)
             except Exception as e:
-                logging.warning(
-                    "failed to parse chat message: %s", e, exc_info=e)
+                logging.warning("failed to parse chat message: %s", e, exc_info=e)
 
 
 @dataclass
