@@ -560,14 +560,16 @@ class SegmentsInfo(_message.Message):
     def __init__(self, playlist_name: _Optional[str] = ..., live_playlist_name: _Optional[str] = ..., duration: _Optional[int] = ..., size: _Optional[int] = ..., playlist_location: _Optional[str] = ..., live_playlist_location: _Optional[str] = ..., segment_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
 
 class ImagesInfo(_message.Message):
-    __slots__ = ("image_count", "started_at", "ended_at")
+    __slots__ = ("filename_prefix", "image_count", "started_at", "ended_at")
+    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
     IMAGE_COUNT_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    filename_prefix: str
     image_count: int
     started_at: int
     ended_at: int
-    def __init__(self, image_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
+    def __init__(self, filename_prefix: _Optional[str] = ..., image_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
 
 class AutoParticipantEgress(_message.Message):
     __slots__ = ("preset", "advanced", "file_outputs", "segment_outputs")
