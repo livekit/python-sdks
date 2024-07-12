@@ -7,7 +7,6 @@ class Transcription:
     participant_identity: str
     track_id: str
     segments: List["TranscriptionSegment"]
-    language: str
 
 
 @dataclass
@@ -16,4 +15,5 @@ class TranscriptionSegment:
     text: str
     start_time: int
     end_time: int
+    language: str
     final: bool

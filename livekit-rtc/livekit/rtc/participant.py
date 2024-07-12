@@ -21,7 +21,6 @@ from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import (
-    DataPacketKind,
     TrackPublishOptions,
 )
 from ._proto.room_pb2 import (
@@ -93,7 +92,7 @@ class LocalParticipant(Participant):
     async def publish_data(
         self,
         payload: Union[bytes, str],
-        kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
+        reliable: bool = True,
         destination_sids: List[Union[str, "RemoteParticipant"]] = [],
         topic: str = "",
     ) -> None:
@@ -107,7 +106,7 @@ class LocalParticipant(Participant):
         req.publish_data.local_participant_handle = self._ffi_handle.handle
         req.publish_data.data_ptr = ctypes.addressof(cdata)
         req.publish_data.data_len = data_len
-        req.publish_data.kind = kind
+        req.publish_data.reliable = reliable
         req.publish_data.topic = topic
 
         sids = []
@@ -140,6 +139,7 @@ class LocalParticipant(Participant):
                 start_time=s.start_time,
                 end_time=s.end_time,
                 final=s.final,
+                language=s.language,
             )
             for s in transcription.segments
         ]
@@ -148,7 +148,6 @@ class LocalParticipant(Participant):
         req.publish_transcription.participant_identity = transcription.participant_identity
         req.publish_transcription.segments.extend(proto_segments)
         req.publish_transcription.track_id = transcription.track_id
-        req.publish_transcription.language = transcription.language
         # fmt: on
         queue = FfiClient.instance.queue.subscribe()
         try:
