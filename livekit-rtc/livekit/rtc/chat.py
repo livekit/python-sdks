@@ -20,7 +20,6 @@ from typing import Any, Callable, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
 from ._event_emitter import EventEmitter
-from ._proto.room_pb2 import DataPacketKind
 from ._utils import generate_random_base62
 
 _CHAT_TOPIC = "lk-chat-topic"
