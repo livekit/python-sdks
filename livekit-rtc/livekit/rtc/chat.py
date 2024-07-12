@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import json
 import logging
-from typing import Any, Callable, Dict, Literal, Optional
+from typing import Any, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
 from ._event_emitter import EventEmitter
@@ -78,10 +78,6 @@ class ChatManager(EventEmitter[EventTypes]):
             topic=_CHAT_UPDATE_TOPIC,
         )
 
-    def on_message(self, callback: Callable[["ChatMessage"], None]):
-        """Register a callback to be called when a chat message is received from the end user."""
-        self._callback = callback
-
     def _on_data_received(self, dp: DataPacket):
         # handle both new and updates the same way, as long as the ID is in there
         # the user can decide how to replace the previous message
@@ -93,7 +89,8 @@ class ChatManager(EventEmitter[EventTypes]):
                     msg.participant = dp.participant
                 self.emit("message_received", msg)
             except Exception as e:
-                logging.warning("failed to parse chat message: %s", e, exc_info=e)
+                logging.warning(
+                    "failed to parse chat message: %s", e, exc_info=e)
 
 
 @dataclass
