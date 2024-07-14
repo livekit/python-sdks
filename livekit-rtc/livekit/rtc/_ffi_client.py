@@ -106,7 +106,12 @@ class FfiQueue(Generic[T]):
     def put(self, item: T) -> None:
         with self._lock:
             for queue, loop in self._subscribers:
-                loop.call_soon_threadsafe(queue.put_nowait, item)
+                try:
+                    loop.call_soon_threadsafe(queue.put_nowait, item)
+                except Exception as e:
+                    # this could happen if user closes the runloop without unsubscribing first
+                    # it's not good when it does occur, but we should not fail the entire runloop
+                    logger.error("error putting to queue: %s", e)
 
     def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> Queue[T]:
         with self._lock:
