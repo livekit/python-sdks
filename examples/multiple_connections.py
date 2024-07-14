@@ -53,7 +53,7 @@ async def main():
 def ensure_event_loop():
     try:
         return asyncio.get_event_loop()
-    except RuntimeError as e:
+    except RuntimeError:
         # Create a new event loop if none exists (this can happen in some contexts like certain threads)
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
