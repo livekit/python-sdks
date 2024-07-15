@@ -45,7 +45,6 @@ EventTypes = Literal[
     "track_unmuted",
     "active_speakers_changed",
     "room_metadata_changed",
-    "room_sid_changed",
     "participant_metadata_changed",
     "participant_name_changed",
     "participant_attributes_changed",
@@ -116,14 +115,18 @@ class Room(EventEmitter[EventTypes]):
         self.participants: Dict[str, RemoteParticipant] = {}
         self.participants_by_identity: Dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
+        self._first_sid_future = asyncio.Future[str]()
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     @property
-    def sid(self) -> str:
-        return self._info.sid
+    async def sid(self) -> str:
+        if self._info.sid:
+            return self._info.sid
+
+        return await self._first_sid_future
 
     @property
     def name(self) -> str:
@@ -363,9 +366,10 @@ class Room(EventEmitter[EventTypes]):
             self._info.metadata = event.room_metadata_changed.metadata
             self.emit("room_metadata_changed", old_metadata, self.metadata)
         elif which == "room_sid_changed":
-            old_sid = self.sid
+            if not self._info.sid:
+                self._first_sid_future.set_result(event.room_sid_changed.sid)
             self._info.sid = event.room_sid_changed.sid
-            self.emit("room_sid_changed", old_sid, self.sid)
+            # This is an internal event, not exposed to users
         elif which == "participant_metadata_changed":
             sid = event.participant_metadata_changed.participant_sid
             # TODO: pass participant identity
