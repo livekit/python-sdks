@@ -78,6 +78,10 @@ class Participant:
     def metadata(self) -> str:
         return self._info.metadata
 
+    @property
+    def attributes(self) -> dict:
+        return self._info.attributes
+
 
 class LocalParticipant(Participant):
     def __init__(

@@ -48,6 +48,7 @@ EventTypes = Literal[
     "room_sid_changed",
     "participant_metadata_changed",
     "participant_name_changed",
+    "participant_attributes_changed",
     "connection_quality_changed",
     "data_received",
     "sip_dtmf_received",
@@ -388,6 +389,9 @@ class Room(EventEmitter[EventTypes]):
             self.emit(
                 "participant_name_changed", participant, old_name, participant.name
             )
+        elif which == "participant_attributes_changed":
+            # TODO
+            pass
         elif which == "connection_quality_changed":
             sid = event.connection_quality_changed.participant_sid
             # TODO: pass participant identity

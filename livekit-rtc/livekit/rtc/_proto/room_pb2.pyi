@@ -523,7 +523,7 @@ class PublishTranscriptionCallback(google.protobuf.message.Message):
 global___PublishTranscriptionCallback = PublishTranscriptionCallback
 
 @typing_extensions.final
-class UpdateLocalMetadataRequest(google.protobuf.message.Message):
+class SetLocalMetadataRequest(google.protobuf.message.Message):
     """Change the local participant's metadata"""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -540,10 +540,10 @@ class UpdateLocalMetadataRequest(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata"]) -> None: ...
 
-global___UpdateLocalMetadataRequest = UpdateLocalMetadataRequest
+global___SetLocalMetadataRequest = SetLocalMetadataRequest
 
 @typing_extensions.final
-class UpdateLocalMetadataResponse(google.protobuf.message.Message):
+class SetLocalMetadataResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ASYNC_ID_FIELD_NUMBER: builtins.int
@@ -555,10 +555,67 @@ class UpdateLocalMetadataResponse(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
 
-global___UpdateLocalMetadataResponse = UpdateLocalMetadataResponse
+global___SetLocalMetadataResponse = SetLocalMetadataResponse
 
 @typing_extensions.final
-class UpdateLocalMetadataCallback(google.protobuf.message.Message):
+class SetLocalMetadataCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+
+global___SetLocalMetadataCallback = SetLocalMetadataCallback
+
+@typing_extensions.final
+class SetLocalAttributesRequest(google.protobuf.message.Message):
+    """Change the local participant's attributes"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    @typing_extensions.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "local_participant_handle", b"local_participant_handle"]) -> None: ...
+
+global___SetLocalAttributesRequest = SetLocalAttributesRequest
+
+@typing_extensions.final
+class SetLocalAttributesResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ASYNC_ID_FIELD_NUMBER: builtins.int
@@ -570,10 +627,30 @@ class UpdateLocalMetadataCallback(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
 
-global___UpdateLocalMetadataCallback = UpdateLocalMetadataCallback
+global___SetLocalAttributesResponse = SetLocalAttributesResponse
 
 @typing_extensions.final
-class UpdateLocalNameRequest(google.protobuf.message.Message):
+class SetLocalAttributesCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+
+global___SetLocalAttributesCallback = SetLocalAttributesCallback
+
+@typing_extensions.final
+class SetLocalNameRequest(google.protobuf.message.Message):
     """Change the local participant's name"""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -590,10 +667,10 @@ class UpdateLocalNameRequest(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["local_participant_handle", b"local_participant_handle", "name", b"name"]) -> None: ...
 
-global___UpdateLocalNameRequest = UpdateLocalNameRequest
+global___SetLocalNameRequest = SetLocalNameRequest
 
 @typing_extensions.final
-class UpdateLocalNameResponse(google.protobuf.message.Message):
+class SetLocalNameResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ASYNC_ID_FIELD_NUMBER: builtins.int
@@ -605,22 +682,27 @@ class UpdateLocalNameResponse(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
 
-global___UpdateLocalNameResponse = UpdateLocalNameResponse
+global___SetLocalNameResponse = SetLocalNameResponse
 
 @typing_extensions.final
-class UpdateLocalNameCallback(google.protobuf.message.Message):
+class SetLocalNameCallback(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
         async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
 
-global___UpdateLocalNameCallback = UpdateLocalNameCallback
+global___SetLocalNameCallback = SetLocalNameCallback
 
 @typing_extensions.final
 class SetSubscribedRequest(google.protobuf.message.Message):
@@ -962,6 +1044,7 @@ class RoomEvent(google.protobuf.message.Message):
     ROOM_SID_CHANGED_FIELD_NUMBER: builtins.int
     PARTICIPANT_METADATA_CHANGED_FIELD_NUMBER: builtins.int
     PARTICIPANT_NAME_CHANGED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_ATTRIBUTES_CHANGED_FIELD_NUMBER: builtins.int
     CONNECTION_QUALITY_CHANGED_FIELD_NUMBER: builtins.int
     CONNECTION_STATE_CHANGED_FIELD_NUMBER: builtins.int
     DISCONNECTED_FIELD_NUMBER: builtins.int
@@ -1004,12 +1087,14 @@ class RoomEvent(google.protobuf.message.Message):
     @property
     def participant_name_changed(self) -> global___ParticipantNameChanged: ...
     @property
+    def participant_attributes_changed(self) -> global___ParticipantAttributesChanged: ...
+    @property
     def connection_quality_changed(self) -> global___ConnectionQualityChanged: ...
     @property
     def connection_state_changed(self) -> global___ConnectionStateChanged: ...
     @property
     def disconnected(self) -> global___Disconnected:
-        """Connected connected = 20;"""
+        """Connected connected = 21;"""
     @property
     def reconnecting(self) -> global___Reconnecting: ...
     @property
@@ -1041,6 +1126,7 @@ class RoomEvent(google.protobuf.message.Message):
         room_sid_changed: global___RoomSidChanged | None = ...,
         participant_metadata_changed: global___ParticipantMetadataChanged | None = ...,
         participant_name_changed: global___ParticipantNameChanged | None = ...,
+        participant_attributes_changed: global___ParticipantAttributesChanged | None = ...,
         connection_quality_changed: global___ConnectionQualityChanged | None = ...,
         connection_state_changed: global___ConnectionStateChanged | None = ...,
         disconnected: global___Disconnected | None = ...,
@@ -1050,9 +1136,9 @@ class RoomEvent(google.protobuf.message.Message):
         eos: global___RoomEOS | None = ...,
         data_packet_received: global___DataPacketReceived | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1069,11 +1155,13 @@ class RoomInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        sid: builtins.str = ...,
+        sid: builtins.str | None = ...,
         name: builtins.str = ...,
         metadata: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_sid", b"_sid", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_sid", b"_sid", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_sid", b"_sid"]) -> typing_extensions.Literal["sid"] | None: ...
 
 global___RoomInfo = RoomInfo
 
@@ -1383,6 +1471,61 @@ class ParticipantMetadataChanged(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["metadata", b"metadata", "participant_sid", b"participant_sid"]) -> None: ...
 
 global___ParticipantMetadataChanged = ParticipantMetadataChanged
+
+@typing_extensions.final
+class ParticipantAttributesChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    @typing_extensions.final
+    class OldAttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
+    @typing_extensions.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
+    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    OLD_ATTRIBUTES_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
+    participant_sid: builtins.str
+    @property
+    def old_attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        participant_sid: builtins.str = ...,
+        old_attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "old_attributes", b"old_attributes", "participant_sid", b"participant_sid"]) -> None: ...
+
+global___ParticipantAttributesChanged = ParticipantAttributesChanged
 
 @typing_extensions.final
 class ParticipantNameChanged(google.protobuf.message.Message):

@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from . import handle_pb2 as handle__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11participant.proto\x12\rlivekit.proto\x1a\x0chandle.proto\"P\n\x0fParticipantInfo\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x10\n\x08identity\x18\x03 \x01(\t\x12\x10\n\x08metadata\x18\x04 \x01(\t\"o\n\x10OwnedParticipant\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.ParticipantInfoB\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11participant.proto\x12\rlivekit.proto\x1a\x0chandle.proto\"\xc7\x01\n\x0fParticipantInfo\x12\x0b\n\x03sid\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x10\n\x08identity\x18\x03 \x01(\t\x12\x10\n\x08metadata\x18\x04 \x01(\t\x12\x42\n\nattributes\x18\x05 \x03(\x0b\x32..livekit.proto.ParticipantInfo.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"o\n\x10OwnedParticipant\x12-\n\x06handle\x18\x01 \x01(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.ParticipantInfoB\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,8 +23,12 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'participant_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_PARTICIPANTINFO']._serialized_start=50
-  _globals['_PARTICIPANTINFO']._serialized_end=130
-  _globals['_OWNEDPARTICIPANT']._serialized_start=132
-  _globals['_OWNEDPARTICIPANT']._serialized_end=243
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._options = None
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_options = b'8\001'
+  _globals['_PARTICIPANTINFO']._serialized_start=51
+  _globals['_PARTICIPANTINFO']._serialized_end=250
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_start=201
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_end=250
+  _globals['_OWNEDPARTICIPANT']._serialized_start=252
+  _globals['_OWNEDPARTICIPANT']._serialized_end=363
 # @@protoc_insertion_point(module_scope)
