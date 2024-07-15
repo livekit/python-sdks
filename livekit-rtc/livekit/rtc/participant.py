@@ -79,8 +79,8 @@ class Participant:
         return self._info.metadata
 
     @property
-    def attributes(self) -> dict:
-        return self._info.attributes
+    def attributes(self) -> dict[str, str]:
+        return dict(self._info.attributes)
 
 
 class LocalParticipant(Participant):
@@ -166,10 +166,10 @@ class LocalParticipant(Participant):
         if cb.publish_transcription.error:
             raise PublishTranscriptionError(cb.publish_transcription.error)
 
-    async def update_metadata(self, metadata: str) -> None:
+    async def set_metadata(self, metadata: str) -> None:
         req = proto_ffi.FfiRequest()
-        req.update_local_metadata.local_participant_handle = self._ffi_handle.handle
-        req.update_local_metadata.metadata = metadata
+        req.set_local_metadata.local_participant_handle = self._ffi_handle.handle
+        req.set_local_metadata.metadata = metadata
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -181,10 +181,10 @@ class LocalParticipant(Participant):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-    async def update_name(self, name: str) -> None:
+    async def set_name(self, name: str) -> None:
         req = proto_ffi.FfiRequest()
-        req.update_local_name.local_participant_handle = self._ffi_handle.handle
-        req.update_local_name.name = name
+        req.set_local_name.local_participant_handle = self._ffi_handle.handle
+        req.set_local_name.name = name
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -192,6 +192,21 @@ class LocalParticipant(Participant):
             await queue.wait_for(
                 lambda e: e.update_local_name.async_id
                 == resp.update_local_name.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+    async def set_attributes(self, attributes: dict[str, str]) -> None:
+        req = proto_ffi.FfiRequest()
+        req.set_local_attributes.local_participant_handle = self._ffi_handle.handle
+        req.set_local_attributes.attributes.update(attributes)
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: e.set_local_attributes.async_id
+                == resp.set_local_attributes.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
