@@ -112,7 +112,7 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
-        self.participants: Dict[str, RemoteParticipant] = {}
+        self.remote_participants: Dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
 
@@ -215,7 +215,7 @@ class Room(EventEmitter[EventTypes]):
             # add the initial remote participant tracks
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
-                rp.tracks[publication.sid] = publication
+                rp.trackPublications[publication.sid] = publication
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -270,37 +270,39 @@ class Room(EventEmitter[EventTypes]):
             self.emit("participant_connected", rparticipant)
         elif which == "participant_disconnected":
             identity = event.participant_disconnected.participant_identity
-            rparticipant = self.participants.pop(identity)
+            rparticipant = self.remote_participants.pop(identity)
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
-            lpublication = self.local_participant.tracks[sid]
+            lpublication = self.local_participant.trackPublications[sid]
             track = lpublication.track
             self.emit("local_track_published", lpublication, track)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.tracks[sid]
+            lpublication = self.local_participant.trackPublications[sid]
             self.emit("local_track_unpublished", lpublication)
         elif which == "track_published":
-            rparticipant = self.participants[event.track_published.participant_identity]
+            rparticipant = self.remote_participants[
+                event.track_published.participant_identity
+            ]
             rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant.tracks[rpublication.sid] = rpublication
+            rparticipant.trackPublications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
-            rparticipant = self.participants[
+            rparticipant = self.remote_participants[
                 event.track_unpublished.participant_identity
             ]
-            rpublication = rparticipant.tracks.pop(
+            rpublication = rparticipant.trackPublications.pop(
                 event.track_unpublished.publication_sid
             )
             self.emit("track_unpublished", rpublication, rparticipant)
         elif which == "track_subscribed":
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
-            rparticipant = self.participants[
+            rparticipant = self.remote_participants[
                 event.track_subscribed.participant_identity
             ]
-            rpublication = rparticipant.tracks[track_info.sid]
+            rpublication = rparticipant.trackPublications[track_info.sid]
             rpublication.subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 remote_video_track = RemoteVideoTrack(owned_track_info)
@@ -316,15 +318,17 @@ class Room(EventEmitter[EventTypes]):
                 )
         elif which == "track_unsubscribed":
             identity = event.track_unsubscribed.participant_identity
-            rparticipant = self.participants[identity]
-            rpublication = rparticipant.tracks[event.track_unsubscribed.track_sid]
+            rparticipant = self.remote_participants[identity]
+            rpublication = rparticipant.trackPublications[
+                event.track_unsubscribed.track_sid
+            ]
             track = rpublication.track
             rpublication.track = None
             rpublication.subscribed = False
             self.emit("track_unsubscribed", track, rpublication, rparticipant)
         elif which == "track_subscription_failed":
             identity = event.track_subscription_failed.participant_identity
-            rparticipant = self.participants[identity]
+            rparticipant = self.remote_participants[identity]
             error = event.track_subscription_failed.error
             self.emit(
                 "track_subscription_failed",
@@ -337,7 +341,7 @@ class Room(EventEmitter[EventTypes]):
             # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.tracks[event.track_muted.track_sid]
+            publication = participant.trackPublications[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
                 publication.track._info.muted = True
@@ -348,7 +352,7 @@ class Room(EventEmitter[EventTypes]):
             # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.tracks[event.track_unmuted.track_sid]
+            publication = participant.trackPublications[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
                 publication.track._info.muted = False
@@ -470,12 +474,11 @@ class Room(EventEmitter[EventTypes]):
     def _retrieve_remote_participant(
         self, identity: str
     ) -> Optional[RemoteParticipant]:
-        """Retrieve a remote participant by sid or identity"""
-        return self.participants.get(identity, None)
+        """Retrieve a remote participant by identity"""
+        return self.remote_participants.get(identity, None)
 
     def _retrieve_participant(self, identity: str) -> Optional[Participant]:
-        """Retrieve a participant by sid or identity,
-        returns the LocalParticipant if sid or identity matches"""
+        """Retrieve a local or remote participant by identity"""
         if identity and identity == self.local_participant.identity:
             return self.local_participant
 
@@ -484,9 +487,9 @@ class Room(EventEmitter[EventTypes]):
     def _create_remote_participant(
         self, owned_info: proto_participant.OwnedParticipant
     ) -> RemoteParticipant:
-        if owned_info.info.identity in self.participants:
+        if owned_info.info.identity in self.remote_participants:
             raise Exception("participant already exists")
 
         participant = RemoteParticipant(owned_info)
-        self.participants[participant.identity] = participant
+        self.remote_participants[participant.identity] = participant
         return participant
