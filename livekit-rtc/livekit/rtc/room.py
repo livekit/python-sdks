@@ -215,7 +215,7 @@ class Room(EventEmitter[EventTypes]):
             # add the initial remote participant tracks
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
-                rp.trackPublications[publication.sid] = publication
+                rp.track_publications[publication.sid] = publication
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -274,25 +274,25 @@ class Room(EventEmitter[EventTypes]):
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
-            lpublication = self.local_participant.trackPublications[sid]
+            lpublication = self.local_participant.track_publications[sid]
             track = lpublication.track
             self.emit("local_track_published", lpublication, track)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.trackPublications[sid]
+            lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
         elif which == "track_published":
             rparticipant = self.remote_participants[
                 event.track_published.participant_identity
             ]
             rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant.trackPublications[rpublication.sid] = rpublication
+            rparticipant.track_publications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
             rparticipant = self.remote_participants[
                 event.track_unpublished.participant_identity
             ]
-            rpublication = rparticipant.trackPublications.pop(
+            rpublication = rparticipant.track_publications.pop(
                 event.track_unpublished.publication_sid
             )
             self.emit("track_unpublished", rpublication, rparticipant)
@@ -302,7 +302,7 @@ class Room(EventEmitter[EventTypes]):
             rparticipant = self.remote_participants[
                 event.track_subscribed.participant_identity
             ]
-            rpublication = rparticipant.trackPublications[track_info.sid]
+            rpublication = rparticipant.track_publications[track_info.sid]
             rpublication.subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 remote_video_track = RemoteVideoTrack(owned_track_info)
@@ -319,7 +319,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "track_unsubscribed":
             identity = event.track_unsubscribed.participant_identity
             rparticipant = self.remote_participants[identity]
-            rpublication = rparticipant.trackPublications[
+            rpublication = rparticipant.track_publications[
                 event.track_unsubscribed.track_sid
             ]
             track = rpublication.track
@@ -341,7 +341,7 @@ class Room(EventEmitter[EventTypes]):
             # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.trackPublications[event.track_muted.track_sid]
+            publication = participant.track_publications[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
                 publication.track._info.muted = True
@@ -352,7 +352,7 @@ class Room(EventEmitter[EventTypes]):
             # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.trackPublications[event.track_unmuted.track_sid]
+            publication = participant.track_publications[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
                 publication.track._info.muted = False

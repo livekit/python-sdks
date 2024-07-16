@@ -60,7 +60,7 @@ class Participant:
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        self.trackPublications: dict[str, TrackPublication] = {}
+        self.track_publications: dict[str, TrackPublication] = {}
 
     @property
     def sid(self) -> str:
@@ -91,7 +91,7 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self.trackPublications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
 
     async def publish_data(
         self,
@@ -232,7 +232,7 @@ class LocalParticipant(Participant):
             track_publication = LocalTrackPublication(cb.publish_track.publication)
             track_publication.track = track
             track._info.sid = track_publication.sid
-            self.trackPublications[track_publication.sid] = track_publication
+            self.track_publications[track_publication.sid] = track_publication
 
             queue.task_done()
             return track_publication
@@ -254,7 +254,7 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self.trackPublications.pop(track_sid)
+            publication = self.track_publications.pop(track_sid)
             publication.track = None
             queue.task_done()
         finally:
@@ -264,4 +264,4 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self.trackPublications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
