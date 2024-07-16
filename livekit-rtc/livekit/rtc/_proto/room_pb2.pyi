@@ -1207,14 +1207,14 @@ global___ParticipantConnected = ParticipantConnected
 class ParticipantDisconnected(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantDisconnected = ParticipantDisconnected
 
@@ -1255,19 +1255,19 @@ global___LocalTrackUnpublished = LocalTrackUnpublished
 class TrackPublished(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     PUBLICATION_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     @property
     def publication(self) -> track_pb2.OwnedTrackPublication: ...
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         publication: track_pb2.OwnedTrackPublication | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["publication", b"publication"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "publication", b"publication"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "publication", b"publication"]) -> None: ...
 
 global___TrackPublished = TrackPublished
 
@@ -1275,17 +1275,17 @@ global___TrackPublished = TrackPublished
 class TrackUnpublished(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     PUBLICATION_SID_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     publication_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         publication_sid: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "publication_sid", b"publication_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]) -> None: ...
 
 global___TrackUnpublished = TrackUnpublished
 
@@ -1297,19 +1297,19 @@ class TrackSubscribed(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     TRACK_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     @property
     def track(self) -> track_pb2.OwnedTrack: ...
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         track: track_pb2.OwnedTrack | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["track", b"track"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "track", b"track"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "track", b"track"]) -> None: ...
 
 global___TrackSubscribed = TrackSubscribed
 
@@ -1317,18 +1317,18 @@ global___TrackSubscribed = TrackSubscribed
 class TrackUnsubscribed(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     TRACK_SID_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     """The FFI language can dispose/remove the VideoSink here"""
     track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         track_sid: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "track_sid", b"track_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackUnsubscribed = TrackUnsubscribed
 
@@ -1336,20 +1336,20 @@ global___TrackUnsubscribed = TrackUnsubscribed
 class TrackSubscriptionFailed(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     TRACK_SID_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     track_sid: builtins.str
     error: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         track_sid: builtins.str = ...,
         error: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["error", b"error", "participant_sid", b"participant_sid", "track_sid", b"track_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackSubscriptionFailed = TrackSubscriptionFailed
 
@@ -1357,17 +1357,17 @@ global___TrackSubscriptionFailed = TrackSubscriptionFailed
 class TrackMuted(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     TRACK_SID_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         track_sid: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "track_sid", b"track_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackMuted = TrackMuted
 
@@ -1375,17 +1375,17 @@ global___TrackMuted = TrackMuted
 class TrackUnmuted(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     TRACK_SID_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         track_sid: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "track_sid", b"track_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackUnmuted = TrackUnmuted
 
@@ -1393,18 +1393,18 @@ global___TrackUnmuted = TrackUnmuted
 class E2eeStateChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     STATE_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     """Using sid instead of identity for ffi communication"""
     state: e2ee_pb2.EncryptionState.ValueType
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         state: e2ee_pb2.EncryptionState.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "state", b"state"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "state", b"state"]) -> None: ...
 
 global___E2eeStateChanged = E2eeStateChanged
 
@@ -1412,15 +1412,15 @@ global___E2eeStateChanged = E2eeStateChanged
 class ActiveSpeakersChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SIDS_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITIES_FIELD_NUMBER: builtins.int
     @property
-    def participant_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def participant_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        participant_sids: collections.abc.Iterable[builtins.str] | None = ...,
+        participant_identities: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sids", b"participant_sids"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identities", b"participant_identities"]) -> None: ...
 
 global___ActiveSpeakersChanged = ActiveSpeakersChanged
 
@@ -1458,17 +1458,17 @@ global___RoomSidChanged = RoomSidChanged
 class ParticipantMetadataChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     metadata: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         metadata: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["metadata", b"metadata", "participant_sid", b"participant_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantMetadataChanged = ParticipantMetadataChanged
 
@@ -1508,10 +1508,10 @@ class ParticipantAttributesChanged(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     OLD_ATTRIBUTES_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     @property
     def old_attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
@@ -1519,11 +1519,11 @@ class ParticipantAttributesChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         old_attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "old_attributes", b"old_attributes", "participant_sid", b"participant_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "old_attributes", b"old_attributes", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantAttributesChanged = ParticipantAttributesChanged
 
@@ -1531,17 +1531,17 @@ global___ParticipantAttributesChanged = ParticipantAttributesChanged
 class ParticipantNameChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     name: builtins.str
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         name: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "participant_sid", b"participant_sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantNameChanged = ParticipantNameChanged
 
@@ -1549,17 +1549,17 @@ global___ParticipantNameChanged = ParticipantNameChanged
 class ConnectionQualityChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     QUALITY_FIELD_NUMBER: builtins.int
-    participant_sid: builtins.str
+    participant_identity: builtins.str
     quality: global___ConnectionQuality.ValueType
     def __init__(
         self,
         *,
-        participant_sid: builtins.str = ...,
+        participant_identity: builtins.str = ...,
         quality: global___ConnectionQuality.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["participant_sid", b"participant_sid", "quality", b"quality"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["participant_identity", b"participant_identity", "quality", b"quality"]) -> None: ...
 
 global___ConnectionQualityChanged = ConnectionQualityChanged
 
@@ -1610,13 +1610,10 @@ class DataPacketReceived(google.protobuf.message.Message):
 
     KIND_FIELD_NUMBER: builtins.int
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
-    PARTICIPANT_SID_FIELD_NUMBER: builtins.int
     USER_FIELD_NUMBER: builtins.int
     SIP_DTMF_FIELD_NUMBER: builtins.int
     kind: global___DataPacketKind.ValueType
     participant_identity: builtins.str
-    """Can be empty if the data is sent a server SDK"""
-    participant_sid: builtins.str
     """Can be empty if the data is sent a server SDK"""
     @property
     def user(self) -> global___UserPacket: ...
@@ -1627,15 +1624,11 @@ class DataPacketReceived(google.protobuf.message.Message):
         *,
         kind: global___DataPacketKind.ValueType = ...,
         participant_identity: builtins.str = ...,
-        participant_sid: builtins.str | None = ...,
         user: global___UserPacket | None = ...,
         sip_dtmf: global___SipDTMF | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "participant_sid", b"participant_sid", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_participant_sid", b"_participant_sid", "kind", b"kind", "participant_identity", b"participant_identity", "participant_sid", b"participant_sid", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_participant_sid", b"_participant_sid"]) -> typing_extensions.Literal["participant_sid"] | None: ...
-    @typing.overload
+    def HasField(self, field_name: typing_extensions.Literal["sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["value", b"value"]) -> typing_extensions.Literal["user", "sip_dtmf"] | None: ...
 
 global___DataPacketReceived = DataPacketReceived
