@@ -108,7 +108,7 @@ async def main():
     # participants and tracks that are already available in the room
     # participant_connected and track_published events will *not* be emitted for them
     for participant in room.participants.items():
-        for publication in participant.tracks.items():
+        for publication in participant.trackPublications.items():
             print("track publication: %s", publication.sid)
 ```
 
