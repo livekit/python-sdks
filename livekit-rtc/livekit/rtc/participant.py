@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import ctypes
-from dataclasses import dataclass, field
 from typing import List, Union
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -97,10 +96,16 @@ class LocalParticipant(Participant):
     async def publish_data(
         self,
         payload: Union[bytes, str],
-        options: DataPublishOptions,
+        *,
+        reliable: bool = True,
+        destination_identities: List[str] | None = None,
+        topic: str = "",
     ) -> None:
         if isinstance(payload, str):
             payload = payload.encode("utf-8")
+
+        if destination_identities is None:
+            destination_identities = []
 
         data_len = len(payload)
         cdata = (ctypes.c_byte * data_len)(*payload)
@@ -109,9 +114,9 @@ class LocalParticipant(Participant):
         req.publish_data.local_participant_handle = self._ffi_handle.handle
         req.publish_data.data_ptr = ctypes.addressof(cdata)
         req.publish_data.data_len = data_len
-        req.publish_data.reliable = options.reliable
-        req.publish_data.topic = options.topic
-        req.publish_data.destination_identities.extend(options.destination_identities)
+        req.publish_data.reliable = reliable
+        req.publish_data.topic = topic
+        req.publish_data.destination_identities.extend(destination_identities)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -256,10 +261,3 @@ class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
         self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
-
-
-@dataclass
-class DataPublishOptions:
-    reliable: bool = True
-    topic: str = ""
-    destination_identities: List[str] = field(default_factory=list)

@@ -39,7 +39,6 @@ from .e2ee import (
     KeyProviderOptions,
 )
 from .participant import (
-    DataPublishOptions,
     LocalParticipant,
     Participant,
     RemoteParticipant,
@@ -92,7 +91,6 @@ __all__ = [
     "LocalParticipant",
     "Participant",
     "RemoteParticipant",
-    "DataPublishOptions",
     "ConnectError",
     "Room",
     "RoomOptions",
