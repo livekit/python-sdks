@@ -92,6 +92,7 @@ __all__ = [
     "LocalParticipant",
     "Participant",
     "RemoteParticipant",
+    "DataPublishOptions",
     "ConnectError",
     "Room",
     "RoomOptions",
