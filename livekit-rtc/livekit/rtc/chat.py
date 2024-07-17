@@ -19,6 +19,7 @@ import logging
 from typing import Any, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
+from .participant import DataPublishOptions
 from ._event_emitter import EventEmitter
 from ._utils import generate_random_base62
 
@@ -60,8 +61,7 @@ class ChatManager(EventEmitter[EventTypes]):
         )
         await self._lp.publish_data(
             payload=json.dumps(msg.asjsondict()),
-            reliable=True,
-            topic=_CHAT_TOPIC,
+            options=DataPublishOptions(topic=_CHAT_TOPIC),
         )
         return msg
 
@@ -73,8 +73,7 @@ class ChatManager(EventEmitter[EventTypes]):
         """
         await self._lp.publish_data(
             payload=json.dumps(message.asjsondict()),
-            reliable=True,
-            topic=_CHAT_UPDATE_TOPIC,
+            options=DataPublishOptions(topic=_CHAT_UPDATE_TOPIC),
         )
 
     def _on_data_received(self, dp: DataPacket):
