@@ -98,14 +98,11 @@ class LocalParticipant(Participant):
         payload: Union[bytes, str],
         *,
         reliable: bool = True,
-        destination_identities: List[str] | None = None,
+        destination_identities: List[str] = [],
         topic: str = "",
     ) -> None:
         if isinstance(payload, str):
             payload = payload.encode("utf-8")
-
-        if destination_identities is None:
-            destination_identities = []
 
         data_len = len(payload)
         cdata = (ctypes.c_byte * data_len)(*payload)
