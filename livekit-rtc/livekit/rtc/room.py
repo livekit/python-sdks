@@ -391,7 +391,6 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "participant_name_changed":
             identity = event.participant_name_changed.participant_identity
-            # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
             old_name = participant.name
@@ -400,8 +399,20 @@ class Room(EventEmitter[EventTypes]):
                 "participant_name_changed", participant, old_name, participant.name
             )
         elif which == "participant_attributes_changed":
-            # TODO
-            pass
+            identity = event.participant_attributes_changed.participant_identity
+            attributes = event.participant_attributes_changed.attributes
+            changed_attributes = dict(
+                event.participant_attributes_changed.changed_attributes
+            )
+            participant = self._retrieve_participant(identity)
+            assert isinstance(participant, Participant)
+            participant._info.attributes.clear()
+            participant._info.attributes.update(attributes)
+            self.emit(
+                "participant_attributes_changed",
+                participant,
+                changed_attributes,
+            )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
             # TODO: pass participant identity

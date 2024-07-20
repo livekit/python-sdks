@@ -523,6 +523,68 @@ class PublishTranscriptionCallback(google.protobuf.message.Message):
 global___PublishTranscriptionCallback = PublishTranscriptionCallback
 
 @typing_extensions.final
+class PublishSipDtmfRequest(google.protobuf.message.Message):
+    """Publish Sip DTMF messages to other participants"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    CODE_FIELD_NUMBER: builtins.int
+    DIGIT_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    code: builtins.int
+    digit: builtins.str
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int = ...,
+        code: builtins.int = ...,
+        digit: builtins.str = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["code", b"code", "destination_identities", b"destination_identities", "digit", b"digit", "local_participant_handle", b"local_participant_handle"]) -> None: ...
+
+global___PublishSipDtmfRequest = PublishSipDtmfRequest
+
+@typing_extensions.final
+class PublishSipDtmfResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+
+global___PublishSipDtmfResponse = PublishSipDtmfResponse
+
+@typing_extensions.final
+class PublishSipDtmfCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+
+global___PublishSipDtmfCallback = PublishSipDtmfCallback
+
+@typing_extensions.final
 class SetLocalMetadataRequest(google.protobuf.message.Message):
     """Change the local participant's metadata"""
 
@@ -1477,22 +1539,6 @@ class ParticipantAttributesChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     @typing_extensions.final
-    class OldAttributesEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: builtins.str
-        value: builtins.str
-        def __init__(
-            self,
-            *,
-            key: builtins.str = ...,
-            value: builtins.str = ...,
-        ) -> None: ...
-        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
-
-    @typing_extensions.final
     class AttributesEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1508,22 +1554,38 @@ class ParticipantAttributesChanged(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    @typing_extensions.final
+    class ChangedAttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
-    OLD_ATTRIBUTES_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
+    CHANGED_ATTRIBUTES_FIELD_NUMBER: builtins.int
     participant_identity: builtins.str
     @property
-    def old_attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
-    @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def changed_attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     def __init__(
         self,
         *,
         participant_identity: builtins.str = ...,
-        old_attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        changed_attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "old_attributes", b"old_attributes", "participant_identity", b"participant_identity"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "changed_attributes", b"changed_attributes", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantAttributesChanged = ParticipantAttributesChanged
 
