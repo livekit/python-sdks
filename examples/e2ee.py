@@ -87,9 +87,7 @@ async def draw_cube(source: rtc.VideoSource):
                             idx = (y + dy) * WIDTH * 4 + (x + dx) * 4
                             arr[idx : idx + 4] = [255, 255, 255, 255]
 
-        f = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.ARGB, arr).convert(
-            rtc.VideoBufferType.I420
-        )
+        f = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.ARGB, arr)
         source.capture_frame(f)
         angle += 0.02
 
