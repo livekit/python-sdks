@@ -47,7 +47,7 @@ async def draw_cube(source: rtc.VideoSource):
         [3, 7],
     ]
 
-    arr = np.frombuffer(bytearray(WIDTH * HEIGHT * 4), dtype=np.uint8)
+    arr = np.zeros((WIDTH * HEIGHT * 4), dtype=np.uint8)
     angle = 0
 
     while True:
