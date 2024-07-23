@@ -144,7 +144,7 @@ class LocalParticipant(Participant):
         req.publish_transcription.local_participant_handle = self._ffi_handle.handle
         req.publish_transcription.participant_identity = transcription.participant_identity
         req.publish_transcription.segments.extend(proto_segments)
-        req.publish_transcription.track_id = transcription.track_id
+        req.publish_transcription.track_id = transcription.track_sid
         # fmt: on
         queue = FfiClient.instance.queue.subscribe()
         try:

@@ -1,6 +1,6 @@
 from . import models as _models
 from . import egress as _egress
-from . import agent as _agent
+import agent_dispatch as _agent_dispatch
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
@@ -51,8 +51,8 @@ class RoomEgress(_message.Message):
 class RoomAgent(_message.Message):
     __slots__ = ("dispatches",)
     DISPATCHES_FIELD_NUMBER: _ClassVar[int]
-    dispatches: _containers.RepeatedCompositeFieldContainer[_agent.RoomAgentDispatch]
-    def __init__(self, dispatches: _Optional[_Iterable[_Union[_agent.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+    dispatches: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
+    def __init__(self, dispatches: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class ListRoomsRequest(_message.Message):
     __slots__ = ("names",)

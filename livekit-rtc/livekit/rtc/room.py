@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 
 import asyncio
 import ctypes
@@ -29,7 +30,8 @@ from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
-from .track_publication import RemoteTrackPublication
+from .track_publication import TrackPublication, RemoteTrackPublication
+from .transcription import TranscriptionSegment
 
 EventTypes = Literal[
     "participant_connected",
@@ -51,6 +53,7 @@ EventTypes = Literal[
     "connection_quality_changed",
     "data_received",
     "sip_dtmf_received",
+    "transcription_received",
     "e2ee_state_changed",
     "connection_state_changed",
     "connected",
@@ -410,8 +413,8 @@ class Room(EventEmitter[EventTypes]):
             participant._info.attributes.update(attributes)
             self.emit(
                 "participant_attributes_changed",
-                participant,
                 changed_attributes,
+                participant,
             )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
@@ -461,6 +464,35 @@ class Room(EventEmitter[EventTypes]):
                         participant=rparticipant,
                     ),
                 )
+            elif which_val == "transcription":
+                transcription = packet.transcription
+                participant = self._retrieve_participant(
+                    transcription.transcribed_participant_identity
+                )
+                publication: TrackPublication | None = None
+                if participant:
+                    publication = participant.track_publications.get(
+                        transcription.track_id
+                    )
+
+                segments = [
+                    TranscriptionSegment(
+                        id=seg.id,
+                        text=seg.text,
+                        start_time=seg.start_time,
+                        end_time=seg.end_time,
+                        language=seg.language,
+                        final=seg.final,
+                    )
+                    for seg in transcription.segments
+                ]
+                self.emit(
+                    "transcription_received",
+                    segments,
+                    participant,
+                    publication,
+                )
+                pass
 
         elif which == "e2ee_state_changed":
             identity = event.e2ee_state_changed.participant_identity

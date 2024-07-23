@@ -25,7 +25,7 @@ async def main(room: rtc.Room) -> None:
 
     @room.on("participant_attributes_changed")
     def on_participant_attributes_changed(
-        participant: rtc.Participant, changed_attributes: dict[str, str]
+        changed_attributes: dict[str, str], participant: rtc.Participant
     ):
         logging.info(
             "participant attributes changed: %s %s",

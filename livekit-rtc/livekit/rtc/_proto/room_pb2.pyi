@@ -1115,6 +1115,7 @@ class RoomEvent(google.protobuf.message.Message):
     E2EE_STATE_CHANGED_FIELD_NUMBER: builtins.int
     EOS_FIELD_NUMBER: builtins.int
     DATA_PACKET_RECEIVED_FIELD_NUMBER: builtins.int
+    TRANSCRIPTION_RECEIVED_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1168,6 +1169,8 @@ class RoomEvent(google.protobuf.message.Message):
         """The stream of room events has ended"""
     @property
     def data_packet_received(self) -> global___DataPacketReceived: ...
+    @property
+    def transcription_received(self) -> global___TranscriptionReceived: ...
     def __init__(
         self,
         *,
@@ -1197,10 +1200,11 @@ class RoomEvent(google.protobuf.message.Message):
         e2ee_state_changed: global___E2eeStateChanged | None = ...,
         eos: global___RoomEOS | None = ...,
         data_packet_received: global___DataPacketReceived | None = ...,
+        transcription_received: global___TranscriptionReceived | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1694,6 +1698,33 @@ class DataPacketReceived(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing_extensions.Literal["value", b"value"]) -> typing_extensions.Literal["user", "sip_dtmf"] | None: ...
 
 global___DataPacketReceived = DataPacketReceived
+
+@typing_extensions.final
+class TranscriptionReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    SEGMENTS_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
+    @property
+    def segments(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___TranscriptionSegment]: ...
+    def __init__(
+        self,
+        *,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
+        segments: collections.abc.Iterable[global___TranscriptionSegment] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_participant_identity", b"_participant_identity", "_track_sid", b"_track_sid", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_participant_identity", b"_participant_identity", "_track_sid", b"_track_sid", "participant_identity", b"participant_identity", "segments", b"segments", "track_sid", b"track_sid"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_participant_identity", b"_participant_identity"]) -> typing_extensions.Literal["participant_identity"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_track_sid", b"_track_sid"]) -> typing_extensions.Literal["track_sid"] | None: ...
+
+global___TranscriptionReceived = TranscriptionReceived
 
 @typing_extensions.final
 class ConnectionStateChanged(google.protobuf.message.Message):

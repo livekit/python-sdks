@@ -5,7 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class Transcription:
     participant_identity: str
-    track_id: str
+    track_sid: str
     segments: List["TranscriptionSegment"]
 
 

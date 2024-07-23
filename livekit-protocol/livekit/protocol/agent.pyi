@@ -32,71 +32,10 @@ JS_RUNNING: JobStatus
 JS_SUCCESS: JobStatus
 JS_FAILED: JobStatus
 
-class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata")
-    AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
-    ROOM_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
-    agent_name: str
-    room: str
-    metadata: str
-    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
-
-class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata")
-    AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
-    agent_name: str
-    metadata: str
-    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
-
-class DeleteAgentDispatchRequest(_message.Message):
-    __slots__ = ("dispatch_id",)
-    DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
-    dispatch_id: str
-    def __init__(self, dispatch_id: _Optional[str] = ...) -> None: ...
-
-class ListAgentDispatchRequesst(_message.Message):
-    __slots__ = ("dispatch_id", "room")
-    DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
-    ROOM_FIELD_NUMBER: _ClassVar[int]
-    dispatch_id: str
-    room: str
-    def __init__(self, dispatch_id: _Optional[str] = ..., room: _Optional[str] = ...) -> None: ...
-
-class ListAgentDispatchResponse(_message.Message):
-    __slots__ = ("agent_dispatches",)
-    AGENT_DISPATCHES_FIELD_NUMBER: _ClassVar[int]
-    agent_dispatches: _containers.RepeatedCompositeFieldContainer[AgentDispatch]
-    def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
-
-class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state")
-    ID_FIELD_NUMBER: _ClassVar[int]
-    AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
-    ROOM_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    id: str
-    agent_name: str
-    room: str
-    metadata: str
-    state: AgentDispatchState
-    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ...) -> None: ...
-
-class AgentDispatchState(_message.Message):
-    __slots__ = ("jobs", "created_at", "deleted_at")
-    JOBS_FIELD_NUMBER: _ClassVar[int]
-    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    DELETED_AT_FIELD_NUMBER: _ClassVar[int]
-    jobs: _containers.RepeatedCompositeFieldContainer[Job]
-    created_at: int
-    deleted_at: int
-    def __init__(self, jobs: _Optional[_Iterable[_Union[Job, _Mapping]]] = ..., created_at: _Optional[int] = ..., deleted_at: _Optional[int] = ...) -> None: ...
-
 class Job(_message.Message):
-    __slots__ = ("id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state")
+    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state")
     ID_FIELD_NUMBER: _ClassVar[int]
+    DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
@@ -105,6 +44,7 @@ class Job(_message.Message):
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     id: str
+    dispatch_id: str
     type: JobType
     room: _models.Room
     participant: _models.ParticipantInfo
@@ -112,7 +52,7 @@ class Job(_message.Message):
     metadata: str
     agent_name: str
     state: JobState
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ...) -> None: ...
 
 class JobState(_message.Message):
     __slots__ = ("status", "error", "started_at", "ended_at", "updated_at")
@@ -185,22 +125,20 @@ class WorkerPong(_message.Message):
     def __init__(self, last_timestamp: _Optional[int] = ..., timestamp: _Optional[int] = ...) -> None: ...
 
 class RegisterWorkerRequest(_message.Message):
-    __slots__ = ("type", "agent_name", "version", "name", "ping_interval", "namespace", "allowed_permissions")
+    __slots__ = ("type", "agent_name", "version", "ping_interval", "namespace", "allowed_permissions")
     TYPE_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
-    NAME_FIELD_NUMBER: _ClassVar[int]
     PING_INTERVAL_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     ALLOWED_PERMISSIONS_FIELD_NUMBER: _ClassVar[int]
     type: JobType
     agent_name: str
     version: str
-    name: str
     ping_interval: int
     namespace: str
     allowed_permissions: _models.ParticipantPermission
-    def __init__(self, type: _Optional[_Union[JobType, str]] = ..., agent_name: _Optional[str] = ..., version: _Optional[str] = ..., name: _Optional[str] = ..., ping_interval: _Optional[int] = ..., namespace: _Optional[str] = ..., allowed_permissions: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ...) -> None: ...
+    def __init__(self, type: _Optional[_Union[JobType, str]] = ..., agent_name: _Optional[str] = ..., version: _Optional[str] = ..., ping_interval: _Optional[int] = ..., namespace: _Optional[str] = ..., allowed_permissions: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ...) -> None: ...
 
 class RegisterWorkerResponse(_message.Message):
     __slots__ = ("worker_id", "server_info")
