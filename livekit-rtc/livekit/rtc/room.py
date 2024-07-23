@@ -425,6 +425,24 @@ class Room(EventEmitter[EventTypes]):
                 participant,
                 event.connection_quality_changed.quality,
             )
+        elif which == "transcription_received":
+            transcription = event.transcription_received
+            segments = [
+                TranscriptionSegment(
+                    id=s.id,
+                    text=s.text,
+                    final=s.final,
+                    start_time=s.start_time,
+                    end_time=s.end_time,
+                    language=s.language,
+                )
+                for s in transcription.segments
+            ]
+            part = self._retrieve_participant(transcription.participant_identity)
+            pub: TrackPublication | None = None
+            if part:
+                pub = part.track_publications.get(transcription.track_sid)
+            self.emit("transcription_received", segments, part, pub)
         elif which == "data_packet_received":
             packet = event.data_packet_received
             which_val = packet.WhichOneof("value")
@@ -464,36 +482,6 @@ class Room(EventEmitter[EventTypes]):
                         participant=rparticipant,
                     ),
                 )
-            elif which_val == "transcription":
-                transcription = packet.transcription
-                participant = self._retrieve_participant(
-                    transcription.transcribed_participant_identity
-                )
-                publication: TrackPublication | None = None
-                if participant:
-                    publication = participant.track_publications.get(
-                        transcription.track_id
-                    )
-
-                segments = [
-                    TranscriptionSegment(
-                        id=seg.id,
-                        text=seg.text,
-                        start_time=seg.start_time,
-                        end_time=seg.end_time,
-                        language=seg.language,
-                        final=seg.final,
-                    )
-                    for seg in transcription.segments
-                ]
-                self.emit(
-                    "transcription_received",
-                    segments,
-                    participant,
-                    publication,
-                )
-                pass
-
         elif which == "e2ee_state_changed":
             identity = event.e2ee_state_changed.participant_identity
             e2ee_state = event.e2ee_state_changed.state
