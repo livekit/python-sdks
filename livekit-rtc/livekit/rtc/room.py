@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
 
 import asyncio
 import ctypes
@@ -29,7 +30,8 @@ from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
-from .track_publication import RemoteTrackPublication
+from .track_publication import TrackPublication, RemoteTrackPublication
+from .transcription import TranscriptionSegment
 
 EventTypes = Literal[
     "participant_connected",
@@ -47,9 +49,11 @@ EventTypes = Literal[
     "room_metadata_changed",
     "participant_metadata_changed",
     "participant_name_changed",
+    "participant_attributes_changed",
     "connection_quality_changed",
     "data_received",
     "sip_dtmf_received",
+    "transcription_received",
     "e2ee_state_changed",
     "connection_state_changed",
     "connected",
@@ -111,17 +115,20 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
-        self.participants: Dict[str, RemoteParticipant] = {}
-        self.participants_by_identity: Dict[str, RemoteParticipant] = {}
+        self.remote_participants: Dict[str, RemoteParticipant] = {}
         self.connection_state = ConnectionState.CONN_DISCONNECTED
+        self._first_sid_future = asyncio.Future[str]()
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     @property
-    def sid(self) -> str:
-        return self._info.sid
+    async def sid(self) -> str:
+        if self._info.sid:
+            return self._info.sid
+
+        return await self._first_sid_future
 
     @property
     def name(self) -> str:
@@ -211,7 +218,7 @@ class Room(EventEmitter[EventTypes]):
             # add the initial remote participant tracks
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
-                rp.tracks[publication.sid] = publication
+                rp.track_publications[publication.sid] = publication
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -265,35 +272,40 @@ class Room(EventEmitter[EventTypes]):
             )
             self.emit("participant_connected", rparticipant)
         elif which == "participant_disconnected":
-            sid = event.participant_disconnected.participant_sid
-            rparticipant = self.participants.pop(sid)
-            self.participants_by_identity.pop(rparticipant.identity)
+            identity = event.participant_disconnected.participant_identity
+            rparticipant = self.remote_participants.pop(identity)
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
-            lpublication = self.local_participant.tracks[sid]
+            lpublication = self.local_participant.track_publications[sid]
             track = lpublication.track
             self.emit("local_track_published", lpublication, track)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.tracks[sid]
+            lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
         elif which == "track_published":
-            rparticipant = self.participants[event.track_published.participant_sid]
+            rparticipant = self.remote_participants[
+                event.track_published.participant_identity
+            ]
             rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant.tracks[rpublication.sid] = rpublication
+            rparticipant.track_publications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
-            rparticipant = self.participants[event.track_unpublished.participant_sid]
-            rpublication = rparticipant.tracks.pop(
+            rparticipant = self.remote_participants[
+                event.track_unpublished.participant_identity
+            ]
+            rpublication = rparticipant.track_publications.pop(
                 event.track_unpublished.publication_sid
             )
             self.emit("track_unpublished", rpublication, rparticipant)
         elif which == "track_subscribed":
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
-            rparticipant = self.participants[event.track_subscribed.participant_sid]
-            rpublication = rparticipant.tracks[track_info.sid]
+            rparticipant = self.remote_participants[
+                event.track_subscribed.participant_identity
+            ]
+            rpublication = rparticipant.track_publications[track_info.sid]
             rpublication.subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 remote_video_track = RemoteVideoTrack(owned_track_info)
@@ -308,16 +320,18 @@ class Room(EventEmitter[EventTypes]):
                     "track_subscribed", remote_audio_track, rpublication, rparticipant
                 )
         elif which == "track_unsubscribed":
-            sid = event.track_unsubscribed.participant_sid
-            rparticipant = self.participants[sid]
-            rpublication = rparticipant.tracks[event.track_unsubscribed.track_sid]
+            identity = event.track_unsubscribed.participant_identity
+            rparticipant = self.remote_participants[identity]
+            rpublication = rparticipant.track_publications[
+                event.track_unsubscribed.track_sid
+            ]
             track = rpublication.track
             rpublication.track = None
             rpublication.subscribed = False
             self.emit("track_unsubscribed", track, rpublication, rparticipant)
         elif which == "track_subscription_failed":
-            sid = event.track_subscription_failed.participant_sid
-            rparticipant = self.participants[sid]
+            identity = event.track_subscription_failed.participant_identity
+            rparticipant = self.remote_participants[identity]
             error = event.track_subscription_failed.error
             self.emit(
                 "track_subscription_failed",
@@ -326,22 +340,22 @@ class Room(EventEmitter[EventTypes]):
                 error,
             )
         elif which == "track_muted":
-            sid = event.track_muted.participant_sid
+            identity = event.track_muted.participant_identity
             # TODO: pass participant identity
-            participant = self._retrieve_participant(sid, "")
+            participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.tracks[event.track_muted.track_sid]
+            publication = participant.track_publications[event.track_muted.track_sid]
             publication._info.muted = True
             if publication.track:
                 publication.track._info.muted = True
 
             self.emit("track_muted", participant, publication)
         elif which == "track_unmuted":
-            sid = event.track_unmuted.participant_sid
+            identity = event.track_unmuted.participant_identity
             # TODO: pass participant identity
-            participant = self._retrieve_participant(sid, "")
+            participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
-            publication = participant.tracks[event.track_unmuted.track_sid]
+            publication = participant.track_publications[event.track_unmuted.track_sid]
             publication._info.muted = False
             if publication.track:
                 publication.track._info.muted = False
@@ -350,8 +364,8 @@ class Room(EventEmitter[EventTypes]):
         elif which == "active_speakers_changed":
             speakers: list[Participant] = []
             # TODO: pass participant identity
-            for sid in event.active_speakers_changed.participant_sids:
-                participant = self._retrieve_participant(sid, "")
+            for identity in event.active_speakers_changed.participant_identities:
+                participant = self._retrieve_participant(identity)
                 assert isinstance(participant, Participant)
                 speakers.append(participant)
 
@@ -360,10 +374,15 @@ class Room(EventEmitter[EventTypes]):
             old_metadata = self.metadata
             self._info.metadata = event.room_metadata_changed.metadata
             self.emit("room_metadata_changed", old_metadata, self.metadata)
+        elif which == "room_sid_changed":
+            if not self._info.sid:
+                self._first_sid_future.set_result(event.room_sid_changed.sid)
+            self._info.sid = event.room_sid_changed.sid
+            # This is an internal event, not exposed to users
         elif which == "participant_metadata_changed":
-            sid = event.participant_metadata_changed.participant_sid
+            identity = event.participant_metadata_changed.participant_identity
             # TODO: pass participant identity
-            participant = self._retrieve_participant(sid, "")
+            participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
             old_metadata = participant.metadata
             participant._info.metadata = event.participant_metadata_changed.metadata
@@ -374,24 +393,56 @@ class Room(EventEmitter[EventTypes]):
                 participant.metadata,
             )
         elif which == "participant_name_changed":
-            sid = event.participant_name_changed.participant_sid
-            # TODO: pass participant identity
-            participant = self._retrieve_participant(sid, "")
+            identity = event.participant_name_changed.participant_identity
+            participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
             old_name = participant.name
             participant._info.name = event.participant_name_changed.name
             self.emit(
                 "participant_name_changed", participant, old_name, participant.name
             )
+        elif which == "participant_attributes_changed":
+            identity = event.participant_attributes_changed.participant_identity
+            attributes = event.participant_attributes_changed.attributes
+            changed_attributes = dict(
+                event.participant_attributes_changed.changed_attributes
+            )
+            participant = self._retrieve_participant(identity)
+            assert isinstance(participant, Participant)
+            participant._info.attributes.clear()
+            participant._info.attributes.update(attributes)
+            self.emit(
+                "participant_attributes_changed",
+                changed_attributes,
+                participant,
+            )
         elif which == "connection_quality_changed":
-            sid = event.connection_quality_changed.participant_sid
+            identity = event.connection_quality_changed.participant_identity
             # TODO: pass participant identity
-            participant = self._retrieve_participant(sid, "")
+            participant = self._retrieve_participant(identity)
             self.emit(
                 "connection_quality_changed",
                 participant,
                 event.connection_quality_changed.quality,
             )
+        elif which == "transcription_received":
+            transcription = event.transcription_received
+            segments = [
+                TranscriptionSegment(
+                    id=s.id,
+                    text=s.text,
+                    final=s.final,
+                    start_time=s.start_time,
+                    end_time=s.end_time,
+                    language=s.language,
+                )
+                for s in transcription.segments
+            ]
+            part = self._retrieve_participant(transcription.participant_identity)
+            pub: TrackPublication | None = None
+            if part:
+                pub = part.track_publications.get(transcription.track_sid)
+            self.emit("transcription_received", segments, part, pub)
         elif which == "data_packet_received":
             packet = event.data_packet_received
             which_val = packet.WhichOneof("value")
@@ -407,9 +458,7 @@ class Room(EventEmitter[EventTypes]):
                 FfiHandle(owned_buffer_info.handle.id)
                 rparticipant = cast(
                     RemoteParticipant,
-                    self._retrieve_remote_participant(
-                        packet.participant_sid, packet.participant_identity
-                    ),
+                    self._retrieve_remote_participant(packet.participant_identity),
                 )
                 self.emit(
                     "data_received",
@@ -423,9 +472,7 @@ class Room(EventEmitter[EventTypes]):
             elif which_val == "sip_dtmf":
                 rparticipant = cast(
                     RemoteParticipant,
-                    self._retrieve_remote_participant(
-                        packet.participant_sid, packet.participant_identity
-                    ),
+                    self._retrieve_remote_participant(packet.participant_identity),
                 )
                 self.emit(
                     "sip_dtmf_received",
@@ -435,13 +482,12 @@ class Room(EventEmitter[EventTypes]):
                         participant=rparticipant,
                     ),
                 )
-
         elif which == "e2ee_state_changed":
-            sid = event.e2ee_state_changed.participant_sid
+            identity = event.e2ee_state_changed.participant_identity
             e2ee_state = event.e2ee_state_changed.state
             # TODO: pass participant identity
             self.emit(
-                "e2ee_state_changed", self._retrieve_participant(sid, ""), e2ee_state
+                "e2ee_state_changed", self._retrieve_participant(identity), e2ee_state
             )
         elif which == "connection_state_changed":
             connection_state = event.connection_state_changed.state
@@ -457,35 +503,24 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnected")
 
     def _retrieve_remote_participant(
-        self, sid: str, identity: str
+        self, identity: str
     ) -> Optional[RemoteParticipant]:
-        """Retrieve a remote participant by sid or identity"""
-        participant = None
-        if identity:
-            participant = self.participants_by_identity[identity]
-        if not participant and sid in self.participants:
-            participant = self.participants[sid]
-        return participant
+        """Retrieve a remote participant by identity"""
+        return self.remote_participants.get(identity, None)
 
-    def _retrieve_participant(self, sid: str, identity: str) -> Optional[Participant]:
-        """Retrieve a participant by sid or identity,
-        returns the LocalParticipant if sid or identity matches"""
+    def _retrieve_participant(self, identity: str) -> Optional[Participant]:
+        """Retrieve a local or remote participant by identity"""
         if identity and identity == self.local_participant.identity:
             return self.local_participant
-        if sid and sid == self.local_participant.sid:
-            return self.local_participant
-        else:
-            return self._retrieve_remote_participant(sid, identity)
+
+        return self._retrieve_remote_participant(identity)
 
     def _create_remote_participant(
         self, owned_info: proto_participant.OwnedParticipant
     ) -> RemoteParticipant:
-        if owned_info.info.sid in self.participants:
-            raise Exception("participant already exists")
-        if owned_info.info.identity in self.participants_by_identity:
+        if owned_info.info.identity in self.remote_participants:
             raise Exception("participant already exists")
 
         participant = RemoteParticipant(owned_info)
-        self.participants[participant.sid] = participant
-        self.participants_by_identity[participant.identity] = participant
+        self.remote_participants[participant.identity] = participant
         return participant

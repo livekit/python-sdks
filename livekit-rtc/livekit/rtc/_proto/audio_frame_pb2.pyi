@@ -110,11 +110,13 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
     OPTIONS_FIELD_NUMBER: builtins.int
     SAMPLE_RATE_FIELD_NUMBER: builtins.int
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    ENABLE_QUEUE_FIELD_NUMBER: builtins.int
     type: global___AudioSourceType.ValueType
     @property
     def options(self) -> global___AudioSourceOptions: ...
     sample_rate: builtins.int
     num_channels: builtins.int
+    enable_queue: builtins.bool
     def __init__(
         self,
         *,
@@ -122,9 +124,13 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
         options: global___AudioSourceOptions | None = ...,
         sample_rate: builtins.int = ...,
         num_channels: builtins.int = ...,
+        enable_queue: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_options", b"_options", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_options", b"_options", "num_channels", b"num_channels", "options", b"options", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "options", b"options"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "num_channels", b"num_channels", "options", b"options", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_enable_queue", b"_enable_queue"]) -> typing_extensions.Literal["enable_queue"] | None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_options", b"_options"]) -> typing_extensions.Literal["options"] | None: ...
 
 global___NewAudioSourceRequest = NewAudioSourceRequest

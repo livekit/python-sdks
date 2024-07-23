@@ -21,7 +21,6 @@ from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import (
-    DataPacketKind,
     TrackPublishOptions,
 )
 from ._proto.room_pb2 import (
@@ -61,7 +60,7 @@ class Participant:
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        self.tracks: dict[str, TrackPublication] = {}
+        self.track_publications: dict[str, TrackPublication] = {}
 
     @property
     def sid(self) -> str:
@@ -79,6 +78,10 @@ class Participant:
     def metadata(self) -> str:
         return self._info.metadata
 
+    @property
+    def attributes(self) -> dict[str, str]:
+        return dict(self._info.attributes)
+
 
 class LocalParticipant(Participant):
     def __init__(
@@ -88,13 +91,14 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self.tracks: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
 
     async def publish_data(
         self,
         payload: Union[bytes, str],
-        kind: DataPacketKind.ValueType = DataPacketKind.KIND_RELIABLE,
-        destination_sids: List[Union[str, "RemoteParticipant"]] = [],
+        *,
+        reliable: bool = True,
+        destination_identities: List[str] = [],
         topic: str = "",
     ) -> None:
         if isinstance(payload, str):
@@ -107,17 +111,9 @@ class LocalParticipant(Participant):
         req.publish_data.local_participant_handle = self._ffi_handle.handle
         req.publish_data.data_ptr = ctypes.addressof(cdata)
         req.publish_data.data_len = data_len
-        req.publish_data.kind = kind
+        req.publish_data.reliable = reliable
         req.publish_data.topic = topic
-
-        sids = []
-        for p in destination_sids:
-            if isinstance(p, RemoteParticipant):
-                sids.append(p.sid)
-            else:
-                sids.append(p)
-
-        req.publish_data.destination_sids.extend(sids)
+        req.publish_data.destination_identities.extend(destination_identities)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -140,6 +136,7 @@ class LocalParticipant(Participant):
                 start_time=s.start_time,
                 end_time=s.end_time,
                 final=s.final,
+                language=s.language,
             )
             for s in transcription.segments
         ]
@@ -147,8 +144,7 @@ class LocalParticipant(Participant):
         req.publish_transcription.local_participant_handle = self._ffi_handle.handle
         req.publish_transcription.participant_identity = transcription.participant_identity
         req.publish_transcription.segments.extend(proto_segments)
-        req.publish_transcription.track_id = transcription.track_id
-        req.publish_transcription.language = transcription.language
+        req.publish_transcription.track_id = transcription.track_sid
         # fmt: on
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -163,10 +159,10 @@ class LocalParticipant(Participant):
         if cb.publish_transcription.error:
             raise PublishTranscriptionError(cb.publish_transcription.error)
 
-    async def update_metadata(self, metadata: str) -> None:
+    async def set_metadata(self, metadata: str) -> None:
         req = proto_ffi.FfiRequest()
-        req.update_local_metadata.local_participant_handle = self._ffi_handle.handle
-        req.update_local_metadata.metadata = metadata
+        req.set_local_metadata.local_participant_handle = self._ffi_handle.handle
+        req.set_local_metadata.metadata = metadata
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -178,10 +174,10 @@ class LocalParticipant(Participant):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-    async def update_name(self, name: str) -> None:
+    async def set_name(self, name: str) -> None:
         req = proto_ffi.FfiRequest()
-        req.update_local_name.local_participant_handle = self._ffi_handle.handle
-        req.update_local_name.name = name
+        req.set_local_name.local_participant_handle = self._ffi_handle.handle
+        req.set_local_name.name = name
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -189,6 +185,21 @@ class LocalParticipant(Participant):
             await queue.wait_for(
                 lambda e: e.update_local_name.async_id
                 == resp.update_local_name.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+    async def set_attributes(self, attributes: dict[str, str]) -> None:
+        req = proto_ffi.FfiRequest()
+        req.set_local_attributes.local_participant_handle = self._ffi_handle.handle
+        req.set_local_attributes.attributes.update(attributes)
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: e.set_local_attributes.async_id
+                == resp.set_local_attributes.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -214,7 +225,7 @@ class LocalParticipant(Participant):
             track_publication = LocalTrackPublication(cb.publish_track.publication)
             track_publication.track = track
             track._info.sid = track_publication.sid
-            self.tracks[track_publication.sid] = track_publication
+            self.track_publications[track_publication.sid] = track_publication
 
             queue.task_done()
             return track_publication
@@ -236,7 +247,7 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self.tracks.pop(track_sid)
+            publication = self.track_publications.pop(track_sid)
             publication.track = None
             queue.task_done()
         finally:
@@ -246,4 +257,4 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self.tracks: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore

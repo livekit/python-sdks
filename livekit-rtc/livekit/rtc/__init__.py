@@ -38,7 +38,11 @@ from .e2ee import (
     KeyProvider,
     KeyProviderOptions,
 )
-from .participant import LocalParticipant, Participant, RemoteParticipant
+from .participant import (
+    LocalParticipant,
+    Participant,
+    RemoteParticipant,
+)
 from .room import ConnectError, DataPacket, Room, RoomOptions, RtcConfiguration, SipDTMF
 from .track import (
     AudioTrack,

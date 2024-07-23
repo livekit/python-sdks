@@ -139,7 +139,7 @@ async def main(room: rtc.Room) -> None:
     )
     await room.connect(os.getenv("LIVEKIT_URL"), token)
     logging.info("connected to room %s", room.name)
-    logging.info("participants: %s", room.participants)
+    logging.info("participants: %s", room.remote_participants)
 
     await asyncio.sleep(2)
     await room.local_participant.publish_data("hello world")

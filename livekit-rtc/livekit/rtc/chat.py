@@ -20,7 +20,6 @@ from typing import Any, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
 from ._event_emitter import EventEmitter
-from ._proto.room_pb2 import DataPacketKind
 from ._utils import generate_random_base62
 
 _CHAT_TOPIC = "lk-chat-topic"
@@ -61,7 +60,6 @@ class ChatManager(EventEmitter[EventTypes]):
         )
         await self._lp.publish_data(
             payload=json.dumps(msg.asjsondict()),
-            kind=DataPacketKind.KIND_RELIABLE,
             topic=_CHAT_TOPIC,
         )
         return msg
@@ -74,7 +72,6 @@ class ChatManager(EventEmitter[EventTypes]):
         """
         await self._lp.publish_data(
             payload=json.dumps(message.asjsondict()),
-            kind=DataPacketKind.KIND_RELIABLE,
             topic=_CHAT_UPDATE_TOPIC,
         )
 
