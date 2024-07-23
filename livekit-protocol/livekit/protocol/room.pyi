@@ -1,6 +1,6 @@
 from . import models as _models
 from . import egress as _egress
-import agent_dispatch as _agent_dispatch
+from . import agent_dispatch as _agent_dispatch
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
