@@ -31,6 +31,7 @@ protoc \
     $API_PROTOCOL/livekit_ingress.proto \
     $API_PROTOCOL/livekit_models.proto \
     $API_PROTOCOL/livekit_agent.proto \
+    $API_PROTOCOL/livekit_agent_dispatch.proto \
     $API_PROTOCOL/livekit_sip.proto \
     $API_PROTOCOL/livekit_analytics.proto
 
