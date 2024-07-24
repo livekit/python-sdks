@@ -14,7 +14,7 @@
 
 import asyncio
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, AsyncIterator
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
@@ -91,11 +91,11 @@ class VideoStream:
         self._ffi_handle.dispose()
         await self._task
 
-    def __aiter__(self) -> "VideoStream":
-        return self
-
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.video_stream_event.stream_handle == self._ffi_handle.handle
+
+    def __aiter__(self) -> AsyncIterator[VideoFrameEvent]:
+        return self
 
     async def __anext__(self) -> VideoFrameEvent:
         if self._task.done():
