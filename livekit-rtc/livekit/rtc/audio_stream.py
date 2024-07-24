@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import asyncio
-from typing import Optional
+from typing import Optional, AsyncIterator
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -78,11 +78,11 @@ class AudioStream:
         self._ffi_handle.dispose()
         await self._task
 
-    def __aiter__(self) -> "AudioStream":
-        return self
-
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.audio_stream_event.stream_handle == self._ffi_handle.handle
+
+    def __aiter__(self) -> AsyncIterator[AudioFrameEvent]:
+        return self
 
     async def __anext__(self) -> AudioFrameEvent:
         if self._task.done():
