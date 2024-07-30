@@ -168,8 +168,8 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             await queue.wait_for(
-                lambda e: e.update_local_metadata.async_id
-                == resp.update_local_metadata.async_id
+                lambda e: e.set_local_metadata.async_id
+                == resp.set_local_metadata.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -183,8 +183,7 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             await queue.wait_for(
-                lambda e: e.update_local_name.async_id
-                == resp.update_local_name.async_id
+                lambda e: e.set_local_name.async_id == resp.set_local_name.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
