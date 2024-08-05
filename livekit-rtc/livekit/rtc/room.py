@@ -30,7 +30,7 @@ from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
-from .track_publication import TrackPublication, RemoteTrackPublication
+from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
 
 EventTypes = Literal[
@@ -521,6 +521,6 @@ class Room(EventEmitter[EventTypes]):
         if owned_info.info.identity in self.remote_participants:
             raise Exception("participant already exists")
 
-        participant = RemoteParticipant(owned_info)
+        participant = RemoteParticipant(self, owned_info)
         self.remote_participants[participant.identity] = participant
         return participant
