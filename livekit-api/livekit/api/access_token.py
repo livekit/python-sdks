@@ -77,6 +77,7 @@ class Claims:
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
     sip: SIPGrants = dataclasses.field(default_factory=SIPGrants)
+    attributes: dict[str, str] = dataclasses.field(default_factory=dict)
     metadata: str = ""
     sha256: str = ""
 
@@ -123,6 +124,10 @@ class AccessToken:
 
     def with_metadata(self, metadata: str) -> "AccessToken":
         self.claims.metadata = metadata
+        return self
+
+    def with_attributes(self, attributes: dict[str, str]) -> "AccessToken":
+        self.claims.attributes = attributes
         return self
 
     def with_sha256(self, sha256: str) -> "AccessToken":
