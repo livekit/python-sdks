@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Optional, List
+from typing import Any, Optional, List
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
@@ -153,7 +153,6 @@ class AccessToken:
                 ),
             }
         )
-
         return jwt.encode(claims, self.api_secret, algorithm="HS256")
 
 
@@ -203,6 +202,7 @@ class TokenVerifier:
             name=claims.get("name", ""),
             video=video,
             sip=sip,
+            attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
         )

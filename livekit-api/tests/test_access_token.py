@@ -17,7 +17,7 @@ def test_verify_token():
         .with_metadata("test_metadata")
         .with_grants(grants)
         .with_sip_grants(sip)
-        .with_attributes({"foo": "bar"})
+        .with_attributes({"key1": "value1", "key2": "value2"})
         .to_jwt()
     )
 
@@ -28,7 +28,8 @@ def test_verify_token():
     assert claims.metadata == "test_metadata"
     assert claims.video == grants
     assert claims.sip == sip
-    assert claims.attributes["foo"] == "bar"
+    assert claims.attributes["key1"] == "value1"
+    assert claims.attributes["key2"] == "value2"
 
 
 def test_verify_token_invalid():
