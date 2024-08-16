@@ -77,6 +77,7 @@ class Claims:
     name: str = ""
     video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
     sip: SIPGrants = dataclasses.field(default_factory=SIPGrants)
+    attributes: dict[str, str] = dataclasses.field(default_factory=dict)
     metadata: str = ""
     sha256: str = ""
 
@@ -125,6 +126,10 @@ class AccessToken:
         self.claims.metadata = metadata
         return self
 
+    def with_attributes(self, attributes: dict[str, str]) -> "AccessToken":
+        self.claims.attributes = attributes
+        return self
+
     def with_sha256(self, sha256: str) -> "AccessToken":
         self.claims.sha256 = sha256
         return self
@@ -148,7 +153,6 @@ class AccessToken:
                 ),
             }
         )
-
         return jwt.encode(claims, self.api_secret, algorithm="HS256")
 
 
@@ -198,6 +202,7 @@ class TokenVerifier:
             name=claims.get("name", ""),
             video=video,
             sip=sip,
+            attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
         )
