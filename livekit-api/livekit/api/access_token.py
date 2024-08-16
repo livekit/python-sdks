@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Any, Optional, List
+from typing import Optional, List
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
