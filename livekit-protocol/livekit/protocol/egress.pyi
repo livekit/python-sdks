@@ -32,6 +32,7 @@ class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     DEFAULT_PROTOCOL: _ClassVar[StreamProtocol]
     RTMP: _ClassVar[StreamProtocol]
+    SRT: _ClassVar[StreamProtocol]
 
 class EncodingOptionsPreset(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -64,6 +65,7 @@ IMAGE_SUFFIX_INDEX: ImageFileSuffix
 IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix
 DEFAULT_PROTOCOL: StreamProtocol
 RTMP: StreamProtocol
+SRT: StreamProtocol
 H264_720P_30: EncodingOptionsPreset
 H264_720P_60: EncodingOptionsPreset
 H264_1080P_30: EncodingOptionsPreset
