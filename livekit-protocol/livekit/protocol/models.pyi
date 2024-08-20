@@ -72,6 +72,7 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     JOIN_FAILURE: _ClassVar[DisconnectReason]
     MIGRATION: _ClassVar[DisconnectReason]
     SIGNAL_CLOSE: _ClassVar[DisconnectReason]
+    ROOM_CLOSED: _ClassVar[DisconnectReason]
 
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -134,6 +135,7 @@ STATE_MISMATCH: DisconnectReason
 JOIN_FAILURE: DisconnectReason
 MIGRATION: DisconnectReason
 SIGNAL_CLOSE: DisconnectReason
+ROOM_CLOSED: DisconnectReason
 RR_UNKNOWN: ReconnectReason
 RR_SIGNAL_DISCONNECTED: ReconnectReason
 RR_PUBLISHER_FAILED: ReconnectReason
@@ -218,7 +220,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -261,6 +263,7 @@ class ParticipantInfo(_message.Message):
     IS_PUBLISHER_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    DISCONNECT_REASON_FIELD_NUMBER: _ClassVar[int]
     sid: str
     identity: str
     state: ParticipantInfo.State
@@ -274,7 +277,8 @@ class ParticipantInfo(_message.Message):
     is_publisher: bool
     kind: ParticipantInfo.Kind
     attributes: _containers.ScalarMap[str, str]
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    disconnect_reason: DisconnectReason
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
@@ -680,6 +684,58 @@ class RTPStats(_message.Message):
     report_drift: RTPDrift
     rebased_report_drift: RTPDrift
     def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
+
+class RTPForwarderState(_message.Message):
+    __slots__ = ("started", "reference_layer_spatial", "pre_start_time", "ext_first_timestamp", "dummy_start_timestamp_offset", "rtp_munger", "vp8_munger")
+    STARTED_FIELD_NUMBER: _ClassVar[int]
+    REFERENCE_LAYER_SPATIAL_FIELD_NUMBER: _ClassVar[int]
+    PRE_START_TIME_FIELD_NUMBER: _ClassVar[int]
+    EXT_FIRST_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    DUMMY_START_TIMESTAMP_OFFSET_FIELD_NUMBER: _ClassVar[int]
+    RTP_MUNGER_FIELD_NUMBER: _ClassVar[int]
+    VP8_MUNGER_FIELD_NUMBER: _ClassVar[int]
+    started: bool
+    reference_layer_spatial: int
+    pre_start_time: int
+    ext_first_timestamp: int
+    dummy_start_timestamp_offset: int
+    rtp_munger: RTPMungerState
+    vp8_munger: VP8MungerState
+    def __init__(self, started: bool = ..., reference_layer_spatial: _Optional[int] = ..., pre_start_time: _Optional[int] = ..., ext_first_timestamp: _Optional[int] = ..., dummy_start_timestamp_offset: _Optional[int] = ..., rtp_munger: _Optional[_Union[RTPMungerState, _Mapping]] = ..., vp8_munger: _Optional[_Union[VP8MungerState, _Mapping]] = ...) -> None: ...
+
+class RTPMungerState(_message.Message):
+    __slots__ = ("ext_last_sequence_number", "ext_second_last_sequence_number", "ext_last_timestamp", "ext_second_last_timestamp", "last_marker", "second_last_marker")
+    EXT_LAST_SEQUENCE_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    EXT_SECOND_LAST_SEQUENCE_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    EXT_LAST_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    EXT_SECOND_LAST_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    LAST_MARKER_FIELD_NUMBER: _ClassVar[int]
+    SECOND_LAST_MARKER_FIELD_NUMBER: _ClassVar[int]
+    ext_last_sequence_number: int
+    ext_second_last_sequence_number: int
+    ext_last_timestamp: int
+    ext_second_last_timestamp: int
+    last_marker: bool
+    second_last_marker: bool
+    def __init__(self, ext_last_sequence_number: _Optional[int] = ..., ext_second_last_sequence_number: _Optional[int] = ..., ext_last_timestamp: _Optional[int] = ..., ext_second_last_timestamp: _Optional[int] = ..., last_marker: bool = ..., second_last_marker: bool = ...) -> None: ...
+
+class VP8MungerState(_message.Message):
+    __slots__ = ("ext_last_picture_id", "picture_id_used", "last_tl0_pic_idx", "tl0_pic_idx_used", "tid_used", "last_key_idx", "key_idx_used")
+    EXT_LAST_PICTURE_ID_FIELD_NUMBER: _ClassVar[int]
+    PICTURE_ID_USED_FIELD_NUMBER: _ClassVar[int]
+    LAST_TL0_PIC_IDX_FIELD_NUMBER: _ClassVar[int]
+    TL0_PIC_IDX_USED_FIELD_NUMBER: _ClassVar[int]
+    TID_USED_FIELD_NUMBER: _ClassVar[int]
+    LAST_KEY_IDX_FIELD_NUMBER: _ClassVar[int]
+    KEY_IDX_USED_FIELD_NUMBER: _ClassVar[int]
+    ext_last_picture_id: int
+    picture_id_used: bool
+    last_tl0_pic_idx: int
+    tl0_pic_idx_used: bool
+    tid_used: bool
+    last_key_idx: int
+    key_idx_used: bool
+    def __init__(self, ext_last_picture_id: _Optional[int] = ..., picture_id_used: bool = ..., last_tl0_pic_idx: _Optional[int] = ..., tl0_pic_idx_used: bool = ..., tid_used: bool = ..., last_key_idx: _Optional[int] = ..., key_idx_used: bool = ...) -> None: ...
 
 class TimedVersion(_message.Message):
     __slots__ = ("unix_micro", "ticks")

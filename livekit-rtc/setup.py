@@ -14,12 +14,12 @@
 
 import os
 import pathlib
+from sysconfig import get_platform
 from typing import Any, Dict
 
 import setuptools  # type: ignore
 import setuptools.command.build_py  # type: ignore
 from wheel.bdist_wheel import bdist_wheel as _bdist_wheel  # type: ignore
-from wheel.bdist_wheel import get_platform  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
 about: Dict[Any, Any] = {}
@@ -29,7 +29,7 @@ with open(os.path.join(here, "livekit", "rtc", "version.py"), "r") as f:
 
 class bdist_wheel(_bdist_wheel):
     def finalize_options(self):
-        self.plat_name = get_platform(None)  # force a platform tag
+        self.plat_name = get_platform()  # force a platform tag
         _bdist_wheel.finalize_options(self)
 
 

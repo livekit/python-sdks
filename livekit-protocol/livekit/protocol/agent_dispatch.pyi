@@ -25,12 +25,14 @@ class RoomAgentDispatch(_message.Message):
     def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
-    __slots__ = ("dispatch_id",)
+    __slots__ = ("dispatch_id", "room")
     DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_FIELD_NUMBER: _ClassVar[int]
     dispatch_id: str
-    def __init__(self, dispatch_id: _Optional[str] = ...) -> None: ...
+    room: str
+    def __init__(self, dispatch_id: _Optional[str] = ..., room: _Optional[str] = ...) -> None: ...
 
-class ListAgentDispatchRequesst(_message.Message):
+class ListAgentDispatchRequest(_message.Message):
     __slots__ = ("dispatch_id", "room")
     DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
