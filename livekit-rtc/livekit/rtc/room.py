@@ -287,8 +287,8 @@ class Room(EventEmitter[EventTypes]):
             self.emit("local_track_unpublished", lpublication)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
-            publication = self.local_participant.track_publications[sid]
-            self.emit("local_track_subscribed", publication)
+            lpublication = self.local_participant.track_publications[sid]
+            self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
             rparticipant = self.remote_participants[
                 event.track_published.participant_identity
