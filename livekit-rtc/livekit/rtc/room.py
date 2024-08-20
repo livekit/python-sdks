@@ -38,6 +38,7 @@ EventTypes = Literal[
     "participant_disconnected",
     "local_track_published",
     "local_track_unpublished",
+    "local_track_subscribed",
     "track_published",
     "track_unpublished",
     "track_subscribed",
@@ -284,6 +285,10 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
+        elif which == "local_track_subscribed":
+            sid = event.local_track_subscribed.track_sid
+            publication = self.local_participant.track_publications[sid]
+            self.emit("local_track_subscribed", publication)
         elif which == "track_published":
             rparticipant = self.remote_participants[
                 event.track_published.participant_identity
@@ -496,7 +501,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "connected":
             self.emit("connected")
         elif which == "disconnected":
-            self.emit("disconnected")
+            self.emit("disconnected", event.disconnected.reason)
         elif which == "reconnecting":
             self.emit("reconnecting")
         elif which == "reconnected":
