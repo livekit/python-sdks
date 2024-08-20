@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 from . import audio_frame_pb2
 import builtins
 import collections.abc
@@ -57,7 +58,7 @@ LOG_DEBUG: LogLevel.ValueType  # 3
 LOG_TRACE: LogLevel.ValueType  # 4
 global___LogLevel = LogLevel
 
-@typing_extensions.final
+@typing.final
 class FfiRequest(google.protobuf.message.Message):
     """**How is the livekit-ffi working:
     We refer as the ffi server the Rust server that is running the LiveKit client implementation, and we
@@ -122,6 +123,7 @@ class FfiRequest(google.protobuf.message.Message):
     @property
     def connect(self) -> room_pb2.ConnectRequest:
         """Room"""
+
     @property
     def disconnect(self) -> room_pb2.DisconnectRequest: ...
     @property
@@ -147,6 +149,7 @@ class FfiRequest(google.protobuf.message.Message):
     @property
     def create_video_track(self) -> track_pb2.CreateVideoTrackRequest:
         """Track"""
+
     @property
     def create_audio_track(self) -> track_pb2.CreateAudioTrackRequest: ...
     @property
@@ -154,6 +157,7 @@ class FfiRequest(google.protobuf.message.Message):
     @property
     def new_video_stream(self) -> video_frame_pb2.NewVideoStreamRequest:
         """Video"""
+
     @property
     def new_video_source(self) -> video_frame_pb2.NewVideoSourceRequest: ...
     @property
@@ -163,6 +167,7 @@ class FfiRequest(google.protobuf.message.Message):
     @property
     def new_audio_stream(self) -> audio_frame_pb2.NewAudioStreamRequest:
         """Audio"""
+
     @property
     def new_audio_source(self) -> audio_frame_pb2.NewAudioSourceRequest: ...
     @property
@@ -203,13 +208,13 @@ class FfiRequest(google.protobuf.message.Message):
         remix_and_resample: audio_frame_pb2.RemixAndResampleRequest | None = ...,
         e2ee: e2ee_pb2.E2eeRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "new_audio_stream", "new_audio_source", "capture_audio_frame", "new_audio_resampler", "remix_and_resample", "e2ee"] | None: ...
+    def HasField(self, field_name: typing.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "new_audio_stream", "new_audio_source", "capture_audio_frame", "new_audio_resampler", "remix_and_resample", "e2ee"] | None: ...
 
 global___FfiRequest = FfiRequest
 
-@typing_extensions.final
+@typing.final
 class FfiResponse(google.protobuf.message.Message):
     """This is the output of livekit_ffi_request function."""
 
@@ -246,6 +251,7 @@ class FfiResponse(google.protobuf.message.Message):
     @property
     def connect(self) -> room_pb2.ConnectResponse:
         """Room"""
+
     @property
     def disconnect(self) -> room_pb2.DisconnectResponse: ...
     @property
@@ -271,6 +277,7 @@ class FfiResponse(google.protobuf.message.Message):
     @property
     def create_video_track(self) -> track_pb2.CreateVideoTrackResponse:
         """Track"""
+
     @property
     def create_audio_track(self) -> track_pb2.CreateAudioTrackResponse: ...
     @property
@@ -278,6 +285,7 @@ class FfiResponse(google.protobuf.message.Message):
     @property
     def new_video_stream(self) -> video_frame_pb2.NewVideoStreamResponse:
         """Video"""
+
     @property
     def new_video_source(self) -> video_frame_pb2.NewVideoSourceResponse: ...
     @property
@@ -287,6 +295,7 @@ class FfiResponse(google.protobuf.message.Message):
     @property
     def new_audio_stream(self) -> audio_frame_pb2.NewAudioStreamResponse:
         """Audio"""
+
     @property
     def new_audio_source(self) -> audio_frame_pb2.NewAudioSourceResponse: ...
     @property
@@ -327,13 +336,13 @@ class FfiResponse(google.protobuf.message.Message):
         remix_and_resample: audio_frame_pb2.RemixAndResampleResponse | None = ...,
         e2ee: e2ee_pb2.E2eeResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "new_audio_stream", "new_audio_source", "capture_audio_frame", "new_audio_resampler", "remix_and_resample", "e2ee"] | None: ...
+    def HasField(self, field_name: typing.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "remix_and_resample", b"remix_and_resample", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "video_convert", b"video_convert"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "new_audio_stream", "new_audio_source", "capture_audio_frame", "new_audio_resampler", "remix_and_resample", "e2ee"] | None: ...
 
 global___FfiResponse = FfiResponse
 
-@typing_extensions.final
+@typing.final
 class FfiEvent(google.protobuf.message.Message):
     """To minimize complexity, participant events are not included in the protocol.
     It is easily deducible from the room events and it turned out that is is easier to implement
@@ -426,13 +435,13 @@ class FfiEvent(google.protobuf.message.Message):
         panic: global___Panic | None = ...,
         publish_sip_dtmf: room_pb2.PublishSipDtmfCallback | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf"] | None: ...
+    def HasField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf"] | None: ...
 
 global___FfiEvent = FfiEvent
 
-@typing_extensions.final
+@typing.final
 class DisposeRequest(google.protobuf.message.Message):
     """Stop all rooms synchronously (Do we need async here?).
     e.g: This is used for the Unity Editor after each assemblies reload.
@@ -445,11 +454,11 @@ class DisposeRequest(google.protobuf.message.Message):
     def __init__(
         self,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["async", b"async"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["async", b"async"]) -> None: ...
 
 global___DisposeRequest = DisposeRequest
 
-@typing_extensions.final
+@typing.final
 class DisposeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -461,13 +470,13 @@ class DisposeResponse(google.protobuf.message.Message):
         *,
         async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_async_id", b"_async_id", "async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_async_id", b"_async_id", "async_id", b"async_id"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_async_id", b"_async_id"]) -> typing_extensions.Literal["async_id"] | None: ...
+    def HasField(self, field_name: typing.Literal["_async_id", b"_async_id", "async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_async_id", b"_async_id", "async_id", b"async_id"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_async_id", b"_async_id"]) -> typing.Literal["async_id"] | None: ...
 
 global___DisposeResponse = DisposeResponse
 
-@typing_extensions.final
+@typing.final
 class DisposeCallback(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -478,11 +487,11 @@ class DisposeCallback(google.protobuf.message.Message):
         *,
         async_id: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___DisposeCallback = DisposeCallback
 
-@typing_extensions.final
+@typing.final
 class LogRecord(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -509,18 +518,18 @@ class LogRecord(google.protobuf.message.Message):
         line: builtins.int | None = ...,
         message: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "line", b"line", "module_path", b"module_path"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "line", b"line", "module_path", b"module_path"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_file", b"_file", "_line", b"_line", "_module_path", b"_module_path", "file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_file", b"_file"]) -> typing_extensions.Literal["file"] | None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_file", b"_file"]) -> typing.Literal["file"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_line", b"_line"]) -> typing_extensions.Literal["line"] | None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_line", b"_line"]) -> typing.Literal["line"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_module_path", b"_module_path"]) -> typing_extensions.Literal["module_path"] | None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_module_path", b"_module_path"]) -> typing.Literal["module_path"] | None: ...
 
 global___LogRecord = LogRecord
 
-@typing_extensions.final
+@typing.final
 class LogBatch(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -532,11 +541,11 @@ class LogBatch(google.protobuf.message.Message):
         *,
         records: collections.abc.Iterable[global___LogRecord] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["records", b"records"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["records", b"records"]) -> None: ...
 
 global___LogBatch = LogBatch
 
-@typing_extensions.final
+@typing.final
 class Panic(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -547,6 +556,6 @@ class Panic(google.protobuf.message.Message):
         *,
         message: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["message", b"message"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["message", b"message"]) -> None: ...
 
 global___Panic = Panic
