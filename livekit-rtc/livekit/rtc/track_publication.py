@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Optional
+import asyncio
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
@@ -71,18 +72,14 @@ class TrackPublication:
 class LocalTrackPublication(TrackPublication):
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):
         super().__init__(owned_info)
-        self._queue = (
-            FfiClient.instance.queue.subscribe()
-        )  # start listening at publication creation
+        self._first_subscription: asyncio.Future[None] = asyncio.Future()
+
+    @property
+    def first_subscription(self) -> asyncio.Future[None]:
+        return self._first_subscription
 
     async def wait_for_subscriber(self):
-        try:
-            await self._queue.wait_for(
-                lambda e: e.room_event.local_track_subscribed.track_sid
-                == self._info.sid
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(self._queue)
+        await self._first_subscription
 
 
 class RemoteTrackPublication(TrackPublication):
