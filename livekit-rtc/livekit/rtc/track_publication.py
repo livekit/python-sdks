@@ -74,8 +74,8 @@ class LocalTrackPublication(TrackPublication):
         super().__init__(owned_info)
         self._first_subscription: asyncio.Future[None] = asyncio.Future()
 
-    async def wait_for_subscriber(self):
-        await self._first_subscription
+    async def wait_for_subscriber(self) -> None:
+        await asyncio.shield(self._first_subscription)
 
 
 class RemoteTrackPublication(TrackPublication):
