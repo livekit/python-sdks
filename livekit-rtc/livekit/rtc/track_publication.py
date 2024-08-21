@@ -71,6 +71,18 @@ class TrackPublication:
 class LocalTrackPublication(TrackPublication):
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):
         super().__init__(owned_info)
+        self._queue = (
+            FfiClient.instance.queue.subscribe()
+        )  # start listening at publication creation
+
+    async def wait_for_subscriber(self):
+        try:
+            await self._queue.wait_for(
+                lambda e: e.room_event.local_track_subscribed.track_sid
+                == self._info.sid
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(self._queue)
 
 
 class RemoteTrackPublication(TrackPublication):
