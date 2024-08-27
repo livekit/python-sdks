@@ -101,7 +101,7 @@ class TwirpClient:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
                 raise TwirpError(error_data["code"], error_data["msg"])
-            
+
     def sync_request(
         self,
         service: str,
@@ -114,9 +114,7 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        resp = requests.post(
-            url, headers=headers, data=serialized_data
-        )
+        resp = requests.post(url, headers=headers, data=serialized_data)
         if resp.status == 200:
             return response_class.FromString(resp.data())
         else:

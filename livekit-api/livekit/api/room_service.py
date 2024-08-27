@@ -145,7 +145,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_create=True)),
             proto_models.Room,
         )
-    
+
     def sync_delete_room(
         self, delete: proto_room.DeleteRoomRequest
     ) -> proto_room.DeleteRoomResponse:
@@ -156,7 +156,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_create=True)),
             proto_room.DeleteRoomResponse,
         )
-    
+
     def sync_update_room_metadata(
         self, update: proto_room.UpdateRoomMetadataRequest
     ) -> proto_models.Room:
@@ -167,7 +167,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             proto_models.Room,
         )
-    
+
     def sync_remove_participant(
         self, remove: proto_room.RoomParticipantIdentity
     ) -> proto_room.RemoveParticipantResponse:
@@ -178,7 +178,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
             proto_room.RemoveParticipantResponse,
         )
-    
+
     def sync_mute_published_track(
         self,
         update: proto_room.MuteRoomTrackRequest,
@@ -190,7 +190,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             proto_room.MuteRoomTrackResponse,
         )
-    
+
     def sync_update_participant(
         self, update: proto_room.UpdateParticipantRequest
     ) -> proto_models.ParticipantInfo:
@@ -201,7 +201,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             proto_models.ParticipantInfo,
         )
-    
+
     def sync_update_subscriptions(
         self, update: proto_room.UpdateSubscriptionsRequest
     ) -> proto_room.UpdateSubscriptionsResponse:
@@ -212,7 +212,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             proto_room.UpdateSubscriptionsResponse,
         )
-    
+
     def sync_send_data(
         self, send: proto_room.SendDataRequest
     ) -> proto_room.SendDataResponse:
@@ -223,7 +223,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=send.room)),
             proto_room.SendDataResponse,
         )
-    
+
     def sync_list_participants(
         self, list: proto_room.ListParticipantsRequest
     ) -> proto_room.ListParticipantsResponse:
@@ -234,7 +234,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=list.room)),
             proto_room.ListParticipantsResponse,
         )
-    
+
     def sync_get_participant(
         self, get: proto_room.RoomParticipantIdentity
     ) -> proto_models.ParticipantInfo:
@@ -245,7 +245,7 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=get.room)),
             proto_models.ParticipantInfo,
         )
-    
+
     def sync_list_rooms(
         self, list: proto_room.ListRoomsRequest
     ) -> proto_room.ListRoomsResponse:

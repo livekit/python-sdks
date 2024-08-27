@@ -121,7 +121,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_start_web_egress(
         self, start: proto_egress.WebEgressRequest
     ) -> proto_egress.EgressInfo:
@@ -132,7 +132,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_start_participant_egress(
         self, start: proto_egress.ParticipantEgressRequest
     ) -> proto_egress.EgressInfo:
@@ -143,7 +143,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_start_track_composite_egress(
         self, start: proto_egress.TrackCompositeEgressRequest
     ) -> proto_egress.EgressInfo:
@@ -154,7 +154,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_start_track_egress(
         self, start: proto_egress.TrackEgressRequest
     ) -> proto_egress.EgressInfo:
@@ -165,7 +165,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_update_layout(
         self, update: proto_egress.UpdateLayoutRequest
     ) -> proto_egress.EgressInfo:
@@ -176,7 +176,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_update_stream(
         self, update: proto_egress.UpdateStreamRequest
     ) -> proto_egress.EgressInfo:
@@ -187,7 +187,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.EgressInfo,
         )
-    
+
     def sync_list_egress(
         self, list: proto_egress.ListEgressRequest
     ) -> proto_egress.ListEgressResponse:
@@ -198,7 +198,7 @@ class EgressService(Service):
             self._auth_header(VideoGrants(room_record=True)),
             proto_egress.ListEgressResponse,
         )
-    
+
     def sync_stop_egress(
         self, stop: proto_egress.StopEgressRequest
     ) -> proto_egress.EgressInfo:

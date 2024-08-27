@@ -143,7 +143,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPTrunkInfo,
         )
-    
+
     def sync_create_sip_inbound_trunk(
         self, create: proto_sip.CreateSIPInboundTrunkRequest
     ) -> proto_sip.SIPInboundTrunkInfo:
@@ -154,7 +154,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPInboundTrunkInfo,
         )
-    
+
     def sync_create_sip_outbound_trunk(
         self, create: proto_sip.CreateSIPOutboundTrunkRequest
     ) -> proto_sip.SIPOutboundTrunkInfo:
@@ -165,7 +165,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPOutboundTrunkInfo,
         )
-    
+
     def sync_list_sip_trunk(
         self, list: proto_sip.ListSIPTrunkRequest
     ) -> proto_sip.ListSIPTrunkResponse:
@@ -176,7 +176,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.ListSIPTrunkResponse,
         )
-    
+
     def sync_list_sip_inbound_trunk(
         self, list: proto_sip.ListSIPInboundTrunkRequest
     ) -> proto_sip.ListSIPInboundTrunkResponse:
@@ -187,7 +187,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.ListSIPInboundTrunkResponse,
         )
-    
+
     def sync_list_sip_outbound_trunk(
         self, list: proto_sip.ListSIPOutboundTrunkRequest
     ) -> proto_sip.ListSIPOutboundTrunkResponse:
@@ -198,7 +198,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.ListSIPOutboundTrunkResponse,
         )
-    
+
     def sync_delete_sip_trunk(
         self, delete: proto_sip.DeleteSIPTrunkRequest
     ) -> proto_sip.SIPTrunkInfo:
@@ -209,7 +209,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPTrunkInfo,
         )
-    
+
     def sync_create_sip_dispatch_rule(
         self, create: proto_sip.CreateSIPDispatchRuleRequest
     ) -> proto_sip.SIPDispatchRuleInfo:
@@ -220,7 +220,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPDispatchRuleInfo,
         )
-    
+
     def sync_list_sip_dispatch_rule(
         self, list: proto_sip.ListSIPDispatchRuleRequest
     ) -> proto_sip.ListSIPDispatchRuleResponse:
@@ -231,7 +231,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.ListSIPDispatchRuleResponse,
         )
-    
+
     def sync_delete_sip_dispatch_rule(
         self, delete: proto_sip.DeleteSIPDispatchRuleRequest
     ) -> proto_sip.SIPDispatchRuleInfo:
@@ -242,7 +242,7 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
             proto_sip.SIPDispatchRuleInfo,
         )
-    
+
     def sync_create_sip_participant(
         self, create: proto_sip.CreateSIPParticipantRequest
     ) -> proto_sip.SIPParticipantInfo:
