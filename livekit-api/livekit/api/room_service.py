@@ -134,3 +134,125 @@ class RoomService(Service):
             self._auth_header(VideoGrants(room_admin=True, room=send.room)),
             proto_room.SendDataResponse,
         )
+
+    def sync_create_room(
+        self, create: proto_room.CreateRoomRequest
+    ) -> proto_models.Room:
+        return self._client.sync_request(
+            SVC,
+            "CreateRoom",
+            create,
+            self._auth_header(VideoGrants(room_create=True)),
+            proto_models.Room,
+        )
+    
+    def sync_delete_room(
+        self, delete: proto_room.DeleteRoomRequest
+    ) -> proto_room.DeleteRoomResponse:
+        return self._client.sync_request(
+            SVC,
+            "DeleteRoom",
+            delete,
+            self._auth_header(VideoGrants(room_create=True)),
+            proto_room.DeleteRoomResponse,
+        )
+    
+    def sync_update_room_metadata(
+        self, update: proto_room.UpdateRoomMetadataRequest
+    ) -> proto_models.Room:
+        return self._client.sync_request(
+            SVC,
+            "UpdateRoomMetadata",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_models.Room,
+        )
+    
+    def sync_remove_participant(
+        self, remove: proto_room.RoomParticipantIdentity
+    ) -> proto_room.RemoveParticipantResponse:
+        return self._client.sync_request(
+            SVC,
+            "RemoveParticipant",
+            remove,
+            self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
+            proto_room.RemoveParticipantResponse,
+        )
+    
+    def sync_mute_published_track(
+        self,
+        update: proto_room.MuteRoomTrackRequest,
+    ) -> proto_room.MuteRoomTrackResponse:
+        return self._client.sync_request(
+            SVC,
+            "MutePublishedTrack",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_room.MuteRoomTrackResponse,
+        )
+    
+    def sync_update_participant(
+        self, update: proto_room.UpdateParticipantRequest
+    ) -> proto_models.ParticipantInfo:
+        return self._client.sync_request(
+            SVC,
+            "UpdateParticipant",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_models.ParticipantInfo,
+        )
+    
+    def sync_update_subscriptions(
+        self, update: proto_room.UpdateSubscriptionsRequest
+    ) -> proto_room.UpdateSubscriptionsResponse:
+        return self._client.sync_request(
+            SVC,
+            "UpdateSubscriptions",
+            update,
+            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            proto_room.UpdateSubscriptionsResponse,
+        )
+    
+    def sync_send_data(
+        self, send: proto_room.SendDataRequest
+    ) -> proto_room.SendDataResponse:
+        return self._client.sync_request(
+            SVC,
+            "SendData",
+            send,
+            self._auth_header(VideoGrants(room_admin=True, room=send.room)),
+            proto_room.SendDataResponse,
+        )
+    
+    def sync_list_participants(
+        self, list: proto_room.ListParticipantsRequest
+    ) -> proto_room.ListParticipantsResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListParticipants",
+            list,
+            self._auth_header(VideoGrants(room_admin=True, room=list.room)),
+            proto_room.ListParticipantsResponse,
+        )
+    
+    def sync_get_participant(
+        self, get: proto_room.RoomParticipantIdentity
+    ) -> proto_models.ParticipantInfo:
+        return self._client.sync_request(
+            SVC,
+            "GetParticipant",
+            get,
+            self._auth_header(VideoGrants(room_admin=True, room=get.room)),
+            proto_models.ParticipantInfo,
+        )
+    
+    def sync_list_rooms(
+        self, list: proto_room.ListRoomsRequest
+    ) -> proto_room.ListRoomsResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListRooms",
+            list,
+            self._auth_header(VideoGrants(room_list=True)),
+            proto_room.ListRoomsResponse,
+        )
