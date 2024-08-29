@@ -100,4 +100,9 @@ class VideoStream:
     async def __anext__(self) -> VideoFrameEvent:
         if self._task.done():
             raise StopAsyncIteration
-        return await self._queue.get()
+
+        item = await self._queue.get()
+        if item is None:
+            raise StopAsyncIteration
+
+        return item

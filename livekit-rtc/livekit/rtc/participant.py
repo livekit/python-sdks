@@ -16,8 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import ctypes
-from typing import Callable, List, Union
-from weakref import proxy
+from typing import List, Union
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -30,8 +29,6 @@ from ._proto.room_pb2 import (
 )
 from ._proto.track_pb2 import TrackSource
 from ._utils import BroadcastQueue
-from .audio_stream import AudioStream
-from .room import Room
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -39,7 +36,6 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
-from .video_stream import VideoStream
 
 
 class PublishTrackError(Exception):
@@ -260,85 +256,6 @@ class LocalParticipant(Participant):
 
 
 class RemoteParticipant(Participant):
-    def __init__(
-        self, room: Room, owned_info: proto_participant.OwnedParticipant
-    ) -> None:
+    def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self._room: Room | None = proxy(room)
         self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
-
-    async def _create_stream(
-        self,
-        *,
-        kind: str,
-        source: TrackSource | None = None,
-        name: str | None = None,
-        filter_function: Callable[[RemoteTrackPublication], bool] | None = None,
-    ):
-        if not self._room:
-            raise Exception("Room has been disposed")
-
-        def _filter_function(publication: RemoteTrackPublication) -> bool:
-            if publication.kind != kind:
-                return False
-
-            if not publication.track:
-                return False
-
-            if source is not None:
-                return publication.source == source
-            elif name is not None:
-                return publication.track.name == name
-            elif filter_function is not None:
-                return filter_function(publication)
-
-            return True
-
-        stream_future = asyncio.Future[VideoStream | AudioStream]()
-
-        def _track_subscribed(publication: RemoteTrackPublication):
-            if _filter_function(publication):
-                assert publication.track
-                if kind == "video":
-                    stream_future.set_result(VideoStream(publication.track))
-                elif kind == "audio":
-                    stream_future.set_result(AudioStream(publication.track))
-
-        self._room.on("track_subscribed", _track_subscribed)
-        for publication in self.track_publications.values():
-            _track_subscribed(publication)
-        self._room.off("track_subscribed", _track_subscribed)
-
-        return await stream_future
-
-    async def create_audio_stream(
-        self,
-        *,
-        source: TrackSource | None = None,
-        name: str | None = None,
-        filter_function: Callable[[RemoteTrackPublication], bool] | None = None,
-    ):
-        stream = await self._create_stream(
-            kind="audio",
-            source=source,
-            name=name,
-            filter_function=filter_function,
-        )
-        assert isinstance(stream, AudioStream)
-        return stream
-
-    async def create_video_stream(
-        self,
-        *,
-        source: TrackSource | None = None,
-        name: str | None = None,
-        filter_function: Callable[[RemoteTrackPublication], bool] | None = None,
-    ):
-        stream = await self._create_stream(
-            kind="video",
-            source=source,
-            name=name,
-            filter_function=filter_function,
-        )
-        assert isinstance(stream, AudioStream)
-        return stream

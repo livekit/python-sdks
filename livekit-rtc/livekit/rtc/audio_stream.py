@@ -13,15 +13,18 @@
 # limitations under the License.
 
 import asyncio
-from typing import Optional, AsyncIterator
+from abc import abstractmethod
+from dataclasses import dataclass
+from typing import Any, AsyncIterator, Optional
 
-from ._ffi_client import FfiHandle, FfiClient
+from ._ffi_client import FfiClient, FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
+from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
+from .participant import Participant
 from .track import Track
-from dataclasses import dataclass
 
 
 @dataclass
@@ -29,35 +32,29 @@ class AudioFrameEvent:
     frame: AudioFrame
 
 
-class AudioStream:
-    """AudioStream is a stream of audio frames received from a RemoteTrack."""
-
+class AudioStreamInner:
     def __init__(
         self,
-        track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
     ) -> None:
-        self._track = track
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
-        self._queue: RingQueue[AudioFrameEvent] = RingQueue(capacity)
+        self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
-        req = proto_ffi.FfiRequest()
-        new_audio_stream = req.new_audio_stream
-        new_audio_stream.track_handle = track._ffi_handle.handle
-        new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
-        resp = FfiClient.instance.request(req)
-
-        stream_info = resp.new_audio_stream.stream
-        self._ffi_handle = FfiHandle(stream_info.handle.id)
-        self._info = stream_info
+        stream = self._create_owned_stream()
+        self._ffi_handle = FfiHandle(stream.handle.id)
+        self._info = stream.info
 
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+
+    @abstractmethod
+    def _create_owned_stream(self) -> Any:
+        pass
 
     async def _run(self):
         while True:
@@ -70,6 +67,7 @@ class AudioStream:
                 event = AudioFrameEvent(frame)
                 self._queue.put(event)
             elif audio_event.HasField("eos"):
+                self._queue.put(None)
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -87,4 +85,67 @@ class AudioStream:
     async def __anext__(self) -> AudioFrameEvent:
         if self._task.done():
             raise StopAsyncIteration
-        return await self._queue.get()
+
+        item = await self._queue.get()
+        if item is None:
+            raise StopAsyncIteration
+
+        return item
+
+
+class AudioStream(AudioStreamInner):
+    """AudioStream is a stream of audio frames received from a RemoteTrack."""
+
+    def __init__(
+        self,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ) -> None:
+        self._track = track
+        super().__init__(loop, capacity)
+
+    def _create_owned_stream(self) -> Any:
+        req = proto_ffi.FfiRequest()
+        new_audio_stream = req.new_audio_stream
+        new_audio_stream.track_handle = self._track._ffi_handle.handle
+        new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        resp = FfiClient.instance.request(req)
+        return resp.new_audio_stream.stream
+
+    @classmethod
+    def from_participant(
+        cls,
+        participant: Participant,
+        track_source: TrackSource.ValueType,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ) -> "_ParticipantAudioStream":
+        return _ParticipantAudioStream(participant, track_source, loop, capacity)
+
+
+class _ParticipantAudioStream(AudioStreamInner):
+    def __init__(
+        self,
+        participant: Participant,
+        track_source: TrackSource.ValueType,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+    ):
+        self._track_source = track_source
+        self._participant = participant
+        super().__init__(loop, capacity)
+
+    def _create_owned_stream(self) -> Any:
+        req = proto_ffi.FfiRequest()
+        audio_stream_from_participant = req.audio_stream_from_participant
+        audio_stream_from_participant.participant_handle = (
+            self._participant._ffi_handle.handle
+        )
+        audio_stream_from_participant.type = (
+            proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        )
+        audio_stream_from_participant.track_source = self._track_source
+        resp = FfiClient.instance.request(req)
+        print("NEIL respobj", resp)
+        return resp.audio_stream_from_participant.stream

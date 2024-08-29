@@ -526,6 +526,6 @@ class Room(EventEmitter[EventTypes]):
         if owned_info.info.identity in self.remote_participants:
             raise Exception("participant already exists")
 
-        participant = RemoteParticipant(self, owned_info)
+        participant = RemoteParticipant(owned_info)
         self.remote_participants[participant.identity] = participant
         return participant

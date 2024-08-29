@@ -15,22 +15,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
 from . import handle_pb2
-import typing
+import sys
+
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-@typing.final
+@typing_extensions.final
 class ParticipantInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @typing.final
+    @typing_extensions.final
     class AttributesEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -44,7 +48,7 @@ class ParticipantInfo(google.protobuf.message.Message):
             key: builtins.str = ...,
             value: builtins.str = ...,
         ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
     SID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
@@ -66,11 +70,11 @@ class ParticipantInfo(google.protobuf.message.Message):
         metadata: builtins.str = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "identity", b"identity", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "identity", b"identity", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedParticipant(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -86,7 +90,7 @@ class OwnedParticipant(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___ParticipantInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedParticipant = OwnedParticipant
