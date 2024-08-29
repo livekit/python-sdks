@@ -37,6 +37,8 @@ class AudioStream:
         track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
+        sample_rate: int = 48000,
+        num_channels: int = 1,
     ) -> None:
         self._track = track
         self._loop = loop or asyncio.get_event_loop()
@@ -47,6 +49,8 @@ class AudioStream:
         new_audio_stream = req.new_audio_stream
         new_audio_stream.track_handle = track._ffi_handle.handle
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        new_audio_stream.sample_rate = sample_rate
+        new_audio_stream.num_channels = num_channels
         resp = FfiClient.instance.request(req)
 
         stream_info = resp.new_audio_stream.stream
