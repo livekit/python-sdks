@@ -348,3 +348,73 @@ class OwnedTrack(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedTrack = OwnedTrack
+
+@typing.final
+class LocalTrackMuteRequest(google.protobuf.message.Message):
+    """Mute/UnMute a track"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    MUTE_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    mute: builtins.bool
+    def __init__(
+        self,
+        *,
+        track_handle: builtins.int = ...,
+        mute: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
+
+global___LocalTrackMuteRequest = LocalTrackMuteRequest
+
+@typing.final
+class LocalTrackMuteResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MUTED_FIELD_NUMBER: builtins.int
+    muted: builtins.bool
+    def __init__(
+        self,
+        *,
+        muted: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["muted", b"muted"]) -> None: ...
+
+global___LocalTrackMuteResponse = LocalTrackMuteResponse
+
+@typing.final
+class EnableRemoteTrackRequest(google.protobuf.message.Message):
+    """Enable/Disable a remote track"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    ENABLED_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    enabled: builtins.bool
+    def __init__(
+        self,
+        *,
+        track_handle: builtins.int = ...,
+        enabled: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
+
+global___EnableRemoteTrackRequest = EnableRemoteTrackRequest
+
+@typing.final
+class EnableRemoteTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ENABLED_FIELD_NUMBER: builtins.int
+    enabled: builtins.bool
+    def __init__(
+        self,
+        *,
+        enabled: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
+
+global___EnableRemoteTrackResponse = EnableRemoteTrackResponse

@@ -72,15 +72,21 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
 
     TRACK_HANDLE_FIELD_NUMBER: builtins.int
     TYPE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___AudioStreamType.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
     def __init__(
         self,
         *,
         track_handle: builtins.int = ...,
         type: global___AudioStreamType.ValueType = ...,
+        sample_rate: builtins.int = ...,
+        num_channels: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewAudioStreamRequest = NewAudioStreamRequest
 
