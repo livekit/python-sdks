@@ -25,8 +25,9 @@ from ._proto.room_pb2 import (
     IceTransportType,
     TrackPublishOptions,
 )
+from ._proto.room_pb2 import VideoEncoding
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
-from ._proto.video_frame_pb2 import VideoBufferType, VideoRotation
+from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream
@@ -116,10 +117,12 @@ __all__ = [
     "TrackPublication",
     "Transcription",
     "TranscriptionSegment",
+    "VideoCodec",
+    "VideoEncoding",
     "VideoFrame",
+    "VideoFrameEvent",
     "VideoSource",
     "VideoStream",
-    "VideoFrameEvent",
     "ChatManager",
     "ChatMessage",
     "__version__",
