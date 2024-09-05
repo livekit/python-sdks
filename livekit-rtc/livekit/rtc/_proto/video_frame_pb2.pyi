@@ -23,6 +23,7 @@ import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
 import sys
+from . import track_pb2
 import typing
 
 if sys.version_info >= (3, 10):
@@ -184,6 +185,54 @@ class NewVideoStreamResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___NewVideoStreamResponse = NewVideoStreamResponse
+
+@typing_extensions.final
+class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
+    """Request a video stream from a participant"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TYPE_FIELD_NUMBER: builtins.int
+    TRACK_SOURCE_FIELD_NUMBER: builtins.int
+    FORMAT_FIELD_NUMBER: builtins.int
+    NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
+    participant_handle: builtins.int
+    type: global___VideoStreamType.ValueType
+    track_source: track_pb2.TrackSource.ValueType
+    format: global___VideoBufferType.ValueType
+    normalize_stride: builtins.bool
+    def __init__(
+        self,
+        *,
+        participant_handle: builtins.int = ...,
+        type: global___VideoStreamType.ValueType = ...,
+        track_source: track_pb2.TrackSource.ValueType = ...,
+        format: global___VideoBufferType.ValueType | None = ...,
+        normalize_stride: builtins.bool = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_format", b"_format", "format", b"format"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_format", b"_format", "format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_format", b"_format"]) -> typing_extensions.Literal["format"] | None: ...
+
+global___VideoStreamFromParticipantRequest = VideoStreamFromParticipantRequest
+
+@typing_extensions.final
+class VideoStreamFromParticipantResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    STREAM_FIELD_NUMBER: builtins.int
+    @property
+    def stream(self) -> global___OwnedVideoStream: ...
+    def __init__(
+        self,
+        *,
+        stream: global___OwnedVideoStream | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
+
+global___VideoStreamFromParticipantResponse = VideoStreamFromParticipantResponse
 
 @typing_extensions.final
 class NewVideoSourceRequest(google.protobuf.message.Message):

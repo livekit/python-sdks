@@ -21,6 +21,7 @@ import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
 import sys
+from . import track_pb2
 import typing
 
 if sys.version_info >= (3, 10):
@@ -71,15 +72,21 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
 
     TRACK_HANDLE_FIELD_NUMBER: builtins.int
     TYPE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___AudioStreamType.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
     def __init__(
         self,
         *,
         track_handle: builtins.int = ...,
         type: global___AudioStreamType.ValueType = ...,
+        sample_rate: builtins.int = ...,
+        num_channels: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewAudioStreamRequest = NewAudioStreamRequest
 
@@ -99,6 +106,52 @@ class NewAudioStreamResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___NewAudioStreamResponse = NewAudioStreamResponse
+
+@typing_extensions.final
+class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TYPE_FIELD_NUMBER: builtins.int
+    TRACK_SOURCE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    participant_handle: builtins.int
+    type: global___AudioStreamType.ValueType
+    track_source: track_pb2.TrackSource.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
+    def __init__(
+        self,
+        *,
+        participant_handle: builtins.int = ...,
+        type: global___AudioStreamType.ValueType = ...,
+        track_source: track_pb2.TrackSource.ValueType | None = ...,
+        sample_rate: builtins.int = ...,
+        num_channels: builtins.int = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_track_source", b"_track_source", "track_source", b"track_source"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_track_source", b"_track_source", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_track_source", b"_track_source"]) -> typing_extensions.Literal["track_source"] | None: ...
+
+global___AudioStreamFromParticipantRequest = AudioStreamFromParticipantRequest
+
+@typing_extensions.final
+class AudioStreamFromParticipantResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    STREAM_FIELD_NUMBER: builtins.int
+    @property
+    def stream(self) -> global___OwnedAudioStream: ...
+    def __init__(
+        self,
+        *,
+        stream: global___OwnedAudioStream | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
+
+global___AudioStreamFromParticipantResponse = AudioStreamFromParticipantResponse
 
 @typing_extensions.final
 class NewAudioSourceRequest(google.protobuf.message.Message):

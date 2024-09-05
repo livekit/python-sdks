@@ -147,5 +147,4 @@ class _ParticipantAudioStream(AudioStreamInner):
         )
         audio_stream_from_participant.track_source = self._track_source
         resp = FfiClient.instance.request(req)
-        print("NEIL respobj", resp)
         return resp.audio_stream_from_participant.stream
