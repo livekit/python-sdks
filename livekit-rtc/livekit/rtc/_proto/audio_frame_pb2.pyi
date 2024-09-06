@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.internal.enum_type_wrapper
@@ -63,7 +62,7 @@ class AudioSourceType(_AudioSourceType, metaclass=_AudioSourceTypeEnumTypeWrappe
 AUDIO_SOURCE_NATIVE: AudioSourceType.ValueType  # 0
 global___AudioSourceType = AudioSourceType
 
-@typing.final
+@typing_extensions.final
 class NewAudioStreamRequest(google.protobuf.message.Message):
     """Create a new AudioStream
     AudioStream is used to receive audio frames from a track
@@ -87,11 +86,11 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
         sample_rate: builtins.int = ...,
         num_channels: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewAudioStreamRequest = NewAudioStreamRequest
 
-@typing.final
+@typing_extensions.final
 class NewAudioStreamResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -103,12 +102,12 @@ class NewAudioStreamResponse(google.protobuf.message.Message):
         *,
         stream: global___OwnedAudioStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___NewAudioStreamResponse = NewAudioStreamResponse
 
-@typing.final
+@typing_extensions.final
 class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -131,13 +130,13 @@ class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
         sample_rate: builtins.int = ...,
         num_channels: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_track_source", b"_track_source", "track_source", b"track_source"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_track_source", b"_track_source", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_track_source", b"_track_source"]) -> typing.Literal["track_source"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_track_source", b"_track_source", "track_source", b"track_source"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_track_source", b"_track_source", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_track_source", b"_track_source"]) -> typing_extensions.Literal["track_source"] | None: ...
 
 global___AudioStreamFromParticipantRequest = AudioStreamFromParticipantRequest
 
-@typing.final
+@typing_extensions.final
 class AudioStreamFromParticipantResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -149,12 +148,12 @@ class AudioStreamFromParticipantResponse(google.protobuf.message.Message):
         *,
         stream: global___OwnedAudioStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___AudioStreamFromParticipantResponse = AudioStreamFromParticipantResponse
 
-@typing.final
+@typing_extensions.final
 class NewAudioSourceRequest(google.protobuf.message.Message):
     """Create a new AudioSource"""
 
@@ -166,11 +165,11 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
     ENABLE_QUEUE_FIELD_NUMBER: builtins.int
     type: global___AudioSourceType.ValueType
+    @property
+    def options(self) -> global___AudioSourceOptions: ...
     sample_rate: builtins.int
     num_channels: builtins.int
     enable_queue: builtins.bool
-    @property
-    def options(self) -> global___AudioSourceOptions: ...
     def __init__(
         self,
         *,
@@ -180,16 +179,16 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
         num_channels: builtins.int = ...,
         enable_queue: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "num_channels", b"num_channels", "options", b"options", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "options", b"options"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_enable_queue", b"_enable_queue", "_options", b"_options", "enable_queue", b"enable_queue", "num_channels", b"num_channels", "options", b"options", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_enable_queue", b"_enable_queue"]) -> typing.Literal["enable_queue"] | None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_enable_queue", b"_enable_queue"]) -> typing_extensions.Literal["enable_queue"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_options", b"_options"]) -> typing.Literal["options"] | None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_options", b"_options"]) -> typing_extensions.Literal["options"] | None: ...
 
 global___NewAudioSourceRequest = NewAudioSourceRequest
 
-@typing.final
+@typing_extensions.final
 class NewAudioSourceResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -201,12 +200,12 @@ class NewAudioSourceResponse(google.protobuf.message.Message):
         *,
         source: global___OwnedAudioSource | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["source", b"source"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["source", b"source"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["source", b"source"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["source", b"source"]) -> None: ...
 
 global___NewAudioSourceResponse = NewAudioSourceResponse
 
-@typing.final
+@typing_extensions.final
 class CaptureAudioFrameRequest(google.protobuf.message.Message):
     """Push a frame to an AudioSource 
     The data provided must be available as long as the client receive the callback.
@@ -225,12 +224,12 @@ class CaptureAudioFrameRequest(google.protobuf.message.Message):
         source_handle: builtins.int = ...,
         buffer: global___AudioFrameBufferInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "source_handle", b"source_handle"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "source_handle", b"source_handle"]) -> None: ...
 
 global___CaptureAudioFrameRequest = CaptureAudioFrameRequest
 
-@typing.final
+@typing_extensions.final
 class CaptureAudioFrameResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -241,11 +240,11 @@ class CaptureAudioFrameResponse(google.protobuf.message.Message):
         *,
         async_id: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
 
 global___CaptureAudioFrameResponse = CaptureAudioFrameResponse
 
-@typing.final
+@typing_extensions.final
 class CaptureAudioFrameCallback(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -259,13 +258,13 @@ class CaptureAudioFrameCallback(google.protobuf.message.Message):
         async_id: builtins.int = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
 
 global___CaptureAudioFrameCallback = CaptureAudioFrameCallback
 
-@typing.final
+@typing_extensions.final
 class NewAudioResamplerRequest(google.protobuf.message.Message):
     """Create a new AudioResampler"""
 
@@ -277,7 +276,7 @@ class NewAudioResamplerRequest(google.protobuf.message.Message):
 
 global___NewAudioResamplerRequest = NewAudioResamplerRequest
 
-@typing.final
+@typing_extensions.final
 class NewAudioResamplerResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -289,12 +288,12 @@ class NewAudioResamplerResponse(google.protobuf.message.Message):
         *,
         resampler: global___OwnedAudioResampler | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["resampler", b"resampler"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["resampler", b"resampler"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["resampler", b"resampler"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["resampler", b"resampler"]) -> None: ...
 
 global___NewAudioResamplerResponse = NewAudioResamplerResponse
 
-@typing.final
+@typing_extensions.final
 class RemixAndResampleRequest(google.protobuf.message.Message):
     """Remix and resample an audio frame"""
 
@@ -305,10 +304,10 @@ class RemixAndResampleRequest(google.protobuf.message.Message):
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
     SAMPLE_RATE_FIELD_NUMBER: builtins.int
     resampler_handle: builtins.int
-    num_channels: builtins.int
-    sample_rate: builtins.int
     @property
     def buffer(self) -> global___AudioFrameBufferInfo: ...
+    num_channels: builtins.int
+    sample_rate: builtins.int
     def __init__(
         self,
         *,
@@ -317,12 +316,12 @@ class RemixAndResampleRequest(google.protobuf.message.Message):
         num_channels: builtins.int = ...,
         sample_rate: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]) -> None: ...
 
 global___RemixAndResampleRequest = RemixAndResampleRequest
 
-@typing.final
+@typing_extensions.final
 class RemixAndResampleResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -334,12 +333,12 @@ class RemixAndResampleResponse(google.protobuf.message.Message):
         *,
         buffer: global___OwnedAudioFrameBuffer | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer"]) -> None: ...
 
 global___RemixAndResampleResponse = RemixAndResampleResponse
 
-@typing.final
+@typing_extensions.final
 class AudioFrameBufferInfo(google.protobuf.message.Message):
     """
     AudioFrame buffer
@@ -364,11 +363,11 @@ class AudioFrameBufferInfo(google.protobuf.message.Message):
         sample_rate: builtins.int = ...,
         samples_per_channel: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]) -> None: ...
 
 global___AudioFrameBufferInfo = AudioFrameBufferInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedAudioFrameBuffer(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -384,12 +383,12 @@ class OwnedAudioFrameBuffer(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___AudioFrameBufferInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioFrameBuffer = OwnedAudioFrameBuffer
 
-@typing.final
+@typing_extensions.final
 class AudioStreamInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -400,11 +399,11 @@ class AudioStreamInfo(google.protobuf.message.Message):
         *,
         type: global___AudioStreamType.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["type", b"type"]) -> None: ...
 
 global___AudioStreamInfo = AudioStreamInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedAudioStream(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -420,12 +419,12 @@ class OwnedAudioStream(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___AudioStreamInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioStream = OwnedAudioStream
 
-@typing.final
+@typing_extensions.final
 class AudioStreamEvent(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -444,13 +443,13 @@ class AudioStreamEvent(google.protobuf.message.Message):
         frame_received: global___AudioFrameReceived | None = ...,
         eos: global___AudioStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["frame_received", "eos"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received", "eos"] | None: ...
 
 global___AudioStreamEvent = AudioStreamEvent
 
-@typing.final
+@typing_extensions.final
 class AudioFrameReceived(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -462,12 +461,12 @@ class AudioFrameReceived(google.protobuf.message.Message):
         *,
         frame: global___OwnedAudioFrameBuffer | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frame", b"frame"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frame", b"frame"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["frame", b"frame"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["frame", b"frame"]) -> None: ...
 
 global___AudioFrameReceived = AudioFrameReceived
 
-@typing.final
+@typing_extensions.final
 class AudioStreamEOS(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -477,7 +476,7 @@ class AudioStreamEOS(google.protobuf.message.Message):
 
 global___AudioStreamEOS = AudioStreamEOS
 
-@typing.final
+@typing_extensions.final
 class AudioSourceOptions(google.protobuf.message.Message):
     """
     AudioSource
@@ -498,11 +497,11 @@ class AudioSourceOptions(google.protobuf.message.Message):
         noise_suppression: builtins.bool = ...,
         auto_gain_control: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression"]) -> None: ...
 
 global___AudioSourceOptions = AudioSourceOptions
 
-@typing.final
+@typing_extensions.final
 class AudioSourceInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -513,11 +512,11 @@ class AudioSourceInfo(google.protobuf.message.Message):
         *,
         type: global___AudioSourceType.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["type", b"type"]) -> None: ...
 
 global___AudioSourceInfo = AudioSourceInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedAudioSource(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -533,12 +532,12 @@ class OwnedAudioSource(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___AudioSourceInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioSource = OwnedAudioSource
 
-@typing.final
+@typing_extensions.final
 class AudioResamplerInfo(google.protobuf.message.Message):
     """
     AudioResampler
@@ -552,7 +551,7 @@ class AudioResamplerInfo(google.protobuf.message.Message):
 
 global___AudioResamplerInfo = AudioResamplerInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedAudioResampler(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -568,7 +567,7 @@ class OwnedAudioResampler(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___AudioResamplerInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioResampler = OwnedAudioResampler

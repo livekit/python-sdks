@@ -16,6 +16,7 @@
 
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType
+from ._proto.participant_pb2 import ParticipantKind
 from ._proto.room_pb2 import (
     ConnectionQuality,
     ConnectionState,
@@ -24,8 +25,8 @@ from ._proto.room_pb2 import (
     IceServer,
     IceTransportType,
     TrackPublishOptions,
+    VideoEncoding,
 )
-from ._proto.room_pb2 import VideoEncoding
 from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
 from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
@@ -91,6 +92,7 @@ __all__ = [
     "AudioFrameEvent",
     "LocalParticipant",
     "Participant",
+    "ParticipantKind",
     "RemoteParticipant",
     "ConnectError",
     "Room",

@@ -82,6 +82,10 @@ class Participant:
     def attributes(self) -> dict[str, str]:
         return dict(self._info.attributes)
 
+    @property
+    def kind(self) -> proto_participant.ParticipantKind.ValueType:
+        return self._info.kind
+
 
 class LocalParticipant(Participant):
     def __init__(
