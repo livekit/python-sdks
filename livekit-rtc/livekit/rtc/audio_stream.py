@@ -101,14 +101,20 @@ class AudioStream(AudioStreamInner):
         track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
+        sample_rate: int = 48000,
+        num_channels: int = 1,
     ) -> None:
         self._track = track
+        self._sample_rate = sample_rate
+        self._num_channels = num_channels
         super().__init__(loop, capacity)
 
     def _create_owned_stream(self) -> Any:
         req = proto_ffi.FfiRequest()
         new_audio_stream = req.new_audio_stream
         new_audio_stream.track_handle = self._track._ffi_handle.handle
+        new_audio_stream.sample_rate = self._sample_rate
+        new_audio_stream.num_channels = self._num_channels
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
