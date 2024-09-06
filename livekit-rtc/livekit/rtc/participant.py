@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import ctypes
 from typing import List, Union
 
@@ -27,7 +26,6 @@ from ._proto.room_pb2 import (
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
 )
-from ._proto.track_pb2 import TrackSource
 from ._utils import BroadcastQueue
 from .track import LocalTrack
 from .track_publication import (
