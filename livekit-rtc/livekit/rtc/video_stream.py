@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import asyncio
-from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Optional
 
@@ -36,20 +35,32 @@ class VideoFrameEvent:
     rotation: proto_video_frame.VideoRotation
 
 
-class VideoStreamInner:
+class VideoStream:
     """VideoStream is a stream of video frames received from a RemoteTrack."""
 
     def __init__(
         self,
-        *,
+        track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
+        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
+        **kwargs,
     ) -> None:
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[VideoFrameEvent | None] = RingQueue(capacity)
+        self._track = track
+        self._format = format
+        self._capacity = capacity
+        self._format = format
+        stream: Any = None
+        if "participant" in kwargs:
+            stream = self._create_owned_stream_from_participant(
+                participant=kwargs["participant"], track_source=kwargs["track_source"]
+            )
+        else:
+            stream = self._create_owned_stream()
 
-        stream = self._create_owned_stream()
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
 
@@ -59,9 +70,52 @@ class VideoStreamInner:
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    @abstractmethod
     def _create_owned_stream(self) -> Any:
-        pass
+        req = proto_ffi.FfiRequest()
+        new_video_stream = req.new_video_stream
+        new_video_stream.track_handle = self._track._ffi_handle.handle
+        new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
+        if self._format is not None:
+            new_video_stream.format = self._format
+        new_video_stream.normalize_stride = True
+        resp = FfiClient.instance.request(req)
+        return resp.new_video_stream.stream
+
+    def _create_owned_stream_from_participant(
+        self, participant: Participant, track_source: TrackSource.ValueType
+    ) -> Any:
+        req = proto_ffi.FfiRequest()
+        video_stream_from_participant = req.video_stream_from_participant
+        video_stream_from_participant.participant_handle = (
+            participant._ffi_handle.handle
+        )
+        video_stream_from_participant.type = (
+            proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
+        )
+        video_stream_from_participant.track_source = track_source
+        video_stream_from_participant.normalize_stride = True
+        if self._format is not None:
+            video_stream_from_participant.format = self._format
+        resp = FfiClient.instance.request(req)
+        return resp.video_stream_from_participant.stream
+
+    @classmethod
+    def from_participant(
+        cls,
+        participant: Participant,
+        track_source: TrackSource.ValueType,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
+        capacity: int = 0,
+    ) -> VideoStream:
+        return VideoStream(
+            participant=participant,
+            track_source=track_source,
+            loop=loop,
+            capacity=capacity,
+            format=format,
+            track=None,  # type: ignore
+        )
 
     async def _run(self) -> None:
         while True:
@@ -103,71 +157,3 @@ class VideoStreamInner:
             raise StopAsyncIteration
 
         return item
-
-
-class VideoStream(VideoStreamInner):
-    """AudioStream is a stream of audio frames received from a RemoteTrack."""
-
-    def __init__(
-        self,
-        track: Track,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        capacity: int = 0,
-        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
-    ) -> None:
-        self._track = track
-        self._format = format
-        super().__init__(loop=loop, capacity=capacity)
-
-    def _create_owned_stream(self) -> Any:
-        req = proto_ffi.FfiRequest()
-        new_video_stream = req.new_video_stream
-        new_video_stream.track_handle = self._track._ffi_handle.handle
-        new_video_stream.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
-        if self._format is not None:
-            new_video_stream.format = self._format
-        new_video_stream.normalize_stride = True
-        resp = FfiClient.instance.request(req)
-        return resp.new_video_stream.stream
-
-    @classmethod
-    def from_participant(
-        cls,
-        participant: Participant,
-        track_source: TrackSource.ValueType,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        capacity: int = 0,
-    ) -> "_ParticipantVideoStream":
-        return _ParticipantVideoStream(participant, track_source, loop, capacity)
-
-
-class _ParticipantVideoStream(VideoStreamInner):
-    def __init__(
-        self,
-        participant: Participant,
-        track_source: TrackSource.ValueType,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        capacity: int = 0,
-        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
-    ):
-        self._track_source = track_source
-        self._participant = participant
-        self._format = format
-        self._track_source = track_source
-        super().__init__(loop=loop, capacity=capacity)
-
-    def _create_owned_stream(self) -> Any:
-        req = proto_ffi.FfiRequest()
-        video_stream_from_participant = req.video_stream_from_participant
-        video_stream_from_participant.participant_handle = (
-            self._participant._ffi_handle.handle
-        )
-        video_stream_from_participant.type = (
-            proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
-        )
-        video_stream_from_participant.track_source = self._track_source
-        video_stream_from_participant.normalize_stride = True
-        if self._format is not None:
-            video_stream_from_participant.format = self._format
-        resp = FfiClient.instance.request(req)
-        return resp.video_stream_from_participant.stream
