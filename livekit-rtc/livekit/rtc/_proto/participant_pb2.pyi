@@ -15,22 +15,49 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
+import sys
 import typing
+
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-@typing.final
+class _ParticipantKind:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ParticipantKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ParticipantKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PARTICIPANT_KIND_STANDARD: _ParticipantKind.ValueType  # 0
+    PARTICIPANT_KIND_INGRESS: _ParticipantKind.ValueType  # 1
+    PARTICIPANT_KIND_EGRESS: _ParticipantKind.ValueType  # 2
+    PARTICIPANT_KIND_SIP: _ParticipantKind.ValueType  # 3
+    PARTICIPANT_KIND_AGENT: _ParticipantKind.ValueType  # 4
+
+class ParticipantKind(_ParticipantKind, metaclass=_ParticipantKindEnumTypeWrapper): ...
+
+PARTICIPANT_KIND_STANDARD: ParticipantKind.ValueType  # 0
+PARTICIPANT_KIND_INGRESS: ParticipantKind.ValueType  # 1
+PARTICIPANT_KIND_EGRESS: ParticipantKind.ValueType  # 2
+PARTICIPANT_KIND_SIP: ParticipantKind.ValueType  # 3
+PARTICIPANT_KIND_AGENT: ParticipantKind.ValueType  # 4
+global___ParticipantKind = ParticipantKind
+
+@typing_extensions.final
 class ParticipantInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @typing.final
+    @typing_extensions.final
     class AttributesEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -44,19 +71,21 @@ class ParticipantInfo(google.protobuf.message.Message):
             key: builtins.str = ...,
             value: builtins.str = ...,
         ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
     SID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     IDENTITY_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
     metadata: builtins.str
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    kind: global___ParticipantKind.ValueType
     def __init__(
         self,
         *,
@@ -65,12 +94,13 @@ class ParticipantInfo(google.protobuf.message.Message):
         identity: builtins.str = ...,
         metadata: builtins.str = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        kind: global___ParticipantKind.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "identity", b"identity", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attributes", b"attributes", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedParticipant(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -86,7 +116,7 @@ class OwnedParticipant(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___ParticipantInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedParticipant = OwnedParticipant
