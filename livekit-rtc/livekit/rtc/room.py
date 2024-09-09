@@ -30,7 +30,7 @@ from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
-from .track_publication import TrackPublication, RemoteTrackPublication
+from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
 
 EventTypes = Literal[
