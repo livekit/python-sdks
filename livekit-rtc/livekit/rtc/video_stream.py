@@ -67,6 +67,39 @@ class VideoStream:
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
+    @classmethod
+    def from_participant(
+        cls,
+        participant: Participant,
+        track_source: TrackSource.ValueType,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
+        capacity: int = 0,
+    ) -> VideoStream:
+        return VideoStream(
+            participant=participant,
+            track_source=track_source,
+            loop=loop,
+            capacity=capacity,
+            format=format,
+            track=None,  # type: ignore
+        )
+
+    @classmethod
+    def from_track(
+        cls,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
+        capacity: int = 0,
+    ) -> VideoStream:
+        return VideoStream(
+            track=track,
+            loop=loop,
+            capacity=capacity,
+            format=format,
+        )
+
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
@@ -98,24 +131,6 @@ class VideoStream:
             video_stream_from_participant.format = self._format
         resp = FfiClient.instance.request(req)
         return resp.video_stream_from_participant.stream
-
-    @classmethod
-    def from_participant(
-        cls,
-        participant: Participant,
-        track_source: TrackSource.ValueType,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
-        capacity: int = 0,
-    ) -> VideoStream:
-        return VideoStream(
-            participant=participant,
-            track_source=track_source,
-            loop=loop,
-            capacity=capacity,
-            format=format,
-            track=None,  # type: ignore
-        )
 
     async def _run(self) -> None:
         while True:

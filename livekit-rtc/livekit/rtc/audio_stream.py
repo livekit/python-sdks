@@ -65,6 +65,43 @@ class AudioStream:
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
 
+    @classmethod
+    def from_participant(
+        cls,
+        participant: Participant,
+        track_source: TrackSource.ValueType,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+        sample_rate: int = 48000,
+        num_channels: int = 1,
+    ) -> AudioStream:
+        return AudioStream(
+            participant=participant,
+            track_source=track_source,
+            loop=loop,
+            capacity=capacity,
+            track=None,  # type: ignore
+            sample_rate=sample_rate,
+            num_channels=num_channels,
+        )
+
+    @classmethod
+    def from_track(
+        cls,
+        track: Track,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        capacity: int = 0,
+        sample_rate: int = 48000,
+        num_channels: int = 1,
+    ) -> AudioStream:
+        return AudioStream(
+            track=track,
+            loop=loop,
+            capacity=capacity,
+            sample_rate=sample_rate,
+            num_channels=num_channels,
+        )
+
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
@@ -92,22 +129,6 @@ class AudioStream:
         audio_stream_from_participant.track_source = track_source
         resp = FfiClient.instance.request(req)
         return resp.audio_stream_from_participant.stream
-
-    @classmethod
-    def from_participant(
-        cls,
-        participant: Participant,
-        track_source: TrackSource.ValueType,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        capacity: int = 0,
-    ) -> AudioStream:
-        return AudioStream(
-            participant=participant,
-            track_source=track_source,
-            loop=loop,
-            capacity=capacity,
-            track=None,  # type: ignore
-        )
 
     async def _run(self):
         while True:
