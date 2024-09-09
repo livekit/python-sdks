@@ -45,7 +45,7 @@ class AudioStream:
         num_channels: int = 1,
         **kwargs,
     ) -> None:
-        self._track = track
+        self._track: Track | None = track
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._loop = loop or asyncio.get_event_loop()
@@ -68,6 +68,7 @@ class AudioStream:
     @classmethod
     def from_participant(
         cls,
+        *,
         participant: Participant,
         track_source: TrackSource.ValueType,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -88,6 +89,7 @@ class AudioStream:
     @classmethod
     def from_track(
         cls,
+        *,
         track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,

@@ -49,7 +49,7 @@ class VideoStream:
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[VideoFrameEvent | None] = RingQueue(capacity)
-        self._track = track
+        self._track: Track | None = track
         self._format = format
         self._capacity = capacity
         self._format = format
@@ -70,6 +70,7 @@ class VideoStream:
     @classmethod
     def from_participant(
         cls,
+        *,
         participant: Participant,
         track_source: TrackSource.ValueType,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -88,6 +89,7 @@ class VideoStream:
     @classmethod
     def from_track(
         cls,
+        *,
         track: Track,
         loop: Optional[asyncio.AbstractEventLoop] = None,
         format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
