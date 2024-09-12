@@ -19,13 +19,25 @@ from .audio_frame import AudioFrame
 
 
 class AudioSource:
-    def __init__(self, sample_rate: int, num_channels: int) -> None:
+    def __init__(
+        self, sample_rate: int, num_channels: int, queue_size_ms: int = 1000
+    ) -> None:
+        """
+        Initializes a new instance of the audio source.
+
+        Args:
+            sample_rate (int): The sample rate of the audio source in Hz (e.g., 44100, 48000).
+            num_channels (int): The number of audio channels
+            queue_size_ms (int, optional): The buffer size of the audio queue in milliseconds.
+                Defaults to 1000 ms.
+        """
         req = proto_ffi.FfiRequest()
         req.new_audio_source.type = (
             proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
         )
         req.new_audio_source.sample_rate = sample_rate
         req.new_audio_source.num_channels = num_channels
+        req.new_audio_source.queue_size_ms = queue_size_ms
 
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -42,6 +54,14 @@ class AudioSource:
     def num_channels(self) -> int:
         return self._num_channels
 
+    def clear_queue(self) -> None:
+        req = proto_ffi.FfiRequest()
+        req.clear_audio_buffer.source_handle = self._ffi_handle.handle
+
+        resp = FfiClient.instance.request(req)
+        if resp.clear_audio_source_buffer.error:
+            raise Exception(resp.clear_audio_source_buffer.error)
+
     async def capture_frame(self, frame: AudioFrame) -> None:
         """Captures an AudioFrame.
 
@@ -49,6 +69,7 @@ class AudioSource:
         be pushed in chunks of 10ms. It'll return only when all of the data in
         the buffer has been pushed.
         """
+
         req = proto_ffi.FfiRequest()
 
         req.capture_audio_frame.source_handle = self._ffi_handle.handle

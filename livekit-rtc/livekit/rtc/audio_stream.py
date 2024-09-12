@@ -108,6 +108,7 @@ class AudioStream:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     def _create_owned_stream(self) -> Any:
+        assert self._track is not None
         req = proto_ffi.FfiRequest()
         new_audio_stream = req.new_audio_stream
         new_audio_stream.track_handle = self._track._ffi_handle.handle

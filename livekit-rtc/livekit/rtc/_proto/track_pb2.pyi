@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import builtins
 import collections.abc
 from . import e2ee_pb2
@@ -89,7 +90,7 @@ STATE_ACTIVE: StreamState.ValueType  # 1
 STATE_PAUSED: StreamState.ValueType  # 2
 global___StreamState = StreamState
 
-@typing_extensions.final
+@typing.final
 class CreateVideoTrackRequest(google.protobuf.message.Message):
     """Create a new VideoTrack from a VideoSource"""
 
@@ -105,11 +106,11 @@ class CreateVideoTrackRequest(google.protobuf.message.Message):
         name: builtins.str = ...,
         source_handle: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
 global___CreateVideoTrackRequest = CreateVideoTrackRequest
 
-@typing_extensions.final
+@typing.final
 class CreateVideoTrackResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -121,12 +122,12 @@ class CreateVideoTrackResponse(google.protobuf.message.Message):
         *,
         track: global___OwnedTrack | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["track", b"track"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["track", b"track"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
 global___CreateVideoTrackResponse = CreateVideoTrackResponse
 
-@typing_extensions.final
+@typing.final
 class CreateAudioTrackRequest(google.protobuf.message.Message):
     """Create a new AudioTrack from a AudioSource"""
 
@@ -142,11 +143,11 @@ class CreateAudioTrackRequest(google.protobuf.message.Message):
         name: builtins.str = ...,
         source_handle: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
 global___CreateAudioTrackRequest = CreateAudioTrackRequest
 
-@typing_extensions.final
+@typing.final
 class CreateAudioTrackResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -158,12 +159,12 @@ class CreateAudioTrackResponse(google.protobuf.message.Message):
         *,
         track: global___OwnedTrack | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["track", b"track"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["track", b"track"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
 global___CreateAudioTrackResponse = CreateAudioTrackResponse
 
-@typing_extensions.final
+@typing.final
 class GetStatsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -174,11 +175,11 @@ class GetStatsRequest(google.protobuf.message.Message):
         *,
         track_handle: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["track_handle", b"track_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
 
 global___GetStatsRequest = GetStatsRequest
 
-@typing_extensions.final
+@typing.final
 class GetStatsResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -189,11 +190,11 @@ class GetStatsResponse(google.protobuf.message.Message):
         *,
         async_id: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["async_id", b"async_id"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___GetStatsResponse = GetStatsResponse
 
-@typing_extensions.final
+@typing.final
 class GetStatsCallback(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -211,13 +212,13 @@ class GetStatsCallback(google.protobuf.message.Message):
         error: builtins.str | None = ...,
         stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_error", b"_error"]) -> typing_extensions.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
 
 global___GetStatsCallback = GetStatsCallback
 
-@typing_extensions.final
+@typing.final
 class TrackEvent(google.protobuf.message.Message):
     """
     Track
@@ -231,7 +232,7 @@ class TrackEvent(google.protobuf.message.Message):
 
 global___TrackEvent = TrackEvent
 
-@typing_extensions.final
+@typing.final
 class TrackPublicationInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -272,11 +273,11 @@ class TrackPublicationInfo(google.protobuf.message.Message):
         remote: builtins.bool = ...,
         encryption_type: e2ee_pb2.EncryptionType.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
 global___TrackPublicationInfo = TrackPublicationInfo
 
-@typing_extensions.final
+@typing.final
 class OwnedTrackPublication(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -292,12 +293,12 @@ class OwnedTrackPublication(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___TrackPublicationInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedTrackPublication = OwnedTrackPublication
 
-@typing_extensions.final
+@typing.final
 class TrackInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -323,11 +324,11 @@ class TrackInfo(google.protobuf.message.Message):
         muted: builtins.bool = ...,
         remote: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> None: ...
 
 global___TrackInfo = TrackInfo
 
-@typing_extensions.final
+@typing.final
 class OwnedTrack(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -343,12 +344,12 @@ class OwnedTrack(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___TrackInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedTrack = OwnedTrack
 
-@typing_extensions.final
+@typing.final
 class LocalTrackMuteRequest(google.protobuf.message.Message):
     """Mute/UnMute a track"""
 
@@ -364,11 +365,11 @@ class LocalTrackMuteRequest(google.protobuf.message.Message):
         track_handle: builtins.int = ...,
         mute: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
 
 global___LocalTrackMuteRequest = LocalTrackMuteRequest
 
-@typing_extensions.final
+@typing.final
 class LocalTrackMuteResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -379,11 +380,11 @@ class LocalTrackMuteResponse(google.protobuf.message.Message):
         *,
         muted: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["muted", b"muted"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["muted", b"muted"]) -> None: ...
 
 global___LocalTrackMuteResponse = LocalTrackMuteResponse
 
-@typing_extensions.final
+@typing.final
 class EnableRemoteTrackRequest(google.protobuf.message.Message):
     """Enable/Disable a remote track"""
 
@@ -399,11 +400,11 @@ class EnableRemoteTrackRequest(google.protobuf.message.Message):
         track_handle: builtins.int = ...,
         enabled: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
 
 global___EnableRemoteTrackRequest = EnableRemoteTrackRequest
 
-@typing_extensions.final
+@typing.final
 class EnableRemoteTrackResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -414,6 +415,6 @@ class EnableRemoteTrackResponse(google.protobuf.message.Message):
         *,
         enabled: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
 global___EnableRemoteTrackResponse = EnableRemoteTrackResponse
