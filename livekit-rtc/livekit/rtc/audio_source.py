@@ -54,7 +54,7 @@ class AudioSource:
     def num_channels(self) -> int:
         return self._num_channels
 
-    def clear_buffer(self) -> None:
+    def clear_queue(self) -> None:
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
 
