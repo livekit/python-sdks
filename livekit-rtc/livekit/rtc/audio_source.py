@@ -77,11 +77,7 @@ class AudioSource:
         """Clears the audio queue, discarding all buffered audio data."""
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
-
-        resp = FfiClient.instance.request(req)
-        if resp.clear_audio_source_buffer.error:
-            raise Exception(resp.clear_audio_source_buffer.error)
-
+        _ = FfiClient.instance.request(req)
         self._release_waiter()
 
     async def capture_frame(self, frame: AudioFrame) -> None:
