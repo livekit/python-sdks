@@ -91,9 +91,6 @@ class AudioSource:
         now = time.monotonic()
         elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
         self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
-
-        # remove 50ms to account for processing time (e.g. using wait_for_playour for very small chunks)
-        self._q_size -= 0.05
         self._last_capture = now
 
         if self._join_handle:
@@ -102,7 +99,11 @@ class AudioSource:
         if self._join_fut.done():
             self._join_fut = self._loop.create_future()
 
-        self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
+        # remove 50ms to account for processing time
+        # (e.g. using wait_for_playout for very small chunks)
+        self._join_handle = self._loop.call_later(
+            self._q_size - 0.05, self._release_waiter
+        )
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
