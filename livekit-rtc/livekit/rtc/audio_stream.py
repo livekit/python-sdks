@@ -126,6 +126,8 @@ class AudioStream:
         audio_stream_from_participant.participant_handle = (
             participant._ffi_handle.handle
         )
+        audio_stream_from_participant.sample_rate = self._sample_rate
+        audio_stream_from_participant.num_channels = self._num_channels
         audio_stream_from_participant.type = (
             proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         )
