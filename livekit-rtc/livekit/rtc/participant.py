@@ -34,6 +34,7 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
+from .chat_message import ChatMessage
 
 
 class PublishTrackError(Exception):
@@ -175,6 +176,56 @@ class LocalParticipant(Participant):
                 lambda e: e.set_local_metadata.async_id
                 == resp.set_local_metadata.async_id
             )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+    async def send_chat_message(
+        self,
+        text: str,
+        destination_identities: List[str] = [],
+        sender_identity: str | None = None,
+    ) -> ChatMessage:
+        req = proto_ffi.FfiRequest()
+        req.send_chat_message.local_participant_handle = self._ffi_handle.handle
+        req.send_chat_message.message = text
+        req.send_chat_message.destination_identities = destination_identities
+        if sender_identity:
+            req.send_chat_message.sender_identity = sender_identity
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: e.send_chat_message.async_id
+                == resp.send_chat_message.async_id
+            )
+            return resp.chat_message
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+    async def edit_chat_message(
+        self,
+        edit_text: str,
+        original_message: ChatMessage,
+        destination_identities: List[str] = [],
+        sender_identity: str | None = None,
+    ) -> ChatMessage:
+        req = proto_ffi.FfiRequest()
+        req.edit_chat_message.local_participant_handle = self._ffi_handle.handle
+        req.edit_chat_message.edit_text = edit_text
+        req.edit_chat_message.original_message = original_message
+        req.edit_chat_message.destination_identities = destination_identities
+        if sender_identity:
+            req.edit_chat_message.sender_identity = sender_identity
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: e.edit_chat_message.async_id
+                == resp.edit_chat_message.async_id
+            )
+            return resp.chat_message
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 

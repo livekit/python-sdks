@@ -32,6 +32,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
+from .chat_message import ChatMessage
 
 EventTypes = Literal[
     "participant_connected",
@@ -488,6 +489,20 @@ class Room(EventEmitter[EventTypes]):
                         participant=rparticipant,
                     ),
                 )
+        elif which == "chat_message":
+            msg = event.chat_message.message
+            part = self._retrieve_participant(event.chat_message.participant_identity)
+            self.emit(
+                "chat_message",
+                ChatMessage(
+                    id=msg.id,
+                    message=msg.message,
+                    timestamp=msg.timestamp,
+                    edit_timestamp=msg.edit_timestamp,
+                    generated=msg.generated,
+                ),
+                pub,
+            )
         elif which == "e2ee_state_changed":
             identity = event.e2ee_state_changed.participant_identity
             e2ee_state = event.e2ee_state_changed.state
