@@ -1,10 +1,15 @@
 from livekit.rtc import AudioResampler, AudioResamplerQuality
 import time
 import wave
+import os
 
 
 def test_audio_resampler():
-    with wave.open("test_audio.wav", "rb") as wf_in:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    wav_file_path = os.path.join(current_dir, "test_audio.wav")
+
+    # Open the wave file
+    with wave.open(wav_file_path, "rb") as wf_in:
         n_channels = wf_in.getnchannels()
         sampwidth = wf_in.getsampwidth()
         n_frames = wf_in.getnframes()
@@ -27,7 +32,7 @@ def test_audio_resampler():
         output_frames = []
         for i in range(nb_runs):
             output_frames = []
-            resampler = AudioResampler(44100, 16000, quality=quality)
+            resampler = AudioResampler(44100, 8000, quality=quality)
 
             start_time = time.perf_counter()
 
@@ -55,5 +60,5 @@ def test_audio_resampler():
         with wave.open(f"audio_resampled_{quality.name}.wav", "wb") as wf_out:
             wf_out.setnchannels(n_channels)
             wf_out.setsampwidth(sampwidth)
-            wf_out.setframerate(16000)
+            wf_out.setframerate(8000)
             wf_out.writeframes(output_data)
