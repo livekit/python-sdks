@@ -69,6 +69,7 @@ from .video_frame import (
 )
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
+from .audio_resampler import AudioResampler, AudioResamplerQuality
 
 __all__ = [
     "ConnectionQuality",
@@ -127,5 +128,7 @@ __all__ = [
     "VideoStream",
     "ChatManager",
     "ChatMessage",
+    "AudioResampler",
+    "AudioResamplerQuality",
     "__version__",
 ]
