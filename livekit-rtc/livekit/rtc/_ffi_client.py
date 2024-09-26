@@ -192,10 +192,10 @@ class FfiClient:
     _instance: Optional["FfiClient"] = None
 
     @classproperty
-    def instance(self):
-        if self._instance is None:
-            self._instance = FfiClient()
-        return self._instance
+    def instance(cls) -> "FfiClient":
+        if cls._instance is None:
+            cls._instance = FfiClient()
+        return cls._instance
 
     def __init__(self) -> None:
         self._lock = threading.RLock()

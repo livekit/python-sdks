@@ -60,8 +60,12 @@ class AudioFrame:
         )
 
     def remix_and_resample(self, sample_rate: int, num_channels: int) -> "AudioFrame":
-        """Resample the audio frame to the given sample rate and number of channels."""
+        """Resample the audio frame to the given sample rate and number of channels.
 
+        .. warning::
+            This method is deprecated and will be removed in a future release.
+            Please use the `rtc.AudioResampler` class instead.
+        """
         req = proto_ffi.FfiRequest()
         req.new_audio_resampler.CopyFrom(proto_audio.NewAudioResamplerRequest())
 

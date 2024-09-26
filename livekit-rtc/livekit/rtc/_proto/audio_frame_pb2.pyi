@@ -32,6 +32,79 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _SoxResamplerDataType:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SoxResamplerDataTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxResamplerDataType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SOXR_DATATYPE_INT16I: _SoxResamplerDataType.ValueType  # 0
+    """TODO(theomonnom): support other datatypes (shouldn't really be needed)"""
+    SOXR_DATATYPE_INT16S: _SoxResamplerDataType.ValueType  # 1
+
+class SoxResamplerDataType(_SoxResamplerDataType, metaclass=_SoxResamplerDataTypeEnumTypeWrapper): ...
+
+SOXR_DATATYPE_INT16I: SoxResamplerDataType.ValueType  # 0
+"""TODO(theomonnom): support other datatypes (shouldn't really be needed)"""
+SOXR_DATATYPE_INT16S: SoxResamplerDataType.ValueType  # 1
+global___SoxResamplerDataType = SoxResamplerDataType
+
+class _SoxQualityRecipe:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SoxQualityRecipeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxQualityRecipe.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SOXR_QUALITY_QUICK: _SoxQualityRecipe.ValueType  # 0
+    SOXR_QUALITY_LOW: _SoxQualityRecipe.ValueType  # 1
+    SOXR_QUALITY_MEDIUM: _SoxQualityRecipe.ValueType  # 2
+    SOXR_QUALITY_HIGH: _SoxQualityRecipe.ValueType  # 3
+    SOXR_QUALITY_VERYHIGH: _SoxQualityRecipe.ValueType  # 4
+
+class SoxQualityRecipe(_SoxQualityRecipe, metaclass=_SoxQualityRecipeEnumTypeWrapper): ...
+
+SOXR_QUALITY_QUICK: SoxQualityRecipe.ValueType  # 0
+SOXR_QUALITY_LOW: SoxQualityRecipe.ValueType  # 1
+SOXR_QUALITY_MEDIUM: SoxQualityRecipe.ValueType  # 2
+SOXR_QUALITY_HIGH: SoxQualityRecipe.ValueType  # 3
+SOXR_QUALITY_VERYHIGH: SoxQualityRecipe.ValueType  # 4
+global___SoxQualityRecipe = SoxQualityRecipe
+
+class _SoxFlagBits:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SoxFlagBitsEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxFlagBits.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SOXR_ROLLOFF_SMALL: _SoxFlagBits.ValueType  # 0
+    """1 << 0"""
+    SOXR_ROLLOFF_MEDIUM: _SoxFlagBits.ValueType  # 1
+    """1 << 1"""
+    SOXR_ROLLOFF_NONE: _SoxFlagBits.ValueType  # 2
+    """1 << 2"""
+    SOXR_HIGH_PREC_CLOCK: _SoxFlagBits.ValueType  # 3
+    """1 << 3"""
+    SOXR_DOUBLE_PRECISION: _SoxFlagBits.ValueType  # 4
+    """1 << 4"""
+    SOXR_VR: _SoxFlagBits.ValueType  # 5
+    """1 << 5"""
+
+class SoxFlagBits(_SoxFlagBits, metaclass=_SoxFlagBitsEnumTypeWrapper): ...
+
+SOXR_ROLLOFF_SMALL: SoxFlagBits.ValueType  # 0
+"""1 << 0"""
+SOXR_ROLLOFF_MEDIUM: SoxFlagBits.ValueType  # 1
+"""1 << 1"""
+SOXR_ROLLOFF_NONE: SoxFlagBits.ValueType  # 2
+"""1 << 2"""
+SOXR_HIGH_PREC_CLOCK: SoxFlagBits.ValueType  # 3
+"""1 << 3"""
+SOXR_DOUBLE_PRECISION: SoxFlagBits.ValueType  # 4
+"""1 << 4"""
+SOXR_VR: SoxFlagBits.ValueType  # 5
+"""1 << 5"""
+global___SoxFlagBits = SoxFlagBits
+
 class _AudioStreamType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -362,6 +435,150 @@ class RemixAndResampleResponse(google.protobuf.message.Message):
 global___RemixAndResampleResponse = RemixAndResampleResponse
 
 @typing.final
+class NewSoxResamplerRequest(google.protobuf.message.Message):
+    """New resampler using SoX (much better quality)"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    INPUT_RATE_FIELD_NUMBER: builtins.int
+    OUTPUT_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    INPUT_DATA_TYPE_FIELD_NUMBER: builtins.int
+    OUTPUT_DATA_TYPE_FIELD_NUMBER: builtins.int
+    QUALITY_RECIPE_FIELD_NUMBER: builtins.int
+    FLAGS_FIELD_NUMBER: builtins.int
+    input_rate: builtins.float
+    output_rate: builtins.float
+    num_channels: builtins.int
+    input_data_type: global___SoxResamplerDataType.ValueType
+    output_data_type: global___SoxResamplerDataType.ValueType
+    quality_recipe: global___SoxQualityRecipe.ValueType
+    flags: builtins.int
+    def __init__(
+        self,
+        *,
+        input_rate: builtins.float = ...,
+        output_rate: builtins.float = ...,
+        num_channels: builtins.int = ...,
+        input_data_type: global___SoxResamplerDataType.ValueType = ...,
+        output_data_type: global___SoxResamplerDataType.ValueType = ...,
+        quality_recipe: global___SoxQualityRecipe.ValueType = ...,
+        flags: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["flags", b"flags", "input_data_type", b"input_data_type", "input_rate", b"input_rate", "num_channels", b"num_channels", "output_data_type", b"output_data_type", "output_rate", b"output_rate", "quality_recipe", b"quality_recipe"]) -> None: ...
+
+global___NewSoxResamplerRequest = NewSoxResamplerRequest
+
+@typing.final
+class NewSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RESAMPLER_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    @property
+    def resampler(self) -> global___OwnedSoxResampler: ...
+    def __init__(
+        self,
+        *,
+        resampler: global___OwnedSoxResampler | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "resampler", b"resampler"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "resampler", b"resampler"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+
+global___NewSoxResamplerResponse = NewSoxResamplerResponse
+
+@typing.final
+class PushSoxResamplerRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RESAMPLER_HANDLE_FIELD_NUMBER: builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    resampler_handle: builtins.int
+    data_ptr: builtins.int
+    """*const i16"""
+    size: builtins.int
+    """in bytes"""
+    def __init__(
+        self,
+        *,
+        resampler_handle: builtins.int = ...,
+        data_ptr: builtins.int = ...,
+        size: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "resampler_handle", b"resampler_handle", "size", b"size"]) -> None: ...
+
+global___PushSoxResamplerRequest = PushSoxResamplerRequest
+
+@typing.final
+class PushSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    OUTPUT_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    output_ptr: builtins.int
+    """*const i16 (could be null)"""
+    size: builtins.int
+    """in bytes"""
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        output_ptr: builtins.int = ...,
+        size: builtins.int = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+
+global___PushSoxResamplerResponse = PushSoxResamplerResponse
+
+@typing.final
+class FlushSoxResamplerRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RESAMPLER_HANDLE_FIELD_NUMBER: builtins.int
+    resampler_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        resampler_handle: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["resampler_handle", b"resampler_handle"]) -> None: ...
+
+global___FlushSoxResamplerRequest = FlushSoxResamplerRequest
+
+@typing.final
+class FlushSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    OUTPUT_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    output_ptr: builtins.int
+    """*const i16 (could be null)"""
+    size: builtins.int
+    """in bytes"""
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        output_ptr: builtins.int = ...,
+        size: builtins.int = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+
+global___FlushSoxResamplerResponse = FlushSoxResamplerResponse
+
+@typing.final
 class AudioFrameBufferInfo(google.protobuf.message.Message):
     """
     AudioFrame buffer
@@ -594,3 +811,38 @@ class OwnedAudioResampler(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioResampler = OwnedAudioResampler
+
+@typing.final
+class SoxResamplerInfo(google.protobuf.message.Message):
+    """
+    Sox AudioResampler
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___SoxResamplerInfo = SoxResamplerInfo
+
+@typing.final
+class OwnedSoxResampler(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___SoxResamplerInfo: ...
+    def __init__(
+        self,
+        *,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___SoxResamplerInfo | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+
+global___OwnedSoxResampler = OwnedSoxResampler
