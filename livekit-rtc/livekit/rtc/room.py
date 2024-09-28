@@ -536,5 +536,4 @@ class Room(EventEmitter[EventTypes]):
         if self._first_sid_future.done():
             sid = self._first_sid_future.result()
 
-        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata},
-        connection_state={self.connection_state})"
+        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self.connection_state})"
