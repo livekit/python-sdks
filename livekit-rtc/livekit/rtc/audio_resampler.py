@@ -93,7 +93,7 @@ class AudioResampler:
         Raises:
             Exception: If there is an error during resampling.
         """
-        bdata = data if isinstance(data, bytearray) else data.data
+        bdata = data if isinstance(data, bytearray) else data.data.cast("b")
 
         req = proto_ffi.FfiRequest()
         req.push_sox_resampler.resampler_handle = self._ffi_handle.handle
@@ -144,8 +144,8 @@ class AudioResampler:
         if not resp.flush_sox_resampler.output_ptr:
             return []
 
-        cdata = (ctypes.c_int8 * resp.push_sox_resampler.size).from_address(
-            resp.push_sox_resampler.output_ptr
+        cdata = (ctypes.c_int8 * resp.flush_sox_resampler.size).from_address(
+            resp.flush_sox_resampler.output_ptr
         )
         output_data = bytearray(cdata)
         return [
