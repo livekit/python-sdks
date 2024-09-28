@@ -80,6 +80,9 @@ class LocalAudioTrack(Track):
         resp = FfiClient.instance.request(req)
         return LocalAudioTrack(resp.create_audio_track.track)
 
+    def __repr__(self) -> str:
+        return f"LocalAudioTrack(sid={self.sid}, name={self.name})"
+
 
 class LocalVideoTrack(Track):
     def __init__(self, info: proto_track.OwnedTrack):
@@ -94,15 +97,24 @@ class LocalVideoTrack(Track):
         resp = FfiClient.instance.request(req)
         return LocalVideoTrack(resp.create_video_track.track)
 
+    def __repr__(self) -> str:
+        return f"LocalVideoTrack(sid={self.sid}, name={self.name})"
+
 
 class RemoteAudioTrack(Track):
     def __init__(self, info: proto_track.OwnedTrack):
         super().__init__(info)
 
+    def __repr__(self) -> str:
+        return f"RemoteAudioTrack(sid={self.sid}, name={self.name})"
+
 
 class RemoteVideoTrack(Track):
     def __init__(self, info: proto_track.OwnedTrack):
         super().__init__(info)
+
+    def __repr__(self) -> str:
+        return f"RemoteVideoTrack(sid={self.sid}, name={self.name})"
 
 
 LocalTrack = Union[LocalVideoTrack, LocalAudioTrack]

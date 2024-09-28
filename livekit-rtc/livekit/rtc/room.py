@@ -530,3 +530,11 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self.remote_participants[participant.identity] = participant
         return participant
+
+    def __repr__(self) -> str:
+        sid = "unknown"
+        if self._first_sid_future.done():
+            sid = self._first_sid_future.result()
+
+        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata},
+        connection_state={self.connection_state})"
