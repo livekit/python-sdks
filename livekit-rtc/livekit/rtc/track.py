@@ -81,7 +81,7 @@ class LocalAudioTrack(Track):
         return LocalAudioTrack(resp.create_audio_track.track)
 
     def __repr__(self) -> str:
-        return f"LocalAudioTrack(sid={self.sid}, name={self.name})"
+        return f"rtc.LocalAudioTrack(sid={self.sid}, name={self.name})"
 
 
 class LocalVideoTrack(Track):
@@ -98,7 +98,7 @@ class LocalVideoTrack(Track):
         return LocalVideoTrack(resp.create_video_track.track)
 
     def __repr__(self) -> str:
-        return f"LocalVideoTrack(sid={self.sid}, name={self.name})"
+        return f"rtc.LocalVideoTrack(sid={self.sid}, name={self.name})"
 
 
 class RemoteAudioTrack(Track):
@@ -106,7 +106,7 @@ class RemoteAudioTrack(Track):
         super().__init__(info)
 
     def __repr__(self) -> str:
-        return f"RemoteAudioTrack(sid={self.sid}, name={self.name})"
+        return f"rtc.RemoteAudioTrack(sid={self.sid}, name={self.name})"
 
 
 class RemoteVideoTrack(Track):
@@ -114,7 +114,7 @@ class RemoteVideoTrack(Track):
         super().__init__(info)
 
     def __repr__(self) -> str:
-        return f"RemoteVideoTrack(sid={self.sid}, name={self.name})"
+        return f"rtc.RemoteVideoTrack(sid={self.sid}, name={self.name})"
 
 
 LocalTrack = Union[LocalVideoTrack, LocalAudioTrack]

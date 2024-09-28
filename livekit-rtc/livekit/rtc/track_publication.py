@@ -78,7 +78,7 @@ class LocalTrackPublication(TrackPublication):
         await asyncio.shield(self._first_subscription)
 
     def __repr__(self) -> str:
-        return f"LocalTrackPublication(sid={self.sid}, name={self.name}, kind={self.kind}, source={self.source})"
+        return f"rtc.LocalTrackPublication(sid={self.sid}, name={self.name}, kind={self.kind}, source={self.source})"
 
 
 class RemoteTrackPublication(TrackPublication):
@@ -93,4 +93,4 @@ class RemoteTrackPublication(TrackPublication):
         FfiClient.instance.request(req)
 
     def __repr__(self) -> str:
-        return f"RemoteTrackPublication(sid={self.sid}, name={self.name}, kind={self.kind}, source={self.source})"
+        return f"rtc.RemoteTrackPublication(sid={self.sid}, name={self.name}, kind={self.kind}, source={self.source})"
