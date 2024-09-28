@@ -256,8 +256,14 @@ class LocalParticipant(Participant):
         finally:
             self._room_queue.unsubscribe(queue)
 
+    def __repr__(self) -> str:
+        return f"rtc.LocalParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
+
 
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
         self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+
+    def __repr__(self) -> str:
+        return f"rtc.RemoteParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"

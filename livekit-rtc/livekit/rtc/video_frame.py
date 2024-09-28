@@ -22,6 +22,13 @@ from ._utils import get_address
 
 
 class VideoFrame:
+    """
+    Represents a video frame with associated metadata and pixel data.
+
+    This class provides methods to access video frame properties such as width, height,
+    and pixel format, as well as methods for manipulating and converting video frames.
+    """
+
     def __init__(
         self,
         width: int,
@@ -29,6 +36,16 @@ class VideoFrame:
         type: proto_video.VideoBufferType.ValueType,
         data: Union[bytes, bytearray, memoryview],
     ) -> None:
+        """
+        Initializes a new VideoFrame instance.
+
+        Args:
+            width (int): The width of the video frame in pixels.
+            height (int): The height of the video frame in pixels.
+            type (proto_video.VideoBufferType.ValueType): The format type of the video frame data
+                (e.g., RGBA, BGRA, RGB24, etc.).
+            data (Union[bytes, bytearray, memoryview]): The raw pixel data for the video frame.
+        """
         self._width = width
         self._height = height
         self._type = type
@@ -36,18 +53,42 @@ class VideoFrame:
 
     @property
     def width(self) -> int:
+        """
+        Returns the width of the video frame in pixels.
+
+        Returns:
+            int: The width of the video frame.
+        """
         return self._width
 
     @property
     def height(self) -> int:
+        """
+        Returns the height of the video frame in pixels.
+
+        Returns:
+            int: The height of the video frame.
+        """
         return self._height
 
     @property
     def type(self) -> proto_video.VideoBufferType.ValueType:
+        """
+        Returns the height of the video frame in pixels.
+
+        Returns:
+            int: The height of the video frame.
+        """
         return self._type
 
     @property
     def data(self) -> memoryview:
+        """
+        Returns a memoryview of the raw pixel data for the video frame.
+
+        Returns:
+            memoryview: The raw pixel data of the video frame as a memoryview object.
+        """
         return memoryview(self._data)
 
     @staticmethod
@@ -89,6 +130,19 @@ class VideoFrame:
         return info
 
     def get_plane(self, plane_nth: int) -> Optional[memoryview]:
+        """
+        Returns the memoryview of a specific plane in the video frame, based on its index.
+
+        Some video formats (e.g., I420, NV12) contain multiple planes (Y, U, V channels).
+        This method allows access to individual planes by index.
+
+        Args:
+            plane_nth (int): The index of the plane to retrieve (starting from 0).
+
+        Returns:
+            Optional[memoryview]: A memoryview of the specified plane's data, or None if
+            the index is out of bounds for the format.
+        """
         plane_infos = _get_plane_infos(
             get_address(self.data), self.type, self.width, self.height
         )
@@ -102,6 +156,39 @@ class VideoFrame:
     def convert(
         self, type: proto_video.VideoBufferType.ValueType, *, flip_y: bool = False
     ) -> "VideoFrame":
+        """
+        Converts the current video frame to a different format type, optionally flipping
+        the frame vertically.
+
+        Args:
+            type (proto_video.VideoBufferType.ValueType): The target format type to convert to
+                (e.g., RGBA, I420).
+            flip_y (bool, optional): If True, the frame will be flipped vertically. Defaults to False.
+
+        Returns:
+            VideoFrame: A new VideoFrame object in the specified format.
+
+        Raises:
+            Exception: If there is an error during the conversion process.
+
+        Example:
+            Convert a frame from RGBA to I420 format:
+
+            >>> frame = VideoFrame(width=1920, height=1080, type=proto_video.VideoBufferType.RGBA, data=raw_data)
+            >>> converted_frame = frame.convert(proto_video.VideoBufferType.I420)
+            >>> print(converted_frame.type)
+            VideoBufferType.I420
+
+        Example:
+            Convert a frame from BGRA to RGB24 format and flip it vertically:
+
+            >>> frame = VideoFrame(width=1280, height=720, type=proto_video.VideoBufferType.BGRA, data=raw_data)
+            >>> converted_frame = frame.convert(proto_video.VideoBufferType.RGB24, flip_y=True)
+            >>> print(converted_frame.type)
+            VideoBufferType.RGB24
+            >>> print(converted_frame.width, converted_frame.height)
+            1280 720
+        """
         req = proto.FfiRequest()
         req.video_convert.flip_y = flip_y
         req.video_convert.dst_type = type
@@ -111,6 +198,9 @@ class VideoFrame:
             raise Exception(resp.video_convert.error)
 
         return VideoFrame._from_owned_info(resp.video_convert.buffer)
+
+    def __repr__(self) -> str:
+        return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={self.type})"
 
 
 def _component_info(
