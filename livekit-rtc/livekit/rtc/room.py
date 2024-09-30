@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import ctypes
 import logging
 from dataclasses import dataclass, field
@@ -225,23 +226,25 @@ class Room(EventEmitter[EventTypes]):
         self._task = self._loop.create_task(self._listen_task())
 
     async def disconnect(self) -> None:
-        if not self.isconnected():
-            return
-
-        req = proto_ffi.FfiRequest()
-        req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-
-        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = FfiClient.instance.request(req)
-            await queue.wait_for(
-                lambda e: e.disconnect.async_id == resp.disconnect.async_id
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+            if self.isconnected():
+                req = proto_ffi.FfiRequest()
+                req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
 
-        await self._task
-        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+                queue = FfiClient.instance.queue.subscribe()
+                try:
+                    resp = FfiClient.instance.request(req)
+                    await queue.wait_for(
+                        lambda e: e.disconnect.async_id == resp.disconnect.async_id
+                    )
+                finally:
+                    FfiClient.instance.queue.unsubscribe(queue)
+
+            if self._task is not None:
+                await self._task
+        finally:
+            if self._ffi_queue is not None:
+                FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
