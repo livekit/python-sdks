@@ -144,13 +144,11 @@ class AccessToken:
     def to_jwt(self) -> str:
         video = self.claims.video
         if video.room_join and (not self.identity or not video.room):
-            raise ValueError(
-                "identity and room must be set when joining a room")
+            raise ValueError("identity and room must be set when joining a room")
 
         claims = dataclasses.asdict(
             self.claims,
-            dict_factory=lambda items: {
-                snake_to_lower_camel(k): v for k, v in items},
+            dict_factory=lambda items: {snake_to_lower_camel(k): v for k, v in items},
         )
         claims.update(
             {
