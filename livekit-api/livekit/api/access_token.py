@@ -80,6 +80,7 @@ class Claims:
     attributes: dict[str, str] = dataclasses.field(default_factory=dict)
     metadata: str = ""
     sha256: str = ""
+    kind: str = ""
 
 
 class AccessToken:
@@ -116,6 +117,10 @@ class AccessToken:
 
     def with_identity(self, identity: str) -> "AccessToken":
         self.identity = identity
+        return self
+    
+    def with_kind(self, kind: str) -> "AccessToken":
+        self.claims.kind = kind
         return self
 
     def with_name(self, name: str) -> "AccessToken":
