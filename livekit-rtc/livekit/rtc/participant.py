@@ -80,14 +80,18 @@ class Participant:
 
     @property
     def attributes(self) -> dict[str, str]:
+        """Custom attributes associated with the participant."""
         return dict(self._info.attributes)
 
     @property
     def kind(self) -> proto_participant.ParticipantKind.ValueType:
+        """Participant's kind (e.g., regular participant, ingress, egress, sip, agent)."""
         return self._info.kind
 
 
 class LocalParticipant(Participant):
+    """Represents the local participant in a room."""
+
     def __init__(
         self,
         room_queue: BroadcastQueue[proto_ffi.FfiEvent],
@@ -105,6 +109,18 @@ class LocalParticipant(Participant):
         destination_identities: List[str] = [],
         topic: str = "",
     ) -> None:
+        """
+        Publish arbitrary data to the room.
+
+        Args:
+            payload (Union[bytes, str]): The data to publish.
+            reliable (bool, optional): Whether to send reliably or not. Defaults to True.
+            destination_identities (List[str], optional): List of participant identities to send to. Defaults to [].
+            topic (str, optional): The topic under which to publish the data. Defaults to "".
+
+        Raises:
+            PublishDataError: If there is an error in publishing data.
+        """
         if isinstance(payload, str):
             payload = payload.encode("utf-8")
 
@@ -132,6 +148,15 @@ class LocalParticipant(Participant):
             raise PublishDataError(cb.publish_data.error)
 
     async def publish_transcription(self, transcription: Transcription) -> None:
+        """
+        Publish transcription data to the room.
+
+        Args:
+            transcription (Transcription): The transcription data to publish.
+
+        Raises:
+            PublishTranscriptionError: If there is an error in publishing transcription.
+        """
         req = proto_ffi.FfiRequest()
         proto_segments = [
             ProtoTranscriptionSegment(
@@ -164,6 +189,14 @@ class LocalParticipant(Participant):
             raise PublishTranscriptionError(cb.publish_transcription.error)
 
     async def set_metadata(self, metadata: str) -> None:
+        """
+        Set the metadata for the local participant.
+
+        Note: this requires `canUpdateOwnMetadata` permission.
+
+        Args:
+            metadata (str): The new metadata.
+        """
         req = proto_ffi.FfiRequest()
         req.set_local_metadata.local_participant_handle = self._ffi_handle.handle
         req.set_local_metadata.metadata = metadata
@@ -179,6 +212,14 @@ class LocalParticipant(Participant):
             FfiClient.instance.queue.unsubscribe(queue)
 
     async def set_name(self, name: str) -> None:
+        """
+        Set the name for the local participant.
+
+        Note: this requires `canUpdateOwnMetadata` permission.
+
+        Args:
+            name (str): The new name.
+        """
         req = proto_ffi.FfiRequest()
         req.set_local_name.local_participant_handle = self._ffi_handle.handle
         req.set_local_name.name = name
@@ -193,6 +234,14 @@ class LocalParticipant(Participant):
             FfiClient.instance.queue.unsubscribe(queue)
 
     async def set_attributes(self, attributes: dict[str, str]) -> None:
+        """
+        Set custom attributes for the local participant.
+
+        Note: this requires `canUpdateOwnMetadata` permission.
+
+        Args:
+            attributes (dict[str, str]): A dictionary of attributes to set.
+        """
         req = proto_ffi.FfiRequest()
         req.set_local_attributes.local_participant_handle = self._ffi_handle.handle
         req.set_local_attributes.attributes.update(attributes)
@@ -210,6 +259,19 @@ class LocalParticipant(Participant):
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
     ) -> LocalTrackPublication:
+        """
+        Publish a local track to the room.
+
+        Args:
+            track (LocalTrack): The track to publish.
+            options (TrackPublishOptions, optional): Options for publishing the track.
+
+        Returns:
+            LocalTrackPublication: The publication of the published track.
+
+        Raises:
+            PublishTrackError: If there is an error in publishing the track.
+        """
         req = proto_ffi.FfiRequest()
         req.publish_track.track_handle = track._ffi_handle.handle
         req.publish_track.local_participant_handle = self._ffi_handle.handle
@@ -236,6 +298,15 @@ class LocalParticipant(Participant):
             self._room_queue.unsubscribe(queue)
 
     async def unpublish_track(self, track_sid: str) -> None:
+        """
+        Unpublish a track from the room.
+
+        Args:
+            track_sid (str): The SID of the track to unpublish.
+
+        Raises:
+            UnpublishTrackError: If there is an error in unpublishing the track.
+        """
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
