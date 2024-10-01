@@ -129,9 +129,7 @@ class AudioSource:
         if self._join_fut.done():
             self._join_fut = self._loop.create_future()
 
-        self._join_handle = self._loop.call_later(
-            self._q_size, self._release_waiter
-        )
+        self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
