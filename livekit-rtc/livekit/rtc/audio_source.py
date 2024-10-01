@@ -67,7 +67,8 @@ class AudioSource:
         self._info = resp.new_audio_source.source
         self._ffi_handle = FfiHandle(self._info.handle.id)
 
-        self._last_capture = self._q_size = 0.0
+        self._last_capture = 0.0
+        self._q_size = 0.0
         self._join_handle: asyncio.TimerHandle | None = None
         self._join_fut: asyncio.Future[None] = self._loop.create_future()
 
@@ -128,11 +129,7 @@ class AudioSource:
         if self._join_fut.done():
             self._join_fut = self._loop.create_future()
 
-        # remove 50ms to account for processing time
-        # (e.g. using wait_for_playout for very small chunks)
-        self._join_handle = self._loop.call_later(
-            self._q_size - 0.05, self._release_waiter
-        )
+        self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
