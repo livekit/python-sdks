@@ -449,16 +449,16 @@ class Room(EventEmitter[EventTypes]):
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
-            lpublication = self._local_participant.track_publications[sid]
+            lpublication = self.local_participant.track_publications[sid]
             track = lpublication.track
             self.emit("local_track_published", lpublication, track)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self._local_participant.track_publications[sid]
+            lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
-            lpublication = self._local_participant.track_publications[sid]
+            lpublication = self.local_participant.track_publications[sid]
             lpublication._first_subscription.set_result(None)
             self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
@@ -687,8 +687,8 @@ class Room(EventEmitter[EventTypes]):
 
     def _retrieve_participant(self, identity: str) -> Optional[Participant]:
         """Retrieve a local or remote participant by identity"""
-        if identity and identity == self._local_participant.identity:
-            return self._local_participant
+        if identity and identity == self.local_participant.identity:
+            return self.local_participant
 
         return self._retrieve_remote_participant(identity)
 
