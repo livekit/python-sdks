@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Optional, List
+from typing import Optional, List, Literal
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
@@ -84,6 +84,8 @@ class Claims:
 
 
 class AccessToken:
+    ParticipantKind = Literal["standard", "egress", "ingress", "sip", "agent"]
+
     def __init__(
         self,
         api_key: Optional[str] = None,
@@ -118,8 +120,8 @@ class AccessToken:
     def with_identity(self, identity: str) -> "AccessToken":
         self.identity = identity
         return self
-    
-    def with_kind(self, kind: str) -> "AccessToken":
+
+    def with_kind(self, kind: ParticipantKind) -> "AccessToken":
         self.claims.kind = kind
         return self
 
