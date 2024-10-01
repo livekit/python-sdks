@@ -131,9 +131,10 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
 
-        self.remote_participants: Dict[str, RemoteParticipant] = {}
-        self.connection_state = ConnectionState.CONN_DISCONNECTED
+        self._remote_participants: Dict[str, RemoteParticipant] = {}
+        self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
+        self._local_participant: LocalParticipant | None = None
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -150,6 +151,37 @@ class Room(EventEmitter[EventTypes]):
             return self._info.sid
 
         return await self._first_sid_future
+
+    @property
+    def local_participant(self) -> LocalParticipant:
+        """Gets the local participant in the room.
+
+        Returns:
+            LocalParticipant: The local participant in the room.
+        """
+        if self._local_participant is None:
+            raise Exception("cannot access local participant before connecting")
+
+        return self._local_participant
+
+    @property
+    def connection_state(self) -> ConnectionState.ValueType:
+        """Gets the connection state of the room.
+
+        Returns:
+            ConnectionState: The connection state of the room.
+        """
+        return self._connection_state
+
+    @property
+    def remote_participants(self) -> dict[str, RemoteParticipant]:
+        """Gets the remote participants in the room.
+
+        Returns:
+            dict[str, RemoteParticipant]: A dictionary of remote participants indexed by their
+            identity.
+        """
+        return self._remote_participants
 
     @property
     def name(self) -> str:
@@ -186,7 +218,7 @@ class Room(EventEmitter[EventTypes]):
         """
         return (
             self._ffi_handle is not None
-            and self.connection_state != ConnectionState.CONN_DISCONNECTED
+            and self._connection_state != ConnectionState.CONN_DISCONNECTED
         )
 
     def on(self, event: EventTypes, callback: Optional[Callable] = None) -> Callable:
@@ -345,9 +377,9 @@ class Room(EventEmitter[EventTypes]):
         self._e2ee_manager = E2EEManager(self._ffi_handle.handle, options.e2ee)
 
         self._info = cb.connect.room.info
-        self.connection_state = ConnectionState.CONN_CONNECTED
+        self._connection_state = ConnectionState.CONN_CONNECTED
 
-        self.local_participant = LocalParticipant(
+        self._local_participant = LocalParticipant(
             self._room_queue, cb.connect.local_participant
         )
 
@@ -413,31 +445,31 @@ class Room(EventEmitter[EventTypes]):
             self.emit("participant_connected", rparticipant)
         elif which == "participant_disconnected":
             identity = event.participant_disconnected.participant_identity
-            rparticipant = self.remote_participants.pop(identity)
+            rparticipant = self._remote_participants.pop(identity)
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
-            lpublication = self.local_participant.track_publications[sid]
+            lpublication = self._local_participant.track_publications[sid]
             track = lpublication.track
             self.emit("local_track_published", lpublication, track)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.track_publications[sid]
+            lpublication = self._local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
-            lpublication = self.local_participant.track_publications[sid]
+            lpublication = self._local_participant.track_publications[sid]
             lpublication._first_subscription.set_result(None)
             self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
-            rparticipant = self.remote_participants[
+            rparticipant = self._remote_participants[
                 event.track_published.participant_identity
             ]
             rpublication = RemoteTrackPublication(event.track_published.publication)
             rparticipant.track_publications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
-            rparticipant = self.remote_participants[
+            rparticipant = self._remote_participants[
                 event.track_unpublished.participant_identity
             ]
             rpublication = rparticipant.track_publications.pop(
@@ -447,7 +479,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "track_subscribed":
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
-            rparticipant = self.remote_participants[
+            rparticipant = self._remote_participants[
                 event.track_subscribed.participant_identity
             ]
             rpublication = rparticipant.track_publications[track_info.sid]
@@ -466,7 +498,7 @@ class Room(EventEmitter[EventTypes]):
                 )
         elif which == "track_unsubscribed":
             identity = event.track_unsubscribed.participant_identity
-            rparticipant = self.remote_participants[identity]
+            rparticipant = self._remote_participants[identity]
             rpublication = rparticipant.track_publications[
                 event.track_unsubscribed.track_sid
             ]
@@ -476,7 +508,7 @@ class Room(EventEmitter[EventTypes]):
             self.emit("track_unsubscribed", track, rpublication, rparticipant)
         elif which == "track_subscription_failed":
             identity = event.track_subscription_failed.participant_identity
-            rparticipant = self.remote_participants[identity]
+            rparticipant = self._remote_participants[identity]
             error = event.track_subscription_failed.error
             self.emit(
                 "track_subscription_failed",
@@ -636,7 +668,7 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "connection_state_changed":
             connection_state = event.connection_state_changed.state
-            self.connection_state = connection_state
+            self._connection_state = connection_state
             self.emit("connection_state_changed", connection_state)
         elif which == "connected":
             self.emit("connected")
@@ -651,23 +683,23 @@ class Room(EventEmitter[EventTypes]):
         self, identity: str
     ) -> Optional[RemoteParticipant]:
         """Retrieve a remote participant by identity"""
-        return self.remote_participants.get(identity, None)
+        return self._remote_participants.get(identity, None)
 
     def _retrieve_participant(self, identity: str) -> Optional[Participant]:
         """Retrieve a local or remote participant by identity"""
-        if identity and identity == self.local_participant.identity:
-            return self.local_participant
+        if identity and identity == self._local_participant.identity:
+            return self._local_participant
 
         return self._retrieve_remote_participant(identity)
 
     def _create_remote_participant(
         self, owned_info: proto_participant.OwnedParticipant
     ) -> RemoteParticipant:
-        if owned_info.info.identity in self.remote_participants:
+        if owned_info.info.identity in self._remote_participants:
             raise Exception("participant already exists")
 
         participant = RemoteParticipant(owned_info)
-        self.remote_participants[participant.identity] = participant
+        self._remote_participants[participant.identity] = participant
         return participant
 
     def __repr__(self) -> str:
@@ -675,4 +707,4 @@ class Room(EventEmitter[EventTypes]):
         if self._first_sid_future.done():
             sid = self._first_sid_future.result()
 
-        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self.connection_state})"
+        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self._connection_state})"
