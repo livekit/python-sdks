@@ -48,6 +48,17 @@ class KeyProvider:
         return self._options
 
     def set_shared_key(self, key: bytes, key_index: int) -> None:
+        """Sets the shared encryption key.
+
+        Parameters:
+            key (bytes): The new shared key.
+            key_index (int): The index of the key.
+
+        Example:
+            ```python
+            key_provider.set_shared_key(b"my_shared_key", key_index=1)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.set_shared_key.key_index = key_index
@@ -55,6 +66,19 @@ class KeyProvider:
         FfiClient.instance.request(req)
 
     def export_shared_key(self, key_index: int) -> bytes:
+        """Exports the shared encryption key.
+
+        Parameters:
+            key_index (int): The index of the key to export.
+
+        Returns:
+            bytes: The exported shared key.
+
+        Example:
+            ```python
+            key = key_provider.export_shared_key(key_index=1)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.get_shared_key.key_index = key_index
@@ -63,6 +87,19 @@ class KeyProvider:
         return key
 
     def ratchet_shared_key(self, key_index: int) -> bytes:
+        """Ratchets the shared encryption key to a new key.
+
+        Parameters:
+            key_index (int): The index of the key to ratchet.
+
+        Returns:
+            bytes: The new ratcheted shared key.
+
+        Example:
+            ```python
+            new_key = key_provider.ratchet_shared_key(key_index=1)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.ratchet_shared_key.key_index = key_index
@@ -73,6 +110,18 @@ class KeyProvider:
         return new_key
 
     def set_key(self, participant_identity: str, key: bytes, key_index: int) -> None:
+        """Sets the encryption key for a specific participant.
+
+        Parameters:
+            participant_identity (str): The identity of the participant.
+            key (bytes): The encryption key to set.
+            key_index (int): The index of the key.
+
+        Example:
+            ```python
+            key_provider.set_key("participant123", b"participant_key", key_index=2)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.set_key.participant_identity = participant_identity
@@ -83,6 +132,20 @@ class KeyProvider:
         FfiClient.instance.request(req)
 
     def export_key(self, participant_identity: str, key_index: int) -> bytes:
+        """Exports the encryption key for a specific participant.
+
+        Parameters:
+            participant_identity (str): The identity of the participant.
+            key_index (int): The index of the key to export.
+
+        Returns:
+            bytes: The exported key.
+
+        Example:
+            ```python
+            key = key_provider.export_key("participant123", key_index=2)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.get_key.participant_identity = participant_identity
@@ -92,6 +155,20 @@ class KeyProvider:
         return key
 
     def ratchet_key(self, participant_identity: str, key_index: int) -> bytes:
+        """Ratchets the encryption key for a specific participant to a new key.
+
+        Parameters:
+            participant_identity (str): The identity of the participant.
+            key_index (int): The index of the key to ratchet.
+
+        Returns:
+            bytes: The new ratcheted key.
+
+        Example:
+            ```python
+            new_key = key_provider.ratchet_key("participant123", key_index=2)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.ratchet_key.participant_identity = participant_identity
@@ -124,6 +201,16 @@ class FrameCryptor:
         return self._enabled
 
     def set_enabled(self, enabled: bool) -> None:
+        """Enables or disables frame encryption.
+
+        Parameters:
+            enabled (bool): True to enable, False to disable.
+
+        Example:
+            ```python
+            frame_cryptor.set_enabled(True)
+            ```
+        """
         self._enabled = enabled
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
@@ -132,6 +219,16 @@ class FrameCryptor:
         FfiClient.instance.request(req)
 
     def set_key_index(self, key_index: int) -> None:
+        """Sets the key index for encryption/decryption.
+
+        Parameters:
+            key_index (int): The new key index.
+
+        Example:
+            ```python
+            frame_cryptor.set_key_index(3)
+            ```
+        """
         self._key_index = key_index
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
@@ -160,6 +257,16 @@ class E2EEManager:
         return self._enabled
 
     def set_enabled(self, enabled: bool) -> None:
+        """Enables or disables end-to-end encryption.
+
+        Parameters:
+            enabled (bool): True to enable, False to disable.
+
+        Example:
+            ```python
+            e2ee_manager.set_enabled(True)
+            ```
+        """
         self._enabled = enabled
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
@@ -167,6 +274,18 @@ class E2EEManager:
         FfiClient.instance.request(req)
 
     def frame_cryptors(self) -> List[FrameCryptor]:
+        """Retrieves the list of frame cryptors for participants.
+
+        Returns:
+            List[FrameCryptor]: A list of FrameCryptor instances.
+
+        Example:
+            ```python
+            cryptors = e2ee_manager.frame_cryptors()
+            for cryptor in cryptors:
+                print(cryptor.participant_identity)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
 

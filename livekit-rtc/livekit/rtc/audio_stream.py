@@ -30,11 +30,22 @@ from .track import Track
 
 @dataclass
 class AudioFrameEvent:
+    """An event representing a received audio frame.
+
+    Attributes:
+        frame (AudioFrame): The received audio frame.
+    """
+
     frame: AudioFrame
 
 
 class AudioStream:
-    """AudioStream is a stream of audio frames received from a RemoteTrack."""
+    """An asynchronous audio stream for receiving audio frames from a participant or track.
+
+    The `AudioStream` class provides an asynchronous iterator over audio frames received from
+    a specific track or participant. It allows you to receive audio frames in real-time with
+    customizable sample rates and channel configurations.
+    """
 
     def __init__(
         self,
@@ -45,6 +56,32 @@ class AudioStream:
         num_channels: int = 1,
         **kwargs,
     ) -> None:
+        """Initialize an `AudioStream` instance.
+
+        Args:
+            track (Optional[Track]): The audio track from which to receive audio. If not provided,
+                you must specify `participant` and `track_source` in `kwargs`.
+            loop (Optional[asyncio.AbstractEventLoop], optional): The event loop to use.
+                Defaults to the current event loop.
+            capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
+            sample_rate (int, optional): The sample rate for the audio stream in Hz.
+                Defaults to 48000.
+            num_channels (int, optional): The number of audio channels. Defaults to 1.
+        Example:
+            ```python
+            audio_stream = AudioStream(
+                track=audio_track,
+                sample_rate=44100,
+                num_channels=2,
+            )
+
+            audio_stream = AudioStream.from_track(
+                track=audio_track,
+                sample_rate=44100,
+                num_channels=2,
+            )
+            ```
+        """
         self._track: Track | None = track
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -76,6 +113,29 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
     ) -> AudioStream:
+        """Create an `AudioStream` from a participant's audio track.
+
+        Args:
+            participant (Participant): The participant from whom to receive audio.
+            track_source (TrackSource.ValueType): The source of the audio track (e.g., microphone, screen share).
+            loop (Optional[asyncio.AbstractEventLoop], optional): The event loop to use. Defaults to the current event loop.
+            capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
+            sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
+            num_channels (int, optional): The number of audio channels. Defaults to 1.
+
+        Returns:
+            AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
+
+        Example:
+            ```python
+            audio_stream = AudioStream.from_participant(
+                participant=participant,
+                track_source=TrackSource.MICROPHONE,
+                sample_rate=24000,
+                num_channels=1,
+            )
+            ```
+        """
         return AudioStream(
             participant=participant,
             track_source=track_source,
@@ -96,6 +156,27 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
     ) -> AudioStream:
+        """Create an `AudioStream` from an existing audio track.
+
+        Args:
+            track (Track): The audio track from which to receive audio.
+            loop (Optional[asyncio.AbstractEventLoop], optional): The event loop to use. Defaults to the current event loop.
+            capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
+            sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
+            num_channels (int, optional): The number of audio channels. Defaults to 1.
+
+        Returns:
+            AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
+
+        Example:
+            ```python
+            audio_stream = AudioStream.from_track(
+                track=audio_track,
+                sample_rate=44100,
+                num_channels=2,
+            )
+            ```
+        """
         return AudioStream(
             track=track,
             loop=loop,
@@ -152,6 +233,11 @@ class AudioStream:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def aclose(self) -> None:
+        """Asynchronously close the audio stream.
+
+        This method cleans up resources associated with the audio stream and waits for
+        any pending operations to complete.
+        """
         self._ffi_handle.dispose()
         await self._task
 
