@@ -74,6 +74,10 @@ ffi_lib.livekit_ffi_request.restype = ctypes.c_uint64
 ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_uint64]
 ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
 
+
+ffi_lib.livekit_ffi_dispose.argtypes = []
+ffi_lib.livekit_ffi_dispose.restype = None
+
 INVALID_HANDLE = 0
 
 
@@ -202,6 +206,11 @@ class FfiClient:
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         ffi_lib.livekit_ffi_initialize(ffi_event_callback, True)
+        
+        @atexit.register
+        def _dispose_lk_ffi():
+            ffi_lib.livekit_ffi_dispose()
+
 
     @property
     def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
