@@ -51,6 +51,11 @@ class PublishDataError(Exception):
         self.message = message
 
 
+class PublishDTMFError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
 class PublishTranscriptionError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -146,6 +151,34 @@ class LocalParticipant(Participant):
 
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
+
+    async def publish_dtmf(self, code: int, digit: str) -> None:
+        """
+        Publish SIP DTMF message.
+
+        Args:
+            code (int): DTMF code.
+            digit (str): DTMF digit.
+
+        Raises:
+            PublishDTMFError: If there is an error in publishing SIP DTMF message.
+        """
+        req = proto_ffi.FfiRequest()
+        req.publish_sip_dtmf.local_participant_handle = self._ffi_handle.handle
+        req.publish_sip_dtmf.code = code
+        req.publish_sip_dtmf.digit = digit
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.publish_sip_dtmf.async_id == resp.publish_sip_dtmf.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.publish_sip_dtmf.error:
+            raise PublishDTMFError(cb.publish_sip_dtmf.error)
 
     async def publish_transcription(self, transcription: Transcription) -> None:
         """
