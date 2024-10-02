@@ -206,11 +206,10 @@ class FfiClient:
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         ffi_lib.livekit_ffi_initialize(ffi_event_callback, True)
-        
+
         @atexit.register
         def _dispose_lk_ffi():
             ffi_lib.livekit_ffi_dispose()
-
 
     @property
     def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
