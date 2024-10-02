@@ -152,7 +152,7 @@ class LocalParticipant(Participant):
         if cb.publish_data.error:
             raise PublishDataError(cb.publish_data.error)
 
-    async def publish_dtmf(self, code: int, digit: str) -> None:
+    async def publish_dtmf(self, *, code: int, digit: str) -> None:
         """
         Publish SIP DTMF message.
 
