@@ -24,6 +24,8 @@ class AudioFrame:
     """
     A class that represents a frame of audio data with specific properties such as sample rate,
     number of channels, and samples per channel.
+
+    The format of the audio data is 16-bit signed integers (int16) interleaved by channel.
     """
 
     def __init__(
