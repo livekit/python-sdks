@@ -14,6 +14,7 @@
 
 import signal
 import asyncio
+import sys
 from contextlib import ExitStack
 import ctypes
 import importlib.resources
@@ -166,7 +167,7 @@ def ffi_event_callback(
 
         return  # no need to queue the logs
     elif which == "panic":
-        logger.critical("Panic: %s", event.panic.message)
+        print("FFI Panic: ", event.panic.message, file=sys.stderr)
         # We are in a unrecoverable state, terminate the process
         os.kill(os.getpid(), signal.SIGTERM)
         return
