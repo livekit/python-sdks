@@ -70,7 +70,7 @@ class AudioSource:
         self._last_capture = 0.0
         self._q_size = 0.0
         self._join_handle: asyncio.TimerHandle | None = None
-        self._join_fut: asyncio.Future[None] = self._loop.create_future()
+        self._join_fut: asyncio.Future[None] | None = None
 
     @property
     def sample_rate(self) -> int:
@@ -118,6 +118,9 @@ class AudioSource:
             Exception: If there is an error during frame capture.
         """
 
+        if frame.samples_per_channel == 0:
+            return
+
         now = time.monotonic()
         elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
         self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
@@ -126,7 +129,7 @@ class AudioSource:
         if self._join_handle:
             self._join_handle.cancel()
 
-        if self._join_fut.done():
+        if self._join_fut is None:
             self._join_fut = self._loop.create_future()
 
         self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
@@ -163,8 +166,11 @@ class AudioSource:
         await asyncio.shield(self._join_fut)
 
     def _release_waiter(self) -> None:
+        assert self._join_fut is not None
+
         if not self._join_fut.done():
             self._join_fut.set_result(None)
 
         self._last_capture = 0.0
         self._q_size = 0.0
+        self._join_fut = None
