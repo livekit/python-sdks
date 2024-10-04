@@ -167,7 +167,7 @@ def ffi_event_callback(
 
         return  # no need to queue the logs
     elif which == "panic":
-        print("FFI Panic: ", event.panic.message, file=sys.stderr)
+        print("FFI Panic: ", event.panic.message, file=sys.stderr, flush=True)
         # We are in a unrecoverable state, terminate the process
         os.kill(os.getpid(), signal.SIGTERM)
         return
