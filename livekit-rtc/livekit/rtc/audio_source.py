@@ -166,7 +166,8 @@ class AudioSource:
         await asyncio.shield(self._join_fut)
 
     def _release_waiter(self) -> None:
-        assert self._join_fut is not None
+        if self._join_fut is None:
+            return  # could be None when clear_queue is called
 
         if not self._join_fut.done():
             self._join_fut.set_result(None)
