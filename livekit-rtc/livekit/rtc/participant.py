@@ -376,7 +376,7 @@ class LocalParticipant(Participant):
                 response_error = error
             except Exception as error:
                 print(
-                    f"Uncaught error returned by RPC handler for {method}. Returning UNCAUGHT_ERROR instead.",
+                    f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.",
                     error,
                 )
                 response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)

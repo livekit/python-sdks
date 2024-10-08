@@ -35,16 +35,16 @@ async def main():
         print("Error:", error)
 
     try:
-        print("\n\nRunning math example...")
-        await perform_square_root(callers_room)
-        await asyncio.sleep(2)
-        await perform_quantum_hypergeometric_series(callers_room)
+        print("\n\nRunning error handling example...")
+        await perform_divide(callers_room)
     except Exception as error:
         print("Error:", error)
 
     try:
-        print("\n\nRunning divide by zero example...")
-        await perform_divide(callers_room)
+        print("\n\nRunning math example...")
+        await perform_square_root(callers_room)
+        await asyncio.sleep(2)
+        await perform_quantum_hypergeometric_series(callers_room)
     except Exception as error:
         print("Error:", error)
 
@@ -98,9 +98,6 @@ async def register_receiver_methods(
         dividend = json_data["dividend"]
         divisor = json_data["divisor"]
         print(f"[Math Genius] {caller.identity} wants to divide {dividend} by {divisor}.")
-        
-        if divisor == 0:
-            raise ValueError("Cannot divide by zero!")
         
         result = dividend / divisor
         return json.dumps({"result": result})
@@ -159,7 +156,7 @@ async def perform_quantum_hypergeometric_series(room: rtc.Room):
 
 
 async def perform_divide(room: rtc.Room):
-    print("[Caller] Let's try to divide by zero!")
+    print("[Caller] Let's divide 10 by 0.")
     try:
         response = await room.local_participant.perform_rpc(
             "math-genius", "divide", json.dumps({"dividend": 10, "divisor": 0})
@@ -168,7 +165,7 @@ async def perform_divide(room: rtc.Room):
         print(f"[Caller] The result is {parsed_response['result']}")
     except rtc.RpcError as error:
         if error.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR:
-            print("[Caller] Aww something went wrong over there, too bad!")
+            print("[Caller] Aww something went wrong with that one, lets try something else.")
         else:
             print(f"[Caller] RPC call failed with unexpected RpcError: {error}")
     except Exception as error:
