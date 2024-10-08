@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import ctypes
-from typing import List, Union
+from typing import List, Union, Callable, Dict, Awaitable, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -34,7 +34,7 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
-
+from .rpc import RpcError
 
 class PublishTrackError(Exception):
     def __init__(self, message: str) -> None:
@@ -105,6 +105,7 @@ class LocalParticipant(Participant):
         super().__init__(owned_info)
         self._room_queue = room_queue
         self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._rpc_handlers: Dict[str, Callable[[str, RemoteParticipant, str, int], Awaitable[str]]] = {}
 
     async def publish_data(
         self,
@@ -220,6 +221,182 @@ class LocalParticipant(Participant):
 
         if cb.publish_transcription.error:
             raise PublishTranscriptionError(cb.publish_transcription.error)
+        
+    async def perform_rpc(
+        self,
+        destination_identity: str,
+        method: str,
+        payload: str,
+        response_timeout_ms: Optional[int] = None
+    ) -> str:
+        """
+        Initiate an RPC call to a remote participant.
+
+        Args:
+            destination_identity (str): The `identity` of the destination participant
+            method (str): The method name to call
+            payload (str): The method payload
+            response_timeout_ms (Optional[int]): Timeout for receiving a response after initial connection
+
+        Returns:
+            str: The response payload
+
+        Raises:
+            RpcError: On failure. Details in `message`.
+        """
+        req = proto_ffi.FfiRequest()
+        req.perform_rpc.local_participant_handle = self._ffi_handle.handle
+        req.perform_rpc.destination_identity = destination_identity
+        req.perform_rpc.method = method
+        req.perform_rpc.payload = payload
+        if response_timeout_ms is not None:
+            req.perform_rpc.response_timeout_ms = response_timeout_ms
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: (e.perform_rpc.async_id == resp.perform_rpc.async_id)
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.perform_rpc.error:
+            raise RpcError.from_proto(cb.perform_rpc.error)
+
+        return cb.perform_rpc.payload
+    
+    async def register_rpc_method(
+        self,
+        method: str,
+        handler: Callable[[str, 'RemoteParticipant', str, int], Awaitable[str]]
+    ) -> None:
+        """
+        Establishes the participant as a receiver for calls of the specified RPC method.
+        Will overwrite any existing callback for the same method.
+
+        Args:
+            method (str): The name of the indicated RPC method
+            handler (Callable): Will be invoked when an RPC request for this method is received
+
+        Returns:
+            None
+
+        Raises:
+            RpcError: On failure. Details in `message`.
+
+        Example:
+            async def greet_handler(request_id: str, caller: RemoteParticipant, payload: str, response_timeout_ms: int) -> str:
+                print(f"Received greeting from {caller.identity}: {payload}")
+                return f"Hello, {caller.identity}!"
+
+            await room.local_participant.register_rpc_method('greet', greet_handler)
+
+        The handler receives the following parameters:
+        - `request_id`: A unique identifier for this RPC request
+        - `caller`: The RemoteParticipant who initiated the RPC call
+        - `payload`: The data sent by the caller (as a string)
+        - `response_timeout_ms`: The maximum time available to return a response
+
+        The handler should return a string or a coroutine that resolves to a string.
+        If unable to respond within `response_timeout_ms`, the request will result in an error on the caller's side.
+
+        You may raise errors of type `RpcError` with a string `message` in the handler,
+        and they will be received on the caller's side with the message intact.
+        Other errors raised in your handler will not be transmitted as-is, and will instead arrive to the caller as `1500` ("Application Error").
+        """
+        self._rpc_handlers[method] = handler
+
+        req = proto_ffi.FfiRequest()
+        req.register_rpc_method.local_participant_handle = self._ffi_handle.handle
+        req.register_rpc_method.method = method
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: (
+                    e.register_rpc_method.async_id == resp.register_rpc_method.async_id
+                )
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+
+    async def unregister_rpc_method(self, method: str) -> None:
+        """
+        Unregisters a previously registered RPC method.
+
+        Args:
+            method (str): The name of the RPC method to unregister
+        """
+        self._rpc_handlers.pop(method, None)
+
+        req = proto_ffi.FfiRequest()
+        req.unregister_rpc_method.local_participant_handle = self._ffi_handle.handle
+        req.unregister_rpc_method.method = method
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(
+                lambda e: (
+                    e.unregister_rpc_method.async_id == resp.unregister_rpc_method.async_id
+                )
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+            
+    async def _handle_rpc_method_invocation(
+        self,
+        invocation_id: int,
+        method: str,
+        request_id: str,
+        caller: RemoteParticipant,
+        payload: str,
+        timeout_ms: int,
+    ) -> None:
+        response_error: Optional[RpcError] = None
+        response_payload: Optional[str] = None
+
+        handler = self._rpc_handlers.get(method)
+
+        if not handler:
+            response_error = RpcError.built_in('UNSUPPORTED_METHOD')
+        else:
+            try:
+                response_payload = await handler(request_id, caller, payload, timeout_ms)
+            except RpcError as error:
+                response_error = error
+            except Exception as error:
+                print(
+                    f"Uncaught error returned by RPC handler for {method}. Returning UNCAUGHT_ERROR instead.",
+                    error,
+                )
+                response_error = RpcError.built_in('APPLICATION_ERROR')
+
+        req = proto_ffi.RpcMethodInvocationResponseRequest(
+            invocation_id=invocation_id,
+            error=response_error.to_proto() if response_error else None,
+            payload=response_payload,
+        )
+
+        res = FfiClient.instance.request(
+            proto_ffi.FfiRequest(rpc_method_invocation_response=req)
+        )
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            cb = await queue.wait_for(
+                lambda e: (
+                    e.message.WhichOneof('message') == 'rpc_method_invocation_response' and
+                    e.message.rpc_method_invocation_response.async_id == res.rpc_method_invocation_response.async_id
+                )
+            )
+            if cb.error:
+                print(f"error sending rpc method invocation response: {cb.error}")
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
     async def set_metadata(self, metadata: str) -> None:
         """

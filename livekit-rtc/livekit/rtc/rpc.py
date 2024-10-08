@@ -76,12 +76,11 @@ class RpcError(Exception):
         )
 
     @classmethod
-    def built_in(cls, key: str, data: Optional[str] = None) -> 'RpcError':
+    def built_in(cls, code: 'RpcError.ErrorCode', data: Optional[str] = None) -> 'RpcError':
         """
-        Creates an error object from the code, with an auto-populated message.
+        Creates an error object from the ErrorCode, with an auto-populated message.
 
         @internal
         """
-        code = getattr(cls.ErrorCode, key)
-        message = cls.ErrorMessage[key]
+        message = cls.ErrorMessage[code]
         return cls(code, message, data)
