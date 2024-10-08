@@ -366,7 +366,7 @@ class LocalParticipant(Participant):
         handler = self._rpc_handlers.get(method)
 
         if not handler:
-            response_error = RpcError.built_in("UNSUPPORTED_METHOD")
+            response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
         else:
             try:
                 response_payload = await handler(
@@ -379,7 +379,7 @@ class LocalParticipant(Participant):
                     f"Uncaught error returned by RPC handler for {method}. Returning UNCAUGHT_ERROR instead.",
                     error,
                 )
-                response_error = RpcError.built_in("APPLICATION_ERROR")
+                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
