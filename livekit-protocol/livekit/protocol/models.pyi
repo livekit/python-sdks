@@ -1,4 +1,5 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+import metrics as _metrics
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -200,7 +201,7 @@ class PlayoutDelay(_message.Message):
     def __init__(self, enabled: bool = ..., min: _Optional[int] = ..., max: _Optional[int] = ...) -> None: ...
 
 class ParticipantPermission(_message.Message):
-    __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent")
+    __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent", "can_subscribe_metrics")
     CAN_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -209,6 +210,7 @@ class ParticipantPermission(_message.Message):
     RECORDER_FIELD_NUMBER: _ClassVar[int]
     CAN_UPDATE_METADATA_FIELD_NUMBER: _ClassVar[int]
     AGENT_FIELD_NUMBER: _ClassVar[int]
+    CAN_SUBSCRIBE_METRICS_FIELD_NUMBER: _ClassVar[int]
     can_subscribe: bool
     can_publish: bool
     can_publish_data: bool
@@ -217,7 +219,8 @@ class ParticipantPermission(_message.Message):
     recorder: bool
     can_update_metadata: bool
     agent: bool
-    def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ...) -> None: ...
+    can_subscribe_metrics: bool
+    def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
     __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason")
@@ -361,7 +364,7 @@ class VideoLayer(_message.Message):
     def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription")
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
@@ -375,6 +378,11 @@ class DataPacket(_message.Message):
     SPEAKER_FIELD_NUMBER: _ClassVar[int]
     SIP_DTMF_FIELD_NUMBER: _ClassVar[int]
     TRANSCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    METRICS_FIELD_NUMBER: _ClassVar[int]
+    CHAT_MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    RPC_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    RPC_ACK_FIELD_NUMBER: _ClassVar[int]
+    RPC_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     kind: DataPacket.Kind
     participant_identity: str
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
@@ -382,7 +390,12 @@ class DataPacket(_message.Message):
     speaker: ActiveSpeakerUpdate
     sip_dtmf: SipDTMF
     transcription: Transcription
-    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ...) -> None: ...
+    metrics: _metrics.MetricsBatch
+    chat_message: ChatMessage
+    rpc_request: RpcRequest
+    rpc_ack: RpcAck
+    rpc_response: RpcResponse
+    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
     __slots__ = ("speakers",)
@@ -456,6 +469,62 @@ class TranscriptionSegment(_message.Message):
     language: str
     def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ..., language: _Optional[str] = ...) -> None: ...
 
+class ChatMessage(_message.Message):
+    __slots__ = ("id", "timestamp", "edit_timestamp", "message", "deleted", "generated")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    EDIT_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    DELETED_FIELD_NUMBER: _ClassVar[int]
+    GENERATED_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    timestamp: int
+    edit_timestamp: int
+    message: str
+    deleted: bool
+    generated: bool
+    def __init__(self, id: _Optional[str] = ..., timestamp: _Optional[int] = ..., edit_timestamp: _Optional[int] = ..., message: _Optional[str] = ..., deleted: bool = ..., generated: bool = ...) -> None: ...
+
+class RpcRequest(_message.Message):
+    __slots__ = ("id", "method", "payload", "response_timeout_ms", "version")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    METHOD_FIELD_NUMBER: _ClassVar[int]
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    RESPONSE_TIMEOUT_MS_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    method: str
+    payload: str
+    response_timeout_ms: int
+    version: int
+    def __init__(self, id: _Optional[str] = ..., method: _Optional[str] = ..., payload: _Optional[str] = ..., response_timeout_ms: _Optional[int] = ..., version: _Optional[int] = ...) -> None: ...
+
+class RpcAck(_message.Message):
+    __slots__ = ("request_id",)
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    request_id: str
+    def __init__(self, request_id: _Optional[str] = ...) -> None: ...
+
+class RpcResponse(_message.Message):
+    __slots__ = ("request_id", "payload", "error")
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    request_id: str
+    payload: str
+    error: RpcError
+    def __init__(self, request_id: _Optional[str] = ..., payload: _Optional[str] = ..., error: _Optional[_Union[RpcError, _Mapping]] = ...) -> None: ...
+
+class RpcError(_message.Message):
+    __slots__ = ("code", "message", "data")
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    code: int
+    message: str
+    data: str
+    def __init__(self, code: _Optional[int] = ..., message: _Optional[str] = ..., data: _Optional[str] = ...) -> None: ...
+
 class ParticipantTracks(_message.Message):
     __slots__ = ("participant_sid", "track_sids")
     PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
@@ -489,7 +558,7 @@ class ServerInfo(_message.Message):
     def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ..., agent_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientInfo(_message.Message):
-    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network")
+    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network", "other_sdks")
     class SDK(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         UNKNOWN: _ClassVar[ClientInfo.SDK]
@@ -503,6 +572,8 @@ class ClientInfo(_message.Message):
         RUST: _ClassVar[ClientInfo.SDK]
         PYTHON: _ClassVar[ClientInfo.SDK]
         CPP: _ClassVar[ClientInfo.SDK]
+        UNITY_WEB: _ClassVar[ClientInfo.SDK]
+        NODE: _ClassVar[ClientInfo.SDK]
     UNKNOWN: ClientInfo.SDK
     JS: ClientInfo.SDK
     SWIFT: ClientInfo.SDK
@@ -514,6 +585,8 @@ class ClientInfo(_message.Message):
     RUST: ClientInfo.SDK
     PYTHON: ClientInfo.SDK
     CPP: ClientInfo.SDK
+    UNITY_WEB: ClientInfo.SDK
+    NODE: ClientInfo.SDK
     SDK_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
@@ -524,6 +597,7 @@ class ClientInfo(_message.Message):
     BROWSER_VERSION_FIELD_NUMBER: _ClassVar[int]
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     NETWORK_FIELD_NUMBER: _ClassVar[int]
+    OTHER_SDKS_FIELD_NUMBER: _ClassVar[int]
     sdk: ClientInfo.SDK
     version: str
     protocol: int
@@ -534,7 +608,8 @@ class ClientInfo(_message.Message):
     browser_version: str
     address: str
     network: str
-    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ...) -> None: ...
+    other_sdks: str
+    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ..., other_sdks: _Optional[str] = ...) -> None: ...
 
 class ClientConfiguration(_message.Message):
     __slots__ = ("video", "screen", "resume_connection", "disabled_codecs", "force_relay")
@@ -587,7 +662,7 @@ class RTPDrift(_message.Message):
     def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., start_timestamp: _Optional[int] = ..., end_timestamp: _Optional[int] = ..., rtp_clock_ticks: _Optional[int] = ..., drift_samples: _Optional[int] = ..., drift_ms: _Optional[float] = ..., clock_rate: _Optional[float] = ...) -> None: ...
 
 class RTPStats(_message.Message):
-    __slots__ = ("start_time", "end_time", "duration", "packets", "packet_rate", "bytes", "header_bytes", "bitrate", "packets_lost", "packet_loss_rate", "packet_loss_percentage", "packets_duplicate", "packet_duplicate_rate", "bytes_duplicate", "header_bytes_duplicate", "bitrate_duplicate", "packets_padding", "packet_padding_rate", "bytes_padding", "header_bytes_padding", "bitrate_padding", "packets_out_of_order", "frames", "frame_rate", "jitter_current", "jitter_max", "gap_histogram", "nacks", "nack_acks", "nack_misses", "nack_repeated", "plis", "last_pli", "firs", "last_fir", "rtt_current", "rtt_max", "key_frames", "last_key_frame", "layer_lock_plis", "last_layer_lock_pli", "packet_drift", "report_drift", "rebased_report_drift")
+    __slots__ = ("start_time", "end_time", "duration", "packets", "packet_rate", "bytes", "header_bytes", "bitrate", "packets_lost", "packet_loss_rate", "packet_loss_percentage", "packets_duplicate", "packet_duplicate_rate", "bytes_duplicate", "header_bytes_duplicate", "bitrate_duplicate", "packets_padding", "packet_padding_rate", "bytes_padding", "header_bytes_padding", "bitrate_padding", "packets_out_of_order", "frames", "frame_rate", "jitter_current", "jitter_max", "gap_histogram", "nacks", "nack_acks", "nack_misses", "nack_repeated", "plis", "last_pli", "firs", "last_fir", "rtt_current", "rtt_max", "key_frames", "last_key_frame", "layer_lock_plis", "last_layer_lock_pli", "packet_drift", "ntp_report_drift", "rebased_report_drift", "received_report_drift")
     class GapHistogramEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -637,8 +712,9 @@ class RTPStats(_message.Message):
     LAYER_LOCK_PLIS_FIELD_NUMBER: _ClassVar[int]
     LAST_LAYER_LOCK_PLI_FIELD_NUMBER: _ClassVar[int]
     PACKET_DRIFT_FIELD_NUMBER: _ClassVar[int]
-    REPORT_DRIFT_FIELD_NUMBER: _ClassVar[int]
+    NTP_REPORT_DRIFT_FIELD_NUMBER: _ClassVar[int]
     REBASED_REPORT_DRIFT_FIELD_NUMBER: _ClassVar[int]
+    RECEIVED_REPORT_DRIFT_FIELD_NUMBER: _ClassVar[int]
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     duration: float
@@ -681,12 +757,31 @@ class RTPStats(_message.Message):
     layer_lock_plis: int
     last_layer_lock_pli: _timestamp_pb2.Timestamp
     packet_drift: RTPDrift
-    report_drift: RTPDrift
+    ntp_report_drift: RTPDrift
     rebased_report_drift: RTPDrift
-    def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
+    received_report_drift: RTPDrift
+    def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., ntp_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., received_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
+
+class RTCPSenderReportState(_message.Message):
+    __slots__ = ("rtp_timestamp", "rtp_timestamp_ext", "ntp_timestamp", "at", "at_adjusted", "packets", "octets")
+    RTP_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    RTP_TIMESTAMP_EXT_FIELD_NUMBER: _ClassVar[int]
+    NTP_TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+    AT_FIELD_NUMBER: _ClassVar[int]
+    AT_ADJUSTED_FIELD_NUMBER: _ClassVar[int]
+    PACKETS_FIELD_NUMBER: _ClassVar[int]
+    OCTETS_FIELD_NUMBER: _ClassVar[int]
+    rtp_timestamp: int
+    rtp_timestamp_ext: int
+    ntp_timestamp: int
+    at: int
+    at_adjusted: int
+    packets: int
+    octets: int
+    def __init__(self, rtp_timestamp: _Optional[int] = ..., rtp_timestamp_ext: _Optional[int] = ..., ntp_timestamp: _Optional[int] = ..., at: _Optional[int] = ..., at_adjusted: _Optional[int] = ..., packets: _Optional[int] = ..., octets: _Optional[int] = ...) -> None: ...
 
 class RTPForwarderState(_message.Message):
-    __slots__ = ("started", "reference_layer_spatial", "pre_start_time", "ext_first_timestamp", "dummy_start_timestamp_offset", "rtp_munger", "vp8_munger")
+    __slots__ = ("started", "reference_layer_spatial", "pre_start_time", "ext_first_timestamp", "dummy_start_timestamp_offset", "rtp_munger", "vp8_munger", "sender_report_state")
     STARTED_FIELD_NUMBER: _ClassVar[int]
     REFERENCE_LAYER_SPATIAL_FIELD_NUMBER: _ClassVar[int]
     PRE_START_TIME_FIELD_NUMBER: _ClassVar[int]
@@ -694,6 +789,7 @@ class RTPForwarderState(_message.Message):
     DUMMY_START_TIMESTAMP_OFFSET_FIELD_NUMBER: _ClassVar[int]
     RTP_MUNGER_FIELD_NUMBER: _ClassVar[int]
     VP8_MUNGER_FIELD_NUMBER: _ClassVar[int]
+    SENDER_REPORT_STATE_FIELD_NUMBER: _ClassVar[int]
     started: bool
     reference_layer_spatial: int
     pre_start_time: int
@@ -701,7 +797,8 @@ class RTPForwarderState(_message.Message):
     dummy_start_timestamp_offset: int
     rtp_munger: RTPMungerState
     vp8_munger: VP8MungerState
-    def __init__(self, started: bool = ..., reference_layer_spatial: _Optional[int] = ..., pre_start_time: _Optional[int] = ..., ext_first_timestamp: _Optional[int] = ..., dummy_start_timestamp_offset: _Optional[int] = ..., rtp_munger: _Optional[_Union[RTPMungerState, _Mapping]] = ..., vp8_munger: _Optional[_Union[VP8MungerState, _Mapping]] = ...) -> None: ...
+    sender_report_state: _containers.RepeatedCompositeFieldContainer[RTCPSenderReportState]
+    def __init__(self, started: bool = ..., reference_layer_spatial: _Optional[int] = ..., pre_start_time: _Optional[int] = ..., ext_first_timestamp: _Optional[int] = ..., dummy_start_timestamp_offset: _Optional[int] = ..., rtp_munger: _Optional[_Union[RTPMungerState, _Mapping]] = ..., vp8_munger: _Optional[_Union[VP8MungerState, _Mapping]] = ..., sender_report_state: _Optional[_Iterable[_Union[RTCPSenderReportState, _Mapping]]] = ...) -> None: ...
 
 class RTPMungerState(_message.Message):
     __slots__ = ("ext_last_sequence_number", "ext_second_last_sequence_number", "ext_last_timestamp", "ext_second_last_timestamp", "last_marker", "second_last_marker")
