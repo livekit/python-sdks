@@ -366,7 +366,7 @@ class LocalParticipant(Participant):
             response_error = RpcError.built_in('UNSUPPORTED_METHOD')
         else:
             try:
-                response_payload = await handler(request_id, caller, payload, timeout_ms)
+                response_payload = await handler(request_id, caller, payload, response_timeout_ms)
             except RpcError as error:
                 response_error = error
             except Exception as error:
