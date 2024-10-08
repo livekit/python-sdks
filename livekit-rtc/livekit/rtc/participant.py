@@ -37,6 +37,7 @@ from .transcription import Transcription
 from .rpc import RpcError
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 
+
 class PublishTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -106,7 +107,9 @@ class LocalParticipant(Participant):
         super().__init__(owned_info)
         self._room_queue = room_queue
         self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
-        self._rpc_handlers: Dict[str, Callable[[str, RemoteParticipant, str, int], Awaitable[str]]] = {}
+        self._rpc_handlers: Dict[
+            str, Callable[[str, RemoteParticipant, str, int], Awaitable[str]]
+        ] = {}
 
     async def publish_data(
         self,
@@ -222,13 +225,13 @@ class LocalParticipant(Participant):
 
         if cb.publish_transcription.error:
             raise PublishTranscriptionError(cb.publish_transcription.error)
-        
+
     async def perform_rpc(
         self,
         destination_identity: str,
         method: str,
         payload: str,
-        response_timeout_ms: Optional[int] = None
+        response_timeout_ms: Optional[int] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -266,11 +269,11 @@ class LocalParticipant(Participant):
             raise RpcError.from_proto(cb.perform_rpc.error)
 
         return cb.perform_rpc.payload
-    
+
     async def register_rpc_method(
         self,
         method: str,
-        handler: Callable[[str, 'RemoteParticipant', str, int], Awaitable[str]]
+        handler: Callable[[str, "RemoteParticipant", str, int], Awaitable[str]],
     ) -> None:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
@@ -323,7 +326,6 @@ class LocalParticipant(Participant):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-
     async def unregister_rpc_method(self, method: str) -> None:
         """
         Unregisters a previously registered RPC method.
@@ -342,12 +344,13 @@ class LocalParticipant(Participant):
             resp = FfiClient.instance.request(req)
             await queue.wait_for(
                 lambda e: (
-                    e.unregister_rpc_method.async_id == resp.unregister_rpc_method.async_id
+                    e.unregister_rpc_method.async_id
+                    == resp.unregister_rpc_method.async_id
                 )
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
-            
+
     async def _handle_rpc_method_invocation(
         self,
         invocation_id: int,
@@ -363,10 +366,12 @@ class LocalParticipant(Participant):
         handler = self._rpc_handlers.get(method)
 
         if not handler:
-            response_error = RpcError.built_in('UNSUPPORTED_METHOD')
+            response_error = RpcError.built_in("UNSUPPORTED_METHOD")
         else:
             try:
-                response_payload = await handler(request_id, caller, payload, response_timeout_ms)
+                response_payload = await handler(
+                    request_id, caller, payload, response_timeout_ms
+                )
             except RpcError as error:
                 response_error = error
             except Exception as error:
@@ -374,25 +379,30 @@ class LocalParticipant(Participant):
                     f"Uncaught error returned by RPC handler for {method}. Returning UNCAUGHT_ERROR instead.",
                     error,
                 )
-                response_error = RpcError.built_in('APPLICATION_ERROR')
+                response_error = RpcError.built_in("APPLICATION_ERROR")
 
-        req = proto_ffi.FfiRequest(rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
-            invocation_id=invocation_id,
-            error=response_error.to_proto() if response_error else None,
-            payload=response_payload
-        ))
-        
+        req = proto_ffi.FfiRequest(
+            rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
+                invocation_id=invocation_id,
+                error=response_error.to_proto() if response_error else None,
+                payload=response_payload,
+            )
+        )
+
         res = FfiClient.instance.request(req)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
             cb = await queue.wait_for(
                 lambda e: (
-                    e.rpc_method_invocation_response.async_id == res.rpc_method_invocation_response.async_id
+                    e.rpc_method_invocation_response.async_id
+                    == res.rpc_method_invocation_response.async_id
                 )
             )
             if cb.rpc_method_invocation_response.error:
-                print(f"error sending rpc method invocation response: {cb.rpc_method_invocation_response.error}")
+                print(
+                    f"error sending rpc method invocation response: {cb.rpc_method_invocation_response.error}"
+                )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 

@@ -16,6 +16,7 @@ from typing import Optional, Dict, Union, ClassVar
 from enum import IntEnum
 from ._proto import rpc_pb2 as proto_rpc
 
+
 class RpcError(Exception):
     """
     Specialized error handling for RPC methods.
@@ -39,19 +40,23 @@ class RpcError(Exception):
         REQUEST_PAYLOAD_TOO_LARGE = 1402
 
     ErrorMessage: ClassVar[Dict[ErrorCode, str]] = {
-        ErrorCode.APPLICATION_ERROR: 'Application error in method handler',
-        ErrorCode.CONNECTION_TIMEOUT: 'Connection timeout',
-        ErrorCode.RESPONSE_TIMEOUT: 'Response timeout',
-        ErrorCode.RECIPIENT_DISCONNECTED: 'Recipient disconnected',
-        ErrorCode.RESPONSE_PAYLOAD_TOO_LARGE: 'Response payload too large',
-        ErrorCode.SEND_FAILED: 'Failed to send',
-
-        ErrorCode.UNSUPPORTED_METHOD: 'Method not supported at destination',
-        ErrorCode.RECIPIENT_NOT_FOUND: 'Recipient not found',
-        ErrorCode.REQUEST_PAYLOAD_TOO_LARGE: 'Request payload too large',
+        ErrorCode.APPLICATION_ERROR: "Application error in method handler",
+        ErrorCode.CONNECTION_TIMEOUT: "Connection timeout",
+        ErrorCode.RESPONSE_TIMEOUT: "Response timeout",
+        ErrorCode.RECIPIENT_DISCONNECTED: "Recipient disconnected",
+        ErrorCode.RESPONSE_PAYLOAD_TOO_LARGE: "Response payload too large",
+        ErrorCode.SEND_FAILED: "Failed to send",
+        ErrorCode.UNSUPPORTED_METHOD: "Method not supported at destination",
+        ErrorCode.RECIPIENT_NOT_FOUND: "Recipient not found",
+        ErrorCode.REQUEST_PAYLOAD_TOO_LARGE: "Request payload too large",
     }
 
-    def __init__(self, code: Union[int, 'RpcError.ErrorCode'], message: str, data: Optional[str] = None):
+    def __init__(
+        self,
+        code: Union[int, "RpcError.ErrorCode"],
+        message: str,
+        data: Optional[str] = None,
+    ):
         """
         Creates an error object with the given code and message, plus an optional data payload.
 
@@ -65,18 +70,16 @@ class RpcError(Exception):
         self.data = data
 
     @classmethod
-    def from_proto(cls, proto: proto_rpc.RpcError) -> 'RpcError':
+    def from_proto(cls, proto: proto_rpc.RpcError) -> "RpcError":
         return cls(proto.code, proto.message, proto.data)
 
     def to_proto(self) -> proto_rpc.RpcError:
-        return proto_rpc.RpcError(
-            code=self.code,
-            message=self.message,
-            data=self.data
-        )
+        return proto_rpc.RpcError(code=self.code, message=self.message, data=self.data)
 
     @classmethod
-    def built_in(cls, code: 'RpcError.ErrorCode', data: Optional[str] = None) -> 'RpcError':
+    def built_in(
+        cls, code: "RpcError.ErrorCode", data: Optional[str] = None
+    ) -> "RpcError":
         """
         Creates an error object from the ErrorCode, with an auto-populated message.
 
