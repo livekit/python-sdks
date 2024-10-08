@@ -42,6 +42,12 @@ async def main():
     except Exception as error:
         print("Error:", error)
 
+    try:
+        print("\n\nRunning divide by zero example...")
+        await perform_divide(callers_room)
+    except Exception as error:
+        print("Error:", error)
+
     print("\n\nParticipants done, disconnecting...")
     await callers_room.disconnect()
     await greeters_room.disconnect()
@@ -82,9 +88,29 @@ async def register_receiver_methods(
         print(f"[Math Genius] Aha! It's {result}")
         return json.dumps({"result": result})
 
+    async def divide_method(
+        request_id: str,
+        caller: rtc.RemoteParticipant,
+        payload: str,
+        response_timeout_ms: int,
+    ):
+        json_data = json.loads(payload)
+        dividend = json_data["dividend"]
+        divisor = json_data["divisor"]
+        print(f"[Math Genius] {caller.identity} wants to divide {dividend} by {divisor}.")
+        
+        if divisor == 0:
+            raise ValueError("Cannot divide by zero!")
+        
+        result = dividend / divisor
+        return json.dumps({"result": result})
+
     await greeters_room.local_participant.register_rpc_method("arrival", arrival_method)
     await math_genius_room.local_participant.register_rpc_method(
         "square-root", square_root_method
+    )
+    await math_genius_room.local_participant.register_rpc_method(
+        "divide", divide_method
     )
 
 
@@ -130,6 +156,23 @@ async def perform_quantum_hypergeometric_series(room: rtc.Room):
     except Exception as error:
         print("[Caller] Unexpected error:", error)
         raise
+
+
+async def perform_divide(room: rtc.Room):
+    print("[Caller] Let's try to divide by zero!")
+    try:
+        response = await room.local_participant.perform_rpc(
+            "math-genius", "divide", json.dumps({"dividend": 10, "divisor": 0})
+        )
+        parsed_response = json.loads(response)
+        print(f"[Caller] The result is {parsed_response['result']}")
+    except rtc.RpcError as error:
+        if error.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR:
+            print("[Caller] Aww something went wrong over there, too bad!")
+        else:
+            print(f"[Caller] RPC call failed with unexpected RpcError: {error}")
+    except Exception as error:
+        print(f"[Caller] RPC call failed with unexpected error: {error}")
 
 
 def create_token(identity: str, room_name: str):
