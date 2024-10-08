@@ -25,7 +25,7 @@ import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import room_pb2
-import rpc_pb2
+from . import rpc_pb2
 import sys
 from . import track_pb2
 import typing
