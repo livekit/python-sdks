@@ -33,11 +33,9 @@ async def main():
 
     try:
         print('\n\nRunning math example...')
-        await asyncio.gather(
-            perform_square_root(callers_room),
-            asyncio.sleep(2),
-            perform_quantum_hypergeometric_series(callers_room)
-        )
+        await perform_square_root(callers_room)
+        await asyncio.sleep(2)
+        await perform_quantum_hypergeometric_series(callers_room)
     except Exception as error:
         print('Error:', error)
 
@@ -123,8 +121,8 @@ async def connect_participant(identity: str, room_name: str) -> rtc.Room:
     room = rtc.Room()
     token = create_token(identity, room_name)
 
-    def on_disconnected():
-        print(f"[{identity}] Disconnected from room")
+    def on_disconnected(reason: str):
+        print(f"[{identity}] Disconnected from room: {reason}")
 
     room.on('disconnected', on_disconnected)
 

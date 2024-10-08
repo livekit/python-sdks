@@ -262,7 +262,7 @@ class LocalParticipant(Participant):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-        if cb.perform_rpc.error:
+        if cb.perform_rpc.HasField("error"):
             raise RpcError.from_proto(cb.perform_rpc.error)
 
         return cb.perform_rpc.payload
