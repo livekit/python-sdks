@@ -35,6 +35,7 @@ from .track_publication import (
 )
 from .transcription import Transcription
 from .rpc import RpcError
+from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 
 class PublishTrackError(Exception):
     def __init__(self, message: str) -> None:
@@ -375,26 +376,23 @@ class LocalParticipant(Participant):
                 )
                 response_error = RpcError.built_in('APPLICATION_ERROR')
 
-        req = proto_ffi.RpcMethodInvocationResponseRequest(
+        req = proto_ffi.FfiRequest(rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
             invocation_id=invocation_id,
             error=response_error.to_proto() if response_error else None,
-            payload=response_payload,
-        )
-
-        res = FfiClient.instance.request(
-            proto_ffi.FfiRequest(rpc_method_invocation_response=req)
-        )
+            payload=response_payload
+        ))
+        
+        res = FfiClient.instance.request(req)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
             cb = await queue.wait_for(
                 lambda e: (
-                    e.message.WhichOneof('message') == 'rpc_method_invocation_response' and
-                    e.message.rpc_method_invocation_response.async_id == res.rpc_method_invocation_response.async_id
+                    e.rpc_method_invocation_response.async_id == res.rpc_method_invocation_response.async_id
                 )
             )
-            if cb.error:
-                print(f"error sending rpc method invocation response: {cb.error}")
+            if cb.rpc_method_invocation_response.error:
+                print(f"error sending rpc method invocation response: {cb.rpc_method_invocation_response.error}")
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 

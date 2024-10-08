@@ -418,8 +418,8 @@ class Room(EventEmitter[EventTypes]):
         # listen to incoming room events
         while True:
             event = await self._ffi_queue.get()
-            if event.message.WhichOneof("value") == "rpc_method_invocation":
-                self._on_rpc_method_invocation(event)
+            if event.WhichOneof("message") == "rpc_method_invocation":
+                self._on_rpc_method_invocation(event.rpc_method_invocation)
             elif event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
                 if event.room_event.HasField("eos"):
                     break
@@ -438,18 +438,17 @@ class Room(EventEmitter[EventTypes]):
             self._room_queue.put_nowait(event)
             await self._room_queue.join()
             
-    def _on_rpc_method_invocation(self, event: proto_room.RoomEvent):
-        rpc_invocation = event.message.rpc_method_invocation
+    def _on_rpc_method_invocation(self, rpc_invocation: proto_ffi.RpcMethodInvocation):
         if rpc_invocation.local_participant_handle == self._local_participant._ffi_handle.handle:  # type: ignore
             caller = self._remote_participants.get(rpc_invocation.caller_identity)
-            self._local_participant._handle_rpc_method_invocation(
+            asyncio.create_task(self._local_participant._handle_rpc_method_invocation(
                 rpc_invocation.invocation_id,
                 rpc_invocation.method,
                 rpc_invocation.request_id,
                 caller,
                 rpc_invocation.payload,
                 rpc_invocation.timeout_ms,
-            )
+            ))
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof("message")
