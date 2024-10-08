@@ -447,7 +447,7 @@ class Room(EventEmitter[EventTypes]):
                 rpc_invocation.request_id,
                 caller,
                 rpc_invocation.payload,
-                rpc_invocation.timeout_ms,
+                rpc_invocation.response_timeout_ms,
             ))
 
     def _on_room_event(self, event: proto_room.RoomEvent):

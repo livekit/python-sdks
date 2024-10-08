@@ -355,7 +355,7 @@ class LocalParticipant(Participant):
         request_id: str,
         caller: RemoteParticipant,
         payload: str,
-        timeout_ms: int,
+        response_timeout_ms: int,
     ) -> None:
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None

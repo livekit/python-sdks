@@ -294,14 +294,14 @@ class RpcMethodInvocationEvent(google.protobuf.message.Message):
     REQUEST_ID_FIELD_NUMBER: builtins.int
     CALLER_IDENTITY_FIELD_NUMBER: builtins.int
     PAYLOAD_FIELD_NUMBER: builtins.int
-    TIMEOUT_MS_FIELD_NUMBER: builtins.int
+    RESPONSE_TIMEOUT_MS_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     invocation_id: builtins.int
     method: builtins.str
     request_id: builtins.str
     caller_identity: builtins.str
     payload: builtins.str
-    timeout_ms: builtins.int
+    response_timeout_ms: builtins.int
     def __init__(
         self,
         *,
@@ -311,8 +311,8 @@ class RpcMethodInvocationEvent(google.protobuf.message.Message):
         request_id: builtins.str = ...,
         caller_identity: builtins.str = ...,
         payload: builtins.str = ...,
-        timeout_ms: builtins.int = ...,
+        response_timeout_ms: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing.Literal["caller_identity", b"caller_identity", "invocation_id", b"invocation_id", "local_participant_handle", b"local_participant_handle", "method", b"method", "payload", b"payload", "request_id", b"request_id", "timeout_ms", b"timeout_ms"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["caller_identity", b"caller_identity", "invocation_id", b"invocation_id", "local_participant_handle", b"local_participant_handle", "method", b"method", "payload", b"payload", "request_id", b"request_id", "response_timeout_ms", b"response_timeout_ms"]) -> None: ...
 
 global___RpcMethodInvocationEvent = RpcMethodInvocationEvent

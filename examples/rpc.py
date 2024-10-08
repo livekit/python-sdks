@@ -75,7 +75,7 @@ async def perform_greeting(room: rtc.Room):
         response = await room.local_participant.perform_rpc('greeter', 'arrival', 'Hello')
         print(f"[Caller] That's nice, the greeter said: \"{response}\"")
     except Exception as error:
-        print('[Caller] RPC call failed:', error)
+        print(f'[Caller] RPC call failed: {error}')
         raise
 
 async def perform_square_root(room: rtc.Room):
@@ -85,7 +85,7 @@ async def perform_square_root(room: rtc.Room):
         parsed_response = json.loads(response)
         print(f"[Caller] Nice, the answer was {parsed_response['result']}")
     except Exception as error:
-        print('[Caller] RPC call failed:', error)
+        print(f'[Caller] RPC call failed: {error}')
         raise
 
 async def perform_quantum_hypergeometric_series(room: rtc.Room):
