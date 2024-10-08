@@ -441,7 +441,9 @@ class Room(EventEmitter[EventTypes]):
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
-            logging.warning("Received RPC invocation before local participant was initialized")
+            logging.warning(
+                "Received RPC invocation before local participant was initialized"
+            )
             return
 
         if (

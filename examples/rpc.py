@@ -97,8 +97,10 @@ async def register_receiver_methods(
         json_data = json.loads(payload)
         dividend = json_data["dividend"]
         divisor = json_data["divisor"]
-        print(f"[Math Genius] {caller.identity} wants to divide {dividend} by {divisor}.")
-        
+        print(
+            f"[Math Genius] {caller.identity} wants to divide {dividend} by {divisor}."
+        )
+
         result = dividend / divisor
         return json.dumps({"result": result})
 
@@ -165,7 +167,9 @@ async def perform_divide(room: rtc.Room):
         print(f"[Caller] The result is {parsed_response['result']}")
     except rtc.RpcError as error:
         if error.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR:
-            print("[Caller] Aww something went wrong with that one, lets try something else.")
+            print(
+                "[Caller] Aww something went wrong with that one, lets try something else."
+            )
         else:
             print(f"[Caller] RPC call failed with unexpected RpcError: {error}")
     except Exception as error:

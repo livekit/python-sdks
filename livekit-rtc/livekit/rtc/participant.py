@@ -379,7 +379,9 @@ class LocalParticipant(Participant):
                     f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.",
                     error,
                 )
-                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+                response_error = RpcError._built_in(
+                    RpcError.ErrorCode.APPLICATION_ERROR
+                )
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
