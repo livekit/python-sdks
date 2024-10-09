@@ -15,7 +15,8 @@
 from __future__ import annotations
 
 import ctypes
-from typing import List, Union
+from typing import List, Mapping, Union
+from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -61,18 +62,18 @@ class PublishTranscriptionError(Exception):
         self.message = message
 
 
-class Participant:
+class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        self._track_publications: dict[str, TrackPublication] = {}
 
     @property
-    def track_publications(self) -> dict[str, TrackPublication]:
+    @abstractmethod
+    def track_publications(self) -> Mapping[str, TrackPublication]:
         """
         A dictionary of track publications associated with the participant.
         """
-        return self._track_publications
+        ...
 
     @property
     def sid(self) -> str:
@@ -111,7 +112,14 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+
+    @property
+    def track_publications(self) -> Mapping[str, LocalTrackPublication]:
+        """
+        A dictionary of track publications associated with the participant.
+        """
+        return self._track_publications
 
     async def publish_data(
         self,
@@ -330,7 +338,7 @@ class LocalParticipant(Participant):
             track_publication = LocalTrackPublication(cb.publish_track.publication)
             track_publication.track = track
             track._info.sid = track_publication.sid
-            self.track_publications[track_publication.sid] = track_publication
+            self._track_publications[track_publication.sid] = track_publication
 
             queue.task_done()
             return track_publication
@@ -361,7 +369,7 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self.track_publications.pop(track_sid)
+            publication = self._track_publications.pop(track_sid)
             publication.track = None
             queue.task_done()
         finally:
@@ -374,7 +382,14 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self.track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+
+    @property
+    def track_publications(self) -> Mapping[str, RemoteTrackPublication]:
+        """
+        A dictionary of track publications associated with the participant.
+        """
+        return self._track_publications
 
     def __repr__(self) -> str:
         return f"rtc.RemoteParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
