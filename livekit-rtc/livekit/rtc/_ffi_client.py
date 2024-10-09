@@ -27,8 +27,7 @@ from typing import Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
-
-logger = logging.getLogger("livekit")
+from .log import logger
 
 _resource_files = ExitStack()
 atexit.register(_resource_files.close)

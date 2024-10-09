@@ -19,7 +19,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast
 
-from ._event_emitter import EventEmitter
+from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
