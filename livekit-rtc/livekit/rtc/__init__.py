@@ -57,6 +57,7 @@ from .track import (
     Track,
     VideoTrack,
 )
+from .event_emitter import EventEmitter
 from .track_publication import (
     LocalTrackPublication,
     RemoteTrackPublication,
@@ -131,6 +132,7 @@ __all__ = [
     "ChatMessage",
     "AudioResampler",
     "AudioResamplerQuality",
+    "EventEmitter",
     "combine_audio_frames",
     "__version__",
 ]
