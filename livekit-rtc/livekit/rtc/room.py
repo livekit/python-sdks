@@ -17,7 +17,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast
+from typing import Callable, Dict, Literal, Optional, cast, Mapping
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -174,7 +174,7 @@ class Room(EventEmitter[EventTypes]):
         return self._connection_state
 
     @property
-    def remote_participants(self) -> dict[str, RemoteParticipant]:
+    def remote_participants(self) -> Mapping[str, RemoteParticipant]:
         """Gets the remote participants in the room.
 
         Returns:
