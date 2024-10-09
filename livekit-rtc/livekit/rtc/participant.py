@@ -65,7 +65,14 @@ class Participant:
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        self.track_publications: dict[str, TrackPublication] = {}
+        self._track_publications: dict[str, TrackPublication] = {}
+
+    @property
+    def track_publications(self) -> dict[str, TrackPublication]:
+        """
+        A dictionary of track publications associated with the participant.
+        """
+        return self._track_publications
 
     @property
     def sid(self) -> str:
