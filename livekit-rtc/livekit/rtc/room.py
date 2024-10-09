@@ -17,7 +17,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast
+from typing import Callable, Dict, Literal, Optional, cast, Mapping
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -174,7 +174,7 @@ class Room(EventEmitter[EventTypes]):
         return self._connection_state
 
     @property
-    def remote_participants(self) -> dict[str, RemoteParticipant]:
+    def remote_participants(self) -> Mapping[str, RemoteParticipant]:
         """Gets the remote participants in the room.
 
         Returns:
@@ -389,7 +389,7 @@ class Room(EventEmitter[EventTypes]):
             # add the initial remote participant tracks
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
-                rp.track_publications[publication.sid] = publication
+                rp._track_publications[publication.sid] = publication
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -466,13 +466,13 @@ class Room(EventEmitter[EventTypes]):
                 event.track_published.participant_identity
             ]
             rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant.track_publications[rpublication.sid] = rpublication
+            rparticipant._track_publications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
             rparticipant = self._remote_participants[
                 event.track_unpublished.participant_identity
             ]
-            rpublication = rparticipant.track_publications.pop(
+            rpublication = rparticipant._track_publications.pop(
                 event.track_unpublished.publication_sid
             )
             self.emit("track_unpublished", rpublication, rparticipant)
