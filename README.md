@@ -63,7 +63,7 @@ async def main():
     print(results)
     await lkapi.aclose()
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.run(main())
 ```
 
 ## Using Real-time SDK
