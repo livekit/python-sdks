@@ -61,24 +61,24 @@ async def register_receiver_methods(
 ):
     async def arrival_method(
         request_id: str,
-        caller: rtc.RemoteParticipant,
+        caller_identity: str,
         payload: str,
         response_timeout_ms: int,
     ):
-        print(f'[Greeter] Oh {caller.identity} arrived and said "{payload}"')
+        print(f'[Greeter] Oh {caller_identity} arrived and said "{payload}"')
         await asyncio.sleep(2)
         return "Welcome and have a wonderful day!"
 
     async def square_root_method(
         request_id: str,
-        caller: rtc.RemoteParticipant,
+        caller_identity: str,
         payload: str,
         response_timeout_ms: int,
     ):
         json_data = json.loads(payload)
         number = json_data["number"]
         print(
-            f"[Math Genius] I guess {caller.identity} wants the square root of {number}. I've only got {response_timeout_ms / 1000} seconds to respond but I think I can pull it off."
+            f"[Math Genius] I guess {caller_identity} wants the square root of {number}. I've only got {response_timeout_ms / 1000} seconds to respond but I think I can pull it off."
         )
 
         print("[Math Genius] *doing math*…")
@@ -90,7 +90,7 @@ async def register_receiver_methods(
 
     async def divide_method(
         request_id: str,
-        caller: rtc.RemoteParticipant,
+        caller_identity: str,
         payload: str,
         response_timeout_ms: int,
     ):
@@ -98,7 +98,7 @@ async def register_receiver_methods(
         dividend = json_data["dividend"]
         divisor = json_data["divisor"]
         print(
-            f"[Math Genius] {caller.identity} wants to divide {dividend} by {divisor}."
+            f"[Math Genius] {caller_identity} wants to divide {dividend} by {divisor}."
         )
 
         result = dividend / divisor

@@ -450,17 +450,12 @@ class Room(EventEmitter[EventTypes]):
             rpc_invocation.local_participant_handle
             == self._local_participant._ffi_handle.handle
         ):
-            caller = self._remote_participants.get(rpc_invocation.caller_identity)
-            if caller is None:
-                logging.warning(f"Caller {rpc_invocation.caller_identity} not found")
-                return
-
             asyncio.create_task(
                 self._local_participant._handle_rpc_method_invocation(
                     rpc_invocation.invocation_id,
                     rpc_invocation.method,
                     rpc_invocation.request_id,
-                    caller,
+                    rpc_invocation.caller_identity,
                     rpc_invocation.payload,
                     rpc_invocation.response_timeout_ms,
                 )

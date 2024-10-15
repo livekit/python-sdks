@@ -305,9 +305,9 @@ class LocalParticipant(Participant):
             RpcError: On failure. Details in `message`.
 
         Example:
-            async def greet_handler(request_id: str, caller: RemoteParticipant, payload: str, response_timeout_ms: int) -> str:
-                print(f"Received greeting from {caller.identity}: {payload}")
-                return f"Hello, {caller.identity}!"
+            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int) -> str:
+                print(f"Received greeting from {caller_identity}: {payload}")
+                return f"Hello, {caller_identity}!"
 
             await room.local_participant.register_rpc_method('greet', greet_handler)
 
