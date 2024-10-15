@@ -19,7 +19,7 @@ import logging
 from typing import Any, Dict, Literal, Optional
 
 from .room import Room, Participant, DataPacket
-from ._event_emitter import EventEmitter
+from .event_emitter import EventEmitter
 from ._utils import generate_random_base62
 
 _CHAT_TOPIC = "lk-chat-topic"

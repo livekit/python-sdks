@@ -57,6 +57,7 @@ from .track import (
     Track,
     VideoTrack,
 )
+from .event_emitter import EventEmitter
 from .track_publication import (
     LocalTrackPublication,
     RemoteTrackPublication,
@@ -133,6 +134,7 @@ __all__ = [
     "AudioResampler",
     "AudioResamplerQuality",
     "RpcError",
+    "EventEmitter",
     "combine_audio_frames",
     "__version__",
 ]
