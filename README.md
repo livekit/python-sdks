@@ -6,7 +6,6 @@
   <img style="width:100%;" alt="The LiveKit icon, the name of the repository and some sample code in the background." src="https://raw.githubusercontent.com/livekit/python-sdks/main/.github/banner_light.png">
 </picture>
 
-
 <!--END_BANNER_IMAGE-->
 
 [![pypi-v](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
