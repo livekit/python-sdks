@@ -219,7 +219,7 @@ class AudioStream:
     async def _run(self):
         while True:
             event = await self._ffi_queue.wait_for(self._is_event)
-            audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event 
+            audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event
 
             if audio_event.HasField("frame_received"):
                 owned_buffer_info = audio_event.frame_received.frame
