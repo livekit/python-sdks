@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import time
 import asyncio
-from typing import cast
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -149,11 +148,7 @@ class AudioSource:
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-        capture_result = cast(
-            proto_audio_frame.CaptureAudioFrameCallback, cb.capture_audio_frame
-        )
-
-        if capture_result.error:
+        if cb.capture_audio_frame.error:
             raise Exception(cb.capture_audio_frame.error)
 
     async def wait_for_playout(self) -> None:
