@@ -141,7 +141,7 @@ class AudioSource:
         queue = FfiClient.instance.queue.subscribe(loop=self._loop)
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.capture_audio_frame.async_id
                 == resp.capture_audio_frame.async_id
             )

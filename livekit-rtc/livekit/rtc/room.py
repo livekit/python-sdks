@@ -362,7 +362,7 @@ class Room(EventEmitter[EventTypes]):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.connect.async_id == resp.connect.async_id
             )
         finally:
@@ -372,18 +372,18 @@ class Room(EventEmitter[EventTypes]):
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
             raise ConnectError(cb.connect.error)
 
-        self._ffi_handle = FfiHandle(cb.connect.room.handle.id)
+        self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
 
         self._e2ee_manager = E2EEManager(self._ffi_handle.handle, options.e2ee)
 
-        self._info = cb.connect.room.info
+        self._info = cb.connect.result.room.info
         self._connection_state = ConnectionState.CONN_CONNECTED
 
         self._local_participant = LocalParticipant(
-            self._room_queue, cb.connect.local_participant
+            self._room_queue, cb.connect.result.local_participant
         )
 
-        for pt in cb.connect.participants:
+        for pt in cb.connect.result.participants:
             rp = self._create_remote_participant(pt.participant)
 
             # add the initial remote participant tracks
@@ -582,12 +582,15 @@ class Room(EventEmitter[EventTypes]):
             identity = event.participant_attributes_changed.participant_identity
             attributes = event.participant_attributes_changed.attributes
             changed_attributes = dict(
-                event.participant_attributes_changed.changed_attributes
+                (entry.key, entry.value)
+                for entry in event.participant_attributes_changed.changed_attributes
             )
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
             participant._info.attributes.clear()
-            participant._info.attributes.update(attributes)
+            participant._info.attributes.update(
+                (entry.key, entry.value) for entry in attributes
+            )
             self.emit(
                 "participant_attributes_changed",
                 changed_attributes,

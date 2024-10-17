@@ -55,7 +55,7 @@ class Track:
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.get_stats.async_id == resp.get_stats.async_id
             )
         finally:
