@@ -695,6 +695,106 @@ class SetLocalMetadataCallback(google.protobuf.message.Message):
 global___SetLocalMetadataCallback = SetLocalMetadataCallback
 
 @typing.final
+class SendChatMessageRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    message: builtins.str
+    sender_identity: builtins.str
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int = ...,
+        message: builtins.str = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "message", b"message", "sender_identity", b"sender_identity"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_sender_identity", b"_sender_identity"]) -> typing.Literal["sender_identity"] | None: ...
+
+global___SendChatMessageRequest = SendChatMessageRequest
+
+@typing.final
+class EditChatMessageRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    EDIT_TEXT_FIELD_NUMBER: builtins.int
+    ORIGINAL_MESSAGE_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    edit_text: builtins.str
+    sender_identity: builtins.str
+    @property
+    def original_message(self) -> global___ChatMessage: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int = ...,
+        edit_text: builtins.str = ...,
+        original_message: global___ChatMessage | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "destination_identities", b"destination_identities", "edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_sender_identity", b"_sender_identity"]) -> typing.Literal["sender_identity"] | None: ...
+
+global___EditChatMessageRequest = EditChatMessageRequest
+
+@typing.final
+class SendChatMessageResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___SendChatMessageResponse = SendChatMessageResponse
+
+@typing.final
+class SendChatMessageCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def chat_message(self) -> global___ChatMessage: ...
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int = ...,
+        error: builtins.str | None = ...,
+        chat_message: global___ChatMessage | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_chat_message", b"_chat_message", "_error", b"_error", "chat_message", b"chat_message", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_chat_message", b"_chat_message", "_error", b"_error", "async_id", b"async_id", "chat_message", b"chat_message", "error", b"error"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_chat_message", b"_chat_message"]) -> typing.Literal["chat_message"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+
+global___SendChatMessageCallback = SendChatMessageCallback
+
+@typing.final
 class SetLocalAttributesRequest(google.protobuf.message.Message):
     """Change the local participant's attributes"""
 
@@ -1178,6 +1278,7 @@ class RoomEvent(google.protobuf.message.Message):
     EOS_FIELD_NUMBER: builtins.int
     DATA_PACKET_RECEIVED_FIELD_NUMBER: builtins.int
     TRANSCRIPTION_RECEIVED_FIELD_NUMBER: builtins.int
+    CHAT_MESSAGE_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1237,6 +1338,8 @@ class RoomEvent(google.protobuf.message.Message):
     def data_packet_received(self) -> global___DataPacketReceived: ...
     @property
     def transcription_received(self) -> global___TranscriptionReceived: ...
+    @property
+    def chat_message(self) -> global___ChatMessageReceived: ...
     def __init__(
         self,
         *,
@@ -1268,10 +1371,11 @@ class RoomEvent(google.protobuf.message.Message):
         eos: global___RoomEOS | None = ...,
         data_packet_received: global___DataPacketReceived | None = ...,
         transcription_received: global___TranscriptionReceived | None = ...,
+        chat_message: global___ChatMessageReceived | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received"] | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1731,6 +1835,63 @@ class UserPacket(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing.Literal["_topic", b"_topic"]) -> typing.Literal["topic"] | None: ...
 
 global___UserPacket = UserPacket
+
+@typing.final
+class ChatMessage(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    TIMESTAMP_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    EDIT_TIMESTAMP_FIELD_NUMBER: builtins.int
+    DELETED_FIELD_NUMBER: builtins.int
+    GENERATED_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    timestamp: builtins.int
+    message: builtins.str
+    edit_timestamp: builtins.int
+    deleted: builtins.bool
+    generated: builtins.bool
+    def __init__(
+        self,
+        *,
+        id: builtins.str = ...,
+        timestamp: builtins.int = ...,
+        message: builtins.str = ...,
+        edit_timestamp: builtins.int | None = ...,
+        deleted: builtins.bool | None = ...,
+        generated: builtins.bool | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["_deleted", b"_deleted", "_edit_timestamp", b"_edit_timestamp", "_generated", b"_generated", "deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_deleted", b"_deleted", "_edit_timestamp", b"_edit_timestamp", "_generated", b"_generated", "deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_deleted", b"_deleted"]) -> typing.Literal["deleted"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_edit_timestamp", b"_edit_timestamp"]) -> typing.Literal["edit_timestamp"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing.Literal["_generated", b"_generated"]) -> typing.Literal["generated"] | None: ...
+
+global___ChatMessage = ChatMessage
+
+@typing.final
+class ChatMessageReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MESSAGE_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def message(self) -> global___ChatMessage: ...
+    def __init__(
+        self,
+        *,
+        message: global___ChatMessage | None = ...,
+        participant_identity: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["message", b"message", "participant_identity", b"participant_identity"]) -> None: ...
+
+global___ChatMessageReceived = ChatMessageReceived
 
 @typing.final
 class SipDTMF(google.protobuf.message.Message):
