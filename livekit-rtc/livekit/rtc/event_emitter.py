@@ -55,6 +55,8 @@ class EventEmitter(Generic[T]):
                         callback_args = args[:num_args]
 
                         callback(*callback_args)
+                except TypeError:
+                    raise
                 except Exception:
                     logger.exception(f"failed to emit event {event}")
 
