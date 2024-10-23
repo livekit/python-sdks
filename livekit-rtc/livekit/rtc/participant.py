@@ -163,7 +163,7 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_data.async_id == resp.publish_data.async_id
             )
         finally:
@@ -191,7 +191,7 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_sip_dtmf.async_id == resp.publish_sip_dtmf.async_id
             )
         finally:
@@ -231,7 +231,7 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_transcription.async_id
                 == resp.publish_transcription.async_id
             )
@@ -479,7 +479,15 @@ class LocalParticipant(Participant):
         """
         req = proto_ffi.FfiRequest()
         req.set_local_attributes.local_participant_handle = self._ffi_handle.handle
-        req.set_local_attributes.attributes.update(attributes)
+        existing_attributes = {
+            entry.key: entry.value for entry in req.set_local_attributes.attributes
+        }
+        existing_attributes.update(attributes)
+
+        for key, value in existing_attributes.items():
+            entry = req.set_local_attributes.attributes.add()
+            entry.key = key
+            entry.value = value
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -515,7 +523,7 @@ class LocalParticipant(Participant):
         queue = self._room_queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_track.async_id == resp.publish_track.async_id
             )
 
@@ -549,7 +557,7 @@ class LocalParticipant(Participant):
         queue = self._room_queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.unpublish_track.async_id == resp.unpublish_track.async_id
             )
 
