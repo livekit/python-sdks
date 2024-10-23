@@ -114,9 +114,9 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self.track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
         self._rpc_handlers: Dict[
-            str, Callable[[str, RemoteParticipant, str, int], Awaitable[str]]
+            str, Callable[[str, str, str, int], Awaitable[str]]
         ] = {}
 
     @property
@@ -288,7 +288,7 @@ class LocalParticipant(Participant):
     async def register_rpc_method(
         self,
         method: str,
-        handler: Callable[[str, "RemoteParticipant", str, int], Awaitable[str]],
+        handler: Callable[[str, str, str, int], Awaitable[str]],
     ) -> None:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
@@ -313,7 +313,7 @@ class LocalParticipant(Participant):
 
         The handler receives the following parameters:
         - `request_id`: A unique identifier for this RPC request
-        - `caller`: The RemoteParticipant who initiated the RPC call
+        - `caller_identity`: The identity of the RemoteParticipant who initiated the RPC call
         - `payload`: The data sent by the caller (as a string)
         - `response_timeout_ms`: The maximum time available to return a response
 
@@ -371,7 +371,7 @@ class LocalParticipant(Participant):
         invocation_id: int,
         method: str,
         request_id: str,
-        caller: RemoteParticipant,
+        caller_identity: str,
         payload: str,
         response_timeout_ms: int,
     ) -> None:
@@ -385,7 +385,7 @@ class LocalParticipant(Participant):
         else:
             try:
                 response_payload = await handler(
-                    request_id, caller, payload, response_timeout_ms
+                    request_id, caller_identity, payload, response_timeout_ms
                 )
             except RpcError as error:
                 response_error = error
