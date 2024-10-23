@@ -10,6 +10,7 @@ import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import room_pb2
+from . import rpc_pb2
 from . import track_pb2
 import typing
 import typing_extensions
@@ -105,6 +106,10 @@ class FfiRequest(google.protobuf.message.Message):
     FLUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
     SEND_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
     EDIT_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    REGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    UNREGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
     @property
     def dispose(self) -> global___DisposeRequest: ...
     @property
@@ -185,6 +190,16 @@ class FfiRequest(google.protobuf.message.Message):
     def send_chat_message(self) -> room_pb2.SendChatMessageRequest: ...
     @property
     def edit_chat_message(self) -> room_pb2.EditChatMessageRequest: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcRequest:
+        """RPC"""
+        pass
+    @property
+    def register_rpc_method(self) -> rpc_pb2.RegisterRpcMethodRequest: ...
+    @property
+    def unregister_rpc_method(self) -> rpc_pb2.UnregisterRpcMethodRequest: ...
+    @property
+    def rpc_method_invocation_response(self) -> rpc_pb2.RpcMethodInvocationResponseRequest: ...
     def __init__(self,
         *,
         dispose: typing.Optional[global___DisposeRequest] = ...,
@@ -223,10 +238,14 @@ class FfiRequest(google.protobuf.message.Message):
         flush_sox_resampler: typing.Optional[audio_frame_pb2.FlushSoxResamplerRequest] = ...,
         send_chat_message: typing.Optional[room_pb2.SendChatMessageRequest] = ...,
         edit_chat_message: typing.Optional[room_pb2.EditChatMessageRequest] = ...,
+        perform_rpc: typing.Optional[rpc_pb2.PerformRpcRequest] = ...,
+        register_rpc_method: typing.Optional[rpc_pb2.RegisterRpcMethodRequest] = ...,
+        unregister_rpc_method: typing.Optional[rpc_pb2.UnregisterRpcMethodRequest] = ...,
+        rpc_method_invocation_response: typing.Optional[rpc_pb2.RpcMethodInvocationResponseRequest] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","edit_chat_message",b"edit_chat_message","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","remix_and_resample",b"remix_and_resample","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","edit_chat_message",b"edit_chat_message","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","remix_and_resample",b"remix_and_resample","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["dispose","connect","disconnect","publish_track","unpublish_track","publish_data","set_subscribed","set_local_metadata","set_local_name","set_local_attributes","get_session_stats","publish_transcription","publish_sip_dtmf","create_video_track","create_audio_track","local_track_mute","enable_remote_track","get_stats","new_video_stream","new_video_source","capture_video_frame","video_convert","video_stream_from_participant","new_audio_stream","new_audio_source","capture_audio_frame","clear_audio_buffer","new_audio_resampler","remix_and_resample","e2ee","audio_stream_from_participant","new_sox_resampler","push_sox_resampler","flush_sox_resampler","send_chat_message","edit_chat_message"]]: ...
+    def HasField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","edit_chat_message",b"edit_chat_message","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","register_rpc_method",b"register_rpc_method","remix_and_resample",b"remix_and_resample","rpc_method_invocation_response",b"rpc_method_invocation_response","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","edit_chat_message",b"edit_chat_message","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","register_rpc_method",b"register_rpc_method","remix_and_resample",b"remix_and_resample","rpc_method_invocation_response",b"rpc_method_invocation_response","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["dispose","connect","disconnect","publish_track","unpublish_track","publish_data","set_subscribed","set_local_metadata","set_local_name","set_local_attributes","get_session_stats","publish_transcription","publish_sip_dtmf","create_video_track","create_audio_track","local_track_mute","enable_remote_track","get_stats","new_video_stream","new_video_source","capture_video_frame","video_convert","video_stream_from_participant","new_audio_stream","new_audio_source","capture_audio_frame","clear_audio_buffer","new_audio_resampler","remix_and_resample","e2ee","audio_stream_from_participant","new_sox_resampler","push_sox_resampler","flush_sox_resampler","send_chat_message","edit_chat_message","perform_rpc","register_rpc_method","unregister_rpc_method","rpc_method_invocation_response"]]: ...
 global___FfiRequest = FfiRequest
 
 class FfiResponse(google.protobuf.message.Message):
@@ -267,6 +286,10 @@ class FfiResponse(google.protobuf.message.Message):
     PUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
     FLUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
     SEND_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    REGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    UNREGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
     @property
     def dispose(self) -> global___DisposeResponse: ...
     @property
@@ -345,6 +368,16 @@ class FfiResponse(google.protobuf.message.Message):
     def flush_sox_resampler(self) -> audio_frame_pb2.FlushSoxResamplerResponse: ...
     @property
     def send_chat_message(self) -> room_pb2.SendChatMessageResponse: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcResponse:
+        """RPC"""
+        pass
+    @property
+    def register_rpc_method(self) -> rpc_pb2.RegisterRpcMethodResponse: ...
+    @property
+    def unregister_rpc_method(self) -> rpc_pb2.UnregisterRpcMethodResponse: ...
+    @property
+    def rpc_method_invocation_response(self) -> rpc_pb2.RpcMethodInvocationResponseResponse: ...
     def __init__(self,
         *,
         dispose: typing.Optional[global___DisposeResponse] = ...,
@@ -382,10 +415,14 @@ class FfiResponse(google.protobuf.message.Message):
         push_sox_resampler: typing.Optional[audio_frame_pb2.PushSoxResamplerResponse] = ...,
         flush_sox_resampler: typing.Optional[audio_frame_pb2.FlushSoxResamplerResponse] = ...,
         send_chat_message: typing.Optional[room_pb2.SendChatMessageResponse] = ...,
+        perform_rpc: typing.Optional[rpc_pb2.PerformRpcResponse] = ...,
+        register_rpc_method: typing.Optional[rpc_pb2.RegisterRpcMethodResponse] = ...,
+        unregister_rpc_method: typing.Optional[rpc_pb2.UnregisterRpcMethodResponse] = ...,
+        rpc_method_invocation_response: typing.Optional[rpc_pb2.RpcMethodInvocationResponseResponse] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","remix_and_resample",b"remix_and_resample","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","remix_and_resample",b"remix_and_resample","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["dispose","connect","disconnect","publish_track","unpublish_track","publish_data","set_subscribed","set_local_metadata","set_local_name","set_local_attributes","get_session_stats","publish_transcription","publish_sip_dtmf","create_video_track","create_audio_track","local_track_mute","enable_remote_track","get_stats","new_video_stream","new_video_source","capture_video_frame","video_convert","video_stream_from_participant","new_audio_stream","new_audio_source","capture_audio_frame","clear_audio_buffer","new_audio_resampler","remix_and_resample","audio_stream_from_participant","e2ee","new_sox_resampler","push_sox_resampler","flush_sox_resampler","send_chat_message"]]: ...
+    def HasField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","register_rpc_method",b"register_rpc_method","remix_and_resample",b"remix_and_resample","rpc_method_invocation_response",b"rpc_method_invocation_response","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_from_participant",b"audio_stream_from_participant","capture_audio_frame",b"capture_audio_frame","capture_video_frame",b"capture_video_frame","clear_audio_buffer",b"clear_audio_buffer","connect",b"connect","create_audio_track",b"create_audio_track","create_video_track",b"create_video_track","disconnect",b"disconnect","dispose",b"dispose","e2ee",b"e2ee","enable_remote_track",b"enable_remote_track","flush_sox_resampler",b"flush_sox_resampler","get_session_stats",b"get_session_stats","get_stats",b"get_stats","local_track_mute",b"local_track_mute","message",b"message","new_audio_resampler",b"new_audio_resampler","new_audio_source",b"new_audio_source","new_audio_stream",b"new_audio_stream","new_sox_resampler",b"new_sox_resampler","new_video_source",b"new_video_source","new_video_stream",b"new_video_stream","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","push_sox_resampler",b"push_sox_resampler","register_rpc_method",b"register_rpc_method","remix_and_resample",b"remix_and_resample","rpc_method_invocation_response",b"rpc_method_invocation_response","send_chat_message",b"send_chat_message","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","set_subscribed",b"set_subscribed","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_convert",b"video_convert","video_stream_from_participant",b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["dispose","connect","disconnect","publish_track","unpublish_track","publish_data","set_subscribed","set_local_metadata","set_local_name","set_local_attributes","get_session_stats","publish_transcription","publish_sip_dtmf","create_video_track","create_audio_track","local_track_mute","enable_remote_track","get_stats","new_video_stream","new_video_source","capture_video_frame","video_convert","video_stream_from_participant","new_audio_stream","new_audio_source","capture_audio_frame","clear_audio_buffer","new_audio_resampler","remix_and_resample","audio_stream_from_participant","e2ee","new_sox_resampler","push_sox_resampler","flush_sox_resampler","send_chat_message","perform_rpc","register_rpc_method","unregister_rpc_method","rpc_method_invocation_response"]]: ...
 global___FfiResponse = FfiResponse
 
 class FfiEvent(google.protobuf.message.Message):
@@ -415,6 +452,11 @@ class FfiEvent(google.protobuf.message.Message):
     PANIC_FIELD_NUMBER: builtins.int
     PUBLISH_SIP_DTMF_FIELD_NUMBER: builtins.int
     CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    REGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    UNREGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
     @property
     def room_event(self) -> room_pb2.RoomEvent: ...
     @property
@@ -457,6 +499,16 @@ class FfiEvent(google.protobuf.message.Message):
     def publish_sip_dtmf(self) -> room_pb2.PublishSipDtmfCallback: ...
     @property
     def chat_message(self) -> room_pb2.SendChatMessageCallback: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcCallback: ...
+    @property
+    def register_rpc_method(self) -> rpc_pb2.RegisterRpcMethodCallback: ...
+    @property
+    def unregister_rpc_method(self) -> rpc_pb2.UnregisterRpcMethodCallback: ...
+    @property
+    def rpc_method_invocation(self) -> rpc_pb2.RpcMethodInvocationEvent: ...
+    @property
+    def rpc_method_invocation_response(self) -> rpc_pb2.RpcMethodInvocationResponseCallback: ...
     def __init__(self,
         *,
         room_event: typing.Optional[room_pb2.RoomEvent] = ...,
@@ -480,10 +532,15 @@ class FfiEvent(google.protobuf.message.Message):
         panic: typing.Optional[global___Panic] = ...,
         publish_sip_dtmf: typing.Optional[room_pb2.PublishSipDtmfCallback] = ...,
         chat_message: typing.Optional[room_pb2.SendChatMessageCallback] = ...,
+        perform_rpc: typing.Optional[rpc_pb2.PerformRpcCallback] = ...,
+        register_rpc_method: typing.Optional[rpc_pb2.RegisterRpcMethodCallback] = ...,
+        unregister_rpc_method: typing.Optional[rpc_pb2.UnregisterRpcMethodCallback] = ...,
+        rpc_method_invocation: typing.Optional[rpc_pb2.RpcMethodInvocationEvent] = ...,
+        rpc_method_invocation_response: typing.Optional[rpc_pb2.RpcMethodInvocationResponseCallback] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event",b"audio_stream_event","capture_audio_frame",b"capture_audio_frame","chat_message",b"chat_message","connect",b"connect","disconnect",b"disconnect","dispose",b"dispose","get_session_stats",b"get_session_stats","get_stats",b"get_stats","logs",b"logs","message",b"message","panic",b"panic","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","room_event",b"room_event","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","track_event",b"track_event","unpublish_track",b"unpublish_track","video_stream_event",b"video_stream_event"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event",b"audio_stream_event","capture_audio_frame",b"capture_audio_frame","chat_message",b"chat_message","connect",b"connect","disconnect",b"disconnect","dispose",b"dispose","get_session_stats",b"get_session_stats","get_stats",b"get_stats","logs",b"logs","message",b"message","panic",b"panic","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","room_event",b"room_event","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","track_event",b"track_event","unpublish_track",b"unpublish_track","video_stream_event",b"video_stream_event"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["room_event","track_event","video_stream_event","audio_stream_event","connect","disconnect","dispose","publish_track","unpublish_track","publish_data","publish_transcription","capture_audio_frame","set_local_metadata","set_local_name","set_local_attributes","get_stats","logs","get_session_stats","panic","publish_sip_dtmf","chat_message"]]: ...
+    def HasField(self, field_name: typing_extensions.Literal["audio_stream_event",b"audio_stream_event","capture_audio_frame",b"capture_audio_frame","chat_message",b"chat_message","connect",b"connect","disconnect",b"disconnect","dispose",b"dispose","get_session_stats",b"get_session_stats","get_stats",b"get_stats","logs",b"logs","message",b"message","panic",b"panic","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","register_rpc_method",b"register_rpc_method","room_event",b"room_event","rpc_method_invocation",b"rpc_method_invocation","rpc_method_invocation_response",b"rpc_method_invocation_response","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","track_event",b"track_event","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_stream_event",b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["audio_stream_event",b"audio_stream_event","capture_audio_frame",b"capture_audio_frame","chat_message",b"chat_message","connect",b"connect","disconnect",b"disconnect","dispose",b"dispose","get_session_stats",b"get_session_stats","get_stats",b"get_stats","logs",b"logs","message",b"message","panic",b"panic","perform_rpc",b"perform_rpc","publish_data",b"publish_data","publish_sip_dtmf",b"publish_sip_dtmf","publish_track",b"publish_track","publish_transcription",b"publish_transcription","register_rpc_method",b"register_rpc_method","room_event",b"room_event","rpc_method_invocation",b"rpc_method_invocation","rpc_method_invocation_response",b"rpc_method_invocation_response","set_local_attributes",b"set_local_attributes","set_local_metadata",b"set_local_metadata","set_local_name",b"set_local_name","track_event",b"track_event","unpublish_track",b"unpublish_track","unregister_rpc_method",b"unregister_rpc_method","video_stream_event",b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message",b"message"]) -> typing.Optional[typing_extensions.Literal["room_event","track_event","video_stream_event","audio_stream_event","connect","disconnect","dispose","publish_track","unpublish_track","publish_data","publish_transcription","capture_audio_frame","set_local_metadata","set_local_name","set_local_attributes","get_stats","logs","get_session_stats","panic","publish_sip_dtmf","chat_message","perform_rpc","register_rpc_method","unregister_rpc_method","rpc_method_invocation","rpc_method_invocation_response"]]: ...
 global___FfiEvent = FfiEvent
 
 class DisposeRequest(google.protobuf.message.Message):

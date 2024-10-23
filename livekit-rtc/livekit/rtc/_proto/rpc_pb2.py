@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\trpc.proto\x12\rlivekit.proto\"E\n\x08RpcError\x12\x0c\n\x04\x63ode\x18\x01 \x01(\r\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x11\n\x04\x64\x61ta\x18\x03 \x01(\tH\x00\x88\x01\x01\x42\x07\n\x05_data\"\xae\x01\n\x11PerformRpcRequest\x12 \n\x18local_participant_handle\x18\x01 \x01(\x04\x12\x1c\n\x14\x64\x65stination_identity\x18\x02 \x01(\t\x12\x0e\n\x06method\x18\x03 \x01(\t\x12\x0f\n\x07payload\x18\x04 \x01(\t\x12 \n\x13response_timeout_ms\x18\x05 \x01(\rH\x00\x88\x01\x01\x42\x16\n\x14_response_timeout_ms\"L\n\x18RegisterRpcMethodRequest\x12 \n\x18local_participant_handle\x18\x01 \x01(\x04\x12\x0e\n\x06method\x18\x02 \x01(\t\"N\n\x1aUnregisterRpcMethodRequest\x12 \n\x18local_participant_handle\x18\x01 \x01(\x04\x12\x0e\n\x06method\x18\x02 \x01(\t\"\xb6\x01\n\"RpcMethodInvocationResponseRequest\x12 \n\x18local_participant_handle\x18\x01 \x01(\x04\x12\x15\n\rinvocation_id\x18\x02 \x01(\x04\x12\x14\n\x07payload\x18\x03 \x01(\tH\x00\x88\x01\x01\x12+\n\x05\x65rror\x18\x04 \x01(\x0b\x32\x17.livekit.proto.RpcErrorH\x01\x88\x01\x01\x42\n\n\x08_payloadB\x08\n\x06_error\"&\n\x12PerformRpcResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"-\n\x19RegisterRpcMethodResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"/\n\x1bUnregisterRpcMethodResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"7\n#RpcMethodInvocationResponseResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"\x7f\n\x12PerformRpcCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x14\n\x07payload\x18\x02 \x01(\tH\x00\x88\x01\x01\x12+\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x17.livekit.proto.RpcErrorH\x01\x88\x01\x01\x42\n\n\x08_payloadB\x08\n\x06_error\"-\n\x19RegisterRpcMethodCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"/\n\x1bUnregisterRpcMethodCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\"U\n#RpcMethodInvocationResponseCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x01(\x04\x12\x12\n\x05\x65rror\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x08\n\x06_error\"\xbe\x01\n\x18RpcMethodInvocationEvent\x12 \n\x18local_participant_handle\x18\x01 \x01(\x04\x12\x15\n\rinvocation_id\x18\x02 \x01(\x04\x12\x0e\n\x06method\x18\x03 \x01(\t\x12\x12\n\nrequest_id\x18\x04 \x01(\t\x12\x17\n\x0f\x63\x61ller_identity\x18\x05 \x01(\t\x12\x0f\n\x07payload\x18\x06 \x01(\t\x12\x1b\n\x13response_timeout_ms\x18\x07 \x01(\rB\x10\xaa\x02\rLiveKit.Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\trpc.proto\x12\rlivekit.proto\"7\n\x08RpcError\x12\x0c\n\x04\x63ode\x18\x01 \x02(\r\x12\x0f\n\x07message\x18\x02 \x02(\t\x12\x0c\n\x04\x64\x61ta\x18\x03 \x01(\t\"\x91\x01\n\x11PerformRpcRequest\x12 \n\x18local_participant_handle\x18\x01 \x02(\x04\x12\x1c\n\x14\x64\x65stination_identity\x18\x02 \x02(\t\x12\x0e\n\x06method\x18\x03 \x02(\t\x12\x0f\n\x07payload\x18\x04 \x02(\t\x12\x1b\n\x13response_timeout_ms\x18\x05 \x01(\r\"L\n\x18RegisterRpcMethodRequest\x12 \n\x18local_participant_handle\x18\x01 \x02(\x04\x12\x0e\n\x06method\x18\x02 \x02(\t\"N\n\x1aUnregisterRpcMethodRequest\x12 \n\x18local_participant_handle\x18\x01 \x02(\x04\x12\x0e\n\x06method\x18\x02 \x02(\t\"\x96\x01\n\"RpcMethodInvocationResponseRequest\x12 \n\x18local_participant_handle\x18\x01 \x02(\x04\x12\x15\n\rinvocation_id\x18\x02 \x02(\x04\x12\x0f\n\x07payload\x18\x03 \x01(\t\x12&\n\x05\x65rror\x18\x04 \x01(\x0b\x32\x17.livekit.proto.RpcError\"&\n\x12PerformRpcResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"-\n\x19RegisterRpcMethodResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"/\n\x1bUnregisterRpcMethodResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"7\n#RpcMethodInvocationResponseResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"_\n\x12PerformRpcCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\x12\x0f\n\x07payload\x18\x02 \x01(\t\x12&\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x17.livekit.proto.RpcError\"-\n\x19RegisterRpcMethodCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"/\n\x1bUnregisterRpcMethodCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"F\n#RpcMethodInvocationResponseCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\x12\r\n\x05\x65rror\x18\x02 \x01(\t\"\xbe\x01\n\x18RpcMethodInvocationEvent\x12 \n\x18local_participant_handle\x18\x01 \x02(\x04\x12\x15\n\rinvocation_id\x18\x02 \x02(\x04\x12\x0e\n\x06method\x18\x03 \x02(\t\x12\x12\n\nrequest_id\x18\x04 \x02(\t\x12\x17\n\x0f\x63\x61ller_identity\x18\x05 \x02(\t\x12\x0f\n\x07payload\x18\x06 \x02(\t\x12\x1b\n\x13response_timeout_ms\x18\x07 \x02(\rB\x10\xaa\x02\rLiveKit.Proto')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,31 +33,31 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
   _globals['_RPCERROR']._serialized_start=28
-  _globals['_RPCERROR']._serialized_end=97
-  _globals['_PERFORMRPCREQUEST']._serialized_start=100
-  _globals['_PERFORMRPCREQUEST']._serialized_end=274
-  _globals['_REGISTERRPCMETHODREQUEST']._serialized_start=276
-  _globals['_REGISTERRPCMETHODREQUEST']._serialized_end=352
-  _globals['_UNREGISTERRPCMETHODREQUEST']._serialized_start=354
-  _globals['_UNREGISTERRPCMETHODREQUEST']._serialized_end=432
-  _globals['_RPCMETHODINVOCATIONRESPONSEREQUEST']._serialized_start=435
-  _globals['_RPCMETHODINVOCATIONRESPONSEREQUEST']._serialized_end=617
-  _globals['_PERFORMRPCRESPONSE']._serialized_start=619
-  _globals['_PERFORMRPCRESPONSE']._serialized_end=657
-  _globals['_REGISTERRPCMETHODRESPONSE']._serialized_start=659
-  _globals['_REGISTERRPCMETHODRESPONSE']._serialized_end=704
-  _globals['_UNREGISTERRPCMETHODRESPONSE']._serialized_start=706
-  _globals['_UNREGISTERRPCMETHODRESPONSE']._serialized_end=753
-  _globals['_RPCMETHODINVOCATIONRESPONSERESPONSE']._serialized_start=755
-  _globals['_RPCMETHODINVOCATIONRESPONSERESPONSE']._serialized_end=810
-  _globals['_PERFORMRPCCALLBACK']._serialized_start=812
-  _globals['_PERFORMRPCCALLBACK']._serialized_end=939
-  _globals['_REGISTERRPCMETHODCALLBACK']._serialized_start=941
-  _globals['_REGISTERRPCMETHODCALLBACK']._serialized_end=986
-  _globals['_UNREGISTERRPCMETHODCALLBACK']._serialized_start=988
-  _globals['_UNREGISTERRPCMETHODCALLBACK']._serialized_end=1035
-  _globals['_RPCMETHODINVOCATIONRESPONSECALLBACK']._serialized_start=1037
-  _globals['_RPCMETHODINVOCATIONRESPONSECALLBACK']._serialized_end=1122
-  _globals['_RPCMETHODINVOCATIONEVENT']._serialized_start=1125
-  _globals['_RPCMETHODINVOCATIONEVENT']._serialized_end=1315
+  _globals['_RPCERROR']._serialized_end=83
+  _globals['_PERFORMRPCREQUEST']._serialized_start=86
+  _globals['_PERFORMRPCREQUEST']._serialized_end=231
+  _globals['_REGISTERRPCMETHODREQUEST']._serialized_start=233
+  _globals['_REGISTERRPCMETHODREQUEST']._serialized_end=309
+  _globals['_UNREGISTERRPCMETHODREQUEST']._serialized_start=311
+  _globals['_UNREGISTERRPCMETHODREQUEST']._serialized_end=389
+  _globals['_RPCMETHODINVOCATIONRESPONSEREQUEST']._serialized_start=392
+  _globals['_RPCMETHODINVOCATIONRESPONSEREQUEST']._serialized_end=542
+  _globals['_PERFORMRPCRESPONSE']._serialized_start=544
+  _globals['_PERFORMRPCRESPONSE']._serialized_end=582
+  _globals['_REGISTERRPCMETHODRESPONSE']._serialized_start=584
+  _globals['_REGISTERRPCMETHODRESPONSE']._serialized_end=629
+  _globals['_UNREGISTERRPCMETHODRESPONSE']._serialized_start=631
+  _globals['_UNREGISTERRPCMETHODRESPONSE']._serialized_end=678
+  _globals['_RPCMETHODINVOCATIONRESPONSERESPONSE']._serialized_start=680
+  _globals['_RPCMETHODINVOCATIONRESPONSERESPONSE']._serialized_end=735
+  _globals['_PERFORMRPCCALLBACK']._serialized_start=737
+  _globals['_PERFORMRPCCALLBACK']._serialized_end=832
+  _globals['_REGISTERRPCMETHODCALLBACK']._serialized_start=834
+  _globals['_REGISTERRPCMETHODCALLBACK']._serialized_end=879
+  _globals['_UNREGISTERRPCMETHODCALLBACK']._serialized_start=881
+  _globals['_UNREGISTERRPCMETHODCALLBACK']._serialized_end=928
+  _globals['_RPCMETHODINVOCATIONRESPONSECALLBACK']._serialized_start=930
+  _globals['_RPCMETHODINVOCATIONRESPONSECALLBACK']._serialized_end=1000
+  _globals['_RPCMETHODINVOCATIONEVENT']._serialized_start=1003
+  _globals['_RPCMETHODINVOCATIONEVENT']._serialized_end=1193
 # @@protoc_insertion_point(module_scope)
