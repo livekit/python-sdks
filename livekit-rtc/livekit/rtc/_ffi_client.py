@@ -18,6 +18,7 @@ import sys
 from contextlib import ExitStack
 import ctypes
 import importlib.resources
+from importlib.metadata import version
 import logging
 import os
 import platform
@@ -54,6 +55,7 @@ def get_ffi_lib():
     res = importlib.resources.files("livekit.rtc.resources") / libname
     ctx = importlib.resources.as_file(res)
     path = _resource_files.enter_context(ctx)
+    print(path)
     return ctypes.CDLL(str(path))
 
 
@@ -204,8 +206,8 @@ class FfiClient:
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
-
-        ffi_lib.livekit_ffi_initialize(ffi_event_callback, True)
+        
+        ffi_lib.livekit_ffi_initialize(ffi_event_callback, True, "python", version("livekit"))
 
         @atexit.register
         def _dispose_lk_ffi():
