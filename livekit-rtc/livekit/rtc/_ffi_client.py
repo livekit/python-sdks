@@ -18,7 +18,7 @@ import sys
 from contextlib import ExitStack
 import ctypes
 import importlib.resources
-from importlib.metadata import version
+from .version import __version__
 import logging
 import os
 import platform
@@ -212,7 +212,7 @@ class FfiClient:
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         ffi_lib.livekit_ffi_initialize(
-            ffi_event_callback, True, b"python", version("livekit").encode("utf-8")
+            ffi_event_callback, True, b"python", __version__.encode("utf-8")
         )
 
         @atexit.register
