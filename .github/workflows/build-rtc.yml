@@ -19,6 +19,43 @@ env:
   PACKAGE_DIR: ./livekit-rtc
 
 jobs:
+  generate_protobuf:
+    runs-on: ubuntu-latest
+    name: Generating protobuf
+    if: github.event_name == 'pull_request'
+
+    defaults:
+      run:
+        working-directory: ${{ env.PACKAGE_DIR }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - uses: actions/setup-python@v4
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          version: "25.1"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install deps
+        run: |
+          pip3 install mypy-protobuf==3.6.0
+
+      - name: generate python stubs
+        run: ./generate_proto.sh
+
+      - name: Add changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '["livekit-rtc/"]'
+          default_author: github_actions
+          message: generated protobuf
+
+
   build_wheels:
     name: Build RTC wheels (${{ matrix.archs }})
     runs-on: ${{ matrix.os }}

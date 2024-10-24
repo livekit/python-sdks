@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 # This script requires protobuf-compiler and https://github.com/nipunn1313/mypy-protobuf
+# (Used by the build-rtc CI)
 
 FFI_PROTOCOL=./rust-sdks/livekit-ffi/protocol
 FFI_OUT_PYTHON=./livekit/rtc/_proto
