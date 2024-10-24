@@ -55,7 +55,6 @@ def get_ffi_lib():
     res = importlib.resources.files("livekit.rtc.resources") / libname
     ctx = importlib.resources.as_file(res)
     path = _resource_files.enter_context(ctx)
-    print(path)
     return ctypes.CDLL(str(path))
 
 
@@ -67,7 +66,7 @@ ffi_lib.livekit_ffi_initialize.argtypes = [
     ffi_cb_fnc,
     ctypes.c_bool,
     ctypes.c_char_p,
-    ctypes.c_char_p
+    ctypes.c_char_p,
 ]
 
 ffi_lib.livekit_ffi_request.argtypes = [
@@ -211,12 +210,9 @@ class FfiClient:
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
-        
+
         ffi_lib.livekit_ffi_initialize(
-            ffi_event_callback,
-            True,
-            b"python",
-            version("livekit").encode('utf-8')
+            ffi_event_callback, True, b"python", version("livekit").encode("utf-8")
         )
 
         @atexit.register
