@@ -69,10 +69,9 @@ class ParticipantInfo(google.protobuf.message.Message):
         def __init__(
             self,
             *,
-            key: builtins.str | None = ...,
-            value: builtins.str | None = ...,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
 
     SID_FIELD_NUMBER: builtins.int
@@ -91,14 +90,13 @@ class ParticipantInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        sid: builtins.str | None = ...,
-        name: builtins.str | None = ...,
-        identity: builtins.str | None = ...,
-        metadata: builtins.str | None = ...,
+        sid: builtins.str = ...,
+        name: builtins.str = ...,
+        identity: builtins.str = ...,
+        metadata: builtins.str = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
-        kind: global___ParticipantKind.ValueType | None = ...,
+        kind: global___ParticipantKind.ValueType = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo

@@ -43,9 +43,8 @@ class FfiOwnedHandle(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        id: builtins.int | None = ...,
+        id: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["id", b"id"]) -> None: ...
 
 global___FfiOwnedHandle = FfiOwnedHandle

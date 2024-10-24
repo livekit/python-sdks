@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0chandle.proto\x12\rlivekit.proto\"\x1c\n\x0e\x46\x66iOwnedHandle\x12\n\n\x02id\x18\x01 \x02(\x04\x42\x10\xaa\x02\rLiveKit.Proto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0chandle.proto\x12\rlivekit.proto\"\x1c\n\x0e\x46\x66iOwnedHandle\x12\n\n\x02id\x18\x01 \x01(\x04\x42\x10\xaa\x02\rLiveKit.Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

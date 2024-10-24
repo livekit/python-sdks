@@ -103,10 +103,9 @@ class CreateVideoTrackRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        name: builtins.str | None = ...,
-        source_handle: builtins.int | None = ...,
+        name: builtins.str = ...,
+        source_handle: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
 global___CreateVideoTrackRequest = CreateVideoTrackRequest
@@ -141,10 +140,9 @@ class CreateAudioTrackRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        name: builtins.str | None = ...,
-        source_handle: builtins.int | None = ...,
+        name: builtins.str = ...,
+        source_handle: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
 global___CreateAudioTrackRequest = CreateAudioTrackRequest
@@ -175,9 +173,8 @@ class GetStatsRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
+        track_handle: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
 
 global___GetStatsRequest = GetStatsRequest
@@ -191,9 +188,8 @@ class GetStatsResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int | None = ...,
+        async_id: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___GetStatsResponse = GetStatsResponse
@@ -212,12 +208,13 @@ class GetStatsCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int | None = ...,
+        async_id: builtins.int = ...,
         error: builtins.str | None = ...,
         stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
 
 global___GetStatsCallback = GetStatsCallback
 
@@ -264,19 +261,18 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        sid: builtins.str | None = ...,
-        name: builtins.str | None = ...,
-        kind: global___TrackKind.ValueType | None = ...,
-        source: global___TrackSource.ValueType | None = ...,
-        simulcasted: builtins.bool | None = ...,
-        width: builtins.int | None = ...,
-        height: builtins.int | None = ...,
-        mime_type: builtins.str | None = ...,
-        muted: builtins.bool | None = ...,
-        remote: builtins.bool | None = ...,
-        encryption_type: e2ee_pb2.EncryptionType.ValueType | None = ...,
+        sid: builtins.str = ...,
+        name: builtins.str = ...,
+        kind: global___TrackKind.ValueType = ...,
+        source: global___TrackSource.ValueType = ...,
+        simulcasted: builtins.bool = ...,
+        width: builtins.int = ...,
+        height: builtins.int = ...,
+        mime_type: builtins.str = ...,
+        muted: builtins.bool = ...,
+        remote: builtins.bool = ...,
+        encryption_type: e2ee_pb2.EncryptionType.ValueType = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
 global___TrackPublicationInfo = TrackPublicationInfo
@@ -321,14 +317,13 @@ class TrackInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        sid: builtins.str | None = ...,
-        name: builtins.str | None = ...,
-        kind: global___TrackKind.ValueType | None = ...,
-        stream_state: global___StreamState.ValueType | None = ...,
-        muted: builtins.bool | None = ...,
-        remote: builtins.bool | None = ...,
+        sid: builtins.str = ...,
+        name: builtins.str = ...,
+        kind: global___TrackKind.ValueType = ...,
+        stream_state: global___StreamState.ValueType = ...,
+        muted: builtins.bool = ...,
+        remote: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> None: ...
 
 global___TrackInfo = TrackInfo
@@ -367,10 +362,9 @@ class LocalTrackMuteRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
-        mute: builtins.bool | None = ...,
+        track_handle: builtins.int = ...,
+        mute: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
 
 global___LocalTrackMuteRequest = LocalTrackMuteRequest
@@ -384,9 +378,8 @@ class LocalTrackMuteResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        muted: builtins.bool | None = ...,
+        muted: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["muted", b"muted"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["muted", b"muted"]) -> None: ...
 
 global___LocalTrackMuteResponse = LocalTrackMuteResponse
@@ -404,10 +397,9 @@ class EnableRemoteTrackRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
-        enabled: builtins.bool | None = ...,
+        track_handle: builtins.int = ...,
+        enabled: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
 
 global___EnableRemoteTrackRequest = EnableRemoteTrackRequest
@@ -421,9 +413,8 @@ class EnableRemoteTrackResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        enabled: builtins.bool | None = ...,
+        enabled: builtins.bool = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["enabled", b"enabled"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
 global___EnableRemoteTrackResponse = EnableRemoteTrackResponse
