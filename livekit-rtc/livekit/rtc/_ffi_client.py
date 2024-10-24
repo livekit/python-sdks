@@ -212,7 +212,7 @@ class FfiClient:
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
         ffi_lib.livekit_ffi_initialize(
-            ffi_event_callback, True, b"python", __version__.encode("utf-8")
+            ffi_event_callback, True, b"python", __version__.encode("ascii")
         )
 
         @atexit.register
