@@ -18,6 +18,7 @@ import sys
 from contextlib import ExitStack
 import ctypes
 import importlib.resources
+from .version import __version__
 import logging
 import os
 import platform
@@ -61,7 +62,12 @@ ffi_lib = get_ffi_lib()
 ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
 
 # C function types
-ffi_lib.livekit_ffi_initialize.argtypes = [ffi_cb_fnc, ctypes.c_bool]
+ffi_lib.livekit_ffi_initialize.argtypes = [
+    ffi_cb_fnc,
+    ctypes.c_bool,
+    ctypes.c_char_p,
+    ctypes.c_char_p,
+]
 
 ffi_lib.livekit_ffi_request.argtypes = [
     ctypes.POINTER(ctypes.c_ubyte),
@@ -205,7 +211,9 @@ class FfiClient:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
-        ffi_lib.livekit_ffi_initialize(ffi_event_callback, True)
+        ffi_lib.livekit_ffi_initialize(
+            ffi_event_callback, True, b"python", __version__.encode("ascii")
+        )
 
         @atexit.register
         def _dispose_lk_ffi():
