@@ -193,11 +193,11 @@ class ConnectRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        url: builtins.str = ...,
-        token: builtins.str = ...,
+        url: builtins.str | None = ...,
+        token: builtins.str | None = ...,
         options: global___RoomOptions | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["options", b"options"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["options", b"options", "token", b"token", "url", b"url"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["options", b"options", "token", b"token", "url", b"url"]) -> None: ...
 
 global___ConnectRequest = ConnectRequest
@@ -211,8 +211,9 @@ class ConnectResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___ConnectResponse = ConnectResponse
@@ -244,31 +245,46 @@ class ConnectCallback(google.protobuf.message.Message):
         def HasField(self, field_name: typing.Literal["participant", b"participant"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["participant", b"participant", "publications", b"publications"]) -> None: ...
 
+    @typing.final
+    class Result(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        ROOM_FIELD_NUMBER: builtins.int
+        LOCAL_PARTICIPANT_FIELD_NUMBER: builtins.int
+        PARTICIPANTS_FIELD_NUMBER: builtins.int
+        @property
+        def room(self) -> global___OwnedRoom: ...
+        @property
+        def local_participant(self) -> participant_pb2.OwnedParticipant: ...
+        @property
+        def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConnectCallback.ParticipantWithTracks]: ...
+        def __init__(
+            self,
+            *,
+            room: global___OwnedRoom | None = ...,
+            local_participant: participant_pb2.OwnedParticipant | None = ...,
+            participants: collections.abc.Iterable[global___ConnectCallback.ParticipantWithTracks] | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["local_participant", b"local_participant", "room", b"room"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["local_participant", b"local_participant", "participants", b"participants", "room", b"room"]) -> None: ...
+
     ASYNC_ID_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
-    ROOM_FIELD_NUMBER: builtins.int
-    LOCAL_PARTICIPANT_FIELD_NUMBER: builtins.int
-    PARTICIPANTS_FIELD_NUMBER: builtins.int
+    RESULT_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     error: builtins.str
     @property
-    def room(self) -> global___OwnedRoom: ...
-    @property
-    def local_participant(self) -> participant_pb2.OwnedParticipant: ...
-    @property
-    def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConnectCallback.ParticipantWithTracks]: ...
+    def result(self) -> global___ConnectCallback.Result: ...
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
-        room: global___OwnedRoom | None = ...,
-        local_participant: participant_pb2.OwnedParticipant | None = ...,
-        participants: collections.abc.Iterable[global___ConnectCallback.ParticipantWithTracks] | None = ...,
+        result: global___ConnectCallback.Result | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "local_participant", b"local_participant", "room", b"room"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "local_participant", b"local_participant", "participants", b"participants", "room", b"room"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "result"] | None: ...
 
 global___ConnectCallback = ConnectCallback
 
@@ -283,8 +299,9 @@ class DisconnectRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
+        room_handle: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
 
 global___DisconnectRequest = DisconnectRequest
@@ -298,8 +315,9 @@ class DisconnectResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___DisconnectResponse = DisconnectResponse
@@ -313,8 +331,9 @@ class DisconnectCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___DisconnectCallback = DisconnectCallback
@@ -335,11 +354,11 @@ class PublishTrackRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        track_handle: builtins.int = ...,
+        local_participant_handle: builtins.int | None = ...,
+        track_handle: builtins.int | None = ...,
         options: global___TrackPublishOptions | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["options", b"options"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "track_handle", b"track_handle"]) -> None: ...
 
 global___PublishTrackRequest = PublishTrackRequest
@@ -353,8 +372,9 @@ class PublishTrackResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___PublishTrackResponse = PublishTrackResponse
@@ -373,13 +393,13 @@ class PublishTrackCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
         publication: track_pb2.OwnedTrackPublication | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error", "publication", b"publication"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "publication", b"publication"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "publication"] | None: ...
 
 global___PublishTrackCallback = PublishTrackCallback
 
@@ -398,10 +418,11 @@ class UnpublishTrackRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        track_sid: builtins.str = ...,
-        stop_on_unpublish: builtins.bool = ...,
+        local_participant_handle: builtins.int | None = ...,
+        track_sid: builtins.str | None = ...,
+        stop_on_unpublish: builtins.bool | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]) -> None: ...
 
 global___UnpublishTrackRequest = UnpublishTrackRequest
@@ -415,8 +436,9 @@ class UnpublishTrackResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___UnpublishTrackResponse = UnpublishTrackResponse
@@ -432,12 +454,11 @@ class UnpublishTrackCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___UnpublishTrackCallback = UnpublishTrackCallback
 
@@ -466,17 +487,16 @@ class PublishDataRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        data_ptr: builtins.int = ...,
-        data_len: builtins.int = ...,
-        reliable: builtins.bool = ...,
+        local_participant_handle: builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        data_len: builtins.int | None = ...,
+        reliable: builtins.bool | None = ...,
         destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
         topic: builtins.str | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_topic", b"_topic", "topic", b"topic"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_topic", b"_topic", "data_len", b"data_len", "data_ptr", b"data_ptr", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "topic", b"topic"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_topic", b"_topic"]) -> typing.Literal["topic"] | None: ...
+    def HasField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "topic", b"topic"]) -> None: ...
 
 global___PublishDataRequest = PublishDataRequest
 
@@ -489,8 +509,9 @@ class PublishDataResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___PublishDataResponse = PublishDataResponse
@@ -506,12 +527,11 @@ class PublishDataCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___PublishDataCallback = PublishDataCallback
 
@@ -533,11 +553,12 @@ class PublishTranscriptionRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        participant_identity: builtins.str = ...,
-        track_id: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_id: builtins.str | None = ...,
         segments: collections.abc.Iterable[global___TranscriptionSegment] | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "track_id", b"track_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "segments", b"segments", "track_id", b"track_id"]) -> None: ...
 
 global___PublishTranscriptionRequest = PublishTranscriptionRequest
@@ -551,8 +572,9 @@ class PublishTranscriptionResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___PublishTranscriptionResponse = PublishTranscriptionResponse
@@ -568,12 +590,11 @@ class PublishTranscriptionCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___PublishTranscriptionCallback = PublishTranscriptionCallback
 
@@ -595,11 +616,12 @@ class PublishSipDtmfRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        code: builtins.int = ...,
-        digit: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        code: builtins.int | None = ...,
+        digit: builtins.str | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "digit", b"digit", "local_participant_handle", b"local_participant_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["code", b"code", "destination_identities", b"destination_identities", "digit", b"digit", "local_participant_handle", b"local_participant_handle"]) -> None: ...
 
 global___PublishSipDtmfRequest = PublishSipDtmfRequest
@@ -613,8 +635,9 @@ class PublishSipDtmfResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___PublishSipDtmfResponse = PublishSipDtmfResponse
@@ -630,12 +653,11 @@ class PublishSipDtmfCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___PublishSipDtmfCallback = PublishSipDtmfCallback
 
@@ -652,9 +674,10 @@ class SetLocalMetadataRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        metadata: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata"]) -> None: ...
 
 global___SetLocalMetadataRequest = SetLocalMetadataRequest
@@ -668,8 +691,9 @@ class SetLocalMetadataResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___SetLocalMetadataResponse = SetLocalMetadataResponse
@@ -685,12 +709,11 @@ class SetLocalMetadataCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___SetLocalMetadataCallback = SetLocalMetadataCallback
 
@@ -710,14 +733,13 @@ class SendChatMessageRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        message: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        message: builtins.str | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         sender_identity: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "message", b"message", "sender_identity", b"sender_identity"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_sender_identity", b"_sender_identity"]) -> typing.Literal["sender_identity"] | None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "message", b"message", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "message", b"message", "sender_identity", b"sender_identity"]) -> None: ...
 
 global___SendChatMessageRequest = SendChatMessageRequest
 
@@ -740,15 +762,14 @@ class EditChatMessageRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        edit_text: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        edit_text: builtins.str | None = ...,
         original_message: global___ChatMessage | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         sender_identity: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_sender_identity", b"_sender_identity", "destination_identities", b"destination_identities", "edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_sender_identity", b"_sender_identity"]) -> typing.Literal["sender_identity"] | None: ...
+    def HasField(self, field_name: typing.Literal["edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "sender_identity", b"sender_identity"]) -> None: ...
 
 global___EditChatMessageRequest = EditChatMessageRequest
 
@@ -761,8 +782,9 @@ class SendChatMessageResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___SendChatMessageResponse = SendChatMessageResponse
@@ -781,16 +803,13 @@ class SendChatMessageCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
         chat_message: global___ChatMessage | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_chat_message", b"_chat_message", "_error", b"_error", "chat_message", b"chat_message", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_chat_message", b"_chat_message", "_error", b"_error", "async_id", b"async_id", "chat_message", b"chat_message", "error", b"error"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_chat_message", b"_chat_message"]) -> typing.Literal["chat_message"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "chat_message"] | None: ...
 
 global___SendChatMessageCallback = SendChatMessageCallback
 
@@ -800,36 +819,40 @@ class SetLocalAttributesRequest(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @typing.final
-    class AttributesEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: builtins.str
-        value: builtins.str
-        def __init__(
-            self,
-            *,
-            key: builtins.str = ...,
-            value: builtins.str = ...,
-        ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
-
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     @property
-    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "local_participant_handle", b"local_participant_handle"]) -> None: ...
 
 global___SetLocalAttributesRequest = SetLocalAttributesRequest
+
+@typing.final
+class AttributesEntry(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    KEY_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    key: builtins.str
+    value: builtins.str
+    def __init__(
+        self,
+        *,
+        key: builtins.str | None = ...,
+        value: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
+global___AttributesEntry = AttributesEntry
 
 @typing.final
 class SetLocalAttributesResponse(google.protobuf.message.Message):
@@ -840,8 +863,9 @@ class SetLocalAttributesResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___SetLocalAttributesResponse = SetLocalAttributesResponse
@@ -857,12 +881,11 @@ class SetLocalAttributesCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___SetLocalAttributesCallback = SetLocalAttributesCallback
 
@@ -879,9 +902,10 @@ class SetLocalNameRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int = ...,
-        name: builtins.str = ...,
+        local_participant_handle: builtins.int | None = ...,
+        name: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name"]) -> None: ...
 
 global___SetLocalNameRequest = SetLocalNameRequest
@@ -895,8 +919,9 @@ class SetLocalNameResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___SetLocalNameResponse = SetLocalNameResponse
@@ -912,12 +937,11 @@ class SetLocalNameCallback(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___SetLocalNameCallback = SetLocalNameCallback
 
@@ -934,9 +958,10 @@ class SetSubscribedRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        subscribe: builtins.bool = ...,
-        publication_handle: builtins.int = ...,
+        subscribe: builtins.bool | None = ...,
+        publication_handle: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]) -> None: ...
 
 global___SetSubscribedRequest = SetSubscribedRequest
@@ -960,8 +985,9 @@ class GetSessionStatsRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
+        room_handle: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
 
 global___GetSessionStatsRequest = GetSessionStatsRequest
@@ -975,8 +1001,9 @@ class GetSessionStatsResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___GetSessionStatsResponse = GetSessionStatsResponse
@@ -985,27 +1012,41 @@ global___GetSessionStatsResponse = GetSessionStatsResponse
 class GetSessionStatsCallback(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class Result(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        PUBLISHER_STATS_FIELD_NUMBER: builtins.int
+        SUBSCRIBER_STATS_FIELD_NUMBER: builtins.int
+        @property
+        def publisher_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+        @property
+        def subscriber_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+        def __init__(
+            self,
+            *,
+            publisher_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+            subscriber_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing.Literal["publisher_stats", b"publisher_stats", "subscriber_stats", b"subscriber_stats"]) -> None: ...
+
     ASYNC_ID_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
-    PUBLISHER_STATS_FIELD_NUMBER: builtins.int
-    SUBSCRIBER_STATS_FIELD_NUMBER: builtins.int
+    RESULT_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     error: builtins.str
     @property
-    def publisher_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
-    @property
-    def subscriber_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+    def result(self) -> global___GetSessionStatsCallback.Result: ...
     def __init__(
         self,
         *,
-        async_id: builtins.int = ...,
+        async_id: builtins.int | None = ...,
         error: builtins.str | None = ...,
-        publisher_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
-        subscriber_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+        result: global___GetSessionStatsCallback.Result | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_error", b"_error", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_error", b"_error", "async_id", b"async_id", "error", b"error", "publisher_stats", b"publisher_stats", "subscriber_stats", b"subscriber_stats"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_error", b"_error"]) -> typing.Literal["error"] | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "result"] | None: ...
 
 global___GetSessionStatsCallback = GetSessionStatsCallback
 
@@ -1024,9 +1065,10 @@ class VideoEncoding(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        max_bitrate: builtins.int = ...,
-        max_framerate: builtins.float = ...,
+        max_bitrate: builtins.int | None = ...,
+        max_framerate: builtins.float | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]) -> None: ...
 
 global___VideoEncoding = VideoEncoding
@@ -1040,8 +1082,9 @@ class AudioEncoding(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        max_bitrate: builtins.int = ...,
+        max_bitrate: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate"]) -> None: ...
 
 global___AudioEncoding = AudioEncoding
@@ -1075,14 +1118,14 @@ class TrackPublishOptions(google.protobuf.message.Message):
         *,
         video_encoding: global___VideoEncoding | None = ...,
         audio_encoding: global___AudioEncoding | None = ...,
-        video_codec: video_frame_pb2.VideoCodec.ValueType = ...,
-        dtx: builtins.bool = ...,
-        red: builtins.bool = ...,
-        simulcast: builtins.bool = ...,
-        source: track_pb2.TrackSource.ValueType = ...,
-        stream: builtins.str = ...,
+        video_codec: video_frame_pb2.VideoCodec.ValueType | None = ...,
+        dtx: builtins.bool | None = ...,
+        red: builtins.bool | None = ...,
+        simulcast: builtins.bool | None = ...,
+        source: track_pb2.TrackSource.ValueType | None = ...,
+        stream: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
@@ -1102,9 +1145,10 @@ class IceServer(google.protobuf.message.Message):
         self,
         *,
         urls: collections.abc.Iterable[builtins.str] | None = ...,
-        username: builtins.str = ...,
-        password: builtins.str = ...,
+        username: builtins.str | None = ...,
+        password: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["password", b"password", "username", b"username"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["password", b"password", "urls", b"urls", "username", b"username"]) -> None: ...
 
 global___IceServer = IceServer
@@ -1129,12 +1173,8 @@ class RtcConfig(google.protobuf.message.Message):
         continual_gathering_policy: global___ContinualGatheringPolicy.ValueType | None = ...,
         ice_servers: collections.abc.Iterable[global___IceServer] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_continual_gathering_policy", b"_continual_gathering_policy", "_ice_transport_type", b"_ice_transport_type", "continual_gathering_policy", b"continual_gathering_policy", "ice_transport_type", b"ice_transport_type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_continual_gathering_policy", b"_continual_gathering_policy", "_ice_transport_type", b"_ice_transport_type", "continual_gathering_policy", b"continual_gathering_policy", "ice_servers", b"ice_servers", "ice_transport_type", b"ice_transport_type"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_continual_gathering_policy", b"_continual_gathering_policy"]) -> typing.Literal["continual_gathering_policy"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_ice_transport_type", b"_ice_transport_type"]) -> typing.Literal["ice_transport_type"] | None: ...
+    def HasField(self, field_name: typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_transport_type", b"ice_transport_type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_servers", b"ice_servers", "ice_transport_type", b"ice_transport_type"]) -> None: ...
 
 global___RtcConfig = RtcConfig
 
@@ -1161,19 +1201,15 @@ class RoomOptions(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        auto_subscribe: builtins.bool = ...,
-        adaptive_stream: builtins.bool = ...,
-        dynacast: builtins.bool = ...,
+        auto_subscribe: builtins.bool | None = ...,
+        adaptive_stream: builtins.bool | None = ...,
+        dynacast: builtins.bool | None = ...,
         e2ee: e2ee_pb2.E2eeOptions | None = ...,
         rtc_config: global___RtcConfig | None = ...,
-        join_retries: builtins.int = ...,
+        join_retries: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "e2ee", b"e2ee", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_e2ee", b"_e2ee", "_rtc_config", b"_rtc_config", "adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_e2ee", b"_e2ee"]) -> typing.Literal["e2ee"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_rtc_config", b"_rtc_config"]) -> typing.Literal["rtc_config"] | None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> None: ...
 
 global___RoomOptions = RoomOptions
 
@@ -1196,13 +1232,14 @@ class TranscriptionSegment(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        id: builtins.str = ...,
-        text: builtins.str = ...,
-        start_time: builtins.int = ...,
-        end_time: builtins.int = ...,
-        final: builtins.bool = ...,
-        language: builtins.str = ...,
+        id: builtins.str | None = ...,
+        text: builtins.str | None = ...,
+        start_time: builtins.int | None = ...,
+        end_time: builtins.int | None = ...,
+        final: builtins.bool | None = ...,
+        language: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]) -> None: ...
 
 global___TranscriptionSegment = TranscriptionSegment
@@ -1218,9 +1255,10 @@ class BufferInfo(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        data_ptr: builtins.int = ...,
-        data_len: builtins.int = ...,
+        data_ptr: builtins.int | None = ...,
+        data_len: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> None: ...
 
 global___BufferInfo = BufferInfo
@@ -1343,7 +1381,7 @@ class RoomEvent(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        room_handle: builtins.int = ...,
+        room_handle: builtins.int | None = ...,
         participant_connected: global___ParticipantConnected | None = ...,
         participant_disconnected: global___ParticipantDisconnected | None = ...,
         local_track_published: global___LocalTrackPublished | None = ...,
@@ -1373,7 +1411,7 @@ class RoomEvent(google.protobuf.message.Message):
         transcription_received: global___TranscriptionReceived | None = ...,
         chat_message: global___ChatMessageReceived | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message"] | None: ...
 
@@ -1393,12 +1431,11 @@ class RoomInfo(google.protobuf.message.Message):
         self,
         *,
         sid: builtins.str | None = ...,
-        name: builtins.str = ...,
-        metadata: builtins.str = ...,
+        name: builtins.str | None = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_sid", b"_sid", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_sid", b"_sid", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_sid", b"_sid"]) -> typing.Literal["sid"] | None: ...
+    def HasField(self, field_name: typing.Literal["metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___RoomInfo = RoomInfo
 
@@ -1449,8 +1486,9 @@ class ParticipantDisconnected(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantDisconnected = ParticipantDisconnected
@@ -1467,8 +1505,9 @@ class LocalTrackPublished(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        track_sid: builtins.str = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> None: ...
 
 global___LocalTrackPublished = LocalTrackPublished
@@ -1482,8 +1521,9 @@ class LocalTrackUnpublished(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        publication_sid: builtins.str = ...,
+        publication_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["publication_sid", b"publication_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["publication_sid", b"publication_sid"]) -> None: ...
 
 global___LocalTrackUnpublished = LocalTrackUnpublished
@@ -1497,8 +1537,9 @@ class LocalTrackSubscribed(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        track_sid: builtins.str = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> None: ...
 
 global___LocalTrackSubscribed = LocalTrackSubscribed
@@ -1515,10 +1556,10 @@ class TrackPublished(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
         publication: track_pb2.OwnedTrackPublication | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["publication", b"publication"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]) -> None: ...
 
 global___TrackPublished = TrackPublished
@@ -1534,9 +1575,10 @@ class TrackUnpublished(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        publication_sid: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        publication_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]) -> None: ...
 
 global___TrackUnpublished = TrackUnpublished
@@ -1557,10 +1599,10 @@ class TrackSubscribed(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
         track: track_pb2.OwnedTrack | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track", b"track"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track", b"track"]) -> None: ...
 
 global___TrackSubscribed = TrackSubscribed
@@ -1577,9 +1619,10 @@ class TrackUnsubscribed(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        track_sid: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackUnsubscribed = TrackUnsubscribed
@@ -1597,10 +1640,11 @@ class TrackSubscriptionFailed(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        track_sid: builtins.str = ...,
-        error: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackSubscriptionFailed = TrackSubscriptionFailed
@@ -1616,9 +1660,10 @@ class TrackMuted(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        track_sid: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackMuted = TrackMuted
@@ -1634,9 +1679,10 @@ class TrackUnmuted(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        track_sid: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
 global___TrackUnmuted = TrackUnmuted
@@ -1653,9 +1699,10 @@ class E2eeStateChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        state: e2ee_pb2.EncryptionState.ValueType = ...,
+        participant_identity: builtins.str | None = ...,
+        state: e2ee_pb2.EncryptionState.ValueType | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "state", b"state"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "state", b"state"]) -> None: ...
 
 global___E2eeStateChanged = E2eeStateChanged
@@ -1685,8 +1732,9 @@ class RoomMetadataChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        metadata: builtins.str = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["metadata", b"metadata"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["metadata", b"metadata"]) -> None: ...
 
 global___RoomMetadataChanged = RoomMetadataChanged
@@ -1700,8 +1748,9 @@ class RoomSidChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        sid: builtins.str = ...,
+        sid: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["sid", b"sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["sid", b"sid"]) -> None: ...
 
 global___RoomSidChanged = RoomSidChanged
@@ -1717,9 +1766,10 @@ class ParticipantMetadataChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        metadata: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantMetadataChanged = ParticipantMetadataChanged
@@ -1728,53 +1778,22 @@ global___ParticipantMetadataChanged = ParticipantMetadataChanged
 class ParticipantAttributesChanged(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @typing.final
-    class AttributesEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: builtins.str
-        value: builtins.str
-        def __init__(
-            self,
-            *,
-            key: builtins.str = ...,
-            value: builtins.str = ...,
-        ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
-
-    @typing.final
-    class ChangedAttributesEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: builtins.str
-        value: builtins.str
-        def __init__(
-            self,
-            *,
-            key: builtins.str = ...,
-            value: builtins.str = ...,
-        ) -> None: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
-
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
     CHANGED_ATTRIBUTES_FIELD_NUMBER: builtins.int
     participant_identity: builtins.str
     @property
-    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
     @property
-    def changed_attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def changed_attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
-        changed_attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        participant_identity: builtins.str | None = ...,
+        attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
+        changed_attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "changed_attributes", b"changed_attributes", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantAttributesChanged = ParticipantAttributesChanged
@@ -1790,9 +1809,10 @@ class ParticipantNameChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        name: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
+        name: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["name", b"name", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantNameChanged = ParticipantNameChanged
@@ -1808,9 +1828,10 @@ class ConnectionQualityChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        participant_identity: builtins.str = ...,
-        quality: global___ConnectionQuality.ValueType = ...,
+        participant_identity: builtins.str | None = ...,
+        quality: global___ConnectionQuality.ValueType | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]) -> None: ...
 
 global___ConnectionQualityChanged = ConnectionQualityChanged
@@ -1830,9 +1851,8 @@ class UserPacket(google.protobuf.message.Message):
         data: global___OwnedBuffer | None = ...,
         topic: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_topic", b"_topic", "data", b"data", "topic", b"topic"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_topic", b"_topic", "data", b"data", "topic", b"topic"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_topic", b"_topic"]) -> typing.Literal["topic"] | None: ...
+    def HasField(self, field_name: typing.Literal["data", b"data", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data", b"data", "topic", b"topic"]) -> None: ...
 
 global___UserPacket = UserPacket
 
@@ -1855,21 +1875,15 @@ class ChatMessage(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        id: builtins.str = ...,
-        timestamp: builtins.int = ...,
-        message: builtins.str = ...,
+        id: builtins.str | None = ...,
+        timestamp: builtins.int | None = ...,
+        message: builtins.str | None = ...,
         edit_timestamp: builtins.int | None = ...,
         deleted: builtins.bool | None = ...,
         generated: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_deleted", b"_deleted", "_edit_timestamp", b"_edit_timestamp", "_generated", b"_generated", "deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_deleted", b"_deleted", "_edit_timestamp", b"_edit_timestamp", "_generated", b"_generated", "deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_deleted", b"_deleted"]) -> typing.Literal["deleted"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_edit_timestamp", b"_edit_timestamp"]) -> typing.Literal["edit_timestamp"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_generated", b"_generated"]) -> typing.Literal["generated"] | None: ...
+    def HasField(self, field_name: typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> None: ...
 
 global___ChatMessage = ChatMessage
 
@@ -1886,9 +1900,9 @@ class ChatMessageReceived(google.protobuf.message.Message):
         self,
         *,
         message: global___ChatMessage | None = ...,
-        participant_identity: builtins.str = ...,
+        participant_identity: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["message", b"message"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["message", b"message", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["message", b"message", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ChatMessageReceived = ChatMessageReceived
@@ -1904,12 +1918,11 @@ class SipDTMF(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        code: builtins.int = ...,
+        code: builtins.int | None = ...,
         digit: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_digit", b"_digit", "digit", b"digit"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_digit", b"_digit", "code", b"code", "digit", b"digit"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["_digit", b"_digit"]) -> typing.Literal["digit"] | None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "digit", b"digit"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "digit", b"digit"]) -> None: ...
 
 global___SipDTMF = SipDTMF
 
@@ -1931,12 +1944,12 @@ class DataPacketReceived(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        kind: global___DataPacketKind.ValueType = ...,
-        participant_identity: builtins.str = ...,
+        kind: global___DataPacketKind.ValueType | None = ...,
+        participant_identity: builtins.str | None = ...,
         user: global___UserPacket | None = ...,
         sip_dtmf: global___SipDTMF | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["value", b"value"]) -> typing.Literal["user", "sip_dtmf"] | None: ...
 
@@ -1960,12 +1973,8 @@ class TranscriptionReceived(google.protobuf.message.Message):
         track_sid: builtins.str | None = ...,
         segments: collections.abc.Iterable[global___TranscriptionSegment] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["_participant_identity", b"_participant_identity", "_track_sid", b"_track_sid", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["_participant_identity", b"_participant_identity", "_track_sid", b"_track_sid", "participant_identity", b"participant_identity", "segments", b"segments", "track_sid", b"track_sid"]) -> None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_participant_identity", b"_participant_identity"]) -> typing.Literal["participant_identity"] | None: ...
-    @typing.overload
-    def WhichOneof(self, oneof_group: typing.Literal["_track_sid", b"_track_sid"]) -> typing.Literal["track_sid"] | None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "segments", b"segments", "track_sid", b"track_sid"]) -> None: ...
 
 global___TranscriptionReceived = TranscriptionReceived
 
@@ -1978,8 +1987,9 @@ class ConnectionStateChanged(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        state: global___ConnectionState.ValueType = ...,
+        state: global___ConnectionState.ValueType | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["state", b"state"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["state", b"state"]) -> None: ...
 
 global___ConnectionStateChanged = ConnectionStateChanged
@@ -2003,8 +2013,9 @@ class Disconnected(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        reason: global___DisconnectReason.ValueType = ...,
+        reason: global___DisconnectReason.ValueType | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reason", b"reason"]) -> None: ...
 
 global___Disconnected = Disconnected
