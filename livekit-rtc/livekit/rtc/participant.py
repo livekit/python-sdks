@@ -285,7 +285,7 @@ class LocalParticipant(Participant):
 
         return cb.perform_rpc.payload
 
-    async def register_rpc_method(
+    def register_rpc_method(
         self,
         method: str,
         handler: Callable[[str, str, str, int], Awaitable[str]],
@@ -330,18 +330,9 @@ class LocalParticipant(Participant):
         req.register_rpc_method.local_participant_handle = self._ffi_handle.handle
         req.register_rpc_method.method = method
 
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            await queue.wait_for(
-                lambda e: (
-                    e.register_rpc_method.async_id == resp.register_rpc_method.async_id
-                )
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+        FfiClient.instance.request(req)
 
-    async def unregister_rpc_method(self, method: str) -> None:
+    def unregister_rpc_method(self, method: str) -> None:
         """
         Unregisters a previously registered RPC method.
 
@@ -354,17 +345,7 @@ class LocalParticipant(Participant):
         req.unregister_rpc_method.local_participant_handle = self._ffi_handle.handle
         req.unregister_rpc_method.method = method
 
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            await queue.wait_for(
-                lambda e: (
-                    e.unregister_rpc_method.async_id
-                    == resp.unregister_rpc_method.async_id
-                )
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+        FfiClient.instance.request(req)
 
     async def _handle_rpc_method_invocation(
         self,
@@ -408,20 +389,8 @@ class LocalParticipant(Participant):
 
         res = FfiClient.instance.request(req)
 
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            cb = await queue.wait_for(
-                lambda e: (
-                    e.rpc_method_invocation_response.async_id
-                    == res.rpc_method_invocation_response.async_id
-                )
-            )
-            if cb.rpc_method_invocation_response.error:
-                print(
-                    f"error sending rpc method invocation response: {cb.rpc_method_invocation_response.error}"
-                )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+        if res.error:
+            print(f"error sending rpc method invocation response: {res.error}")
 
     async def set_metadata(self, metadata: str) -> None:
         """
