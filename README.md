@@ -128,6 +128,58 @@ def on_message_received(msg: rtc.ChatMessage):
 await chat.send_message("hello world")
 ```
 
+
+### RPC
+
+Perform your own predefined method calls from one participant to another. 
+
+This feature is especially powerful when used with [Agents](https://docs.livekit.io/agents), for instance to forward LLM function calls to your client application.
+
+#### Registering an RPC method
+
+The participant who implements the method and will receive its calls must first register support:
+
+```python
+async def handle_greet(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int):
+    print(f"Received greeting from {caller_identity}: {payload}")
+    return f"Hello, {caller_identity}!"
+
+room.local_participant.register_rpc_method(
+   # method name - can be any string that makes sense for your application
+  'greet',
+
+  # method handler - will be called when the method is invoked by a RemoteParticipant
+  handle_greet
+)
+```
+
+In addition to the payload, your handler will also receive `response_timeout_ms`, which informs you the maximum time available to return a response. If you are unable to respond in time, the call will result in an error on the caller's side.
+
+#### Performing an RPC request
+
+The caller may then initiate an RPC call like so:
+
+```python
+try:
+  response = await room.local_participant.perform_rpc(
+    'recipient-identity',
+    'greet',
+    'Hello from RPC!'
+  )
+  print('RPC response:', response)
+except Exception as e:
+  print('RPC call failed:', e)
+```
+
+You may find it useful to adjust the `response_timeout_ms` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
+
+#### Errors
+
+LiveKit is a dynamic realtime environment and calls can fail for various reasons. 
+
+You may throw errors of the type `RpcError` with a string `message` in an RPC method handler and they will be received on the caller's side with the message intact. Other errors will not be transmitted and will instead arrive to the caller as `1500` ("Application Error"). Other built-in errors are detailed in `RpcError`.
+
+
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)

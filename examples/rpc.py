@@ -26,7 +26,7 @@ async def main():
     )
 
     # Register all methods for the receiving participant
-    await register_receiver_methods(greeters_room, math_genius_room)
+    register_receiver_methods(greeters_room, math_genius_room)
 
     try:
         print("\n\nRunning greeting example...")
@@ -56,7 +56,7 @@ async def main():
     print("Participants disconnected. Example completed.")
 
 
-async def register_receiver_methods(
+def register_receiver_methods(
     greeters_room: rtc.Room, math_genius_room: rtc.Room
 ):
     async def arrival_method(
@@ -104,11 +104,11 @@ async def register_receiver_methods(
         result = dividend / divisor
         return json.dumps({"result": result})
 
-    await greeters_room.local_participant.register_rpc_method("arrival", arrival_method)
-    await math_genius_room.local_participant.register_rpc_method(
+    greeters_room.local_participant.register_rpc_method("arrival", arrival_method)
+    math_genius_room.local_participant.register_rpc_method(
         "square-root", square_root_method
     )
-    await math_genius_room.local_participant.register_rpc_method(
+    math_genius_room.local_participant.register_rpc_method(
         "divide", divide_method
     )
 

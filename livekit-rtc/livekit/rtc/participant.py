@@ -381,6 +381,7 @@ class LocalParticipant(Participant):
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
+                local_participant_handle=self._ffi_handle.handle,
                 invocation_id=invocation_id,
                 error=response_error.to_proto() if response_error else None,
                 payload=response_payload,
@@ -389,8 +390,10 @@ class LocalParticipant(Participant):
 
         res = FfiClient.instance.request(req)
 
-        if res.error:
-            print(f"error sending rpc method invocation response: {res.error}")
+        if res.rpc_method_invocation_response.error:
+            print(
+                f"error sending rpc method invocation response: {res.rpc_method_invocation_response.error}"
+            )
 
     async def set_metadata(self, metadata: str) -> None:
         """
