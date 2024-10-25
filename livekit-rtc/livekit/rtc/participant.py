@@ -331,11 +331,11 @@ class LocalParticipant(Participant):
         req.register_rpc_method.method = method
 
         FfiClient.instance.request(req)
-    
+
     def rpc_method(self, method: str):
         """
         Decorator form of `register_rpc_method`
-        
+
         Args:
             method (str): The name of the indicated RPC method
 
@@ -348,9 +348,11 @@ class LocalParticipant(Participant):
         See Also:
             `register_rpc_method` for more details
         """
+
         def decorator(handler: Callable[[str, str, str, int], Awaitable[str]]):
             self.register_rpc_method(method, handler)
             return handler
+
         return decorator
 
     def unregister_rpc_method(self, method: str) -> None:

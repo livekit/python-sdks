@@ -104,6 +104,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         result = dividend / divisor
         return json.dumps({"result": result})
 
+
 async def perform_greeting(room: rtc.Room):
     print("[Caller] Letting the greeter know that I've arrived")
     try:
