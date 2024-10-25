@@ -72,6 +72,7 @@ from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .utils import combine_audio_frames
+from .rpc import RpcError
 
 __all__ = [
     "ConnectionQuality",
@@ -132,6 +133,7 @@ __all__ = [
     "ChatMessage",
     "AudioResampler",
     "AudioResamplerQuality",
+    "RpcError",
     "EventEmitter",
     "combine_audio_frames",
     "__version__",
