@@ -56,9 +56,7 @@ async def main():
     print("Participants disconnected. Example completed.")
 
 
-def register_receiver_methods(
-    greeters_room: rtc.Room, math_genius_room: rtc.Room
-):
+def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Room):
     async def arrival_method(
         request_id: str,
         caller_identity: str,
@@ -108,9 +106,7 @@ def register_receiver_methods(
     math_genius_room.local_participant.register_rpc_method(
         "square-root", square_root_method
     )
-    math_genius_room.local_participant.register_rpc_method(
-        "divide", divide_method
-    )
+    math_genius_room.local_participant.register_rpc_method("divide", divide_method)
 
 
 async def perform_greeting(room: rtc.Room):
