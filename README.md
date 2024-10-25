@@ -166,9 +166,9 @@ try:
     'greet',
     'Hello from RPC!'
   )
-  print('RPC response:', response)
+  print(f"RPC response: {response}")
 except Exception as e:
-  print('RPC call failed:', e)
+  print(f"RPC call failed: {e}")
 ```
 
 You may find it useful to adjust the `response_timeout_ms` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
