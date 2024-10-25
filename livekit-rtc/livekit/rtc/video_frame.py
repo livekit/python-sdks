@@ -169,7 +169,7 @@ class VideoFrame:
             VideoFrame: A new VideoFrame object in the specified format.
 
         Raises:
-            Exception: If there is an error during the conversion process.
+            Exception: If the conversion isn't supported.
 
         Example:
             Convert a frame from RGBA to I420 format:
