@@ -140,17 +140,10 @@ This feature is especially powerful when used with [Agents](https://docs.livekit
 The participant who implements the method and will receive its calls must first register support:
 
 ```python
+@room.local_participant.rpc_method("greet")
 async def handle_greet(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int):
     print(f"Received greeting from {caller_identity}: {payload}")
     return f"Hello, {caller_identity}!"
-
-room.local_participant.register_rpc_method(
-   # method name - can be any string that makes sense for your application
-  'greet',
-
-  # method handler - will be called when the method is invoked by a RemoteParticipant
-  handle_greet
-)
 ```
 
 In addition to the payload, your handler will also receive `response_timeout_ms`, which informs you the maximum time available to return a response. If you are unable to respond in time, the call will result in an error on the caller's side.

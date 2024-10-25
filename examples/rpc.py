@@ -25,7 +25,6 @@ async def main():
         connect_participant("math-genius", room_name),
     )
 
-    # Register all methods for the receiving participant
     register_receiver_methods(greeters_room, math_genius_room)
 
     try:
@@ -57,6 +56,7 @@ async def main():
 
 
 def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Room):
+    @greeters_room.local_participant.rpc_method("arrival")
     async def arrival_method(
         request_id: str,
         caller_identity: str,
@@ -67,6 +67,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         await asyncio.sleep(2)
         return "Welcome and have a wonderful day!"
 
+    @math_genius_room.local_participant.rpc_method("square-root")
     async def square_root_method(
         request_id: str,
         caller_identity: str,
@@ -86,6 +87,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         print(f"[Math Genius] Aha! It's {result}")
         return json.dumps({"result": result})
 
+    @math_genius_room.local_participant.rpc_method("divide")
     async def divide_method(
         request_id: str,
         caller_identity: str,
@@ -101,13 +103,6 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
 
         result = dividend / divisor
         return json.dumps({"result": result})
-
-    greeters_room.local_participant.register_rpc_method("arrival", arrival_method)
-    math_genius_room.local_participant.register_rpc_method(
-        "square-root", square_root_method
-    )
-    math_genius_room.local_participant.register_rpc_method("divide", divide_method)
-
 
 async def perform_greeting(room: rtc.Room):
     print("[Caller] Letting the greeter know that I've arrived")
