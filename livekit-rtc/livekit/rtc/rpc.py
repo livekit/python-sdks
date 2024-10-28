@@ -39,6 +39,7 @@ class RpcError(Exception):
         RECIPIENT_NOT_FOUND = 1401
         REQUEST_PAYLOAD_TOO_LARGE = 1402
         UNSUPPORTED_SERVER = 1403
+        UNSUPPORTED_VERSION = 1404
 
     ErrorMessage: ClassVar[Dict[ErrorCode, str]] = {
         ErrorCode.APPLICATION_ERROR: "Application error in method handler",
@@ -51,6 +52,7 @@ class RpcError(Exception):
         ErrorCode.RECIPIENT_NOT_FOUND: "Recipient not found",
         ErrorCode.REQUEST_PAYLOAD_TOO_LARGE: "Request payload too large",
         ErrorCode.UNSUPPORTED_SERVER: "RPC not supported by server",
+        ErrorCode.UNSUPPORTED_VERSION: "Unsupported RPC version",
     }
 
     def __init__(
