@@ -352,7 +352,7 @@ class LocalParticipant(Participant):
             `register_rpc_method` for more details
         """
 
-        def decorator(handler: Callable[[str, str, str, int], Awaitable[str]]):
+        def decorator(handler: Callable[[str, str, str, float], Union[Awaitable[str], str]]):
             self.register_rpc_method(method, handler)
             return handler
 
