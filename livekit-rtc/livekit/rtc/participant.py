@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import ctypes
-from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping
+from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -395,7 +395,7 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    async_handler = handler  # type: Callable[[RpcInvocationData], Awaitable[str]]
+                    async_handler = cast(Callable[[RpcInvocationData], Awaitable[str]], handler)
 
                     async def run_handler():
                         try:
@@ -415,7 +415,7 @@ class LocalParticipant(Participant):
                             RpcError.ErrorCode.RECIPIENT_DISCONNECTED
                         )
                 else:
-                    sync_handler = handler  # type: Callable[[RpcInvocationData], str]
+                    sync_handler = cast(Callable[[RpcInvocationData], str], handler)
                     response_payload = sync_handler(params)
             except RpcError as error:
                 response_error = error
