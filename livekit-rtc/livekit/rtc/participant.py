@@ -37,6 +37,7 @@ from .track_publication import (
 from .transcription import Transcription
 from .rpc import RpcError
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
+from .log import logger
 
 
 class PublishTrackError(Exception):
@@ -394,9 +395,8 @@ class LocalParticipant(Participant):
             except RpcError as error:
                 response_error = error
             except Exception as error:
-                print(
-                    f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.",
-                    error,
+                logger.exception(
+                    f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.  Original error: {error}",
                 )
                 response_error = RpcError._built_in(
                     RpcError.ErrorCode.APPLICATION_ERROR
@@ -414,7 +414,7 @@ class LocalParticipant(Participant):
         res = FfiClient.instance.request(req)
 
         if res.rpc_method_invocation_response.error:
-            print(
+            logger.exception(
                 f"error sending rpc method invocation response: {res.rpc_method_invocation_response.error}"
             )
 
