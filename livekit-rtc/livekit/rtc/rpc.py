@@ -15,6 +15,22 @@
 from typing import Optional, Dict, Union, ClassVar
 from enum import IntEnum
 from ._proto import rpc_pb2 as proto_rpc
+from dataclasses import dataclass
+
+@dataclass
+class RpcHandlerParams:
+    """Parameters passed to method handler for incoming RPC invocations
+    
+    Attributes:
+        request_id (str): The unique request ID. Will match at both sides of the call, useful for debugging or logging.
+        caller_identity (str): The unique participant identity of the caller.
+        payload (str): The payload of the request. User-definable format, typically JSON.
+        response_timeout (float): The maximum time the caller will wait for a response.
+    """
+    request_id: str
+    caller_identity: str
+    payload: str
+    response_timeout: float
 
 
 class RpcError(Exception):

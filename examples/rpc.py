@@ -3,8 +3,7 @@ import os
 import json
 import asyncio
 from dotenv import load_dotenv
-import time
-
+from livekit.rtc.rpc import RpcHandlerParams
 load_dotenv(dotenv_path=".env.local", override=False)
 LIVEKIT_API_KEY = os.getenv("LIVEKIT_API_KEY")
 LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET")
@@ -91,26 +90,20 @@ async def main():
 def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Room):
     @greeters_room.local_participant.rpc_method("arrival")
     async def arrival_method(
-        request_id: str,
-        caller_identity: str,
-        payload: str,
-        response_timeout: float,
+        params: RpcHandlerParams,
     ):
-        print(f'[Greeter] Oh {caller_identity} arrived and said "{payload}"')
+        print(f'[Greeter] Oh {params.caller_identity} arrived and said "{params.payload}"')
         await asyncio.sleep(2)
         return "Welcome and have a wonderful day!"
 
     @math_genius_room.local_participant.rpc_method("square-root")
     async def square_root_method(
-        request_id: str,
-        caller_identity: str,
-        payload: str,
-        response_timeout: float,
+        params: RpcHandlerParams,
     ):
-        json_data = json.loads(payload)
+        json_data = json.loads(params.payload)
         number = json_data["number"]
         print(
-            f"[Math Genius] I guess {caller_identity} wants the square root of {number}. I've only got {response_timeout} seconds to respond but I think I can pull it off."
+            f"[Math Genius] I guess {params.caller_identity} wants the square root of {number}. I've only got {params.response_timeout} seconds to respond but I think I can pull it off."
         )
 
         print("[Math Genius] *doing math*…")
@@ -121,17 +114,14 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         return json.dumps({"result": result})
 
     @math_genius_room.local_participant.rpc_method("divide")
-    def divide_method(
-        request_id: str,
-        caller_identity: str,
-        payload: str,
-        response_timeout: float,
+    async def divide_method(
+        params: RpcHandlerParams,
     ):
-        json_data = json.loads(payload)
+        json_data = json.loads(params.payload)
         dividend = json_data["dividend"]
         divisor = json_data["divisor"]
         print(
-            f"[Math Genius] {caller_identity} wants to divide {dividend} by {divisor}."
+            f"[Math Genius] {params.caller_identity} wants to divide {dividend} by {divisor}."
         )
 
         result = dividend / divisor
@@ -139,14 +129,11 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
 
     @math_genius_room.local_participant.rpc_method("long-calculation")
     async def long_calculation_method(
-        request_id: str,
-        caller_identity: str,
-        payload: str,
-        response_timeout: float,
+        params: RpcHandlerParams,
     ):
-        print(f"[Math Genius] Starting a very long calculation for {caller_identity}")
+        print(f"[Math Genius] Starting a very long calculation for {params.caller_identity}")
         print(
-            f"[Math Genius] This will take 30 seconds even though you're only giving me {response_timeout} seconds"
+            f"[Math Genius] This will take 30 seconds even though you're only giving me {params.response_timeout} seconds"
         )
         await asyncio.sleep(30)
         return json.dumps({"result": "Calculation complete!"})

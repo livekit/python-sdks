@@ -40,6 +40,7 @@ from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
 import asyncio
 
+from .rpc import RpcHandlerParams
 
 class PublishTrackError(Exception):
     def __init__(self, message: str) -> None:
@@ -118,7 +119,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
         self._rpc_handlers: Dict[
-            str, Callable[[str, str, str, float], Union[Awaitable[str], str]]
+            str, Callable[[RpcHandlerParams], Union[Awaitable[str], str]]
         ] = {}
 
     @property
@@ -291,7 +292,7 @@ class LocalParticipant(Participant):
     def register_rpc_method(
         self,
         method: str,
-        handler: Callable[[str, str, str, float], Union[Awaitable[str], str]],
+        handler: Callable[[RpcHandlerParams], Union[Awaitable[str], str]],
     ) -> None:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
@@ -308,20 +309,15 @@ class LocalParticipant(Participant):
             RpcError: On failure. Details in `message`.
 
         Example:
-            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout: float) -> str:
-                print(f"Received greeting from {caller_identity}: {payload}")
-                return f"Hello, {caller_identity}!"
+            async def greet_handler(params: RpcHandlerParams) -> str:
+                print(f"Received greeting from {params.caller_identity}: {params.payload}")
+                return f"Hello, {params.caller_identity}!"
 
             await room.local_participant.register_rpc_method('greet', greet_handler)
 
-        The handler receives the following parameters:
-        - `request_id`: A unique identifier for this RPC request
-        - `caller_identity`: The identity of the RemoteParticipant who initiated the RPC call
-        - `payload`: The data sent by the caller (as a string)
-        - `response_timeout`: The maximum time available to return a response
-
         The handler should return a string or a coroutine that resolves to a string.
-        If unable to respond within `response_timeout`, the request will result in an error on the caller's side.
+        
+        If unable to respond within `response_timeout`, the caller will hang up and receive an error on their side.
 
         You may raise errors of type `RpcError` with a string `message` in the handler,
         and they will be received on the caller's side with the message intact.
@@ -344,16 +340,16 @@ class LocalParticipant(Participant):
 
         Example:
             @local_participant.rpc_method("greet")
-            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout: float) -> str:
-                print(f"Received greeting from {caller_identity}: {payload}")
-                return f"Hello, {caller_identity}!"
+            async def greet_handler(params: RpcHandlerParams) -> str:
+                print(f"Received greeting from {params.caller_identity}: {params.payload}")
+                return f"Hello, {params.caller_identity}!"
 
         See Also:
             `register_rpc_method` for more details
         """
 
         def decorator(
-            handler: Callable[[str, str, str, float], Union[Awaitable[str], str]],
+            handler: Callable[[RpcHandlerParams], Union[Awaitable[str], str]],
         ):
             self.register_rpc_method(method, handler)
             return handler
@@ -386,6 +382,8 @@ class LocalParticipant(Participant):
     ) -> None:
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
+        
+        params = RpcHandlerParams(request_id, caller_identity, payload, response_timeout)
 
         handler = self._rpc_handlers.get(method)
 
@@ -394,13 +392,11 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    async_handler = handler  # type: Callable[[str, str, str, float], Awaitable[str]]
+                    async_handler = handler  # type: Callable[[RpcHandlerParams], Awaitable[str]]
 
                     async def run_handler():
                         try:
-                            return await async_handler(
-                                request_id, caller_identity, payload, response_timeout
-                            )
+                            return await async_handler(params)
                         except asyncio.CancelledError:
                             # This will be caught by the outer try-except if it's due to timeout
                             raise
@@ -416,10 +412,8 @@ class LocalParticipant(Participant):
                             RpcError.ErrorCode.RECIPIENT_DISCONNECTED
                         )
                 else:
-                    sync_handler = handler  # type: Callable[[str, str, str, float], str]
-                    response_payload = sync_handler(
-                        request_id, caller_identity, payload, response_timeout
-                    )
+                    sync_handler = handler  # type: Callable[[RpcHandlerParams], str]
+                    response_payload = sync_handler(params)
             except RpcError as error:
                 response_error = error
             except Exception as error:
