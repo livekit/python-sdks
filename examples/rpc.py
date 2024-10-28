@@ -88,7 +88,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         return json.dumps({"result": result})
 
     @math_genius_room.local_participant.rpc_method("divide")
-    async def divide_method(
+    def divide_method(
         request_id: str,
         caller_identity: str,
         payload: str,

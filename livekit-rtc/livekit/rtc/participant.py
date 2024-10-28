@@ -38,6 +38,7 @@ from .transcription import Transcription
 from .rpc import RpcError
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
+import asyncio
 
 
 class PublishTrackError(Exception):
@@ -117,7 +118,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
         self._rpc_handlers: Dict[
-            str, Callable[[str, str, str, int], Awaitable[str]]
+            str, Callable[[str, str, str, int], Union[Awaitable[str], str]]
         ] = {}
 
     @property
@@ -289,7 +290,7 @@ class LocalParticipant(Participant):
     def register_rpc_method(
         self,
         method: str,
-        handler: Callable[[str, str, str, int], Awaitable[str]],
+        handler: Callable[[str, str, str, int], Union[Awaitable[str], str]],
     ) -> None:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
@@ -389,9 +390,14 @@ class LocalParticipant(Participant):
             response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
         else:
             try:
-                response_payload = await handler(
-                    request_id, caller_identity, payload, response_timeout_ms
-                )
+                if asyncio.iscoroutinefunction(handler):
+                    response_payload = await handler(
+                        request_id, caller_identity, payload, response_timeout_ms
+                    )
+                else:
+                    response_payload = handler(
+                        request_id, caller_identity, payload, response_timeout_ms
+                    )
             except RpcError as error:
                 response_error = error
             except Exception as error:
