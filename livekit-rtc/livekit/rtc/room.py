@@ -400,7 +400,7 @@ class Room(EventEmitter[EventTypes]):
         """Disconnects from the room."""
         if not self.isconnected():
             return
-        
+
         if self._rpc_invocation_tasks:
             for task in self._rpc_invocation_tasks:
                 task.cancel()
@@ -736,8 +736,3 @@ class Room(EventEmitter[EventTypes]):
             sid = self._first_sid_future.result()
 
         return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self._connection_state})"
-
-
-
-
-

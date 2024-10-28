@@ -65,6 +65,7 @@ class PublishTranscriptionError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
+
 class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
@@ -391,6 +392,7 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
+
                     async def run_handler():
                         try:
                             return await handler(
@@ -401,11 +403,15 @@ class LocalParticipant(Participant):
                             raise
 
                     try:
-                        response_payload = await asyncio.wait_for(run_handler(), timeout=response_timeout)
+                        response_payload = await asyncio.wait_for(
+                            run_handler(), timeout=response_timeout
+                        )
                     except asyncio.TimeoutError:
                         raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
                     except asyncio.CancelledError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
+                        raise RpcError._built_in(
+                            RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+                        )
                 else:
                     response_payload = handler(
                         request_id, caller_identity, payload, response_timeout
@@ -601,7 +607,3 @@ class RemoteParticipant(Participant):
 
     def __repr__(self) -> str:
         return f"rtc.RemoteParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
-
-
-
-
