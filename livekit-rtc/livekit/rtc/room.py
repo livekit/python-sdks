@@ -400,10 +400,14 @@ class Room(EventEmitter[EventTypes]):
         """Disconnects from the room."""
         if not self.isconnected():
             return
+        
+        if self._rpc_invocation_tasks:
+            for task in self._rpc_invocation_tasks:
+                task.cancel()
+            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -412,12 +416,6 @@ class Room(EventEmitter[EventTypes]):
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
-
-        if self._rpc_invocation_tasks:
-            for task in self._rpc_invocation_tasks:
-                task.cancel()
-            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
-
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
@@ -457,7 +455,7 @@ class Room(EventEmitter[EventTypes]):
                     rpc_invocation.request_id,
                     rpc_invocation.caller_identity,
                     rpc_invocation.payload,
-                    rpc_invocation.response_timeout_ms,
+                    rpc_invocation.response_timeout_ms / 1000.0,
                 )
             )
             self._rpc_invocation_tasks.add(task)

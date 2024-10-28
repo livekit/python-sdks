@@ -248,7 +248,7 @@ class LocalParticipant(Participant):
         destination_identity: str,
         method: str,
         payload: str,
-        response_timeout_ms: Optional[int] = None,
+        response_timeout: Optional[float] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -257,7 +257,7 @@ class LocalParticipant(Participant):
             destination_identity (str): The `identity` of the destination participant
             method (str): The method name to call
             payload (str): The method payload
-            response_timeout_ms (Optional[int]): Timeout for receiving a response after initial connection
+            response_timeout (Optional[float]): Timeout for receiving a response after initial connection
 
         Returns:
             str: The response payload
@@ -270,8 +270,8 @@ class LocalParticipant(Participant):
         req.perform_rpc.destination_identity = destination_identity
         req.perform_rpc.method = method
         req.perform_rpc.payload = payload
-        if response_timeout_ms is not None:
-            req.perform_rpc.response_timeout_ms = response_timeout_ms
+        if response_timeout is not None:
+            req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -307,7 +307,7 @@ class LocalParticipant(Participant):
             RpcError: On failure. Details in `message`.
 
         Example:
-            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int) -> str:
+            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout: float) -> str:
                 print(f"Received greeting from {caller_identity}: {payload}")
                 return f"Hello, {caller_identity}!"
 
@@ -317,10 +317,10 @@ class LocalParticipant(Participant):
         - `request_id`: A unique identifier for this RPC request
         - `caller_identity`: The identity of the RemoteParticipant who initiated the RPC call
         - `payload`: The data sent by the caller (as a string)
-        - `response_timeout_ms`: The maximum time available to return a response
+        - `response_timeout`: The maximum time available to return a response
 
         The handler should return a string or a coroutine that resolves to a string.
-        If unable to respond within `response_timeout_ms`, the request will result in an error on the caller's side.
+        If unable to respond within `response_timeout`, the request will result in an error on the caller's side.
 
         You may raise errors of type `RpcError` with a string `message` in the handler,
         and they will be received on the caller's side with the message intact.
@@ -343,7 +343,7 @@ class LocalParticipant(Participant):
 
         Example:
             @local_participant.rpc_method("greet")
-            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int) -> str:
+            async def greet_handler(request_id: str, caller_identity: str, payload: str, response_timeout: float) -> str:
                 print(f"Received greeting from {caller_identity}: {payload}")
                 return f"Hello, {caller_identity}!"
 
@@ -379,7 +379,7 @@ class LocalParticipant(Participant):
         request_id: str,
         caller_identity: str,
         payload: str,
-        response_timeout_ms: int,
+        response_timeout: float,
     ) -> None:
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
@@ -391,12 +391,24 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    response_payload = await handler(
-                        request_id, caller_identity, payload, response_timeout_ms
-                    )
+                    async def run_handler():
+                        try:
+                            return await handler(
+                                request_id, caller_identity, payload, response_timeout
+                            )
+                        except asyncio.CancelledError:
+                            # This will be caught by the outer try-except if it's due to timeout
+                            raise
+
+                    try:
+                        response_payload = await asyncio.wait_for(run_handler(), timeout=response_timeout)
+                    except asyncio.TimeoutError:
+                        raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+                    except asyncio.CancelledError:
+                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
                 else:
                     response_payload = handler(
-                        request_id, caller_identity, payload, response_timeout_ms
+                        request_id, caller_identity, payload, response_timeout
                     )
             except RpcError as error:
                 response_error = error
@@ -589,3 +601,5 @@ class RemoteParticipant(Participant):
 
     def __repr__(self) -> str:
         return f"rtc.RemoteParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
+
+

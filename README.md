@@ -141,12 +141,12 @@ The participant who implements the method and will receive its calls must first 
 
 ```python
 @room.local_participant.rpc_method("greet")
-async def handle_greet(request_id: str, caller_identity: str, payload: str, response_timeout_ms: int):
+async def handle_greet(request_id: str, caller_identity: str, payload: str, response_timeout: float):
     print(f"Received greeting from {caller_identity}: {payload}")
     return f"Hello, {caller_identity}!"
 ```
 
-In addition to the payload, your handler will also receive `response_timeout_ms`, which informs you the maximum time available to return a response. If you are unable to respond in time, the call will result in an error on the caller's side.
+In addition to the payload, your handler will also receive `response_timeout`, which informs you the maximum time available to return a response. If you are unable to respond in time, the call will result in an error on the caller's side.
 
 #### Performing an RPC request
 
@@ -164,7 +164,7 @@ except Exception as e:
   print(f"RPC call failed: {e}")
 ```
 
-You may find it useful to adjust the `response_timeout_ms` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
+You may find it useful to adjust the `response_timeout` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
 
 #### Errors
 
