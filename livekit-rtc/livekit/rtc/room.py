@@ -131,6 +131,7 @@ class Room(EventEmitter[EventTypes]):
         self._loop = loop or asyncio.get_event_loop()
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
+        self._rpc_invocation_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -412,6 +413,11 @@ class Room(EventEmitter[EventTypes]):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
+        if self._rpc_invocation_tasks:
+            for task in self._rpc_invocation_tasks:
+                task.cancel()
+            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
+
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
@@ -444,7 +450,7 @@ class Room(EventEmitter[EventTypes]):
             rpc_invocation.local_participant_handle
             == self._local_participant._ffi_handle.handle
         ):
-            asyncio.create_task(
+            task = self._loop.create_task(
                 self._local_participant._handle_rpc_method_invocation(
                     rpc_invocation.invocation_id,
                     rpc_invocation.method,
@@ -454,6 +460,8 @@ class Room(EventEmitter[EventTypes]):
                     rpc_invocation.response_timeout_ms,
                 )
             )
+            self._rpc_invocation_tasks.add(task)
+            task.add_done_callback(self._rpc_tasks.discard)
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof("message")
@@ -730,3 +738,8 @@ class Room(EventEmitter[EventTypes]):
             sid = self._first_sid_future.result()
 
         return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self._connection_state})"
+
+
+
+
+
