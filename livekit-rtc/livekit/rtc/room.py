@@ -444,6 +444,9 @@ class Room(EventEmitter[EventTypes]):
             await self._room_queue.join()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
+        if self._local_participant is None:
+            return
+
         if (
             rpc_invocation.local_participant_handle
             == self._local_participant._ffi_handle.handle
