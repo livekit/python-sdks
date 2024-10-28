@@ -461,7 +461,7 @@ class Room(EventEmitter[EventTypes]):
                 )
             )
             self._rpc_invocation_tasks.add(task)
-            task.add_done_callback(self._rpc_tasks.discard)
+            task.add_done_callback(self._rpc_invocation_tasks.discard)
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof("message")
