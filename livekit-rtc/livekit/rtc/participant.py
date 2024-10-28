@@ -118,7 +118,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
         self._rpc_handlers: Dict[
-            str, Callable[[str, str, str, int], Union[Awaitable[str], str]]
+            str, Callable[[str, str, str, float], Union[Awaitable[str], str]]
         ] = {}
 
     @property
@@ -291,7 +291,7 @@ class LocalParticipant(Participant):
     def register_rpc_method(
         self,
         method: str,
-        handler: Callable[[str, str, str, int], Union[Awaitable[str], str]],
+        handler: Callable[[str, str, str, float], Union[Awaitable[str], str]],
     ) -> None:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
