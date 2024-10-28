@@ -116,6 +116,7 @@ class VideoFrame:
         info.height = self.height
         info.type = self.type
         info.data_ptr = addr
+        info.stride = 0
 
         if self.type in [
             proto_video.VideoBufferType.ARGB,
