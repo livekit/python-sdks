@@ -65,7 +65,6 @@ class PublishTranscriptionError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
-
 class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
@@ -245,6 +244,7 @@ class LocalParticipant(Participant):
 
     async def perform_rpc(
         self,
+        *,
         destination_identity: str,
         method: str,
         payload: str,
@@ -601,5 +601,7 @@ class RemoteParticipant(Participant):
 
     def __repr__(self) -> str:
         return f"rtc.RemoteParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
+
+
 
 

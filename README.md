@@ -155,9 +155,9 @@ The caller may then initiate an RPC call like so:
 ```python
 try:
   response = await room.local_participant.perform_rpc(
-    'recipient-identity',
-    'greet',
-    'Hello from RPC!'
+    destination_identity='recipient-identity',
+    method='greet',
+    payload='Hello from RPC!'
   )
   print(f"RPC response: {response}")
 except Exception as e:

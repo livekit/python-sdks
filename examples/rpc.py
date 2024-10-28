@@ -152,7 +152,9 @@ async def perform_greeting(room: rtc.Room):
     print("[Caller] Letting the greeter know that I've arrived")
     try:
         response = await room.local_participant.perform_rpc(
-            "greeter", "arrival", "Hello"
+            destination_identity="greeter",
+            method="arrival",
+            payload="Hello"
         )
         print(f'[Caller] That\'s nice, the greeter said: "{response}"')
     except Exception as error:
@@ -164,7 +166,9 @@ async def perform_square_root(room: rtc.Room):
     print("[Caller] What's the square root of 16?")
     try:
         response = await room.local_participant.perform_rpc(
-            "math-genius", "square-root", json.dumps({"number": 16})
+            destination_identity="math-genius",
+            method="square-root",
+            payload=json.dumps({"number": 16})
         )
         parsed_response = json.loads(response)
         print(f"[Caller] Nice, the answer was {parsed_response['result']}")
@@ -177,7 +181,9 @@ async def perform_quantum_hypergeometric_series(room: rtc.Room):
     print("[Caller] What's the quantum hypergeometric series of 42?")
     try:
         response = await room.local_participant.perform_rpc(
-            "math-genius", "quantum-hypergeometric-series", json.dumps({"number": 42})
+            destination_identity="math-genius",
+            method="quantum-hypergeometric-series",
+            payload=json.dumps({"number": 42})
         )
         parsed_response = json.loads(response)
         print(f"[Caller] genius says {parsed_response['result']}!")
@@ -196,7 +202,9 @@ async def perform_divide(room: rtc.Room):
     print("[Caller] Let's divide 10 by 0.")
     try:
         response = await room.local_participant.perform_rpc(
-            "math-genius", "divide", json.dumps({"dividend": 10, "divisor": 0})
+            destination_identity="math-genius",
+            method="divide",
+            payload=json.dumps({"dividend": 10, "divisor": 0})
         )
         parsed_response = json.loads(response)
         print(f"[Caller] The result is {parsed_response['result']}")
@@ -215,9 +223,9 @@ async def perform_long_calculation(room: rtc.Room):
     print("[Caller] Giving the math genius 10s to complete a long calculation")
     try:
         response = await room.local_participant.perform_rpc(
-            "math-genius", 
-            "long-calculation", 
-            json.dumps({}),
+            destination_identity="math-genius",
+            method="long-calculation",
+            payload=json.dumps({}),
             response_timeout=10
         )
         parsed_response = json.loads(response)
