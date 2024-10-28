@@ -134,6 +134,7 @@ __all__ = [
     "AudioResampler",
     "AudioResamplerQuality",
     "RpcError",
+    "RpcInvocationData",
     "EventEmitter",
     "combine_audio_frames",
     "__version__",
