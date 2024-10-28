@@ -352,7 +352,9 @@ class LocalParticipant(Participant):
             `register_rpc_method` for more details
         """
 
-        def decorator(handler: Callable[[str, str, str, float], Union[Awaitable[str], str]]):
+        def decorator(
+            handler: Callable[[str, str, str, float], Union[Awaitable[str], str]],
+        ):
             self.register_rpc_method(method, handler)
             return handler
 
@@ -392,10 +394,11 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
+                    async_handler = handler  # type: Callable[[str, str, str, float], Awaitable[str]]
 
                     async def run_handler():
                         try:
-                            return await handler(
+                            return await async_handler(
                                 request_id, caller_identity, payload, response_timeout
                             )
                         except asyncio.CancelledError:
@@ -413,7 +416,8 @@ class LocalParticipant(Participant):
                             RpcError.ErrorCode.RECIPIENT_DISCONNECTED
                         )
                 else:
-                    response_payload = handler(
+                    sync_handler = handler  # type: Callable[[str, str, str, float], str]
+                    response_payload = sync_handler(
                         request_id, caller_identity, payload, response_timeout
                     )
             except RpcError as error:
