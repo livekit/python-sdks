@@ -34,10 +34,10 @@ from livekit import api
 import os
 
 # will automatically use the LIVEKIT_API_KEY and LIVEKIT_API_SECRET env vars
-token = api.AccessToken() \
+token = api.access_token.AccessToken() \
     .with_identity("python-bot") \
     .with_name("Python Bot") \
-    .with_grants(api.VideoGrants(
+    .with_grants(api.access_token.VideoGrants(
         room_join=True,
         room="my-room",
     )).to_jwt()
@@ -52,7 +52,7 @@ from livekit import api
 import asyncio
 
 async def main():
-    lkapi = api.LiveKitAPI(
+    lkapi = api.livekit_api.LiveKitAPI(
         'http://localhost:7880',
     )
     room_info = await lkapi.room.create_room(
