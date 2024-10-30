@@ -26,6 +26,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
+from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
@@ -130,6 +131,7 @@ class Room(EventEmitter[EventTypes]):
         self._loop = loop or asyncio.get_event_loop()
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
+        self._rpc_invocation_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -399,9 +401,10 @@ class Room(EventEmitter[EventTypes]):
         if not self.isconnected():
             return
 
+        await self._drain_rpc_invocation_tasks()
+
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -410,7 +413,6 @@ class Room(EventEmitter[EventTypes]):
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
-
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
@@ -418,7 +420,9 @@ class Room(EventEmitter[EventTypes]):
         # listen to incoming room events
         while True:
             event = await self._ffi_queue.get()
-            if event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
+            if event.WhichOneof("message") == "rpc_method_invocation":
+                self._on_rpc_method_invocation(event.rpc_method_invocation)
+            elif event.room_event.room_handle == self._ffi_handle.handle:  # type: ignore
                 if event.room_event.HasField("eos"):
                     break
 
@@ -435,6 +439,30 @@ class Room(EventEmitter[EventTypes]):
             # before processing the next one
             self._room_queue.put_nowait(event)
             await self._room_queue.join()
+
+        # Clean up any pending RPC invocation tasks
+        await self._drain_rpc_invocation_tasks()
+
+    def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
+        if self._local_participant is None:
+            return
+
+        if (
+            rpc_invocation.local_participant_handle
+            == self._local_participant._ffi_handle.handle
+        ):
+            task = self._loop.create_task(
+                self._local_participant._handle_rpc_method_invocation(
+                    rpc_invocation.invocation_id,
+                    rpc_invocation.method,
+                    rpc_invocation.request_id,
+                    rpc_invocation.caller_identity,
+                    rpc_invocation.payload,
+                    rpc_invocation.response_timeout_ms / 1000.0,
+                )
+            )
+            self._rpc_invocation_tasks.add(task)
+            task.add_done_callback(self._rpc_invocation_tasks.discard)
 
     def _on_room_event(self, event: proto_room.RoomEvent):
         which = event.WhichOneof("message")
@@ -681,6 +709,12 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnecting")
         elif which == "reconnected":
             self.emit("reconnected")
+
+    async def _drain_rpc_invocation_tasks(self) -> None:
+        if self._rpc_invocation_tasks:
+            for task in self._rpc_invocation_tasks:
+                task.cancel()
+            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
 
     def _retrieve_remote_participant(
         self, identity: str
