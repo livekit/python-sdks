@@ -342,6 +342,7 @@ class LocalParticipant(Participant):
 
         if handler is not None:
             register(handler)
+            return None
         else:
             # Called as a decorator
             return register
