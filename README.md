@@ -140,7 +140,7 @@ This feature is especially powerful when used with [Agents](https://docs.livekit
 The participant who implements the method and will receive its calls must first register support:
 
 ```python
-@room.local_participant.rpc_method("greet")
+@room.local_participant.register_rpc_method("greet")
 async def handle_greet(request_id: str, caller_identity: str, payload: str, response_timeout: float):
     print(f"Received greeting from {caller_identity}: {payload}")
     return f"Hello, {caller_identity}!"

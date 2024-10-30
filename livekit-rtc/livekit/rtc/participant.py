@@ -292,70 +292,57 @@ class LocalParticipant(Participant):
 
     def register_rpc_method(
         self,
-        method: str,
-        handler: Callable[[RpcInvocationData], Union[Awaitable[str], str]],
-    ) -> None:
+        method_name: str,
+        handler: Optional[Callable[[RpcInvocationData], Union[Awaitable[str], str]]] = None,
+    ) -> Union[None, Callable]:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
-        Will overwrite any existing callback for the same method.
+        Can be used either as a decorator or a regular method.
+        
+        The handler will recieve one argument of type `RpcInvocationData` and should return a string response which will be forwarded back to the caller.
+        
+        The handler may be synchronous or asynchronous.
+
+        If unable to respond within `response_timeout`, the caller will hang up and receive an error on their side.
+
+        You may raise errors of type `RpcError` in the handler, and they will be forwarded to the caller.
+        
+        Other errors raised in your handler will be caught and forwarded to the caller as "1500 Application Error".
 
         Args:
-            method (str): The name of the indicated RPC method
-            handler (Callable): Will be invoked when an RPC request for this method is received
+            method_name (str): The name of the indicated RPC method.
+            handler (Optional[Callable]): Handler to be invoked whenever an RPC request for this method is received.  Omit this argument to use the decorator syntax.
 
         Returns:
-            None
-
-        Raises:
-            RpcError: On failure. Details in `message`.
+            None (when used as a decorator it returns the decorator function)
 
         Example:
+            # As a decorator:
+            @room.local_participant.register_rpc_method("greet")
+            async def greet_handler(data: RpcInvocationData) -> str:
+                print(f"Received greeting from {data.caller_identity}: {data.payload}")
+                return f"Hello, {data.caller_identity}!"
+                
+            # As a regular method:
             async def greet_handler(data: RpcInvocationData) -> str:
                 print(f"Received greeting from {data.caller_identity}: {data.payload}")
                 return f"Hello, {data.caller_identity}!"
 
-            await room.local_participant.register_rpc_method('greet', greet_handler)
-
-        The handler should return a string or a coroutine that resolves to a string.
-
-        If unable to respond within `response_timeout`, the caller will hang up and receive an error on their side.
-
-        You may raise errors of type `RpcError` with a string `message` in the handler,
-        and they will be received on the caller's side with the message intact.
-        Other errors raised in your handler will not be transmitted as-is, and will instead arrive to the caller as `1500` ("Application Error").
-        """
-        self._rpc_handlers[method] = handler
-
-        req = proto_ffi.FfiRequest()
-        req.register_rpc_method.local_participant_handle = self._ffi_handle.handle
-        req.register_rpc_method.method = method
-
-        FfiClient.instance.request(req)
-
-    def rpc_method(self, method: str):
-        """
-        Decorator form of `register_rpc_method`
-
-        Args:
-            method (str): The name of the indicated RPC method
-
-        Example:
-            @local_participant.rpc_method("greet")
-            async def greet_handler(data: RpcInvocationData) -> str:
-                print(f"Received greeting from {data.caller_identity}: {data.payload}")
-                return f"Hello, {params.caller_identity}!"
-
-        See Also:
-            `register_rpc_method` for more details
+            room.local_participant.register_rpc_method('greet', greet_handler)
         """
 
-        def decorator(
-            handler: Callable[[RpcInvocationData], Union[Awaitable[str], str]],
-        ):
-            self.register_rpc_method(method, handler)
-            return handler
+        def register(handler_func):
+            self._rpc_handlers[method_name] = handler_func
+            req = proto_ffi.FfiRequest()
+            req.register_rpc_method.local_participant_handle = self._ffi_handle.handle
+            req.register_rpc_method.method = method_name
+            FfiClient.instance.request(req)
 
-        return decorator
+        if handler is not None:
+            register(handler)
+        else:
+            # Called as a decorator
+            return register
 
     def unregister_rpc_method(self, method: str) -> None:
         """
