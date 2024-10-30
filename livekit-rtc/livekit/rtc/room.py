@@ -401,10 +401,7 @@ class Room(EventEmitter[EventTypes]):
         if not self.isconnected():
             return
 
-        if self._rpc_invocation_tasks:
-            for task in self._rpc_invocation_tasks:
-                task.cancel()
-            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
+        await self._drain_rpc_invocation_tasks()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -442,6 +439,9 @@ class Room(EventEmitter[EventTypes]):
             # before processing the next one
             self._room_queue.put_nowait(event)
             await self._room_queue.join()
+
+        # Clean up any pending RPC invocation tasks
+        await self._drain_rpc_invocation_tasks()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
@@ -709,6 +709,12 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnecting")
         elif which == "reconnected":
             self.emit("reconnected")
+
+    async def _drain_rpc_invocation_tasks(self) -> None:
+        if self._rpc_invocation_tasks:
+            for task in self._rpc_invocation_tasks:
+                task.cancel()
+            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
 
     def _retrieve_remote_participant(
         self, identity: str
