@@ -41,8 +41,8 @@ class RpcError(Exception):
 
     Instances of this type, when thrown in a method handler, will have their `message`
     serialized and sent across the wire. The caller will receive an equivalent error on the other side.
-
-    Build-in types are included but developers may use any string, with a max length of 256 bytes.
+    
+    Built-in errors are included (codes 1001-1999) but developers may use the code, message, and data fields to create their own errors.
     """
 
     class ErrorCode(IntEnum):
@@ -83,27 +83,42 @@ class RpcError(Exception):
         Creates an error object with the given code and message, plus an optional data payload.
 
         If thrown in an RPC method handler, the error will be sent back to the caller.
-
-        Error codes 1001-1999 are reserved for built-in errors (see RpcError.ErrorCode for their meanings).
+        
+        Args:
+            code (int): Your error code (Error codes 1001-1999 are reserved for built-in errors)
+            message (str): A readable error message.
+            data (Optional[str]): Optional additional data associated with the error (JSON recommended)
         """
         super().__init__(message)
-        self.code = code
-        self.message = message
-        self.data = data
+        self._code = code
+        self._message = message
+        self._data = data
+
+    @property
+    def code(self) -> int:
+        """Error code value. Codes 1001-1999 are reserved for built-in errors (see RpcError.ErrorCode for their meanings)."""
+        return self._code   
+
+    @property
+    def message(self) -> str:
+        """A readable error message."""
+        return self._message
+
+    @property
+    def data(self) -> Optional[str]:
+        """Optional additional data associated with the error (JSON recommended)."""
+        return self._data
 
     @classmethod
-    def from_proto(cls, proto: proto_rpc.RpcError) -> "RpcError":
+    def _from_proto(cls, proto: proto_rpc.RpcError) -> "RpcError":
         return cls(proto.code, proto.message, proto.data)
 
-    def to_proto(self) -> proto_rpc.RpcError:
+    def _to_proto(self) -> proto_rpc.RpcError:
         return proto_rpc.RpcError(code=self.code, message=self.message, data=self.data)
 
     @classmethod
     def _built_in(
         cls, code: "RpcError.ErrorCode", data: Optional[str] = None
     ) -> "RpcError":
-        """
-        Creates an error object from the ErrorCode, with an auto-populated message.
-        """
         message = cls.ErrorMessage[code]
         return cls(code, message, data)

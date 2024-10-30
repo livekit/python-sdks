@@ -286,7 +286,7 @@ class LocalParticipant(Participant):
             FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.perform_rpc.HasField("error"):
-            raise RpcError.from_proto(cb.perform_rpc.error)
+            raise RpcError._from_proto(cb.perform_rpc.error)
 
         return cb.perform_rpc.payload
 
@@ -431,7 +431,7 @@ class LocalParticipant(Participant):
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
                 local_participant_handle=self._ffi_handle.handle,
                 invocation_id=invocation_id,
-                error=response_error.to_proto() if response_error else None,
+                error=response_error._to_proto() if response_error else None,
                 payload=response_payload,
             )
         )
