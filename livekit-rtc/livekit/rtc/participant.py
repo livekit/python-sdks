@@ -293,20 +293,22 @@ class LocalParticipant(Participant):
     def register_rpc_method(
         self,
         method_name: str,
-        handler: Optional[Callable[[RpcInvocationData], Union[Awaitable[str], str]]] = None,
+        handler: Optional[
+            Callable[[RpcInvocationData], Union[Awaitable[str], str]]
+        ] = None,
     ) -> Union[None, Callable]:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
         Can be used either as a decorator or a regular method.
-        
+
         The handler will recieve one argument of type `RpcInvocationData` and should return a string response which will be forwarded back to the caller.
-        
+
         The handler may be synchronous or asynchronous.
 
         If unable to respond within `response_timeout`, the caller will hang up and receive an error on their side.
 
         You may raise errors of type `RpcError` in the handler, and they will be forwarded to the caller.
-        
+
         Other errors raised in your handler will be caught and forwarded to the caller as "1500 Application Error".
 
         Args:
@@ -322,7 +324,7 @@ class LocalParticipant(Participant):
             async def greet_handler(data: RpcInvocationData) -> str:
                 print(f"Received greeting from {data.caller_identity}: {data.payload}")
                 return f"Hello, {data.caller_identity}!"
-                
+
             # As a regular method:
             async def greet_handler(data: RpcInvocationData) -> str:
                 print(f"Received greeting from {data.caller_identity}: {data.payload}")
@@ -382,7 +384,9 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    async_handler = cast(Callable[[RpcInvocationData], Awaitable[str]], handler)
+                    async_handler = cast(
+                        Callable[[RpcInvocationData], Awaitable[str]], handler
+                    )
 
                     async def run_handler():
                         try:

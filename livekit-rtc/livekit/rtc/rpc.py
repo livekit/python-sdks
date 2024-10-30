@@ -41,7 +41,7 @@ class RpcError(Exception):
 
     Instances of this type, when thrown in a method handler, will have their `message`
     serialized and sent across the wire. The caller will receive an equivalent error on the other side.
-    
+
     Built-in errors are included (codes 1001-1999) but developers may use the code, message, and data fields to create their own errors.
     """
 
@@ -83,7 +83,7 @@ class RpcError(Exception):
         Creates an error object with the given code and message, plus an optional data payload.
 
         If thrown in an RPC method handler, the error will be sent back to the caller.
-        
+
         Args:
             code (int): Your error code (Error codes 1001-1999 are reserved for built-in errors)
             message (str): A readable error message.
@@ -97,7 +97,7 @@ class RpcError(Exception):
     @property
     def code(self) -> int:
         """Error code value. Codes 1001-1999 are reserved for built-in errors (see RpcError.ErrorCode for their meanings)."""
-        return self._code   
+        return self._code
 
     @property
     def message(self) -> str:
