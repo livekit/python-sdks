@@ -301,7 +301,7 @@ class LocalParticipant(Participant):
         Establishes the participant as a receiver for calls of the specified RPC method.
         Can be used either as a decorator or a regular method.
 
-        The handler will recieve one argument of type `RpcInvocationData` and should return a string response which will be forwarded back to the caller.
+        The handler will receive one argument of type `RpcInvocationData` and should return a string response which will be forwarded back to the caller.
 
         The handler may be synchronous or asynchronous.
 
