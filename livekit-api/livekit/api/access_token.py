@@ -154,9 +154,9 @@ class AccessToken:
             {
                 "sub": self.identity,
                 "iss": self.api_key,
-                "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
+                "nbf": calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple()),
                 "exp": calendar.timegm(
-                    (datetime.datetime.utcnow() + self.ttl).utctimetuple()
+                    (datetime.datetime.now(datetime.timezone.utc) + self.ttl).utctimetuple()
                 ),
             }
         )
