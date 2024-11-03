@@ -42,7 +42,7 @@ class VideoGrants:
     can_publish_data: bool = True
 
     # TrackSource types that a participant may publish.
-    # When set, it supercedes CanPublish. Only sources explicitly set here can be
+    # When set, it supersedes CanPublish. Only sources explicitly set here can be
     # published
     can_publish_sources: List[str] = dataclasses.field(default_factory=list)
 
