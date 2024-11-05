@@ -218,7 +218,7 @@ def _get_plane_length(
     type: proto_video.VideoBufferType.ValueType, width: int, height: int
 ) -> int:
     """
-    Return the size in bytes of a participar video buffer type based on its size (This ignore the strides)
+    Return the size in bytes of a participant video buffer type based on its size (This ignores the strides)
     """
     if type in [
         proto_video.VideoBufferType.ARGB,

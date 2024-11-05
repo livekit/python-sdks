@@ -42,7 +42,7 @@ class VideoGrants:
     can_publish_data: bool = True
 
     # TrackSource types that a participant may publish.
-    # When set, it supercedes CanPublish. Only sources explicitly set here can be
+    # When set, it supersedes CanPublish. Only sources explicitly set here can be
     # published
     can_publish_sources: List[str] = dataclasses.field(default_factory=list)
 
@@ -154,9 +154,9 @@ class AccessToken:
             {
                 "sub": self.identity,
                 "iss": self.api_key,
-                "nbf": calendar.timegm(datetime.datetime.utcnow().utctimetuple()),
+                "nbf": calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple()),
                 "exp": calendar.timegm(
-                    (datetime.datetime.utcnow() + self.ttl).utctimetuple()
+                    (datetime.datetime.now(datetime.timezone.utc) + self.ttl).utctimetuple()
                 ),
             }
         )

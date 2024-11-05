@@ -26,13 +26,13 @@ DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 @typing.final
 class FfiOwnedHandle(google.protobuf.message.Message):
     """# Safety
-    The foreign language is responsable for disposing handles
+    The foreign language is responsible for disposing handles
     Forgetting to dispose the handle may lead to memory leaks
 
     Dropping a handle doesn't necessarily mean that the object is destroyed if it is still used
     on the FfiServer (Atomic reference counting)
 
-    When refering to a handle without owning it, we just use a uint32 without this message. 
+    When referring to a handle without owning it, we just use an uint32 without this message.
     (the variable name is suffixed with "_handle")
     """
 
