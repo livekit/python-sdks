@@ -11,6 +11,8 @@ class WebhookReceiver:
 
     def receive(self, body: str, auth_token: str) -> proto_webhook.WebhookEvent:
         claims = self._verifier.verify(auth_token)
+        if claims.sha256 is None:
+            raise Exception("sha256 was not found in the token")
 
         body_hash = hashlib.sha256(body.encode()).digest()
         claims_hash = base64.b64decode(claims.sha256)
