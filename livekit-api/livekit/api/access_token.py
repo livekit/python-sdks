@@ -19,6 +19,9 @@ import datetime
 import os
 import jwt
 from typing import Optional, List, Literal
+from google.protobuf.json_format import MessageToDict, ParseDict
+
+from livekit.protocol.room import RoomConfiguration
 
 DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
@@ -27,13 +30,13 @@ DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
 @dataclasses.dataclass
 class VideoGrants:
     # actions on rooms
-    room_create: bool = False
-    room_list: bool = False
-    room_record: bool = False
+    room_create: Optional[bool] = None
+    room_list: Optional[bool] = None
+    room_record: Optional[bool] = None
 
     # actions on a particular room
-    room_admin: bool = False
-    room_join: bool = False
+    room_admin: Optional[bool] = None
+    room_join: Optional[bool] = None
     room: str = ""
 
     # permissions within a room
@@ -44,23 +47,22 @@ class VideoGrants:
     # TrackSource types that a participant may publish.
     # When set, it supersedes CanPublish. Only sources explicitly set here can be
     # published
-    can_publish_sources: List[str] = dataclasses.field(default_factory=list)
+    can_publish_sources: Optional[List[str]] = None
 
     # by default, a participant is not allowed to update its own metadata
-    can_update_own_metadata: bool = False
+    can_update_own_metadata: Optional[bool] = None
 
     # actions on ingresses
-    ingress_admin: bool = False  # applies to all ingress
+    ingress_admin: Optional[bool] = None  # applies to all ingress
 
     # participant is not visible to other participants (useful when making bots)
-    hidden: bool = False
+    hidden: Optional[bool] = None
 
-    # indicates to the room that current participant is a recorder
-    recorder: bool = False
+    # [deprecated] indicates to the room that current participant is a recorder
+    recorder: Optional[bool] = None
 
     # indicates that the holder can register as an Agent framework worker
-    # it is also set on all participants that are joining as Agent
-    agent: bool = False
+    agent: Optional[bool] = None
 
 
 @dataclasses.dataclass
@@ -75,12 +77,28 @@ class SIPGrants:
 class Claims:
     identity: str = ""
     name: str = ""
-    video: VideoGrants = dataclasses.field(default_factory=VideoGrants)
-    sip: SIPGrants = dataclasses.field(default_factory=SIPGrants)
-    attributes: dict[str, str] = dataclasses.field(default_factory=dict)
-    metadata: str = ""
-    sha256: str = ""
     kind: str = ""
+    metadata: str = ""
+    video: Optional[VideoGrants] = None
+    sip: Optional[SIPGrants] = None
+    attributes: Optional[dict[str, str]] = None
+    sha256: Optional[str] = None
+    room_preset: Optional[str] = None
+    room_config: Optional[RoomConfiguration] = None
+
+    def asdict(self) -> dict:
+        # we don't
+        claims = dataclasses.asdict(
+            self,
+            dict_factory=lambda items: {
+                snake_to_lower_camel(k): v
+                for k, v in items
+                if v is not None and v != ""
+            },
+        )
+        if self.room_config:
+            claims["roomConfig"] = MessageToDict(self.room_config)
+        return claims
 
 
 class AccessToken:
@@ -141,26 +159,36 @@ class AccessToken:
         self.claims.sha256 = sha256
         return self
 
+    def with_room_preset(self, preset: str) -> "AccessToken":
+        self.claims.room_preset = preset
+        return self
+
+    def with_room_config(self, config: RoomConfiguration) -> "AccessToken":
+        self.claims.room_config = config
+        return self
+
     def to_jwt(self) -> str:
         video = self.claims.video
-        if video.room_join and (not self.identity or not video.room):
+        if video and video.room_join and (not self.identity or not video.room):
             raise ValueError("identity and room must be set when joining a room")
 
-        claims = dataclasses.asdict(
-            self.claims,
-            dict_factory=lambda items: {snake_to_lower_camel(k): v for k, v in items},
-        )
-        claims.update(
+        # we want to exclude None values from the token
+        jwt_claims = self.claims.asdict()
+        jwt_claims.update(
             {
                 "sub": self.identity,
                 "iss": self.api_key,
-                "nbf": calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple()),
+                "nbf": calendar.timegm(
+                    datetime.datetime.now(datetime.timezone.utc).utctimetuple()
+                ),
                 "exp": calendar.timegm(
-                    (datetime.datetime.now(datetime.timezone.utc) + self.ttl).utctimetuple()
+                    (
+                        datetime.datetime.now(datetime.timezone.utc) + self.ttl
+                    ).utctimetuple()
                 ),
             }
         )
-        return jwt.encode(claims, self.api_secret, algorithm="HS256")
+        return jwt.encode(jwt_claims, self.api_secret, algorithm="HS256")
 
 
 class TokenVerifier:
@@ -204,7 +232,7 @@ class TokenVerifier:
         }
         sip = SIPGrants(**sip_dict)
 
-        return Claims(
+        grant_claims = Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
             video=video,
@@ -213,6 +241,17 @@ class TokenVerifier:
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
         )
+
+        if claims.get("roomPreset"):
+            grant_claims.room_preset = claims.get("roomPreset")
+        if claims.get("roomConfig"):
+            grant_claims.room_config = ParseDict(
+                claims.get("roomConfig"),
+                RoomConfiguration(),
+                ignore_unknown_fields=True,
+            )
+
+        return grant_claims
 
 
 def camel_to_snake(t: str):

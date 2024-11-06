@@ -16,6 +16,8 @@
 
 # flake8: noqa
 # re-export packages from protocol
+from livekit.protocol.agent_dispatch import *
+from livekit.protocol.agent import *
 from livekit.protocol.egress import *
 from livekit.protocol.ingress import *
 from livekit.protocol.models import *

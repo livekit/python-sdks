@@ -446,7 +446,7 @@ class StopEgressRequest(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
 
 class EgressInfo(_message.Message):
-    __slots__ = ("egress_id", "room_id", "room_name", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results")
+    __slots__ = ("egress_id", "room_id", "room_name", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results", "manifest_location", "manifest_presigned_url")
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -469,6 +469,8 @@ class EgressInfo(_message.Message):
     FILE_RESULTS_FIELD_NUMBER: _ClassVar[int]
     SEGMENT_RESULTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_RESULTS_FIELD_NUMBER: _ClassVar[int]
+    MANIFEST_LOCATION_FIELD_NUMBER: _ClassVar[int]
+    MANIFEST_PRESIGNED_URL_FIELD_NUMBER: _ClassVar[int]
     egress_id: str
     room_id: str
     room_name: str
@@ -491,7 +493,9 @@ class EgressInfo(_message.Message):
     file_results: _containers.RepeatedCompositeFieldContainer[FileInfo]
     segment_results: _containers.RepeatedCompositeFieldContainer[SegmentsInfo]
     image_results: _containers.RepeatedCompositeFieldContainer[ImagesInfo]
-    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ...) -> None: ...
+    manifest_location: str
+    manifest_presigned_url: str
+    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., manifest_location: _Optional[str] = ..., manifest_presigned_url: _Optional[str] = ...) -> None: ...
 
 class StreamInfoList(_message.Message):
     __slots__ = ("info",)

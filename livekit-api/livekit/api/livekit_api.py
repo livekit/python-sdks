@@ -4,6 +4,7 @@ from .room_service import RoomService
 from .egress_service import EgressService
 from .ingress_service import IngressService
 from .sip_service import SipService
+from .agent_dispatch_service import AgentDispatchService
 from typing import Optional
 
 
@@ -31,6 +32,13 @@ class LiveKitAPI:
         self._ingress = IngressService(self._session, url, api_key, api_secret)
         self._egress = EgressService(self._session, url, api_key, api_secret)
         self._sip = SipService(self._session, url, api_key, api_secret)
+        self._agent_dispatch = AgentDispatchService(
+            self._session, url, api_key, api_secret
+        )
+
+    @property
+    def agent_dispatch(self):
+        return self._agent_dispatch
 
     @property
     def room(self):
