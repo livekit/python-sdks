@@ -3,17 +3,17 @@ from typing import Callable, Dict, Set, Optional, Generic, TypeVar
 
 from .log import logger
 
-T = TypeVar("T")
+T_contra = TypeVar("T_contra", contravariant=True)
 
 
-class EventEmitter(Generic[T]):
+class EventEmitter(Generic[T_contra]):
     def __init__(self) -> None:
         """
         Initialize a new instance of EventEmitter.
         """
-        self._events: Dict[T, Set[Callable]] = dict()
+        self._events: Dict[T_contra, Set[Callable]] = dict()
 
-    def emit(self, event: T, *args) -> None:
+    def emit(self, event: T_contra, *args) -> None:
         """
         Trigger all callbacks associated with the given event.
 
@@ -60,7 +60,7 @@ class EventEmitter(Generic[T]):
                 except Exception:
                     logger.exception(f"failed to emit event {event}")
 
-    def once(self, event: T, callback: Optional[Callable] = None) -> Callable:
+    def once(self, event: T_contra, callback: Optional[Callable] = None) -> Callable:
         """
         Register a callback to be called only once when the event is emitted.
 
@@ -116,7 +116,7 @@ class EventEmitter(Generic[T]):
 
             return decorator
 
-    def on(self, event: T, callback: Optional[Callable] = None) -> Callable:
+    def on(self, event: T_contra, callback: Optional[Callable] = None) -> Callable:
         """
         Register a callback to be called whenever the event is emitted.
 
@@ -168,7 +168,7 @@ class EventEmitter(Generic[T]):
 
             return decorator
 
-    def off(self, event: T, callback: Callable) -> None:
+    def off(self, event: T_contra, callback: Callable) -> None:
         """
         Unregister a callback from an event.
 
