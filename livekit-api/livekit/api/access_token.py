@@ -87,7 +87,7 @@ class Claims:
     room_config: Optional[RoomConfiguration] = None
 
     def asdict(self) -> dict:
-        # we don't
+        # in order to produce minimal JWT size, exclude None or empty values
         claims = dataclasses.asdict(
             self,
             dict_factory=lambda items: {
