@@ -2,6 +2,7 @@ from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import models as _models
 from . import egress as _egress
 from . import ingress as _ingress
+from . import sip as _sip
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -45,6 +46,16 @@ class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     INGRESS_STARTED: _ClassVar[AnalyticsEventType]
     INGRESS_ENDED: _ClassVar[AnalyticsEventType]
     INGRESS_UPDATED: _ClassVar[AnalyticsEventType]
+    SIP_INBOUND_TRUNK_CREATED: _ClassVar[AnalyticsEventType]
+    SIP_INBOUND_TRUNK_DELETED: _ClassVar[AnalyticsEventType]
+    SIP_OUTBOUND_TRUNK_CREATED: _ClassVar[AnalyticsEventType]
+    SIP_OUTBOUND_TRUNK_DELETED: _ClassVar[AnalyticsEventType]
+    SIP_DISPATCH_RULE_CREATED: _ClassVar[AnalyticsEventType]
+    SIP_DISPATCH_RULE_DELETED: _ClassVar[AnalyticsEventType]
+    SIP_PARTICIPANT_CREATED: _ClassVar[AnalyticsEventType]
+    SIP_CALL_INCOMING: _ClassVar[AnalyticsEventType]
+    SIP_CALL_STARTED: _ClassVar[AnalyticsEventType]
+    SIP_CALL_ENDED: _ClassVar[AnalyticsEventType]
 UPSTREAM: StreamType
 DOWNSTREAM: StreamType
 ROOM_CREATED: AnalyticsEventType
@@ -75,6 +86,16 @@ INGRESS_DELETED: AnalyticsEventType
 INGRESS_STARTED: AnalyticsEventType
 INGRESS_ENDED: AnalyticsEventType
 INGRESS_UPDATED: AnalyticsEventType
+SIP_INBOUND_TRUNK_CREATED: AnalyticsEventType
+SIP_INBOUND_TRUNK_DELETED: AnalyticsEventType
+SIP_OUTBOUND_TRUNK_CREATED: AnalyticsEventType
+SIP_OUTBOUND_TRUNK_DELETED: AnalyticsEventType
+SIP_DISPATCH_RULE_CREATED: AnalyticsEventType
+SIP_DISPATCH_RULE_DELETED: AnalyticsEventType
+SIP_PARTICIPANT_CREATED: AnalyticsEventType
+SIP_CALL_INCOMING: AnalyticsEventType
+SIP_CALL_STARTED: AnalyticsEventType
+SIP_CALL_ENDED: AnalyticsEventType
 
 class AnalyticsVideoLayer(_message.Message):
     __slots__ = ("layer", "packets", "bytes", "frames")
@@ -89,7 +110,7 @@ class AnalyticsVideoLayer(_message.Message):
     def __init__(self, layer: _Optional[int] = ..., packets: _Optional[int] = ..., bytes: _Optional[int] = ..., frames: _Optional[int] = ...) -> None: ...
 
 class AnalyticsStream(_message.Message):
-    __slots__ = ("ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers", "start_time", "end_time")
+    __slots__ = ("ssrc", "primary_packets", "primary_bytes", "retransmit_packets", "retransmit_bytes", "padding_packets", "padding_bytes", "packets_lost", "frames", "rtt", "jitter", "nacks", "plis", "firs", "video_layers", "start_time", "end_time", "packets_out_of_order")
     SSRC_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_PACKETS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_BYTES_FIELD_NUMBER: _ClassVar[int]
@@ -107,6 +128,7 @@ class AnalyticsStream(_message.Message):
     VIDEO_LAYERS_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
+    PACKETS_OUT_OF_ORDER_FIELD_NUMBER: _ClassVar[int]
     ssrc: int
     primary_packets: int
     primary_bytes: int
@@ -124,7 +146,8 @@ class AnalyticsStream(_message.Message):
     video_layers: _containers.RepeatedCompositeFieldContainer[AnalyticsVideoLayer]
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
-    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    packets_out_of_order: int
+    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packets_out_of_order: _Optional[int] = ...) -> None: ...
 
 class AnalyticsStat(_message.Message):
     __slots__ = ("id", "analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
@@ -187,7 +210,7 @@ class AnalyticsClientMeta(_message.Message):
     def __init__(self, region: _Optional[str] = ..., node: _Optional[str] = ..., client_addr: _Optional[str] = ..., client_connect_time: _Optional[int] = ..., connection_type: _Optional[str] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., geo_hash: _Optional[str] = ..., country: _Optional[str] = ..., isp_asn: _Optional[int] = ...) -> None: ...
 
 class AnalyticsEvent(_message.Message):
-    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id")
+    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id", "sip_call_id", "sip_call", "sip_trunk_id", "sip_inbound_trunk", "sip_outbound_trunk", "sip_dispatch_rule_id", "sip_dispatch_rule")
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -211,6 +234,13 @@ class AnalyticsEvent(_message.Message):
     RTP_STATS_FIELD_NUMBER: _ClassVar[int]
     VIDEO_LAYER_FIELD_NUMBER: _ClassVar[int]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    SIP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
+    SIP_CALL_FIELD_NUMBER: _ClassVar[int]
+    SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
+    SIP_INBOUND_TRUNK_FIELD_NUMBER: _ClassVar[int]
+    SIP_OUTBOUND_TRUNK_FIELD_NUMBER: _ClassVar[int]
+    SIP_DISPATCH_RULE_ID_FIELD_NUMBER: _ClassVar[int]
+    SIP_DISPATCH_RULE_FIELD_NUMBER: _ClassVar[int]
     id: str
     type: AnalyticsEventType
     timestamp: _timestamp_pb2.Timestamp
@@ -234,7 +264,14 @@ class AnalyticsEvent(_message.Message):
     rtp_stats: _models.RTPStats
     video_layer: int
     node_id: str
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ...) -> None: ...
+    sip_call_id: str
+    sip_call: _sip.SIPCallInfo
+    sip_trunk_id: str
+    sip_inbound_trunk: _sip.SIPInboundTrunkInfo
+    sip_outbound_trunk: _sip.SIPOutboundTrunkInfo
+    sip_dispatch_rule_id: str
+    sip_dispatch_rule: _sip.SIPDispatchRuleInfo
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
     __slots__ = ("events",)

@@ -132,3 +132,20 @@ class SipService(Service):
             self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
             proto_sip.SIPParticipantInfo,
         )
+
+    async def transfer_sip_participant(
+        self, transfer: proto_sip.TransferSIPParticipantRequest
+    ) -> proto_sip.SIPParticipantInfo:
+        return await self._client.request(
+            SVC,
+            "TransferSIPParticipant",
+            transfer,
+            self._auth_header(
+                VideoGrants(
+                    room_admin=True,
+                    room=transfer.room_name,
+                ),
+                sip=SIPGrants(call=True),
+            ),
+            proto_sip.SIPParticipantInfo,
+        )

@@ -9,34 +9,34 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateRoomRequest(_message.Message):
-    __slots__ = ("name", "config_name", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "egress", "agent", "min_playout_delay", "max_playout_delay", "sync_streams", "replay_enabled")
+    __slots__ = ("name", "room_preset", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "replay_enabled", "agents")
     NAME_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_NAME_FIELD_NUMBER: _ClassVar[int]
+    ROOM_PRESET_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     EGRESS_FIELD_NUMBER: _ClassVar[int]
-    AGENT_FIELD_NUMBER: _ClassVar[int]
     MIN_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     SYNC_STREAMS_FIELD_NUMBER: _ClassVar[int]
     REPLAY_ENABLED_FIELD_NUMBER: _ClassVar[int]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
     name: str
-    config_name: str
+    room_preset: str
     empty_timeout: int
     departure_timeout: int
     max_participants: int
     node_id: str
     metadata: str
     egress: RoomEgress
-    agent: RoomAgent
     min_playout_delay: int
     max_playout_delay: int
     sync_streams: bool
     replay_enabled: bool
-    def __init__(self, name: _Optional[str] = ..., config_name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., agent: _Optional[_Union[RoomAgent, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., replay_enabled: bool = ...) -> None: ...
+    agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
+    def __init__(self, name: _Optional[str] = ..., room_preset: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., replay_enabled: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class RoomEgress(_message.Message):
     __slots__ = ("room", "participant", "tracks")
@@ -188,23 +188,23 @@ class UpdateRoomMetadataRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class RoomConfiguration(_message.Message):
-    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "egress", "agent", "min_playout_delay", "max_playout_delay", "sync_streams")
+    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents")
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     EGRESS_FIELD_NUMBER: _ClassVar[int]
-    AGENT_FIELD_NUMBER: _ClassVar[int]
     MIN_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     SYNC_STREAMS_FIELD_NUMBER: _ClassVar[int]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
     name: str
     empty_timeout: int
     departure_timeout: int
     max_participants: int
     egress: RoomEgress
-    agent: RoomAgent
     min_playout_delay: int
     max_playout_delay: int
     sync_streams: bool
-    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., agent: _Optional[_Union[RoomAgent, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ...) -> None: ...
+    agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
+    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
