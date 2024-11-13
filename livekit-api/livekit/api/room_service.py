@@ -1,5 +1,23 @@
 import aiohttp
-from livekit.protocol.room import CreateRoomRequest, ListRoomsRequest, DeleteRoomRequest, ListRoomsResponse, DeleteRoomResponse, ListParticipantsRequest, ListParticipantsResponse, RoomParticipantIdentity, MuteRoomTrackRequest, MuteRoomTrackResponse, UpdateParticipantRequest, UpdateSubscriptionsRequest, SendDataRequest, SendDataResponse, UpdateRoomMetadataRequest, RemoveParticipantResponse, UpdateSubscriptionsResponse
+from livekit.protocol.room import (
+    CreateRoomRequest,
+    ListRoomsRequest,
+    DeleteRoomRequest,
+    ListRoomsResponse,
+    DeleteRoomResponse,
+    ListParticipantsRequest,
+    ListParticipantsResponse,
+    RoomParticipantIdentity,
+    MuteRoomTrackRequest,
+    MuteRoomTrackResponse,
+    UpdateParticipantRequest,
+    UpdateSubscriptionsRequest,
+    SendDataRequest,
+    SendDataResponse,
+    UpdateRoomMetadataRequest,
+    RemoveParticipantResponse,
+    UpdateSubscriptionsResponse,
+)
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
 from .access_token import VideoGrants
@@ -7,19 +25,21 @@ from .access_token import VideoGrants
 SVC = "RoomService"
 """@private"""
 
+
 class RoomService(Service):
     """Client for LiveKit RoomService API
-    
+
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:
-    
+
     ```python
     from livekit import api
     lkapi = api.LiveKitAPI()
     room_service = lkapi.room
     ```
-    
+
     Also see https://docs.livekit.io/home/server/managing-rooms/ and https://docs.livekit.io/home/server/managing-participants/
     """
+
     def __init__(
         self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
     ):
@@ -30,7 +50,7 @@ class RoomService(Service):
         create: CreateRoomRequest,
     ) -> Room:
         """Creates a new room with specified configuration.
-        
+
         Args:
             create (CreateRoomRequest): arg containing:
                 - name: str - Unique room name
@@ -41,7 +61,7 @@ class RoomService(Service):
                 - min_playout_delay: int - Minimum playout delay in ms
                 - max_playout_delay: int - Maximum playout delay in ms
                 - sync_streams: bool - Enable A/V sync for playout delays >200ms
-        
+
         Returns:
             Room: The created room object
         """
@@ -55,11 +75,11 @@ class RoomService(Service):
 
     async def list_rooms(self, list: ListRoomsRequest) -> ListRoomsResponse:
         """Lists active rooms.
-        
+
         Args:
             list (ListRoomsRequest): arg containing:
                 - names: list[str] - Optional list of room names to filter by
-                
+
         Returns:
             ListRoomsResponse:
                 - rooms: list[Room] - List of active Room objects
@@ -74,11 +94,11 @@ class RoomService(Service):
 
     async def delete_room(self, delete: DeleteRoomRequest) -> DeleteRoomResponse:
         """Deletes a room and disconnects all participants.
-        
+
         Args:
             delete (DeleteRoomRequest): arg containing:
                 - room: str - Name of room to delete
-                
+
         Returns:
             DeleteRoomResponse: Empty response object
         """
@@ -92,12 +112,12 @@ class RoomService(Service):
 
     async def update_room_metadata(self, update: UpdateRoomMetadataRequest) -> Room:
         """Updates a room's [metadata](https://docs.livekit.io/home/client/data/room-metadata/).
-        
+
         Args:
             update (UpdateRoomMetadataRequest): arg containing:
                 - room: str - Name of room to update
                 - metadata: str - New metadata to set
-                
+
         Returns:
             Room: Updated Room object
         """
@@ -113,11 +133,11 @@ class RoomService(Service):
         self, list: ListParticipantsRequest
     ) -> ListParticipantsResponse:
         """Lists all participants in a room.
-        
+
         Args:
             list (ListParticipantsRequest): arg containing:
                 - room: str - Name of room to list participants from
-                
+
         Returns:
             ListParticipantsResponse:
                 - participants: list[ParticipantInfo] - List of participant details
@@ -132,12 +152,12 @@ class RoomService(Service):
 
     async def get_participant(self, get: RoomParticipantIdentity) -> ParticipantInfo:
         """Gets details about a specific participant.
-        
+
         Args:
             get (RoomParticipantIdentity): arg containing:
                 - room: str - Room name
                 - identity: str - Participant identity to look up
-                
+
         Returns:
             ParticipantInfo:
                 - sid: str - Participant session ID
@@ -163,12 +183,12 @@ class RoomService(Service):
         self, remove: RoomParticipantIdentity
     ) -> RemoveParticipantResponse:
         """Removes a participant from a room.
-        
+
         Args:
             remove (RoomParticipantIdentity): arg containing:
                 - room: str - Room name
                 - identity: str - Identity of participant to remove
-                
+
         Returns:
             RemoveParticipantResponse: Empty response object
         """
@@ -185,14 +205,14 @@ class RoomService(Service):
         update: MuteRoomTrackRequest,
     ) -> MuteRoomTrackResponse:
         """Mutes or unmutes a participant's published track.
-        
+
         Args:
             update (MuteRoomTrackRequest): arg containing:
                 - room: str - Room name
                 - identity: str - Participant identity
                 - track_sid: str - Track session ID to mute
                 - muted: bool - True to mute, False to unmute
-                
+
         Returns:
             MuteRoomTrackResponse containing:
                 - track: TrackInfo - Updated track information
@@ -209,7 +229,7 @@ class RoomService(Service):
         self, update: UpdateParticipantRequest
     ) -> ParticipantInfo:
         """Updates a participant's metadata or permissions.
-        
+
         Args:
             update (UpdateParticipantRequest): arg containing:
                 - room: str - Room name
@@ -218,7 +238,7 @@ class RoomService(Service):
                 - permission: ParticipantPermission - New permissions
                 - name: str - New display name
                 - attributes: dict[str, str] - Key-value attributes
-                
+
         Returns:
             ParticipantInfo: Updated participant information
         """
@@ -234,7 +254,7 @@ class RoomService(Service):
         self, update: UpdateSubscriptionsRequest
     ) -> UpdateSubscriptionsResponse:
         """Updates a participant's track subscriptions.
-        
+
         Args:
             update (UpdateSubscriptionsRequest): arg containing:
                 - room: str - Room name
@@ -242,7 +262,7 @@ class RoomService(Service):
                 - track_sids: list[str] - Track session IDs
                 - subscribe: bool - True to subscribe, False to unsubscribe
                 - participant_tracks: list[ParticipantTracks] - Participant track mappings
-                
+
         Returns:
             UpdateSubscriptionsResponse: Empty response object
         """
@@ -256,7 +276,7 @@ class RoomService(Service):
 
     async def send_data(self, send: SendDataRequest) -> SendDataResponse:
         """Sends data to participants in a room.
-        
+
         Args:
             send (SendDataRequest): arg containing:
                 - room: str - Room name
@@ -264,7 +284,7 @@ class RoomService(Service):
                 - kind: DataPacket.Kind - RELIABLE or LOSSY delivery
                 - destination_identities: list[str] - Target participant identities
                 - topic: str - Optional topic for the message
-                
+
         Returns:
             SendDataResponse: Empty response object
         """

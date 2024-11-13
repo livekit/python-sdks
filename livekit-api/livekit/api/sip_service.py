@@ -1,30 +1,52 @@
 import aiohttp
-from livekit.protocol.sip import CreateSIPTrunkRequest, SIPTrunkInfo, CreateSIPInboundTrunkRequest, SIPInboundTrunkInfo, CreateSIPOutboundTrunkRequest, SIPOutboundTrunkInfo, ListSIPTrunkRequest, ListSIPTrunkResponse, ListSIPInboundTrunkRequest, ListSIPInboundTrunkResponse, ListSIPOutboundTrunkRequest, ListSIPOutboundTrunkResponse, DeleteSIPTrunkRequest, SIPDispatchRuleInfo, CreateSIPDispatchRuleRequest, ListSIPDispatchRuleRequest, ListSIPDispatchRuleResponse, DeleteSIPDispatchRuleRequest, CreateSIPParticipantRequest, TransferSIPParticipantRequest, SIPParticipantInfo
+from livekit.protocol.sip import (
+    CreateSIPTrunkRequest,
+    SIPTrunkInfo,
+    CreateSIPInboundTrunkRequest,
+    SIPInboundTrunkInfo,
+    CreateSIPOutboundTrunkRequest,
+    SIPOutboundTrunkInfo,
+    ListSIPTrunkRequest,
+    ListSIPTrunkResponse,
+    ListSIPInboundTrunkRequest,
+    ListSIPInboundTrunkResponse,
+    ListSIPOutboundTrunkRequest,
+    ListSIPOutboundTrunkResponse,
+    DeleteSIPTrunkRequest,
+    SIPDispatchRuleInfo,
+    CreateSIPDispatchRuleRequest,
+    ListSIPDispatchRuleRequest,
+    ListSIPDispatchRuleResponse,
+    DeleteSIPDispatchRuleRequest,
+    CreateSIPParticipantRequest,
+    TransferSIPParticipantRequest,
+    SIPParticipantInfo,
+)
 from ._service import Service
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
 """@private"""
 
+
 class SipService(Service):
     """Client for LiveKit SIP Service API
-    
+
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:
-    
+
     ```python
     from livekit import api
     lkapi = api.LiveKitAPI()
     sip_service = lkapi.sip
     ```
     """
+
     def __init__(
         self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
     ):
         super().__init__(session, url, api_key, api_secret)
 
-    async def create_sip_trunk(
-        self, create: CreateSIPTrunkRequest
-    ) -> SIPTrunkInfo:
+    async def create_sip_trunk(self, create: CreateSIPTrunkRequest) -> SIPTrunkInfo:
         return await self._client.request(
             SVC,
             "CreateSIPTrunk",
@@ -55,9 +77,7 @@ class SipService(Service):
             SIPOutboundTrunkInfo,
         )
 
-    async def list_sip_trunk(
-        self, list: ListSIPTrunkRequest
-    ) -> ListSIPTrunkResponse:
+    async def list_sip_trunk(self, list: ListSIPTrunkRequest) -> ListSIPTrunkResponse:
         return await self._client.request(
             SVC,
             "ListSIPTrunk",
@@ -88,9 +108,7 @@ class SipService(Service):
             ListSIPOutboundTrunkResponse,
         )
 
-    async def delete_sip_trunk(
-        self, delete: DeleteSIPTrunkRequest
-    ) -> SIPTrunkInfo:
+    async def delete_sip_trunk(self, delete: DeleteSIPTrunkRequest) -> SIPTrunkInfo:
         return await self._client.request(
             SVC,
             "DeleteSIPTrunk",

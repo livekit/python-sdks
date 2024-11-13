@@ -1,6 +1,12 @@
 import aiohttp
 from typing import Optional
-from livekit.protocol.agent_dispatch import CreateAgentDispatchRequest, AgentDispatch, DeleteAgentDispatchRequest, ListAgentDispatchRequest, ListAgentDispatchResponse
+from livekit.protocol.agent_dispatch import (
+    CreateAgentDispatchRequest,
+    AgentDispatch,
+    DeleteAgentDispatchRequest,
+    ListAgentDispatchRequest,
+    ListAgentDispatchResponse,
+)
 from ._service import Service
 from .access_token import VideoGrants
 
@@ -25,9 +31,7 @@ class AgentDispatchService(Service):
     ):
         super().__init__(session, url, api_key, api_secret)
 
-    async def create_dispatch(
-        self, req: CreateAgentDispatchRequest
-    ) -> AgentDispatch:
+    async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
         """Create an explicit dispatch for an agent to join a room.
 
         To use explicit dispatch, your agent must be registered with an `agentName`.
@@ -46,9 +50,7 @@ class AgentDispatchService(Service):
             AgentDispatch,
         )
 
-    async def delete_dispatch(
-        self, dispatch_id: str, room_name: str
-    ) -> AgentDispatch:
+    async def delete_dispatch(self, dispatch_id: str, room_name: str) -> AgentDispatch:
         """Delete an explicit dispatch for an agent in a room.
 
         Args:
@@ -69,9 +71,7 @@ class AgentDispatchService(Service):
             AgentDispatch,
         )
 
-    async def list_dispatch(
-        self, room_name: str
-    ) -> list[AgentDispatch]:
+    async def list_dispatch(self, room_name: str) -> list[AgentDispatch]:
         """List all agent dispatches in a room.
 
         Args:
@@ -104,9 +104,7 @@ class AgentDispatchService(Service):
         res = await self._client.request(
             SVC,
             "ListDispatch",
-            ListAgentDispatchRequest(
-                dispatch_id=dispatch_id, room=room_name
-            ),
+            ListAgentDispatchRequest(dispatch_id=dispatch_id, room=room_name),
             self._auth_header(VideoGrants(room_admin=True, room=room_name)),
             ListAgentDispatchResponse,
         )
