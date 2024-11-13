@@ -1,6 +1,24 @@
 import aiohttp
-from livekit.protocol import room as proto_room
-from livekit.protocol import models as proto_models
+from livekit.protocol.room import (
+    CreateRoomRequest,
+    ListRoomsRequest,
+    DeleteRoomRequest,
+    ListRoomsResponse,
+    DeleteRoomResponse,
+    ListParticipantsRequest,
+    ListParticipantsResponse,
+    RoomParticipantIdentity,
+    MuteRoomTrackRequest,
+    MuteRoomTrackResponse,
+    UpdateParticipantRequest,
+    UpdateSubscriptionsRequest,
+    SendDataRequest,
+    SendDataResponse,
+    UpdateRoomMetadataRequest,
+    RemoveParticipantResponse,
+    UpdateSubscriptionsResponse,
+)
+from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
 from .access_token import VideoGrants
 
@@ -13,124 +31,112 @@ class RoomService(Service):
     ):
         super().__init__(session, url, api_key, api_secret)
 
-    async def create_room(
-        self, create: proto_room.CreateRoomRequest
-    ) -> proto_models.Room:
+    async def create_room(self, create: CreateRoomRequest) -> Room:
         return await self._client.request(
             SVC,
             "CreateRoom",
             create,
             self._auth_header(VideoGrants(room_create=True)),
-            proto_models.Room,
+            Room,
         )
 
-    async def list_rooms(
-        self, list: proto_room.ListRoomsRequest
-    ) -> proto_room.ListRoomsResponse:
+    async def list_rooms(self, list: ListRoomsRequest) -> ListRoomsResponse:
         return await self._client.request(
             SVC,
             "ListRooms",
             list,
             self._auth_header(VideoGrants(room_list=True)),
-            proto_room.ListRoomsResponse,
+            ListRoomsResponse,
         )
 
-    async def delete_room(
-        self, delete: proto_room.DeleteRoomRequest
-    ) -> proto_room.DeleteRoomResponse:
+    async def delete_room(self, delete: DeleteRoomRequest) -> DeleteRoomResponse:
         return await self._client.request(
             SVC,
             "DeleteRoom",
             delete,
             self._auth_header(VideoGrants(room_create=True)),
-            proto_room.DeleteRoomResponse,
+            DeleteRoomResponse,
         )
 
-    async def update_room_metadata(
-        self, update: proto_room.UpdateRoomMetadataRequest
-    ) -> proto_models.Room:
+    async def update_room_metadata(self, update: UpdateRoomMetadataRequest) -> Room:
         return await self._client.request(
             SVC,
             "UpdateRoomMetadata",
             update,
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
-            proto_models.Room,
+            Room,
         )
 
     async def list_participants(
-        self, list: proto_room.ListParticipantsRequest
-    ) -> proto_room.ListParticipantsResponse:
+        self, list: ListParticipantsRequest
+    ) -> ListParticipantsResponse:
         return await self._client.request(
             SVC,
             "ListParticipants",
             list,
             self._auth_header(VideoGrants(room_admin=True, room=list.room)),
-            proto_room.ListParticipantsResponse,
+            ListParticipantsResponse,
         )
 
-    async def get_participant(
-        self, get: proto_room.RoomParticipantIdentity
-    ) -> proto_models.ParticipantInfo:
+    async def get_participant(self, get: RoomParticipantIdentity) -> ParticipantInfo:
         return await self._client.request(
             SVC,
             "GetParticipant",
             get,
             self._auth_header(VideoGrants(room_admin=True, room=get.room)),
-            proto_models.ParticipantInfo,
+            ParticipantInfo,
         )
 
     async def remove_participant(
-        self, remove: proto_room.RoomParticipantIdentity
-    ) -> proto_room.RemoveParticipantResponse:
+        self, remove: RoomParticipantIdentity
+    ) -> RemoveParticipantResponse:
         return await self._client.request(
             SVC,
             "RemoveParticipant",
             remove,
             self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
-            proto_room.RemoveParticipantResponse,
+            RemoveParticipantResponse,
         )
 
     async def mute_published_track(
         self,
-        update: proto_room.MuteRoomTrackRequest,
-    ) -> proto_room.MuteRoomTrackResponse:
+        update: MuteRoomTrackRequest,
+    ) -> MuteRoomTrackResponse:
         return await self._client.request(
             SVC,
             "MutePublishedTrack",
             update,
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
-            proto_room.MuteRoomTrackResponse,
+            MuteRoomTrackResponse,
         )
 
     async def update_participant(
-        self, update: proto_room.UpdateParticipantRequest
-    ) -> proto_models.ParticipantInfo:
+        self, update: UpdateParticipantRequest
+    ) -> ParticipantInfo:
         return await self._client.request(
             SVC,
             "UpdateParticipant",
             update,
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
-            proto_models.ParticipantInfo,
+            ParticipantInfo,
         )
 
     async def update_subscriptions(
-        self, update: proto_room.UpdateSubscriptionsRequest
-    ) -> proto_room.UpdateSubscriptionsResponse:
+        self, update: UpdateSubscriptionsRequest
+    ) -> UpdateSubscriptionsResponse:
         return await self._client.request(
             SVC,
             "UpdateSubscriptions",
             update,
             self._auth_header(VideoGrants(room_admin=True, room=update.room)),
-            proto_room.UpdateSubscriptionsResponse,
+            UpdateSubscriptionsResponse,
         )
 
-    async def send_data(
-        self, send: proto_room.SendDataRequest
-    ) -> proto_room.SendDataResponse:
+    async def send_data(self, send: SendDataRequest) -> SendDataResponse:
         return await self._client.request(
             SVC,
             "SendData",
             send,
             self._auth_header(VideoGrants(room_admin=True, room=send.room)),
-            proto_room.SendDataResponse,
+            SendDataResponse,
         )

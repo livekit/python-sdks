@@ -9,6 +9,17 @@ from typing import Optional
 
 
 class LiveKitAPI:
+    """LiveKit Server API Client
+
+    Usage:
+
+    ```python
+    from livekit import api
+    lkapi = api.LiveKitAPI()
+    rooms = await lkapi.room.list_rooms(api.proto_room.ListRoomsRequest(names=['test-room']))
+    ```
+    """
+
     def __init__(
         self,
         url: Optional[str] = None,
@@ -37,23 +48,28 @@ class LiveKitAPI:
         )
 
     @property
-    def agent_dispatch(self):
+    def agent_dispatch(self) -> AgentDispatchService:
+        """See :class:`AgentDispatchService`"""
         return self._agent_dispatch
 
     @property
-    def room(self):
+    def room(self) -> RoomService:
+        """See :class:`RoomService`"""
         return self._room
 
     @property
-    def ingress(self):
+    def ingress(self) -> IngressService:
+        """See :class:`IngressService`"""
         return self._ingress
 
     @property
-    def egress(self):
+    def egress(self) -> EgressService:
+        """See :class:`EgressService`"""
         return self._egress
 
     @property
-    def sip(self):
+    def sip(self) -> SipService:
+        """See: :class:`SipService`"""
         return self._sip
 
     async def aclose(self):

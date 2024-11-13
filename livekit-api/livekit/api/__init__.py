@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LiveKit API SDK"""
+"""LiveKit Server APIs for Python
+
+See https://docs.livekit.io/home/server/ for docs and examples.
+"""
 
 # flake8: noqa
 # re-export packages from protocol
