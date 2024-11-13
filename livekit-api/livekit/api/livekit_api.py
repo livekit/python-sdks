@@ -59,37 +59,27 @@ class LiveKitAPI:
 
     @property
     def agent_dispatch(self) -> AgentDispatchService:
-        """Instance of the AgentDispatchService
-
-        See `livekit.api.agent_dispatch_service.AgentDispatchService`"""
+        """Instance of the AgentDispatchService"""
         return self._agent_dispatch
 
     @property
     def room(self) -> RoomService:
-        """Instance of the RoomService
-
-        See `livekit.api.room_service.RoomService`"""
+        """Instance of the RoomService"""
         return self._room
 
     @property
     def ingress(self) -> IngressService:
-        """Instance of the IngressService
-
-        See `livekit.api.ingress_service.IngressService`"""
+        """Instance of the IngressService"""
         return self._ingress
 
     @property
     def egress(self) -> EgressService:
-        """Instance of the EgressService
-
-        See `livekit.api.egress_service.EgressService`"""
+        """Instance of the EgressService"""
         return self._egress
 
     @property
     def sip(self) -> SipService:
-        """Instance of the SipService
-
-        See `livekit.api.sip_service.SipService`"""
+        """Instance of the SipService"""
         return self._sip
 
     async def aclose(self):
