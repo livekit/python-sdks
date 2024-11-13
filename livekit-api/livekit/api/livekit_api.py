@@ -84,18 +84,18 @@ class LiveKitAPI:
 
     async def aclose(self):
         """Close the API client
-        
+
         Call this before your application exits or when the API client is no longer needed."""
         await self._session.close()
-        
+
     async def __aenter__(self):
         """@private
-        
+
         Support for `async with`"""
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """@private
-        
+
         Support for `async with`"""
         await self.aclose()
