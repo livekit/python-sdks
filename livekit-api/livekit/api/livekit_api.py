@@ -83,5 +83,7 @@ class LiveKitAPI:
         return self._sip
 
     async def aclose(self):
-        """@private"""
+        """Close the API client
+        
+        Call this before your application exits or when the API client is no longer needed."""
         await self._session.close()
