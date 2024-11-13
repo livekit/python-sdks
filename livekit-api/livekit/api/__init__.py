@@ -14,6 +14,8 @@
 
 """LiveKit Server APIs for Python
 
+`pip install livekit-api`
+
 Manage rooms, participants, egress, ingress, SIP, and Agent dispatch.
 
 Primary entry point is `LiveKitAPI`.
