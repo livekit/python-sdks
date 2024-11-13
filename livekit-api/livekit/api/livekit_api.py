@@ -10,6 +10,8 @@ from typing import Optional
 
 class LiveKitAPI:
     """LiveKit Server API Client
+    
+    This class is the main entrypoint, which exposes all services.
 
     Usage:
 
@@ -28,6 +30,14 @@ class LiveKitAPI:
         *,
         timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=60),  # 60 seconds
     ):
+        """Create a new LiveKitAPI instance.
+        
+        Args:
+            url: LiveKit server URL (read from `LIVEKIT_URL` environment variable if not provided)
+            api_key: API key (read from `LIVEKIT_API_KEY` environment variable if not provided)
+            api_secret: API secret (read from `LIVEKIT_API_SECRET` environment variable if not provided)
+            timeout: Request timeout (default: 60 seconds)
+        """
         url = url or os.getenv("LIVEKIT_URL")
         api_key = api_key or os.getenv("LIVEKIT_API_KEY")
         api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
@@ -49,28 +59,39 @@ class LiveKitAPI:
 
     @property
     def agent_dispatch(self) -> AgentDispatchService:
-        """See :class:`AgentDispatchService`"""
+        """Instance of the AgentDispatchService
+        
+        See `livekit.api.agent_dispatch_service.AgentDispatchService`"""
         return self._agent_dispatch
 
     @property
     def room(self) -> RoomService:
-        """See :class:`RoomService`"""
+        """Instance of the RoomService
+        
+        See `livekit.api.room_service.RoomService`"""
         return self._room
 
     @property
     def ingress(self) -> IngressService:
-        """See :class:`IngressService`"""
+        """Instance of the IngressService
+        
+        See `livekit.api.ingress_service.IngressService`"""
         return self._ingress
 
     @property
     def egress(self) -> EgressService:
-        """See :class:`EgressService`"""
+        """Instance of the EgressService
+        
+        See `livekit.api.egress_service.EgressService`"""
         return self._egress
 
     @property
     def sip(self) -> SipService:
-        """See: :class:`SipService`"""
+        """Instance of the SipService
+        
+        See `livekit.api.sip_service.SipService`"""
         return self._sip
 
     async def aclose(self):
+        """@private"""
         await self._session.close()

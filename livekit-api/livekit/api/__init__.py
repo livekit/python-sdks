@@ -14,7 +14,11 @@
 
 """LiveKit Server APIs for Python
 
-See https://docs.livekit.io/home/server/ for docs and examples.
+Manage rooms, participants, egress, ingress, SIP, and Agent dispatch.
+
+Primary entry point is `LiveKitAPI`.
+
+See https://docs.livekit.io/reference/server/server-apis for more information.
 """
 
 # flake8: noqa
@@ -33,3 +37,19 @@ from .livekit_api import LiveKitAPI
 from .access_token import VideoGrants, SIPGrants, AccessToken, TokenVerifier
 from .webhook import WebhookReceiver
 from .version import __version__
+
+__all__ = [
+    "LiveKitAPI",
+    "room_service",
+    "egress_service",
+    "ingress_service",
+    "sip_service",
+    "agent_dispatch_service",
+    "VideoGrants",
+    "SIPGrants",
+    "AccessToken",
+    "TokenVerifier",
+    "WebhookReceiver",
+    "TwirpError",
+    "TwirpErrorCode",
+]

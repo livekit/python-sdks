@@ -1,31 +1,25 @@
 import aiohttp
-from livekit.protocol.room import (
-    CreateRoomRequest,
-    ListRoomsRequest,
-    DeleteRoomRequest,
-    ListRoomsResponse,
-    DeleteRoomResponse,
-    ListParticipantsRequest,
-    ListParticipantsResponse,
-    RoomParticipantIdentity,
-    MuteRoomTrackRequest,
-    MuteRoomTrackResponse,
-    UpdateParticipantRequest,
-    UpdateSubscriptionsRequest,
-    SendDataRequest,
-    SendDataResponse,
-    UpdateRoomMetadataRequest,
-    RemoveParticipantResponse,
-    UpdateSubscriptionsResponse,
-)
+from livekit.protocol.room import CreateRoomRequest, ListRoomsRequest, DeleteRoomRequest, ListRoomsResponse, DeleteRoomResponse, ListParticipantsRequest, ListParticipantsResponse, RoomParticipantIdentity, MuteRoomTrackRequest, MuteRoomTrackResponse, UpdateParticipantRequest, UpdateSubscriptionsRequest, SendDataRequest, SendDataResponse, UpdateRoomMetadataRequest, RemoveParticipantResponse, UpdateSubscriptionsResponse
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
 from .access_token import VideoGrants
 
 SVC = "RoomService"
-
+"""@private"""
 
 class RoomService(Service):
+    """Client for LiveKit RoomService API
+    
+    Recommended way to use this service is via `livekit.api.LiveKitAPI`:
+    
+    ```python
+    from livekit import api
+    lkapi = api.LiveKitAPI()
+    room_service = lkapi.room
+    ```
+    
+    Also see https://docs.livekit.io/home/server/managing-rooms/ and https://docs.livekit.io/home/server/managing-participants/
+    """
     def __init__(
         self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
     ):
