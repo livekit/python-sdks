@@ -18,11 +18,13 @@ class Service(ABC):
         self.api_secret = api_secret
 
     def _auth_header(
-        self, grants: VideoGrants, sip: SIPGrants | None = None
+        self, grants: VideoGrants | None, sip: SIPGrants | None = None
     ) -> Dict[str, str]:
-        tok = AccessToken(self.api_key, self.api_secret).with_grants(grants)
+        tok = AccessToken(self.api_key, self.api_secret)
+        if grants:
+            tok.with_grants(grants)
         if sip is not None:
-            tok = tok.with_sip_grants(sip)
+            tok.with_sip_grants(sip)
 
         token = tok.to_jwt()
 

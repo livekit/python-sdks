@@ -12,10 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""LiveKit API SDK"""
+"""LiveKit Server APIs for Python
+
+`pip install livekit-api`
+
+Manage rooms, participants, egress, ingress, SIP, and Agent dispatch.
+
+Primary entry point is `LiveKitAPI`.
+
+See https://docs.livekit.io/reference/server/server-apis for more information.
+"""
 
 # flake8: noqa
 # re-export packages from protocol
+from livekit.protocol.agent_dispatch import *
+from livekit.protocol.agent import *
 from livekit.protocol.egress import *
 from livekit.protocol.ingress import *
 from livekit.protocol.models import *
@@ -28,3 +39,17 @@ from .livekit_api import LiveKitAPI
 from .access_token import VideoGrants, SIPGrants, AccessToken, TokenVerifier
 from .webhook import WebhookReceiver
 from .version import __version__
+
+__all__ = [
+    "LiveKitAPI",
+    "room_service",
+    "egress_service",
+    "ingress_service",
+    "sip_service",
+    "agent_dispatch_service",
+    "VideoGrants",
+    "SIPGrants",
+    "AccessToken",
+    "TokenVerifier",
+    "WebhookReceiver",
+]
