@@ -1,16 +1,29 @@
 import aiohttp
 from typing import Optional
-from livekit.protocol import agent_dispatch as proto_agent_dispatch
+from livekit.protocol.agent_dispatch import (
+    CreateAgentDispatchRequest,
+    AgentDispatch,
+    DeleteAgentDispatchRequest,
+    ListAgentDispatchRequest,
+    ListAgentDispatchResponse,
+)
 from ._service import Service
 from .access_token import VideoGrants
 
 SVC = "AgentDispatchService"
+"""@private"""
 
 
 class AgentDispatchService(Service):
     """Manage agent dispatches. Service APIs require roomAdmin permissions.
 
-    An easier way to construct this service is via LiveKitAPI.agent_dispatch.
+    Recommended way to use this service is via `livekit.api.LiveKitAPI`:
+
+    ```python
+    from livekit import api
+    lkapi = api.LiveKitAPI()
+    agent_dispatch = lkapi.agent_dispatch
+    ```
     """
 
     def __init__(
@@ -18,9 +31,7 @@ class AgentDispatchService(Service):
     ):
         super().__init__(session, url, api_key, api_secret)
 
-    async def create_dispatch(
-        self, req: proto_agent_dispatch.CreateAgentDispatchRequest
-    ) -> proto_agent_dispatch.AgentDispatch:
+    async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
         """Create an explicit dispatch for an agent to join a room.
 
         To use explicit dispatch, your agent must be registered with an `agentName`.
@@ -36,12 +47,10 @@ class AgentDispatchService(Service):
             "CreateDispatch",
             req,
             self._auth_header(VideoGrants(room_admin=True, room=req.room)),
-            proto_agent_dispatch.AgentDispatch,
+            AgentDispatch,
         )
 
-    async def delete_dispatch(
-        self, dispatch_id: str, room_name: str
-    ) -> proto_agent_dispatch.AgentDispatch:
+    async def delete_dispatch(self, dispatch_id: str, room_name: str) -> AgentDispatch:
         """Delete an explicit dispatch for an agent in a room.
 
         Args:
@@ -54,17 +63,15 @@ class AgentDispatchService(Service):
         return await self._client.request(
             SVC,
             "DeleteDispatch",
-            proto_agent_dispatch.DeleteAgentDispatchRequest(
+            DeleteAgentDispatchRequest(
                 dispatch_id=dispatch_id,
                 room=room_name,
             ),
             self._auth_header(VideoGrants(room_admin=True, room=room_name)),
-            proto_agent_dispatch.AgentDispatch,
+            AgentDispatch,
         )
 
-    async def list_dispatch(
-        self, room_name: str
-    ) -> list[proto_agent_dispatch.AgentDispatch]:
+    async def list_dispatch(self, room_name: str) -> list[AgentDispatch]:
         """List all agent dispatches in a room.
 
         Args:
@@ -76,15 +83,15 @@ class AgentDispatchService(Service):
         res = await self._client.request(
             SVC,
             "ListDispatch",
-            proto_agent_dispatch.ListAgentDispatchRequest(room=room_name),
+            ListAgentDispatchRequest(room=room_name),
             self._auth_header(VideoGrants(room_admin=True, room=room_name)),
-            proto_agent_dispatch.ListAgentDispatchResponse,
+            ListAgentDispatchResponse,
         )
         return list(res.agent_dispatches)
 
     async def get_dispatch(
         self, dispatch_id: str, room_name: str
-    ) -> Optional[proto_agent_dispatch.AgentDispatch]:
+    ) -> Optional[AgentDispatch]:
         """Get an Agent dispatch by ID
 
         Args:
@@ -97,11 +104,9 @@ class AgentDispatchService(Service):
         res = await self._client.request(
             SVC,
             "ListDispatch",
-            proto_agent_dispatch.ListAgentDispatchRequest(
-                dispatch_id=dispatch_id, room=room_name
-            ),
+            ListAgentDispatchRequest(dispatch_id=dispatch_id, room=room_name),
             self._auth_header(VideoGrants(room_admin=True, room=room_name)),
-            proto_agent_dispatch.ListAgentDispatchResponse,
+            ListAgentDispatchResponse,
         )
         if len(res.agent_dispatches) > 0:
             return res.agent_dispatches[0]
