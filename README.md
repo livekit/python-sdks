@@ -74,6 +74,8 @@ $ pip install livekit
 
 ### Connecting to a room
 
+see [room_example](examples/room_example.py) for full example
+
 ```python
 from livekit import rtc
 
@@ -86,7 +88,7 @@ async def main():
             "participant connected: %s %s", participant.sid, participant.identity)
 
     async def receive_frames(stream: rtc.VideoStream):
-        async for frame in video_stream:
+        async for frame in stream:
             # received a video frame from the track, process it here
             pass
 
@@ -105,9 +107,11 @@ async def main():
 
     # participants and tracks that are already available in the room
     # participant_connected and track_published events will *not* be emitted for them
-    for participant in room.participants.items():
-        for publication in participant.track_publications.items():
-            print("track publication: %s", publication.sid)
+    for identity, participant in room.remote_participants.items():
+        print(f"identity: {identity}")
+        print(f"participant: {participant}")
+        for tid, publication in participant.track_publications.items():
+            print(f"\ttrack id: {publication}")
 ```
 
 ### Sending and receiving chat
