@@ -41,7 +41,7 @@ async def create_explicit_disptach(http_session: aiohttp.ClientSession):
 """
 When agent name is set, the agent will no longer be automatically dispatched
 to new rooms. If you want that agent to be dispatched to a new room as soon as
-the participant connects, you can set the roomConfig with the agent
+the participant connects, you can set the RoomConfiguration with the agent
 definition in the access token.
 """
 
