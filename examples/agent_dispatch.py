@@ -16,7 +16,7 @@ agent_name = "test-agent"
 """
 This example demonstrates how to have an agent join a room 
 without using the automatic dispatch. In order to use this 
-feature, you must have an agent running with `agentName` set 
+feature, you must have an agent running with `agent_name` set 
 when defining your WorkerOptions. A dispatch requests the 
 agent to enter a specific room with optional metadata.
 """
