@@ -60,26 +60,27 @@ def test_args():
     emitter.emit("whatever", 1, 2, 3)
     emitter.emit("whatever", 1, 2, 3, 4, 5)  # only 3 arguments will be passed
 
-    assert len(calls) == 2
-    assert calls[0] == (1, 2, 3)
-    assert calls[1] == (1, 2, 3)
-
-    calls = []
+    assert calls == [(1, 2, 3), (1, 2, 3)]
 
     with pytest.raises(TypeError):
         emitter.emit("whatever", 1, 2)
 
-    assert len(calls) == 0
+
+def test_varargs():
+    EventTypes = Literal["whatever"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    calls = []
 
     @emitter.on("whatever")
     def on_whatever_varargs(*args):
         calls.append(args)
 
     emitter.emit("whatever", 1, 2, 3, 4, 5)
+    emitter.emit("whatever", 1, 2)
 
-    assert len(calls) == 2
-    assert calls[0] == (1, 2, 3)
-    assert calls[1] == (1, 2, 3, 4, 5)
+    assert calls == [(1, 2, 3, 4, 5), (1, 2)]
 
 
 def test_throw():
