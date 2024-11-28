@@ -7,15 +7,16 @@ from livekit import rtc
 TOKEN = os.environ.get("LIVEKIT_TOKEN")
 URL = os.environ.get("LIVEKIT_URL")
 
+
 async def main():
     logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
     room = rtc.Room()
 
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant):
         logging.info(
-            "participant connected: %s %s", participant.sid, participant.identity)
+            "participant connected: %s %s", participant.sid, participant.identity
+        )
 
     async def receive_frames(stream: rtc.VideoStream):
         async for frame in stream:
@@ -24,7 +25,11 @@ async def main():
 
     # track_subscribed is emitted whenever the local participant is subscribed to a new track
     @room.on("track_subscribed")
-    def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
+    def on_track_subscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ):
         logging.info("track subscribed: %s", publication.sid)
         if track.kind == rtc.TrackKind.KIND_VIDEO:
             video_stream = rtc.VideoStream(track)
@@ -43,7 +48,8 @@ async def main():
         print(f"participant identity: {participant.identity}")
         print(f"participant name: {participant.name}")
         print(f"participant kind: {participant.kind}")
-        print(f"participant track publications: {participant.track_publications}")
+        print(f"participant track publications: {
+              participant.track_publications}")
         for tid, publication in participant.track_publications.items():
             print(f"\ttrack id: {tid}")
             print(f"\t\ttrack publication: {publication}")
@@ -52,7 +58,6 @@ async def main():
             print(f"\t\ttrack source: {publication.source}")
 
         print(f"participant metadata: {participant.metadata}")
-        
 
 
 if __name__ == "__main__":
@@ -62,4 +67,3 @@ if __name__ == "__main__":
         exit(1)
 
     asyncio.run(main())
-
