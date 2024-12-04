@@ -114,12 +114,14 @@ class LocalVideoTrack(Track):
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = True
         FfiClient.instance.request(req)
+        self._info.muted = True
 
     def unmute(self):
         req = proto_ffi.FfiRequest()
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = False
         FfiClient.instance.request(req)
+        self._info.muted = False
 
     def __repr__(self) -> str:
         return f"rtc.LocalVideoTrack(sid={self.sid}, name={self.name})"

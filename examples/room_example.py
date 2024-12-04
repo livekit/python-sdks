@@ -49,8 +49,10 @@ async def main():
         print(f"participant identity: {participant.identity}")
         print(f"participant name: {participant.name}")
         print(f"participant kind: {participant.kind}")
-        print(f"participant track publications: {
-              participant.track_publications}")
+        print(
+            f"participant track publications: {
+              participant.track_publications}"
+        )
         for tid, publication in participant.track_publications.items():
             print(f"\ttrack id: {tid}")
             print(f"\t\ttrack publication: {publication}")
