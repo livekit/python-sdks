@@ -22,8 +22,8 @@ agent to enter a specific room with optional metadata.
 """
 
 
-async def create_explicit_disptach(http_session: aiohttp.ClientSession):
-    agent_disptach_service = AgentDispatchService(
+async def create_explicit_dispatch(http_session: aiohttp.ClientSession):
+    agent_dispatch_service = AgentDispatchService(
         session=http_session,
         url=os.getenv("LIVEKIT_URL"),
         api_key=os.getenv("LIVEKIT_API_KEY"),
@@ -32,9 +32,9 @@ async def create_explicit_disptach(http_session: aiohttp.ClientSession):
     dispatch_request = CreateAgentDispatchRequest(
         agent_name=agent_name, room=room_name, metadata="my_metadata"
     )
-    dispatch = await agent_disptach_service.create_dispatch(dispatch_request)
+    dispatch = await agent_dispatch_service.create_dispatch(dispatch_request)
     print("created dispatch", dispatch)
-    dispatches = await agent_disptach_service.list_dispatch(room_name=room_name)
+    dispatches = await agent_dispatch_service.list_dispatch(room_name=room_name)
     print(f"there are {len(dispatches)} dispatches in {room_name}")
 
 
@@ -68,7 +68,7 @@ async def main():
         token = await create_token_with_agent_dispatch()
         print("created participant token", token)
         print("creating explicit dispatch")
-        await create_explicit_disptach(http_session)
+        await create_explicit_dispatch(http_session)
 
 
 asyncio.run(main())
