@@ -1,14 +1,5 @@
 import asyncio
-import os
-import aiohttp
-from livekit.protocol.room import RoomConfiguration
-from livekit.protocol.agent_dispatch import (
-    RoomAgentDispatch,
-    CreateAgentDispatchRequest,
-)
-from livekit.api import AccessToken, VideoGrants
-from livekit.api.agent_dispatch_service import AgentDispatchService
-
+from livekit import api
 
 room_name = "my-room"
 agent_name = "test-agent"
@@ -22,19 +13,17 @@ agent to enter a specific room with optional metadata.
 """
 
 
-async def create_explicit_dispatch(http_session: aiohttp.ClientSession):
-    agent_dispatch_service = AgentDispatchService(
-        session=http_session,
-        url=os.getenv("LIVEKIT_URL"),
-        api_key=os.getenv("LIVEKIT_API_KEY"),
-        api_secret=os.getenv("LIVEKIT_API_SECRET"),
+async def create_explicit_dispatch():
+    lkapi = api.LiveKitAPI()
+
+    dispatch = await lkapi.agent_dispatch.create_dispatch(
+        api.CreateAgentDispatchRequest(
+            agent_name=agent_name, room=room_name, metadata="my_metadata"
+        )
     )
-    dispatch_request = CreateAgentDispatchRequest(
-        agent_name=agent_name, room=room_name, metadata="my_metadata"
-    )
-    dispatch = await agent_dispatch_service.create_dispatch(dispatch_request)
     print("created dispatch", dispatch)
-    dispatches = await agent_dispatch_service.list_dispatch(room_name=room_name)
+
+    dispatches = await lkapi.agent_dispatch.list_dispatch(room_name=room_name)
     print(f"there are {len(dispatches)} dispatches in {room_name}")
 
 
@@ -48,13 +37,15 @@ definition in the access token.
 
 async def create_token_with_agent_dispatch() -> str:
     token = (
-        AccessToken()
+        api.AccessToken()
         .with_identity("my_participant")
-        .with_grants(VideoGrants(room_join=True, room=room_name))
+        .with_grants(api.VideoGrants(room_join=True, room=room_name))
         .with_room_config(
-            RoomConfiguration(
+            api.RoomConfiguration(
                 agents=[
-                    RoomAgentDispatch(agent_name="test-agent", metadata="my_metadata")
+                    api.RoomAgentDispatch(
+                        agent_name="test-agent", metadata="my_metadata"
+                    )
                 ],
             ),
         )
@@ -64,11 +55,10 @@ async def create_token_with_agent_dispatch() -> str:
 
 
 async def main():
-    async with aiohttp.ClientSession() as http_session:
-        token = await create_token_with_agent_dispatch()
-        print("created participant token", token)
-        print("creating explicit dispatch")
-        await create_explicit_dispatch(http_session)
+    token = await create_token_with_agent_dispatch()
+    print("created participant token", token)
+    print("creating explicit dispatch")
+    await create_explicit_dispatch()
 
 
 asyncio.run(main())
