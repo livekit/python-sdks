@@ -73,6 +73,7 @@ from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
+from .synchronizer import AVSynchronizer
 
 __all__ = [
     "ConnectionQuality",
@@ -137,5 +138,6 @@ __all__ = [
     "RpcInvocationData",
     "EventEmitter",
     "combine_audio_frames",
+    "AVSynchronizer",
     "__version__",
 ]
