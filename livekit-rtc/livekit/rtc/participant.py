@@ -565,6 +565,7 @@ class LocalParticipant(Participant):
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
+        req.unpublish_track.stop_on_unpublish = True
 
         queue = self._room_queue.subscribe()
         try:
