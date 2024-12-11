@@ -25,6 +25,7 @@ async def create_explicit_dispatch():
 
     dispatches = await lkapi.agent_dispatch.list_dispatch(room_name=room_name)
     print(f"there are {len(dispatches)} dispatches in {room_name}")
+    await lkapi.aclose()
 
 
 """
