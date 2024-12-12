@@ -9,6 +9,7 @@ from typing import AsyncIterable, Optional, Union
 
 import numpy as np
 from livekit import rtc, api
+import sys
 
 try:
     import cv2
@@ -218,7 +219,7 @@ async def video_generator(
             yield video_frame, sub_audio_frame
 
 
-async def main(room: rtc.Room):
+async def main(room: rtc.Room, room_name: str):
     token = (
         api.AccessToken()
         .with_identity("python-publisher")
@@ -226,7 +227,7 @@ async def main(room: rtc.Room):
         .with_grants(
             api.VideoGrants(
                 room_join=True,
-                room="room-ysBA-Q0hM",
+                room=room_name,
                 agent=True,
             )
         )
@@ -303,6 +304,11 @@ if __name__ == "__main__":
         handlers=[logging.FileHandler("audio_wave.log"), logging.StreamHandler()],
     )
 
+    if len(sys.argv) != 2:
+        print("Usage: python audio_wave.py <room-name>")
+        sys.exit(1)
+
+    room_name = sys.argv[1]
     loop = asyncio.get_event_loop()
     room = rtc.Room(loop=loop)
 
@@ -310,7 +316,7 @@ if __name__ == "__main__":
         await room.disconnect()
         loop.stop()
 
-    asyncio.ensure_future(main(room))
+    asyncio.ensure_future(main(room, room_name))
     for signal in [signal.SIGINT, signal.SIGTERM]:
         loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 

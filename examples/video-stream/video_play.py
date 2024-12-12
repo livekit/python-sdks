@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import AsyncIterable, Union
+import sys
 
 import numpy as np
 import os
@@ -92,7 +93,7 @@ class MediaFileStreamer:
         self._audio_container.close()
 
 
-async def main(room: rtc.Room):
+async def main(room: rtc.Room, room_name: str, media_path: str):
     token = (
         api.AccessToken()
         .with_identity("python-publisher")
@@ -100,7 +101,7 @@ async def main(room: rtc.Room):
         .with_grants(
             api.VideoGrants(
                 room_join=True,
-                room="my-room",
+                room=room_name,
             )
         )
         .to_jwt()
@@ -116,7 +117,6 @@ async def main(room: rtc.Room):
         return
 
     # Create media streamer
-    media_path = "/path/to/video.mp4"
     streamer = MediaFileStreamer(media_path)
     media_info = streamer.info
 
@@ -137,7 +137,13 @@ async def main(room: rtc.Room):
     audio_track = rtc.LocalAudioTrack.create_audio_track("audio", audio_source)
 
     # Publish tracks
-    video_options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_CAMERA)
+    video_options = rtc.TrackPublishOptions(
+        source=rtc.TrackSource.SOURCE_CAMERA,
+        video_encoding=rtc.VideoEncoding(
+            max_framerate=30,
+            max_bitrate=5_000_000,
+        ),
+    )
     audio_options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
 
     await room.local_participant.publish_track(video_track, video_options)
@@ -183,6 +189,13 @@ if __name__ == "__main__":
         handlers=[logging.FileHandler("video_play.log"), logging.StreamHandler()],
     )
 
+    if len(sys.argv) != 3:
+        print("Usage: python video_play.py <room-name> </path/to/video>")
+        sys.exit(1)
+
+    room_name = sys.argv[1]
+    media_path = sys.argv[2]
+
     loop = asyncio.get_event_loop()
     room = rtc.Room(loop=loop)
 
@@ -190,7 +203,7 @@ if __name__ == "__main__":
         await room.disconnect()
         loop.stop()
 
-    asyncio.ensure_future(main(room))
+    asyncio.ensure_future(main(room, room_name, media_path))
     for signal in [signal.SIGINT, signal.SIGTERM]:
         loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
 
