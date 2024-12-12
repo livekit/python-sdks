@@ -22,17 +22,25 @@ await av_sync.push(audio_frame)
 ## Examples
 
 ### 1. Video File Playback (`video_play.py`)
-Shows how to stream video and audio from separate sources while maintaining sync:
 
-- Reads video and audio streams separately from a media file
+Demonstrates synchronizing video and audio from separate sources while maintaining sync:
+
+- Reads video and audio streams separately from a media file (using `av` library)
 - Uses separate tasks to push video and audio frames to the synchronizer
 - Since the streams are continuous, a larger `queue_size_ms` can be used, though this will increase memory usage
 
-### 2. Audio Visualization (`audio_wave.py`) 
+#### Usage:
+
+```bash
+python video_play.py <room-name> </path/to/video>
+```
+
+### 2. Audio Visualization (`audio_wave.py`)
+
 Demonstrates generating video based on audio input:
 
 - Generates audio frames with alternating sine waves and silence
-- Creates video frames visualizing the audio waveform
+- Creates video frames visualizing the audio waveform (using `cv2` library)
 - Shows how to handle cases with and without audio:
   - When audio is present: Push synchronized video and audio frames
   - During silence: Push only video frames
