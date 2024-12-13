@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build Docs 
+name: Build Docs
 
 on:
   workflow_dispatch:
@@ -45,29 +45,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Install Package to Document
-      run: python -m pip install ${{ inputs.package_dir }}/
+      - name: Install Package to Document
+        run: python -m pip install ${{ inputs.package_dir }}/
 
-    - name: Download ffi
-      run: |
-        if [[ '${{ inputs.package_name }}' = 'livekit.rtc' ]]; then
-          pip install requests
-          python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
-        fi
+      - name: Download ffi
+        run: |
+          if [[ '${{ inputs.package_name }}' = 'livekit.rtc' ]]; then
+            pip install requests
+            python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
+          fi
 
-    - name: Install pdoc 
-      run: pip install --upgrade pdoc
+      - name: Install pdoc
+        run: pip install --upgrade pdoc
 
-    - name: Build Docs
-      run:  python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
+      - name: Build Docs
+        run: python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
 
-    - name: S3 Upload
-      run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.DOCS_DEPLOY_AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.DOCS_DEPLOY_AWS_API_SECRET }}
-        AWS_DEFAULT_REGION: "us-east-1"
+      - name: S3 Upload
+        run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DOCS_DEPLOY_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DOCS_DEPLOY_AWS_API_SECRET }}
+          AWS_DEFAULT_REGION: "us-east-1"
