@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: ${{ env.PACKAGE_DIR }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           ref: ${{ github.event.pull_request.head.ref }}
@@ -58,7 +58,7 @@ jobs:
       run:
         working-directory: ${{ env.PACKAGE_DIR }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -69,7 +69,7 @@ jobs:
           pip3 install build wheel
           python3 -m build --wheel --sdist
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: protocol-release
           path: |
@@ -84,7 +84,7 @@ jobs:
       id-token: write
     if: startsWith(github.ref, 'refs/tags/protocol-v')
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: protocol-release
           path: dist
