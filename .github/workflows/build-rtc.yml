@@ -97,7 +97,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: rtc-release
+          name: rtc-release-${{ matrix.os }}
           path: livekit-rtc/dist/*.whl
 
   make_sdist:
@@ -118,7 +118,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: rtc-release
+          name: rtc-release-sdist
           path: livekit-rtc/dist/*.tar.gz
 
   publish:
@@ -131,8 +131,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: rtc-release
+          pattern: rtc-release-*
           path: dist
+          merge-multiple: true
 
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
