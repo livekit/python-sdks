@@ -54,6 +54,71 @@ PARTICIPANT_KIND_SIP: ParticipantKind.ValueType  # 3
 PARTICIPANT_KIND_AGENT: ParticipantKind.ValueType  # 4
 global___ParticipantKind = ParticipantKind
 
+class _DisconnectReason:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _DisconnectReasonEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DisconnectReason.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    UNKNOWN_REASON: _DisconnectReason.ValueType  # 0
+    CLIENT_INITIATED: _DisconnectReason.ValueType  # 1
+    """the client initiated the disconnect"""
+    DUPLICATE_IDENTITY: _DisconnectReason.ValueType  # 2
+    """another participant with the same identity has joined the room"""
+    SERVER_SHUTDOWN: _DisconnectReason.ValueType  # 3
+    """the server instance is shutting down"""
+    PARTICIPANT_REMOVED: _DisconnectReason.ValueType  # 4
+    """RoomService.RemoveParticipant was called"""
+    ROOM_DELETED: _DisconnectReason.ValueType  # 5
+    """RoomService.DeleteRoom was called"""
+    STATE_MISMATCH: _DisconnectReason.ValueType  # 6
+    """the client is attempting to resume a session, but server is not aware of it"""
+    JOIN_FAILURE: _DisconnectReason.ValueType  # 7
+    """client was unable to connect fully"""
+    MIGRATION: _DisconnectReason.ValueType  # 8
+    """Cloud-only, the server requested Participant to migrate the connection elsewhere"""
+    SIGNAL_CLOSE: _DisconnectReason.ValueType  # 9
+    """the signal websocket was closed unexpectedly"""
+    ROOM_CLOSED: _DisconnectReason.ValueType  # 10
+    """the room was closed, due to all Standard and Ingress participants having left"""
+    USER_UNAVAILABLE: _DisconnectReason.ValueType  # 11
+    """SIP callee did not respond in time"""
+    USER_REJECTED: _DisconnectReason.ValueType  # 12
+    """SIP callee rejected the call (busy)"""
+    SIP_TRUNK_FAILURE: _DisconnectReason.ValueType  # 13
+    """SIP protocol failure or unexpected response"""
+
+class DisconnectReason(_DisconnectReason, metaclass=_DisconnectReasonEnumTypeWrapper): ...
+
+UNKNOWN_REASON: DisconnectReason.ValueType  # 0
+CLIENT_INITIATED: DisconnectReason.ValueType  # 1
+"""the client initiated the disconnect"""
+DUPLICATE_IDENTITY: DisconnectReason.ValueType  # 2
+"""another participant with the same identity has joined the room"""
+SERVER_SHUTDOWN: DisconnectReason.ValueType  # 3
+"""the server instance is shutting down"""
+PARTICIPANT_REMOVED: DisconnectReason.ValueType  # 4
+"""RoomService.RemoveParticipant was called"""
+ROOM_DELETED: DisconnectReason.ValueType  # 5
+"""RoomService.DeleteRoom was called"""
+STATE_MISMATCH: DisconnectReason.ValueType  # 6
+"""the client is attempting to resume a session, but server is not aware of it"""
+JOIN_FAILURE: DisconnectReason.ValueType  # 7
+"""client was unable to connect fully"""
+MIGRATION: DisconnectReason.ValueType  # 8
+"""Cloud-only, the server requested Participant to migrate the connection elsewhere"""
+SIGNAL_CLOSE: DisconnectReason.ValueType  # 9
+"""the signal websocket was closed unexpectedly"""
+ROOM_CLOSED: DisconnectReason.ValueType  # 10
+"""the room was closed, due to all Standard and Ingress participants having left"""
+USER_UNAVAILABLE: DisconnectReason.ValueType  # 11
+"""SIP callee did not respond in time"""
+USER_REJECTED: DisconnectReason.ValueType  # 12
+"""SIP callee rejected the call (busy)"""
+SIP_TRUNK_FAILURE: DisconnectReason.ValueType  # 13
+"""SIP protocol failure or unexpected response"""
+global___DisconnectReason = DisconnectReason
+
 @typing.final
 class ParticipantInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -81,11 +146,13 @@ class ParticipantInfo(google.protobuf.message.Message):
     METADATA_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
+    DISCONNECT_REASON_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
     metadata: builtins.str
     kind: global___ParticipantKind.ValueType
+    disconnect_reason: global___DisconnectReason.ValueType
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     def __init__(
@@ -97,9 +164,10 @@ class ParticipantInfo(google.protobuf.message.Message):
         metadata: builtins.str | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         kind: global___ParticipantKind.ValueType | None = ...,
+        disconnect_reason: global___DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 

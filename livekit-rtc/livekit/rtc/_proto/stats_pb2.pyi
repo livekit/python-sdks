@@ -535,6 +535,25 @@ class RtcStats(google.protobuf.message.Message):
         def ClearField(self, field_name: typing.Literal["certificate", b"certificate", "rtc", b"rtc"]) -> None: ...
 
     @typing.final
+    class Stream(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        RTC_FIELD_NUMBER: builtins.int
+        STREAM_FIELD_NUMBER: builtins.int
+        @property
+        def rtc(self) -> global___RtcStatsData: ...
+        @property
+        def stream(self) -> global___StreamStats: ...
+        def __init__(
+            self,
+            *,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___StreamStats | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> None: ...
+
+    @typing.final
     class Track(google.protobuf.message.Message):
         """Deprecated"""
 
@@ -558,6 +577,7 @@ class RtcStats(google.protobuf.message.Message):
     LOCAL_CANDIDATE_FIELD_NUMBER: builtins.int
     REMOTE_CANDIDATE_FIELD_NUMBER: builtins.int
     CERTIFICATE_FIELD_NUMBER: builtins.int
+    STREAM_FIELD_NUMBER: builtins.int
     TRACK_FIELD_NUMBER: builtins.int
     @property
     def codec(self) -> global___RtcStats.Codec: ...
@@ -588,6 +608,8 @@ class RtcStats(google.protobuf.message.Message):
     @property
     def certificate(self) -> global___RtcStats.Certificate: ...
     @property
+    def stream(self) -> global___RtcStats.Stream: ...
+    @property
     def track(self) -> global___RtcStats.Track: ...
     def __init__(
         self,
@@ -606,11 +628,12 @@ class RtcStats(google.protobuf.message.Message):
         local_candidate: global___RtcStats.LocalCandidate | None = ...,
         remote_candidate: global___RtcStats.RemoteCandidate | None = ...,
         certificate: global___RtcStats.Certificate | None = ...,
+        stream: global___RtcStats.Stream | None = ...,
         track: global___RtcStats.Track | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "track", b"track", "transport", b"transport"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "track", b"track", "transport", b"transport"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["stats", b"stats"]) -> typing.Literal["codec", "inbound_rtp", "outbound_rtp", "remote_inbound_rtp", "remote_outbound_rtp", "media_source", "media_playout", "peer_connection", "data_channel", "transport", "candidate_pair", "local_candidate", "remote_candidate", "certificate", "track"] | None: ...
+    def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["stats", b"stats"]) -> typing.Literal["codec", "inbound_rtp", "outbound_rtp", "remote_inbound_rtp", "remote_outbound_rtp", "media_source", "media_playout", "peer_connection", "data_channel", "transport", "candidate_pair", "local_candidate", "remote_candidate", "certificate", "stream", "track"] | None: ...
 
 global___RtcStats = RtcStats
 
@@ -1469,3 +1492,23 @@ class CertificateStats(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]) -> None: ...
 
 global___CertificateStats = CertificateStats
+
+@typing.final
+class StreamStats(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    STREAM_IDENTIFIER_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    stream_identifier: builtins.str
+    """required int64 timestamp = 3;"""
+    def __init__(
+        self,
+        *,
+        id: builtins.str | None = ...,
+        stream_identifier: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> None: ...
+
+global___StreamStats = StreamStats
