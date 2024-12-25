@@ -883,7 +883,7 @@ class DataStream(_message.Message):
         file_name: str
         def __init__(self, file_name: _Optional[str] = ...) -> None: ...
     class Header(_message.Message):
-        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "total_chunks", "encryption_type", "extensions", "text_header", "file_header")
+        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "extensions", "text_header", "file_header")
         class ExtensionsEntry(_message.Message):
             __slots__ = ("key", "value")
             KEY_FIELD_NUMBER: _ClassVar[int]
@@ -896,7 +896,6 @@ class DataStream(_message.Message):
         TOPIC_FIELD_NUMBER: _ClassVar[int]
         MIME_TYPE_FIELD_NUMBER: _ClassVar[int]
         TOTAL_LENGTH_FIELD_NUMBER: _ClassVar[int]
-        TOTAL_CHUNKS_FIELD_NUMBER: _ClassVar[int]
         ENCRYPTION_TYPE_FIELD_NUMBER: _ClassVar[int]
         EXTENSIONS_FIELD_NUMBER: _ClassVar[int]
         TEXT_HEADER_FIELD_NUMBER: _ClassVar[int]
@@ -906,12 +905,11 @@ class DataStream(_message.Message):
         topic: str
         mime_type: str
         total_length: int
-        total_chunks: int
         encryption_type: Encryption.Type
         extensions: _containers.ScalarMap[str, str]
         text_header: DataStream.TextHeader
         file_header: DataStream.FileHeader
-        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., total_chunks: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., extensions: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., file_header: _Optional[_Union[DataStream.FileHeader, _Mapping]] = ...) -> None: ...
+        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., extensions: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., file_header: _Optional[_Union[DataStream.FileHeader, _Mapping]] = ...) -> None: ...
     class Chunk(_message.Message):
         __slots__ = ("stream_id", "chunk_index", "content", "complete", "version", "iv")
         STREAM_ID_FIELD_NUMBER: _ClassVar[int]
