@@ -181,6 +181,8 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
     finally:
         await streamer.aclose()
         await av_sync.aclose()
+        audio_source.close()
+        video_source.close()
 
 
 if __name__ == "__main__":

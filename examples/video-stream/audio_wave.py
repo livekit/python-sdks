@@ -296,6 +296,8 @@ async def main(room: rtc.Room, room_name: str):
     finally:
         audio_task.cancel()
         await av_sync.aclose()
+        audio_source.close()
+        video_source.close()
 
 
 if __name__ == "__main__":
