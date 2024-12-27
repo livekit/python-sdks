@@ -118,7 +118,7 @@ class AudioSource:
             Exception: If there is an error during frame capture.
         """
 
-        if frame.samples_per_channel == 0:
+        if frame.samples_per_channel == 0 or self._ffi_handle.disposed:
             return
 
         now = time.monotonic()
@@ -175,3 +175,11 @@ class AudioSource:
         self._last_capture = 0.0
         self._q_size = 0.0
         self._join_fut = None
+
+    def close(self) -> None:
+        """Close the audio source
+
+        This method cleans up resources associated with the audio source.
+        """
+        self._ffi_handle.dispose()
+

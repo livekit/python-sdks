@@ -42,3 +42,6 @@ class VideoSource:
         req.capture_video_frame.rotation = rotation
         req.capture_video_frame.timestamp_us = timestamp_us
         FfiClient.instance.request(req)
+
+    def close() -> None:
+        self._ffi_handle.dispose()
