@@ -47,6 +47,9 @@ class SipService(Service):
         super().__init__(session, url, api_key, api_secret)
 
     async def create_sip_trunk(self, create: CreateSIPTrunkRequest) -> SIPTrunkInfo:
+        """
+        @deprecated Use create_sip_inbound_trunk or create_sip_outbound_trunk instead
+        """
         return await self._client.request(
             SVC,
             "CreateSIPTrunk",
