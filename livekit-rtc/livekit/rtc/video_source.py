@@ -43,5 +43,5 @@ class VideoSource:
         req.capture_video_frame.timestamp_us = timestamp_us
         FfiClient.instance.request(req)
 
-    def close(self) -> None:
+    async def aclose(self) -> None:
         self._ffi_handle.dispose()

@@ -176,7 +176,7 @@ class AudioSource:
         self._q_size = 0.0
         self._join_fut = None
 
-    def close(self) -> None:
+    async def aclose(self) -> None:
         """Close the audio source
 
         This method cleans up resources associated with the audio source.
