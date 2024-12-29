@@ -54,6 +54,11 @@ class EgressStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     EGRESS_FAILED: _ClassVar[EgressStatus]
     EGRESS_ABORTED: _ClassVar[EgressStatus]
     EGRESS_LIMIT_REACHED: _ClassVar[EgressStatus]
+
+class EgressSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    EGRESS_SOURCE_TYPE_WEB: _ClassVar[EgressSourceType]
+    EGRESS_SOURCE_TYPE_SDK: _ClassVar[EgressSourceType]
 DEFAULT_FILETYPE: EncodedFileType
 MP4: EncodedFileType
 OGG: EncodedFileType
@@ -81,6 +86,8 @@ EGRESS_COMPLETE: EgressStatus
 EGRESS_FAILED: EgressStatus
 EGRESS_ABORTED: EgressStatus
 EGRESS_LIMIT_REACHED: EgressStatus
+EGRESS_SOURCE_TYPE_WEB: EgressSourceType
+EGRESS_SOURCE_TYPE_SDK: EgressSourceType
 
 class RoomCompositeEgressRequest(_message.Message):
     __slots__ = ("room_name", "layout", "audio_only", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
@@ -446,10 +453,11 @@ class StopEgressRequest(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
 
 class EgressInfo(_message.Message):
-    __slots__ = ("egress_id", "room_id", "room_name", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results", "manifest_location", "manifest_presigned_url")
+    __slots__ = ("egress_id", "room_id", "room_name", "source_type", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results", "manifest_location", "backup_storage_used")
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -470,10 +478,11 @@ class EgressInfo(_message.Message):
     SEGMENT_RESULTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_RESULTS_FIELD_NUMBER: _ClassVar[int]
     MANIFEST_LOCATION_FIELD_NUMBER: _ClassVar[int]
-    MANIFEST_PRESIGNED_URL_FIELD_NUMBER: _ClassVar[int]
+    BACKUP_STORAGE_USED_FIELD_NUMBER: _ClassVar[int]
     egress_id: str
     room_id: str
     room_name: str
+    source_type: EgressSourceType
     status: EgressStatus
     started_at: int
     ended_at: int
@@ -494,8 +503,8 @@ class EgressInfo(_message.Message):
     segment_results: _containers.RepeatedCompositeFieldContainer[SegmentsInfo]
     image_results: _containers.RepeatedCompositeFieldContainer[ImagesInfo]
     manifest_location: str
-    manifest_presigned_url: str
-    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., manifest_location: _Optional[str] = ..., manifest_presigned_url: _Optional[str] = ...) -> None: ...
+    backup_storage_used: bool
+    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ...) -> None: ...
 
 class StreamInfoList(_message.Message):
     __slots__ = ("info",)

@@ -76,6 +76,7 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ROOM_CLOSED: _ClassVar[DisconnectReason]
     USER_UNAVAILABLE: _ClassVar[DisconnectReason]
     USER_REJECTED: _ClassVar[DisconnectReason]
+    SIP_TRUNK_FAILURE: _ClassVar[DisconnectReason]
 
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -141,6 +142,7 @@ SIGNAL_CLOSE: DisconnectReason
 ROOM_CLOSED: DisconnectReason
 USER_UNAVAILABLE: DisconnectReason
 USER_REJECTED: DisconnectReason
+SIP_TRUNK_FAILURE: DisconnectReason
 RR_UNKNOWN: ReconnectReason
 RR_SIGNAL_DISCONNECTED: ReconnectReason
 RR_PUBLISHER_FAILED: ReconnectReason
@@ -368,7 +370,7 @@ class VideoLayer(_message.Message):
     def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response")
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response", "stream_header", "stream_chunk")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
@@ -387,6 +389,8 @@ class DataPacket(_message.Message):
     RPC_REQUEST_FIELD_NUMBER: _ClassVar[int]
     RPC_ACK_FIELD_NUMBER: _ClassVar[int]
     RPC_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    STREAM_HEADER_FIELD_NUMBER: _ClassVar[int]
+    STREAM_CHUNK_FIELD_NUMBER: _ClassVar[int]
     kind: DataPacket.Kind
     participant_identity: str
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
@@ -399,7 +403,9 @@ class DataPacket(_message.Message):
     rpc_request: RpcRequest
     rpc_ack: RpcAck
     rpc_response: RpcResponse
-    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ...) -> None: ...
+    stream_header: DataStream.Header
+    stream_chunk: DataStream.Chunk
+    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ..., stream_header: _Optional[_Union[DataStream.Header, _Mapping]] = ..., stream_chunk: _Optional[_Union[DataStream.Chunk, _Mapping]] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
     __slots__ = ("speakers",)
@@ -845,3 +851,78 @@ class TimedVersion(_message.Message):
     unix_micro: int
     ticks: int
     def __init__(self, unix_micro: _Optional[int] = ..., ticks: _Optional[int] = ...) -> None: ...
+
+class DataStream(_message.Message):
+    __slots__ = ()
+    class OperationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        CREATE: _ClassVar[DataStream.OperationType]
+        UPDATE: _ClassVar[DataStream.OperationType]
+        DELETE: _ClassVar[DataStream.OperationType]
+        REACTION: _ClassVar[DataStream.OperationType]
+    CREATE: DataStream.OperationType
+    UPDATE: DataStream.OperationType
+    DELETE: DataStream.OperationType
+    REACTION: DataStream.OperationType
+    class TextHeader(_message.Message):
+        __slots__ = ("operation_type", "version", "reply_to_stream_id", "attached_stream_ids", "generated")
+        OPERATION_TYPE_FIELD_NUMBER: _ClassVar[int]
+        VERSION_FIELD_NUMBER: _ClassVar[int]
+        REPLY_TO_STREAM_ID_FIELD_NUMBER: _ClassVar[int]
+        ATTACHED_STREAM_IDS_FIELD_NUMBER: _ClassVar[int]
+        GENERATED_FIELD_NUMBER: _ClassVar[int]
+        operation_type: DataStream.OperationType
+        version: int
+        reply_to_stream_id: str
+        attached_stream_ids: _containers.RepeatedScalarFieldContainer[str]
+        generated: bool
+        def __init__(self, operation_type: _Optional[_Union[DataStream.OperationType, str]] = ..., version: _Optional[int] = ..., reply_to_stream_id: _Optional[str] = ..., attached_stream_ids: _Optional[_Iterable[str]] = ..., generated: bool = ...) -> None: ...
+    class FileHeader(_message.Message):
+        __slots__ = ("file_name",)
+        FILE_NAME_FIELD_NUMBER: _ClassVar[int]
+        file_name: str
+        def __init__(self, file_name: _Optional[str] = ...) -> None: ...
+    class Header(_message.Message):
+        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "extensions", "text_header", "file_header")
+        class ExtensionsEntry(_message.Message):
+            __slots__ = ("key", "value")
+            KEY_FIELD_NUMBER: _ClassVar[int]
+            VALUE_FIELD_NUMBER: _ClassVar[int]
+            key: str
+            value: str
+            def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+        STREAM_ID_FIELD_NUMBER: _ClassVar[int]
+        TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
+        TOPIC_FIELD_NUMBER: _ClassVar[int]
+        MIME_TYPE_FIELD_NUMBER: _ClassVar[int]
+        TOTAL_LENGTH_FIELD_NUMBER: _ClassVar[int]
+        ENCRYPTION_TYPE_FIELD_NUMBER: _ClassVar[int]
+        EXTENSIONS_FIELD_NUMBER: _ClassVar[int]
+        TEXT_HEADER_FIELD_NUMBER: _ClassVar[int]
+        FILE_HEADER_FIELD_NUMBER: _ClassVar[int]
+        stream_id: str
+        timestamp: int
+        topic: str
+        mime_type: str
+        total_length: int
+        encryption_type: Encryption.Type
+        extensions: _containers.ScalarMap[str, str]
+        text_header: DataStream.TextHeader
+        file_header: DataStream.FileHeader
+        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., extensions: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., file_header: _Optional[_Union[DataStream.FileHeader, _Mapping]] = ...) -> None: ...
+    class Chunk(_message.Message):
+        __slots__ = ("stream_id", "chunk_index", "content", "complete", "version", "iv")
+        STREAM_ID_FIELD_NUMBER: _ClassVar[int]
+        CHUNK_INDEX_FIELD_NUMBER: _ClassVar[int]
+        CONTENT_FIELD_NUMBER: _ClassVar[int]
+        COMPLETE_FIELD_NUMBER: _ClassVar[int]
+        VERSION_FIELD_NUMBER: _ClassVar[int]
+        IV_FIELD_NUMBER: _ClassVar[int]
+        stream_id: str
+        chunk_index: int
+        content: bytes
+        complete: bool
+        version: int
+        iv: bytes
+        def __init__(self, stream_id: _Optional[str] = ..., chunk_index: _Optional[int] = ..., content: _Optional[bytes] = ..., complete: bool = ..., version: _Optional[int] = ..., iv: _Optional[bytes] = ...) -> None: ...
+    def __init__(self) -> None: ...

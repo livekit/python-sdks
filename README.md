@@ -13,7 +13,9 @@
 # 📹🎙️🐍 Python SDK for LiveKit
 
 <!--BEGIN_DESCRIPTION-->
+
 Use this SDK to add realtime video, audio and data features to your Python app. By connecting to <a href="https://livekit.io/">LiveKit</a> Cloud or a self-hosted server, you can quickly build applications such as multi-modal AI, live streaming, or video calls with just a few lines of code.
+
 <!--END_DESCRIPTION-->
 
 This repo contains two packages
@@ -52,9 +54,7 @@ from livekit import api
 import asyncio
 
 async def main():
-    lkapi = api.LiveKitAPI(
-        'http://localhost:7880',
-    )
+    lkapi = api.LiveKitAPI("https://my-project.livekit.cloud")
     room_info = await lkapi.room.create_room(
         api.CreateRoomRequest(name="my-room"),
     )
@@ -64,6 +64,29 @@ async def main():
     await lkapi.aclose()
 
 asyncio.run(main())
+```
+
+### Using other APIs
+
+Services can be accessed via the LiveKitAPI object.
+
+```python
+lkapi = api.LiveKitAPI("https://my-project.livekit.cloud")
+
+# Room Service
+room_svc = lkapi.room
+
+# Egress Service
+egress_svc = lkapi.egress
+
+# Ingress Service
+ingress_svc = lkapi.ingress
+
+# Sip Service
+sip_svc = lkapi.sip
+
+# Agent Dispatch
+dispatch_svc = lkapi.agent_dispatch
 ```
 
 ## Using Real-time SDK
@@ -132,10 +155,9 @@ def on_message_received(msg: rtc.ChatMessage):
 await chat.send_message("hello world")
 ```
 
-
 ### RPC
 
-Perform your own predefined method calls from one participant to another. 
+Perform your own predefined method calls from one participant to another.
 
 This feature is especially powerful when used with [Agents](https://docs.livekit.io/agents), for instance to forward LLM function calls to your client application.
 
@@ -172,10 +194,9 @@ You may find it useful to adjust the `response_timeout` parameter, which indicat
 
 #### Errors
 
-LiveKit is a dynamic realtime environment and calls can fail for various reasons. 
+LiveKit is a dynamic realtime environment and calls can fail for various reasons.
 
 You may throw errors of the type `RpcError` with a string `message` in an RPC method handler and they will be received on the caller's side with the message intact. Other errors will not be transmitted and will instead arrive to the caller as `1500` ("Application Error"). Other built-in errors are detailed in `RpcError`.
-
 
 ## Examples
 
@@ -189,7 +210,9 @@ You may throw errors of the type `RpcError` with a string `message` in an RPC me
 Please join us on [Slack](https://livekit.io/join-slack) to get help from our devs / community members. We welcome your contributions(PRs) and details can be discussed there.
 
 <!--BEGIN_REPO_NAV-->
+
 <br/><table>
+
 <thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
 <tbody>
 <tr><td>Realtime SDKs</td><td><a href="https://github.com/livekit/components-js">React Components</a> · <a href="https://github.com/livekit/client-sdk-js">Browser</a> · <a href="https://github.com/livekit/components-swift">Swift Components</a> · <a href="https://github.com/livekit/client-sdk-swift">iOS/macOS/visionOS</a> · <a href="https://github.com/livekit/client-sdk-android">Android</a> · <a href="https://github.com/livekit/client-sdk-flutter">Flutter</a> · <a href="https://github.com/livekit/client-sdk-react-native">React Native</a> · <a href="https://github.com/livekit/rust-sdks">Rust</a> · <a href="https://github.com/livekit/node-sdks">Node.js</a> · <b>Python</b> · <a href="https://github.com/livekit/client-sdk-unity-web">Unity (web)</a> · <a href="https://github.com/livekit/client-sdk-unity">Unity (beta)</a></td></tr><tr></tr>
