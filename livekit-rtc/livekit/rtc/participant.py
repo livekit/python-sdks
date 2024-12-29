@@ -418,8 +418,9 @@ class LocalParticipant(Participant):
                 response_error = error
             except Exception as error:
                 logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}."
-                    f" Returning APPLICATION_ERROR instead.  Original error: {error}"
+                    f"Uncaught error returned by RPC handler for {method}. "
+                    "Returning APPLICATION_ERROR instead. "
+                    f"Original error: {error}"
                 )
                 response_error = RpcError._built_in(
                     RpcError.ErrorCode.APPLICATION_ERROR
@@ -437,10 +438,8 @@ class LocalParticipant(Participant):
         res = FfiClient.instance.request(req)
 
         if res.rpc_method_invocation_response.error:
-            logger.exception(
-                f"error sending rpc method invocation response: {
-                    res.rpc_method_invocation_response.error}"
-            )
+            message = res.rpc_method_invocation_response.error
+            logger.exception(f"error sending rpc method invocation response: {message}")
 
     async def set_metadata(self, metadata: str) -> None:
         """
