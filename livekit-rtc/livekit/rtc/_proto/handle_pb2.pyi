@@ -15,15 +15,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
-import typing
+import sys
+
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-@typing.final
+@typing_extensions.final
 class FfiOwnedHandle(google.protobuf.message.Message):
     """# Safety
     The foreign language is responsable for disposing handles
@@ -45,7 +49,7 @@ class FfiOwnedHandle(google.protobuf.message.Message):
         *,
         id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["id", b"id"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["id", b"id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
 
 global___FfiOwnedHandle = FfiOwnedHandle
