@@ -418,8 +418,8 @@ class LocalParticipant(Participant):
                 response_error = error
             except Exception as error:
                 logger.exception(
-                    f"Uncaught error returned by RPC handler for {
-                        method}. Returning APPLICATION_ERROR instead.  Original error: {error}",
+                    f"Uncaught error returned by RPC handler for {method}."
+                    f" Returning APPLICATION_ERROR instead.  Original error: {error}"
                 )
                 response_error = RpcError._built_in(
                     RpcError.ErrorCode.APPLICATION_ERROR
