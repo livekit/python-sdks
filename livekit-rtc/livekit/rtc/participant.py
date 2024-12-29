@@ -107,6 +107,11 @@ class Participant(ABC):
         """Participant's kind (e.g., regular participant, ingress, egress, sip, agent)."""
         return self._info.kind
 
+    @property
+    def disconnect_reason(self) -> proto_participant.DisconnectReason.ValueType:
+        """Reason for the participant's disconnection."""
+        return self._info.disconnect_reason
+
 
 class LocalParticipant(Participant):
     """Represents the local participant in a room."""
@@ -413,7 +418,8 @@ class LocalParticipant(Participant):
                 response_error = error
             except Exception as error:
                 logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.  Original error: {error}",
+                    f"Uncaught error returned by RPC handler for {
+                        method}. Returning APPLICATION_ERROR instead.  Original error: {error}",
                 )
                 response_error = RpcError._built_in(
                     RpcError.ErrorCode.APPLICATION_ERROR
@@ -432,7 +438,8 @@ class LocalParticipant(Participant):
 
         if res.rpc_method_invocation_response.error:
             logger.exception(
-                f"error sending rpc method invocation response: {res.rpc_method_invocation_response.error}"
+                f"error sending rpc method invocation response: {
+                    res.rpc_method_invocation_response.error}"
             )
 
     async def set_metadata(self, metadata: str) -> None:
