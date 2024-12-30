@@ -43,6 +43,8 @@ class AVSynchronizer:
         self._max_delay_tolerance_ms = _max_delay_tolerance_ms
 
         self._stopped = False
+        self._last_video_time: float = 0
+        self._last_audio_time: float = 0
 
         self._video_queue_max_size = int(
             self._video_fps * self._video_queue_size_ms / 1000
@@ -51,7 +53,7 @@ class AVSynchronizer:
             # ensure queue is bounded if queue size is specified
             self._video_queue_max_size = max(1, self._video_queue_max_size)
 
-        self._video_queue = asyncio.Queue[VideoFrame](
+        self._video_queue = asyncio.Queue[tuple[VideoFrame, float]](
             maxsize=self._video_queue_max_size
         )
         self._fps_controller = _FPSController(
@@ -60,12 +62,16 @@ class AVSynchronizer:
         )
         self._capture_video_task = asyncio.create_task(self._capture_video())
 
-    async def push(self, frame: Union[VideoFrame, AudioFrame]) -> None:
+    async def push(
+        self, frame: Union[VideoFrame, AudioFrame], timestamp: Optional[float] = None
+    ) -> None:
         if isinstance(frame, AudioFrame):
             await self._audio_source.capture_frame(frame)
+            if timestamp is not None:
+                self._last_audio_time = timestamp
             return
 
-        await self._video_queue.put(frame)
+        await self._video_queue.put((frame, timestamp))
 
     async def clear_queue(self) -> None:
         self._audio_source.clear_queue()
@@ -79,9 +85,11 @@ class AVSynchronizer:
 
     async def _capture_video(self) -> None:
         while not self._stopped:
-            frame = await self._video_queue.get()
+            frame, timestamp = await self._video_queue.get()
             async with self._fps_controller:
                 self._video_source.capture_frame(frame)
+                if timestamp is not None:
+                    self._last_video_time = timestamp
             self._video_queue.task_done()
 
     async def aclose(self) -> None:
@@ -92,6 +100,14 @@ class AVSynchronizer:
     @property
     def actual_fps(self) -> float:
         return self._fps_controller.actual_fps
+
+    @property
+    def last_video_time(self) -> float:
+        return self._last_video_time
+
+    @property
+    def last_audio_time(self) -> float:
+        return self._last_audio_time
 
 
 class _FPSController:
