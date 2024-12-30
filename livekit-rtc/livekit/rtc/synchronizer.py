@@ -8,6 +8,8 @@ from .video_frame import VideoFrame
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .video_source import VideoSource
+import numpy as np
+import cv2
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +86,39 @@ class AVSynchronizer:
         await self._video_queue.join()
 
     async def _capture_video(self) -> None:
+        count = 0
         while not self._stopped:
             frame, timestamp = await self._video_queue.get()
+
+            # debug
+            frame_rgba = np.frombuffer(frame.data, dtype=np.uint8).reshape(
+                frame.height, frame.width, 4
+            )
+            frame_bgr = cv2.cvtColor(frame_rgba[:, :, :3], cv2.COLOR_RGBA2BGR)
+            frame_bgr = cv2.putText(
+                frame_bgr,
+                f"{self.actual_fps:.2f}fps, video time: {timestamp:.3f}s, audio time: {self.last_audio_time:.3f}s",
+                (10, 100),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                2,
+            )
+            frame_rgba = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGBA)
+            frame = VideoFrame(
+                width=frame.width,
+                height=frame.height,
+                type=frame.type,
+                data=frame_rgba.tobytes(),
+            )
+            count += 1
+            if count % 30 == 0:
+                print(
+                    f"{self.actual_fps:.2f}fps, last video time: {self.last_video_time:.3f}s, "
+                    f"last audio time: {self.last_audio_time:.3f}s"
+                )
+            # end debug
+
             async with self._fps_controller:
                 self._video_source.capture_frame(frame)
                 if timestamp is not None:

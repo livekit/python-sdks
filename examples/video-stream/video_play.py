@@ -13,10 +13,9 @@ from livekit import rtc
 
 try:
     import av
-    import cv2
 except ImportError:
     raise RuntimeError(
-        "av and opencv-python is required to run this example, install with `pip install av opencv-python`"
+        "av is required to run this example, install with `pip install av`"
     )
 
 # ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
@@ -52,32 +51,18 @@ class MediaFileStreamer:
             audio_sample_rate=audio_stream.sample_rate,
             audio_channels=audio_stream.channels,
         )
-        print(self._info)
 
     @property
     def info(self) -> MediaInfo:
         return self._info
 
-    async def stream_video(
-        self, av_sync: rtc.AVSynchronizer
-    ) -> AsyncIterable[tuple[rtc.VideoFrame, float]]:
+    async def stream_video(self) -> AsyncIterable[tuple[rtc.VideoFrame, float]]:
         """Streams video frames from the media file in an endless loop."""
         for i, av_frame in enumerate(self._video_container.decode(video=0)):
             # Convert video frame to RGBA
             frame = av_frame.to_rgb().to_ndarray()
             frame_rgba = np.ones((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
             frame_rgba[:, :, :3] = frame
-
-            # put fps and timestamps in the frame
-            frame_rgba = cv2.putText(
-                frame_rgba, f"{av_sync.actual_fps:.2f}fps", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2
-            )
-
-            if i % 10 == 0:
-                print(
-                    f"decoded frame {i} ({av_frame.time:.3f}s), {av_sync.actual_fps:.2f}fps, "
-                    f"last video time: {av_sync.last_video_time:.3f}s, last audio time: {av_sync.last_audio_time:.3f}s"
-                )
             yield (
                 rtc.VideoFrame(
                     width=frame.shape[1],
@@ -190,7 +175,7 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
         while True:
             streamer.reset()
             video_task = asyncio.create_task(
-                _push_frames(streamer.stream_video(av_sync), av_sync)
+                _push_frames(streamer.stream_video(), av_sync)
             )
             audio_task = asyncio.create_task(
                 _push_frames(streamer.stream_audio(), av_sync)
