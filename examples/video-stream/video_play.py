@@ -173,14 +173,17 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
             await asyncio.sleep(0)
 
     async def _log_fps(av_sync: rtc.AVSynchronizer):
+        start_time = asyncio.get_running_loop().time()
         while True:
             await asyncio.sleep(2)
+            wall_time = asyncio.get_running_loop().time() - start_time
             diff = av_sync.last_video_time - av_sync.last_audio_time
-
             logger.info(
-                f"fps: {av_sync.actual_fps:.2f}, video_time: {av_sync.last_video_time:.3f}s, "
+                f"fps: {av_sync.actual_fps:.2f}, wall_time: {wall_time:.3f}s, "
+                f"video_time: {av_sync.last_video_time:.3f}s, "
                 f"audio_time: {av_sync.last_audio_time:.3f}s, diff: {diff:.3f}s"
             )
+
 
     try:
         while True:
