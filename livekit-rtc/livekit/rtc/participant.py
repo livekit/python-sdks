@@ -107,6 +107,33 @@ class Participant(ABC):
         """Participant's kind (e.g., regular participant, ingress, egress, sip, agent)."""
         return self._info.kind
 
+    @property
+    def disconnect_reason(
+        self,
+    ) -> Optional[proto_participant.DisconnectReason.ValueType]:
+        """Reason for the participant's disconnection.
+
+        Returns one of DisconnectReasons or None if the participant isn't disconnected. Common reasons are:
+        - CLIENT_INITIATED - the client initiated the disconnect
+        - DUPLICATE_IDENTITY - another participant with the same identity has joined the room
+        - SERVER_SHUTDOWN - the server instance is shutting down
+        - PARTICIPANT_REMOVED - RoomService.RemoveParticipant was called
+        - ROOM_DELETED - RoomService.DeleteRoom was called
+        - STATE_MISMATCH - the client is attempting to resume a session, but server is not aware of it
+        - JOIN_FAILURE - client was unable to connect fully
+
+        When dialing a participant via SIP, you may see the following reasons:
+        - USER_UNAVAILABLE - SIP callee did not respond in time
+        - USER_REJECTED - SIP callee rejected the call (busy)
+        - SIP_TRUNK_FAILURE - SIP protocol failure or unexpected response
+        """
+        if (
+            self._info.disconnect_reason
+            == proto_participant.DisconnectReason.UNKNOWN_REASON
+        ):
+            return None
+        return self._info.disconnect_reason
+
 
 class LocalParticipant(Participant):
     """Represents the local participant in a room."""
@@ -413,7 +440,9 @@ class LocalParticipant(Participant):
                 response_error = error
             except Exception as error:
                 logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}. Returning APPLICATION_ERROR instead.  Original error: {error}",
+                    f"Uncaught error returned by RPC handler for {method}. "
+                    "Returning APPLICATION_ERROR instead. "
+                    f"Original error: {error}"
                 )
                 response_error = RpcError._built_in(
                     RpcError.ErrorCode.APPLICATION_ERROR
@@ -431,9 +460,8 @@ class LocalParticipant(Participant):
         res = FfiClient.instance.request(req)
 
         if res.rpc_method_invocation_response.error:
-            logger.exception(
-                f"error sending rpc method invocation response: {res.rpc_method_invocation_response.error}"
-            )
+            message = res.rpc_method_invocation_response.error
+            logger.exception(f"error sending rpc method invocation response: {message}")
 
     async def set_metadata(self, metadata: str) -> None:
         """
