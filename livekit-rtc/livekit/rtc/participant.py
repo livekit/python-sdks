@@ -108,8 +108,30 @@ class Participant(ABC):
         return self._info.kind
 
     @property
-    def disconnect_reason(self) -> proto_participant.DisconnectReason.ValueType:
-        """Reason for the participant's disconnection."""
+    def disconnect_reason(
+        self,
+    ) -> Optional[proto_participant.DisconnectReason.ValueType]:
+        """Reason for the participant's disconnection.
+
+        Returns one of DisconnectReasons or None if the participant isn't disconnected. Common reasons are:
+        - CLIENT_INITIATED - the client initiated the disconnect
+        - DUPLICATE_IDENTITY - another participant with the same identity has joined the room
+        - SERVER_SHUTDOWN - the server instance is shutting down
+        - PARTICIPANT_REMOVED - RoomService.RemoveParticipant was called
+        - ROOM_DELETED - RoomService.DeleteRoom was called
+        - STATE_MISMATCH - the client is attempting to resume a session, but server is not aware of it
+        - JOIN_FAILURE - client was unable to connect fully
+
+        When dialing a participant via SIP, you may see the following reasons:
+        - USER_UNAVAILABLE - SIP callee did not respond in time
+        - USER_REJECTED - SIP callee rejected the call (busy)
+        - SIP_TRUNK_FAILURE - SIP protocol failure or unexpected response
+        """
+        if (
+            self._info.disconnect_reason
+            == proto_participant.DisconnectReason.DISCONNECT_REASON_UNKNOWN
+        ):
+            return None
         return self._info.disconnect_reason
 
 
