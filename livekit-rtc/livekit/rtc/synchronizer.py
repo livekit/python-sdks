@@ -45,6 +45,7 @@ class AVSynchronizer:
         self._max_delay_tolerance_ms = _max_delay_tolerance_ms
 
         self._stopped = False
+        # the time of the last video/audio frame captured
         self._last_video_time: float = 0
         self._last_audio_time: float = 0
 
@@ -55,7 +56,7 @@ class AVSynchronizer:
             # ensure queue is bounded if queue size is specified
             self._video_queue_max_size = max(1, self._video_queue_max_size)
 
-        self._video_queue = asyncio.Queue[tuple[VideoFrame, float]](
+        self._video_queue = asyncio.Queue[tuple[VideoFrame, Optional[float]]](
             maxsize=self._video_queue_max_size
         )
         self._fps_controller = _FPSController(
@@ -67,6 +68,13 @@ class AVSynchronizer:
     async def push(
         self, frame: Union[VideoFrame, AudioFrame], timestamp: Optional[float] = None
     ) -> None:
+        """Push a frame to the synchronizer
+
+        Args:
+            frame: The video or audio frame to push.
+            timestamp: (optional) The timestamp of the frame, for logging purposes for now.
+                For AudioFrame, it should be the end time of the frame.
+        """
         if isinstance(frame, AudioFrame):
             await self._audio_source.capture_frame(frame)
             if timestamp is not None:
@@ -79,53 +87,25 @@ class AVSynchronizer:
         self._audio_source.clear_queue()
         while not self._video_queue.empty():
             await self._video_queue.get()
+            self._video_queue.task_done()
 
     async def wait_for_playout(self) -> None:
         """Wait until all video and audio frames are played out."""
-        await self._audio_source.wait_for_playout()
-        await self._video_queue.join()
+        await asyncio.gather(
+            self._audio_source.wait_for_playout(),
+            self._video_queue.join(),
+        )
+
+    def reset(self) -> None:
+        self._fps_controller.reset()
 
     async def _capture_video(self) -> None:
-        count = 0
         while not self._stopped:
             frame, timestamp = await self._video_queue.get()
-
             async with self._fps_controller:
-                # debug
-                frame_rgba = np.frombuffer(frame.data, dtype=np.uint8).reshape(
-                    frame.height, frame.width, 4
-                )
-                frame_bgr = cv2.cvtColor(frame_rgba[:, :, :3], cv2.COLOR_RGBA2BGR)
-                frame_bgr = cv2.putText(
-                    frame_bgr,
-                    f"{self.actual_fps:.2f}fps, video time: {timestamp:.3f}s, "
-                    f"audio time: {self.last_audio_time:.3f}s, diff: {timestamp - self.last_audio_time:.3f}s",
-                    (10, 100),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 0, 255),
-                    2,
-                )
-                frame_rgba = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGBA)
-                frame = VideoFrame(
-                    width=frame.width,
-                    height=frame.height,
-                    type=frame.type,
-                    data=frame_rgba.tobytes(),
-                )
-                count += 1
-                # end debug
-
                 self._video_source.capture_frame(frame)
                 if timestamp is not None:
                     self._last_video_time = timestamp
-
-                if count % 30 == 0:
-                    diff = self.last_video_time - self.last_audio_time
-                    print(
-                        f"{self.actual_fps:.2f}fps, last video time: {self.last_video_time:.3f}s, "
-                        f"last audio time: {self.last_audio_time:.3f}s, diff: {diff:.3f}s"
-                    )
             self._video_queue.task_done()
 
     async def aclose(self) -> None:
@@ -139,10 +119,12 @@ class AVSynchronizer:
 
     @property
     def last_video_time(self) -> float:
+        """The time of the last video frame captured"""
         return self._last_video_time
 
     @property
     def last_audio_time(self) -> float:
+        """The time of the last audio frame played out"""
         return self._last_audio_time - self._audio_source.queued_duration
 
 
@@ -174,6 +156,10 @@ class _FPSController:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         self.after_process()
+
+    def reset(self) -> None:
+        self._next_frame_time = None
+        self._send_timestamps.clear()
 
     async def wait_next_process(self) -> None:
         """Wait until it's time for the next frame.
