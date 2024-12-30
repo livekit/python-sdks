@@ -129,7 +129,7 @@ class Participant(ABC):
         """
         if (
             self._info.disconnect_reason
-            == proto_participant.DisconnectReason.DISCONNECT_REASON_UNKNOWN
+            == proto_participant.DisconnectReason.UNKNOWN_REASON
         ):
             return None
         return self._info.disconnect_reason
