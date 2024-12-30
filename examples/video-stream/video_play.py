@@ -79,6 +79,7 @@ class MediaFileStreamer:
             # Convert audio frame to raw int16 samples
             frame = av_frame.to_ndarray().T  # Transpose to (samples, channels)
             frame = (frame * 32768).astype(np.int16)
+            duration = len(frame) / self.info.audio_sample_rate
             yield (
                 rtc.AudioFrame(
                     data=frame.tobytes(),
@@ -86,7 +87,7 @@ class MediaFileStreamer:
                     num_channels=frame.shape[1],
                     samples_per_channel=frame.shape[0],
                 ),
-                av_frame.time,
+                av_frame.time + duration,
             )
 
     def reset(self):
@@ -128,7 +129,7 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
     media_info = streamer.info
 
     # Create video and audio sources/tracks
-    queue_size_ms = 50  # TODO: testing with different sizes
+    queue_size_ms = 1000  # TODO: testing with different sizes
     video_source = rtc.VideoSource(
         width=media_info.video_width,
         height=media_info.video_height,

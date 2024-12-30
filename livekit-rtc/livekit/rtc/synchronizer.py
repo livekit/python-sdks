@@ -90,39 +90,42 @@ class AVSynchronizer:
         while not self._stopped:
             frame, timestamp = await self._video_queue.get()
 
-            # debug
-            frame_rgba = np.frombuffer(frame.data, dtype=np.uint8).reshape(
-                frame.height, frame.width, 4
-            )
-            frame_bgr = cv2.cvtColor(frame_rgba[:, :, :3], cv2.COLOR_RGBA2BGR)
-            frame_bgr = cv2.putText(
-                frame_bgr,
-                f"{self.actual_fps:.2f}fps, video time: {timestamp:.3f}s, audio time: {self.last_audio_time:.3f}s",
-                (10, 100),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 0, 255),
-                2,
-            )
-            frame_rgba = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGBA)
-            frame = VideoFrame(
-                width=frame.width,
-                height=frame.height,
-                type=frame.type,
-                data=frame_rgba.tobytes(),
-            )
-            count += 1
-            if count % 30 == 0:
-                print(
-                    f"{self.actual_fps:.2f}fps, last video time: {self.last_video_time:.3f}s, "
-                    f"last audio time: {self.last_audio_time:.3f}s"
-                )
-            # end debug
-
             async with self._fps_controller:
+                # debug
+                frame_rgba = np.frombuffer(frame.data, dtype=np.uint8).reshape(
+                    frame.height, frame.width, 4
+                )
+                frame_bgr = cv2.cvtColor(frame_rgba[:, :, :3], cv2.COLOR_RGBA2BGR)
+                frame_bgr = cv2.putText(
+                    frame_bgr,
+                    f"{self.actual_fps:.2f}fps, video time: {timestamp:.3f}s, "
+                    f"audio time: {self.last_audio_time:.3f}s, diff: {timestamp - self.last_audio_time:.3f}s",
+                    (10, 100),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 0, 255),
+                    2,
+                )
+                frame_rgba = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGBA)
+                frame = VideoFrame(
+                    width=frame.width,
+                    height=frame.height,
+                    type=frame.type,
+                    data=frame_rgba.tobytes(),
+                )
+                count += 1
+                # end debug
+
                 self._video_source.capture_frame(frame)
                 if timestamp is not None:
                     self._last_video_time = timestamp
+
+                if count % 30 == 0:
+                    diff = self.last_video_time - self.last_audio_time
+                    print(
+                        f"{self.actual_fps:.2f}fps, last video time: {self.last_video_time:.3f}s, "
+                        f"last audio time: {self.last_audio_time:.3f}s, diff: {diff:.3f}s"
+                    )
             self._video_queue.task_done()
 
     async def aclose(self) -> None:
@@ -140,7 +143,7 @@ class AVSynchronizer:
 
     @property
     def last_audio_time(self) -> float:
-        return self._last_audio_time
+        return self._last_audio_time - self._audio_source.queued_duration
 
 
 class _FPSController:
