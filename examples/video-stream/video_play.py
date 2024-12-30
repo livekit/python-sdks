@@ -184,7 +184,6 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
                 f"audio_time: {av_sync.last_audio_time:.3f}s, diff: {diff:.3f}s"
             )
 
-
     try:
         while True:
             streamer.reset()
