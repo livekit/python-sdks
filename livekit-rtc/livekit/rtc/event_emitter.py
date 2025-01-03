@@ -197,4 +197,4 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].remove(callback)
+            self._events[event].discard(callback)
