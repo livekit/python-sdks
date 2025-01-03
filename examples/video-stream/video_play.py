@@ -56,31 +56,38 @@ class MediaFileStreamer:
     def info(self) -> MediaInfo:
         return self._info
 
-    async def stream_video(self) -> AsyncIterable[rtc.VideoFrame]:
+    async def stream_video(self) -> AsyncIterable[tuple[rtc.VideoFrame, float]]:
         """Streams video frames from the media file in an endless loop."""
-        for av_frame in self._video_container.decode(video=0):
+        for i, av_frame in enumerate(self._video_container.decode(video=0)):
             # Convert video frame to RGBA
             frame = av_frame.to_rgb().to_ndarray()
             frame_rgba = np.ones((frame.shape[0], frame.shape[1], 4), dtype=np.uint8)
             frame_rgba[:, :, :3] = frame
-            yield rtc.VideoFrame(
-                width=frame.shape[1],
-                height=frame.shape[0],
-                type=rtc.VideoBufferType.RGBA,
-                data=frame_rgba.tobytes(),
+            yield (
+                rtc.VideoFrame(
+                    width=frame.shape[1],
+                    height=frame.shape[0],
+                    type=rtc.VideoBufferType.RGBA,
+                    data=frame_rgba.tobytes(),
+                ),
+                av_frame.time,
             )
 
-    async def stream_audio(self) -> AsyncIterable[rtc.AudioFrame]:
+    async def stream_audio(self) -> AsyncIterable[tuple[rtc.AudioFrame, float]]:
         """Streams audio frames from the media file in an endless loop."""
         for av_frame in self._audio_container.decode(audio=0):
             # Convert audio frame to raw int16 samples
             frame = av_frame.to_ndarray().T  # Transpose to (samples, channels)
             frame = (frame * 32768).astype(np.int16)
-            yield rtc.AudioFrame(
-                data=frame.tobytes(),
-                sample_rate=self.info.audio_sample_rate,
-                num_channels=frame.shape[1],
-                samples_per_channel=frame.shape[0],
+            duration = len(frame) / self.info.audio_sample_rate
+            yield (
+                rtc.AudioFrame(
+                    data=frame.tobytes(),
+                    sample_rate=self.info.audio_sample_rate,
+                    num_channels=frame.shape[1],
+                    samples_per_channel=frame.shape[0],
+                ),
+                av_frame.time + duration,
             )
 
     def reset(self):
@@ -102,6 +109,7 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
             api.VideoGrants(
                 room_join=True,
                 room=room_name,
+                agent=True,
             )
         )
         .to_jwt()
@@ -121,7 +129,7 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
     media_info = streamer.info
 
     # Create video and audio sources/tracks
-    queue_size_ms = 1000  # 1 second
+    queue_size_ms = 1000
     video_source = rtc.VideoSource(
         width=media_info.video_width,
         height=media_info.video_height,
@@ -157,26 +165,54 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
     )
 
     async def _push_frames(
-        stream: AsyncIterable[rtc.VideoFrame | rtc.AudioFrame],
+        stream: AsyncIterable[tuple[rtc.VideoFrame | rtc.AudioFrame, float]],
         av_sync: rtc.AVSynchronizer,
     ):
-        async for frame in stream:
-            await av_sync.push(frame)
+        async for frame, timestamp in stream:
+            await av_sync.push(frame, timestamp)
             await asyncio.sleep(0)
+
+    async def _log_fps(av_sync: rtc.AVSynchronizer):
+        start_time = asyncio.get_running_loop().time()
+        while True:
+            await asyncio.sleep(2)
+            wall_time = asyncio.get_running_loop().time() - start_time
+            diff = av_sync.last_video_time - av_sync.last_audio_time
+            logger.info(
+                f"fps: {av_sync.actual_fps:.2f}, wall_time: {wall_time:.3f}s, "
+                f"video_time: {av_sync.last_video_time:.3f}s, "
+                f"audio_time: {av_sync.last_audio_time:.3f}s, diff: {diff:.3f}s"
+            )
 
     try:
         while True:
             streamer.reset()
-            video_task = asyncio.create_task(
-                _push_frames(streamer.stream_video(), av_sync)
+
+            video_stream = streamer.stream_video()
+            audio_stream = streamer.stream_audio()
+
+            # read the head frames and push them at the same time
+            first_video_frame, video_timestamp = await video_stream.__anext__()
+            first_audio_frame, audio_timestamp = await audio_stream.__anext__()
+            logger.info(
+                f"first video duration: {1/media_info.video_fps:.3f}s, "
+                f"first audio duration: {first_audio_frame.duration:.3f}s"
             )
-            audio_task = asyncio.create_task(
-                _push_frames(streamer.stream_audio(), av_sync)
-            )
+            await av_sync.push(first_video_frame, video_timestamp)
+            await av_sync.push(first_audio_frame, audio_timestamp)
+
+            video_task = asyncio.create_task(_push_frames(video_stream, av_sync))
+            audio_task = asyncio.create_task(_push_frames(audio_stream, av_sync))
+
+            log_fps_task = asyncio.create_task(_log_fps(av_sync))
 
             # wait for both tasks to complete
             await asyncio.gather(video_task, audio_task)
             await av_sync.wait_for_playout()
+
+            # clean up
+            av_sync.reset()
+            log_fps_task.cancel()
             logger.info("playout finished")
     finally:
         await streamer.aclose()
