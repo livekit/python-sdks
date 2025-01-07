@@ -144,7 +144,7 @@ def ffi_event_callback(
     data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     data_len: ctypes.c_size_t,
 ) -> None:
-    event_data = bytes(data_ptr[: int(data_len)])
+    event_data = ctypes.string_at(data_ptr, int(data_len))
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 
