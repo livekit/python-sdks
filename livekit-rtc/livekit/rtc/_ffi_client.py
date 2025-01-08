@@ -144,7 +144,7 @@ def ffi_event_callback(
     data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     data_len: ctypes.c_size_t,
 ) -> None:
-    event_data = bytes(data_ptr[: int(data_len)])
+    event_data = ctypes.string_at(data_ptr, int(data_len))
     event = proto_ffi.FfiEvent()
     event.ParseFromString(event_data)
 
@@ -235,7 +235,7 @@ class FfiClient:
         )
         assert handle != INVALID_HANDLE
 
-        resp_data = bytes(resp_ptr[: resp_len.value])
+        resp_data = ctypes.string_at(resp_ptr, resp_len.value)
         resp = proto_ffi.FfiResponse()
         resp.ParseFromString(resp_data)
 
