@@ -195,7 +195,7 @@ async def main(room: rtc.Room, room_name: str, media_path: str):
             first_video_frame, video_timestamp = await video_stream.__anext__()
             first_audio_frame, audio_timestamp = await audio_stream.__anext__()
             logger.info(
-                f"first video duration: {1/media_info.video_fps:.3f}s, "
+                f"first video duration: {1 / media_info.video_fps:.3f}s, "
                 f"first audio duration: {first_audio_frame.duration:.3f}s"
             )
             await av_sync.push(first_video_frame, video_timestamp)
