@@ -15,8 +15,7 @@ try:
     import cv2
 except ImportError:
     raise RuntimeError(
-        "cv2 is required to run this example, "
-        "install with `pip install opencv-python`"
+        "cv2 is required to run this example, install with `pip install opencv-python`"
     )
 
 # ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
