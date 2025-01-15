@@ -314,7 +314,7 @@ class FileStreamWriter(BaseStreamWriter):
                 chunk_index=self._next_chunk_index,
                 content=chunk,
             )
-        await self._send_chunk(chunk_msg)
+            await self._send_chunk(chunk_msg)
 
     @property
     def info(self) -> FileStreamInfo:
