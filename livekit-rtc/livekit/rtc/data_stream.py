@@ -305,7 +305,10 @@ class FileStreamWriter(BaseStreamWriter):
         )
 
     async def write(self, data: bytes):
-        chunked_data = [data[i : i + 2] for i in range(0, len(data), 2)]
+        chunked_data = [
+            data[i : i + STREAM_CHUNK_SIZE]
+            for i in range(0, len(data), STREAM_CHUNK_SIZE)
+        ]
 
         for chunk in chunked_data:
             self._next_chunk_index += 1
