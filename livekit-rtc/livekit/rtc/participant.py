@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import ctypes
-import os
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
 
@@ -42,7 +41,7 @@ from .log import logger
 import asyncio
 
 from .rpc import RpcInvocationData
-from .data_stream import TextStreamWriter, FileStreamWriter, STREAM_CHUNK_SIZE
+from .data_stream import TextStreamWriter, FileStreamWriter
 
 
 class PublishTrackError(Exception):
