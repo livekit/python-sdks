@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import ctypes
+import os
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
 
@@ -41,6 +42,7 @@ from .log import logger
 import asyncio
 
 from .rpc import RpcInvocationData
+from .data_stream import TextStreamWriter, FileStreamWriter, STREAM_CHUNK_SIZE
 
 
 class PublishTrackError(Exception):
@@ -538,6 +540,36 @@ class LocalParticipant(Participant):
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
+
+    async def stream_text(
+        self,
+        destination_identities: List[str] = [],
+        topic: str = "",
+        extensions: Dict[str, str] = {},
+        reply_to_id: str | None = None,
+    ):
+        writer = TextStreamWriter(
+            self,
+            topic=topic,
+            extensions=extensions,
+            reply_to_id=reply_to_id,
+        )
+
+        await writer._send_header(destination_identities=destination_identities)
+
+        return writer
+
+    async def send_file(
+        self, path_to_file: str, file_name: str, extensions: Dict[str, str] = {}
+    ):
+        file_size = os.stat(path_to_file).st_size
+        writer = FileStreamWriter(
+            self, file_name=file_name, extensions=extensions, total_size=file_size
+        )
+        with open(path_to_file, "rb") as f:
+            while bytes := f.read(STREAM_CHUNK_SIZE):
+                await writer.write(bytes)
+            await writer.close()
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()

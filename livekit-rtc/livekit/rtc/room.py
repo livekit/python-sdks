@@ -33,6 +33,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
+from .data_stream import TextStreamReader, FileStreamReader
 
 EventTypes = Literal[
     "participant_connected",
@@ -62,6 +63,8 @@ EventTypes = Literal[
     "disconnected",
     "reconnecting",
     "reconnected",
+    "text_stream_received",
+    "file_stream_received",
 ]
 
 
@@ -137,6 +140,8 @@ class Room(EventEmitter[EventTypes]):
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
+        self._text_stream_readers: Dict[str, TextStreamReader]
+        self._file_stream_readers: Dict[str, FileStreamReader]
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -709,6 +714,13 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnecting")
         elif which == "reconnected":
             self.emit("reconnected")
+        elif which == "stream_header_received":
+            self._handle_stream_header(
+                event.stream_header_received.header,
+                event.stream_header_received.participant_identity,
+            )
+        elif which == "stream_chunk_received":
+            self._handle_stream_chunk(event.stream_chunk_received.chunk)
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
@@ -738,6 +750,40 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
+
+    def _handle_stream_header(
+        self, header: proto_room.DataStream.Header, participant_identity: str
+    ):
+        participant = self._retrieve_participant(participant_identity)
+        if header.text_header:
+            reader = TextStreamReader(header)
+            self._text_stream_readers[header.stream_id] = reader
+            self.emit("text_stream_received", reader, participant)
+        elif header.file_header:
+            reader = FileStreamReader(header)
+            self._file_stream_readers[header.stream_id] = reader
+            self.emit("file_stream_received", reader, participant)
+        pass
+
+    def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
+        text_reader = self._text_stream_readers.get(chunk.stream_id)
+        file_reader = self._file_stream_readers.get(chunk.stream_id)
+
+        if text_reader:
+            text_reader._on_chunk_update(chunk)
+        elif file_reader:
+            file_reader._on_chunk_update(chunk)
+
+    def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
+        text_reader = self._text_stream_readers.get(trailer.stream_id)
+        file_reader = self._file_stream_readers.get(trailer.stream_id)
+
+        if text_reader:
+            text_reader._on_stream_close(trailer)
+            self._text_stream_readers.pop(trailer.stream_id)
+        elif file_reader:
+            file_reader._on_stream_close(trailer)
+            self._file_stream_readers.pop(trailer.stream_id)
 
     def __repr__(self) -> str:
         sid = "unknown"
