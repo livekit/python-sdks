@@ -141,6 +141,7 @@ class BaseStreamWriter:
         extensions: Optional[Dict[str, str]] = {},
         stream_id: str | None = None,
         total_size: int | None = None,
+        mime_type: str = "",
     ):
         self._local_participant = local_participant
         if stream_id is None:
@@ -149,7 +150,7 @@ class BaseStreamWriter:
         self._header = proto_DataStream.Header(
             stream_id=stream_id,
             timestamp=timestamp,
-            mime_type="text/plain",
+            mime_type=mime_type,
             topic=topic,
             extensions=extensions,
             total_length=total_size,
@@ -234,7 +235,14 @@ class TextStreamWriter(BaseStreamWriter):
         total_size: int | None = None,
         reply_to_id: str | None = None,
     ) -> None:
-        super().__init__(local_participant, topic, extensions, stream_id, total_size)
+        super().__init__(
+            local_participant,
+            topic,
+            extensions,
+            stream_id,
+            total_size,
+            mime_type="text/plain",
+        )
         if reply_to_id:
             self._header.text_header.reply_to_stream_id = reply_to_id
         self._info = TextStreamInfo(
@@ -248,13 +256,16 @@ class TextStreamWriter(BaseStreamWriter):
         )
 
     async def write(self, text: str, chunk_index: int | None = None):
+        content = text.encode()
+        if len(content) > STREAM_CHUNK_SIZE:
+            raise ValueError("maximum chunk size exceeded")
         if chunk_index is None:
             chunk_index = self._next_chunk_index
             self._next_chunk_index += 1
         chunk_msg = proto_DataStream.Chunk(
             stream_id=self._header.stream_id,
             chunk_index=chunk_index,
-            content=text.encode(),
+            content=content,
         )
         await self._send_chunk(chunk_msg)
 
@@ -272,8 +283,16 @@ class FileStreamWriter(BaseStreamWriter):
         extensions: Optional[Dict[str, str]] = {},
         stream_id: str | None = None,
         total_size: int | None = None,
+        mime_type: str = "",
     ) -> None:
-        super().__init__(local_participant, topic, extensions, stream_id, total_size)
+        super().__init__(
+            local_participant,
+            topic,
+            extensions,
+            stream_id,
+            total_size,
+            mime_type=mime_type,
+        )
         self._header.file_header.file_name = file_name
         self._info = FileStreamInfo(
             id=self._header.stream_id,
@@ -286,6 +305,9 @@ class FileStreamWriter(BaseStreamWriter):
         )
 
     async def write(self, data: bytes, chunk_index: int | None = None):
+        if len(data) > STREAM_CHUNK_SIZE:
+            raise ValueError("maximum chunk size exceeded")
+
         if chunk_index is None:
             chunk_index = self._next_chunk_index
             self._next_chunk_index += 1
