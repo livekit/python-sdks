@@ -560,16 +560,26 @@ class LocalParticipant(Participant):
         return writer
 
     async def send_file(
-        self, path_to_file: str, file_name: str, extensions: Dict[str, str] = {}
+        self,
+        path_to_file: str,
+        file_name: str,
+        extensions: Dict[str, str] = {},
+        stream_id: str | None = None,
     ):
         file_size = os.stat(path_to_file).st_size
         writer = FileStreamWriter(
-            self, file_name=file_name, extensions=extensions, total_size=file_size
+            self,
+            file_name=file_name,
+            extensions=extensions,
+            total_size=file_size,
+            stream_id=stream_id,
         )
         with open(path_to_file, "rb") as f:
             while bytes := f.read(STREAM_CHUNK_SIZE):
                 await writer.write(bytes)
             await writer.close()
+
+        return writer.info
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
