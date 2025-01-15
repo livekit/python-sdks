@@ -304,16 +304,16 @@ class FileStreamWriter(BaseStreamWriter):
             file_name=self._header.file_header.file_name,
         )
 
-    async def write(self, data: bytes, chunk_index: int | None = None):
-        if len(data) > STREAM_CHUNK_SIZE:
-            raise ValueError("maximum chunk size exceeded")
+    async def write(self, data: bytes):
+        chunked_data = [data[i : i + 2] for i in range(0, len(data), 2)]
 
-        if chunk_index is None:
-            chunk_index = self._next_chunk_index
+        for chunk in chunked_data:
             self._next_chunk_index += 1
-        chunk_msg = proto_DataStream.Chunk(
-            stream_id=self._header.stream_id, chunk_index=chunk_index, content=data
-        )
+            chunk_msg = proto_DataStream.Chunk(
+                stream_id=self._header.stream_id,
+                chunk_index=self._next_chunk_index,
+                content=chunk,
+            )
         await self._send_chunk(chunk_msg)
 
     @property
