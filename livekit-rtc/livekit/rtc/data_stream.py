@@ -211,7 +211,7 @@ class BaseStreamWriter:
 
     async def _send_trailer(self, trailer: proto_DataStream.Trailer):
         req = proto_ffi.FfiRequest(
-            send_stream_trailer=proto_room.SendStreamTrailer(
+            send_stream_trailer=proto_room.SendStreamTrailerRequest(
                 trailer=trailer,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
             )
@@ -231,7 +231,9 @@ class BaseStreamWriter:
             raise PublishDataError(cb.send_stream_trailer.error)
 
     async def close(self):
-        await self._send_trailer()
+        await self._send_trailer(
+            trailer=proto_DataStream.Trailer(stream_id=self._header.stream_id)
+        )
 
 
 class TextStreamWriter(BaseStreamWriter):
