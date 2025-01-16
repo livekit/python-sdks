@@ -15,8 +15,13 @@
 from __future__ import annotations
 
 import ctypes
+import asyncio
+import os
+import mimetypes
+import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
+
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -38,10 +43,9 @@ from .transcription import Transcription
 from .rpc import RpcError
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
-import asyncio
 
 from .rpc import RpcInvocationData
-from .data_stream import TextStreamWriter, FileStreamWriter
+from .data_stream import TextStreamWriter, FileStreamWriter, STREAM_CHUNK_SIZE
 
 
 class PublishTrackError(Exception):
@@ -552,9 +556,10 @@ class LocalParticipant(Participant):
             topic=topic,
             extensions=extensions,
             reply_to_id=reply_to_id,
+            destination_identities=destination_identities,
         )
 
-        await writer._send_header(destination_identities=destination_identities)
+        await writer._send_header()
 
         return writer
 
@@ -562,9 +567,10 @@ class LocalParticipant(Participant):
         self,
         file_name: str,
         file_size: int | None = None,
-        mime_type: str = "",
+        mime_type: str = "application/octet-stream",
         extensions: Dict[str, str] = {},
         stream_id: str | None = None,
+        destination_identities: List[str] = [],
     ):
         writer = FileStreamWriter(
             self,
@@ -573,9 +579,41 @@ class LocalParticipant(Participant):
             total_size=file_size,
             stream_id=stream_id,
             mime_type=mime_type,
+            destination_identities=destination_identities,
         )
 
+        await writer._send_header()
+
         return writer
+
+    async def send_file(
+        self,
+        file_path: str,
+        destination_identities: List[str] = [],
+        extensions: Dict[str, str] = {},
+        stream_id: str | None = None,
+    ):
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type is None:
+            mime_type = (
+                "application/octet-stream"  # Fallback MIME type for unknown files
+            )
+
+        writer: FileStreamWriter = await self.stream_file(
+            file_name=file_name,
+            file_size=file_size,
+            mime_type=mime_type,
+            extensions=extensions,
+            stream_id=stream_id,
+            destination_identities=destination_identities,
+        )
+
+        async with aiofiles.open(file_path, "rb") as f:
+            while bytes := await f.read(STREAM_CHUNK_SIZE):
+                await writer.write(bytes)
+        await writer.close()
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()

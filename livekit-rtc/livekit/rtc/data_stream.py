@@ -143,6 +143,7 @@ class BaseStreamWriter:
         stream_id: str | None = None,
         total_size: int | None = None,
         mime_type: str = "",
+        destination_identities: List[str] = [],
     ):
         self._local_participant = local_participant
         if stream_id is None:
@@ -157,13 +158,15 @@ class BaseStreamWriter:
             total_length=total_size,
         )
         self._next_chunk_index: int = 0
+        self._destination_identities = destination_identities
 
-    async def _send_header(self, destination_identities: List[str] = []):
+    async def _send_header(self):
         req = proto_ffi.FfiRequest(
             send_stream_header=proto_room.SendStreamHeaderRequest(
                 header=self._header,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
-                destination_identities=destination_identities,
+                destination_identities=self._destination_identities,
+                sender_identity=self._local_participant.identity,
             )
         )
 
@@ -185,6 +188,8 @@ class BaseStreamWriter:
             send_stream_chunk=proto_room.SendStreamChunkRequest(
                 chunk=chunk,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
+                sender_identity=self._local_participant.identity,
+                destination_identities=self._destination_identities,
             )
         )
 
@@ -235,6 +240,7 @@ class TextStreamWriter(BaseStreamWriter):
         stream_id: str | None = None,
         total_size: int | None = None,
         reply_to_id: str | None = None,
+        destination_identities: List[str] = [],
     ) -> None:
         super().__init__(
             local_participant,
@@ -243,6 +249,7 @@ class TextStreamWriter(BaseStreamWriter):
             stream_id,
             total_size,
             mime_type="text/plain",
+            destination_identities=destination_identities,
         )
         if reply_to_id:
             self._header.text_header.reply_to_stream_id = reply_to_id
@@ -285,6 +292,7 @@ class FileStreamWriter(BaseStreamWriter):
         stream_id: str | None = None,
         total_size: int | None = None,
         mime_type: str = "",
+        destination_identities: List[str] = [],
     ) -> None:
         super().__init__(
             local_participant,
@@ -293,6 +301,7 @@ class FileStreamWriter(BaseStreamWriter):
             stream_id,
             total_size,
             mime_type=mime_type,
+            destination_identities=destination_identities,
         )
         self._header.file_header.file_name = file_name
         self._info = FileStreamInfo(
