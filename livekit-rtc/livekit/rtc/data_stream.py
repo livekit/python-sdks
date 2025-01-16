@@ -95,6 +95,12 @@ class TextStreamReader:
     def info(self) -> TextStreamInfo:
         return self._info
 
+    async def read_all(self) -> str:
+        final_string = ""
+        async for update in self:
+            final_string = update.collected
+        return final_string
+
 
 @dataclass
 class FileStreamInfo(BaseStreamInfo):
