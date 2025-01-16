@@ -49,6 +49,7 @@ class TextStreamInfo(BaseStreamInfo):
 @dataclass
 class TextStreamUpdate:
     current: str
+    index: int
     collected: str
 
 
@@ -86,7 +87,9 @@ class TextStreamReader:
         chunk_list = list(self._chunks.values())
         chunk_list.sort(key=lambda chunk: chunk.chunk_index)
         collected: str = "".join(map(lambda chunk: chunk.content.decode(), chunk_list))
-        return TextStreamUpdate(current=decodedStr, collected=collected)
+        return TextStreamUpdate(
+            current=decodedStr, index=item.chunk_index, collected=collected
+        )
 
     @property
     def info(self) -> TextStreamInfo:
