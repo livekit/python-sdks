@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import uuid
 import datetime
 from dataclasses import dataclass
@@ -303,21 +304,23 @@ class FileStreamWriter(BaseStreamWriter):
             extensions=dict(self._header.extensions),
             file_name=self._header.file_header.file_name,
         )
+        self._write_lock = asyncio.Lock()
 
     async def write(self, data: bytes):
-        chunked_data = [
-            data[i : i + STREAM_CHUNK_SIZE]
-            for i in range(0, len(data), STREAM_CHUNK_SIZE)
-        ]
+        async with self._write_lock:
+            chunked_data = [
+                data[i : i + STREAM_CHUNK_SIZE]
+                for i in range(0, len(data), STREAM_CHUNK_SIZE)
+            ]
 
-        for chunk in chunked_data:
-            self._next_chunk_index += 1
-            chunk_msg = proto_DataStream.Chunk(
-                stream_id=self._header.stream_id,
-                chunk_index=self._next_chunk_index,
-                content=chunk,
-            )
-            await self._send_chunk(chunk_msg)
+            for chunk in chunked_data:
+                self._next_chunk_index += 1
+                chunk_msg = proto_DataStream.Chunk(
+                    stream_id=self._header.stream_id,
+                    chunk_index=self._next_chunk_index,
+                    content=chunk,
+                )
+                await self._send_chunk(chunk_msg)
 
     @property
     def info(self) -> FileStreamInfo:
