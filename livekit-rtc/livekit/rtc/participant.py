@@ -45,7 +45,12 @@ from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
 
 from .rpc import RpcInvocationData
-from .data_stream import TextStreamWriter, FileStreamWriter, STREAM_CHUNK_SIZE
+from .data_stream import (
+    TextStreamWriter,
+    FileStreamWriter,
+    FileStreamInfo,
+    STREAM_CHUNK_SIZE,
+)
 
 
 class PublishTrackError(Exception):
@@ -550,7 +555,7 @@ class LocalParticipant(Participant):
         topic: str = "",
         extensions: Dict[str, str] = {},
         reply_to_id: str | None = None,
-    ):
+    ) -> TextStreamWriter:
         writer = TextStreamWriter(
             self,
             topic=topic,
@@ -571,7 +576,7 @@ class LocalParticipant(Participant):
         extensions: Dict[str, str] = {},
         stream_id: str | None = None,
         destination_identities: List[str] = [],
-    ):
+    ) -> FileStreamWriter:
         writer = FileStreamWriter(
             self,
             file_name=file_name,
@@ -592,7 +597,7 @@ class LocalParticipant(Participant):
         destination_identities: List[str] = [],
         extensions: Dict[str, str] = {},
         stream_id: str | None = None,
-    ):
+    ) -> FileStreamInfo:
         file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
@@ -614,6 +619,8 @@ class LocalParticipant(Participant):
             while bytes := await f.read(STREAM_CHUNK_SIZE):
                 await writer.write(bytes)
         await writer.close()
+
+        return writer.info
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
