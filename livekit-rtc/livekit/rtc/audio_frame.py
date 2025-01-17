@@ -17,7 +17,7 @@ from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
-from typing import Any, Union, no_type_check
+from typing import Any, Union
 
 
 class AudioFrame:
@@ -202,7 +202,6 @@ class AudioFrame:
             f"duration={self.duration:.3f})"
         )
 
-    @no_type_check
     @classmethod
     def __get_pydantic_core_schema__(cls, *_: Any):
         from pydantic_core import core_schema
