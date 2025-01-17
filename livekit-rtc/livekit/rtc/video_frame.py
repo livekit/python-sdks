@@ -20,7 +20,7 @@ from typing import List, Optional
 from ._ffi_client import FfiClient, FfiHandle
 from ._utils import get_address
 
-from typing import Any
+from typing import Any, no_type_check
 
 
 class VideoFrame:
@@ -205,6 +205,7 @@ class VideoFrame:
     def __repr__(self) -> str:
         return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={self.type})"
 
+    @no_type_check
     @classmethod
     def __get_pydantic_core_schema__(cls, *_: Any):
         from pydantic_core import core_schema
