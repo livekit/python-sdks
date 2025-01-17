@@ -1264,9 +1264,8 @@ class RoomEvent(google.protobuf.message.Message):
     DATA_PACKET_RECEIVED_FIELD_NUMBER: builtins.int
     TRANSCRIPTION_RECEIVED_FIELD_NUMBER: builtins.int
     CHAT_MESSAGE_FIELD_NUMBER: builtins.int
-    STREAM_HEADER_RECEIVED_FIELD_NUMBER: builtins.int
-    STREAM_CHUNK_RECEIVED_FIELD_NUMBER: builtins.int
-    STREAM_TRAILER_RECEIVED_FIELD_NUMBER: builtins.int
+    STREAM_HEADER_FIELD_NUMBER: builtins.int
+    STREAM_CHUNK_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1329,11 +1328,9 @@ class RoomEvent(google.protobuf.message.Message):
     @property
     def chat_message(self) -> global___ChatMessageReceived: ...
     @property
-    def stream_header_received(self) -> global___DataStreamHeaderReceived: ...
+    def stream_header(self) -> global___DataStream.Header: ...
     @property
-    def stream_chunk_received(self) -> global___DataStreamChunkReceived: ...
-    @property
-    def stream_trailer_received(self) -> global___DataStreamTrailerReceived: ...
+    def stream_chunk(self) -> global___DataStream.Chunk: ...
     def __init__(
         self,
         *,
@@ -1366,13 +1363,12 @@ class RoomEvent(google.protobuf.message.Message):
         data_packet_received: global___DataPacketReceived | None = ...,
         transcription_received: global___TranscriptionReceived | None = ...,
         chat_message: global___ChatMessageReceived | None = ...,
-        stream_header_received: global___DataStreamHeaderReceived | None = ...,
-        stream_chunk_received: global___DataStreamChunkReceived | None = ...,
-        stream_trailer_received: global___DataStreamTrailerReceived | None = ...,
+        stream_header: global___DataStream.Header | None = ...,
+        stream_chunk: global___DataStream.Chunk | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received"] | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk", b"stream_chunk", "stream_header", b"stream_header", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk", b"stream_chunk", "stream_header", b"stream_header", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header", "stream_chunk"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -2108,9 +2104,10 @@ class DataStream(google.protobuf.message.Message):
 
         STREAM_ID_FIELD_NUMBER: builtins.int
         TIMESTAMP_FIELD_NUMBER: builtins.int
-        MIME_TYPE_FIELD_NUMBER: builtins.int
         TOPIC_FIELD_NUMBER: builtins.int
+        MIME_TYPE_FIELD_NUMBER: builtins.int
         TOTAL_LENGTH_FIELD_NUMBER: builtins.int
+        TOTAL_CHUNKS_FIELD_NUMBER: builtins.int
         EXTENSIONS_FIELD_NUMBER: builtins.int
         TEXT_HEADER_FIELD_NUMBER: builtins.int
         FILE_HEADER_FIELD_NUMBER: builtins.int
@@ -2118,9 +2115,11 @@ class DataStream(google.protobuf.message.Message):
         """unique identifier for this data stream"""
         timestamp: builtins.int
         """using int64 for Unix timestamp"""
-        mime_type: builtins.str
         topic: builtins.str
+        mime_type: builtins.str
         total_length: builtins.int
+        """only populated for finite streams, if it's a stream of unknown size this stays empty"""
+        total_chunks: builtins.int
         """only populated for finite streams, if it's a stream of unknown size this stays empty"""
         @property
         def extensions(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
@@ -2135,15 +2134,16 @@ class DataStream(google.protobuf.message.Message):
             *,
             stream_id: builtins.str | None = ...,
             timestamp: builtins.int | None = ...,
-            mime_type: builtins.str | None = ...,
             topic: builtins.str | None = ...,
+            mime_type: builtins.str | None = ...,
             total_length: builtins.int | None = ...,
+            total_chunks: builtins.int | None = ...,
             extensions: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
             text_header: global___DataStream.TextHeader | None = ...,
             file_header: global___DataStream.FileHeader | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["content_header", b"content_header", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["content_header", b"content_header", "extensions", b"extensions", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
+        def HasField(self, field_name: typing.Literal["content_header", b"content_header", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_chunks", b"total_chunks", "total_length", b"total_length"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["content_header", b"content_header", "extensions", b"extensions", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_chunks", b"total_chunks", "total_length", b"total_length"]) -> None: ...
         def WhichOneof(self, oneof_group: typing.Literal["content_header", b"content_header"]) -> typing.Literal["text_header", "file_header"] | None: ...
 
     @typing.final
@@ -2153,6 +2153,7 @@ class DataStream(google.protobuf.message.Message):
         STREAM_ID_FIELD_NUMBER: builtins.int
         CHUNK_INDEX_FIELD_NUMBER: builtins.int
         CONTENT_FIELD_NUMBER: builtins.int
+        COMPLETE_FIELD_NUMBER: builtins.int
         VERSION_FIELD_NUMBER: builtins.int
         IV_FIELD_NUMBER: builtins.int
         stream_id: builtins.str
@@ -2160,6 +2161,8 @@ class DataStream(google.protobuf.message.Message):
         chunk_index: builtins.int
         content: builtins.bytes
         """content as binary (bytes)"""
+        complete: builtins.bool
+        """true only if this is the last chunk of this stream - can also be sent with empty content"""
         version: builtins.int
         """a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced"""
         iv: builtins.bytes
@@ -2170,302 +2173,15 @@ class DataStream(google.protobuf.message.Message):
             stream_id: builtins.str | None = ...,
             chunk_index: builtins.int | None = ...,
             content: builtins.bytes | None = ...,
+            complete: builtins.bool | None = ...,
             version: builtins.int | None = ...,
             iv: builtins.bytes | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> None: ...
-
-    @typing.final
-    class Trailer(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-        @typing.final
-        class ExtensionsEntry(google.protobuf.message.Message):
-            DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-            KEY_FIELD_NUMBER: builtins.int
-            VALUE_FIELD_NUMBER: builtins.int
-            key: builtins.str
-            value: builtins.str
-            def __init__(
-                self,
-                *,
-                key: builtins.str | None = ...,
-                value: builtins.str | None = ...,
-            ) -> None: ...
-            def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
-            def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
-
-        STREAM_ID_FIELD_NUMBER: builtins.int
-        REASON_FIELD_NUMBER: builtins.int
-        EXTENSIONS_FIELD_NUMBER: builtins.int
-        stream_id: builtins.str
-        """unique identifier for this data stream"""
-        reason: builtins.str
-        """reason why the stream was closed (could contain "error" / "interrupted" / empty for expected end)"""
-        @property
-        def extensions(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
-            """finalizing updates for the stream, can also include additional insights for errors or endTime for transcription"""
-
-        def __init__(
-            self,
-            *,
-            stream_id: builtins.str | None = ...,
-            reason: builtins.str | None = ...,
-            extensions: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
-        ) -> None: ...
-        def HasField(self, field_name: typing.Literal["reason", b"reason", "stream_id", b"stream_id"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["extensions", b"extensions", "reason", b"reason", "stream_id", b"stream_id"]) -> None: ...
+        def HasField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "complete", b"complete", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "complete", b"complete", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> None: ...
 
     def __init__(
         self,
     ) -> None: ...
 
 global___DataStream = DataStream
-
-@typing.final
-class DataStreamHeaderReceived(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
-    HEADER_FIELD_NUMBER: builtins.int
-    participant_identity: builtins.str
-    @property
-    def header(self) -> global___DataStream.Header: ...
-    def __init__(
-        self,
-        *,
-        participant_identity: builtins.str | None = ...,
-        header: global___DataStream.Header | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["header", b"header", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["header", b"header", "participant_identity", b"participant_identity"]) -> None: ...
-
-global___DataStreamHeaderReceived = DataStreamHeaderReceived
-
-@typing.final
-class DataStreamChunkReceived(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
-    CHUNK_FIELD_NUMBER: builtins.int
-    participant_identity: builtins.str
-    @property
-    def chunk(self) -> global___DataStream.Chunk: ...
-    def __init__(
-        self,
-        *,
-        participant_identity: builtins.str | None = ...,
-        chunk: global___DataStream.Chunk | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]) -> None: ...
-
-global___DataStreamChunkReceived = DataStreamChunkReceived
-
-@typing.final
-class DataStreamTrailerReceived(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
-    TRAILER_FIELD_NUMBER: builtins.int
-    participant_identity: builtins.str
-    @property
-    def trailer(self) -> global___DataStream.Trailer: ...
-    def __init__(
-        self,
-        *,
-        participant_identity: builtins.str | None = ...,
-        trailer: global___DataStream.Trailer | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]) -> None: ...
-
-global___DataStreamTrailerReceived = DataStreamTrailerReceived
-
-@typing.final
-class SendStreamHeaderRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
-    HEADER_FIELD_NUMBER: builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
-    sender_identity: builtins.str
-    @property
-    def header(self) -> global___DataStream.Header: ...
-    @property
-    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
-    def __init__(
-        self,
-        *,
-        local_participant_handle: builtins.int | None = ...,
-        header: global___DataStream.Header | None = ...,
-        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
-        sender_identity: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["header", b"header", "local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "header", b"header", "local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity"]) -> None: ...
-
-global___SendStreamHeaderRequest = SendStreamHeaderRequest
-
-@typing.final
-class SendStreamChunkRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
-    CHUNK_FIELD_NUMBER: builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
-    sender_identity: builtins.str
-    @property
-    def chunk(self) -> global___DataStream.Chunk: ...
-    @property
-    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
-    def __init__(
-        self,
-        *,
-        local_participant_handle: builtins.int | None = ...,
-        chunk: global___DataStream.Chunk | None = ...,
-        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
-        sender_identity: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["chunk", b"chunk", "local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["chunk", b"chunk", "destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity"]) -> None: ...
-
-global___SendStreamChunkRequest = SendStreamChunkRequest
-
-@typing.final
-class SendStreamTrailerRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
-    TRAILER_FIELD_NUMBER: builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
-    sender_identity: builtins.str
-    @property
-    def trailer(self) -> global___DataStream.Trailer: ...
-    @property
-    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
-    def __init__(
-        self,
-        *,
-        local_participant_handle: builtins.int | None = ...,
-        trailer: global___DataStream.Trailer | None = ...,
-        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
-        sender_identity: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity", "trailer", b"trailer"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "sender_identity", b"sender_identity", "trailer", b"trailer"]) -> None: ...
-
-global___SendStreamTrailerRequest = SendStreamTrailerRequest
-
-@typing.final
-class SendStreamHeaderResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
-
-global___SendStreamHeaderResponse = SendStreamHeaderResponse
-
-@typing.final
-class SendStreamChunkResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
-
-global___SendStreamChunkResponse = SendStreamChunkResponse
-
-@typing.final
-class SendStreamTrailerResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
-
-global___SendStreamTrailerResponse = SendStreamTrailerResponse
-
-@typing.final
-class SendStreamHeaderCallback(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    ERROR_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    error: builtins.str
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-        error: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
-
-global___SendStreamHeaderCallback = SendStreamHeaderCallback
-
-@typing.final
-class SendStreamChunkCallback(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    ERROR_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    error: builtins.str
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-        error: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
-
-global___SendStreamChunkCallback = SendStreamChunkCallback
-
-@typing.final
-class SendStreamTrailerCallback(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    ERROR_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    error: builtins.str
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-        error: builtins.str | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
-
-global___SendStreamTrailerCallback = SendStreamTrailerCallback
