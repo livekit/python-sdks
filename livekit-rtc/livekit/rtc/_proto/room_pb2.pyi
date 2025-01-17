@@ -1267,6 +1267,7 @@ class RoomEvent(google.protobuf.message.Message):
     STREAM_HEADER_RECEIVED_FIELD_NUMBER: builtins.int
     STREAM_CHUNK_RECEIVED_FIELD_NUMBER: builtins.int
     STREAM_TRAILER_RECEIVED_FIELD_NUMBER: builtins.int
+    DATA_CHANNEL_LOW_THRESHOLD_CHANGED_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1334,6 +1335,8 @@ class RoomEvent(google.protobuf.message.Message):
     def stream_chunk_received(self) -> global___DataStreamChunkReceived: ...
     @property
     def stream_trailer_received(self) -> global___DataStreamTrailerReceived: ...
+    @property
+    def data_channel_low_threshold_changed(self) -> global___DataChannelBufferedAmountLowThresholdChanged: ...
     def __init__(
         self,
         *,
@@ -1369,10 +1372,11 @@ class RoomEvent(google.protobuf.message.Message):
         stream_header_received: global___DataStreamHeaderReceived | None = ...,
         stream_chunk_received: global___DataStreamChunkReceived | None = ...,
         stream_trailer_received: global___DataStreamTrailerReceived | None = ...,
+        data_channel_low_threshold_changed: global___DataChannelBufferedAmountLowThresholdChanged | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received"] | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1383,18 +1387,24 @@ class RoomInfo(google.protobuf.message.Message):
     SID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
+    LOSSY_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    RELIABLE_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     metadata: builtins.str
+    lossy_dc_buffered_amount_low_threshold: builtins.int
+    reliable_dc_buffered_amount_low_threshold: builtins.int
     def __init__(
         self,
         *,
         sid: builtins.str | None = ...,
         name: builtins.str | None = ...,
         metadata: builtins.str | None = ...,
+        lossy_dc_buffered_amount_low_threshold: builtins.int | None = ...,
+        reliable_dc_buffered_amount_low_threshold: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "metadata", b"metadata", "name", b"name", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "metadata", b"metadata", "name", b"name", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]) -> None: ...
 
 global___RoomInfo = RoomInfo
 
@@ -2469,3 +2479,54 @@ class SendStreamTrailerCallback(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
 global___SendStreamTrailerCallback = SendStreamTrailerCallback
+
+@typing.final
+class SetDataChannelBufferedAmountLowThresholdRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    THRESHOLD_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    threshold: builtins.int
+    kind: global___DataPacketKind.ValueType
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int | None = ...,
+        threshold: builtins.int | None = ...,
+        kind: global___DataPacketKind.ValueType | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]) -> None: ...
+
+global___SetDataChannelBufferedAmountLowThresholdRequest = SetDataChannelBufferedAmountLowThresholdRequest
+
+@typing.final
+class SetDataChannelBufferedAmountLowThresholdResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___SetDataChannelBufferedAmountLowThresholdResponse = SetDataChannelBufferedAmountLowThresholdResponse
+
+@typing.final
+class DataChannelBufferedAmountLowThresholdChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    KIND_FIELD_NUMBER: builtins.int
+    THRESHOLD_FIELD_NUMBER: builtins.int
+    kind: global___DataPacketKind.ValueType
+    threshold: builtins.int
+    def __init__(
+        self,
+        *,
+        kind: global___DataPacketKind.ValueType | None = ...,
+        threshold: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "threshold", b"threshold"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "threshold", b"threshold"]) -> None: ...
+
+global___DataChannelBufferedAmountLowThresholdChanged = DataChannelBufferedAmountLowThresholdChanged
