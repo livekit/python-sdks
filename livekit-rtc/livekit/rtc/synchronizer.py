@@ -185,9 +185,9 @@ class _FPSController:
 
     def after_process(self) -> None:
         """Update timing information after processing a frame."""
-        assert self._next_frame_time is not None, (
-            "wait_next_process must be called first"
-        )
+        assert (
+            self._next_frame_time is not None
+        ), "wait_next_process must be called first"
 
         # update timing information
         self._send_timestamps.append(time.perf_counter())
