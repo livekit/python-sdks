@@ -20,7 +20,7 @@ from typing import List, Optional
 from ._ffi_client import FfiClient, FfiHandle
 from ._utils import get_address
 
-from typing import Any, Union
+from typing import Any
 
 
 class VideoFrame:
