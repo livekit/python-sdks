@@ -32,7 +32,7 @@ from ._proto.room_pb2 import (
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
 )
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, split_utf8
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -555,18 +555,47 @@ class LocalParticipant(Participant):
         topic: str = "",
         extensions: Dict[str, str] = {},
         reply_to_id: str | None = None,
+        total_size: int | None = None,
     ) -> TextStreamWriter:
+        """
+        Returns a TextStreamWriter that allows to write individual chunks of text to a text stream.
+        In most cases where you want to simply send a text message use send_text() instead.
+        """
         writer = TextStreamWriter(
             self,
             topic=topic,
             extensions=extensions,
             reply_to_id=reply_to_id,
             destination_identities=destination_identities,
+            total_size=total_size,
         )
 
         await writer._send_header()
 
         return writer
+
+    async def send_text(
+        self,
+        text: str,
+        destination_identities: List[str] = [],
+        topic: str = "",
+        extensions: Dict[str, str] = {},
+        reply_to_id: str | None = None,
+    ):
+        total_size = len(text.encode())
+        writer = await self.stream_text(
+            destination_identities=destination_identities,
+            topic=topic,
+            extensions=extensions,
+            reply_to_id=reply_to_id,
+            total_size=total_size,
+        )
+
+        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
+            await writer.write(chunk)
+        await writer.close()
+
+        return writer.info
 
     async def stream_file(
         self,
@@ -577,6 +606,10 @@ class LocalParticipant(Participant):
         stream_id: str | None = None,
         destination_identities: List[str] = [],
     ) -> FileStreamWriter:
+        """
+        Returns a FileStreamWriter that allows to write individual chunks of bytes to a file stream.
+        In cases where you want to simply send a file from the file system use send_file() instead.
+        """
         writer = FileStreamWriter(
             self,
             file_name=file_name,
