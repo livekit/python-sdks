@@ -21,10 +21,14 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Optional, TypedDict, Dict, List
 from ._proto.room_pb2 import DataStream as proto_DataStream
 from ._utils import RingQueue
-from .participant import LocalParticipant, PublishDataError
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
 from ._ffi_client import FfiClient
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .participant import LocalParticipant
 
 
 STREAM_CHUNK_SIZE = 15_000
@@ -66,7 +70,7 @@ class TextStreamReader:
             attachments=list(header.text_header.attached_stream_ids),
         )
         self._queue: RingQueue[proto_DataStream.Chunk | None] = RingQueue(capacity)
-        self._chunks: Dict[str, proto_DataStream.Chunk] = {}
+        self._chunks: Dict[int, proto_DataStream.Chunk] = {}
 
     def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         self._queue.put(chunk)
@@ -83,7 +87,7 @@ class TextStreamReader:
             raise StopAsyncIteration
         decodedStr = item.content.decode()
 
-        self._chunks[item.stream_id] = item
+        self._chunks[item.chunk_index] = item
         chunk_list = list(self._chunks.values())
         chunk_list.sort(key=lambda chunk: chunk.chunk_index)
         collected: str = "".join(map(lambda chunk: chunk.content.decode(), chunk_list))
@@ -190,7 +194,7 @@ class BaseStreamWriter:
             FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.send_stream_header.error:
-            raise PublishDataError(cb.send_stream_header.error)
+            raise ConnectionError(cb.send_stream_header.error)
 
     async def _send_chunk(self, chunk: proto_DataStream.Chunk):
         req = proto_ffi.FfiRequest(
@@ -213,13 +217,14 @@ class BaseStreamWriter:
             FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.send_stream_chunk.error:
-            raise PublishDataError(cb.send_stream_chunk.error)
+            raise ConnectionError(cb.send_stream_chunk.error)
 
     async def _send_trailer(self, trailer: proto_DataStream.Trailer):
         req = proto_ffi.FfiRequest(
             send_stream_trailer=proto_room.SendStreamTrailerRequest(
                 trailer=trailer,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
+                sender_identity=self._local_participant.identity,
             )
         )
 
@@ -234,11 +239,13 @@ class BaseStreamWriter:
             FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.send_stream_chunk.error:
-            raise PublishDataError(cb.send_stream_trailer.error)
+            raise ConnectionError(cb.send_stream_trailer.error)
 
     async def close(self):
         await self._send_trailer(
-            trailer=proto_DataStream.Trailer(stream_id=self._header.stream_id)
+            trailer=proto_DataStream.Trailer(
+                stream_id=self._header.stream_id, reason=""
+            )
         )
 
 
@@ -262,6 +269,7 @@ class TextStreamWriter(BaseStreamWriter):
             mime_type="text/plain",
             destination_identities=destination_identities,
         )
+        self._header.text_header.operation_type = proto_DataStream.OperationType.CREATE
         if reply_to_id:
             self._header.text_header.reply_to_stream_id = reply_to_id
         self._info = TextStreamInfo(

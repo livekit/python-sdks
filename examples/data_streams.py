@@ -1,0 +1,76 @@
+import os
+import logging
+import asyncio
+from signal import SIGINT, SIGTERM
+from livekit import rtc
+
+# Set the following environment variables with your own values
+TOKEN = os.environ.get("LIVEKIT_TOKEN")
+URL = os.environ.get("LIVEKIT_URL")
+
+
+async def main(room: rtc.Room):
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    async def greetParticipant(identity: str):
+        text_writer = await room.local_participant.stream_text(
+            destination_identities=[identity]
+        )
+        for char in "Hi! Just a friendly message":
+            await text_writer.write(char)
+        await text_writer.close()
+
+    async def on_text_received(reader: rtc.TextStreamReader):
+        full_text = await reader.read_all()
+        logger.info(full_text)
+
+    @room.on("participant_connected")
+    def on_participant_connected(participant: rtc.RemoteParticipant):
+        logger.info(
+            "participant connected: %s %s", participant.sid, participant.identity
+        )
+        asyncio.create_task(greetParticipant(participant.identity))
+
+    # track_subscribed is emitted whenever the local participant is subscribed to a new track
+    @room.on("text_stream_received")
+    def on_text_stream_received(
+        reader: rtc.TextStreamReader,
+        participant_identity: str,
+    ):
+        logger.info("text stream received from: %s", participant_identity)
+        asyncio.create_task(on_text_received(reader=reader))
+
+    # By default, autosubscribe is enabled. The participant will be subscribed to
+    # all published tracks in the room
+    await room.connect(URL, TOKEN)
+    logger.info("connected to room %s", room.name)
+
+    for identity, participant in room.remote_participants.items():
+        print("Sending a welcome message to %s", participant.identity)
+        await greetParticipant(participant.identity)
+
+    logger.info("exiting")
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
+    )
+
+    loop = asyncio.get_event_loop()
+    room = rtc.Room(loop=loop)
+
+    async def cleanup():
+        await room.disconnect()
+        loop.stop()
+
+    asyncio.ensure_future(main(room))
+    for signal in [SIGINT, SIGTERM]:
+        loop.add_signal_handler(signal, lambda: asyncio.ensure_future(cleanup()))
+
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
