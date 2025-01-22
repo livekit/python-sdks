@@ -47,8 +47,8 @@ from .log import logger
 from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
-    FileStreamWriter,
-    FileStreamInfo,
+    ByteStreamWriter,
+    ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
 
@@ -551,6 +551,7 @@ class LocalParticipant(Participant):
 
     async def stream_text(
         self,
+        *,
         destination_identities: List[str] = [],
         topic: str = "",
         extensions: Dict[str, str] = {},
@@ -577,6 +578,7 @@ class LocalParticipant(Participant):
     async def send_text(
         self,
         text: str,
+        *,
         destination_identities: List[str] = [],
         topic: str = "",
         extensions: Dict[str, str] = {},
@@ -597,27 +599,30 @@ class LocalParticipant(Participant):
 
         return writer.info
 
-    async def stream_file(
+    async def stream_bytes(
         self,
-        file_name: str,
-        file_size: int | None = None,
+        name: str,
+        *,
+        total_size: int | None = None,
         mime_type: str = "application/octet-stream",
-        extensions: Dict[str, str] = {},
+        extensions: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
-        destination_identities: List[str] = [],
-    ) -> FileStreamWriter:
+        destination_identities: Optional[List[str]] = None,
+        topic: str = "",
+    ) -> ByteStreamWriter:
         """
         Returns a FileStreamWriter that allows to write individual chunks of bytes to a file stream.
         In cases where you want to simply send a file from the file system use send_file() instead.
         """
-        writer = FileStreamWriter(
+        writer = ByteStreamWriter(
             self,
-            file_name=file_name,
+            name=name,
             extensions=extensions,
-            total_size=file_size,
+            total_size=total_size,
             stream_id=stream_id,
             mime_type=mime_type,
             destination_identities=destination_identities,
+            topic=topic,
         )
 
         await writer._send_header()
@@ -627,10 +632,11 @@ class LocalParticipant(Participant):
     async def send_file(
         self,
         file_path: str,
-        destination_identities: List[str] = [],
-        extensions: Dict[str, str] = {},
+        topic: str = "",
+        destination_identities: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
-    ) -> FileStreamInfo:
+    ) -> ByteStreamInfo:
         file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
@@ -639,13 +645,14 @@ class LocalParticipant(Participant):
                 "application/octet-stream"  # Fallback MIME type for unknown files
             )
 
-        writer: FileStreamWriter = await self.stream_file(
-            file_name=file_name,
-            file_size=file_size,
+        writer: ByteStreamWriter = await self.stream_bytes(
+            name=file_name,
+            total_size=file_size,
             mime_type=mime_type,
-            extensions=extensions,
+            extensions=attributes,
             stream_id=stream_id,
             destination_identities=destination_identities,
+            topic=topic,
         )
 
         async with aiofiles.open(file_path, "rb") as f:

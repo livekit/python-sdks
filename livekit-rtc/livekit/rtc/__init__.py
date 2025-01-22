@@ -77,7 +77,7 @@ from .synchronizer import AVSynchronizer
 from .data_stream import (
     TextStreamInfo,
     TextStreamUpdate,
-    FileStreamInfo,
+    ByteStreamInfo,
     TextStreamReader,
     TextStreamWriter,
 )
@@ -149,7 +149,7 @@ __all__ = [
     "AVSynchronizer",
     "TextStreamUpdate",
     "TextStreamInfo",
-    "FileStreamInfo",
+    "ByteStreamInfo",
     "TextStreamReader",
     "TextStreamWriter",
     "__version__",

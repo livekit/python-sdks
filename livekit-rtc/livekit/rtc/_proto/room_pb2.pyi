@@ -2077,21 +2077,20 @@ class DataStream(google.protobuf.message.Message):
         def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "generated", b"generated", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "version", b"version"]) -> None: ...
 
     @typing.final
-    class FileHeader(google.protobuf.message.Message):
-        """header properties specific to file or image streams"""
+    class ByteHeader(google.protobuf.message.Message):
+        """header properties specific to byte or file streams"""
 
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        FILE_NAME_FIELD_NUMBER: builtins.int
-        file_name: builtins.str
-        """name of the file"""
+        NAME_FIELD_NUMBER: builtins.int
+        name: builtins.str
         def __init__(
             self,
             *,
-            file_name: builtins.str | None = ...,
+            name: builtins.str | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["file_name", b"file_name"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["file_name", b"file_name"]) -> None: ...
+        def HasField(self, field_name: typing.Literal["name", b"name"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["name", b"name"]) -> None: ...
 
     @typing.final
     class Header(google.protobuf.message.Message):
@@ -2100,7 +2099,7 @@ class DataStream(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
         @typing.final
-        class ExtensionsEntry(google.protobuf.message.Message):
+        class AttributesEntry(google.protobuf.message.Message):
             DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
             KEY_FIELD_NUMBER: builtins.int
@@ -2121,9 +2120,9 @@ class DataStream(google.protobuf.message.Message):
         MIME_TYPE_FIELD_NUMBER: builtins.int
         TOPIC_FIELD_NUMBER: builtins.int
         TOTAL_LENGTH_FIELD_NUMBER: builtins.int
-        EXTENSIONS_FIELD_NUMBER: builtins.int
+        ATTRIBUTES_FIELD_NUMBER: builtins.int
         TEXT_HEADER_FIELD_NUMBER: builtins.int
-        FILE_HEADER_FIELD_NUMBER: builtins.int
+        BYTE_HEADER_FIELD_NUMBER: builtins.int
         stream_id: builtins.str
         """unique identifier for this data stream"""
         timestamp: builtins.int
@@ -2133,13 +2132,13 @@ class DataStream(google.protobuf.message.Message):
         total_length: builtins.int
         """only populated for finite streams, if it's a stream of unknown size this stays empty"""
         @property
-        def extensions(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
-            """user defined extensions map that can carry additional info"""
+        def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+            """user defined attributes map that can carry additional info"""
 
         @property
         def text_header(self) -> global___DataStream.TextHeader: ...
         @property
-        def file_header(self) -> global___DataStream.FileHeader: ...
+        def byte_header(self) -> global___DataStream.ByteHeader: ...
         def __init__(
             self,
             *,
@@ -2148,13 +2147,13 @@ class DataStream(google.protobuf.message.Message):
             mime_type: builtins.str | None = ...,
             topic: builtins.str | None = ...,
             total_length: builtins.int | None = ...,
-            extensions: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+            attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
             text_header: global___DataStream.TextHeader | None = ...,
-            file_header: global___DataStream.FileHeader | None = ...,
+            byte_header: global___DataStream.ByteHeader | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["content_header", b"content_header", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["content_header", b"content_header", "extensions", b"extensions", "file_header", b"file_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
-        def WhichOneof(self, oneof_group: typing.Literal["content_header", b"content_header"]) -> typing.Literal["text_header", "file_header"] | None: ...
+        def HasField(self, field_name: typing.Literal["byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
+        def WhichOneof(self, oneof_group: typing.Literal["content_header", b"content_header"]) -> typing.Literal["text_header", "byte_header"] | None: ...
 
     @typing.final
     class Chunk(google.protobuf.message.Message):
@@ -2191,7 +2190,7 @@ class DataStream(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
         @typing.final
-        class ExtensionsEntry(google.protobuf.message.Message):
+        class AttributesEntry(google.protobuf.message.Message):
             DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
             KEY_FIELD_NUMBER: builtins.int
@@ -2209,13 +2208,13 @@ class DataStream(google.protobuf.message.Message):
 
         STREAM_ID_FIELD_NUMBER: builtins.int
         REASON_FIELD_NUMBER: builtins.int
-        EXTENSIONS_FIELD_NUMBER: builtins.int
+        ATTRIBUTES_FIELD_NUMBER: builtins.int
         stream_id: builtins.str
         """unique identifier for this data stream"""
         reason: builtins.str
         """reason why the stream was closed (could contain "error" / "interrupted" / empty for expected end)"""
         @property
-        def extensions(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+        def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
             """finalizing updates for the stream, can also include additional insights for errors or endTime for transcription"""
 
         def __init__(
@@ -2223,10 +2222,10 @@ class DataStream(google.protobuf.message.Message):
             *,
             stream_id: builtins.str | None = ...,
             reason: builtins.str | None = ...,
-            extensions: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+            attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["reason", b"reason", "stream_id", b"stream_id"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["extensions", b"extensions", "reason", b"reason", "stream_id", b"stream_id"]) -> None: ...
+        def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "reason", b"reason", "stream_id", b"stream_id"]) -> None: ...
 
     def __init__(
         self,

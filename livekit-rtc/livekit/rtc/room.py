@@ -33,7 +33,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
-from .data_stream import TextStreamReader, FileStreamReader
+from .data_stream import TextStreamReader, ByteStreamReader
 
 EventTypes = Literal[
     "participant_connected",
@@ -141,7 +141,7 @@ class Room(EventEmitter[EventTypes]):
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
         self._text_stream_readers: Dict[str, TextStreamReader] = {}
-        self._file_stream_readers: Dict[str, FileStreamReader] = {}
+        self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -760,15 +760,15 @@ class Room(EventEmitter[EventTypes]):
             reader = TextStreamReader(header)
             self._text_stream_readers[header.stream_id] = reader
             self.emit("text_stream_received", reader, participant_identity)
-        elif header.file_header:
-            reader = FileStreamReader(header)
-            self._file_stream_readers[header.stream_id] = reader
+        elif header.byte_header:
+            reader = ByteStreamReader(header)
+            self._byte_stream_readers[header.stream_id] = reader
             self.emit("file_stream_received", reader, participant_identity)
         pass
 
     def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
         text_reader = self._text_stream_readers.get(chunk.stream_id)
-        file_reader = self._file_stream_readers.get(chunk.stream_id)
+        file_reader = self._byte_stream_readers.get(chunk.stream_id)
 
         if text_reader:
             text_reader._on_chunk_update(chunk)
@@ -777,14 +777,14 @@ class Room(EventEmitter[EventTypes]):
 
     def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
         text_reader = self._text_stream_readers.get(trailer.stream_id)
-        file_reader = self._file_stream_readers.get(trailer.stream_id)
+        file_reader = self._byte_stream_readers.get(trailer.stream_id)
 
         if text_reader:
             text_reader._on_stream_close(trailer)
             self._text_stream_readers.pop(trailer.stream_id)
         elif file_reader:
             file_reader._on_stream_close(trailer)
-            self._file_stream_readers.pop(trailer.stream_id)
+            self._byte_stream_readers.pop(trailer.stream_id)
 
     def __repr__(self) -> str:
         sid = "unknown"

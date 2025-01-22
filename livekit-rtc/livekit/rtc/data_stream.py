@@ -36,12 +36,12 @@ STREAM_CHUNK_SIZE = 15_000
 
 @dataclass
 class BaseStreamInfo(TypedDict):
-    id: str
+    stream_id: str
     mime_type: str
     topic: str
     timestamp: int
     size: Optional[int]  # Optional means it can be an int or None
-    extensions: Optional[Dict[str, str]]  # Optional for the extensions dictionary
+    attributes: Optional[Dict[str, str]]  # Optional for the extensions dictionary
 
 
 @dataclass
@@ -61,12 +61,12 @@ class TextStreamReader:
     def __init__(self, header: proto_DataStream.Header, capacity: int = 0) -> None:
         self._header = header
         self._info = TextStreamInfo(
-            id=header.stream_id,
+            stream_id=header.stream_id,
             mime_type=header.mime_type,
             topic=header.topic,
             timestamp=header.timestamp,
             size=header.total_length,
-            extensions=dict(header.extensions),
+            attributes=dict(header.attributes),
             attachments=list(header.text_header.attached_stream_ids),
         )
         self._queue: RingQueue[proto_DataStream.Chunk | None] = RingQueue(capacity)
@@ -107,22 +107,22 @@ class TextStreamReader:
 
 
 @dataclass
-class FileStreamInfo(BaseStreamInfo):
-    file_name: str
+class ByteStreamInfo(BaseStreamInfo):
+    name: str
     pass
 
 
-class FileStreamReader:
+class ByteStreamReader:
     def __init__(self, header: proto_DataStream.Header, capacity: int = 0) -> None:
         self._header = header
-        self._info = FileStreamInfo(
-            id=header.stream_id,
+        self._info = ByteStreamInfo(
+            stream_id=header.stream_id,
             mime_type=header.mime_type,
             topic=header.topic,
             timestamp=header.timestamp,
             size=header.total_length,
-            extensions=dict(header.extensions),
-            file_name=header.file_header.file_name,
+            attributes=dict(header.attributes),
+            name=header.byte_header.name,
         )
         self._queue: RingQueue[proto_DataStream.Chunk | None] = RingQueue(capacity)
 
@@ -143,7 +143,7 @@ class FileStreamReader:
         return item.content
 
     @property
-    def info(self) -> FileStreamInfo:
+    def info(self) -> ByteStreamInfo:
         return self._info
 
 
@@ -152,11 +152,11 @@ class BaseStreamWriter:
         self,
         local_participant: LocalParticipant,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = {},
+        attributes: Optional[Dict[str, str]] = {},
         stream_id: str | None = None,
         total_size: int | None = None,
         mime_type: str = "",
-        destination_identities: List[str] = [],
+        destination_identities: Optional[List[str]] = None,
     ):
         self._local_participant = local_participant
         if stream_id is None:
@@ -167,7 +167,7 @@ class BaseStreamWriter:
             timestamp=timestamp,
             mime_type=mime_type,
             topic=topic,
-            extensions=extensions,
+            attributes=attributes,
             total_length=total_size,
         )
         self._next_chunk_index: int = 0
@@ -253,12 +253,13 @@ class TextStreamWriter(BaseStreamWriter):
     def __init__(
         self,
         local_participant: LocalParticipant,
+        *,
         topic: str = "",
         extensions: Optional[Dict[str, str]] = {},
         stream_id: str | None = None,
         total_size: int | None = None,
         reply_to_id: str | None = None,
-        destination_identities: List[str] = [],
+        destination_identities: Optional[List[str]] = None,
     ) -> None:
         super().__init__(
             local_participant,
@@ -273,12 +274,12 @@ class TextStreamWriter(BaseStreamWriter):
         if reply_to_id:
             self._header.text_header.reply_to_stream_id = reply_to_id
         self._info = TextStreamInfo(
-            id=self._header.stream_id,
+            stream_id=self._header.stream_id,
             mime_type=self._header.mime_type,
             topic=self._header.topic,
             timestamp=self._header.timestamp,
             size=self._header.total_length,
-            extensions=dict(self._header.extensions),
+            attributes=dict(self._header.attributes),
             attachments=list(self._header.text_header.attached_stream_ids),
         )
 
@@ -301,17 +302,18 @@ class TextStreamWriter(BaseStreamWriter):
         return self._info
 
 
-class FileStreamWriter(BaseStreamWriter):
+class ByteStreamWriter(BaseStreamWriter):
     def __init__(
         self,
         local_participant: LocalParticipant,
-        file_name: str,
+        *,
+        name: str,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = {},
+        extensions: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         total_size: int | None = None,
-        mime_type: str = "",
-        destination_identities: List[str] = [],
+        mime_type: str = "application/octet-stream",
+        destination_identities: Optional[List[str]] = None,
     ) -> None:
         super().__init__(
             local_participant,
@@ -322,15 +324,15 @@ class FileStreamWriter(BaseStreamWriter):
             mime_type=mime_type,
             destination_identities=destination_identities,
         )
-        self._header.file_header.file_name = file_name
-        self._info = FileStreamInfo(
-            id=self._header.stream_id,
+        self._header.byte_header.name = name
+        self._info = ByteStreamInfo(
+            stream_id=self._header.stream_id,
             mime_type=self._header.mime_type,
             topic=self._header.topic,
             timestamp=self._header.timestamp,
             size=self._header.total_length,
-            extensions=dict(self._header.extensions),
-            file_name=self._header.file_header.file_name,
+            attributes=dict(self._header.attributes),
+            name=self._header.byte_header.name,
         )
         self._write_lock = asyncio.Lock()
 
@@ -351,5 +353,5 @@ class FileStreamWriter(BaseStreamWriter):
                 await self._send_chunk(chunk_msg)
 
     @property
-    def info(self) -> FileStreamInfo:
+    def info(self) -> ByteStreamInfo:
         return self._info
