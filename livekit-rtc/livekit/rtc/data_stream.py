@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import uuid
 import datetime
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional, TypedDict, Dict, List
 from ._proto.room_pb2 import DataStream as proto_DataStream
@@ -241,7 +242,7 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def close(self):
+    async def aclose(self):
         await self._send_trailer(
             trailer=proto_DataStream.Trailer(
                 stream_id=self._header.stream_id, reason=""
@@ -355,3 +356,7 @@ class ByteStreamWriter(BaseStreamWriter):
     @property
     def info(self) -> ByteStreamInfo:
         return self._info
+
+
+TextStreamHandler = Callable[[TextStreamReader, str], None]
+ByteStreamHandler = Callable[[ByteStreamReader, str], None]

@@ -595,7 +595,7 @@ class LocalParticipant(Participant):
 
         for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
             await writer.write(chunk)
-        await writer.close()
+        await writer.aclose()
 
         return writer.info
 
@@ -658,7 +658,7 @@ class LocalParticipant(Participant):
         async with aiofiles.open(file_path, "rb") as f:
             while bytes := await f.read(STREAM_CHUNK_SIZE):
                 await writer.write(bytes)
-        await writer.close()
+        await writer.aclose()
 
         return writer.info
 

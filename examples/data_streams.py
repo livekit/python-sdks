@@ -15,15 +15,19 @@ async def main(room: rtc.Room):
 
     async def greetParticipant(identity: str):
         text_writer = await room.local_participant.stream_text(
-            destination_identities=[identity]
+            destination_identities=[identity], topic="chat"
         )
         for char in "Hi! Just a friendly message":
             await text_writer.write(char)
-        await text_writer.close()
+        await text_writer.aclose()
 
-    async def on_text_received(reader: rtc.TextStreamReader):
+    async def on_chat_message_received(
+        reader: rtc.TextStreamReader, participant_identity: str
+    ):
         full_text = await reader.read_all()
-        logger.info(full_text)
+        logger.info(
+            "Received chat message from %s: '%s'", participant_identity, full_text
+        )
 
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant):
@@ -32,14 +36,12 @@ async def main(room: rtc.Room):
         )
         asyncio.create_task(greetParticipant(participant.identity))
 
-    # track_subscribed is emitted whenever the local participant is subscribed to a new track
-    @room.on("text_stream_received")
-    def on_text_stream_received(
-        reader: rtc.TextStreamReader,
-        participant_identity: str,
-    ):
-        logger.info("text stream received from: %s", participant_identity)
-        asyncio.create_task(on_text_received(reader=reader))
+    room.set_text_stream_handler(
+        lambda reader, participant_identity: asyncio.create_task(
+            on_chat_message_received(reader, participant_identity)
+        ),
+        "chat",
+    )
 
     # By default, autosubscribe is enabled. The participant will be subscribed to
     # all published tracks in the room
@@ -47,10 +49,8 @@ async def main(room: rtc.Room):
     logger.info("connected to room %s", room.name)
 
     for identity, participant in room.remote_participants.items():
-        print("Sending a welcome message to %s", participant.identity)
+        logger.info("Sending a welcome message to %s", identity)
         await greetParticipant(participant.identity)
-
-    logger.info("exiting")
 
 
 if __name__ == "__main__":

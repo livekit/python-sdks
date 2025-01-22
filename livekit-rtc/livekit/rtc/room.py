@@ -33,7 +33,12 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
-from .data_stream import TextStreamReader, ByteStreamReader
+from .data_stream import (
+    TextStreamReader,
+    ByteStreamReader,
+    TextStreamHandler,
+    ByteStreamHandler,
+)
 
 EventTypes = Literal[
     "participant_connected",
@@ -63,8 +68,6 @@ EventTypes = Literal[
     "disconnected",
     "reconnecting",
     "reconnected",
-    "text_stream_received",
-    "file_stream_received",
 ]
 
 
@@ -142,6 +145,8 @@ class Room(EventEmitter[EventTypes]):
         self._local_participant: LocalParticipant | None = None
         self._text_stream_readers: Dict[str, TextStreamReader] = {}
         self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
+        self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
+        self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -420,6 +425,22 @@ class Room(EventEmitter[EventTypes]):
             FfiClient.instance.queue.unsubscribe(queue)
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+
+    def set_byte_stream_handler(
+        self, handler: ByteStreamHandler | None, topic: str = ""
+    ):
+        if handler is None:
+            self._byte_stream_handlers.pop(topic)
+        else:
+            self._byte_stream_handlers[topic] = handler
+
+    def set_text_stream_handler(
+        self, handler: TextStreamHandler | None, topic: str = ""
+    ):
+        if handler is None:
+            self._text_stream_handlers.pop(topic)
+        else:
+            self._text_stream_handlers[topic] = handler
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
@@ -757,13 +778,29 @@ class Room(EventEmitter[EventTypes]):
         self, header: proto_room.DataStream.Header, participant_identity: str
     ):
         if header.text_header:
+            stream_handler = self._text_stream_handlers.get(header.topic)
+            if stream_handler is None:
+                logging.debug(
+                    "ignoring text stream with topic '%s', no callback attached",
+                    header.topic,
+                )
+                return
+
             reader = TextStreamReader(header)
             self._text_stream_readers[header.stream_id] = reader
-            self.emit("text_stream_received", reader, participant_identity)
+            stream_handler(reader, participant_identity)
         elif header.byte_header:
+            stream_handler = self._byte_stream_handlers.get(header.topic)
+            if stream_handler is None:
+                logging.debug(
+                    "ignoring byte stream with topic '%s', no callback attached",
+                    header.topic,
+                )
+                return
+
             reader = ByteStreamReader(header)
             self._byte_stream_readers[header.stream_id] = reader
-            self.emit("file_stream_received", reader, participant_identity)
+            stream_handler(reader, participant_identity)
         pass
 
     def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
