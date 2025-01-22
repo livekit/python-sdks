@@ -21,12 +21,25 @@ async def main(room: rtc.Room):
             await text_writer.write(char)
         await text_writer.aclose()
 
+        await room.local_participant.send_file(
+            "./green_tree_python.jpg",
+            destination_identities=[identity],
+            topic="welcome",
+        )
+
     async def on_chat_message_received(
         reader: rtc.TextStreamReader, participant_identity: str
     ):
         full_text = await reader.read_all()
         logger.info(
             "Received chat message from %s: '%s'", participant_identity, full_text
+        )
+
+    async def on_welcome_image_received(
+        reader: rtc.ByteStreamReader, participant_identity: str
+    ):
+        logger.info(
+            "Received image from %s: '%s'", participant_identity, reader.info["name"]
         )
 
     @room.on("participant_connected")
@@ -41,6 +54,13 @@ async def main(room: rtc.Room):
             on_chat_message_received(reader, participant_identity)
         ),
         "chat",
+    )
+
+    room.set_byte_stream_handler(
+        lambda reader, participant_identity: asyncio.create_task(
+            on_welcome_image_received(reader, participant_identity)
+        ),
+        "welcome",
     )
 
     # By default, autosubscribe is enabled. The participant will be subscribed to

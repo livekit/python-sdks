@@ -80,6 +80,8 @@ from .data_stream import (
     ByteStreamInfo,
     TextStreamReader,
     TextStreamWriter,
+    ByteStreamWriter,
+    ByteStreamReader,
 )
 
 __all__ = [
@@ -152,5 +154,7 @@ __all__ = [
     "ByteStreamInfo",
     "TextStreamReader",
     "TextStreamWriter",
+    "ByteStreamReader",
+    "ByteStreamWriter",
     "__version__",
 ]

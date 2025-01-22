@@ -777,30 +777,34 @@ class Room(EventEmitter[EventTypes]):
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
     ):
-        if header.text_header:
-            stream_handler = self._text_stream_handlers.get(header.topic)
-            if stream_handler is None:
-                logging.debug(
+        stream_type = header.WhichOneof("content_header")
+        if stream_type == "text_header":
+            text_stream_handler = self._text_stream_handlers.get(header.topic)
+            if text_stream_handler is None:
+                logging.info(
                     "ignoring text stream with topic '%s', no callback attached",
                     header.topic,
                 )
                 return
 
-            reader = TextStreamReader(header)
-            self._text_stream_readers[header.stream_id] = reader
-            stream_handler(reader, participant_identity)
-        elif header.byte_header:
-            stream_handler = self._byte_stream_handlers.get(header.topic)
-            if stream_handler is None:
-                logging.debug(
+            text_reader = TextStreamReader(header)
+            self._text_stream_readers[header.stream_id] = text_reader
+            text_stream_handler(text_reader, participant_identity)
+        elif stream_type == "byte_header":
+            logging.warning("received byte header, %s", header.stream_id)
+            byte_stream_handler = self._byte_stream_handlers.get(header.topic)
+            if byte_stream_handler is None:
+                logging.info(
                     "ignoring byte stream with topic '%s', no callback attached",
                     header.topic,
                 )
                 return
 
-            reader = ByteStreamReader(header)
-            self._byte_stream_readers[header.stream_id] = reader
-            stream_handler(reader, participant_identity)
+            byte_reader = ByteStreamReader(header)
+            self._byte_stream_readers[header.stream_id] = byte_reader
+            byte_stream_handler(byte_reader, participant_identity)
+        else:
+            logging.warning("received unknown header type, %s", stream_type)
         pass
 
     def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
