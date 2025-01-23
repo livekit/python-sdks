@@ -426,21 +426,27 @@ class Room(EventEmitter[EventTypes]):
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    def set_byte_stream_handler(
-        self, handler: ByteStreamHandler | None, topic: str = ""
-    ):
-        if handler is None:
-            self._byte_stream_handlers.pop(topic)
-        else:
+    def set_byte_stream_handler(self, handler: ByteStreamHandler, topic: str = ""):
+        existing_handler = self._byte_stream_handlers.get(topic)
+        if existing_handler is None:
             self._byte_stream_handlers[topic] = handler
-
-    def set_text_stream_handler(
-        self, handler: TextStreamHandler | None, topic: str = ""
-    ):
-        if handler is None:
-            self._text_stream_handlers.pop(topic)
         else:
+            raise TypeError("byte stream handler for topic '%s' already set" % topic)
+
+    def remove_byte_stream_handler(self, topic: str = ""):
+        if self._byte_stream_handlers.get(topic):
+            self._byte_stream_handlers.pop(topic)
+
+    def set_text_stream_handler(self, handler: TextStreamHandler, topic: str = ""):
+        existing_handler = self._text_stream_handlers.get(topic)
+        if existing_handler is None:
             self._text_stream_handlers[topic] = handler
+        else:
+            raise TypeError("text stream handler for topic '%s' already set" % topic)
+
+    def remove_text_stream_handler(self, topic: str = ""):
+        if self._text_stream_handlers.get(topic):
+            self._text_stream_handlers.pop(topic)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
