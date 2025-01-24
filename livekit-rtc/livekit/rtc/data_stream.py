@@ -21,7 +21,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional, TypedDict, Dict, List
 from ._proto.room_pb2 import DataStream as proto_DataStream
-from ._utils import RingQueue
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
 from ._ffi_client import FfiClient
@@ -59,7 +58,10 @@ class TextStreamUpdate:
 
 
 class TextStreamReader:
-    def __init__(self, header: proto_DataStream.Header, capacity: int = 0) -> None:
+    def __init__(
+        self,
+        header: proto_DataStream.Header,
+    ) -> None:
         self._header = header
         self._info = TextStreamInfo(
             stream_id=header.stream_id,
@@ -70,14 +72,14 @@ class TextStreamReader:
             attributes=dict(header.attributes),
             attachments=list(header.text_header.attached_stream_ids),
         )
-        self._queue: RingQueue[proto_DataStream.Chunk | None] = RingQueue(capacity)
+        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
         self._chunks: Dict[int, proto_DataStream.Chunk] = {}
 
-    def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
-        self._queue.put(chunk)
+    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
+        await self._queue.put(chunk)
 
-    def _on_stream_close(self, trailer: proto_DataStream.Trailer):
-        self._queue.put(None)
+    async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[TextStreamUpdate]:
         return self
@@ -125,13 +127,15 @@ class ByteStreamReader:
             attributes=dict(header.attributes),
             name=header.byte_header.name,
         )
-        self._queue: RingQueue[proto_DataStream.Chunk | None] = RingQueue(capacity)
+        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(
+            capacity
+        )
 
-    def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
-        self._queue.put(chunk)
+    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
+        await self._queue.put(chunk)
 
-    def _on_stream_close(self, trailer: proto_DataStream.Trailer):
-        self._queue.put(None)
+    async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[bytes]:
         return self
