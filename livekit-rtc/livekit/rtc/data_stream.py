@@ -40,7 +40,7 @@ class BaseStreamInfo(TypedDict):
     mime_type: str
     topic: str
     timestamp: int
-    size: Optional[int]  # Optional means it can be an int or None
+    size: Optional[int]
     attributes: Optional[Dict[str, str]]  # Optional for the extensions dictionary
 
 
@@ -112,7 +112,6 @@ class TextStreamReader:
 @dataclass
 class ByteStreamInfo(BaseStreamInfo):
     name: str
-    pass
 
 
 class ByteStreamReader:
