@@ -747,9 +747,11 @@ class Room(EventEmitter[EventTypes]):
                 event.stream_header_received.participant_identity,
             )
         elif which == "stream_chunk_received":
-            self._handle_stream_chunk(event.stream_chunk_received.chunk)
+            asyncio.run(self._handle_stream_chunk(event.stream_chunk_received.chunk))
         elif which == "stream_trailer_received":
-            self._handle_stream_trailer(event.stream_trailer_received.trailer)
+            asyncio.run(
+                self._handle_stream_trailer(event.stream_trailer_received.trailer)
+            )
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
@@ -813,24 +815,24 @@ class Room(EventEmitter[EventTypes]):
             logging.warning("received unknown header type, %s", stream_type)
         pass
 
-    def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
+    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
         text_reader = self._text_stream_readers.get(chunk.stream_id)
         file_reader = self._byte_stream_readers.get(chunk.stream_id)
 
         if text_reader:
-            text_reader._on_chunk_update(chunk)
+            await text_reader._on_chunk_update(chunk)
         elif file_reader:
-            file_reader._on_chunk_update(chunk)
+            await file_reader._on_chunk_update(chunk)
 
-    def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
+    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
         text_reader = self._text_stream_readers.get(trailer.stream_id)
         file_reader = self._byte_stream_readers.get(trailer.stream_id)
 
         if text_reader:
-            text_reader._on_stream_close(trailer)
+            await text_reader._on_stream_close(trailer)
             self._text_stream_readers.pop(trailer.stream_id)
         elif file_reader:
-            file_reader._on_stream_close(trailer)
+            await file_reader._on_stream_close(trailer)
             self._byte_stream_readers.pop(trailer.stream_id)
 
     def __repr__(self) -> str:
