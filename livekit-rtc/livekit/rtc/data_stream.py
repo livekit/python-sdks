@@ -110,7 +110,6 @@ class TextStreamReader:
 @dataclass
 class ByteStreamInfo(BaseStreamInfo):
     name: str
-    pass
 
 
 class ByteStreamReader:
