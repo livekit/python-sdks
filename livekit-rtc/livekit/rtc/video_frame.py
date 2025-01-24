@@ -20,6 +20,8 @@ from typing import List, Optional
 from ._ffi_client import FfiClient, FfiHandle
 from ._utils import get_address
 
+from typing import Any
+
 
 class VideoFrame:
     """
@@ -202,6 +204,55 @@ class VideoFrame:
 
     def __repr__(self) -> str:
         return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={self.type})"
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, *_: Any):
+        from pydantic_core import core_schema
+        import base64
+
+        def validate_video_frame(value: Any) -> "VideoFrame":
+            if isinstance(value, VideoFrame):
+                return value
+
+            if isinstance(value, tuple):
+                value = value[0]
+
+            if isinstance(value, dict):
+                return VideoFrame(
+                    width=value["width"],
+                    height=value["height"],
+                    type=proto_video.VideoBufferType.ValueType(value["type"]),
+                    data=base64.b64decode(value["data"]),
+                )
+
+            raise TypeError("Invalid type for VideoFrame")
+
+        return core_schema.json_or_python_schema(
+            json_schema=core_schema.chain_schema(
+                [
+                    core_schema.model_fields_schema(
+                        {
+                            "width": core_schema.model_field(core_schema.int_schema()),
+                            "height": core_schema.model_field(core_schema.int_schema()),
+                            "type": core_schema.model_field(core_schema.int_schema()),
+                            "data": core_schema.model_field(core_schema.str_schema()),
+                        },
+                    ),
+                    core_schema.no_info_plain_validator_function(validate_video_frame),
+                ]
+            ),
+            python_schema=core_schema.no_info_plain_validator_function(
+                validate_video_frame
+            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: {
+                    "width": instance.width,
+                    "height": instance.height,
+                    "type": instance.type,
+                    "data": base64.b64encode(instance.data).decode("utf-8"),
+                }
+            ),
+        )
 
 
 def _component_info(
