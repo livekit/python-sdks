@@ -611,7 +611,7 @@ class LocalParticipant(Participant):
         topic: str = "",
     ) -> ByteStreamWriter:
         """
-        Returns a ByteStreamWriter that allows to write individual chunks of bytes to a file stream.
+        Returns a ByteStreamWriter that allows to write individual chunks of bytes to a byte stream.
         In cases where you want to simply send a file from the file system use send_file() instead.
         """
         writer = ByteStreamWriter(
