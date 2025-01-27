@@ -41,6 +41,11 @@ async def main(room: rtc.Room):
         logger.info(
             "Received image from %s: '%s'", participant_identity, reader.info["name"]
         )
+        with open(reader.info["name"], mode="wb") as f:
+            async for chunk in reader:
+                f.write(chunk)
+
+            f.close()
 
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant):
@@ -76,7 +81,10 @@ async def main(room: rtc.Room):
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        handlers=[logging.FileHandler("basic_room.log"), logging.StreamHandler()],
+        handlers=[
+            logging.FileHandler("data_stream_example.log"),
+            logging.StreamHandler(),
+        ],
     )
 
     loop = asyncio.get_event_loop()
