@@ -74,6 +74,15 @@ from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
 from .synchronizer import AVSynchronizer
+from .data_stream import (
+    TextStreamInfo,
+    TextStreamUpdate,
+    ByteStreamInfo,
+    TextStreamReader,
+    TextStreamWriter,
+    ByteStreamWriter,
+    ByteStreamReader,
+)
 
 __all__ = [
     "ConnectionQuality",
@@ -140,5 +149,12 @@ __all__ = [
     "EventEmitter",
     "combine_audio_frames",
     "AVSynchronizer",
+    "TextStreamUpdate",
+    "TextStreamInfo",
+    "ByteStreamInfo",
+    "TextStreamReader",
+    "TextStreamWriter",
+    "ByteStreamReader",
+    "ByteStreamWriter",
     "__version__",
 ]

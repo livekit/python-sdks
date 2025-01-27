@@ -15,8 +15,13 @@
 from __future__ import annotations
 
 import ctypes
+import asyncio
+import os
+import mimetypes
+import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
+
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -27,7 +32,7 @@ from ._proto.room_pb2 import (
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
 )
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, split_utf8
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -38,9 +43,14 @@ from .transcription import Transcription
 from .rpc import RpcError
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
-import asyncio
 
 from .rpc import RpcInvocationData
+from .data_stream import (
+    TextStreamWriter,
+    ByteStreamWriter,
+    ByteStreamInfo,
+    STREAM_CHUNK_SIZE,
+)
 
 
 class PublishTrackError(Exception):
@@ -538,6 +548,119 @@ class LocalParticipant(Participant):
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
+
+    async def stream_text(
+        self,
+        *,
+        destination_identities: List[str] = [],
+        topic: str = "",
+        extensions: Dict[str, str] = {},
+        reply_to_id: str | None = None,
+        total_size: int | None = None,
+    ) -> TextStreamWriter:
+        """
+        Returns a TextStreamWriter that allows to write individual chunks of text to a text stream.
+        In most cases where you want to simply send a text message use send_text() instead.
+        """
+        writer = TextStreamWriter(
+            self,
+            topic=topic,
+            extensions=extensions,
+            reply_to_id=reply_to_id,
+            destination_identities=destination_identities,
+            total_size=total_size,
+        )
+
+        await writer._send_header()
+
+        return writer
+
+    async def send_text(
+        self,
+        text: str,
+        *,
+        destination_identities: List[str] = [],
+        topic: str = "",
+        extensions: Dict[str, str] = {},
+        reply_to_id: str | None = None,
+    ):
+        total_size = len(text.encode())
+        writer = await self.stream_text(
+            destination_identities=destination_identities,
+            topic=topic,
+            extensions=extensions,
+            reply_to_id=reply_to_id,
+            total_size=total_size,
+        )
+
+        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
+            await writer.write(chunk)
+        await writer.aclose()
+
+        return writer.info
+
+    async def stream_bytes(
+        self,
+        name: str,
+        *,
+        total_size: int | None = None,
+        mime_type: str = "application/octet-stream",
+        extensions: Optional[Dict[str, str]] = None,
+        stream_id: str | None = None,
+        destination_identities: Optional[List[str]] = None,
+        topic: str = "",
+    ) -> ByteStreamWriter:
+        """
+        Returns a ByteStreamWriter that allows to write individual chunks of bytes to a byte stream.
+        In cases where you want to simply send a file from the file system use send_file() instead.
+        """
+        writer = ByteStreamWriter(
+            self,
+            name=name,
+            extensions=extensions,
+            total_size=total_size,
+            stream_id=stream_id,
+            mime_type=mime_type,
+            destination_identities=destination_identities,
+            topic=topic,
+        )
+
+        await writer._send_header()
+
+        return writer
+
+    async def send_file(
+        self,
+        file_path: str,
+        topic: str = "",
+        destination_identities: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        stream_id: str | None = None,
+    ) -> ByteStreamInfo:
+        file_size = os.path.getsize(file_path)
+        file_name = os.path.basename(file_path)
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type is None:
+            mime_type = (
+                "application/octet-stream"  # Fallback MIME type for unknown files
+            )
+
+        writer: ByteStreamWriter = await self.stream_bytes(
+            name=file_name,
+            total_size=file_size,
+            mime_type=mime_type,
+            extensions=attributes,
+            stream_id=stream_id,
+            destination_identities=destination_identities,
+            topic=topic,
+        )
+
+        async with aiofiles.open(file_path, "rb") as f:
+            while bytes := await f.read(STREAM_CHUNK_SIZE):
+                await writer.write(bytes)
+        await writer.aclose()
+
+        return writer.info
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()

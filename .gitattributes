@@ -1,5 +1,6 @@
 **/*.dll filter=lfs diff=lfs merge=lfs -text
 **/*.so filter=lfs diff=lfs merge=lfs -text
 **/*.dylib filter=lfs diff=lfs merge=lfs -text
+**/*.jpg filter=lfs diff=lfs merge=lfs -text
 livekit-protocol/livekit/protocol/** linguist-generated=true
 livekit-rtc/livekit/rtc/_proto/** linguist-generated=true
