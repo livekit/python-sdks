@@ -160,20 +160,22 @@ class UpdateSubscriptionsResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class SendDataRequest(_message.Message):
-    __slots__ = ("room", "data", "kind", "destination_sids", "destination_identities", "topic")
+    __slots__ = ("room", "data", "kind", "destination_sids", "destination_identities", "topic", "nonce")
     ROOM_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_SIDS_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_IDENTITIES_FIELD_NUMBER: _ClassVar[int]
     TOPIC_FIELD_NUMBER: _ClassVar[int]
+    NONCE_FIELD_NUMBER: _ClassVar[int]
     room: str
     data: bytes
     kind: _models.DataPacket.Kind
     destination_sids: _containers.RepeatedScalarFieldContainer[str]
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
     topic: str
-    def __init__(self, room: _Optional[str] = ..., data: _Optional[bytes] = ..., kind: _Optional[_Union[_models.DataPacket.Kind, str]] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ...) -> None: ...
+    nonce: bytes
+    def __init__(self, room: _Optional[str] = ..., data: _Optional[bytes] = ..., kind: _Optional[_Union[_models.DataPacket.Kind, str]] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ..., nonce: _Optional[bytes] = ...) -> None: ...
 
 class SendDataResponse(_message.Message):
     __slots__ = ()
