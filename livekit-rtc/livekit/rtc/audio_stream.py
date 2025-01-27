@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 
-import asyncio
+import asyncio, json
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Optional
 
@@ -54,6 +54,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        audio_filter_handle: int | None = None,
+        audio_filter_options: dict[str, Any] | None = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -85,6 +87,8 @@ class AudioStream:
         self._track: Track | None = track
         self._sample_rate = sample_rate
         self._num_channels = num_channels
+        self._audio_filter_handle = audio_filter_handle
+        self._audio_filter_options = audio_filter_options
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
@@ -112,6 +116,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        audio_filter_handle: int | None = None,
+        audio_filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -144,6 +150,8 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
+            audio_filter_handle=audio_filter_handle,
+            audio_filter_options=audio_filter_options,
         )
 
     @classmethod
@@ -155,6 +163,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        audio_filter_handle: int | None = None,
+        audio_filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -183,6 +193,8 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
+            audio_filter_handle=audio_filter_handle,
+            audio_filter_options=audio_filter_options,
         )
 
     def __del__(self) -> None:
@@ -196,6 +208,10 @@ class AudioStream:
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        if self._audio_filter_handle is not None:
+            new_audio_stream.audio_filter_handle = self._audio_filter_handle
+        if self._audio_filter_options is not None:
+            new_audio_stream.audio_filter_options = json.dumps(self._audio_filter_options)
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
 
