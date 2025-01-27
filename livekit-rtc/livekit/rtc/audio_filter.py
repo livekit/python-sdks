@@ -1,6 +1,7 @@
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 
+
 class AudioFilter:
     def __init__(
         self,

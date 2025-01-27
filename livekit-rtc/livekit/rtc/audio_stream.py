@@ -211,7 +211,9 @@ class AudioStream:
         if self._audio_filter_handle is not None:
             new_audio_stream.audio_filter_handle = self._audio_filter_handle
         if self._audio_filter_options is not None:
-            new_audio_stream.audio_filter_options = json.dumps(self._audio_filter_options)
+            new_audio_stream.audio_filter_options = json.dumps(
+                self._audio_filter_options
+            )
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
 
