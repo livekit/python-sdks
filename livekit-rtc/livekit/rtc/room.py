@@ -431,7 +431,7 @@ class Room(EventEmitter[EventTypes]):
         if existing_handler is None:
             self._byte_stream_handlers[topic] = handler
         else:
-            raise TypeError("byte stream handler for topic '%s' already set" % topic)
+            raise ValueError("byte stream handler for topic '%s' already set" % topic)
 
     def remove_byte_stream_handler(self, topic: str = ""):
         if self._byte_stream_handlers.get(topic):
@@ -442,7 +442,7 @@ class Room(EventEmitter[EventTypes]):
         if existing_handler is None:
             self._text_stream_handlers[topic] = handler
         else:
-            raise TypeError("text stream handler for topic '%s' already set" % topic)
+            raise ValueError("text stream handler for topic '%s' already set" % topic)
 
     def remove_text_stream_handler(self, topic: str = ""):
         if self._text_stream_handlers.get(topic):
