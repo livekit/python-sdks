@@ -632,6 +632,7 @@ class LocalParticipant(Participant):
     async def send_file(
         self,
         file_path: str,
+        *,
         topic: str = "",
         destination_identities: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
