@@ -747,9 +747,11 @@ class Room(EventEmitter[EventTypes]):
                 event.stream_header_received.participant_identity,
             )
         elif which == "stream_chunk_received":
-            asyncio.gather(self._handle_stream_chunk(event.stream_chunk_received.chunk))
+            asyncio.create_task(
+                self._handle_stream_chunk(event.stream_chunk_received.chunk)
+            )
         elif which == "stream_trailer_received":
-            asyncio.gather(
+            asyncio.create_task(
                 self._handle_stream_trailer(event.stream_trailer_received.trailer)
             )
 
