@@ -552,9 +552,9 @@ class LocalParticipant(Participant):
     async def stream_text(
         self,
         *,
-        destination_identities: List[str] = [],
+        destination_identities: Optional[List[str]] = None,
         topic: str = "",
-        extensions: Dict[str, str] = {},
+        extensions: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
         total_size: int | None = None,
     ) -> TextStreamWriter:
