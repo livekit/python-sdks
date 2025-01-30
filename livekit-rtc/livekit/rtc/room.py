@@ -404,7 +404,7 @@ class Room(EventEmitter[EventTypes]):
             return
 
         await self._drain_rpc_invocation_tasks()
-        await self._data_stream_tasks()
+        await self._drain_data_stream__tasks()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -445,7 +445,7 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
-        await self._data_stream_tasks()
+        await self._drain_data_stream__tasks()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
