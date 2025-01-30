@@ -33,12 +33,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
-from .data_stream import (
-    TextStreamReader,
-    ByteStreamReader,
-    TextStreamHandler,
-    ByteStreamHandler,
-)
+
 
 EventTypes = Literal[
     "participant_connected",
@@ -138,15 +133,12 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
+        self._data_stream_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
-        self._text_stream_readers: Dict[str, TextStreamReader] = {}
-        self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
-        self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
-        self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -425,28 +417,6 @@ class Room(EventEmitter[EventTypes]):
             FfiClient.instance.queue.unsubscribe(queue)
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
-
-    def set_byte_stream_handler(self, handler: ByteStreamHandler, topic: str = ""):
-        existing_handler = self._byte_stream_handlers.get(topic)
-        if existing_handler is None:
-            self._byte_stream_handlers[topic] = handler
-        else:
-            raise ValueError("byte stream handler for topic '%s' already set" % topic)
-
-    def remove_byte_stream_handler(self, topic: str = ""):
-        if self._byte_stream_handlers.get(topic):
-            self._byte_stream_handlers.pop(topic)
-
-    def set_text_stream_handler(self, handler: TextStreamHandler, topic: str = ""):
-        existing_handler = self._text_stream_handlers.get(topic)
-        if existing_handler is None:
-            self._text_stream_handlers[topic] = handler
-        else:
-            raise ValueError("text stream handler for topic '%s' already set" % topic)
-
-    def remove_text_stream_handler(self, topic: str = ""):
-        if self._text_stream_handlers.get(topic):
-            self._text_stream_handlers.pop(topic)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
@@ -742,24 +712,37 @@ class Room(EventEmitter[EventTypes]):
         elif which == "reconnected":
             self.emit("reconnected")
         elif which == "stream_header_received":
-            self._handle_stream_header(
+            self.local_participant._handle_stream_header(
                 event.stream_header_received.header,
                 event.stream_header_received.participant_identity,
             )
         elif which == "stream_chunk_received":
-            asyncio.create_task(
-                self._handle_stream_chunk(event.stream_chunk_received.chunk)
+            task = asyncio.create_task(
+                self.local_participant._handle_stream_chunk(
+                    event.stream_chunk_received.chunk
+                )
             )
+            self._data_stream_tasks.add(task)
+
         elif which == "stream_trailer_received":
-            asyncio.create_task(
-                self._handle_stream_trailer(event.stream_trailer_received.trailer)
+            task = asyncio.create_task(
+                self.local_participant._handle_stream_trailer(
+                    event.stream_trailer_received.trailer
+                )
             )
+            self._data_stream_tasks.add(task)
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
             for task in self._rpc_invocation_tasks:
                 task.cancel()
             await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
+
+    async def _drain_data_stream__tasks(self) -> None:
+        if self._data_stream_tasks:
+            for task in self._data_stream_tasks:
+                task.cancel()
+            await asyncio.gather(*self._data_stream_tasks, return_exceptions=True)
 
     def _retrieve_remote_participant(
         self, identity: str
@@ -783,59 +766,6 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
-
-    def _handle_stream_header(
-        self, header: proto_room.DataStream.Header, participant_identity: str
-    ):
-        stream_type = header.WhichOneof("content_header")
-        if stream_type == "text_header":
-            text_stream_handler = self._text_stream_handlers.get(header.topic)
-            if text_stream_handler is None:
-                logging.info(
-                    "ignoring text stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
-
-            text_reader = TextStreamReader(header)
-            self._text_stream_readers[header.stream_id] = text_reader
-            text_stream_handler(text_reader, participant_identity)
-        elif stream_type == "byte_header":
-            logging.warning("received byte header, %s", header.stream_id)
-            byte_stream_handler = self._byte_stream_handlers.get(header.topic)
-            if byte_stream_handler is None:
-                logging.info(
-                    "ignoring byte stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
-
-            byte_reader = ByteStreamReader(header)
-            self._byte_stream_readers[header.stream_id] = byte_reader
-            byte_stream_handler(byte_reader, participant_identity)
-        else:
-            logging.warning("received unknown header type, %s", stream_type)
-        pass
-
-    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
-        text_reader = self._text_stream_readers.get(chunk.stream_id)
-        file_reader = self._byte_stream_readers.get(chunk.stream_id)
-
-        if text_reader:
-            await text_reader._on_chunk_update(chunk)
-        elif file_reader:
-            await file_reader._on_chunk_update(chunk)
-
-    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
-        text_reader = self._text_stream_readers.get(trailer.stream_id)
-        file_reader = self._byte_stream_readers.get(trailer.stream_id)
-
-        if text_reader:
-            await text_reader._on_stream_close(trailer)
-            self._text_stream_readers.pop(trailer.stream_id)
-        elif file_reader:
-            await file_reader._on_stream_close(trailer)
-            self._byte_stream_readers.pop(trailer.stream_id)
 
     def __repr__(self) -> str:
         sid = "unknown"

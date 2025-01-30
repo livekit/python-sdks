@@ -21,10 +21,12 @@ import mimetypes
 import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
+import logging
 
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
+from ._proto import room_pb2 as proto_room
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import (
     TrackPublishOptions,
@@ -50,6 +52,10 @@ from .data_stream import (
     ByteStreamWriter,
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
+    TextStreamReader,
+    ByteStreamReader,
+    TextStreamHandler,
+    ByteStreamHandler,
 )
 
 
@@ -159,6 +165,10 @@ class LocalParticipant(Participant):
         self._rpc_handlers: Dict[
             str, Callable[[RpcInvocationData], Union[Awaitable[str], str]]
         ] = {}
+        self._text_stream_readers: Dict[str, TextStreamReader] = {}
+        self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
+        self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
+        self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -549,12 +559,65 @@ class LocalParticipant(Participant):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
+    def _handle_stream_header(
+        self, header: proto_room.DataStream.Header, participant_identity: str
+    ):
+        stream_type = header.WhichOneof("content_header")
+        if stream_type == "text_header":
+            text_stream_handler = self._text_stream_handlers.get(header.topic)
+            if text_stream_handler is None:
+                logging.info(
+                    "ignoring text stream with topic '%s', no callback attached",
+                    header.topic,
+                )
+                return
+
+            text_reader = TextStreamReader(header)
+            self._text_stream_readers[header.stream_id] = text_reader
+            text_stream_handler(text_reader, participant_identity)
+        elif stream_type == "byte_header":
+            logging.warning("received byte header, %s", header.stream_id)
+            byte_stream_handler = self._byte_stream_handlers.get(header.topic)
+            if byte_stream_handler is None:
+                logging.info(
+                    "ignoring byte stream with topic '%s', no callback attached",
+                    header.topic,
+                )
+                return
+
+            byte_reader = ByteStreamReader(header)
+            self._byte_stream_readers[header.stream_id] = byte_reader
+            byte_stream_handler(byte_reader, participant_identity)
+        else:
+            logging.warning("received unknown header type, %s", stream_type)
+        pass
+
+    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
+        text_reader = self._text_stream_readers.get(chunk.stream_id)
+        file_reader = self._byte_stream_readers.get(chunk.stream_id)
+
+        if text_reader:
+            await text_reader._on_chunk_update(chunk)
+        elif file_reader:
+            await file_reader._on_chunk_update(chunk)
+
+    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
+        text_reader = self._text_stream_readers.get(trailer.stream_id)
+        file_reader = self._byte_stream_readers.get(trailer.stream_id)
+
+        if text_reader:
+            await text_reader._on_stream_close(trailer)
+            self._text_stream_readers.pop(trailer.stream_id)
+        elif file_reader:
+            await file_reader._on_stream_close(trailer)
+            self._byte_stream_readers.pop(trailer.stream_id)
+
     async def stream_text(
         self,
         *,
         destination_identities: Optional[List[str]] = None,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
         total_size: int | None = None,
     ) -> TextStreamWriter:
@@ -565,7 +628,7 @@ class LocalParticipant(Participant):
         writer = TextStreamWriter(
             self,
             topic=topic,
-            extensions=extensions,
+            attributes=attributes,
             reply_to_id=reply_to_id,
             destination_identities=destination_identities,
             total_size=total_size,
@@ -581,14 +644,14 @@ class LocalParticipant(Participant):
         *,
         destination_identities: Optional[List[str]] = None,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
     ):
         total_size = len(text.encode())
         writer = await self.stream_text(
             destination_identities=destination_identities,
             topic=topic,
-            extensions=extensions,
+            attributes=attributes,
             reply_to_id=reply_to_id,
             total_size=total_size,
         )
@@ -605,7 +668,7 @@ class LocalParticipant(Participant):
         *,
         total_size: int | None = None,
         mime_type: str = "application/octet-stream",
-        extensions: Optional[Dict[str, str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         destination_identities: Optional[List[str]] = None,
         topic: str = "",
@@ -617,7 +680,7 @@ class LocalParticipant(Participant):
         writer = ByteStreamWriter(
             self,
             name=name,
-            extensions=extensions,
+            attributes=attributes,
             total_size=total_size,
             stream_id=stream_id,
             mime_type=mime_type,
@@ -650,7 +713,7 @@ class LocalParticipant(Participant):
             name=file_name,
             total_size=file_size,
             mime_type=mime_type,
-            extensions=attributes,
+            attributes=attributes,
             stream_id=stream_id,
             destination_identities=destination_identities,
             topic=topic,
@@ -662,6 +725,28 @@ class LocalParticipant(Participant):
         await writer.aclose()
 
         return writer.info
+
+    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
+        existing_handler = self._byte_stream_handlers.get(topic)
+        if existing_handler is None:
+            self._byte_stream_handlers[topic] = handler
+        else:
+            raise ValueError("byte stream handler for topic '%s' already set" % topic)
+
+    def unregister_byte_stream_handler(self, topic: str):
+        if self._byte_stream_handlers.get(topic):
+            self._byte_stream_handlers.pop(topic)
+
+    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler):
+        existing_handler = self._text_stream_handlers.get(topic)
+        if existing_handler is None:
+            self._text_stream_handlers[topic] = handler
+        else:
+            raise ValueError("text stream handler for topic '%s' already set" % topic)
+
+    def unregister_text_stream_handler(self, topic: str):
+        if self._text_stream_handlers.get(topic):
+            self._text_stream_handlers.pop(topic)
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
