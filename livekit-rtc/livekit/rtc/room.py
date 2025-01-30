@@ -404,6 +404,7 @@ class Room(EventEmitter[EventTypes]):
             return
 
         await self._drain_rpc_invocation_tasks()
+        await self._data_stream_tasks()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -444,6 +445,7 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
+        await self._data_stream_tasks()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
@@ -723,6 +725,7 @@ class Room(EventEmitter[EventTypes]):
                 )
             )
             self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
 
         elif which == "stream_trailer_received":
             task = asyncio.create_task(
@@ -731,6 +734,7 @@ class Room(EventEmitter[EventTypes]):
                 )
             )
             self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
