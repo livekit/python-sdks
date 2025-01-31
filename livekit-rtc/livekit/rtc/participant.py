@@ -21,8 +21,6 @@ import mimetypes
 import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
-import logging
-
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi

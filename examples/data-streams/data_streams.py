@@ -54,14 +54,14 @@ async def main(room: rtc.Room):
         )
         asyncio.create_task(greetParticipant(participant.identity))
 
-    room.local_participant.set_text_stream_handler(
+    room.set_text_stream_handler(
         "chat",
         lambda reader, participant_identity: asyncio.create_task(
             on_chat_message_received(reader, participant_identity)
         ),
     )
 
-    room.local_participant.set_byte_stream_handler(
+    room.set_byte_stream_handler(
         "files",
         lambda reader, participant_identity: asyncio.create_task(
             on_welcome_image_received(reader, participant_identity)
