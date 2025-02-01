@@ -437,7 +437,7 @@ class Room(EventEmitter[EventTypes]):
             return
 
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream__tasks()
+        await self._drain_data_stream_tasks()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -478,7 +478,7 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream__tasks()
+        await self._drain_data_stream_tasks()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
@@ -782,7 +782,6 @@ class Room(EventEmitter[EventTypes]):
             self._text_stream_readers[header.stream_id] = text_reader
             text_stream_handler(text_reader, participant_identity)
         elif stream_type == "byte_header":
-            logging.warning("received byte header, %s", header.stream_id)
             byte_stream_handler = self._byte_stream_handlers.get(header.topic)
             if byte_stream_handler is None:
                 logging.info(
@@ -824,7 +823,7 @@ class Room(EventEmitter[EventTypes]):
                 task.cancel()
             await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
 
-    async def _drain_data_stream__tasks(self) -> None:
+    async def _drain_data_stream_tasks(self) -> None:
         if self._data_stream_tasks:
             for task in self._data_stream_tasks:
                 task.cancel()
