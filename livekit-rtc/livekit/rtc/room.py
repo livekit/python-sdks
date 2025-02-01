@@ -40,6 +40,7 @@ from .data_stream import (
     ByteStreamHandler,
 )
 
+
 EventTypes = Literal[
     "participant_connected",
     "participant_disconnected",
@@ -138,11 +139,13 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
+        self._data_stream_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
+
         self._text_stream_readers: Dict[str, TextStreamReader] = {}
         self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
         self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
@@ -406,12 +409,35 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
+    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
+        existing_handler = self._byte_stream_handlers.get(topic)
+        if existing_handler is None:
+            self._byte_stream_handlers[topic] = handler
+        else:
+            raise ValueError("byte stream handler for topic '%s' already set" % topic)
+
+    def unregister_byte_stream_handler(self, topic: str):
+        if self._byte_stream_handlers.get(topic):
+            self._byte_stream_handlers.pop(topic)
+
+    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler):
+        existing_handler = self._text_stream_handlers.get(topic)
+        if existing_handler is None:
+            self._text_stream_handlers[topic] = handler
+        else:
+            raise ValueError("text stream handler for topic '%s' already set" % topic)
+
+    def unregister_text_stream_handler(self, topic: str):
+        if self._text_stream_handlers.get(topic):
+            self._text_stream_handlers.pop(topic)
+
     async def disconnect(self) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
             return
 
         await self._drain_rpc_invocation_tasks()
+        await self._drain_data_stream_tasks()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -425,28 +451,6 @@ class Room(EventEmitter[EventTypes]):
             FfiClient.instance.queue.unsubscribe(queue)
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
-
-    def set_byte_stream_handler(self, handler: ByteStreamHandler, topic: str = ""):
-        existing_handler = self._byte_stream_handlers.get(topic)
-        if existing_handler is None:
-            self._byte_stream_handlers[topic] = handler
-        else:
-            raise TypeError("byte stream handler for topic '%s' already set" % topic)
-
-    def remove_byte_stream_handler(self, topic: str = ""):
-        if self._byte_stream_handlers.get(topic):
-            self._byte_stream_handlers.pop(topic)
-
-    def set_text_stream_handler(self, handler: TextStreamHandler, topic: str = ""):
-        existing_handler = self._text_stream_handlers.get(topic)
-        if existing_handler is None:
-            self._text_stream_handlers[topic] = handler
-        else:
-            raise TypeError("text stream handler for topic '%s' already set" % topic)
-
-    def remove_text_stream_handler(self, topic: str = ""):
-        if self._text_stream_handlers.get(topic):
-            self._text_stream_handlers.pop(topic)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
@@ -474,6 +478,7 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
+        await self._drain_data_stream_tasks()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
         if self._local_participant is None:
@@ -747,40 +752,18 @@ class Room(EventEmitter[EventTypes]):
                 event.stream_header_received.participant_identity,
             )
         elif which == "stream_chunk_received":
-            asyncio.gather(self._handle_stream_chunk(event.stream_chunk_received.chunk))
+            task = asyncio.create_task(
+                self._handle_stream_chunk(event.stream_chunk_received.chunk)
+            )
+            self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
+
         elif which == "stream_trailer_received":
-            asyncio.gather(
+            task = asyncio.create_task(
                 self._handle_stream_trailer(event.stream_trailer_received.trailer)
             )
-
-    async def _drain_rpc_invocation_tasks(self) -> None:
-        if self._rpc_invocation_tasks:
-            for task in self._rpc_invocation_tasks:
-                task.cancel()
-            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
-
-    def _retrieve_remote_participant(
-        self, identity: str
-    ) -> Optional[RemoteParticipant]:
-        """Retrieve a remote participant by identity"""
-        return self._remote_participants.get(identity, None)
-
-    def _retrieve_participant(self, identity: str) -> Optional[Participant]:
-        """Retrieve a local or remote participant by identity"""
-        if identity and identity == self.local_participant.identity:
-            return self.local_participant
-
-        return self._retrieve_remote_participant(identity)
-
-    def _create_remote_participant(
-        self, owned_info: proto_participant.OwnedParticipant
-    ) -> RemoteParticipant:
-        if owned_info.info.identity in self._remote_participants:
-            raise Exception("participant already exists")
-
-        participant = RemoteParticipant(owned_info)
-        self._remote_participants[participant.identity] = participant
-        return participant
+            self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
@@ -799,7 +782,6 @@ class Room(EventEmitter[EventTypes]):
             self._text_stream_readers[header.stream_id] = text_reader
             text_stream_handler(text_reader, participant_identity)
         elif stream_type == "byte_header":
-            logging.warning("received byte header, %s", header.stream_id)
             byte_stream_handler = self._byte_stream_handlers.get(header.topic)
             if byte_stream_handler is None:
                 logging.info(
@@ -834,6 +816,41 @@ class Room(EventEmitter[EventTypes]):
         elif file_reader:
             await file_reader._on_stream_close(trailer)
             self._byte_stream_readers.pop(trailer.stream_id)
+
+    async def _drain_rpc_invocation_tasks(self) -> None:
+        if self._rpc_invocation_tasks:
+            for task in self._rpc_invocation_tasks:
+                task.cancel()
+            await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
+
+    async def _drain_data_stream_tasks(self) -> None:
+        if self._data_stream_tasks:
+            for task in self._data_stream_tasks:
+                task.cancel()
+            await asyncio.gather(*self._data_stream_tasks, return_exceptions=True)
+
+    def _retrieve_remote_participant(
+        self, identity: str
+    ) -> Optional[RemoteParticipant]:
+        """Retrieve a remote participant by identity"""
+        return self._remote_participants.get(identity, None)
+
+    def _retrieve_participant(self, identity: str) -> Optional[Participant]:
+        """Retrieve a local or remote participant by identity"""
+        if identity and identity == self.local_participant.identity:
+            return self.local_participant
+
+        return self._retrieve_remote_participant(identity)
+
+    def _create_remote_participant(
+        self, owned_info: proto_participant.OwnedParticipant
+    ) -> RemoteParticipant:
+        if owned_info.info.identity in self._remote_participants:
+            raise Exception("participant already exists")
+
+        participant = RemoteParticipant(owned_info)
+        self._remote_participants[participant.identity] = participant
+        return participant
 
     def __repr__(self) -> str:
         sid = "unknown"

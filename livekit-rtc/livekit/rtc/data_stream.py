@@ -19,7 +19,7 @@ import uuid
 import datetime
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional, TypedDict, Dict, List
+from typing import AsyncIterator, Optional, Dict, List
 from ._proto.room_pb2 import DataStream as proto_DataStream
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
@@ -35,13 +35,13 @@ STREAM_CHUNK_SIZE = 15_000
 
 
 @dataclass
-class BaseStreamInfo(TypedDict):
+class BaseStreamInfo:
     stream_id: str
     mime_type: str
     topic: str
     timestamp: int
     size: Optional[int]
-    attributes: Optional[Dict[str, str]]  # Optional for the extensions dictionary
+    attributes: Optional[Dict[str, str]]  # Optional for the attributes dictionary
 
 
 @dataclass
@@ -259,7 +259,7 @@ class TextStreamWriter(BaseStreamWriter):
         local_participant: LocalParticipant,
         *,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = {},
+        attributes: Optional[Dict[str, str]] = {},
         stream_id: str | None = None,
         total_size: int | None = None,
         reply_to_id: str | None = None,
@@ -268,7 +268,7 @@ class TextStreamWriter(BaseStreamWriter):
         super().__init__(
             local_participant,
             topic,
-            extensions,
+            attributes,
             stream_id,
             total_size,
             mime_type="text/plain",
@@ -313,7 +313,7 @@ class ByteStreamWriter(BaseStreamWriter):
         *,
         name: str,
         topic: str = "",
-        extensions: Optional[Dict[str, str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         total_size: int | None = None,
         mime_type: str = "application/octet-stream",
@@ -322,7 +322,7 @@ class ByteStreamWriter(BaseStreamWriter):
         super().__init__(
             local_participant,
             topic,
-            extensions,
+            attributes,
             stream_id,
             total_size,
             mime_type=mime_type,

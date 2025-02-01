@@ -24,7 +24,7 @@ async def main(room: rtc.Room):
         await room.local_participant.send_file(
             "./green_tree_python.jpg",
             destination_identities=[identity],
-            topic="welcome",
+            topic="files",
         )
 
     async def on_chat_message_received(
@@ -55,17 +55,17 @@ async def main(room: rtc.Room):
         asyncio.create_task(greetParticipant(participant.identity))
 
     room.set_text_stream_handler(
+        "chat",
         lambda reader, participant_identity: asyncio.create_task(
             on_chat_message_received(reader, participant_identity)
         ),
-        "chat",
     )
 
     room.set_byte_stream_handler(
+        "files",
         lambda reader, participant_identity: asyncio.create_task(
             on_welcome_image_received(reader, participant_identity)
         ),
-        "welcome",
     )
 
     # By default, autosubscribe is enabled. The participant will be subscribed to

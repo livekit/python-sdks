@@ -22,7 +22,6 @@ import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast
 from abc import abstractmethod, ABC
 
-
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
@@ -552,9 +551,9 @@ class LocalParticipant(Participant):
     async def stream_text(
         self,
         *,
-        destination_identities: List[str] = [],
+        destination_identities: Optional[List[str]] = None,
         topic: str = "",
-        extensions: Dict[str, str] = {},
+        attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
         total_size: int | None = None,
     ) -> TextStreamWriter:
@@ -565,7 +564,7 @@ class LocalParticipant(Participant):
         writer = TextStreamWriter(
             self,
             topic=topic,
-            extensions=extensions,
+            attributes=attributes,
             reply_to_id=reply_to_id,
             destination_identities=destination_identities,
             total_size=total_size,
@@ -579,16 +578,16 @@ class LocalParticipant(Participant):
         self,
         text: str,
         *,
-        destination_identities: List[str] = [],
+        destination_identities: Optional[List[str]] = None,
         topic: str = "",
-        extensions: Dict[str, str] = {},
+        attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
     ):
         total_size = len(text.encode())
         writer = await self.stream_text(
             destination_identities=destination_identities,
             topic=topic,
-            extensions=extensions,
+            attributes=attributes,
             reply_to_id=reply_to_id,
             total_size=total_size,
         )
@@ -605,7 +604,7 @@ class LocalParticipant(Participant):
         *,
         total_size: int | None = None,
         mime_type: str = "application/octet-stream",
-        extensions: Optional[Dict[str, str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         destination_identities: Optional[List[str]] = None,
         topic: str = "",
@@ -617,7 +616,7 @@ class LocalParticipant(Participant):
         writer = ByteStreamWriter(
             self,
             name=name,
-            extensions=extensions,
+            attributes=attributes,
             total_size=total_size,
             stream_id=stream_id,
             mime_type=mime_type,
@@ -632,6 +631,7 @@ class LocalParticipant(Participant):
     async def send_file(
         self,
         file_path: str,
+        *,
         topic: str = "",
         destination_identities: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
@@ -649,7 +649,7 @@ class LocalParticipant(Participant):
             name=file_name,
             total_size=file_size,
             mime_type=mime_type,
-            extensions=attributes,
+            attributes=attributes,
             stream_id=stream_id,
             destination_identities=destination_identities,
             topic=topic,
