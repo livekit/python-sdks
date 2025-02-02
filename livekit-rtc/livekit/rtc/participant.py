@@ -31,6 +31,9 @@ from ._proto.room_pb2 import (
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
 )
+from ._proto.track_pb2 import (
+    ParticipantTrackPermission,
+)
 from ._utils import BroadcastQueue, split_utf8
 from .track import LocalTrack
 from .track_publication import (
@@ -396,6 +399,34 @@ class LocalParticipant(Participant):
         req.unregister_rpc_method.local_participant_handle = self._ffi_handle.handle
         req.unregister_rpc_method.method = method
 
+        FfiClient.instance.request(req)
+
+    def set_track_subscription_permissions(
+        self,
+        all_participants_allowed: bool,
+        *,
+        participant_permissions: Optional[List[ParticipantTrackPermission]] = None,
+    ) -> None:
+        """
+        Set the track subscription permissions for the local participant.
+
+        Args:
+            all_participants_allowed (bool): Whether to allow all participants to subscribe to this participant's tracks.
+            participant_permissions (List[ParticipantTrackPermission]): Participant-specific track subscription permissions, ignored if `all_participants_allowed` is True.
+        """
+        if participant_permissions is None:
+            participant_permissions = []
+
+        req = proto_ffi.FfiRequest()
+        req.set_track_subscription_permissions.local_participant_handle = (
+            self._ffi_handle.handle
+        )
+        req.set_track_subscription_permissions.all_participants_allowed = (
+            all_participants_allowed
+        )
+        req.set_track_subscription_permissions.permissions.extend(
+            participant_permissions
+        )
         FfiClient.instance.request(req)
 
     async def _handle_rpc_method_invocation(

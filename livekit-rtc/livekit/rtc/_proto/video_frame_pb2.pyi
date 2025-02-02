@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import collections.abc
 import google.protobuf.descriptor
@@ -141,7 +140,7 @@ class VideoSourceType(_VideoSourceType, metaclass=_VideoSourceTypeEnumTypeWrappe
 VIDEO_SOURCE_NATIVE: VideoSourceType.ValueType  # 0
 global___VideoSourceType = VideoSourceType
 
-@typing.final
+@typing_extensions.final
 class NewVideoStreamRequest(google.protobuf.message.Message):
     """Create a new VideoStream
     VideoStream is used to receive video frames from a track
@@ -167,12 +166,12 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewVideoStreamRequest = NewVideoStreamRequest
 
-@typing.final
+@typing_extensions.final
 class NewVideoStreamResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -184,12 +183,12 @@ class NewVideoStreamResponse(google.protobuf.message.Message):
         *,
         stream: global___OwnedVideoStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___NewVideoStreamResponse = NewVideoStreamResponse
 
-@typing.final
+@typing_extensions.final
 class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
     """Request a video stream from a participant"""
 
@@ -214,12 +213,12 @@ class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> None: ...
 
 global___VideoStreamFromParticipantRequest = VideoStreamFromParticipantRequest
 
-@typing.final
+@typing_extensions.final
 class VideoStreamFromParticipantResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -231,12 +230,12 @@ class VideoStreamFromParticipantResponse(google.protobuf.message.Message):
         *,
         stream: global___OwnedVideoStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["stream", b"stream"]) -> None: ...
 
 global___VideoStreamFromParticipantResponse = VideoStreamFromParticipantResponse
 
-@typing.final
+@typing_extensions.final
 class NewVideoSourceRequest(google.protobuf.message.Message):
     """Create a new VideoSource
     VideoSource is used to send video frame to a track
@@ -252,19 +251,18 @@ class NewVideoSourceRequest(google.protobuf.message.Message):
         """Used to determine which encodings to use + simulcast layers
         Most of the time it corresponds to the source resolution
         """
-
     def __init__(
         self,
         *,
         type: global___VideoSourceType.ValueType | None = ...,
         resolution: global___VideoSourceResolution | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["resolution", b"resolution", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["resolution", b"resolution", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["resolution", b"resolution", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["resolution", b"resolution", "type", b"type"]) -> None: ...
 
 global___NewVideoSourceRequest = NewVideoSourceRequest
 
-@typing.final
+@typing_extensions.final
 class NewVideoSourceResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -276,12 +274,12 @@ class NewVideoSourceResponse(google.protobuf.message.Message):
         *,
         source: global___OwnedVideoSource | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["source", b"source"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["source", b"source"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["source", b"source"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["source", b"source"]) -> None: ...
 
 global___NewVideoSourceResponse = NewVideoSourceResponse
 
-@typing.final
+@typing_extensions.final
 class CaptureVideoFrameRequest(google.protobuf.message.Message):
     """Push a frame to a VideoSource"""
 
@@ -292,11 +290,11 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
     source_handle: builtins.int
+    @property
+    def buffer(self) -> global___VideoBufferInfo: ...
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
-    @property
-    def buffer(self) -> global___VideoBufferInfo: ...
     def __init__(
         self,
         *,
@@ -305,12 +303,12 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___CaptureVideoFrameRequest = CaptureVideoFrameRequest
 
-@typing.final
+@typing_extensions.final
 class CaptureVideoFrameResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -320,7 +318,7 @@ class CaptureVideoFrameResponse(google.protobuf.message.Message):
 
 global___CaptureVideoFrameResponse = CaptureVideoFrameResponse
 
-@typing.final
+@typing_extensions.final
 class VideoConvertRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -328,9 +326,9 @@ class VideoConvertRequest(google.protobuf.message.Message):
     BUFFER_FIELD_NUMBER: builtins.int
     DST_TYPE_FIELD_NUMBER: builtins.int
     flip_y: builtins.bool
-    dst_type: global___VideoBufferType.ValueType
     @property
     def buffer(self) -> global___VideoBufferInfo: ...
+    dst_type: global___VideoBufferType.ValueType
     def __init__(
         self,
         *,
@@ -338,12 +336,12 @@ class VideoConvertRequest(google.protobuf.message.Message):
         buffer: global___VideoBufferInfo | None = ...,
         dst_type: global___VideoBufferType.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "dst_type", b"dst_type", "flip_y", b"flip_y"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "dst_type", b"dst_type", "flip_y", b"flip_y"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "dst_type", b"dst_type", "flip_y", b"flip_y"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "dst_type", b"dst_type", "flip_y", b"flip_y"]) -> None: ...
 
 global___VideoConvertRequest = VideoConvertRequest
 
-@typing.final
+@typing_extensions.final
 class VideoConvertResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -358,13 +356,13 @@ class VideoConvertResponse(google.protobuf.message.Message):
         error: builtins.str | None = ...,
         buffer: global___OwnedVideoBuffer | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "error", b"error", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "error", b"error", "message", b"message"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "buffer"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "error", b"error", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "error", b"error", "message", b"message"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["error", "buffer"] | None: ...
 
 global___VideoConvertResponse = VideoConvertResponse
 
-@typing.final
+@typing_extensions.final
 class VideoResolution(google.protobuf.message.Message):
     """
     VideoFrame buffers
@@ -385,16 +383,16 @@ class VideoResolution(google.protobuf.message.Message):
         height: builtins.int | None = ...,
         frame_rate: builtins.float | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frame_rate", b"frame_rate", "height", b"height", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frame_rate", b"frame_rate", "height", b"height", "width", b"width"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["frame_rate", b"frame_rate", "height", b"height", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["frame_rate", b"frame_rate", "height", b"height", "width", b"width"]) -> None: ...
 
 global___VideoResolution = VideoResolution
 
-@typing.final
+@typing_extensions.final
 class VideoBufferInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @typing.final
+    @typing_extensions.final
     class ComponentInfo(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -411,8 +409,8 @@ class VideoBufferInfo(google.protobuf.message.Message):
             stride: builtins.int | None = ...,
             size: builtins.int | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "size", b"size", "stride", b"stride"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "size", b"size", "stride", b"stride"]) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal["data_ptr", b"data_ptr", "size", b"size", "stride", b"stride"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal["data_ptr", b"data_ptr", "size", b"size", "stride", b"stride"]) -> None: ...
 
     TYPE_FIELD_NUMBER: builtins.int
     WIDTH_FIELD_NUMBER: builtins.int
@@ -438,12 +436,12 @@ class VideoBufferInfo(google.protobuf.message.Message):
         stride: builtins.int | None = ...,
         components: collections.abc.Iterable[global___VideoBufferInfo.ComponentInfo] | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["components", b"components", "data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["components", b"components", "data_ptr", b"data_ptr", "height", b"height", "stride", b"stride", "type", b"type", "width", b"width"]) -> None: ...
 
 global___VideoBufferInfo = VideoBufferInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedVideoBuffer(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -459,12 +457,12 @@ class OwnedVideoBuffer(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___VideoBufferInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedVideoBuffer = OwnedVideoBuffer
 
-@typing.final
+@typing_extensions.final
 class VideoStreamInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -475,12 +473,12 @@ class VideoStreamInfo(google.protobuf.message.Message):
         *,
         type: global___VideoStreamType.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["type", b"type"]) -> None: ...
 
 global___VideoStreamInfo = VideoStreamInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedVideoStream(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -496,12 +494,12 @@ class OwnedVideoStream(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___VideoStreamInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedVideoStream = OwnedVideoStream
 
-@typing.final
+@typing_extensions.final
 class VideoStreamEvent(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -520,24 +518,24 @@ class VideoStreamEvent(google.protobuf.message.Message):
         frame_received: global___VideoFrameReceived | None = ...,
         eos: global___VideoStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["frame_received", "eos"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["message", b"message"]) -> typing_extensions.Literal["frame_received", "eos"] | None: ...
 
 global___VideoStreamEvent = VideoStreamEvent
 
-@typing.final
+@typing_extensions.final
 class VideoFrameReceived(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     BUFFER_FIELD_NUMBER: builtins.int
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
+    @property
+    def buffer(self) -> global___OwnedVideoBuffer: ...
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
-    @property
-    def buffer(self) -> global___OwnedVideoBuffer: ...
     def __init__(
         self,
         *,
@@ -545,12 +543,12 @@ class VideoFrameReceived(google.protobuf.message.Message):
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___VideoFrameReceived = VideoFrameReceived
 
-@typing.final
+@typing_extensions.final
 class VideoStreamEOS(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -560,7 +558,7 @@ class VideoStreamEOS(google.protobuf.message.Message):
 
 global___VideoStreamEOS = VideoStreamEOS
 
-@typing.final
+@typing_extensions.final
 class VideoSourceResolution(google.protobuf.message.Message):
     """
     VideoSource
@@ -578,12 +576,12 @@ class VideoSourceResolution(google.protobuf.message.Message):
         width: builtins.int | None = ...,
         height: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["height", b"height", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["height", b"height", "width", b"width"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["height", b"height", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["height", b"height", "width", b"width"]) -> None: ...
 
 global___VideoSourceResolution = VideoSourceResolution
 
-@typing.final
+@typing_extensions.final
 class VideoSourceInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -594,12 +592,12 @@ class VideoSourceInfo(google.protobuf.message.Message):
         *,
         type: global___VideoSourceType.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["type", b"type"]) -> None: ...
 
 global___VideoSourceInfo = VideoSourceInfo
 
-@typing.final
+@typing_extensions.final
 class OwnedVideoSource(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -615,7 +613,7 @@ class OwnedVideoSource(google.protobuf.message.Message):
         handle: handle_pb2.FfiOwnedHandle | None = ...,
         info: global___VideoSourceInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedVideoSource = OwnedVideoSource

@@ -15,15 +15,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
-import typing
+import sys
+
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-@typing.final
+@typing_extensions.final
 class EnableRemoteTrackPublicationRequest(google.protobuf.message.Message):
     """Enable/Disable a remote track publication"""
 
@@ -39,12 +43,12 @@ class EnableRemoteTrackPublicationRequest(google.protobuf.message.Message):
         track_publication_handle: builtins.int | None = ...,
         enabled: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> None: ...
 
 global___EnableRemoteTrackPublicationRequest = EnableRemoteTrackPublicationRequest
 
-@typing.final
+@typing_extensions.final
 class EnableRemoteTrackPublicationResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -54,7 +58,7 @@ class EnableRemoteTrackPublicationResponse(google.protobuf.message.Message):
 
 global___EnableRemoteTrackPublicationResponse = EnableRemoteTrackPublicationResponse
 
-@typing.final
+@typing_extensions.final
 class UpdateRemoteTrackPublicationDimensionRequest(google.protobuf.message.Message):
     """update a remote track publication dimension"""
 
@@ -73,12 +77,12 @@ class UpdateRemoteTrackPublicationDimensionRequest(google.protobuf.message.Messa
         width: builtins.int | None = ...,
         height: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> None: ...
 
 global___UpdateRemoteTrackPublicationDimensionRequest = UpdateRemoteTrackPublicationDimensionRequest
 
-@typing.final
+@typing_extensions.final
 class UpdateRemoteTrackPublicationDimensionResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
