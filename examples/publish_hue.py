@@ -59,13 +59,13 @@ async def main(room: rtc.Room):
     # logging.info(
     #     "setting track subscription permissions to False, no one can subscribe to the track"
     # )
-    # room.local_participant.set_track_subscription_permissions(False)
+    # room.local_participant.set_track_subscription_permissions(allow_all_participants=False)
 
     # await asyncio.sleep(10)
 
     # logging.info("allowing user to subscribe to the track")
     # room.local_participant.set_track_subscription_permissions(
-    #     False,
+    #     allow_all_participants=False,
     #     participant_permissions=[
     #         rtc.ParticipantTrackPermission(
     #             participant_identity="allowed-user-identity",

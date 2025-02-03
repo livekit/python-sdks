@@ -403,8 +403,8 @@ class LocalParticipant(Participant):
 
     def set_track_subscription_permissions(
         self,
-        all_participants_allowed: bool,
         *,
+        allow_all_participants: bool,
         participant_permissions: Optional[List[ParticipantTrackPermission]] = None,
     ) -> None:
         """
@@ -422,7 +422,7 @@ class LocalParticipant(Participant):
             self._ffi_handle.handle
         )
         req.set_track_subscription_permissions.all_participants_allowed = (
-            all_participants_allowed
+            allow_all_participants
         )
         req.set_track_subscription_permissions.permissions.extend(
             participant_permissions
