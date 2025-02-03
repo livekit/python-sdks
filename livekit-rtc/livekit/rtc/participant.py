@@ -411,8 +411,8 @@ class LocalParticipant(Participant):
         Set the track subscription permissions for the local participant.
 
         Args:
-            all_participants_allowed (bool): Whether to allow all participants to subscribe to this participant's tracks.
-            participant_permissions (List[ParticipantTrackPermission]): Participant-specific track subscription permissions, ignored if `all_participants_allowed` is True.
+            allow_all_participants (bool): Whether to allow all participants to subscribe to this participant's tracks.
+            participant_permissions (List[ParticipantTrackPermission]): Participant-specific track subscription permissions, ignored if `allow_all_participants` is True.
         """
         if participant_permissions is None:
             participant_permissions = []
