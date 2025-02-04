@@ -33,6 +33,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
+from .audio_filter import AudioFilter
 
 EventTypes = Literal[
     "participant_connected",
@@ -119,7 +120,7 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter[EventTypes]):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None, filters: Optional[List[Any]] = None) -> None:
         """Initializes a new Room instance.
 
         Parameters:
@@ -137,6 +138,8 @@ class Room(EventEmitter[EventTypes]):
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
+        self._filters = filters if filters is not None else []
+        self._filter_instances = {}
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -358,6 +361,18 @@ class Room(EventEmitter[EventTypes]):
                 options.rtc_config.ice_servers
             )
 
+        for f in self._filters:
+            if hasattr(f, 'dependencies_path'):
+                deps = f.dependencies_path() or []
+            else:
+                deps = []
+            self._filter_instances[f] = AudioFilter(
+                path = f.plugin_path(),
+                url = url,
+                token = token,
+                dependencies = deps,
+            )
+
         # subscribe before connecting so we don't miss any events
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
 
@@ -392,6 +407,7 @@ class Room(EventEmitter[EventTypes]):
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
                 rp._track_publications[publication.sid] = publication
+
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -520,6 +536,7 @@ class Room(EventEmitter[EventTypes]):
                 )
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 remote_audio_track = RemoteAudioTrack(owned_track_info)
+                remote_audio_track._set_room(self) # set room ref for audio filter
                 rpublication.track = remote_audio_track
                 self.emit(
                     "track_subscribed", remote_audio_track, rpublication, rparticipant
@@ -738,6 +755,12 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
+
+    def _filter_handle(self, plugin) -> int | None:
+        f = self._filter_instances.get(plugin)
+        if f:
+            return f.handle()
+        return None
 
     def __repr__(self) -> str:
         sid = "unknown"

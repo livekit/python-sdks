@@ -55,8 +55,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter_handle: int | None = None,
-        audio_filter_options: dict[str, Any] | None = None,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -88,12 +88,21 @@ class AudioStream:
         self._track: Track | None = track
         self._sample_rate = sample_rate
         self._num_channels = num_channels
-        self._audio_filter_handle = audio_filter_handle
-        self._audio_filter_options = audio_filter_options
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
+        self._audio_filter_handle = None
+        self._audio_filter_options = None
+        if enable_filter is not None:
+            room = track.room()
+            if room is None:
+                raise RuntimeError("Unexpected track")
+            handle = room._filter_handle(enable_filter)
+            if handle is None:
+                raise RuntimeError("audio filter is not enabled for the room")
+            self._audio_filter_handle = handle
+            self._audio_filter_options = enable_filter.filter_options(filter_options)
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
@@ -117,8 +126,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter_handle: int | None = None,
-        audio_filter_options: dict[str, Any] | None = None,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -151,8 +160,8 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
-            audio_filter_handle=audio_filter_handle,
-            audio_filter_options=audio_filter_options,
+            enable_filter=enable_filter,
+            filter_options=filter_options,
         )
 
     @classmethod
@@ -164,8 +173,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter_handle: int | None = None,
-        audio_filter_options: dict[str, Any] | None = None,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -194,8 +203,8 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
-            audio_filter_handle=audio_filter_handle,
-            audio_filter_options=audio_filter_options,
+            enable_filter=enable_filter,
+            filter_options=filter_options,
         )
 
     def __del__(self) -> None:

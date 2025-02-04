@@ -21,6 +21,7 @@ from ._proto import stats_pb2 as proto_stats
 if TYPE_CHECKING:
     from .audio_source import AudioSource
     from .video_source import VideoSource
+    from .room import Room
 
 
 class Track:
@@ -135,6 +136,12 @@ class RemoteAudioTrack(Track):
 
     def __repr__(self) -> str:
         return f"rtc.RemoteAudioTrack(sid={self.sid}, name={self.name})"
+
+    def room(self) -> "Room | None":
+        return self._room
+
+    def _set_room(self, room: "Room"):
+        self._room = room
 
 
 class RemoteVideoTrack(Track):
