@@ -427,3 +427,63 @@ class EnableRemoteTrackResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
 global___EnableRemoteTrackResponse = EnableRemoteTrackResponse
+
+@typing.final
+class SetTrackSubscriptionPermissionsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ALL_PARTICIPANTS_ALLOWED_FIELD_NUMBER: builtins.int
+    PERMISSIONS_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    all_participants_allowed: builtins.bool
+    @property
+    def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ParticipantTrackPermission]: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int | None = ...,
+        all_participants_allowed: builtins.bool | None = ...,
+        permissions: collections.abc.Iterable[global___ParticipantTrackPermission] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle", "permissions", b"permissions"]) -> None: ...
+
+global___SetTrackSubscriptionPermissionsRequest = SetTrackSubscriptionPermissionsRequest
+
+@typing.final
+class ParticipantTrackPermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    ALLOW_ALL_FIELD_NUMBER: builtins.int
+    ALLOWED_TRACK_SIDS_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    """The participant identity this permission applies to."""
+    allow_all: builtins.bool
+    """Grant permission to all all tracks. Takes precedence over allowedTrackSids."""
+    @property
+    def allowed_track_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """List of track sids to grant permission to."""
+
+    def __init__(
+        self,
+        *,
+        participant_identity: builtins.str | None = ...,
+        allow_all: builtins.bool | None = ...,
+        allowed_track_sids: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["allow_all", b"allow_all", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["allow_all", b"allow_all", "allowed_track_sids", b"allowed_track_sids", "participant_identity", b"participant_identity"]) -> None: ...
+
+global___ParticipantTrackPermission = ParticipantTrackPermission
+
+@typing.final
+class SetTrackSubscriptionPermissionsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___SetTrackSubscriptionPermissionsResponse = SetTrackSubscriptionPermissionsResponse
