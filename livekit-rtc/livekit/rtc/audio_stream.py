@@ -26,7 +26,7 @@ from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .participant import Participant
-from .track import Track
+from .track import Track, RemoteAudioTrack
 
 
 @dataclass
@@ -95,7 +95,7 @@ class AudioStream:
         self._audio_filter_handle = None
         self._audio_filter_options = None
         if enable_filter is not None:
-            if isinstance(track, RemoteTrack):
+            if isinstance(track, RemoteAudioTrack):
                 room = track.room()
                 if room is None:
                     raise Exception("Unexpected track")
@@ -105,7 +105,7 @@ class AudioStream:
                 self._audio_filter_handle = handle
                 self._audio_filter_options = enable_filter.filter_options(filter_options)
             else:
-                raise TypeError("track is not a RemoteTrack")
+                raise TypeError("track is not a RemoteAudioTrack")
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
