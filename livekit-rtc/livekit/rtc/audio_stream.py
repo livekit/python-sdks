@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Optional
 
@@ -25,7 +26,7 @@ from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .participant import Participant
-from .track import Track
+from .track import Track, RemoteAudioTrack
 
 
 @dataclass
@@ -54,6 +55,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -89,6 +92,22 @@ class AudioStream:
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
+        self._audio_filter_handle = None
+        self._audio_filter_options = None
+        if enable_filter is not None:
+            if isinstance(track, RemoteAudioTrack):
+                room = track.room()
+                if room is None:
+                    raise Exception("Unexpected track")
+                handle = room._filter_handle(enable_filter)
+                if handle is None:
+                    raise Exception("audio filter is not enabled for the room")
+                self._audio_filter_handle = handle
+                self._audio_filter_options = enable_filter.filter_options(
+                    filter_options
+                )
+            else:
+                raise TypeError("track is not a RemoteAudioTrack")
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
@@ -112,6 +131,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -144,6 +165,8 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
+            enable_filter=enable_filter,
+            filter_options=filter_options,
         )
 
     @classmethod
@@ -155,6 +178,8 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        enable_filter: Any = None,
+        filter_options: dict[str, Any] | None = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -183,6 +208,8 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
+            enable_filter=enable_filter,
+            filter_options=filter_options,
         )
 
     def __del__(self) -> None:
@@ -196,6 +223,12 @@ class AudioStream:
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        if self._audio_filter_handle is not None:
+            new_audio_stream.audio_filter_handle = self._audio_filter_handle
+        if self._audio_filter_options is not None:
+            new_audio_stream.audio_filter_options = json.dumps(
+                self._audio_filter_options
+            )
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
 
