@@ -103,7 +103,9 @@ class AudioStream:
                 if handle is None:
                     raise Exception("audio filter is not enabled for the room")
                 self._audio_filter_handle = handle
-                self._audio_filter_options = enable_filter.filter_options(filter_options)
+                self._audio_filter_options = enable_filter.filter_options(
+                    filter_options
+                )
             else:
                 raise TypeError("track is not a RemoteAudioTrack")
         self._task = self._loop.create_task(self._run())
