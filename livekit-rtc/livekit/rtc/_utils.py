@@ -130,3 +130,15 @@ def generate_random_base62(length=12):
     """
     global _base62_characters
     return "".join(random.choice(_base62_characters) for _ in range(length))
+
+
+# adapted from https://stackoverflow.com/a/6043797
+def split_utf8(s: str, n: int):
+    """Split UTF-8 s into chunks of maximum length n."""
+    while len(s) > n:
+        k = n
+        while (ord(s[k]) & 0xC0) == 0x80:
+            k -= 1
+        yield s[:k]
+        s = s[k:]
+    yield s

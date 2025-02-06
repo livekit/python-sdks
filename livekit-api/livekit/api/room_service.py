@@ -1,4 +1,5 @@
 import aiohttp
+from uuid import uuid4
 from livekit.protocol.room import (
     CreateRoomRequest,
     ListRoomsRequest,
@@ -288,6 +289,8 @@ class RoomService(Service):
         Returns:
             SendDataResponse: Empty response object
         """
+
+        send.nonce = uuid4().bytes
         return await self._client.request(
             SVC,
             "SendData",

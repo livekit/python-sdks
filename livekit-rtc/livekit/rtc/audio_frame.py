@@ -17,7 +17,7 @@ from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
-from typing import Union
+from typing import Any, Union
 
 
 class AudioFrame:
@@ -54,6 +54,10 @@ class AudioFrame:
             raise ValueError(
                 "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
             )
+
+        if len(data) % ctypes.sizeof(ctypes.c_int16) != 0:
+            # can happen if data is bigger than needed
+            raise ValueError("data length must be a multiple of sizeof(int16)")
 
         self._data = bytearray(data)
         self._sample_rate = sample_rate
@@ -196,4 +200,59 @@ class AudioFrame:
             f"num_channels={self.num_channels}, "
             f"samples_per_channel={self.samples_per_channel}, "
             f"duration={self.duration:.3f})"
+        )
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, *_: Any):
+        from pydantic_core import core_schema
+        import base64
+
+        def validate_audio_frame(value: Any) -> "AudioFrame":
+            if isinstance(value, AudioFrame):
+                return value
+
+            if isinstance(value, tuple):
+                value = value[0]
+
+            if isinstance(value, dict):
+                return AudioFrame(
+                    data=base64.b64decode(value["data"]),
+                    sample_rate=value["sample_rate"],
+                    num_channels=value["num_channels"],
+                    samples_per_channel=value["samples_per_channel"],
+                )
+
+            raise TypeError("Invalid type for AudioFrame")
+
+        return core_schema.json_or_python_schema(
+            json_schema=core_schema.chain_schema(
+                [
+                    core_schema.model_fields_schema(
+                        {
+                            "data": core_schema.model_field(core_schema.str_schema()),
+                            "sample_rate": core_schema.model_field(
+                                core_schema.int_schema()
+                            ),
+                            "num_channels": core_schema.model_field(
+                                core_schema.int_schema()
+                            ),
+                            "samples_per_channel": core_schema.model_field(
+                                core_schema.int_schema()
+                            ),
+                        },
+                    ),
+                    core_schema.no_info_plain_validator_function(validate_audio_frame),
+                ]
+            ),
+            python_schema=core_schema.no_info_plain_validator_function(
+                validate_audio_frame
+            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: {
+                    "data": base64.b64encode(instance.data).decode("utf-8"),
+                    "sample_rate": instance.sample_rate,
+                    "num_channels": instance.num_channels,
+                    "samples_per_channel": instance.samples_per_channel,
+                }
+            ),
         )

@@ -158,14 +158,23 @@ TF_ECHO_CANCELLATION: AudioTrackFeature
 TF_NOISE_SUPPRESSION: AudioTrackFeature
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature
 
+class Pagination(_message.Message):
+    __slots__ = ("after_id", "limit")
+    AFTER_ID_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    after_id: str
+    limit: int
+    def __init__(self, after_id: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+
 class Room(_message.Message):
-    __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
+    __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "creation_time_ms", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
     SID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     CREATION_TIME_FIELD_NUMBER: _ClassVar[int]
+    CREATION_TIME_MS_FIELD_NUMBER: _ClassVar[int]
     TURN_PASSWORD_FIELD_NUMBER: _ClassVar[int]
     ENABLED_CODECS_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -179,6 +188,7 @@ class Room(_message.Message):
     departure_timeout: int
     max_participants: int
     creation_time: int
+    creation_time_ms: int
     turn_password: str
     enabled_codecs: _containers.RepeatedCompositeFieldContainer[Codec]
     metadata: str
@@ -186,7 +196,7 @@ class Room(_message.Message):
     num_publishers: int
     active_recording: bool
     version: TimedVersion
-    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., creation_time: _Optional[int] = ..., turn_password: _Optional[str] = ..., enabled_codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., metadata: _Optional[str] = ..., num_participants: _Optional[int] = ..., num_publishers: _Optional[int] = ..., active_recording: bool = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., creation_time: _Optional[int] = ..., creation_time_ms: _Optional[int] = ..., turn_password: _Optional[str] = ..., enabled_codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., metadata: _Optional[str] = ..., num_participants: _Optional[int] = ..., num_publishers: _Optional[int] = ..., active_recording: bool = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
 
 class Codec(_message.Message):
     __slots__ = ("mime", "fmtp_line")
@@ -229,7 +239,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -265,6 +275,7 @@ class ParticipantInfo(_message.Message):
     TRACKS_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     JOINED_AT_FIELD_NUMBER: _ClassVar[int]
+    JOINED_AT_MS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PERMISSION_FIELD_NUMBER: _ClassVar[int]
@@ -279,6 +290,7 @@ class ParticipantInfo(_message.Message):
     tracks: _containers.RepeatedCompositeFieldContainer[TrackInfo]
     metadata: str
     joined_at: int
+    joined_at_ms: int
     name: str
     version: int
     permission: ParticipantPermission
@@ -287,7 +299,7 @@ class ParticipantInfo(_message.Message):
     kind: ParticipantInfo.Kind
     attributes: _containers.ScalarMap[str, str]
     disconnect_reason: DisconnectReason
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
@@ -370,7 +382,7 @@ class VideoLayer(_message.Message):
     def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response", "stream_header", "stream_chunk")
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response", "stream_header", "stream_chunk", "stream_trailer")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
@@ -391,6 +403,7 @@ class DataPacket(_message.Message):
     RPC_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     STREAM_HEADER_FIELD_NUMBER: _ClassVar[int]
     STREAM_CHUNK_FIELD_NUMBER: _ClassVar[int]
+    STREAM_TRAILER_FIELD_NUMBER: _ClassVar[int]
     kind: DataPacket.Kind
     participant_identity: str
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
@@ -405,7 +418,8 @@ class DataPacket(_message.Message):
     rpc_response: RpcResponse
     stream_header: DataStream.Header
     stream_chunk: DataStream.Chunk
-    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ..., stream_header: _Optional[_Union[DataStream.Header, _Mapping]] = ..., stream_chunk: _Optional[_Union[DataStream.Chunk, _Mapping]] = ...) -> None: ...
+    stream_trailer: DataStream.Trailer
+    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ..., stream_header: _Optional[_Union[DataStream.Header, _Mapping]] = ..., stream_chunk: _Optional[_Union[DataStream.Chunk, _Mapping]] = ..., stream_trailer: _Optional[_Union[DataStream.Trailer, _Mapping]] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
     __slots__ = ("speakers",)
@@ -424,7 +438,7 @@ class SpeakerInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., level: _Optional[float] = ..., active: bool = ...) -> None: ...
 
 class UserPacket(_message.Message):
-    __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time")
+    __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time", "nonce")
     PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
@@ -434,6 +448,7 @@ class UserPacket(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
+    NONCE_FIELD_NUMBER: _ClassVar[int]
     participant_sid: str
     participant_identity: str
     payload: bytes
@@ -443,7 +458,8 @@ class UserPacket(_message.Message):
     id: str
     start_time: int
     end_time: int
-    def __init__(self, participant_sid: _Optional[str] = ..., participant_identity: _Optional[str] = ..., payload: _Optional[bytes] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ..., id: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ...) -> None: ...
+    nonce: bytes
+    def __init__(self, participant_sid: _Optional[str] = ..., participant_identity: _Optional[str] = ..., payload: _Optional[bytes] = ..., destination_sids: _Optional[_Iterable[str]] = ..., destination_identities: _Optional[_Iterable[str]] = ..., topic: _Optional[str] = ..., id: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., nonce: _Optional[bytes] = ...) -> None: ...
 
 class SipDTMF(_message.Message):
     __slots__ = ("code", "digit")
@@ -877,14 +893,14 @@ class DataStream(_message.Message):
         attached_stream_ids: _containers.RepeatedScalarFieldContainer[str]
         generated: bool
         def __init__(self, operation_type: _Optional[_Union[DataStream.OperationType, str]] = ..., version: _Optional[int] = ..., reply_to_stream_id: _Optional[str] = ..., attached_stream_ids: _Optional[_Iterable[str]] = ..., generated: bool = ...) -> None: ...
-    class FileHeader(_message.Message):
-        __slots__ = ("file_name",)
-        FILE_NAME_FIELD_NUMBER: _ClassVar[int]
-        file_name: str
-        def __init__(self, file_name: _Optional[str] = ...) -> None: ...
+    class ByteHeader(_message.Message):
+        __slots__ = ("name",)
+        NAME_FIELD_NUMBER: _ClassVar[int]
+        name: str
+        def __init__(self, name: _Optional[str] = ...) -> None: ...
     class Header(_message.Message):
-        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "extensions", "text_header", "file_header")
-        class ExtensionsEntry(_message.Message):
+        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "attributes", "text_header", "byte_header")
+        class AttributesEntry(_message.Message):
             __slots__ = ("key", "value")
             KEY_FIELD_NUMBER: _ClassVar[int]
             VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -897,32 +913,46 @@ class DataStream(_message.Message):
         MIME_TYPE_FIELD_NUMBER: _ClassVar[int]
         TOTAL_LENGTH_FIELD_NUMBER: _ClassVar[int]
         ENCRYPTION_TYPE_FIELD_NUMBER: _ClassVar[int]
-        EXTENSIONS_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
         TEXT_HEADER_FIELD_NUMBER: _ClassVar[int]
-        FILE_HEADER_FIELD_NUMBER: _ClassVar[int]
+        BYTE_HEADER_FIELD_NUMBER: _ClassVar[int]
         stream_id: str
         timestamp: int
         topic: str
         mime_type: str
         total_length: int
         encryption_type: Encryption.Type
-        extensions: _containers.ScalarMap[str, str]
+        attributes: _containers.ScalarMap[str, str]
         text_header: DataStream.TextHeader
-        file_header: DataStream.FileHeader
-        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., extensions: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., file_header: _Optional[_Union[DataStream.FileHeader, _Mapping]] = ...) -> None: ...
+        byte_header: DataStream.ByteHeader
+        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., byte_header: _Optional[_Union[DataStream.ByteHeader, _Mapping]] = ...) -> None: ...
     class Chunk(_message.Message):
-        __slots__ = ("stream_id", "chunk_index", "content", "complete", "version", "iv")
+        __slots__ = ("stream_id", "chunk_index", "content", "version", "iv")
         STREAM_ID_FIELD_NUMBER: _ClassVar[int]
         CHUNK_INDEX_FIELD_NUMBER: _ClassVar[int]
         CONTENT_FIELD_NUMBER: _ClassVar[int]
-        COMPLETE_FIELD_NUMBER: _ClassVar[int]
         VERSION_FIELD_NUMBER: _ClassVar[int]
         IV_FIELD_NUMBER: _ClassVar[int]
         stream_id: str
         chunk_index: int
         content: bytes
-        complete: bool
         version: int
         iv: bytes
-        def __init__(self, stream_id: _Optional[str] = ..., chunk_index: _Optional[int] = ..., content: _Optional[bytes] = ..., complete: bool = ..., version: _Optional[int] = ..., iv: _Optional[bytes] = ...) -> None: ...
+        def __init__(self, stream_id: _Optional[str] = ..., chunk_index: _Optional[int] = ..., content: _Optional[bytes] = ..., version: _Optional[int] = ..., iv: _Optional[bytes] = ...) -> None: ...
+    class Trailer(_message.Message):
+        __slots__ = ("stream_id", "reason", "attributes")
+        class AttributesEntry(_message.Message):
+            __slots__ = ("key", "value")
+            KEY_FIELD_NUMBER: _ClassVar[int]
+            VALUE_FIELD_NUMBER: _ClassVar[int]
+            key: str
+            value: str
+            def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+        STREAM_ID_FIELD_NUMBER: _ClassVar[int]
+        REASON_FIELD_NUMBER: _ClassVar[int]
+        ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+        stream_id: str
+        reason: str
+        attributes: _containers.ScalarMap[str, str]
+        def __init__(self, stream_id: _Optional[str] = ..., reason: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
     def __init__(self) -> None: ...

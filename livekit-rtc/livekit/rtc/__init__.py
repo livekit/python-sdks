@@ -27,7 +27,12 @@ from ._proto.room_pb2 import (
     TrackPublishOptions,
     VideoEncoding,
 )
-from ._proto.track_pb2 import StreamState, TrackKind, TrackSource
+from ._proto.track_pb2 import (
+    StreamState,
+    TrackKind,
+    TrackSource,
+    ParticipantTrackPermission,
+)
 from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
@@ -75,6 +80,15 @@ from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
 from .synchronizer import AVSynchronizer
+from .data_stream import (
+    TextStreamInfo,
+    TextStreamUpdate,
+    ByteStreamInfo,
+    TextStreamReader,
+    TextStreamWriter,
+    ByteStreamWriter,
+    ByteStreamReader,
+)
 
 __all__ = [
     "ConnectionQuality",
@@ -89,6 +103,7 @@ __all__ = [
     "StreamState",
     "TrackKind",
     "TrackSource",
+    "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
     "stats",
@@ -142,5 +157,12 @@ __all__ = [
     "EventEmitter",
     "combine_audio_frames",
     "AVSynchronizer",
+    "TextStreamUpdate",
+    "TextStreamInfo",
+    "ByteStreamInfo",
+    "TextStreamReader",
+    "TextStreamWriter",
+    "ByteStreamReader",
+    "ByteStreamWriter",
     "__version__",
 ]

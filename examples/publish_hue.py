@@ -52,6 +52,28 @@ async def main(room: rtc.Room):
 
     asyncio.ensure_future(draw_color_cycle(source))
 
+    # uncomment the below to test Track Subscription Permissions
+    # https://docs.livekit.io/home/client/tracks/publish/#subscription-permissions
+    # await asyncio.sleep(10)
+
+    # logging.info(
+    #     "setting track subscription permissions to False, no one can subscribe to the track"
+    # )
+    # room.local_participant.set_track_subscription_permissions(allow_all_participants=False)
+
+    # await asyncio.sleep(10)
+
+    # logging.info("allowing user to subscribe to the track")
+    # room.local_participant.set_track_subscription_permissions(
+    #     allow_all_participants=False,
+    #     participant_permissions=[
+    #         rtc.ParticipantTrackPermission(
+    #             participant_identity="allowed-user-identity",
+    #             allow_all=True,
+    #         )
+    #     ],
+    # )
+
 
 async def draw_color_cycle(source: rtc.VideoSource):
     argb_frame = bytearray(WIDTH * HEIGHT * 4)
