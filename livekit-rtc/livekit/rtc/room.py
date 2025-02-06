@@ -17,7 +17,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping
+from typing import Callable, Dict, Literal, Optional, cast, Mapping, List, Any
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
