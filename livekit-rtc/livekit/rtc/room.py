@@ -18,6 +18,7 @@ import ctypes
 import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast, Mapping, List, Any
+from types import ModuleType
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -151,7 +152,7 @@ class Room(EventEmitter[EventTypes]):
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
         self._filters = filters if filters is not None else []
-        self._filter_instances = {}
+        self._filter_instances: Dict[ModuleType, AudioFilter] = {}
 
         self._text_stream_readers: Dict[str, TextStreamReader] = {}
         self._byte_stream_readers: Dict[str, ByteStreamReader] = {}

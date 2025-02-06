@@ -95,14 +95,17 @@ class AudioStream:
         self._audio_filter_handle = None
         self._audio_filter_options = None
         if enable_filter is not None:
-            room = track.room()
-            if room is None:
-                raise RuntimeError("Unexpected track")
-            handle = room._filter_handle(enable_filter)
-            if handle is None:
-                raise RuntimeError("audio filter is not enabled for the room")
-            self._audio_filter_handle = handle
-            self._audio_filter_options = enable_filter.filter_options(filter_options)
+            if isinstance(track, RemoteTrack):
+                room = track.room()
+                if room is None:
+                    raise Exception("Unexpected track")
+                handle = room._filter_handle(enable_filter)
+                if handle is None:
+                    raise Exception("audio filter is not enabled for the room")
+                self._audio_filter_handle = handle
+                self._audio_filter_options = enable_filter.filter_options(filter_options)
+            else:
+                raise TypeError("track is not a RemoteTrack")
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
