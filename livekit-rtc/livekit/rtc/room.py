@@ -127,7 +127,11 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter[EventTypes]):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None, filters: Optional[List[Any]] = None) -> None:
+    def __init__(
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        filters: Optional[List[Any]] = None,
+    ) -> None:
         """Initializes a new Room instance.
 
         Parameters:
@@ -375,15 +379,15 @@ class Room(EventEmitter[EventTypes]):
             )
 
         for f in self._filters:
-            if hasattr(f, 'dependencies_path'):
+            if hasattr(f, "dependencies_path"):
                 deps = f.dependencies_path() or []
             else:
                 deps = []
             self._filter_instances[f] = AudioFilter(
-                path = f.plugin_path(),
-                url = url,
-                token = token,
-                dependencies = deps,
+                path=f.plugin_path(),
+                url=url,
+                token=token,
+                dependencies=deps,
             )
 
         # subscribe before connecting so we don't miss any events
@@ -420,7 +424,6 @@ class Room(EventEmitter[EventTypes]):
             for owned_publication_info in pt.publications:
                 publication = RemoteTrackPublication(owned_publication_info)
                 rp._track_publications[publication.sid] = publication
-
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
@@ -573,7 +576,7 @@ class Room(EventEmitter[EventTypes]):
                 )
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 remote_audio_track = RemoteAudioTrack(owned_track_info)
-                remote_audio_track._set_room(self) # set room ref for audio filter
+                remote_audio_track._set_room(self)  # set room ref for audio filter
                 rpublication.track = remote_audio_track
                 self.emit(
                     "track_subscribed", remote_audio_track, rpublication, rparticipant
