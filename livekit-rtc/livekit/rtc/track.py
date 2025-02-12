@@ -137,12 +137,6 @@ class RemoteAudioTrack(Track):
     def __repr__(self) -> str:
         return f"rtc.RemoteAudioTrack(sid={self.sid}, name={self.name})"
 
-    def room(self) -> "Room | None":
-        return self._room
-
-    def _set_room(self, room: "Room"):
-        self._room = room
-
 
 class RemoteVideoTrack(Track):
     def __init__(self, info: proto_track.OwnedTrack):
