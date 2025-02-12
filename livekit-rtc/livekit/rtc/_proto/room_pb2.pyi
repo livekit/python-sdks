@@ -1126,6 +1126,26 @@ class RtcConfig(google.protobuf.message.Message):
 global___RtcConfig = RtcConfig
 
 @typing.final
+class AudioFilterModule(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MODULE_ID_FIELD_NUMBER: builtins.int
+    HANDLE_ID_FIELD_NUMBER: builtins.int
+    module_id: builtins.str
+    """unique identifier for audio filter"""
+    handle_id: builtins.int
+    def __init__(
+        self,
+        *,
+        module_id: builtins.str | None = ...,
+        handle_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle_id", b"handle_id", "module_id", b"module_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle_id", b"handle_id", "module_id", b"module_id"]) -> None: ...
+
+global___AudioFilterModule = AudioFilterModule
+
+@typing.final
 class RoomOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1147,7 +1167,7 @@ class RoomOptions(google.protobuf.message.Message):
         """allow to setup a custom RtcConfiguration"""
 
     @property
-    def audio_filter_handles(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int]: ...
+    def audio_filter_handles(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AudioFilterModule]: ...
     def __init__(
         self,
         *,
@@ -1157,7 +1177,7 @@ class RoomOptions(google.protobuf.message.Message):
         e2ee: e2ee_pb2.E2eeOptions | None = ...,
         rtc_config: global___RtcConfig | None = ...,
         join_retries: builtins.int | None = ...,
-        audio_filter_handles: collections.abc.Iterable[builtins.int] | None = ...,
+        audio_filter_handles: collections.abc.Iterable[global___AudioFilterModule] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "audio_filter_handles", b"audio_filter_handles", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> None: ...
