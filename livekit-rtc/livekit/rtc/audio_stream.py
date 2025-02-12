@@ -231,7 +231,9 @@ class AudioStream:
         )
         audio_stream_from_participant.track_source = track_source
         if self._audio_filter_module is not None:
-            audio_stream_from_participant.audio_filter_module_id = self._audio_filter_module
+            audio_stream_from_participant.audio_filter_module_id = (
+                self._audio_filter_module
+            )
         if self._audio_filter_options is not None:
             audio_stream_from_participant.audio_filter_options = json.dumps(
                 self._audio_filter_options

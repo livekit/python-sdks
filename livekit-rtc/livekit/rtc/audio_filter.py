@@ -6,9 +6,7 @@ from ._proto import ffi_pb2 as proto_ffi
 
 
 class AudioFilter:
-    def __init__(
-        self, path: str, dependencies: Optional[List[str]] = None
-    ) -> None:
+    def __init__(self, path: str, dependencies: Optional[List[str]] = None) -> None:
         self._path = path
 
         req = proto_ffi.FfiRequest()

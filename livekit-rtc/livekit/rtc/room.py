@@ -101,6 +101,7 @@ class RoomOptions:
     audio_filters: List[ModuleType] | None = None
     """Audio filters"""
 
+
 @dataclass
 class DataPacket:
     data: bytes
@@ -390,10 +391,12 @@ class Room(EventEmitter[EventTypes]):
                     dependencies=deps,
                 )
                 self._filter_instances[module] = audio_filter
-                req.connect.options.audio_filter_handles.append(proto_room.AudioFilterModule(
-                    module_id=str(id(module)),
-                    handle_id=audio_filter.handle(),
-                ))
+                req.connect.options.audio_filter_handles.append(
+                    proto_room.AudioFilterModule(
+                        module_id=str(id(module)),
+                        handle_id=audio_filter.handle(),
+                    )
+                )
 
         # subscribe before connecting so we don't miss any events
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
