@@ -21,6 +21,7 @@ from ._proto import stats_pb2 as proto_stats
 if TYPE_CHECKING:
     from .audio_source import AudioSource
     from .video_source import VideoSource
+    from .room import Room
 
 
 class Track:

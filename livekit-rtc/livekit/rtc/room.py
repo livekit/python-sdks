@@ -17,7 +17,8 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping
+from typing import Callable, Dict, Literal, Optional, cast, Mapping, List, Any
+from types import ModuleType
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -33,6 +34,7 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
+from .audio_filter import AudioFilter
 from .data_stream import (
     TextStreamReader,
     ByteStreamReader,
@@ -96,6 +98,8 @@ class RoomOptions:
     """Options for end-to-end encryption."""
     rtc_config: RtcConfiguration | None = None
     """WebRTC-related configuration."""
+    audio_filters: List[ModuleType] | None = None
+    """Audio filters"""
 
 
 @dataclass
@@ -126,7 +130,10 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter[EventTypes]):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+    def __init__(
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+    ) -> None:
         """Initializes a new Room instance.
 
         Parameters:
@@ -140,6 +147,7 @@ class Room(EventEmitter[EventTypes]):
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
         self._data_stream_tasks: set[asyncio.Task] = set()
+        self._filter_instances: Dict[ModuleType, AudioFilter] = {}
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -370,6 +378,25 @@ class Room(EventEmitter[EventTypes]):
             req.connect.options.rtc_config.ice_servers.extend(
                 options.rtc_config.ice_servers
             )
+
+        if options.audio_filters:
+            for module in options.audio_filters:
+                if hasattr(module, "dependencies_path"):
+                    deps = module.dependencies_path() or []
+                else:
+                    deps = []
+
+                audio_filter = AudioFilter(
+                    path=module.plugin_path(),
+                    dependencies=deps,
+                )
+                self._filter_instances[module] = audio_filter
+                req.connect.options.audio_filter_handles.append(
+                    proto_room.AudioFilterModule(
+                        module_id=str(id(module)),
+                        handle_id=audio_filter.handle(),
+                    )
+                )
 
         # subscribe before connecting so we don't miss any events
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
@@ -851,6 +878,12 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
+
+    def _filter_handle(self, plugin) -> int | None:
+        f = self._filter_instances.get(plugin)
+        if f:
+            return f.handle()
+        return None
 
     def __repr__(self) -> str:
         sid = "unknown"
