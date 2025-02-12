@@ -874,11 +874,8 @@ class LoadAudioFilterPluginRequest(google.protobuf.message.Message):
 
     PLUGIN_PATH_FIELD_NUMBER: builtins.int
     DEPENDENCIES_FIELD_NUMBER: builtins.int
-    OPTIONS_FIELD_NUMBER: builtins.int
     plugin_path: builtins.str
     """path for ffi audio filter plugin"""
-    options: builtins.str
-    """JSON string options that is passed to on_load plugin function"""
     @property
     def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """Optional: paths for dependency dylibs"""
@@ -888,10 +885,9 @@ class LoadAudioFilterPluginRequest(google.protobuf.message.Message):
         *,
         plugin_path: builtins.str | None = ...,
         dependencies: collections.abc.Iterable[builtins.str] | None = ...,
-        options: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["options", b"options", "plugin_path", b"plugin_path"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["dependencies", b"dependencies", "options", b"options", "plugin_path", b"plugin_path"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["plugin_path", b"plugin_path"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["dependencies", b"dependencies", "plugin_path", b"plugin_path"]) -> None: ...
 
 global___LoadAudioFilterPluginRequest = LoadAudioFilterPluginRequest
 
