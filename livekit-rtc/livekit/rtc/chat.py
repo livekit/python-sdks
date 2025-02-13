@@ -19,7 +19,14 @@ import logging
 from typing import Any, Dict, Literal, Optional
 import asyncio
 
-from .room import Room, Participant, DataPacket, TextStreamReader, RemoteParticipant, LocalParticipant
+from .room import (
+    Room,
+    Participant,
+    DataPacket,
+    TextStreamReader,
+    RemoteParticipant,
+    LocalParticipant,
+)
 from .event_emitter import EventEmitter
 from ._utils import generate_random_base62
 
@@ -101,16 +108,27 @@ class ChatManager(EventEmitter[EventTypes]):
                 self.emit("message_received", msg)
             except Exception as e:
                 logging.warning("failed to parse chat message: %s", e, exc_info=e)
-    
-    def _on_text_stream_received(self, stream: TextStreamReader, participant_identity: str):
-        task = asyncio.create_task(self._handle_text_stream(stream, participant_identity))
+
+    def _on_text_stream_received(
+        self, stream: TextStreamReader, participant_identity: str
+    ):
+        task = asyncio.create_task(
+            self._handle_text_stream(stream, participant_identity)
+        )
         self._tasks.append(task)
         task.add_done_callback(self._tasks.remove)
 
-    async def _handle_text_stream(self, stream: TextStreamReader, participant_identity: str):
+    async def _handle_text_stream(
+        self, stream: TextStreamReader, participant_identity: str
+    ):
         msg = await ChatMessage.from_text_stream(stream)
-        participant: RemoteParticipant | LocalParticipant | None = self._room._remote_participants.get(participant_identity)
-        if participant is None and self._room.local_participant.identity == participant_identity:
+        participant: RemoteParticipant | LocalParticipant | None = (
+            self._room._remote_participants.get(participant_identity)
+        )
+        if (
+            participant is None
+            and self._room.local_participant.identity == participant_identity
+        ):
             participant = self._room.local_participant
             msg.is_local = True
         msg.participant = participant
@@ -157,13 +175,13 @@ class ChatMessage:
         if self.deleted:
             d["deleted"] = True
         return d
-    
+
     @classmethod
     async def from_text_stream(cls, stream: TextStreamReader):
         message_text = await stream.read_all()
         timestamp = datetime.fromtimestamp(stream.info.timestamp / 1000.0)
         return cls(
-            message=message_text, 
-            timestamp=timestamp, 
-            id=stream.info.stream_id, 
+            message=message_text,
+            timestamp=timestamp,
+            id=stream.info.stream_id,
         )
