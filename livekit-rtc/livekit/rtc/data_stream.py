@@ -286,18 +286,20 @@ class TextStreamWriter(BaseStreamWriter):
             attributes=dict(self._header.attributes),
             attachments=list(self._header.text_header.attached_stream_ids),
         )
+        self._write_lock = asyncio.Lock()
 
     async def write(self, text: str):
-        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-            content = chunk.encode()
-            chunk_index = self._next_chunk_index
-            self._next_chunk_index += 1
-            chunk_msg = proto_DataStream.Chunk(
-                stream_id=self._header.stream_id,
-                chunk_index=chunk_index,
-                content=content,
-            )
-            await self._send_chunk(chunk_msg)
+        async with self._write_lock:
+            for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
+                content = chunk.encode()
+                chunk_index = self._next_chunk_index
+                self._next_chunk_index += 1
+                chunk_msg = proto_DataStream.Chunk(
+                    stream_id=self._header.stream_id,
+                    chunk_index=chunk_index,
+                    content=content,
+                )
+                await self._send_chunk(chunk_msg)
 
     @property
     def info(self) -> TextStreamInfo:
