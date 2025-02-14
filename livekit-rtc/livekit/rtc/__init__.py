@@ -81,7 +81,6 @@ from .rpc import RpcError, RpcInvocationData
 from .synchronizer import AVSynchronizer
 from .data_stream import (
     TextStreamInfo,
-    TextStreamUpdate,
     ByteStreamInfo,
     TextStreamReader,
     TextStreamWriter,
@@ -155,7 +154,6 @@ __all__ = [
     "EventEmitter",
     "combine_audio_frames",
     "AVSynchronizer",
-    "TextStreamUpdate",
     "TextStreamInfo",
     "ByteStreamInfo",
     "TextStreamReader",
