@@ -47,14 +47,6 @@ class BaseStreamInfo:
 @dataclass
 class TextStreamInfo(BaseStreamInfo):
     attachments: List[str]
-    pass
-
-
-@dataclass
-class TextStreamUpdate:
-    current: str
-    index: int
-    collected: str
 
 
 class TextStreamReader:
@@ -81,22 +73,15 @@ class TextStreamReader:
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
         await self._queue.put(None)
 
-    def __aiter__(self) -> AsyncIterator[TextStreamUpdate]:
+    def __aiter__(self) -> AsyncIterator[str]:
         return self
 
-    async def __anext__(self) -> TextStreamUpdate:
+    async def __anext__(self) -> str:
         item = await self._queue.get()
         if item is None:
             raise StopAsyncIteration
         decodedStr = item.content.decode()
-
-        self._chunks[item.chunk_index] = item
-        chunk_list = list(self._chunks.values())
-        chunk_list.sort(key=lambda chunk: chunk.chunk_index)
-        collected: str = "".join(map(lambda chunk: chunk.content.decode(), chunk_list))
-        return TextStreamUpdate(
-            current=decodedStr, index=item.chunk_index, collected=collected
-        )
+        return decodedStr
 
     @property
     def info(self) -> TextStreamInfo:
@@ -104,8 +89,8 @@ class TextStreamReader:
 
     async def read_all(self) -> str:
         final_string = ""
-        async for update in self:
-            final_string = update.collected
+        async for chunk in self:
+            final_string += chunk
         return final_string
 
 
