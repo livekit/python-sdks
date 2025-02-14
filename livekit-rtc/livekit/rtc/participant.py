@@ -34,7 +34,7 @@ from ._proto.room_pb2 import (
 from ._proto.track_pb2 import (
     ParticipantTrackPermission,
 )
-from ._utils import BroadcastQueue, split_utf8
+from ._utils import BroadcastQueue
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -623,8 +623,7 @@ class LocalParticipant(Participant):
             total_size=total_size,
         )
 
-        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-            await writer.write(chunk)
+        await writer.write(text)
         await writer.aclose()
 
         return writer.info
