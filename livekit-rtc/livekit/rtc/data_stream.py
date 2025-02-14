@@ -24,7 +24,7 @@ from ._proto.room_pb2 import DataStream as proto_DataStream
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
 from ._ffi_client import FfiClient
-
+from ._utils import split_utf8
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -287,19 +287,17 @@ class TextStreamWriter(BaseStreamWriter):
             attachments=list(self._header.text_header.attached_stream_ids),
         )
 
-    async def write(self, text: str, chunk_index: int | None = None):
-        content = text.encode()
-        if len(content) > STREAM_CHUNK_SIZE:
-            raise ValueError("maximum chunk size exceeded")
-        if chunk_index is None:
+    async def write(self, text: str):
+        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
+            content = chunk.encode()
             chunk_index = self._next_chunk_index
             self._next_chunk_index += 1
-        chunk_msg = proto_DataStream.Chunk(
-            stream_id=self._header.stream_id,
-            chunk_index=chunk_index,
-            content=content,
-        )
-        await self._send_chunk(chunk_msg)
+            chunk_msg = proto_DataStream.Chunk(
+                stream_id=self._header.stream_id,
+                chunk_index=chunk_index,
+                content=content,
+            )
+            await self._send_chunk(chunk_msg)
 
     @property
     def info(self) -> TextStreamInfo:
