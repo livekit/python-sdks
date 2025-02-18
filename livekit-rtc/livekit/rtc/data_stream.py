@@ -64,7 +64,6 @@ class TextStreamReader:
             attachments=list(header.text_header.attached_stream_ids),
         )
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
-        self._chunks: Dict[int, proto_DataStream.Chunk] = {}
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         await self._queue.put(chunk)
