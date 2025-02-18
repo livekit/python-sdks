@@ -281,7 +281,6 @@ class TextStreamWriter(BaseStreamWriter):
     async def write(self, text: str):
         async with self._write_lock:
             for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-                logger.info("Sending chunk: %s", chunk)
                 content = chunk.encode()
                 chunk_index = self._next_chunk_index
                 self._next_chunk_index += 1
