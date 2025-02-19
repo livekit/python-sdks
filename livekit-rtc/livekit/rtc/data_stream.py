@@ -27,9 +27,9 @@ from ._ffi_client import FfiClient
 from ._utils import split_utf8
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from .participant import LocalParticipant
-
 
 STREAM_CHUNK_SIZE = 15_000
 
@@ -65,7 +65,6 @@ class TextStreamReader:
             attachments=list(header.text_header.attached_stream_ids),
         )
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
-        self._chunks: Dict[int, proto_DataStream.Chunk] = {}
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         await self._queue.put(chunk)
@@ -146,6 +145,7 @@ class BaseStreamWriter:
         total_size: int | None = None,
         mime_type: str = "",
         destination_identities: Optional[List[str]] = None,
+        sender_identity: str | None = None,
     ):
         self._local_participant = local_participant
         if stream_id is None:
@@ -161,6 +161,7 @@ class BaseStreamWriter:
         )
         self._next_chunk_index: int = 0
         self._destination_identities = destination_identities
+        self._sender_identity = sender_identity or self._local_participant.identity
 
     async def _send_header(self):
         req = proto_ffi.FfiRequest(
@@ -168,7 +169,7 @@ class BaseStreamWriter:
                 header=self._header,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
                 destination_identities=self._destination_identities,
-                sender_identity=self._local_participant.identity,
+                sender_identity=self._sender_identity,
             )
         )
 
@@ -230,10 +231,12 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(self):
+    async def aclose(
+        self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
+    ):
         await self._send_trailer(
             trailer=proto_DataStream.Trailer(
-                stream_id=self._header.stream_id, reason=""
+                stream_id=self._header.stream_id, reason=reason, attributes=attributes
             )
         )
 
@@ -249,6 +252,7 @@ class TextStreamWriter(BaseStreamWriter):
         total_size: int | None = None,
         reply_to_id: str | None = None,
         destination_identities: Optional[List[str]] = None,
+        sender_identity: str | None = None,
     ) -> None:
         super().__init__(
             local_participant,
@@ -258,6 +262,7 @@ class TextStreamWriter(BaseStreamWriter):
             total_size,
             mime_type="text/plain",
             destination_identities=destination_identities,
+            sender_identity=sender_identity,
         )
         self._header.text_header.operation_type = proto_DataStream.OperationType.CREATE
         if reply_to_id:
@@ -276,7 +281,7 @@ class TextStreamWriter(BaseStreamWriter):
     async def write(self, text: str):
         async with self._write_lock:
             for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-                content = chunk.encode()
+                content = chunk
                 chunk_index = self._next_chunk_index
                 self._next_chunk_index += 1
                 chunk_msg = proto_DataStream.Chunk(
