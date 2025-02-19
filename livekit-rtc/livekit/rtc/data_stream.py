@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 import uuid
 import datetime
 from collections.abc import Callable
@@ -33,8 +32,6 @@ if TYPE_CHECKING:
     from .participant import LocalParticipant
 
 STREAM_CHUNK_SIZE = 15_000
-
-logger = logging.getLogger("livekit")
 
 
 @dataclass
@@ -70,7 +67,6 @@ class TextStreamReader:
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
-        logger.info("Received text chunk: %s", chunk.content)
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
