@@ -55,7 +55,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter: Optional[Tuple[str, dict[str, any]]] = None,
+        audio_filter: Optional[Tuple[str, dict[str, Any]]] = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -119,7 +119,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter: Optional[Tuple[str, dict[str, any]]] = None,
+        audio_filter: Optional[Tuple[str, dict[str, Any]]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -164,7 +164,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        audio_filter: Optional[Tuple[str, dict[str, any]]] = None,
+        audio_filter: Optional[Tuple[str, dict[str, Any]]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
