@@ -17,7 +17,7 @@ import logging
 from collections import deque
 import ctypes
 import random
-from typing import Callable, Generic, List, TypeVar
+from typing import Callable, Generator, Generic, List, TypeVar
 
 logger = logging.getLogger("livekit")
 
@@ -133,12 +133,13 @@ def generate_random_base62(length=12):
 
 
 # adapted from https://stackoverflow.com/a/6043797
-def split_utf8(s: str, n: int):
+def split_utf8(s: str, n: int) -> Generator[bytes, None, None]:
     """Split UTF-8 s into chunks of maximum length n."""
-    while len(s) > n:
+    encoded = s.encode()
+    while len(encoded) > n:
         k = n
-        while (ord(s[k]) & 0xC0) == 0x80:
+        while (encoded[k] & 0xC0) == 0x80:
             k -= 1
-        yield s[:k]
-        s = s[k:]
-    yield s
+        yield encoded[:k]
+        encoded = encoded[k:]
+    yield encoded

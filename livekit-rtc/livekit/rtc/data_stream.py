@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import uuid
 import datetime
 from collections.abc import Callable
@@ -27,10 +28,13 @@ from ._ffi_client import FfiClient
 from ._utils import split_utf8
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from .participant import LocalParticipant
 
 STREAM_CHUNK_SIZE = 15_000
+
+logger = logging.getLogger("livekit")
 
 
 @dataclass
@@ -66,6 +70,7 @@ class TextStreamReader:
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
+        logger.info("Received text chunk: %s", chunk.content)
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
@@ -280,7 +285,7 @@ class TextStreamWriter(BaseStreamWriter):
     async def write(self, text: str):
         async with self._write_lock:
             for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-                content = chunk.encode()
+                content = chunk
                 chunk_index = self._next_chunk_index
                 self._next_chunk_index += 1
                 chunk_msg = proto_DataStream.Chunk(
