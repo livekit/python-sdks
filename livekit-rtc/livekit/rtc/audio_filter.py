@@ -1,4 +1,3 @@
-import json
 from typing import Optional, List
 
 from ._ffi_client import FfiClient, FfiHandle
