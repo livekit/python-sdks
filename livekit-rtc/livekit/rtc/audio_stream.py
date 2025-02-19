@@ -26,7 +26,7 @@ from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .participant import Participant
-from .track import Track, RemoteAudioTrack
+from .track import Track
 
 
 @dataclass
