@@ -435,6 +435,91 @@ class RemixAndResampleResponse(google.protobuf.message.Message):
 global___RemixAndResampleResponse = RemixAndResampleResponse
 
 @typing.final
+class NewAecRequest(google.protobuf.message.Message):
+    """AEC"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    sample_rate: builtins.int
+    num_channels: builtins.int
+    def __init__(
+        self,
+        *,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "sample_rate", b"sample_rate"]) -> None: ...
+
+global___NewAecRequest = NewAecRequest
+
+@typing.final
+class NewAecResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AEC_FIELD_NUMBER: builtins.int
+    @property
+    def aec(self) -> global___OwnedAec: ...
+    def __init__(
+        self,
+        *,
+        aec: global___OwnedAec | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["aec", b"aec"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["aec", b"aec"]) -> None: ...
+
+global___NewAecResponse = NewAecResponse
+
+@typing.final
+class CancelEchoRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AEC_HANDLE_FIELD_NUMBER: builtins.int
+    CAP_PTR_FIELD_NUMBER: builtins.int
+    CAP_SIZE_FIELD_NUMBER: builtins.int
+    REND_PTR_FIELD_NUMBER: builtins.int
+    REND_SIZE_FIELD_NUMBER: builtins.int
+    aec_handle: builtins.int
+    cap_ptr: builtins.int
+    """*mut i16"""
+    cap_size: builtins.int
+    """in bytes"""
+    rend_ptr: builtins.int
+    """*const i16"""
+    rend_size: builtins.int
+    def __init__(
+        self,
+        *,
+        aec_handle: builtins.int | None = ...,
+        cap_ptr: builtins.int | None = ...,
+        cap_size: builtins.int | None = ...,
+        rend_ptr: builtins.int | None = ...,
+        rend_size: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["aec_handle", b"aec_handle", "cap_ptr", b"cap_ptr", "cap_size", b"cap_size", "rend_ptr", b"rend_ptr", "rend_size", b"rend_size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["aec_handle", b"aec_handle", "cap_ptr", b"cap_ptr", "cap_size", b"cap_size", "rend_ptr", b"rend_ptr", "rend_size", b"rend_size"]) -> None: ...
+
+global___CancelEchoRequest = CancelEchoRequest
+
+@typing.final
+class CancelEchoResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___CancelEchoResponse = CancelEchoResponse
+
+@typing.final
 class NewSoxResamplerRequest(google.protobuf.message.Message):
     """New resampler using SoX (much better quality)"""
 
@@ -816,6 +901,27 @@ class OwnedAudioResampler(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedAudioResampler = OwnedAudioResampler
+
+@typing.final
+class OwnedAec(google.protobuf.message.Message):
+    """
+    AEC
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    HANDLE_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    def __init__(
+        self,
+        *,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle"]) -> None: ...
+
+global___OwnedAec = OwnedAec
 
 @typing.final
 class SoxResamplerInfo(google.protobuf.message.Message):
