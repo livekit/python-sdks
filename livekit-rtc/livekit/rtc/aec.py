@@ -68,7 +68,6 @@ class Aec:
         Important:
         - Each buffer must represent exactly 10 ms of audio (based on the
           sample rate and number of channels used to initialize Aec).
-        - If you pass more or less than 10 ms, the behavior is undefined.
 
         Raises:
         - Exception: If the AEC processing fails internally.
