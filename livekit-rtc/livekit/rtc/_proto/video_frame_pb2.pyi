@@ -90,10 +90,7 @@ class _VideoBufferTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper
     I010: _VideoBufferType.ValueType  # 9
     NV12: _VideoBufferType.ValueType  # 10
 
-class VideoBufferType(_VideoBufferType, metaclass=_VideoBufferTypeEnumTypeWrapper):
-    """Values of this enum must not be changed
-    It is used to serialize a rtc.VideoFrame on Python
-    """
+class VideoBufferType(_VideoBufferType, metaclass=_VideoBufferTypeEnumTypeWrapper): ...
 
 RGBA: VideoBufferType.ValueType  # 0
 ABGR: VideoBufferType.ValueType  # 1
