@@ -34,6 +34,12 @@ class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RTMP: _ClassVar[StreamProtocol]
     SRT: _ClassVar[StreamProtocol]
 
+class AudioMixing(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    DEFAULT_MIXING: _ClassVar[AudioMixing]
+    DUAL_CHANNEL_AGENT: _ClassVar[AudioMixing]
+    DUAL_CHANNEL_ALTERNATE: _ClassVar[AudioMixing]
+
 class EncodingOptionsPreset(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     H264_720P_30: _ClassVar[EncodingOptionsPreset]
@@ -71,6 +77,9 @@ IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix
 DEFAULT_PROTOCOL: StreamProtocol
 RTMP: StreamProtocol
 SRT: StreamProtocol
+DEFAULT_MIXING: AudioMixing
+DUAL_CHANNEL_AGENT: AudioMixing
+DUAL_CHANNEL_ALTERNATE: AudioMixing
 H264_720P_30: EncodingOptionsPreset
 H264_720P_60: EncodingOptionsPreset
 H264_1080P_30: EncodingOptionsPreset
@@ -90,10 +99,11 @@ EGRESS_SOURCE_TYPE_WEB: EgressSourceType
 EGRESS_SOURCE_TYPE_SDK: EgressSourceType
 
 class RoomCompositeEgressRequest(_message.Message):
-    __slots__ = ("room_name", "layout", "audio_only", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
+    __slots__ = ("room_name", "layout", "audio_only", "audio_mixing", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     LAYOUT_FIELD_NUMBER: _ClassVar[int]
     AUDIO_ONLY_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_MIXING_FIELD_NUMBER: _ClassVar[int]
     VIDEO_ONLY_FIELD_NUMBER: _ClassVar[int]
     CUSTOM_BASE_URL_FIELD_NUMBER: _ClassVar[int]
     FILE_FIELD_NUMBER: _ClassVar[int]
@@ -108,6 +118,7 @@ class RoomCompositeEgressRequest(_message.Message):
     room_name: str
     layout: str
     audio_only: bool
+    audio_mixing: AudioMixing
     video_only: bool
     custom_base_url: str
     file: EncodedFileOutput
@@ -119,7 +130,7 @@ class RoomCompositeEgressRequest(_message.Message):
     stream_outputs: _containers.RepeatedCompositeFieldContainer[StreamOutput]
     segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
     image_outputs: _containers.RepeatedCompositeFieldContainer[ImageOutput]
-    def __init__(self, room_name: _Optional[str] = ..., layout: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., custom_base_url: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
+    def __init__(self, room_name: _Optional[str] = ..., layout: _Optional[str] = ..., audio_only: bool = ..., audio_mixing: _Optional[_Union[AudioMixing, str]] = ..., video_only: bool = ..., custom_base_url: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
 
 class WebEgressRequest(_message.Message):
     __slots__ = ("url", "audio_only", "video_only", "await_start_signal", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
