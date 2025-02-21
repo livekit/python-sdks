@@ -37,6 +37,7 @@ from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream
+from .audio_filter import AudioFilter
 from .chat import ChatManager, ChatMessage
 from .e2ee import (
     E2EEManager,
@@ -108,6 +109,7 @@ __all__ = [
     "AudioFrame",
     "AudioSource",
     "AudioStream",
+    "AudioFilter",
     "AudioFrameEvent",
     "LocalParticipant",
     "Participant",
