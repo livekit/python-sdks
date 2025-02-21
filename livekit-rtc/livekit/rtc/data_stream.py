@@ -70,6 +70,8 @@ class TextStreamReader:
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[str]:
@@ -118,6 +120,8 @@ class ByteStreamReader:
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[bytes]:
