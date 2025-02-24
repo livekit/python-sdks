@@ -511,6 +511,9 @@ class Room(EventEmitter[EventTypes]):
         elif which == "participant_disconnected":
             identity = event.participant_disconnected.participant_identity
             rparticipant = self._remote_participants.pop(identity)
+            rparticipant._info.disconnect_reason = (
+                event.participant_disconnected.disconnect_reason
+            )
             self.emit("participant_disconnected", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
