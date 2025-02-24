@@ -379,25 +379,6 @@ class Room(EventEmitter[EventTypes]):
                 options.rtc_config.ice_servers
             )
 
-        if options.audio_filters:
-            for module in options.audio_filters:
-                if hasattr(module, "dependencies_path"):
-                    deps = module.dependencies_path() or []
-                else:
-                    deps = []
-
-                audio_filter = AudioFilter(
-                    path=module.plugin_path(),
-                    dependencies=deps,
-                )
-                self._filter_instances[module] = audio_filter
-                req.connect.options.audio_filter_handles.append(
-                    proto_room.AudioFilterModule(
-                        module_id=str(id(module)),
-                        handle_id=audio_filter.handle(),
-                    )
-                )
-
         # subscribe before connecting so we don't miss any events
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
 

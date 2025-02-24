@@ -157,6 +157,7 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
     sample_rate: builtins.int
     num_channels: builtins.int
     audio_filter_module_id: builtins.str
+    """Unique identifier passed in LoadAudioFilterPluginRequest"""
     audio_filter_options: builtins.str
     def __init__(
         self,
@@ -874,8 +875,11 @@ class LoadAudioFilterPluginRequest(google.protobuf.message.Message):
 
     PLUGIN_PATH_FIELD_NUMBER: builtins.int
     DEPENDENCIES_FIELD_NUMBER: builtins.int
+    MODULE_ID_FIELD_NUMBER: builtins.int
     plugin_path: builtins.str
     """path for ffi audio filter plugin"""
+    module_id: builtins.str
+    """Unique identifier of the plugin"""
     @property
     def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """Optional: paths for dependency dylibs"""
@@ -885,9 +889,10 @@ class LoadAudioFilterPluginRequest(google.protobuf.message.Message):
         *,
         plugin_path: builtins.str | None = ...,
         dependencies: collections.abc.Iterable[builtins.str] | None = ...,
+        module_id: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["plugin_path", b"plugin_path"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["dependencies", b"dependencies", "plugin_path", b"plugin_path"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["module_id", b"module_id", "plugin_path", b"plugin_path"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["dependencies", b"dependencies", "module_id", b"module_id", "plugin_path", b"plugin_path"]) -> None: ...
 
 global___LoadAudioFilterPluginRequest = LoadAudioFilterPluginRequest
 
@@ -895,15 +900,14 @@ global___LoadAudioFilterPluginRequest = LoadAudioFilterPluginRequest
 class LoadAudioFilterPluginResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: builtins.int
-    @property
-    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
 global___LoadAudioFilterPluginResponse = LoadAudioFilterPluginResponse
