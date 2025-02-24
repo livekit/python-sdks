@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from ._ffi_client import FfiClient, FfiHandle
+from ._ffi_client import FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 
 
@@ -23,6 +23,3 @@ class AudioFilter:
             raise Exception(
                 f"failed to initialize audio filter #{resp.load_audio_filter_plugin.error}"
             )
-
-    def handle(self) -> int:
-        return self._ffi_handle_id
