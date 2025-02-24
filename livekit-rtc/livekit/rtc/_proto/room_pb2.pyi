@@ -1451,14 +1451,17 @@ class ParticipantDisconnected(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    DISCONNECT_REASON_FIELD_NUMBER: builtins.int
     participant_identity: builtins.str
+    disconnect_reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
         participant_identity: builtins.str | None = ...,
+        disconnect_reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantDisconnected = ParticipantDisconnected
 
