@@ -5,7 +5,9 @@ from ._proto import ffi_pb2 as proto_ffi
 
 
 class AudioFilter:
-    def __init__(self, module_id: str, path: str, dependencies: Optional[List[str]] = None) -> None:
+    def __init__(
+        self, module_id: str, path: str, dependencies: Optional[List[str]] = None
+    ) -> None:
         self._path = path
 
         req = proto_ffi.FfiRequest()
@@ -18,7 +20,9 @@ class AudioFilter:
         resp = FfiClient.instance.request(req)
 
         if resp.load_audio_filter_plugin.error:
-            raise Exception(f"failed to initialize audio filter #{resp.load_audio_filter_plugin.error}")
+            raise Exception(
+                f"failed to initialize audio filter #{resp.load_audio_filter_plugin.error}"
+            )
 
     def handle(self) -> int:
         return self._ffi_handle_id
