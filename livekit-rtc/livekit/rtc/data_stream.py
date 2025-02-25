@@ -166,6 +166,7 @@ class BaseStreamWriter:
         self._next_chunk_index: int = 0
         self._destination_identities = destination_identities
         self._sender_identity = sender_identity or self._local_participant.identity
+        self._closed = False
 
     async def _send_header(self):
         req = proto_ffi.FfiRequest(
@@ -191,6 +192,8 @@ class BaseStreamWriter:
             raise ConnectionError(cb.send_stream_header.error)
 
     async def _send_chunk(self, chunk: proto_DataStream.Chunk):
+        if self._closed:
+            raise RuntimeError(f"Cannot send chunk after stream is closed: {chunk}")
         req = proto_ffi.FfiRequest(
             send_stream_chunk=proto_room.SendStreamChunkRequest(
                 chunk=chunk,
@@ -214,6 +217,8 @@ class BaseStreamWriter:
             raise ConnectionError(cb.send_stream_chunk.error)
 
     async def _send_trailer(self, trailer: proto_DataStream.Trailer):
+        if self._closed:
+            raise RuntimeError(f"Cannot send trailer after stream is closed: {trailer}")
         req = proto_ffi.FfiRequest(
             send_stream_trailer=proto_room.SendStreamTrailerRequest(
                 trailer=trailer,
@@ -234,6 +239,8 @@ class BaseStreamWriter:
 
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
+
+        self._closed = True
 
     async def aclose(
         self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
