@@ -59,8 +59,10 @@ class AudioFrame:
             # can happen if data is bigger than needed
             raise ValueError("data length must be a multiple of sizeof(int16)")
 
+        data = memoryview(data).cast("B")
         self._data = (ctypes.c_int16 * (len(data) // ctypes.sizeof(ctypes.c_int16)))()
-        ctypes.memmove(self._data, bytes(data), len(data))
+        ctypes.memmove(self._data, data, len(data))
+
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._samples_per_channel = samples_per_channel
