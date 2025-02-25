@@ -40,11 +40,8 @@ def task_done_logger(task: asyncio.Task) -> None:
         return
 
 
-def get_address(data: memoryview) -> int:
-    """Get the address of a buffer using ctypes"""
-    nbytes = data.nbytes
-    buffer = (ctypes.c_int8 * nbytes).from_buffer(data)
-    return ctypes.addressof(buffer)
+def get_address(mv: memoryview) -> int:
+    return ctypes.addressof(ctypes.c_char.from_buffer(mv))
 
 
 T = TypeVar("T")
