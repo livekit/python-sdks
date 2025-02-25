@@ -59,7 +59,8 @@ class AudioFrame:
             # can happen if data is bigger than needed
             raise ValueError("data length must be a multiple of sizeof(int16)")
 
-        self._data = bytearray(data)
+        self._data = (ctypes.c_int16 * (len(data) // ctypes.sizeof(ctypes.c_int16)))()
+        ctypes.memmove(self._data, bytes(data), len(data))
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._samples_per_channel = samples_per_channel
@@ -133,7 +134,7 @@ class AudioFrame:
         Returns:
             memoryview: A memory view of the audio data.
         """
-        return memoryview(self._data).cast("h")
+        return memoryview(self._data).cast("B").cast("h")
 
     @property
     def sample_rate(self) -> int:
