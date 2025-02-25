@@ -217,8 +217,6 @@ class BaseStreamWriter:
             raise ConnectionError(cb.send_stream_chunk.error)
 
     async def _send_trailer(self, trailer: proto_DataStream.Trailer):
-        if self._closed:
-            raise RuntimeError(f"Cannot send trailer after stream is closed: {trailer}")
         req = proto_ffi.FfiRequest(
             send_stream_trailer=proto_room.SendStreamTrailerRequest(
                 trailer=trailer,
@@ -240,11 +238,12 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-        self._closed = True
-
     async def aclose(
         self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
     ):
+        if self._closed:
+            raise RuntimeError("Stream already closed")
+        self._closed = True
         await self._send_trailer(
             trailer=proto_DataStream.Trailer(
                 stream_id=self._header.stream_id, reason=reason, attributes=attributes
