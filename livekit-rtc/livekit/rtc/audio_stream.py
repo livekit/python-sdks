@@ -55,7 +55,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        krisp: Optional[Tuple[str, dict[str, Any]]] = None,
+        noise_cancellation: Optional[Tuple[str, dict[str, Any]]] = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -93,9 +93,9 @@ class AudioStream:
 
         self._audio_filter_module = None
         self._audio_filter_options = None
-        if krisp is not None:
-            self._audio_filter_module = krisp[0]
-            self._audio_filter_options = krisp[1]
+        if noise_cancellation is not None:
+            self._audio_filter_module = noise_cancellation[0]
+            self._audio_filter_options = noise_cancellation[1]
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
@@ -119,7 +119,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        krisp: Optional[Tuple[str, dict[str, Any]]] = None,
+        noise_cancellation: Optional[Tuple[str, dict[str, Any]]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -152,7 +152,7 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
-            krisp=krisp,
+            noise_cancellation=noise_cancellation,
         )
 
     @classmethod
@@ -164,7 +164,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
-        krisp: Optional[Tuple[str, dict[str, Any]]] = None,
+        noise_cancellation: Optional[Tuple[str, dict[str, Any]]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -193,7 +193,7 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
-            krisp=krisp,
+            noise_cancellation=noise_cancellation,
         )
 
     def __del__(self) -> None:
