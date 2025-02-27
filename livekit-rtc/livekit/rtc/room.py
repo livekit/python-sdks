@@ -98,8 +98,6 @@ class RoomOptions:
     """Options for end-to-end encryption."""
     rtc_config: RtcConfiguration | None = None
     """WebRTC-related configuration."""
-    audio_filters: List[ModuleType] | None = None
-    """Audio filters"""
 
 
 @dataclass
@@ -147,7 +145,6 @@ class Room(EventEmitter[EventTypes]):
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
         self._data_stream_tasks: set[asyncio.Task] = set()
-        self._filter_instances: Dict[ModuleType, AudioFilter] = {}
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -859,12 +856,6 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
-
-    def _filter_handle(self, plugin) -> int | None:
-        f = self._filter_instances.get(plugin)
-        if f:
-            return f.handle()
-        return None
 
     def __repr__(self) -> str:
         sid = "unknown"
