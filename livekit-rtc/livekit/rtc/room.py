@@ -17,8 +17,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping, List
-from types import ModuleType
+from typing import Callable, Dict, Literal, Optional, cast, Mapping
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -34,7 +33,6 @@ from .participant import LocalParticipant, Participant, RemoteParticipant
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
-from .audio_filter import AudioFilter
 from .data_stream import (
     TextStreamReader,
     ByteStreamReader,
