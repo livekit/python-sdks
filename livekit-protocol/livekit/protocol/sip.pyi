@@ -681,38 +681,57 @@ class TransferSIPParticipantRequest(_message.Message):
     def __init__(self, participant_identity: _Optional[str] = ..., room_name: _Optional[str] = ..., transfer_to: _Optional[str] = ..., play_dialtone: bool = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class SIPCallInfo(_message.Message):
-    __slots__ = ("call_id", "trunk_id", "room_name", "room_id", "participant_identity", "from_uri", "to_uri", "enabled_features", "call_direction", "call_status", "created_at", "started_at", "ended_at", "disconnect_reason", "error")
+    __slots__ = ("call_id", "trunk_id", "dispatch_rule_id", "region", "room_name", "room_id", "participant_identity", "participant_attributes", "from_uri", "to_uri", "enabled_features", "call_direction", "call_status", "created_at_ns", "started_at_ns", "ended_at_ns", "disconnect_reason", "error", "call_status_code", "audio_codec", "media_encryption")
+    class ParticipantAttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CALL_ID_FIELD_NUMBER: _ClassVar[int]
     TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
+    DISPATCH_RULE_ID_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     FROM_URI_FIELD_NUMBER: _ClassVar[int]
     TO_URI_FIELD_NUMBER: _ClassVar[int]
     ENABLED_FEATURES_FIELD_NUMBER: _ClassVar[int]
     CALL_DIRECTION_FIELD_NUMBER: _ClassVar[int]
     CALL_STATUS_FIELD_NUMBER: _ClassVar[int]
-    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_NS_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_NS_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_NS_FIELD_NUMBER: _ClassVar[int]
     DISCONNECT_REASON_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    CALL_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_CODEC_FIELD_NUMBER: _ClassVar[int]
+    MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
     call_id: str
     trunk_id: str
+    dispatch_rule_id: str
+    region: str
     room_name: str
     room_id: str
     participant_identity: str
+    participant_attributes: _containers.ScalarMap[str, str]
     from_uri: SIPUri
     to_uri: SIPUri
     enabled_features: _containers.RepeatedScalarFieldContainer[SIPFeature]
     call_direction: SIPCallDirection
     call_status: SIPCallStatus
-    created_at: int
-    started_at: int
-    ended_at: int
+    created_at_ns: int
+    started_at_ns: int
+    ended_at_ns: int
     disconnect_reason: _models.DisconnectReason
     error: str
-    def __init__(self, call_id: _Optional[str] = ..., trunk_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., from_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., to_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., enabled_features: _Optional[_Iterable[_Union[SIPFeature, str]]] = ..., call_direction: _Optional[_Union[SIPCallDirection, str]] = ..., call_status: _Optional[_Union[SIPCallStatus, str]] = ..., created_at: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., disconnect_reason: _Optional[_Union[_models.DisconnectReason, str]] = ..., error: _Optional[str] = ...) -> None: ...
+    call_status_code: SIPStatus
+    audio_codec: str
+    media_encryption: str
+    def __init__(self, call_id: _Optional[str] = ..., trunk_id: _Optional[str] = ..., dispatch_rule_id: _Optional[str] = ..., region: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., from_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., to_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., enabled_features: _Optional[_Iterable[_Union[SIPFeature, str]]] = ..., call_direction: _Optional[_Union[SIPCallDirection, str]] = ..., call_status: _Optional[_Union[SIPCallStatus, str]] = ..., created_at_ns: _Optional[int] = ..., started_at_ns: _Optional[int] = ..., ended_at_ns: _Optional[int] = ..., disconnect_reason: _Optional[_Union[_models.DisconnectReason, str]] = ..., error: _Optional[str] = ..., call_status_code: _Optional[_Union[SIPStatus, _Mapping]] = ..., audio_codec: _Optional[str] = ..., media_encryption: _Optional[str] = ...) -> None: ...
 
 class SIPUri(_message.Message):
     __slots__ = ("user", "host", "ip", "port", "transport")
