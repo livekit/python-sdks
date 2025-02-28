@@ -11,6 +11,7 @@ class JobType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     JT_ROOM: _ClassVar[JobType]
     JT_PUBLISHER: _ClassVar[JobType]
+    JT_PARTICIPANT: _ClassVar[JobType]
 
 class WorkerStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -25,6 +26,7 @@ class JobStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     JS_FAILED: _ClassVar[JobStatus]
 JT_ROOM: JobType
 JT_PUBLISHER: JobType
+JT_PARTICIPANT: JobType
 WS_AVAILABLE: WorkerStatus
 WS_FULL: WorkerStatus
 JS_PENDING: JobStatus

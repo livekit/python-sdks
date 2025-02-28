@@ -1126,26 +1126,6 @@ class RtcConfig(google.protobuf.message.Message):
 global___RtcConfig = RtcConfig
 
 @typing.final
-class AudioFilterModule(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    MODULE_ID_FIELD_NUMBER: builtins.int
-    HANDLE_ID_FIELD_NUMBER: builtins.int
-    module_id: builtins.str
-    """unique identifier for audio filter"""
-    handle_id: builtins.int
-    def __init__(
-        self,
-        *,
-        module_id: builtins.str | None = ...,
-        handle_id: builtins.int | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle_id", b"handle_id", "module_id", b"module_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle_id", b"handle_id", "module_id", b"module_id"]) -> None: ...
-
-global___AudioFilterModule = AudioFilterModule
-
-@typing.final
 class RoomOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1471,14 +1451,17 @@ class ParticipantDisconnected(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    DISCONNECT_REASON_FIELD_NUMBER: builtins.int
     participant_identity: builtins.str
+    disconnect_reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
         participant_identity: builtins.str | None = ...,
+        disconnect_reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> None: ...
 
 global___ParticipantDisconnected = ParticipantDisconnected
 

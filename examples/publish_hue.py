@@ -27,6 +27,13 @@ async def main(room: rtc.Room):
         )
         .to_jwt()
     )
+
+    @room.on("participant_disconnected")
+    def on_participant_disconnected(participant: rtc.Participant):
+        logging.info(
+            f"participant {participant.identity} disconnected, reason: {rtc.DisconnectReason.Name(participant.disconnect_reason)}"
+        )
+
     url = os.getenv("LIVEKIT_URL")
     logging.info("connecting to %s", url)
     try:

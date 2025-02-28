@@ -34,7 +34,7 @@ from ._proto.room_pb2 import (
 from ._proto.track_pb2 import (
     ParticipantTrackPermission,
 )
-from ._utils import BroadcastQueue, split_utf8
+from ._utils import BroadcastQueue
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -585,8 +585,10 @@ class LocalParticipant(Participant):
         destination_identities: Optional[List[str]] = None,
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
+        stream_id: str | None = None,
         reply_to_id: str | None = None,
         total_size: int | None = None,
+        sender_identity: str | None = None,
     ) -> TextStreamWriter:
         """
         Returns a TextStreamWriter that allows to write individual chunks of text to a text stream.
@@ -599,6 +601,8 @@ class LocalParticipant(Participant):
             reply_to_id=reply_to_id,
             destination_identities=destination_identities,
             total_size=total_size,
+            stream_id=stream_id,
+            sender_identity=sender_identity,
         )
 
         await writer._send_header()
@@ -623,8 +627,7 @@ class LocalParticipant(Participant):
             total_size=total_size,
         )
 
-        for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-            await writer.write(chunk)
+        await writer.write(text)
         await writer.aclose()
 
         return writer.info

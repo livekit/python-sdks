@@ -24,12 +24,12 @@ from ._proto.room_pb2 import DataStream as proto_DataStream
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import room_pb2 as proto_room
 from ._ffi_client import FfiClient
-
+from ._utils import split_utf8
 from typing import TYPE_CHECKING
+
 
 if TYPE_CHECKING:
     from .participant import LocalParticipant
-
 
 STREAM_CHUNK_SIZE = 15_000
 
@@ -47,14 +47,6 @@ class BaseStreamInfo:
 @dataclass
 class TextStreamInfo(BaseStreamInfo):
     attachments: List[str]
-    pass
-
-
-@dataclass
-class TextStreamUpdate:
-    current: str
-    index: int
-    collected: str
 
 
 class TextStreamReader:
@@ -73,30 +65,24 @@ class TextStreamReader:
             attachments=list(header.text_header.attached_stream_ids),
         )
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
-        self._chunks: Dict[int, proto_DataStream.Chunk] = {}
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
-    def __aiter__(self) -> AsyncIterator[TextStreamUpdate]:
+    def __aiter__(self) -> AsyncIterator[str]:
         return self
 
-    async def __anext__(self) -> TextStreamUpdate:
+    async def __anext__(self) -> str:
         item = await self._queue.get()
         if item is None:
             raise StopAsyncIteration
         decodedStr = item.content.decode()
-
-        self._chunks[item.chunk_index] = item
-        chunk_list = list(self._chunks.values())
-        chunk_list.sort(key=lambda chunk: chunk.chunk_index)
-        collected: str = "".join(map(lambda chunk: chunk.content.decode(), chunk_list))
-        return TextStreamUpdate(
-            current=decodedStr, index=item.chunk_index, collected=collected
-        )
+        return decodedStr
 
     @property
     def info(self) -> TextStreamInfo:
@@ -104,8 +90,8 @@ class TextStreamReader:
 
     async def read_all(self) -> str:
         final_string = ""
-        async for update in self:
-            final_string = update.collected
+        async for chunk in self:
+            final_string += chunk
         return final_string
 
 
@@ -134,6 +120,8 @@ class ByteStreamReader:
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[bytes]:
@@ -161,6 +149,7 @@ class BaseStreamWriter:
         total_size: int | None = None,
         mime_type: str = "",
         destination_identities: Optional[List[str]] = None,
+        sender_identity: str | None = None,
     ):
         self._local_participant = local_participant
         if stream_id is None:
@@ -176,6 +165,8 @@ class BaseStreamWriter:
         )
         self._next_chunk_index: int = 0
         self._destination_identities = destination_identities
+        self._sender_identity = sender_identity or self._local_participant.identity
+        self._closed = False
 
     async def _send_header(self):
         req = proto_ffi.FfiRequest(
@@ -183,7 +174,7 @@ class BaseStreamWriter:
                 header=self._header,
                 local_participant_handle=self._local_participant._ffi_handle.handle,
                 destination_identities=self._destination_identities,
-                sender_identity=self._local_participant.identity,
+                sender_identity=self._sender_identity,
             )
         )
 
@@ -201,6 +192,8 @@ class BaseStreamWriter:
             raise ConnectionError(cb.send_stream_header.error)
 
     async def _send_chunk(self, chunk: proto_DataStream.Chunk):
+        if self._closed:
+            raise RuntimeError(f"Cannot send chunk after stream is closed: {chunk}")
         req = proto_ffi.FfiRequest(
             send_stream_chunk=proto_room.SendStreamChunkRequest(
                 chunk=chunk,
@@ -245,10 +238,15 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(self):
+    async def aclose(
+        self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
+    ):
+        if self._closed:
+            raise RuntimeError("Stream already closed")
+        self._closed = True
         await self._send_trailer(
             trailer=proto_DataStream.Trailer(
-                stream_id=self._header.stream_id, reason=""
+                stream_id=self._header.stream_id, reason=reason, attributes=attributes
             )
         )
 
@@ -264,6 +262,7 @@ class TextStreamWriter(BaseStreamWriter):
         total_size: int | None = None,
         reply_to_id: str | None = None,
         destination_identities: Optional[List[str]] = None,
+        sender_identity: str | None = None,
     ) -> None:
         super().__init__(
             local_participant,
@@ -273,6 +272,7 @@ class TextStreamWriter(BaseStreamWriter):
             total_size,
             mime_type="text/plain",
             destination_identities=destination_identities,
+            sender_identity=sender_identity,
         )
         self._header.text_header.operation_type = proto_DataStream.OperationType.CREATE
         if reply_to_id:
@@ -286,20 +286,20 @@ class TextStreamWriter(BaseStreamWriter):
             attributes=dict(self._header.attributes),
             attachments=list(self._header.text_header.attached_stream_ids),
         )
+        self._write_lock = asyncio.Lock()
 
-    async def write(self, text: str, chunk_index: int | None = None):
-        content = text.encode()
-        if len(content) > STREAM_CHUNK_SIZE:
-            raise ValueError("maximum chunk size exceeded")
-        if chunk_index is None:
-            chunk_index = self._next_chunk_index
-            self._next_chunk_index += 1
-        chunk_msg = proto_DataStream.Chunk(
-            stream_id=self._header.stream_id,
-            chunk_index=chunk_index,
-            content=content,
-        )
-        await self._send_chunk(chunk_msg)
+    async def write(self, text: str):
+        async with self._write_lock:
+            for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
+                content = chunk
+                chunk_index = self._next_chunk_index
+                self._next_chunk_index += 1
+                chunk_msg = proto_DataStream.Chunk(
+                    stream_id=self._header.stream_id,
+                    chunk_index=chunk_index,
+                    content=content,
+                )
+                await self._send_chunk(chunk_msg)
 
     @property
     def info(self) -> TextStreamInfo:
