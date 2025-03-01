@@ -139,10 +139,7 @@ class Participant(ABC):
         - USER_REJECTED - SIP callee rejected the call (busy)
         - SIP_TRUNK_FAILURE - SIP protocol failure or unexpected response
         """
-        if (
-            self._info.disconnect_reason
-            == proto_participant.DisconnectReason.UNKNOWN_REASON
-        ):
+        if self._info.disconnect_reason == proto_participant.DisconnectReason.UNKNOWN_REASON:
             return None
         return self._info.disconnect_reason
 
@@ -275,8 +272,7 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.publish_transcription.async_id
-                == resp.publish_transcription.async_id
+                lambda e: e.publish_transcription.async_id == resp.publish_transcription.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -332,9 +328,7 @@ class LocalParticipant(Participant):
     def register_rpc_method(
         self,
         method_name: str,
-        handler: Optional[
-            Callable[[RpcInvocationData], Union[Awaitable[str], str]]
-        ] = None,
+        handler: Optional[Callable[[RpcInvocationData], Union[Awaitable[str], str]]] = None,
     ) -> Union[None, Callable]:
         """
         Establishes the participant as a receiver for calls of the specified RPC method.
@@ -418,15 +412,9 @@ class LocalParticipant(Participant):
             participant_permissions = []
 
         req = proto_ffi.FfiRequest()
-        req.set_track_subscription_permissions.local_participant_handle = (
-            self._ffi_handle.handle
-        )
-        req.set_track_subscription_permissions.all_participants_allowed = (
-            allow_all_participants
-        )
-        req.set_track_subscription_permissions.permissions.extend(
-            participant_permissions
-        )
+        req.set_track_subscription_permissions.local_participant_handle = self._ffi_handle.handle
+        req.set_track_subscription_permissions.all_participants_allowed = allow_all_participants
+        req.set_track_subscription_permissions.permissions.extend(participant_permissions)
         FfiClient.instance.request(req)
 
     async def _handle_rpc_method_invocation(
@@ -441,9 +429,7 @@ class LocalParticipant(Participant):
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
 
-        params = RpcInvocationData(
-            request_id, caller_identity, payload, response_timeout
-        )
+        params = RpcInvocationData(request_id, caller_identity, payload, response_timeout)
 
         handler = self._rpc_handlers.get(method)
 
@@ -452,9 +438,7 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    async_handler = cast(
-                        Callable[[RpcInvocationData], Awaitable[str]], handler
-                    )
+                    async_handler = cast(Callable[[RpcInvocationData], Awaitable[str]], handler)
 
                     async def run_handler():
                         try:
@@ -470,9 +454,7 @@ class LocalParticipant(Participant):
                     except asyncio.TimeoutError:
                         raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
                     except asyncio.CancelledError:
-                        raise RpcError._built_in(
-                            RpcError.ErrorCode.RECIPIENT_DISCONNECTED
-                        )
+                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
                 else:
                     sync_handler = cast(Callable[[RpcInvocationData], str], handler)
                     response_payload = sync_handler(params)
@@ -484,9 +466,7 @@ class LocalParticipant(Participant):
                     "Returning APPLICATION_ERROR instead. "
                     f"Original error: {error}"
                 )
-                response_error = RpcError._built_in(
-                    RpcError.ErrorCode.APPLICATION_ERROR
-                )
+                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
@@ -520,8 +500,7 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             await queue.wait_for(
-                lambda e: e.set_local_metadata.async_id
-                == resp.set_local_metadata.async_id
+                lambda e: e.set_local_metadata.async_id == resp.set_local_metadata.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -573,8 +552,7 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             await queue.wait_for(
-                lambda e: e.set_local_attributes.async_id
-                == resp.set_local_attributes.async_id
+                lambda e: e.set_local_attributes.async_id == resp.set_local_attributes.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -675,9 +653,7 @@ class LocalParticipant(Participant):
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
         if mime_type is None:
-            mime_type = (
-                "application/octet-stream"  # Fallback MIME type for unknown files
-            )
+            mime_type = "application/octet-stream"  # Fallback MIME type for unknown files
 
         writer: ByteStreamWriter = await self.stream_bytes(
             name=file_name,

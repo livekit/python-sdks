@@ -75,11 +75,7 @@ def test_agent_config():
 
 
 def test_verify_token_invalid():
-    token = (
-        AccessToken(TEST_API_KEY, TEST_API_SECRET)
-        .with_identity("test_identity")
-        .to_jwt()
-    )
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
     token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
     with pytest.raises(Exception):

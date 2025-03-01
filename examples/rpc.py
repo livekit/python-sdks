@@ -10,9 +10,7 @@ LIVEKIT_API_KEY = os.getenv("LIVEKIT_API_KEY")
 LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET")
 LIVEKIT_URL = os.getenv("LIVEKIT_URL")
 if not LIVEKIT_API_KEY or not LIVEKIT_API_SECRET or not LIVEKIT_URL:
-    raise ValueError(
-        "Missing required environment variables. Please check your .env.local file."
-    )
+    raise ValueError("Missing required environment variables. Please check your .env.local file.")
 
 
 async def main():
@@ -82,9 +80,7 @@ async def main():
     finally:
         # Clean up all rooms
         print("Disconnecting all participants...")
-        await asyncio.gather(
-            *(room.disconnect() for room in rooms), return_exceptions=True
-        )
+        await asyncio.gather(*(room.disconnect() for room in rooms), return_exceptions=True)
         print("Cleanup complete")
 
 
@@ -121,9 +117,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         json_data = json.loads(data.payload)
         dividend = json_data["dividend"]
         divisor = json_data["divisor"]
-        print(
-            f"[Math Genius] {data.caller_identity} wants to divide {dividend} by {divisor}."
-        )
+        print(f"[Math Genius] {data.caller_identity} wants to divide {dividend} by {divisor}.")
 
         result = dividend / divisor
         return json.dumps({"result": result})
@@ -132,9 +126,7 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
     async def long_calculation_method(
         data: RpcInvocationData,
     ):
-        print(
-            f"[Math Genius] Starting a very long calculation for {data.caller_identity}"
-        )
+        print(f"[Math Genius] Starting a very long calculation for {data.caller_identity}")
         print(
             f"[Math Genius] This will take 30 seconds even though you're only giving me {data.response_timeout} seconds"
         )
@@ -202,9 +194,7 @@ async def perform_divide(room: rtc.Room):
         print(f"[Caller] The result is {parsed_response['result']}")
     except rtc.RpcError as error:
         if error.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR:
-            print(
-                "[Caller] Aww something went wrong with that one, lets try something else."
-            )
+            print("[Caller] Aww something went wrong with that one, lets try something else.")
         else:
             print(f"[Caller] RPC call failed with unexpected RpcError: {error}")
     except Exception as error:

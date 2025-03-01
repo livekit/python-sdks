@@ -41,9 +41,7 @@ class SipService(Service):
     ```
     """
 
-    def __init__(
-        self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
-    ):
+    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
         super().__init__(session, url, api_key, api_secret)
 
     async def create_sip_trunk(self, create: CreateSIPTrunkRequest) -> SIPTrunkInfo:

@@ -117,8 +117,7 @@ class AudioResampler:
                 output_data,
                 self._output_rate,
                 self._num_channels,
-                len(output_data)
-                // (self._num_channels * ctypes.sizeof(ctypes.c_int16)),
+                len(output_data) // (self._num_channels * ctypes.sizeof(ctypes.c_int16)),
             )
         ]
 
@@ -153,8 +152,7 @@ class AudioResampler:
                 output_data,
                 self._output_rate,
                 self._num_channels,
-                len(output_data)
-                // (self._num_channels * ctypes.sizeof(ctypes.c_int16)),
+                len(output_data) // (self._num_channels * ctypes.sizeof(ctypes.c_int16)),
             )
         ]
 

@@ -43,11 +43,7 @@ async def create_token_with_agent_dispatch() -> str:
         .with_grants(api.VideoGrants(room_join=True, room=room_name))
         .with_room_config(
             api.RoomConfiguration(
-                agents=[
-                    api.RoomAgentDispatch(
-                        agent_name="test-agent", metadata="my_metadata"
-                    )
-                ],
+                agents=[api.RoomAgentDispatch(agent_name="test-agent", metadata="my_metadata")],
             ),
         )
         .to_jwt()

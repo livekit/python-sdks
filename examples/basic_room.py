@@ -12,15 +12,11 @@ from livekit import api, rtc
 async def main(room: rtc.Room) -> None:
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant) -> None:
-        logging.info(
-            "participant connected: %s %s", participant.sid, participant.identity
-        )
+        logging.info("participant connected: %s %s", participant.sid, participant.identity)
 
     @room.on("participant_disconnected")
     def on_participant_disconnected(participant: rtc.RemoteParticipant):
-        logging.info(
-            "participant disconnected: %s %s", participant.sid, participant.identity
-        )
+        logging.info("participant disconnected: %s %s", participant.sid, participant.identity)
 
     @room.on("local_track_published")
     def on_local_track_published(
@@ -78,9 +74,7 @@ async def main(room: rtc.Room) -> None:
         logging.info("track unsubscribed: %s", publication.sid)
 
     @room.on("track_muted")
-    def on_track_muted(
-        publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    def on_track_muted(publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
         logging.info("track muted: %s", publication.sid)
 
     @room.on("track_unmuted")
@@ -94,9 +88,7 @@ async def main(room: rtc.Room) -> None:
         logging.info("received data from %s: %s", data.participant.identity, data.data)
 
     @room.on("connection_quality_changed")
-    def on_connection_quality_changed(
-        participant: rtc.Participant, quality: rtc.ConnectionQuality
-    ):
+    def on_connection_quality_changed(participant: rtc.Participant, quality: rtc.ConnectionQuality):
         logging.info("connection quality changed for %s", participant.identity)
 
     @room.on("track_subscription_failed")

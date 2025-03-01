@@ -20,9 +20,9 @@ def test_message_serialization():
     msg2 = ChatMessage.from_jsondict(json.loads(json.dumps(data)))
     assert msg2.message == msg.message, "message should be the same"
     assert msg2.id == msg.id, "id should be the same"
-    assert int(msg2.timestamp.timestamp() / 1000) == int(
-        msg.timestamp.timestamp() / 1000
-    ), "timestamp should be the same"
+    assert int(msg2.timestamp.timestamp() / 1000) == int(msg.timestamp.timestamp() / 1000), (
+        "timestamp should be the same"
+    )
     assert not msg2.deleted, "not deleted"
 
     # deletion is handled

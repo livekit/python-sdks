@@ -41,9 +41,7 @@ class RoomService(Service):
     Also see https://docs.livekit.io/home/server/managing-rooms/ and https://docs.livekit.io/home/server/managing-participants/
     """
 
-    def __init__(
-        self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
-    ):
+    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
         super().__init__(session, url, api_key, api_secret)
 
     async def create_room(
@@ -130,9 +128,7 @@ class RoomService(Service):
             Room,
         )
 
-    async def list_participants(
-        self, list: ListParticipantsRequest
-    ) -> ListParticipantsResponse:
+    async def list_participants(self, list: ListParticipantsRequest) -> ListParticipantsResponse:
         """Lists all participants in a room.
 
         Args:
@@ -226,9 +222,7 @@ class RoomService(Service):
             MuteRoomTrackResponse,
         )
 
-    async def update_participant(
-        self, update: UpdateParticipantRequest
-    ) -> ParticipantInfo:
+    async def update_participant(self, update: UpdateParticipantRequest) -> ParticipantInfo:
         """Updates a participant's metadata or permissions.
 
         Args:
