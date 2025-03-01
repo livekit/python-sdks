@@ -754,7 +754,7 @@ class Room(EventEmitter[EventTypes]):
             text_reader = TextStreamReader(header)
             self._text_stream_readers[header.stream_id] = text_reader
             task = asyncio.create_task(
-                text_stream_handler(text_reader, participant_identity, self)
+                text_stream_handler(text_reader, participant_identity)
             )
             self._data_stream_tasks.add(task)
             task.add_done_callback(self._data_stream_tasks.discard)
