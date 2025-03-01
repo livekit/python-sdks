@@ -226,9 +226,7 @@ class AudioStream:
         if self._audio_filter_module is not None:
             new_audio_stream.audio_filter_module_id = self._audio_filter_module
         if self._audio_filter_options is not None:
-            new_audio_stream.audio_filter_options = json.dumps(
-                self._audio_filter_options
-            )
+            new_audio_stream.audio_filter_options = json.dumps(self._audio_filter_options)
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
 
@@ -237,19 +235,13 @@ class AudioStream:
     ) -> Any:
         req = proto_ffi.FfiRequest()
         audio_stream_from_participant = req.audio_stream_from_participant
-        audio_stream_from_participant.participant_handle = (
-            participant._ffi_handle.handle
-        )
+        audio_stream_from_participant.participant_handle = participant._ffi_handle.handle
         audio_stream_from_participant.sample_rate = self._sample_rate
         audio_stream_from_participant.num_channels = self._num_channels
-        audio_stream_from_participant.type = (
-            proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
-        )
+        audio_stream_from_participant.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         audio_stream_from_participant.track_source = track_source
         if self._audio_filter_module is not None:
-            audio_stream_from_participant.audio_filter_module_id = (
-                self._audio_filter_module
-            )
+            audio_stream_from_participant.audio_filter_module_id = self._audio_filter_module
         if self._audio_filter_options is not None:
             audio_stream_from_participant.audio_filter_options = json.dumps(
                 self._audio_filter_options

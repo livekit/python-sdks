@@ -180,9 +180,7 @@ class KeyProvider:
 
 
 class FrameCryptor:
-    def __init__(
-        self, room_handle: int, participant_identity: str, key_index: int, enabled: bool
-    ):
+    def __init__(self, room_handle: int, participant_identity: str, key_index: int, enabled: bool):
         self._room_handle = room_handle
         self._enabled = enabled
         self._participant_identity = participant_identity
@@ -244,9 +242,7 @@ class E2EEManager:
         self._enabled = options is not None
 
         if options is not None:
-            self._key_provider = KeyProvider(
-                self._room_handle, options.key_provider_options
-            )
+            self._key_provider = KeyProvider(self._room_handle, options.key_provider_options)
 
     @property
     def key_provider(self) -> Optional[KeyProvider]:

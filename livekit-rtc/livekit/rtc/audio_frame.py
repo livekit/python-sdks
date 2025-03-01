@@ -50,9 +50,7 @@ class AudioFrame:
         """
         data = memoryview(data).cast("B")
 
-        if len(data) < num_channels * samples_per_channel * ctypes.sizeof(
-            ctypes.c_int16
-        ):
+        if len(data) < num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16):
             raise ValueError(
                 "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
             )
@@ -69,9 +67,7 @@ class AudioFrame:
         self._samples_per_channel = samples_per_channel
 
     @staticmethod
-    def create(
-        sample_rate: int, num_channels: int, samples_per_channel: int
-    ) -> "AudioFrame":
+    def create(sample_rate: int, num_channels: int, samples_per_channel: int) -> "AudioFrame":
         """
         Create a new empty AudioFrame instance with specified sample rate, number of channels,
         and samples per channel.
@@ -95,9 +91,7 @@ class AudioFrame:
         cdata = (ctypes.c_int16 * size).from_address(info.data_ptr)
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
-        return AudioFrame(
-            data, info.sample_rate, info.num_channels, info.samples_per_channel
-        )
+        return AudioFrame(data, info.sample_rate, info.num_channels, info.samples_per_channel)
 
     def remix_and_resample(self, sample_rate: int, num_channels: int) -> "AudioFrame":
         """Resample the audio frame to the given sample rate and number of channels.
@@ -234,12 +228,8 @@ class AudioFrame:
                     core_schema.model_fields_schema(
                         {
                             "data": core_schema.model_field(core_schema.str_schema()),
-                            "sample_rate": core_schema.model_field(
-                                core_schema.int_schema()
-                            ),
-                            "num_channels": core_schema.model_field(
-                                core_schema.int_schema()
-                            ),
+                            "sample_rate": core_schema.model_field(core_schema.int_schema()),
+                            "num_channels": core_schema.model_field(core_schema.int_schema()),
                             "samples_per_channel": core_schema.model_field(
                                 core_schema.int_schema()
                             ),
@@ -248,9 +238,7 @@ class AudioFrame:
                     core_schema.no_info_plain_validator_function(validate_audio_frame),
                 ]
             ),
-            python_schema=core_schema.no_info_plain_validator_function(
-                validate_audio_frame
-            ),
+            python_schema=core_schema.no_info_plain_validator_function(validate_audio_frame),
             serialization=core_schema.plain_serializer_function_ser_schema(
                 lambda instance: {
                     "data": base64.b64encode(instance.data).decode("utf-8"),

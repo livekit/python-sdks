@@ -48,9 +48,7 @@ class AVSynchronizer:
         self._last_video_time: float = 0
         self._last_audio_time: float = 0
 
-        self._video_queue_max_size = int(
-            self._video_fps * self._video_queue_size_ms / 1000
-        )
+        self._video_queue_max_size = int(self._video_fps * self._video_queue_size_ms / 1000)
         if self._video_queue_size_ms > 0:
             # ensure queue is bounded if queue size is specified
             self._video_queue_max_size = max(1, self._video_queue_max_size)
@@ -128,9 +126,7 @@ class AVSynchronizer:
 
 
 class _FPSController:
-    def __init__(
-        self, *, expected_fps: float, max_delay_tolerance_ms: float = 300
-    ) -> None:
+    def __init__(self, *, expected_fps: float, max_delay_tolerance_ms: float = 300) -> None:
         """Controls frame rate by adjusting sleep time based on actual FPS.
 
         Usage:
@@ -178,16 +174,12 @@ class _FPSController:
         else:
             # check if significantly behind schedule
             if -sleep_time > self._max_delay_tolerance_secs:
-                logger.warning(
-                    f"Frame capture was behind schedule for {-sleep_time * 1000:.2f} ms"
-                )
+                logger.warning(f"Frame capture was behind schedule for {-sleep_time * 1000:.2f} ms")
                 self._next_frame_time = time.perf_counter()
 
     def after_process(self) -> None:
         """Update timing information after processing a frame."""
-        assert self._next_frame_time is not None, (
-            "wait_next_process must be called first"
-        )
+        assert self._next_frame_time is not None, "wait_next_process must be called first"
 
         # update timing information
         self._send_timestamps.append(time.perf_counter())

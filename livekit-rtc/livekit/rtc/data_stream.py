@@ -112,9 +112,7 @@ class ByteStreamReader:
             attributes=dict(header.attributes),
             name=header.byte_header.name,
         )
-        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(
-            capacity
-        )
+        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(capacity)
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         await self._queue.put(chunk)
@@ -182,8 +180,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_header.async_id
-                == resp.send_stream_header.async_id
+                lambda e: e.send_stream_header.async_id == resp.send_stream_header.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -207,8 +204,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_chunk.async_id
-                == resp.send_stream_chunk.async_id
+                lambda e: e.send_stream_chunk.async_id == resp.send_stream_chunk.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -229,8 +225,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_trailer.async_id
-                == resp.send_stream_trailer.async_id
+                lambda e: e.send_stream_trailer.async_id == resp.send_stream_trailer.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -238,9 +233,7 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(
-        self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
-    ):
+    async def aclose(self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None):
         if self._closed:
             raise RuntimeError("Stream already closed")
         self._closed = True
@@ -343,8 +336,7 @@ class ByteStreamWriter(BaseStreamWriter):
     async def write(self, data: bytes):
         async with self._write_lock:
             chunked_data = [
-                data[i : i + STREAM_CHUNK_SIZE]
-                for i in range(0, len(data), STREAM_CHUNK_SIZE)
+                data[i : i + STREAM_CHUNK_SIZE] for i in range(0, len(data), STREAM_CHUNK_SIZE)
             ]
 
             for chunk in chunked_data:

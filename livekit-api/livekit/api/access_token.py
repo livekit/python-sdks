@@ -91,9 +91,7 @@ class Claims:
         claims = dataclasses.asdict(
             self,
             dict_factory=lambda items: {
-                snake_to_lower_camel(k): v
-                for k, v in items
-                if v is not None and v != ""
+                snake_to_lower_camel(k): v for k, v in items if v is not None and v != ""
             },
         )
         if self.room_config:
@@ -178,13 +176,9 @@ class AccessToken:
             {
                 "sub": self.identity,
                 "iss": self.api_key,
-                "nbf": calendar.timegm(
-                    datetime.datetime.now(datetime.timezone.utc).utctimetuple()
-                ),
+                "nbf": calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple()),
                 "exp": calendar.timegm(
-                    (
-                        datetime.datetime.now(datetime.timezone.utc) + self.ttl
-                    ).utctimetuple()
+                    (datetime.datetime.now(datetime.timezone.utc) + self.ttl).utctimetuple()
                 ),
             }
         )
@@ -220,16 +214,12 @@ class TokenVerifier:
 
         video_dict = claims.get("video", dict())
         video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
-        video_dict = {
-            k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__
-        }
+        video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
         video = VideoGrants(**video_dict)
 
         sip_dict = claims.get("sip", dict())
         sip_dict = {camel_to_snake(k): v for k, v in sip_dict.items()}
-        sip_dict = {
-            k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__
-        }
+        sip_dict = {k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__}
         sip = SIPGrants(**sip_dict)
 
         grant_claims = Claims(
@@ -259,6 +249,4 @@ def camel_to_snake(t: str):
 
 
 def snake_to_lower_camel(t: str):
-    return "".join(
-        word.capitalize() if i else word for i, word in enumerate(t.split("_"))
-    )
+    return "".join(word.capitalize() if i else word for i, word in enumerate(t.split("_")))

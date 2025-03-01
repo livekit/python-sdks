@@ -14,9 +14,7 @@ from livekit import rtc
 try:
     import av
 except ImportError:
-    raise RuntimeError(
-        "av is required to run this example, install with `pip install av`"
-    )
+    raise RuntimeError("av is required to run this example, install with `pip install av`")
 
 # ensure LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are set
 

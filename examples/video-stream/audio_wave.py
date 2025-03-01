@@ -104,9 +104,7 @@ class WaveformVisualizer:
         y = int((height - text_height) * 0.4 + baseline)
         cv2.putText(canvas, text, (x, y), font_face, font_scale, (0, 0, 0), thickness)
 
-    def draw_current_wave(
-        self, canvas: np.ndarray, audio_samples: np.ndarray
-    ) -> np.ndarray:
+    def draw_current_wave(self, canvas: np.ndarray, audio_samples: np.ndarray) -> np.ndarray:
         """Draw the current waveform and return the current values"""
         height, width = canvas.shape[:2]
         center_y = height // 2 + 100
@@ -136,9 +134,7 @@ class WaveformVisualizer:
         center_y = height // 2
 
         self.volume_history.append(current_volume)
-        cv2.line(
-            canvas, (0, center_y - 250), (width, center_y - 250), (200, 200, 200), 1
-        )
+        cv2.line(canvas, (0, center_y - 250), (width, center_y - 250), (200, 200, 200), 1)
 
         volume_x = np.linspace(0, width, len(self.volume_history), dtype=int)
         volume_y = center_y - 250 + (np.array(self.volume_history) * 200)
@@ -158,9 +154,7 @@ async def video_generator(
     input_audio: asyncio.Queue[Union[rtc.AudioFrame, _AudioEndSentinel]],
     av_sync: rtc.AVSynchronizer,  # only used for drawing the actual fps on the video
 ) -> AsyncIterable[tuple[rtc.VideoFrame, Optional[rtc.AudioFrame]]]:
-    canvas = np.zeros(
-        (media_info.video_height, media_info.video_width, 4), dtype=np.uint8
-    )
+    canvas = np.zeros((media_info.video_height, media_info.video_width, 4), dtype=np.uint8)
     canvas.fill(255)
 
     def _np_to_video_frame(image: np.ndarray) -> rtc.VideoFrame:

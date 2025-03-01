@@ -33,14 +33,10 @@ class EgressService(Service):
     Also see https://docs.livekit.io/home/egress/overview/
     """
 
-    def __init__(
-        self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
-    ):
+    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
         super().__init__(session, url, api_key, api_secret)
 
-    async def start_room_composite_egress(
-        self, start: RoomCompositeEgressRequest
-    ) -> EgressInfo:
+    async def start_room_composite_egress(self, start: RoomCompositeEgressRequest) -> EgressInfo:
         return await self._client.request(
             SVC,
             "StartRoomCompositeEgress",
@@ -58,9 +54,7 @@ class EgressService(Service):
             EgressInfo,
         )
 
-    async def start_participant_egress(
-        self, start: ParticipantEgressRequest
-    ) -> EgressInfo:
+    async def start_participant_egress(self, start: ParticipantEgressRequest) -> EgressInfo:
         return await self._client.request(
             SVC,
             "StartParticipantEgress",
@@ -69,9 +63,7 @@ class EgressService(Service):
             EgressInfo,
         )
 
-    async def start_track_composite_egress(
-        self, start: TrackCompositeEgressRequest
-    ) -> EgressInfo:
+    async def start_track_composite_egress(self, start: TrackCompositeEgressRequest) -> EgressInfo:
         return await self._client.request(
             SVC,
             "StartTrackCompositeEgress",
