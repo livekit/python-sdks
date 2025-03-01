@@ -769,7 +769,7 @@ class Room(EventEmitter[EventTypes]):
 
             byte_reader = ByteStreamReader(header)
             self._byte_stream_readers[header.stream_id] = byte_reader
-            task: asyncio.Task[Any] = asyncio.create_task(
+            task = asyncio.create_task(
                 byte_stream_handler(byte_reader, participant_identity)  # type: ignore
             )
             self._data_stream_tasks.add(task)
