@@ -126,7 +126,10 @@ class ConnectError(Exception):
 
 
 class Room(EventEmitter[EventTypes]):
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+    def __init__(
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+    ) -> None:
         """Initializes a new Room instance.
 
         Parameters:
