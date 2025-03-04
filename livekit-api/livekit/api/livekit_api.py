@@ -53,9 +53,7 @@ class LiveKitAPI:
         self._ingress = IngressService(self._session, url, api_key, api_secret)
         self._egress = EgressService(self._session, url, api_key, api_secret)
         self._sip = SipService(self._session, url, api_key, api_secret)
-        self._agent_dispatch = AgentDispatchService(
-            self._session, url, api_key, api_secret
-        )
+        self._agent_dispatch = AgentDispatchService(self._session, url, api_key, api_secret)
 
     @property
     def agent_dispatch(self) -> AgentDispatchService:

@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Optional
 
@@ -39,6 +40,12 @@ class AudioFrameEvent:
     frame: AudioFrame
 
 
+@dataclass
+class NoiseCancellationOptions:
+    module_id: str
+    options: dict[str, Any]
+
+
 class AudioStream:
     """An asynchronous audio stream for receiving audio frames from a participant or track.
 
@@ -54,6 +61,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        noise_cancellation: Optional[NoiseCancellationOptions] = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -67,6 +75,10 @@ class AudioStream:
             sample_rate (int, optional): The sample rate for the audio stream in Hz.
                 Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
+            noise_cancellation (Optional[NoiseCancellationOptions], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+                created by the noise cancellation module.
+
         Example:
             ```python
             audio_stream = AudioStream(
@@ -89,6 +101,11 @@ class AudioStream:
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
+        self._audio_filter_module = None
+        self._audio_filter_options = None
+        if noise_cancellation is not None:
+            self._audio_filter_module = noise_cancellation.module_id
+            self._audio_filter_options = noise_cancellation.options
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
@@ -112,6 +129,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        noise_cancellation: Optional[NoiseCancellationOptions] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -122,6 +140,9 @@ class AudioStream:
             capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
             sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
+            noise_cancellation (Optional[NoiseCancellationOptions], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+                created by the noise cancellation module.
 
         Returns:
             AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
@@ -144,6 +165,7 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
+            noise_cancellation=noise_cancellation,
         )
 
     @classmethod
@@ -155,6 +177,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        noise_cancellation: Optional[NoiseCancellationOptions] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -164,6 +187,9 @@ class AudioStream:
             capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
             sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
+            noise_cancellation (Optional[NoiseCancellationOptions], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+                created by the noise cancellation module.
 
         Returns:
             AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
@@ -183,6 +209,7 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
+            noise_cancellation=noise_cancellation,
         )
 
     def __del__(self) -> None:
@@ -196,6 +223,10 @@ class AudioStream:
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
+        if self._audio_filter_module is not None:
+            new_audio_stream.audio_filter_module_id = self._audio_filter_module
+        if self._audio_filter_options is not None:
+            new_audio_stream.audio_filter_options = json.dumps(self._audio_filter_options)
         resp = FfiClient.instance.request(req)
         return resp.new_audio_stream.stream
 
@@ -204,15 +235,17 @@ class AudioStream:
     ) -> Any:
         req = proto_ffi.FfiRequest()
         audio_stream_from_participant = req.audio_stream_from_participant
-        audio_stream_from_participant.participant_handle = (
-            participant._ffi_handle.handle
-        )
+        audio_stream_from_participant.participant_handle = participant._ffi_handle.handle
         audio_stream_from_participant.sample_rate = self._sample_rate
         audio_stream_from_participant.num_channels = self._num_channels
-        audio_stream_from_participant.type = (
-            proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
-        )
+        audio_stream_from_participant.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         audio_stream_from_participant.track_source = track_source
+        if self._audio_filter_module is not None:
+            audio_stream_from_participant.audio_filter_module_id = self._audio_filter_module
+        if self._audio_filter_options is not None:
+            audio_stream_from_participant.audio_filter_options = json.dumps(
+                self._audio_filter_options
+            )
         resp = FfiClient.instance.request(req)
         return resp.audio_stream_from_participant.stream
 

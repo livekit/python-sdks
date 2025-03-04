@@ -97,9 +97,7 @@ async def draw_cube(source: rtc.VideoSource):
 
 async def main(room: rtc.Room):
     @room.on("e2ee_state_changed")
-    def on_e2ee_state_changed(
-        participant: rtc.Participant, state: rtc.EncryptionState
-    ) -> None:
+    def on_e2ee_state_changed(participant: rtc.Participant, state: rtc.EncryptionState) -> None:
         logging.info("e2ee state changed: %s %s", participant.identity, state)
 
     logging.info("connecting to %s", URL)

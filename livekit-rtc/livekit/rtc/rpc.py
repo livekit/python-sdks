@@ -117,8 +117,6 @@ class RpcError(Exception):
         return proto_rpc.RpcError(code=self.code, message=self.message, data=self.data)
 
     @classmethod
-    def _built_in(
-        cls, code: "RpcError.ErrorCode", data: Optional[str] = None
-    ) -> "RpcError":
+    def _built_in(cls, code: "RpcError.ErrorCode", data: Optional[str] = None) -> "RpcError":
         message = cls.ErrorMessage[code]
         return cls(code, message, data)

@@ -27,20 +27,12 @@ async def main(room: rtc.Room):
             topic="files",
         )
 
-    async def on_chat_message_received(
-        reader: rtc.TextStreamReader, participant_identity: str
-    ):
+    async def on_chat_message_received(reader: rtc.TextStreamReader, participant_identity: str):
         full_text = await reader.read_all()
-        logger.info(
-            "Received chat message from %s: '%s'", participant_identity, full_text
-        )
+        logger.info("Received chat message from %s: '%s'", participant_identity, full_text)
 
-    async def on_welcome_image_received(
-        reader: rtc.ByteStreamReader, participant_identity: str
-    ):
-        logger.info(
-            "Received image from %s: '%s'", participant_identity, reader.info["name"]
-        )
+    async def on_welcome_image_received(reader: rtc.ByteStreamReader, participant_identity: str):
+        logger.info("Received image from %s: '%s'", participant_identity, reader.info["name"])
         with open(reader.info["name"], mode="wb") as f:
             async for chunk in reader:
                 f.write(chunk)
@@ -49,9 +41,7 @@ async def main(room: rtc.Room):
 
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant):
-        logger.info(
-            "participant connected: %s %s", participant.sid, participant.identity
-        )
+        logger.info("participant connected: %s %s", participant.sid, participant.identity)
         asyncio.create_task(greetParticipant(participant.identity))
 
     room.set_text_stream_handler(

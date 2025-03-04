@@ -72,9 +72,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
         face_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         face_landmarks_proto.landmark.extend(
             [
-                landmark_pb2.NormalizedLandmark(
-                    x=landmark.x, y=landmark.y, z=landmark.z
-                )
+                landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z)
                 for landmark in face_landmarks
             ]
         )
@@ -113,9 +111,7 @@ async def frame_loop(video_stream: rtc.VideoStream) -> None:
         arr = arr.reshape((buffer.height, buffer.width, 3))
 
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=arr)
-        detection_result = landmarker.detect_for_video(
-            mp_image, frame_event.timestamp_us
-        )
+        detection_result = landmarker.detect_for_video(mp_image, frame_event.timestamp_us)
 
         draw_landmarks_on_image(arr, detection_result)
 

@@ -70,6 +70,8 @@ class TextStreamReader:
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[str]:
@@ -110,14 +112,14 @@ class ByteStreamReader:
             attributes=dict(header.attributes),
             name=header.byte_header.name,
         )
-        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(
-            capacity
-        )
+        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(capacity)
 
     async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
         await self._queue.put(chunk)
 
     async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+        self.info.attributes = self.info.attributes or {}
+        self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
 
     def __aiter__(self) -> AsyncIterator[bytes]:
@@ -162,6 +164,7 @@ class BaseStreamWriter:
         self._next_chunk_index: int = 0
         self._destination_identities = destination_identities
         self._sender_identity = sender_identity or self._local_participant.identity
+        self._closed = False
 
     async def _send_header(self):
         req = proto_ffi.FfiRequest(
@@ -177,8 +180,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_header.async_id
-                == resp.send_stream_header.async_id
+                lambda e: e.send_stream_header.async_id == resp.send_stream_header.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -187,6 +189,8 @@ class BaseStreamWriter:
             raise ConnectionError(cb.send_stream_header.error)
 
     async def _send_chunk(self, chunk: proto_DataStream.Chunk):
+        if self._closed:
+            raise RuntimeError(f"Cannot send chunk after stream is closed: {chunk}")
         req = proto_ffi.FfiRequest(
             send_stream_chunk=proto_room.SendStreamChunkRequest(
                 chunk=chunk,
@@ -200,8 +204,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_chunk.async_id
-                == resp.send_stream_chunk.async_id
+                lambda e: e.send_stream_chunk.async_id == resp.send_stream_chunk.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -222,8 +225,7 @@ class BaseStreamWriter:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_trailer.async_id
-                == resp.send_stream_trailer.async_id
+                lambda e: e.send_stream_trailer.async_id == resp.send_stream_trailer.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -231,9 +233,10 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(
-        self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
-    ):
+    async def aclose(self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None):
+        if self._closed:
+            raise RuntimeError("Stream already closed")
+        self._closed = True
         await self._send_trailer(
             trailer=proto_DataStream.Trailer(
                 stream_id=self._header.stream_id, reason=reason, attributes=attributes
@@ -333,8 +336,7 @@ class ByteStreamWriter(BaseStreamWriter):
     async def write(self, data: bytes):
         async with self._write_lock:
             chunked_data = [
-                data[i : i + STREAM_CHUNK_SIZE]
-                for i in range(0, len(data), STREAM_CHUNK_SIZE)
+                data[i : i + STREAM_CHUNK_SIZE] for i in range(0, len(data), STREAM_CHUNK_SIZE)
             ]
 
             for chunk in chunked_data:

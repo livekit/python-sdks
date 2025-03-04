@@ -56,9 +56,7 @@ class AudioSource:
         self._loop = loop or asyncio.get_event_loop()
 
         req = proto_ffi.FfiRequest()
-        req.new_audio_source.type = (
-            proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
-        )
+        req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
         req.new_audio_source.sample_rate = sample_rate
         req.new_audio_source.num_channels = num_channels
         req.new_audio_source.queue_size_ms = queue_size_ms
@@ -142,8 +140,7 @@ class AudioSource:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.capture_audio_frame.async_id
-                == resp.capture_audio_frame.async_id
+                lambda e: e.capture_audio_frame.async_id == resp.capture_audio_frame.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)

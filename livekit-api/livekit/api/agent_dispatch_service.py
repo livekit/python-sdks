@@ -26,9 +26,7 @@ class AgentDispatchService(Service):
     ```
     """
 
-    def __init__(
-        self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str
-    ):
+    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
         super().__init__(session, url, api_key, api_secret)
 
     async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
@@ -89,9 +87,7 @@ class AgentDispatchService(Service):
         )
         return list(res.agent_dispatches)
 
-    async def get_dispatch(
-        self, dispatch_id: str, room_name: str
-    ) -> Optional[AgentDispatch]:
+    async def get_dispatch(self, dispatch_id: str, room_name: str) -> Optional[AgentDispatch]:
         """Get an Agent dispatch by ID
 
         Args:

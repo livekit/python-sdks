@@ -15,9 +15,7 @@ async def main():
 
     @room.on("participant_connected")
     def on_participant_connected(participant: rtc.RemoteParticipant):
-        logger.info(
-            "participant connected: %s %s", participant.sid, participant.identity
-        )
+        logger.info("participant connected: %s %s", participant.sid, participant.identity)
 
     async def receive_frames(stream: rtc.VideoStream):
         async for frame in stream:

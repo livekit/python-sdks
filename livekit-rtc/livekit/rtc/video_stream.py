@@ -122,12 +122,8 @@ class VideoStream:
     ) -> Any:
         req = proto_ffi.FfiRequest()
         video_stream_from_participant = req.video_stream_from_participant
-        video_stream_from_participant.participant_handle = (
-            participant._ffi_handle.handle
-        )
-        video_stream_from_participant.type = (
-            proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
-        )
+        video_stream_from_participant.participant_handle = participant._ffi_handle.handle
+        video_stream_from_participant.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
         video_stream_from_participant.track_source = track_source
         video_stream_from_participant.normalize_stride = True
         if self._format is not None:
