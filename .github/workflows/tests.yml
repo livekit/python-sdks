@@ -23,5 +23,5 @@ jobs:
       - name: Run tests
         run: |
           python3 ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
-          pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc pydantic
+          pip3 install pytest ./livekit-protocol ./livekit-api ./livekit-rtc pydantic numpy
           pytest . --ignore=livekit-rtc/rust-sdks
