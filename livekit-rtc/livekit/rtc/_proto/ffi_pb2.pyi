@@ -112,6 +112,7 @@ class FfiRequest(google.protobuf.message.Message):
     LOCAL_TRACK_MUTE_FIELD_NUMBER: builtins.int
     ENABLE_REMOTE_TRACK_FIELD_NUMBER: builtins.int
     GET_STATS_FIELD_NUMBER: builtins.int
+    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: builtins.int
     NEW_VIDEO_STREAM_FIELD_NUMBER: builtins.int
     NEW_VIDEO_SOURCE_FIELD_NUMBER: builtins.int
     CAPTURE_VIDEO_FRAME_FIELD_NUMBER: builtins.int
@@ -136,6 +137,14 @@ class FfiRequest(google.protobuf.message.Message):
     RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
     ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: builtins.int
     UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
+    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: builtins.int
+    NEW_APM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_STREAM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: builtins.int
     @property
     def dispose(self) -> global___DisposeRequest: ...
     @property
@@ -176,6 +185,8 @@ class FfiRequest(google.protobuf.message.Message):
     def enable_remote_track(self) -> track_pb2.EnableRemoteTrackRequest: ...
     @property
     def get_stats(self) -> track_pb2.GetStatsRequest: ...
+    @property
+    def set_track_subscription_permissions(self) -> track_pb2.SetTrackSubscriptionPermissionsRequest: ...
     @property
     def new_video_stream(self) -> video_frame_pb2.NewVideoStreamRequest:
         """Video"""
@@ -232,6 +243,28 @@ class FfiRequest(google.protobuf.message.Message):
 
     @property
     def update_remote_track_publication_dimension(self) -> track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderRequest:
+        """Data Streams"""
+
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkRequest: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerRequest: ...
+    @property
+    def set_data_channel_buffered_amount_low_threshold(self) -> room_pb2.SetDataChannelBufferedAmountLowThresholdRequest:
+        """Data Channel"""
+
+    @property
+    def load_audio_filter_plugin(self) -> audio_frame_pb2.LoadAudioFilterPluginRequest:
+        """Audio Filter Plugin"""
+
+    @property
+    def new_apm(self) -> audio_frame_pb2.NewApmRequest: ...
+    @property
+    def apm_process_stream(self) -> audio_frame_pb2.ApmProcessStreamRequest: ...
+    @property
+    def apm_process_reverse_stream(self) -> audio_frame_pb2.ApmProcessReverseStreamRequest: ...
     def __init__(
         self,
         *,
@@ -253,6 +286,7 @@ class FfiRequest(google.protobuf.message.Message):
         local_track_mute: track_pb2.LocalTrackMuteRequest | None = ...,
         enable_remote_track: track_pb2.EnableRemoteTrackRequest | None = ...,
         get_stats: track_pb2.GetStatsRequest | None = ...,
+        set_track_subscription_permissions: track_pb2.SetTrackSubscriptionPermissionsRequest | None = ...,
         new_video_stream: video_frame_pb2.NewVideoStreamRequest | None = ...,
         new_video_source: video_frame_pb2.NewVideoSourceRequest | None = ...,
         capture_video_frame: video_frame_pb2.CaptureVideoFrameRequest | None = ...,
@@ -277,10 +311,18 @@ class FfiRequest(google.protobuf.message.Message):
         rpc_method_invocation_response: rpc_pb2.RpcMethodInvocationResponseRequest | None = ...,
         enable_remote_track_publication: track_publication_pb2.EnableRemoteTrackPublicationRequest | None = ...,
         update_remote_track_publication_dimension: track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderRequest | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkRequest | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerRequest | None = ...,
+        set_data_channel_buffered_amount_low_threshold: room_pb2.SetDataChannelBufferedAmountLowThresholdRequest | None = ...,
+        load_audio_filter_plugin: audio_frame_pb2.LoadAudioFilterPluginRequest | None = ...,
+        new_apm: audio_frame_pb2.NewApmRequest | None = ...,
+        apm_process_stream: audio_frame_pb2.ApmProcessStreamRequest | None = ...,
+        apm_process_reverse_stream: audio_frame_pb2.ApmProcessReverseStreamRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "local_track_mute", b"local_track_mute", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "local_track_mute", b"local_track_mute", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "e2ee", "audio_stream_from_participant", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "edit_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension"] | None: ...
+    def HasField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "e2ee", "audio_stream_from_participant", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "edit_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream"] | None: ...
 
 global___FfiRequest = FfiRequest
 
@@ -308,6 +350,7 @@ class FfiResponse(google.protobuf.message.Message):
     LOCAL_TRACK_MUTE_FIELD_NUMBER: builtins.int
     ENABLE_REMOTE_TRACK_FIELD_NUMBER: builtins.int
     GET_STATS_FIELD_NUMBER: builtins.int
+    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: builtins.int
     NEW_VIDEO_STREAM_FIELD_NUMBER: builtins.int
     NEW_VIDEO_SOURCE_FIELD_NUMBER: builtins.int
     CAPTURE_VIDEO_FRAME_FIELD_NUMBER: builtins.int
@@ -331,6 +374,14 @@ class FfiResponse(google.protobuf.message.Message):
     RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
     ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: builtins.int
     UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
+    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: builtins.int
+    NEW_APM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_STREAM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: builtins.int
     @property
     def dispose(self) -> global___DisposeResponse: ...
     @property
@@ -371,6 +422,8 @@ class FfiResponse(google.protobuf.message.Message):
     def enable_remote_track(self) -> track_pb2.EnableRemoteTrackResponse: ...
     @property
     def get_stats(self) -> track_pb2.GetStatsResponse: ...
+    @property
+    def set_track_subscription_permissions(self) -> track_pb2.SetTrackSubscriptionPermissionsResponse: ...
     @property
     def new_video_stream(self) -> video_frame_pb2.NewVideoStreamResponse:
         """Video"""
@@ -425,6 +478,28 @@ class FfiResponse(google.protobuf.message.Message):
 
     @property
     def update_remote_track_publication_dimension(self) -> track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderResponse:
+        """Data Streams"""
+
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkResponse: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerResponse: ...
+    @property
+    def set_data_channel_buffered_amount_low_threshold(self) -> room_pb2.SetDataChannelBufferedAmountLowThresholdResponse:
+        """Data Channel"""
+
+    @property
+    def load_audio_filter_plugin(self) -> audio_frame_pb2.LoadAudioFilterPluginResponse:
+        """Audio Filter Plugin"""
+
+    @property
+    def new_apm(self) -> audio_frame_pb2.NewApmResponse: ...
+    @property
+    def apm_process_stream(self) -> audio_frame_pb2.ApmProcessStreamResponse: ...
+    @property
+    def apm_process_reverse_stream(self) -> audio_frame_pb2.ApmProcessReverseStreamResponse: ...
     def __init__(
         self,
         *,
@@ -446,6 +521,7 @@ class FfiResponse(google.protobuf.message.Message):
         local_track_mute: track_pb2.LocalTrackMuteResponse | None = ...,
         enable_remote_track: track_pb2.EnableRemoteTrackResponse | None = ...,
         get_stats: track_pb2.GetStatsResponse | None = ...,
+        set_track_subscription_permissions: track_pb2.SetTrackSubscriptionPermissionsResponse | None = ...,
         new_video_stream: video_frame_pb2.NewVideoStreamResponse | None = ...,
         new_video_source: video_frame_pb2.NewVideoSourceResponse | None = ...,
         capture_video_frame: video_frame_pb2.CaptureVideoFrameResponse | None = ...,
@@ -469,10 +545,18 @@ class FfiResponse(google.protobuf.message.Message):
         rpc_method_invocation_response: rpc_pb2.RpcMethodInvocationResponseResponse | None = ...,
         enable_remote_track_publication: track_publication_pb2.EnableRemoteTrackPublicationResponse | None = ...,
         update_remote_track_publication_dimension: track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderResponse | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkResponse | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerResponse | None = ...,
+        set_data_channel_buffered_amount_low_threshold: room_pb2.SetDataChannelBufferedAmountLowThresholdResponse | None = ...,
+        load_audio_filter_plugin: audio_frame_pb2.LoadAudioFilterPluginResponse | None = ...,
+        new_apm: audio_frame_pb2.NewApmResponse | None = ...,
+        apm_process_stream: audio_frame_pb2.ApmProcessStreamResponse | None = ...,
+        apm_process_reverse_stream: audio_frame_pb2.ApmProcessReverseStreamResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "local_track_mute", b"local_track_mute", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "local_track_mute", b"local_track_mute", "message", b"message", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "audio_stream_from_participant", "e2ee", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension"] | None: ...
+    def HasField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "audio_stream_from_participant", b"audio_stream_from_participant", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_chat_message", b"send_chat_message", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "audio_stream_from_participant", "e2ee", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream"] | None: ...
 
 global___FfiResponse = FfiResponse
 
@@ -508,6 +592,9 @@ class FfiEvent(google.protobuf.message.Message):
     CHAT_MESSAGE_FIELD_NUMBER: builtins.int
     PERFORM_RPC_FIELD_NUMBER: builtins.int
     RPC_METHOD_INVOCATION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
     @property
     def room_event(self) -> room_pb2.RoomEvent: ...
     @property
@@ -554,6 +641,12 @@ class FfiEvent(google.protobuf.message.Message):
     def perform_rpc(self) -> rpc_pb2.PerformRpcCallback: ...
     @property
     def rpc_method_invocation(self) -> rpc_pb2.RpcMethodInvocationEvent: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderCallback: ...
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkCallback: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerCallback: ...
     def __init__(
         self,
         *,
@@ -580,10 +673,13 @@ class FfiEvent(google.protobuf.message.Message):
         chat_message: room_pb2.SendChatMessageCallback | None = ...,
         perform_rpc: rpc_pb2.PerformRpcCallback | None = ...,
         rpc_method_invocation: rpc_pb2.RpcMethodInvocationEvent | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderCallback | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkCallback | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerCallback | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf", "chat_message", "perform_rpc", "rpc_method_invocation"] | None: ...
+    def HasField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf", "chat_message", "perform_rpc", "rpc_method_invocation", "send_stream_header", "send_stream_chunk", "send_stream_trailer"] | None: ...
 
 global___FfiEvent = FfiEvent
 
