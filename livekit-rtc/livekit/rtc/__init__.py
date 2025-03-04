@@ -77,6 +77,7 @@ from .video_frame import (
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
+from .apm import AudioProcessingModule
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
 from .synchronizer import AVSynchronizer
@@ -163,5 +164,6 @@ __all__ = [
     "TextStreamWriter",
     "ByteStreamReader",
     "ByteStreamWriter",
+    "AudioProcessingModule",
     "__version__",
 ]

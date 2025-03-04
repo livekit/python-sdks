@@ -104,6 +104,9 @@ class FfiHandle:
             self._disposed = True
             assert ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
 
+    def __repr__(self) -> str:
+        return f"FfiHandle({self.handle})"
+
 
 T = TypeVar("T")
 
