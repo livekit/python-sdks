@@ -27,7 +27,7 @@ class AudioProcessingModule:
             echo_cancellation (bool, optional): Whether to enable echo cancellation.
             noise_suppression (bool, optional): Whether to enable noise suppression.
             high_pass_filter (bool, optional): Whether to enable a high-pass filter.
-            auto_gain_control (bool, optional): Whether to enable a gain controller.
+            auto_gain_control (bool, optional): Whether to enable auto gain control.
         """
         req = proto_ffi.FfiRequest()
         req.new_apm.echo_canceller_enabled = echo_cancellation
