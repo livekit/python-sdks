@@ -7,6 +7,11 @@ from .audio_frame import AudioFrame
 
 
 class AudioProcessingModule:
+    """
+    Provides WebRTC audio processing capabilities including echo cancellation, noise suppression,
+    high-pass filtering, and gain control.
+    """
+
     def __init__(
         self,
         *,
@@ -15,6 +20,15 @@ class AudioProcessingModule:
         high_pass_filter_enabled: bool = False,
         gain_controller_enabled: bool = False,
     ) -> None:
+        """
+        Initialize an AudioProcessingModule instance with the specified audio processing features.
+
+        Args:
+            echo_canceller_enabled (bool, optional): Whether to enable echo cancellation.
+            noise_suppression_enabled (bool, optional): Whether to enable noise suppression.
+            high_pass_filter_enabled (bool, optional): Whether to enable a high-pass filter.
+            gain_controller_enabled (bool, optional): Whether to enable a gain controller.
+        """
         req = proto_ffi.FfiRequest()
         req.new_apm.echo_canceller_enabled = echo_canceller_enabled
         req.new_apm.noise_suppression_enabled = noise_suppression_enabled
@@ -25,6 +39,15 @@ class AudioProcessingModule:
         self._ffi_handle = FfiHandle(resp.new_apm.apm.handle.id)
 
     def process_stream(self, data: AudioFrame) -> None:
+        """
+        Process the provided audio frame using the configured audio processing features.
+
+        The input audio frame is modified in-place (if applicable) by the underlying audio
+        processing module (e.g., echo cancellation, noise suppression, etc.).
+
+        Important:
+            Audio frames must be exactly 10 ms in duration.
+        """
         bdata = data.data.cast("b")
 
         req = proto_ffi.FfiRequest()
@@ -37,9 +60,19 @@ class AudioProcessingModule:
         resp = FfiClient.instance.request(req)
 
         if resp.apm_process_stream.error:
-            raise Exception(resp.apm_process_stream.error)
+            raise RuntimeError(resp.apm_process_stream.error)
 
     def process_reverse_stream(self, data: AudioFrame) -> None:
+        """
+        Process the reverse audio frame (typically used for echo cancellation in a full-duplex setup).
+
+        In an echo cancellation scenario, this method is used to process the "far-end" audio
+        prior to mixing or feeding it into the echo canceller. Like `process_stream`, the
+        input audio frame is modified in-place by the underlying processing module.
+
+        Important:
+            Audio frames must be exactly 10 ms in duration.
+        """
         bdata = data.data.cast("b")
 
         req = proto_ffi.FfiRequest()
@@ -52,4 +85,4 @@ class AudioProcessingModule:
         resp = FfiClient.instance.request(req)
 
         if resp.apm_process_stream.error:
-            raise Exception(resp.apm_process_stream.error)
+            raise RuntimeError(resp.apm_process_stream.error)

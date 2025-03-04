@@ -39,8 +39,6 @@ def test_audio_processing():
         wf_out.setsampwidth(sampwidth)
         wf_out.setframerate(sample_rate)
 
-        bytes_per_sample = sampwidth
-
         while True:
             capture_bytes = wf_in_cap.readframes(frames_per_chunk)
             render_bytes = wf_in_rend.readframes(frames_per_chunk)
@@ -54,13 +52,9 @@ def test_audio_processing():
 
             # Pad if necessary
             if len(capture_data) < frames_per_chunk:
-                capture_data = np.pad(
-                    capture_data, (0, frames_per_chunk - len(capture_data))
-                )
+                capture_data = np.pad(capture_data, (0, frames_per_chunk - len(capture_data)))
             if len(render_data) < frames_per_chunk:
-                render_data = np.pad(
-                    render_data, (0, frames_per_chunk - len(render_data))
-                )
+                render_data = np.pad(render_data, (0, frames_per_chunk - len(render_data)))
 
             capture_frame = AudioFrame(
                 data=capture_data.tobytes(),
