@@ -17,10 +17,10 @@ def test_audio_processing():
 
     # Initialize APM with echo cancellation enabled
     apm = AudioProcessingModule(
-        echo_canceller_enabled=True,
-        noise_suppression_enabled=True,
-        high_pass_filter_enabled=True,
-        gain_controller_enabled=True,
+        echo_cancellation=True,
+        noise_suppression=True,
+        high_pass_filter=True,
+        auto_gain_control=True,
     )
     print("APM Internal Handle:", apm._ffi_handle)
 

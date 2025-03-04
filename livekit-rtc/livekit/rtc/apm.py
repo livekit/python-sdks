@@ -15,25 +15,25 @@ class AudioProcessingModule:
     def __init__(
         self,
         *,
-        echo_canceller_enabled: bool = False,
-        noise_suppression_enabled: bool = False,
-        high_pass_filter_enabled: bool = False,
-        gain_controller_enabled: bool = False,
+        echo_cancellation: bool = False,
+        noise_suppression: bool = False,
+        high_pass_filter: bool = False,
+        auto_gain_control: bool = False,
     ) -> None:
         """
         Initialize an AudioProcessingModule instance with the specified audio processing features.
 
         Args:
-            echo_canceller_enabled (bool, optional): Whether to enable echo cancellation.
-            noise_suppression_enabled (bool, optional): Whether to enable noise suppression.
-            high_pass_filter_enabled (bool, optional): Whether to enable a high-pass filter.
-            gain_controller_enabled (bool, optional): Whether to enable a gain controller.
+            echo_cancellation (bool, optional): Whether to enable echo cancellation.
+            noise_suppression (bool, optional): Whether to enable noise suppression.
+            high_pass_filter (bool, optional): Whether to enable a high-pass filter.
+            auto_gain_control (bool, optional): Whether to enable auto gain control.
         """
         req = proto_ffi.FfiRequest()
-        req.new_apm.echo_canceller_enabled = echo_canceller_enabled
-        req.new_apm.noise_suppression_enabled = noise_suppression_enabled
-        req.new_apm.high_pass_filter_enabled = high_pass_filter_enabled
-        req.new_apm.gain_controller_enabled = gain_controller_enabled
+        req.new_apm.echo_canceller_enabled = echo_cancellation
+        req.new_apm.noise_suppression_enabled = noise_suppression
+        req.new_apm.high_pass_filter_enabled = high_pass_filter
+        req.new_apm.gain_controller_enabled = auto_gain_control
 
         resp = FfiClient.instance.request(req)
         self._ffi_handle = FfiHandle(resp.new_apm.apm.handle.id)
