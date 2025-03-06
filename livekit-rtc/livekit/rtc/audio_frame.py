@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import ctypes
-from ._ffi_client import FfiHandle, FfiClient
+from ._ffi_client import FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio
-from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
 from typing import Any, Union
 
