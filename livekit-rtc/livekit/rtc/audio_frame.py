@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import ctypes
-from ._ffi_client import FfiHandle, FfiClient
+from ._ffi_client import FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio
-from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
 from typing import Any, Union
 
@@ -92,28 +91,6 @@ class AudioFrame:
         data = bytearray(cdata)
         FfiHandle(owned_info.handle.id)
         return AudioFrame(data, info.sample_rate, info.num_channels, info.samples_per_channel)
-
-    def remix_and_resample(self, sample_rate: int, num_channels: int) -> "AudioFrame":
-        """Resample the audio frame to the given sample rate and number of channels.
-
-        .. warning::
-            This method is deprecated and will be removed in a future release.
-            Please use the `rtc.AudioResampler` class instead.
-        """
-        req = proto_ffi.FfiRequest()
-        req.new_audio_resampler.CopyFrom(proto_audio.NewAudioResamplerRequest())
-
-        resp = FfiClient.instance.request(req)
-        resampler_handle = FfiHandle(resp.new_audio_resampler.resampler.handle.id)
-
-        resample_req = proto_ffi.FfiRequest()
-        resample_req.remix_and_resample.resampler_handle = resampler_handle.handle
-        resample_req.remix_and_resample.buffer.CopyFrom(self._proto_info())
-        resample_req.remix_and_resample.sample_rate = sample_rate
-        resample_req.remix_and_resample.num_channels = num_channels
-
-        resp = FfiClient.instance.request(resample_req)
-        return AudioFrame._from_owned_info(resp.remix_and_resample.buffer)
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:
         audio_info = proto_audio.AudioFrameBufferInfo()
