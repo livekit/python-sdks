@@ -38,7 +38,6 @@ from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream, NoiseCancellationOptions
 from .audio_filter import AudioFilter
-from .chat import ChatManager, ChatMessage
 from .e2ee import (
     E2EEManager,
     E2EEOptions,
@@ -149,8 +148,6 @@ __all__ = [
     "VideoFrameEvent",
     "VideoSource",
     "VideoStream",
-    "ChatManager",
-    "ChatMessage",
     "AudioResampler",
     "AudioResamplerQuality",
     "RpcError",
