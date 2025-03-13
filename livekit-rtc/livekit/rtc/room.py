@@ -26,7 +26,8 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
-from ._proto.rpc_pb2 import RpcMethodInvocationEvent
+from ._proto.rpc_pb2 import RpcMethodInvocationEvent, RpcMethodInvocationResponseRequest
+
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
