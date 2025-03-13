@@ -199,7 +199,7 @@ class VideoFrame:
         return VideoFrame._from_owned_info(resp.video_convert.buffer)
 
     def __repr__(self) -> str:
-        return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={self.type})"
+        return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={proto_video.VideoBufferType.Name(self.type)})"
 
     @classmethod
     def __get_pydantic_core_schema__(cls, *_: Any):
