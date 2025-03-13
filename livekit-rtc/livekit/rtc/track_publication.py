@@ -12,21 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
+from typing import Optional, cast
 import asyncio
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
-from .track import Track
+from .track import Track, LocalTrack, RemoteTrack
 
 
 class TrackPublication:
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):
         self._info = owned_info.info
-        self.track: Optional[Track] = None
+        self._track: Optional[Track] = None
         self._ffi_handle = FfiHandle(owned_info.handle.id)
+
+    @property
+    def track(self) -> Optional[Track]:
+        return self._track
 
     @property
     def sid(self) -> str:
@@ -74,6 +78,10 @@ class LocalTrackPublication(TrackPublication):
         super().__init__(owned_info)
         self._first_subscription: asyncio.Future[None] = asyncio.Future()
 
+    @property
+    def track(self) -> Optional[LocalTrack]:
+        return cast(Optional[LocalTrack], self._track)
+
     async def wait_for_subscription(self) -> None:
         await asyncio.shield(self._first_subscription)
 
@@ -84,7 +92,15 @@ class LocalTrackPublication(TrackPublication):
 class RemoteTrackPublication(TrackPublication):
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):
         super().__init__(owned_info)
-        self.subscribed = False
+        self._subscribed = False
+
+    @property
+    def track(self) -> Optional[RemoteTrack]:
+        return cast(Optional[RemoteTrack], self._track)
+
+    @property
+    def subscribed(self) -> bool:
+        return self._subscribed
 
     def set_subscribed(self, subscribed: bool):
         req = proto_ffi.FfiRequest()

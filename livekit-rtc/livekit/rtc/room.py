@@ -508,8 +508,8 @@ class Room(EventEmitter[EventTypes]):
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
-            track = lpublication.track
-            self.emit("local_track_published", lpublication, track)
+            ltrack = lpublication.track
+            self.emit("local_track_published", lpublication, ltrack)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
@@ -535,23 +535,23 @@ class Room(EventEmitter[EventTypes]):
             track_info = owned_track_info.info
             rparticipant = self._remote_participants[event.track_subscribed.participant_identity]
             rpublication = rparticipant.track_publications[track_info.sid]
-            rpublication.subscribed = True
+            rpublication._subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 remote_video_track = RemoteVideoTrack(owned_track_info)
-                rpublication.track = remote_video_track
+                rpublication._track = remote_video_track
                 self.emit("track_subscribed", remote_video_track, rpublication, rparticipant)
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 remote_audio_track = RemoteAudioTrack(owned_track_info)
-                rpublication.track = remote_audio_track
+                rpublication._track = remote_audio_track
                 self.emit("track_subscribed", remote_audio_track, rpublication, rparticipant)
         elif which == "track_unsubscribed":
             identity = event.track_unsubscribed.participant_identity
             rparticipant = self._remote_participants[identity]
             rpublication = rparticipant.track_publications[event.track_unsubscribed.track_sid]
-            track = rpublication.track
-            rpublication.track = None
-            rpublication.subscribed = False
-            self.emit("track_unsubscribed", track, rpublication, rparticipant)
+            rtrack = rpublication.track
+            rpublication._track = None
+            rpublication._subscribed = False
+            self.emit("track_unsubscribed", rtrack, rpublication, rparticipant)
         elif which == "track_subscription_failed":
             identity = event.track_subscription_failed.participant_identity
             rparticipant = self._remote_participants[identity]
@@ -828,4 +828,4 @@ class Room(EventEmitter[EventTypes]):
         if self._first_sid_future.done():
             sid = self._first_sid_future.result()
 
-        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={self._connection_state})"
+        return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={ConnectionState.Name(self._connection_state)})"
