@@ -952,7 +952,7 @@ class Room(EventEmitter[EventTypes]):
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
-                local_participant_handle=self._ffi_handle.handle,
+                local_participant_handle=self._local_participant._ffi_handle.handle,
                 invocation_id=invocation_id,
                 error=response_error._to_proto() if response_error else None,
                 payload=response_payload,
