@@ -199,7 +199,7 @@ class VideoFrame:
         return VideoFrame._from_owned_info(resp.video_convert.buffer)
 
     def __repr__(self) -> str:
-        return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={self.type})"
+        return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={proto_video.VideoBufferType.Name(self.type)})"
 
     @classmethod
     def __get_pydantic_core_schema__(cls, *_: Any):
@@ -217,7 +217,7 @@ class VideoFrame:
                 return VideoFrame(
                     width=value["width"],
                     height=value["height"],
-                    type=proto_video.VideoBufferType.ValueType(value["type"]),
+                    type=proto_video.VideoBufferType.Value(value["type"]),
                     data=base64.b64decode(value["data"]),
                 )
 
@@ -230,7 +230,7 @@ class VideoFrame:
                         {
                             "width": core_schema.model_field(core_schema.int_schema()),
                             "height": core_schema.model_field(core_schema.int_schema()),
-                            "type": core_schema.model_field(core_schema.int_schema()),
+                            "type": core_schema.model_field(core_schema.str_schema()),
                             "data": core_schema.model_field(core_schema.str_schema()),
                         },
                     ),
@@ -242,7 +242,7 @@ class VideoFrame:
                 lambda instance: {
                     "width": instance.width,
                     "height": instance.height,
-                    "type": instance.type,
+                    "type": proto_video.VideoBufferType.Name(instance.type),
                     "data": base64.b64encode(instance.data).decode("utf-8"),
                 }
             ),
