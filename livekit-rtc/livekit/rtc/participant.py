@@ -704,7 +704,7 @@ class LocalParticipant(Participant):
                 raise PublishTrackError(cb.publish_track.error)
 
             track_publication = LocalTrackPublication(cb.publish_track.publication)
-            track_publication.track = track
+            track_publication._track = track
             track._info.sid = track_publication.sid
             self._track_publications[track_publication.sid] = track_publication
 
@@ -739,7 +739,7 @@ class LocalParticipant(Participant):
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
             publication = self._track_publications.pop(track_sid)
-            publication.track = None
+            publication._track = None
             queue.task_done()
         finally:
             self._room_queue.unsubscribe(queue)
