@@ -17,7 +17,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping
+from typing import Callable, Dict, Literal, Optional, cast, Mapping, Union, Awaitable
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -30,6 +30,7 @@ from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
 from .participant import LocalParticipant, Participant, RemoteParticipant
+from .rpc import RpcInvocationData, RpcError
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
@@ -39,6 +40,7 @@ from .data_stream import (
     TextStreamHandler,
     ByteStreamHandler,
 )
+from .log import logger
 
 
 EventTypes = Literal[

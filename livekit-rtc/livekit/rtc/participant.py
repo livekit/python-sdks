@@ -15,12 +15,11 @@
 from __future__ import annotations
 
 import ctypes
-import asyncio
 import os
 import mimetypes
 import aiofiles
 import weakref
-from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TYPE_CHECKING
+from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, TYPE_CHECKING
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -44,8 +43,6 @@ from .track_publication import (
 )
 from .transcription import Transcription
 from .rpc import RpcError
-from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
-from .log import logger
 
 from .rpc import RpcInvocationData
 from .data_stream import (
