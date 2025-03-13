@@ -955,7 +955,8 @@ class Room(EventEmitter[EventTypes]):
                 )
                 response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
-        assert self._local_participant is not None # _local_participant is guaranteed to be set after connect()
+        # _local_participant is guaranteed to be set after connect()
+        assert self._local_participant is not None
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
                 local_participant_handle=self._local_participant._ffi_handle.handle,
