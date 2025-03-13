@@ -141,6 +141,9 @@ class Room(EventEmitter[EventTypes]):
         self._loop = loop or asyncio.get_event_loop()
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
+        self._rpc_handlers: Dict[
+            str, Callable[[RpcInvocationData], Union[Awaitable[str], str]]
+        ] = {}
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
         self._data_stream_tasks: set[asyncio.Task] = set()
 
@@ -394,7 +397,7 @@ class Room(EventEmitter[EventTypes]):
         self._connection_state = ConnectionState.CONN_CONNECTED
 
         self._local_participant = LocalParticipant(
-            self._room_queue, cb.connect.result.local_participant
+            self._room_queue, cb.connect.result.local_participant, self
         )
 
         for pt in cb.connect.result.participants:
@@ -449,6 +452,76 @@ class Room(EventEmitter[EventTypes]):
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
+    def register_rpc_method(
+        self,
+        method_name: str,
+        handler: Optional[Callable[[RpcInvocationData], Union[Awaitable[str], str]]] = None,
+    ) -> Union[None, Callable]:
+        """
+        Establishes the participant as a receiver for calls of the specified RPC method.
+        Can be used either as a decorator or a regular method.
+
+        The handler will receive one argument of type `RpcInvocationData` and should return a string response which will be forwarded back to the caller.
+
+        The handler may be synchronous or asynchronous.
+
+        If unable to respond within `response_timeout`, the caller will hang up and receive an error on their side.
+
+        You may raise errors of type `RpcError` in the handler, and they will be forwarded to the caller.
+
+        Other errors raised in your handler will be caught and forwarded to the caller as "1500 Application Error".
+
+        Args:
+            method_name (str): The name of the indicated RPC method.
+            handler (Optional[Callable]): Handler to be invoked whenever an RPC request for this method is received.  Omit this argument to use the decorator syntax.
+
+        Returns:
+            None (when used as a decorator it returns the decorator function)
+
+        Example:
+            # As a decorator:
+            @room.register_rpc_method("greet")
+            async def greet_handler(data: RpcInvocationData) -> str:
+                print(f"Received greeting from {data.caller_identity}: {data.payload}")
+                return f"Hello, {data.caller_identity}!"
+
+            # As a regular method:
+            async def greet_handler(data: RpcInvocationData) -> str:
+                print(f"Received greeting from {data.caller_identity}: {data.payload}")
+                return f"Hello, {data.caller_identity}!"
+
+            room.register_rpc_method('greet', greet_handler)
+        """
+
+        def register(handler_func):
+            self._rpc_handlers[method_name] = handler_func
+            req = proto_ffi.FfiRequest()
+            req.register_rpc_method.room_handle = self._ffi_handle.handle
+            req.register_rpc_method.method = method_name
+            FfiClient.instance.request(req)
+
+        if handler is not None:
+            register(handler)
+            return None
+        else:
+            # Called as a decorator
+            return register
+
+    def unregister_rpc_method(self, method: str) -> None:
+        """
+        Unregisters a previously registered RPC method.
+
+        Args:
+            method (str): The name of the RPC method to unregister
+        """
+        self._rpc_handlers.pop(method, None)
+
+        req = proto_ffi.FfiRequest()
+        req.unregister_rpc_method.room_handle = self._ffi_handle.handle
+        req.unregister_rpc_method.method = method
+
+        FfiClient.instance.request(req)
+
     async def _listen_task(self) -> None:
         # listen to incoming room events
         while True:
@@ -483,7 +556,7 @@ class Room(EventEmitter[EventTypes]):
 
         if rpc_invocation.local_participant_handle == self._local_participant._ffi_handle.handle:
             task = self._loop.create_task(
-                self._local_participant._handle_rpc_method_invocation(
+                self._handle_rpc_method_invocation(
                     rpc_invocation.invocation_id,
                     rpc_invocation.method,
                     rpc_invocation.request_id,
@@ -822,6 +895,72 @@ class Room(EventEmitter[EventTypes]):
         participant = RemoteParticipant(owned_info)
         self._remote_participants[participant.identity] = participant
         return participant
+
+    async def _handle_rpc_method_invocation(
+        self,
+        invocation_id: int,
+        method: str,
+        request_id: str,
+        caller_identity: str,
+        payload: str,
+        response_timeout: float,
+    ) -> None:
+        response_error: Optional[RpcError] = None
+        response_payload: Optional[str] = None
+
+        params = RpcInvocationData(request_id, caller_identity, payload, response_timeout)
+
+        handler = self._rpc_handlers.get(method)
+
+        if not handler:
+            response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
+        else:
+            try:
+                if asyncio.iscoroutinefunction(handler):
+                    async_handler = cast(Callable[[RpcInvocationData], Awaitable[str]], handler)
+
+                    async def run_handler():
+                        try:
+                            return await async_handler(params)
+                        except asyncio.CancelledError:
+                            # This will be caught by the outer try-except if it's due to timeout
+                            raise
+
+                    try:
+                        response_payload = await asyncio.wait_for(
+                            run_handler(), timeout=response_timeout
+                        )
+                    except asyncio.TimeoutError:
+                        raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+                    except asyncio.CancelledError:
+                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
+                else:
+                    sync_handler = cast(Callable[[RpcInvocationData], str], handler)
+                    response_payload = sync_handler(params)
+            except RpcError as error:
+                response_error = error
+            except Exception as error:
+                logger.exception(
+                    f"Uncaught error returned by RPC handler for {method}. "
+                    "Returning APPLICATION_ERROR instead. "
+                    f"Original error: {error}"
+                )
+                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+
+        req = proto_ffi.FfiRequest(
+            rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
+                local_participant_handle=self._ffi_handle.handle,
+                invocation_id=invocation_id,
+                error=response_error._to_proto() if response_error else None,
+                payload=response_payload,
+            )
+        )
+
+        res = FfiClient.instance.request(req)
+
+        if res.rpc_method_invocation_response.error:
+            message = res.rpc_method_invocation_response.error
+            logger.exception(f"error sending rpc method invocation response: {message}")
 
     def __repr__(self) -> str:
         sid = "unknown"
