@@ -508,8 +508,8 @@ class Room(EventEmitter[EventTypes]):
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
-            track = lpublication.track
-            self.emit("local_track_published", lpublication, track)
+            ltrack = lpublication.track
+            self.emit("local_track_published", lpublication, ltrack)
         elif which == "local_track_unpublished":
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
@@ -548,10 +548,10 @@ class Room(EventEmitter[EventTypes]):
             identity = event.track_unsubscribed.participant_identity
             rparticipant = self._remote_participants[identity]
             rpublication = rparticipant.track_publications[event.track_unsubscribed.track_sid]
-            track = rpublication.track
+            rtrack = rpublication.track
             rpublication._track = None
             rpublication._subscribed = False
-            self.emit("track_unsubscribed", track, rpublication, rparticipant)
+            self.emit("track_unsubscribed", rtrack, rpublication, rparticipant)
         elif which == "track_subscription_failed":
             identity = event.track_subscription_failed.participant_identity
             rparticipant = self._remote_participants[identity]
