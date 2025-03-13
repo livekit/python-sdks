@@ -135,24 +135,6 @@ async def main():
             print(f"\ttrack id: {publication}")
 ```
 
-### Sending and receiving chat
-
-```python
-
-room = rtc.Room()
-...
-
-chat = rtc.ChatManager(room)
-
-# receiving chat
-@chat.on("message_received")
-def on_message_received(msg: rtc.ChatMessage):
-    print(f"message received: {msg.participant.identity}: {msg.message}")
-
-# sending chat
-await chat.send_message("hello world")
-```
-
 ### RPC
 
 Perform your own predefined method calls from one participant to another.
