@@ -54,6 +54,7 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
+
 if TYPE_CHECKING:
     from .room import Room
 
