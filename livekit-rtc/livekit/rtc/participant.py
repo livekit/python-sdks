@@ -160,6 +160,10 @@ class LocalParticipant(Participant):
         self._room_ref = weakref.ref(room)
 
     @property
+    def room(self) -> Room | None:
+        return self._room_ref()
+
+    @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
         """
         A dictionary of track publications associated with the participant.
