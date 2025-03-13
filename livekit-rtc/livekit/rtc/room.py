@@ -497,6 +497,8 @@ class Room(EventEmitter[EventTypes]):
         """
 
         def register(handler_func):
+            if self._ffi_handle is None:
+                raise Exception("cannot register RPC method before room is connected")
             self._rpc_handlers[method_name] = handler_func
             req = proto_ffi.FfiRequest()
             req.register_rpc_method.room_handle = self._ffi_handle.handle
@@ -517,6 +519,9 @@ class Room(EventEmitter[EventTypes]):
         Args:
             method (str): The name of the RPC method to unregister
         """
+        if self._ffi_handle is None:
+            raise Exception("cannot unregister RPC method before room is connected")
+
         self._rpc_handlers.pop(method, None)
 
         req = proto_ffi.FfiRequest()

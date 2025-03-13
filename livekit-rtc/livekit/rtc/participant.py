@@ -374,6 +374,7 @@ class LocalParticipant(Participant):
         room = self.room
         if room is not None:
             return room.register_rpc_method(method_name, handler)
+        return None
 
     def unregister_rpc_method(self, method: str) -> None:
         """
