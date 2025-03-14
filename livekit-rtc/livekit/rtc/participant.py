@@ -21,6 +21,7 @@ import aiofiles
 import weakref
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, TYPE_CHECKING
 from abc import abstractmethod, ABC
+from deprecated import deprecated
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -329,6 +330,7 @@ class LocalParticipant(Participant):
 
         return cb.perform_rpc.payload
 
+    @deprecated(reason="Use room.register_rpc_method instead.")
     def register_rpc_method(
         self,
         method_name: str,
@@ -376,6 +378,7 @@ class LocalParticipant(Participant):
             return room.register_rpc_method(method_name, handler)
         return None
 
+    @deprecated(reason="Use room.unregister_rpc_method instead.")
     def unregister_rpc_method(self, method: str) -> None:
         """
         Deprecated
