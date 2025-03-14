@@ -79,18 +79,18 @@ global___PerformRpcRequest = PerformRpcRequest
 class RegisterRpcMethodRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     METHOD_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
+    room_handle: builtins.int
     method: builtins.str
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int | None = ...,
+        room_handle: builtins.int | None = ...,
         method: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "method", b"method"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "method", b"method"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["method", b"method", "room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["method", b"method", "room_handle", b"room_handle"]) -> None: ...
 
 global___RegisterRpcMethodRequest = RegisterRpcMethodRequest
 
@@ -98,18 +98,18 @@ global___RegisterRpcMethodRequest = RegisterRpcMethodRequest
 class UnregisterRpcMethodRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
     METHOD_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
+    room_handle: builtins.int
     method: builtins.str
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int | None = ...,
+        room_handle: builtins.int | None = ...,
         method: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "method", b"method"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "method", b"method"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["method", b"method", "room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["method", b"method", "room_handle", b"room_handle"]) -> None: ...
 
 global___UnregisterRpcMethodRequest = UnregisterRpcMethodRequest
 
