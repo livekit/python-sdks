@@ -18,6 +18,8 @@ import aiohttp
 from google.protobuf.message import Message
 from urllib.parse import urlparse
 
+import requests
+
 DEFAULT_PREFIX = "twirp"
 
 
@@ -97,3 +99,23 @@ class TwirpClient:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
                 raise TwirpError(error_data["code"], error_data["msg"])
+
+    def sync_request(
+        self,
+        service: str,
+        method: str,
+        data: Message,
+        headers: Dict[str, str],
+        response_class: Type[T],
+    ) -> T:
+        url = f"{self.host}/{self.prefix}/{self.pkg}.{service}/{method}"
+        headers["Content-Type"] = "application/protobuf"
+
+        serialized_data = data.SerializeToString()
+        resp = requests.post(url, headers=headers, data=serialized_data)
+        if resp.status_code == 200:
+            return response_class.FromString(resp.content)
+        else:
+            # when we have an error, Twirp always encode it in json
+            error_data = resp.json()
+            raise TwirpError(error_data["code"], error_data["msg"])
