@@ -28,8 +28,8 @@ class LiveKitAPI:
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
         *,
-        timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=60),  # 60 seconds
-        session: aiohttp.ClientSession | None = None,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
+        session: Optional[aiohttp.ClientSession] = None,
     ):
         """Create a new LiveKitAPI instance.
 
@@ -49,6 +49,9 @@ class LiveKitAPI:
 
         if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
+
+        if not timeout:
+            timeout = aiohttp.ClientTimeout(total=60)
 
         self._custom_session = True if session is None else False
         self._session = session or aiohttp.ClientSession(timeout=timeout)
