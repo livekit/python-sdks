@@ -29,6 +29,7 @@ class LiveKitAPI:
         api_secret: Optional[str] = None,
         *,
         timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=60),  # 60 seconds
+        session: aiohttp.ClientSession | None = None,
     ):
         """Create a new LiveKitAPI instance.
 
@@ -37,6 +38,7 @@ class LiveKitAPI:
             api_key: API key (read from `LIVEKIT_API_KEY` environment variable if not provided)
             api_secret: API secret (read from `LIVEKIT_API_SECRET` environment variable if not provided)
             timeout: Request timeout (default: 60 seconds)
+            session: aiohttp.ClientSession instance to use for requests, if not provided, a new one will be created
         """
         url = url or os.getenv("LIVEKIT_URL")
         api_key = api_key or os.getenv("LIVEKIT_API_KEY")
@@ -48,7 +50,9 @@ class LiveKitAPI:
         if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
 
-        self._session = aiohttp.ClientSession(timeout=timeout)
+        self._custom_session = True if session is None else False
+        self._session = session or aiohttp.ClientSession(timeout=timeout)
+
         self._room = RoomService(self._session, url, api_key, api_secret)
         self._ingress = IngressService(self._session, url, api_key, api_secret)
         self._egress = EgressService(self._session, url, api_key, api_secret)
@@ -84,7 +88,9 @@ class LiveKitAPI:
         """Close the API client
 
         Call this before your application exits or when the API client is no longer needed."""
-        await self._session.close()
+        # we do not close custom sessions, that's up to the caller
+        if not self._custom_session:
+            await self._session.close()
 
     async def __aenter__(self):
         """@private
