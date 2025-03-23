@@ -76,6 +76,7 @@ from .video_frame import (
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
+from .audio_mixer import AudioMixer
 from .apm import AudioProcessingModule
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
@@ -148,6 +149,7 @@ __all__ = [
     "VideoFrameEvent",
     "VideoSource",
     "VideoStream",
+    "AudioMixer",
     "AudioResampler",
     "AudioResamplerQuality",
     "RpcError",
