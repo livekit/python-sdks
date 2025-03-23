@@ -72,6 +72,9 @@ class AudioMixer:
         Args:
             stream (AsyncIterator[AudioFrame]): An async iterator that produces AudioFrame objects.
         """
+        if self._ending:
+            raise RuntimeError("Cannot add stream after mixer has been closed")
+
         self._streams.add(stream)
         if stream not in self._buffers:
             self._buffers[stream] = np.empty((0, self._num_channels), dtype=np.int16)
