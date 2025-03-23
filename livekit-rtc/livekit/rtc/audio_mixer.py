@@ -1,11 +1,10 @@
-from typing import AsyncIterator, Optional
 import asyncio
 import numpy as np
 import contextlib
 from dataclasses import dataclass
+from typing import AsyncIterator, Optional
 from .audio_frame import AudioFrame
 from .log import logger
-
 
 _Stream = AsyncIterator[AudioFrame]
 
@@ -58,7 +57,9 @@ class AudioMixer:
         self._chunk_size: int = blocksize if blocksize > 0 else int(sample_rate // 10)
         self._stream_timeout_ms: int = stream_timeout_ms
         self._queue: asyncio.Queue[Optional[AudioFrame]] = asyncio.Queue(maxsize=capacity)
-        self._closed: bool = False
+        # _ending signals that no new streams will be added,
+        # but we continue processing until all streams are exhausted.
+        self._ending: bool = False
         self._mixer_task: asyncio.Task = asyncio.create_task(self._mixer())
 
     def add_stream(self, stream: AsyncIterator[AudioFrame]) -> None:
@@ -87,25 +88,10 @@ class AudioMixer:
         self._streams.discard(stream)
         self._buffers.pop(stream, None)
 
-    async def __aiter__(self) -> "AudioMixer":
-        """
-        Return the async iterator interface for the mixer.
-
-        Returns:
-            AudioMixer: The mixer itself, as it implements the async iterator protocol.
-        """
+    def __aiter__(self) -> "AudioMixer":
         return self
 
     async def __anext__(self) -> AudioFrame:
-        """
-        Retrieve the next mixed AudioFrame from the output queue.
-
-        Returns:
-            AudioFrame: The next mixed audio frame.
-
-        Raises:
-            StopAsyncIteration: When the mixer is closed and no more frames are available.
-        """
         item = await self._queue.get()
         if item is None:
             raise StopAsyncIteration
@@ -117,7 +103,7 @@ class AudioMixer:
 
         This cancels the mixing task, and any unconsumed output in the queue may be dropped.
         """
-        self._closed = True
+        self._ending = True
         self._mixer_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await self._mixer_task
@@ -129,13 +115,18 @@ class AudioMixer:
         This method marks the mixer as closed so that it flushes any remaining buffered output before ending.
         Note that existing streams will still be processed until exhausted.
         """
-        self._closed = True
+        self._ending = True
 
     async def _mixer(self) -> None:
-        while not self._closed:
+        while True:
+            # If we're in ending mode and there are no more streams, exit.
+            if self._ending and not self._streams:
+                break
+
             if not self._streams:
                 await asyncio.sleep(0.01)
                 continue
+
             tasks = [
                 self._get_contribution(
                     stream,
@@ -185,7 +176,7 @@ class AudioMixer:
                     stream.__anext__(), timeout=self._stream_timeout_ms / 1000
                 )
             except asyncio.TimeoutError:
-                logger.warning(f"AudioMixer: stream {stream} timeout, ignoring`")
+                logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
                 break
             except StopAsyncIteration:
                 exhausted = True

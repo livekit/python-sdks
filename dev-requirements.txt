@@ -9,3 +9,5 @@ auditwheel; sys_platform == 'linux'
 cibuildwheel
 
 pytest
+
+matplotlib
