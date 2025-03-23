@@ -111,7 +111,7 @@ class AudioMixer:
             raise StopAsyncIteration
         return item
 
-    async def close(self) -> None:
+    async def aclose(self) -> None:
         """
         Immediately stop mixing and close the mixer.
 
