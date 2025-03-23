@@ -1,3 +1,5 @@
+# type: ignore
+
 from typing import AsyncIterator
 import numpy as np
 import pytest
