@@ -9,3 +9,8 @@ auditwheel; sys_platform == 'linux'
 cibuildwheel
 
 pytest
+pytest-asyncio
+
+matplotlib
+pydantic
+numpy
