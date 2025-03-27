@@ -2,11 +2,11 @@ import asyncio
 import numpy as np
 import contextlib
 from dataclasses import dataclass
-from typing import AsyncIterable, Optional
+from typing import AsyncIterator, Optional
 from .audio_frame import AudioFrame
 from .log import logger
 
-_Stream = AsyncIterable[AudioFrame]
+_Stream = AsyncIterator[AudioFrame]
 
 
 @dataclass
@@ -62,7 +62,7 @@ class AudioMixer:
         self._ending: bool = False
         self._mixer_task: asyncio.Task = asyncio.create_task(self._mixer())
 
-    def add_stream(self, stream: AsyncIterable[AudioFrame]) -> None:
+    def add_stream(self, stream: AsyncIterator[AudioFrame]) -> None:
         """
         Add an audio stream to the mixer.
 
@@ -79,7 +79,7 @@ class AudioMixer:
         if stream not in self._buffers:
             self._buffers[stream] = np.empty((0, self._num_channels), dtype=np.int16)
 
-    def remove_stream(self, stream: AsyncIterable[AudioFrame]) -> None:
+    def remove_stream(self, stream: AsyncIterator[AudioFrame]) -> None:
         """
         Remove an audio stream from the mixer.
 
@@ -169,7 +169,7 @@ class AudioMixer:
         await self._queue.put(None)
 
     async def _get_contribution(
-        self, stream: AsyncIterable[AudioFrame], buf: np.ndarray
+        self, stream: AsyncIterator[AudioFrame], buf: np.ndarray
     ) -> _Contribution:
         had_data = buf.shape[0] > 0
         exhausted = False
