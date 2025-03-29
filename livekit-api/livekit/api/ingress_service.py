@@ -66,3 +66,39 @@ class IngressService(Service):
             self._auth_header(VideoGrants(ingress_admin=True)),
             IngressInfo,
         )
+
+    def sync_create_ingress(self, create: proto_ingress.CreateIngressRequest):
+        return self._client.sync_request(
+            SVC,
+            "CreateIngress",
+            create,
+            self._auth_header(VideoGrants(ingress_admin=True)),
+            proto_ingress.IngressInfo,
+        )
+
+    def sync_update_ingress(self, update: proto_ingress.UpdateIngressRequest):
+        return self._client.sync_request(
+            SVC,
+            "UpdateIngress",
+            update,
+            self._auth_header(VideoGrants(ingress_admin=True)),
+            proto_ingress.IngressInfo,
+        )
+
+    def sync_list_ingress(self, list: proto_ingress.ListIngressRequest):
+        return self._client.sync_request(
+            SVC,
+            "ListIngress",
+            list,
+            self._auth_header(VideoGrants(ingress_admin=True)),
+            proto_ingress.ListIngressResponse,
+        )
+
+    def sync_delete_ingress(self, delete: proto_ingress.DeleteIngressRequest):
+        return self._client.sync_request(
+            SVC,
+            "DeleteIngress",
+            delete,
+            self._auth_header(VideoGrants(ingress_admin=True)),
+            proto_ingress.IngressInfo,
+        )

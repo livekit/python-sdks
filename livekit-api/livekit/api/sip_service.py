@@ -178,3 +178,124 @@ class SipService(Service):
             ),
             SIPParticipantInfo,
         )
+
+    def sync_create_sip_trunk(
+        self, create: proto_sip.CreateSIPTrunkRequest
+    ) -> proto_sip.SIPTrunkInfo:
+        return self._client.sync_request(
+            SVC,
+            "CreateSIPTrunk",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPTrunkInfo,
+        )
+
+    def sync_create_sip_inbound_trunk(
+        self, create: proto_sip.CreateSIPInboundTrunkRequest
+    ) -> proto_sip.SIPInboundTrunkInfo:
+        return self._client.sync_request(
+            SVC,
+            "CreateSIPInboundTrunk",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPInboundTrunkInfo,
+        )
+
+    def sync_create_sip_outbound_trunk(
+        self, create: proto_sip.CreateSIPOutboundTrunkRequest
+    ) -> proto_sip.SIPOutboundTrunkInfo:
+        return self._client.sync_request(
+            SVC,
+            "CreateSIPOutboundTrunk",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPOutboundTrunkInfo,
+        )
+
+    def sync_list_sip_trunk(
+        self, list: proto_sip.ListSIPTrunkRequest
+    ) -> proto_sip.ListSIPTrunkResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListSIPTrunk",
+            list,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.ListSIPTrunkResponse,
+        )
+
+    def sync_list_sip_inbound_trunk(
+        self, list: proto_sip.ListSIPInboundTrunkRequest
+    ) -> proto_sip.ListSIPInboundTrunkResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListSIPInboundTrunk",
+            list,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.ListSIPInboundTrunkResponse,
+        )
+
+    def sync_list_sip_outbound_trunk(
+        self, list: proto_sip.ListSIPOutboundTrunkRequest
+    ) -> proto_sip.ListSIPOutboundTrunkResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListSIPOutboundTrunk",
+            list,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.ListSIPOutboundTrunkResponse,
+        )
+
+    def sync_delete_sip_trunk(
+        self, delete: proto_sip.DeleteSIPTrunkRequest
+    ) -> proto_sip.SIPTrunkInfo:
+        return self._client.sync_request(
+            SVC,
+            "DeleteSIPTrunk",
+            delete,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPTrunkInfo,
+        )
+
+    def sync_create_sip_dispatch_rule(
+        self, create: proto_sip.CreateSIPDispatchRuleRequest
+    ) -> proto_sip.SIPDispatchRuleInfo:
+        return self._client.sync_request(
+            SVC,
+            "CreateSIPDispatchRule",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPDispatchRuleInfo,
+        )
+
+    def sync_list_sip_dispatch_rule(
+        self, list: proto_sip.ListSIPDispatchRuleRequest
+    ) -> proto_sip.ListSIPDispatchRuleResponse:
+        return self._client.sync_request(
+            SVC,
+            "ListSIPDispatchRule",
+            list,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.ListSIPDispatchRuleResponse,
+        )
+
+    def sync_delete_sip_dispatch_rule(
+        self, delete: proto_sip.DeleteSIPDispatchRuleRequest
+    ) -> proto_sip.SIPDispatchRuleInfo:
+        return self._client.sync_request(
+            SVC,
+            "DeleteSIPDispatchRule",
+            delete,
+            self._auth_header(VideoGrants(), sip=SIPGrants(admin=True)),
+            proto_sip.SIPDispatchRuleInfo,
+        )
+
+    def sync_create_sip_participant(
+        self, create: proto_sip.CreateSIPParticipantRequest
+    ) -> proto_sip.SIPParticipantInfo:
+        return self._client.sync_request(
+            SVC,
+            "CreateSIPParticipant",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
+            proto_sip.SIPParticipantInfo,
+        )
