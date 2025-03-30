@@ -29,8 +29,9 @@ class ImageCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 
 class BackupCodecPolicy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    REGRESSION: _ClassVar[BackupCodecPolicy]
+    PREFER_REGRESSION: _ClassVar[BackupCodecPolicy]
     SIMULCAST: _ClassVar[BackupCodecPolicy]
+    REGRESSION: _ClassVar[BackupCodecPolicy]
 
 class TrackType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -115,8 +116,9 @@ H264_HIGH: VideoCodec
 VP8: VideoCodec
 IC_DEFAULT: ImageCodec
 IC_JPEG: ImageCodec
-REGRESSION: BackupCodecPolicy
+PREFER_REGRESSION: BackupCodecPolicy
 SIMULCAST: BackupCodecPolicy
+REGRESSION: BackupCodecPolicy
 AUDIO: TrackType
 VIDEO: TrackType
 DATA: TrackType
@@ -172,6 +174,12 @@ class Pagination(_message.Message):
     after_id: str
     limit: int
     def __init__(self, after_id: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+
+class ListUpdate(_message.Message):
+    __slots__ = ("set",)
+    SET_FIELD_NUMBER: _ClassVar[int]
+    set: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, set: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class Room(_message.Message):
     __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "creation_time_ms", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
@@ -246,7 +254,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -269,6 +277,12 @@ class ParticipantInfo(_message.Message):
     EGRESS: ParticipantInfo.Kind
     SIP: ParticipantInfo.Kind
     AGENT: ParticipantInfo.Kind
+    class KindDetail(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        CLOUD_AGENT: _ClassVar[ParticipantInfo.KindDetail]
+        FORWARDED: _ClassVar[ParticipantInfo.KindDetail]
+    CLOUD_AGENT: ParticipantInfo.KindDetail
+    FORWARDED: ParticipantInfo.KindDetail
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -291,6 +305,7 @@ class ParticipantInfo(_message.Message):
     KIND_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     DISCONNECT_REASON_FIELD_NUMBER: _ClassVar[int]
+    KIND_DETAILS_FIELD_NUMBER: _ClassVar[int]
     sid: str
     identity: str
     state: ParticipantInfo.State
@@ -306,7 +321,8 @@ class ParticipantInfo(_message.Message):
     kind: ParticipantInfo.Kind
     attributes: _containers.ScalarMap[str, str]
     disconnect_reason: DisconnectReason
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ...) -> None: ...
+    kind_details: _containers.RepeatedScalarFieldContainer[ParticipantInfo.KindDetail]
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
