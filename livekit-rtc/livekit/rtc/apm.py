@@ -86,3 +86,28 @@ class AudioProcessingModule:
 
         if resp.apm_process_stream.error:
             raise RuntimeError(resp.apm_process_stream.error)
+
+    def set_stream_delay_ms(self, delay_ms: int) -> None:
+        """
+        This must be called if and only if echo processing is enabled.
+
+        Sets the `delay` in ms between `process_reverse_stream()` receiving a far-end
+        frame and `process_stream()` receiving a near-end frame containing the
+        corresponding echo. On the client-side this can be expressed as
+            delay = (t_render - t_analyze) + (t_process - t_capture)
+        where,
+            - t_analyze is the time a frame is passed to `process_reverse_stream()` and
+            t_render is the time the first sample of the same frame is rendered by
+            the audio hardware.
+            - t_capture is the time the first sample of a frame is captured by the
+            audio hardware and t_process is the time the same frame is passed to
+            `process_stream()`.
+        """
+        req = proto_ffi.FfiRequest()
+        req.apm_set_stream_delay.apm_handle = self._ffi_handle.handle
+        req.apm_set_stream_delay.delay_ms = delay_ms
+
+        resp = FfiClient.instance.request(req)
+
+        if resp.apm_set_stream_delay.error:
+            raise RuntimeError(resp.apm_set_stream_delay.error)
