@@ -586,6 +586,41 @@ class ApmProcessReverseStreamResponse(google.protobuf.message.Message):
 global___ApmProcessReverseStreamResponse = ApmProcessReverseStreamResponse
 
 @typing.final
+class ApmSetStreamDelayRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    APM_HANDLE_FIELD_NUMBER: builtins.int
+    DELAY_MS_FIELD_NUMBER: builtins.int
+    apm_handle: builtins.int
+    delay_ms: builtins.int
+    def __init__(
+        self,
+        *,
+        apm_handle: builtins.int | None = ...,
+        delay_ms: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]) -> None: ...
+
+global___ApmSetStreamDelayRequest = ApmSetStreamDelayRequest
+
+@typing.final
+class ApmSetStreamDelayResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___ApmSetStreamDelayResponse = ApmSetStreamDelayResponse
+
+@typing.final
 class NewSoxResamplerRequest(google.protobuf.message.Message):
     """New resampler using SoX (much better quality)"""
 
