@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Type, TypeVar
+from typing import Dict, Type, TypeVar, Optional
 
 import aiohttp
 from google.protobuf.message import Message
@@ -22,9 +22,18 @@ DEFAULT_PREFIX = "twirp"
 
 
 class TwirpError(Exception):
-    def __init__(self, code: str, msg: str) -> None:
+    def __init__(
+        self,
+        code: str,
+        msg: str,
+        *,
+        status: int,
+        metadata: Optional[Dict[str, str]] = None,
+    ) -> None:
         self._code = code
         self._msg = msg
+        self._status = status
+        self._metadata = metadata or {}
 
     @property
     def code(self) -> str:
@@ -33,6 +42,23 @@ class TwirpError(Exception):
     @property
     def message(self) -> str:
         return self._msg
+
+    @property
+    def status(self) -> int:
+        """HTTP status code"""
+        return self._status
+
+    @property
+    def metadata(self) -> Dict[str, str]:
+        """Twirp metadata"""
+        return self._metadata
+
+    def __str__(self) -> str:
+        result = f"TwirpError(code={self.code}, message={self.message}, status={self.status}"
+        if self.metadata:
+            result += f", metadata={self.metadata}"
+        result += ")"
+        return result
 
 
 class TwirpErrorCode:
@@ -85,15 +111,24 @@ class TwirpClient:
         data: Message,
         headers: Dict[str, str],
         response_class: Type[T],
+        *,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
     ) -> T:
         url = f"{self.host}/{self.prefix}/{self.pkg}.{service}/{method}"
         headers["Content-Type"] = "application/protobuf"
 
         serialized_data = data.SerializeToString()
-        async with self._session.post(url, headers=headers, data=serialized_data) as resp:
+        async with self._session.post(
+            url, headers=headers, data=serialized_data, timeout=timeout
+        ) as resp:
             if resp.status == 200:
                 return response_class.FromString(await resp.read())
             else:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
-                raise TwirpError(error_data["code"], error_data["msg"])
+                raise TwirpError(
+                    error_data.get("code", "unknown"),
+                    error_data.get("msg", ""),
+                    status=resp.status,
+                    metadata=error_data.get("meta"),
+                )

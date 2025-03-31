@@ -18,6 +18,8 @@ from livekit.protocol.room import (
     UpdateRoomMetadataRequest,
     RemoveParticipantResponse,
     UpdateSubscriptionsResponse,
+    ForwardParticipantRequest,
+    ForwardParticipantResponse,
 )
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
@@ -195,6 +197,26 @@ class RoomService(Service):
             remove,
             self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
             RemoveParticipantResponse,
+        )
+
+    async def forward_participant(self, forward: ForwardParticipantRequest) -> None:
+        """Forwards a participant and their published tracks from one room to another.
+
+        This feature is only available for LiveKit Cloud/Private Cloud.
+
+        Args:
+            forward (ForwardParticipantRequest): arg containing:
+                - room: str - Room name
+                - identity: str - identity of Participant to forward
+                - destination_room: str - Destination room name
+        """
+        # currently nothing is returned
+        await self._client.request(
+            SVC,
+            "ForwardParticipant",
+            forward,
+            self._auth_header(VideoGrants(room_admin=True, room=forward.room)),
+            ForwardParticipantResponse,
         )
 
     async def mute_published_track(

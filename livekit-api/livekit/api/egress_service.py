@@ -37,6 +37,7 @@ class EgressService(Service):
         super().__init__(session, url, api_key, api_secret)
 
     async def start_room_composite_egress(self, start: RoomCompositeEgressRequest) -> EgressInfo:
+        """Starts a composite recording of a room."""
         return await self._client.request(
             SVC,
             "StartRoomCompositeEgress",
@@ -46,6 +47,7 @@ class EgressService(Service):
         )
 
     async def start_web_egress(self, start: WebEgressRequest) -> EgressInfo:
+        """Starts a recording of a web page."""
         return await self._client.request(
             SVC,
             "StartWebEgress",
@@ -55,6 +57,7 @@ class EgressService(Service):
         )
 
     async def start_participant_egress(self, start: ParticipantEgressRequest) -> EgressInfo:
+        """Starts a recording of a participant."""
         return await self._client.request(
             SVC,
             "StartParticipantEgress",
@@ -64,6 +67,7 @@ class EgressService(Service):
         )
 
     async def start_track_composite_egress(self, start: TrackCompositeEgressRequest) -> EgressInfo:
+        """Starts a composite recording with audio and video tracks."""
         return await self._client.request(
             SVC,
             "StartTrackCompositeEgress",
@@ -73,6 +77,7 @@ class EgressService(Service):
         )
 
     async def start_track_egress(self, start: TrackEgressRequest) -> EgressInfo:
+        """Starts a recording of a single track."""
         return await self._client.request(
             SVC,
             "StartTrackEgress",
@@ -82,6 +87,7 @@ class EgressService(Service):
         )
 
     async def update_layout(self, update: UpdateLayoutRequest) -> EgressInfo:
+        """Updates the layout of a composite recording."""
         return await self._client.request(
             SVC,
             "UpdateLayout",
@@ -91,6 +97,7 @@ class EgressService(Service):
         )
 
     async def update_stream(self, update: UpdateStreamRequest) -> EgressInfo:
+        """Updates the stream of a RoomComposite, Web, or Participant recording."""
         return await self._client.request(
             SVC,
             "UpdateStream",
@@ -100,6 +107,14 @@ class EgressService(Service):
         )
 
     async def list_egress(self, list: ListEgressRequest) -> ListEgressResponse:
+        """Lists all active egress and recently completed recordings.
+
+        Args:
+            list (ListEgressRequest): arg contains optional filters:
+                - room_name: str - List all egresses for a specific room
+                - egress_id: str - Only list egress with matching ID
+                - active: bool - Only list active egresses
+        """
         return await self._client.request(
             SVC,
             "ListEgress",
@@ -109,6 +124,7 @@ class EgressService(Service):
         )
 
     async def stop_egress(self, stop: StopEgressRequest) -> EgressInfo:
+        """Stops an active egress recording."""
         return await self._client.request(
             SVC,
             "StopEgress",

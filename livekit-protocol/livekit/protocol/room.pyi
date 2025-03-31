@@ -210,3 +210,17 @@ class RoomConfiguration(_message.Message):
     sync_streams: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
     def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+
+class ForwardParticipantRequest(_message.Message):
+    __slots__ = ("room", "identity", "destination_room")
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    DESTINATION_ROOM_FIELD_NUMBER: _ClassVar[int]
+    room: str
+    identity: str
+    destination_room: str
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., destination_room: _Optional[str] = ...) -> None: ...
+
+class ForwardParticipantResponse(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...

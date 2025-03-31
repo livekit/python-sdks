@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Dict
 import aiohttp
 from abc import ABC
 from .twirp_client import TwirpClient
@@ -17,7 +16,7 @@ class Service(ABC):
 
     def _auth_header(
         self, grants: VideoGrants | None, sip: SIPGrants | None = None
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         tok = AccessToken(self.api_key, self.api_secret)
         if grants:
             tok.with_grants(grants)
