@@ -54,9 +54,7 @@ class TwirpError(Exception):
         return self._metadata
 
     def __str__(self) -> str:
-        result = f"TwirpError(code={self.code}, message={self.message}"
-        if self.status is not None:
-            result += f", status={self.status}"
+        result = f"TwirpError(code={self.code}, message={self.message}, status={self.status}"
         if self.metadata:
             result += f", metadata={self.metadata}"
         result += ")"
