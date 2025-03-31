@@ -200,7 +200,9 @@ class RoomService(Service):
         )
 
     async def forward_participant(self, forward: ForwardParticipantRequest) -> None:
-        """Forwards a participant to a new room.
+        """Forwards a participant and their published tracks from one room to another.
+
+        This feature is only available for LiveKit Cloud/Private Cloud.
 
         Args:
             forward (ForwardParticipantRequest): arg containing:
