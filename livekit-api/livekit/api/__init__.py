@@ -36,7 +36,6 @@ from livekit.protocol.sip import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
-from .sip_service import SIPError
 from .access_token import VideoGrants, SIPGrants, AccessToken, TokenVerifier
 from .webhook import WebhookReceiver
 from .version import __version__
@@ -55,5 +54,4 @@ __all__ = [
     "WebhookReceiver",
     "TwirpError",
     "TwirpErrorCode",
-    "SIPError",
 ]

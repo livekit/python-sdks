@@ -22,10 +22,18 @@ DEFAULT_PREFIX = "twirp"
 
 
 class TwirpError(Exception):
-    def __init__(self, code: str, msg: str, *, status: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        code: str,
+        msg: str,
+        *,
+        status: Optional[int] = None,
+        metadata: Optional[Dict[str, str]] = None,
+    ) -> None:
         self._code = code
         self._msg = msg
         self._status = status
+        self._metadata = metadata or {}
 
     @property
     def code(self) -> str:
@@ -37,7 +45,22 @@ class TwirpError(Exception):
 
     @property
     def status(self) -> Optional[int]:
+        """HTTP status code"""
         return self._status
+
+    @property
+    def metadata(self) -> Dict[str, str]:
+        """Twirp metadata"""
+        return self._metadata
+
+    def __str__(self) -> str:
+        result = f"TwirpError(code={self.code}, message={self.message}"
+        if self.status is not None:
+            result += f", status={self.status}"
+        if self.metadata:
+            result += f", metadata={self.metadata}"
+        result += ")"
+        return result
 
 
 class TwirpErrorCode:
@@ -106,4 +129,9 @@ class TwirpClient:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
                 print(f"Error: {error_data}, headers: {resp.headers}")
-                raise TwirpError(error_data["code"], error_data["msg"], status=resp.status)
+                raise TwirpError(
+                    error_data.get("code", "unknown"),
+                    error_data.get("msg", ""),
+                    status=resp.status,
+                    metadata=error_data.get("meta"),
+                )

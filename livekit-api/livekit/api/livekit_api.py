@@ -50,11 +50,13 @@ class LiveKitAPI:
         if not api_key or not api_secret:
             raise ValueError("api_key and api_secret must be set")
 
-        if not timeout:
-            timeout = aiohttp.ClientTimeout(total=60)
-
-        self._custom_session = True if session is None else False
-        self._session = session or aiohttp.ClientSession(timeout=timeout)
+        self._custom_session = True
+        self._session = session
+        if not self._session:
+            self._custom_session = False
+            if not timeout:
+                timeout = aiohttp.ClientTimeout(total=60)
+            self._session = aiohttp.ClientSession(timeout=timeout)
 
         self._room = RoomService(self._session, url, api_key, api_secret)
         self._ingress = IngressService(self._session, url, api_key, api_secret)

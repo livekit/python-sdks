@@ -1,5 +1,4 @@
 import aiohttp
-import re
 from typing import Optional
 
 from livekit.protocol.models import ListUpdate
@@ -32,45 +31,10 @@ from livekit.protocol.sip import (
     SIPTransport,
 )
 from ._service import Service
-from .twirp_client import TwirpError
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
 """@private"""
-
-_sip_status_pattern = re.compile(r"sip status: (\d+) \((.*?)\)")
-
-
-class SIPError(TwirpError):
-    """Error raised by SIP service operations.
-
-    Contains SIP specific status and message information when available.
-    """
-
-    def __init__(self, code: str, msg: str, status: Optional[int] = None):
-        super().__init__(code, msg, status=status)
-        self._sip_status: Optional[int] = None
-        self._sip_message: Optional[str] = None
-
-    @classmethod
-    def from_twirp_error(cls, e: TwirpError) -> "SIPError":
-        err = cls(e.code, e.message, status=e.status)
-        # Parse SIP status and message from error message
-        sip_status_match = _sip_status_pattern.search(e.message)
-        if sip_status_match:
-            err._sip_status = int(sip_status_match.group(1))
-            err._sip_message = sip_status_match.group(2)
-        # maintain traceback from the original error
-        err.__traceback__ = e.__traceback__
-        return err
-
-    @property
-    def sip_status(self) -> Optional[int]:
-        return self._sip_status
-
-    @property
-    def sip_message(self) -> Optional[str]:
-        return self._sip_message
 
 
 class SipService(Service):
@@ -445,17 +409,14 @@ class SipService(Service):
             ):
                 client_timeout = aiohttp.ClientTimeout(total=20)
 
-        try:
-            return await self._client.request(
-                SVC,
-                "CreateSIPParticipant",
-                create,
-                self._admin_headers(),
-                SIPParticipantInfo,
-                timeout=client_timeout,
-            )
-        except TwirpError as e:
-            raise SIPError.from_twirp_error(e) from None
+        return await self._client.request(
+            SVC,
+            "CreateSIPParticipant",
+            create,
+            self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
+            SIPParticipantInfo,
+            timeout=client_timeout,
+        )
 
     async def transfer_sip_participant(
         self, transfer: TransferSIPParticipantRequest
