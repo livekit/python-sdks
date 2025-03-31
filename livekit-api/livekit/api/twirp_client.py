@@ -27,7 +27,7 @@ class TwirpError(Exception):
         code: str,
         msg: str,
         *,
-        status: Optional[int] = None,
+        status: int,
         metadata: Optional[Dict[str, str]] = None,
     ) -> None:
         self._code = code
@@ -44,7 +44,7 @@ class TwirpError(Exception):
         return self._msg
 
     @property
-    def status(self) -> Optional[int]:
+    def status(self) -> int:
         """HTTP status code"""
         return self._status
 
@@ -128,7 +128,6 @@ class TwirpClient:
             else:
                 # when we have an error, Twirp always encode it in json
                 error_data = await resp.json()
-                print(f"Error: {error_data}, headers: {resp.headers}")
                 raise TwirpError(
                     error_data.get("code", "unknown"),
                     error_data.get("msg", ""),
