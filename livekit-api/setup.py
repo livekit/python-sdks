@@ -51,9 +51,9 @@ setuptools.setup(
     install_requires=[
         "pyjwt>=2.0.0",
         "aiohttp>=3.9.0",
-        "protobuf>=3",
+        "protobuf>=4,<5",
         "types-protobuf>=4,<5",
-        "livekit-protocol>=0.8.2,<2",
+        "livekit-protocol~=1.0",
     ],
     package_data={
         "livekit.api": ["py.typed", "*.pyi", "**/*.pyi"],
