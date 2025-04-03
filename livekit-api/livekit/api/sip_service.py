@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import aiohttp
 from typing import Optional
 
@@ -184,13 +186,13 @@ class SipService(Service):
         self,
         trunk_id: str,
         *,
-        address: Optional[str] = None,
-        transport: Optional[SIPTransport] = None,
-        numbers: Optional[list[str]] = None,
-        auth_username: Optional[str] = None,
-        auth_password: Optional[str] = None,
-        name: Optional[str] = None,
-        metadata: Optional[str] = None,
+        address: str | None = None,
+        transport: SIPTransport | None = None,
+        numbers: list[str] | None = None,
+        auth_username: str | None = None,
+        auth_password: str | None = None,
+        name: str | None = None,
+        metadata: str | None = None,
     ) -> SIPOutboundTrunkInfo:
         """Updates specific fields of an existing SIP outbound trunk.
 
