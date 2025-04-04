@@ -1,0 +1,180 @@
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.content {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: normal;
+  color: #444;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.connection-state,
+.state-inactive {
+  font-size: 0.9em;
+  margin: 0;
+  padding: 0;
+}
+
+.connection-state {
+  color: #0066cc;
+}
+
+.state-inactive {
+  color: #999;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.button-container {
+  flex: 0 0 auto;
+}
+
+.toggle-button {
+  width: fit-content;
+  padding: 6px 12px;
+  background-color: #002CF2;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-button:hover {
+  background-color: #0C3AFF;
+}
+
+.visualizer h3 {
+  margin: 4px 0;
+  font-size: 0.9em;
+}
+
+.states {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.state-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.state-label {
+  min-width: 45px;
+  text-align: right;
+  color: #666;
+}
+
+.error {
+  text-align: left;
+  font-size: 0.9em;
+  padding: 8px;
+  color: #666;
+  margin: 10px 0;
+}
+
+.connection-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.connect-button {
+  padding: 12px 24px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.connect-button.connect {
+  background-color: #002CF2;
+  color: white;
+}
+
+.connect-button.connect:hover {
+  background-color: #0C3AFF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 44, 242, 0.2);
+}
+
+.connect-button.disconnect {
+  background-color: #ff3b30;
+  color: white;
+}
+
+.connect-button.disconnect:hover {
+  background-color: #ff514a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 59, 48, 0.2);
+}
+
+.connect-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* LiveKit button styles */
+:root {
+  --lk-button-background: #002CF2;
+  --lk-button-background-hover: #0C3AFF;
+  --lk-button-border-radius: 3px;
+  --lk-disconnect-button-background: #ff3b30;
+  --lk-disconnect-button-background-hover: #ff514a;
+}
