@@ -5,13 +5,14 @@ import sys
 import contextlib
 import os
 from IPython.core.display import HTML, JSON
+from IPython.display import display
 from importlib.resources import as_file, files
 
 _resource_stack = contextlib.ExitStack()
 atexit.register(_resource_stack.close)
 
 
-def display_room(url: str | None = None, token: str | None = None) -> HTML:
+def room_html(url: str | None = None, token: str | None = None) -> HTML:
     """
     Display a LiveKit room in Jupyter or Google Colab.
 
@@ -56,3 +57,18 @@ def display_room(url: str | None = None, token: str | None = None) -> HTML:
     index_path = _resource_stack.enter_context(as_file(index_path))
 
     return HTML(index_path.read_text())
+
+
+def display_room(url: str | None = None, token: str | None = None) -> None:
+    """
+    Display a LiveKit room in Jupyter or Google Colab.
+
+    Args:
+        url (str | None): The LiveKit room URL. If None, the function attempts
+            to use the LIVEKIT_JUPYTER_URL environment variable in a local or
+            Colab environment.
+        token (str | None): The LiveKit join token. If None, the function
+            attempts to use the LIVEKIT_JUPYTER_URL environment variable in a
+            local or Colab environment.
+    """
+    display(room_html(url, token))
