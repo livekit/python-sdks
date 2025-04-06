@@ -18,7 +18,7 @@ import { ConnectionState } from 'livekit-client';
 export async function fetchJoinInfo(): Promise<{ url: string; token: string }> {
   const invoke = (window as any).google?.colab?.kernel?.invokeFunction;
   if (invoke) {
-    const res = await invoke("create_join_token", []);
+    const res = await invoke("get_join_token", []);
     return res.data["application/json"];
   } else if ((window as any).jupyterFetchJoinToken) {
     return await (window as any).jupyterFetchJoinToken();
