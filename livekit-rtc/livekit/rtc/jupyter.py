@@ -32,7 +32,7 @@ def display_room(url: str, token: str) -> None:
     Display a LiveKit room in Jupyter or Google Colab.
 
     Args:
-        url (str | None): The LiveKit room URL.
-        token (str | None): The LiveKit join token.
+        url (str): The LiveKit room URL.
+        token (str): The LiveKit join token.
     """
     display(room_html(url, token))
