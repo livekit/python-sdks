@@ -1,3 +1,66 @@
+:root {
+  --lk-fg: #111;
+  --lk-fg-secondary: #333;
+  --lk-fg-tertiary: #555;
+
+  --lk-bg: #fff;
+  --lk-bg-secondary: #f5f5f5;
+  --lk-bg-tertiary: #fafafa;
+
+  --lk-accent-fg: #fff;
+  --lk-accent-bg: #1f8cf9;
+
+  --lk-danger-fg: #fff;
+  --lk-danger: #f91f31;
+  --lk-danger-text: #6d0311;
+  --lk-danger-bg: #fecdd4;
+
+  --lk-success-fg: #fff;
+  --lk-success: #1ff968;
+  --lk-success-text: #036d26;
+  --lk-success-bg: #cdfedd;
+
+  --lk-control-fg: var(--fg);
+  --lk-control-bg: var(--bg-secondary);
+
+  --lk-connection-excellent: #06db4d;
+  --lk-connection-good: #f9b11f;
+  --lk-connection-poor: #f91f31;
+
+
+  --lk-va-bar-gap: 8px;
+  --lk-va-bar-width: 8px;
+}
+
+
+/* reset unwanted default styles */
+
+.lk-disconnect-button {
+  border: unset;
+  color: unset;
+  font-weight: unset;
+  font-size: 0.8em;
+}
+
+.lk-agent-control-bar {
+  width: 100%;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 600px) {
+  .lk-start-audio-button {
+    position: unset;
+    top: unset;
+    left: unset;
+    transform: unset;
+  }
+}
+
+.lk-start-audio-button {
+  color: #000;
+  background-color: #dadada;
+}
+
 .app-container {
   max-width: 800px;
   margin: 0 auto;
@@ -17,6 +80,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  height: 32px;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
   width: 100%;
@@ -30,7 +94,7 @@
 
 .header h2 {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 1em;
   font-weight: normal;
   color: #444;
 }
@@ -43,7 +107,7 @@
 
 .connection-state,
 .state-inactive {
-  font-size: 0.9em;
+  font-size: 0.85em;
   margin: 0;
   padding: 0;
 }
@@ -58,123 +122,14 @@
 
 .controls {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  padding: 8px 0;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.controls-row {
+.agent-visualizer {
   display: flex;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
-}
-
-.button-container {
-  flex: 0 0 auto;
-}
-
-.toggle-button {
-  width: fit-content;
-  padding: 6px 12px;
-  background-color: #002CF2;
-  border: none;
-  border-radius: 3px;
-  color: #fff;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.toggle-button:hover {
-  background-color: #0C3AFF;
-}
-
-.visualizer h3 {
-  margin: 4px 0;
-  font-size: 0.9em;
-}
-
-.states {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9em;
-  line-height: 1;
-}
-
-.state-row {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.state-label {
-  min-width: 45px;
-  text-align: right;
-  color: #666;
-}
-
-.error {
-  text-align: left;
-  font-size: 0.9em;
-  padding: 8px;
-  color: #666;
-  margin: 10px 0;
-}
-
-.connection-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.connect-button {
-  padding: 12px 24px;
-  font-size: 1.1em;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.connect-button.connect {
-  background-color: #002CF2;
-  color: white;
-}
-
-.connect-button.connect:hover {
-  background-color: #0C3AFF;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 44, 242, 0.2);
-}
-
-.connect-button.disconnect {
-  background-color: #ff3b30;
-  color: white;
-}
-
-.connect-button.disconnect:hover {
-  background-color: #ff514a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(255, 59, 48, 0.2);
-}
-
-.connect-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* LiveKit button styles */
-:root {
-  --lk-button-background: #002CF2;
-  --lk-button-background-hover: #0C3AFF;
-  --lk-button-border-radius: 3px;
-  --lk-disconnect-button-background: #ff3b30;
-  --lk-disconnect-button-background-hover: #ff514a;
+  flex-direction: row;
+  width: 25%;
+  margin-right: 32px;
+  height: var(--lk-control-bar-height);
 }

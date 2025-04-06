@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --outDir=../livekit/rtc/resources/jupyter-html",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
   LiveKitRoom,
-  TrackToggle,
   BarVisualizer,
   useVoiceAssistant,
   RoomAudioRenderer,
   useConnectionState,
   DisconnectButton,
+  useStartAudio,
+  VoiceAssistantControlBar,
 } from '@livekit/components-react';
-import { Track } from 'livekit-client';
 import '@livekit/components-styles';
 import './App.css';
+import type { SVGProps } from 'react';
+import { ConnectionState } from 'livekit-client';
 
 
 export async function fetchJoinInfo(): Promise<{ url: string; token: string }> {
@@ -31,30 +33,30 @@ export async function fetchJoinInfo(): Promise<{ url: string; token: string }> {
 }
 
 
-function CloseIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M3.33398 3.33334L12.6673 12.6667M12.6673 3.33334L3.33398 12.6667"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="square"
-      />
-    </svg>
-  );
-}
+const LeaveIcon = (props: SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="none" {...props}>
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M2 2.75A2.75 2.75 0 0 1 4.75 0h6.5A2.75 2.75 0 0 1 14 2.75v10.5A2.75 2.75 0 0 1 11.25 16h-6.5A2.75 2.75 0 0 1 2 13.25v-.5a.75.75 0 0 1 1.5 0v.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25h-6.5c-.69 0-1.25.56-1.25 1.25v.5a.75.75 0 0 1-1.5 0v-.5Z"
+      clipRule="evenodd"
+    />
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M8.78 7.47a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 1 1-1.06-1.06l.97-.97H1.75a.75.75 0 0 1 0-1.5h4.69l-.97-.97a.75.75 0 0 1 1.06-1.06l2.25 2.25Z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
 
 const ConnectedContent: React.FC<{ onDisconnect: () => void }> = ({ onDisconnect }) => {
   const connectionState = useConnectionState();
   const { state: agentState, audioTrack: agentTrack } = useVoiceAssistant();
-
-  console.log(agentState);
-
-
+  const { canPlayAudio } = useStartAudio({ props: {} }); // why do I need props..?
 
   return (
     <div className="content">
-      <RoomAudioRenderer />
       <header className="header">
         <div className="header-left">
           <h2>livekit-rtc</h2>
@@ -63,35 +65,20 @@ const ConnectedContent: React.FC<{ onDisconnect: () => void }> = ({ onDisconnect
           </span>
         </div>
         <div className="header-controls">
-          <DisconnectButton onClick={onDisconnect}><CloseIcon />Disconnect</DisconnectButton>
+          <DisconnectButton onClick={onDisconnect}><LeaveIcon />Disconnect</DisconnectButton>
         </div>
       </header>
       <div className="controls">
-        <div className="controls-row">
-          <TrackToggle
-            source={Track.Source.Microphone}
-            initialState={false}
-          >
-            Toggle Microphone
-          </TrackToggle>
+        <VoiceAssistantControlBar controls={{ microphone: true, leave: false }} />
 
-          <div className="visualizer mic-visualizer" style={{ height: '40px' }}>
-            {/* <BarVisualizer
-              barCount={15}
-              trackRef={localTrackRef}
-              options={{ minHeight: 40, maxHeight: 40 }}
-            /> */}
-          </div>
-        </div>
-
-        <div className="visualizer agent-visualizer" style={{ height: '40px', width: '100%' }}>
+        {canPlayAudio && connectionState == ConnectionState.Connected && <div className="agent-visualizer">
           <BarVisualizer
             state={agentState}
-            barCount={8}
+            barCount={15}
             trackRef={agentTrack}
-            options={{ minHeight: 60, maxHeight: 60 }}
+            options={{ minHeight: 30, maxHeight: 30 }}
           />
-        </div>
+        </div>}
       </div>
     </div>
   );
@@ -135,6 +122,7 @@ const App = () => {
       onError={(err) => setError(err.message)}
     >
       <ConnectedContent onDisconnect={() => setIsConnected(false)} />
+      <RoomAudioRenderer />
     </LiveKitRoom>
   );
 };
