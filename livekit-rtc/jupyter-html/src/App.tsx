@@ -20,16 +20,38 @@ export async function fetchJoinInfo(): Promise<{ url: string; token: string }> {
   if (invoke) {
     const res = await invoke("get_join_token", []);
     return res.data["application/json"];
-  } else if ((window as any).jupyterFetchJoinToken) {
-    return await (window as any).jupyterFetchJoinToken();
-  } else if (import.meta.env.MODE === "development") {
-    // use env variables
+  }
+
+
+  // This requires that JupyterLab was started with --LabApp.expose_app_in_browser,
+  if ((window as any).jupyterapp && (window as any).jupyterapp.shell) {
+    const currentWidget = (window as any).jupyterapp.shell.currentWidget;
+    if (currentWidget && currentWidget.context?.sessionContext) {
+      const session = currentWidget.context.sessionContext.session;
+      if (session && session.kernel) {
+        try {
+          const comm = session.kernel.createComm("get_join_token_comm");
+          comm.open();
+          comm.send({ request: "token" });
+          return new Promise((resolve) => {
+            comm.onMsg = (msg: any) => {
+              resolve(msg.content.data);
+            };
+          });
+        } catch (error) {
+          throw new Error("Error creating comm channel: " + error);
+        }
+      }
+    }
+  }
+
+  if (import.meta.env.MODE === "development") {
     const url = import.meta.env.VITE_LIVEKIT_URL;
     const token = import.meta.env.VITE_LIVEKIT_TOKEN;
-    return { url: url, token: token };
-  } else {
-    throw new Error("No Colab or Jupyter kernel function available");
+    return { url, token };
   }
+
+  throw new Error("No suitable kernel connection available");
 }
 
 

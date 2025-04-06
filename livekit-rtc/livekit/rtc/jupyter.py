@@ -1,3 +1,4 @@
+# type: ignore
 from __future__ import annotations
 
 import atexit
@@ -13,6 +14,7 @@ atexit.register(_resource_stack.close)
 
 def room_html(url: str, token: str) -> HTML:
     IN_COLAB = "google.colab" in sys.modules
+    IN_JUPYTER = "ipykernel" in sys.modules
 
     if IN_COLAB:
         from google.colab import output
@@ -21,6 +23,18 @@ def room_html(url: str, token: str) -> HTML:
             return JSON({"url": url, "token": token})
 
         output.register_callback("get_join_token", get_join_token)
+    elif IN_JUPYTER:
+        from IPython import get_ipython
+
+        ip = get_ipython()
+        if ip and hasattr(ip, "kernel"):
+
+            def token_comm_target(comm, open_msg):
+                @comm.on_msg
+                def handle_message(msg):
+                    comm.send({"url": url, "token": token})
+
+            ip.kernel.comm_manager.register_target("get_join_token_comm", token_comm_target)
 
     index_path = files("livekit.rtc.resources") / "jupyter-html" / "index.html"
     index_path = _resource_stack.enter_context(as_file(index_path))
