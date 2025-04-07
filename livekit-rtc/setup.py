@@ -61,7 +61,14 @@ setuptools.setup(
     install_requires=["protobuf>=4.25.0", "types-protobuf>=3", "aiofiles>=24"],
     package_data={
         "livekit.rtc": ["_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"],
-        "livekit.rtc.resources": ["*.so", "*.dylib", "*.dll", "LICENSE.md", "*.h"],
+        "livekit.rtc.resources": [
+            "*.so",
+            "*.dylib",
+            "*.dll",
+            "LICENSE.md",
+            "*.h",
+            "jupyter-html/index.html",
+        ],
     },
     project_urls={
         "Documentation": "https://docs.livekit.io",
