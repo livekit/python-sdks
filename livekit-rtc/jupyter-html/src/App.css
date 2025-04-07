@@ -1,0 +1,135 @@
+:root {
+  --lk-fg: #111;
+  --lk-fg-secondary: #333;
+  --lk-fg-tertiary: #555;
+
+  --lk-bg: #fff;
+  --lk-bg-secondary: #f5f5f5;
+  --lk-bg-tertiary: #fafafa;
+
+  --lk-accent-fg: #fff;
+  --lk-accent-bg: #1f8cf9;
+
+  --lk-danger-fg: #fff;
+  --lk-danger: #f91f31;
+  --lk-danger-text: #6d0311;
+  --lk-danger-bg: #fecdd4;
+
+  --lk-success-fg: #fff;
+  --lk-success: #1ff968;
+  --lk-success-text: #036d26;
+  --lk-success-bg: #cdfedd;
+
+  --lk-control-fg: var(--fg);
+  --lk-control-bg: var(--bg-secondary);
+
+  --lk-connection-excellent: #06db4d;
+  --lk-connection-good: #f9b11f;
+  --lk-connection-poor: #f91f31;
+
+
+  --lk-va-bar-gap: 8px;
+  --lk-va-bar-width: 8px;
+}
+
+
+/* reset unwanted default styles */
+
+.lk-disconnect-button {
+  border: unset;
+  color: unset;
+  font-weight: unset;
+  font-size: 0.8em;
+}
+
+.lk-agent-control-bar {
+  width: 100%;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 600px) {
+  .lk-start-audio-button {
+    position: unset;
+    top: unset;
+    left: unset;
+    transform: unset;
+  }
+}
+
+.lk-start-audio-button {
+  color: #000;
+  background-color: #dadada;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.content {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 1em;
+  font-weight: normal;
+  color: #444;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.connection-state,
+.state-inactive {
+  font-size: 0.85em;
+  margin: 0;
+  padding: 0;
+}
+
+.connection-state {
+  color: #0066cc;
+}
+
+.state-inactive {
+  color: #999;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.agent-visualizer {
+  display: flex;
+  flex-direction: row;
+  width: 25%;
+  margin-right: 32px;
+  height: var(--lk-control-bar-height);
+}
