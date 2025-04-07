@@ -31,7 +31,8 @@ def room_html(url: str, token: str) -> HTML:
     index_path = _resource_stack.enter_context(as_file(index_path))
 
     # turns out that directly replacing the URL/token is necessary, as Colab or Jupyter comms become
-    # unreliable when the main thread is busy/blocked
+    # unreliable when the main thread is busy/blocked.
+    # it also avoid the need to use --expose-app-in-browser when starting jupyter notebook
     html_text = index_path.read_text()
     html_text = html_text.replace(token_placeholder, token)
     html_text = html_text.replace(url_placeholder, url)

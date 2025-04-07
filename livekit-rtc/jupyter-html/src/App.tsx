@@ -44,8 +44,8 @@ const LeaveIcon = (props: SVGProps<SVGSVGElement>) => (
 
 const ConnectedContent: React.FC<{ onDisconnect: () => void }> = ({ onDisconnect }) => {
   const connectionState = useConnectionState();
-  const { state: agentState, audioTrack: agentTrack } = useVoiceAssistant();
   const { canPlayAudio } = useStartAudio({ props: {} }); // why do I need props..?
+  const { state: agentState, audioTrack } = useVoiceAssistant();
 
   return (
     <div className="content">
@@ -63,16 +63,16 @@ const ConnectedContent: React.FC<{ onDisconnect: () => void }> = ({ onDisconnect
       <div className="controls">
         <VoiceAssistantControlBar controls={{ microphone: true, leave: false }} />
 
-        {canPlayAudio && connectionState == ConnectionState.Connected && <div className="agent-visualizer">
+        {canPlayAudio && connectionState == ConnectionState.Connected && agentState !== "connecting" && <div className="agent-visualizer">
           <BarVisualizer
             state={agentState}
             barCount={15}
-            trackRef={agentTrack}
-            options={{ minHeight: 30, maxHeight: 30 }}
+            trackRef={audioTrack}
+            options={{ minHeight: 15, maxHeight: 30 }}
           />
         </div>}
       </div>
-    </div>
+    </div >
   );
 };
 
