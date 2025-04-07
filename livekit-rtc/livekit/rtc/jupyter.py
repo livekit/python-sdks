@@ -2,9 +2,8 @@
 from __future__ import annotations
 
 import atexit
-import sys
 import contextlib
-from IPython.core.display import HTML, JSON
+from IPython.core.display import HTML
 from IPython.display import display
 from importlib.resources import as_file, files
 
