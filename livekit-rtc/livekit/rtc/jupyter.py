@@ -13,40 +13,41 @@ atexit.register(_resource_stack.close)
 
 
 def room_html(url: str, token: str) -> HTML:
-    IN_COLAB = "google.colab" in sys.modules
-    IN_JUPYTER = "ipykernel" in sys.modules
-
-    if IN_COLAB:
-        from google.colab import output
-
-        def get_join_token():
-            return JSON({"url": url, "token": token})
-
-        output.register_callback("get_join_token", get_join_token)
-    elif IN_JUPYTER:
-        from IPython import get_ipython
-
-        ip = get_ipython()
-        if ip and hasattr(ip, "kernel"):
-
-            def token_comm_target(comm, open_msg):
-                @comm.on_msg
-                def handle_message(msg):
-                    comm.send({"url": url, "token": token})
-
-            ip.kernel.comm_manager.register_target("get_join_token_comm", token_comm_target)
-
-    index_path = files("livekit.rtc.resources") / "jupyter-html" / "index.html"
-    index_path = _resource_stack.enter_context(as_file(index_path))
-    return HTML(index_path.read_text())
-
-
-def display_room(url: str, token: str) -> None:
     """
-    Display a LiveKit room in Jupyter or Google Colab.
+    Generate the HTML needed to embed a LiveKit room.
 
     Args:
         url (str): The LiveKit room URL.
         token (str): The LiveKit join token.
+
+    Important:
+        The returned HTML contains the provided `url` and `token` values directly.
+        Avoid using sensitive tokens in public notebooks (e.g., tokens with long expiration times).
+    """
+    token_placeholder = "##livekit-token-placeholder##"
+    url_placeholder = "##livekit-url-placeholder##"
+
+    index_path = files("livekit.rtc.resources") / "jupyter-html" / "index.html"
+    index_path = _resource_stack.enter_context(as_file(index_path))
+
+    # turns out that directly replacing the URL/token is necessary, as Colab or Jupyter comms become
+    # unreliable when the main thread is busy/blocked
+    html_text = index_path.read_text()
+    html_text = html_text.replace(token_placeholder, token)
+    html_text = html_text.replace(url_placeholder, url)
+    return HTML(html_text)
+
+
+def display_room(url: str, token: str) -> None:
+    """
+    Display a LiveKit room in a Jupyter notebook or Google Colab.
+
+    Args:
+        url (str): The LiveKit room URL.
+        token (str): The LiveKit join token.
+
+    Important:
+        The rendered HTML will include the provided `url` and `token` in plain text.
+        Avoid using sensitive tokens in public notebooks (e.g., tokens with long expiration times).
     """
     display(room_html(url, token))

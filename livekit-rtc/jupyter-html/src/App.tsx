@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   LiveKitRoom,
   BarVisualizer,
@@ -15,45 +15,15 @@ import type { SVGProps } from 'react';
 import { ConnectionState } from 'livekit-client';
 
 
-export async function fetchJoinInfo(): Promise<{ url: string; token: string }> {
-  const invoke = (window as any).google?.colab?.kernel?.invokeFunction;
-  if (invoke) {
-    const res = await invoke("get_join_token", []);
-    return res.data["application/json"];
-  }
-
-
-  // This requires that JupyterLab was started with --LabApp.expose_app_in_browser,
-  if ((window as any).jupyterapp && (window as any).jupyterapp.shell) {
-    const currentWidget = (window as any).jupyterapp.shell.currentWidget;
-    if (currentWidget && currentWidget.context?.sessionContext) {
-      const session = currentWidget.context.sessionContext.session;
-      if (session && session.kernel) {
-        try {
-          const comm = session.kernel.createComm("get_join_token_comm");
-          comm.open();
-          comm.send({ request: "token" });
-          return new Promise((resolve) => {
-            comm.onMsg = (msg: any) => {
-              resolve(msg.content.data);
-            };
-          });
-        } catch (error) {
-          throw new Error("Error creating comm channel: " + error);
-        }
-      }
-    }
-  }
-
+export function getJoinInfo(): { url: string; token: string } {
   if (import.meta.env.MODE === "development") {
     const url = import.meta.env.VITE_LIVEKIT_URL;
     const token = import.meta.env.VITE_LIVEKIT_TOKEN;
     return { url, token };
   }
 
-  throw new Error("No suitable kernel connection available");
+  return { url: "##livekit-url-placeholder##", token: "##livekit-token-placeholder##" };
 }
-
 
 const LeaveIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="none" {...props}>
@@ -107,19 +77,11 @@ const ConnectedContent: React.FC<{ onDisconnect: () => void }> = ({ onDisconnect
 };
 
 const App = () => {
-  const [joinInfo, setJoinInfo] = useState<{ url: string; token: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(true);
-
-  useEffect(() => {
-    fetchJoinInfo()
-      .then((info) => setJoinInfo(info))
-      .catch((err) => setError(err.message));
-  }, []);
+  const joinInfo = getJoinInfo();
 
   if (error) return <div>Error: {error}</div>;
-
-  if (!joinInfo) return <div>Loading...</div>;
 
   if (!isConnected) {
     return (
