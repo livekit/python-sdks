@@ -161,7 +161,7 @@ class LocalParticipant(Participant):
         super().__init__(owned_info)
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
-        self._rpc_handlers: Dict[str, F] = {}
+        self._rpc_handlers: Dict[str, RpcHandler] = {}
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
