@@ -145,7 +145,9 @@ class Participant(ABC):
 
 
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
-F = TypeVar("F", bound=RpcHandler)
+F = TypeVar(
+    "F", bound=Callable[[RpcInvocationData], Union[Awaitable[Optional[str]], Optional[str]]]
+)
 
 
 class LocalParticipant(Participant):
@@ -159,7 +161,7 @@ class LocalParticipant(Participant):
         super().__init__(owned_info)
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
-        self._rpc_handlers: Dict[str, RpcHandler] = {}
+        self._rpc_handlers: Dict[str, F] = {}
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -439,26 +441,16 @@ class LocalParticipant(Participant):
         else:
             try:
                 if asyncio.iscoroutinefunction(handler):
-                    async_handler = cast(Callable[[RpcInvocationData], Awaitable[str]], handler)
-
-                    async def run_handler():
-                        try:
-                            return await async_handler(params)
-                        except asyncio.CancelledError:
-                            # This will be caught by the outer try-except if it's due to timeout
-                            raise
-
                     try:
                         response_payload = await asyncio.wait_for(
-                            run_handler(), timeout=response_timeout
+                            handler(params), timeout=response_timeout
                         )
                     except asyncio.TimeoutError:
                         raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
                     except asyncio.CancelledError:
                         raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
                 else:
-                    sync_handler = cast(Callable[[RpcInvocationData], str], handler)
-                    response_payload = sync_handler(params)
+                    response_payload = cast(Optional[str], handler(params))
             except RpcError as error:
                 response_error = error
             except Exception as error:
