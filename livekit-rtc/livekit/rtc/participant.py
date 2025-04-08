@@ -453,7 +453,7 @@ class LocalParticipant(Participant):
                     response_payload = cast(Optional[str], handler(params))
             except RpcError as error:
                 response_error = error
-            except Exception as error:
+            except Exception:
                 logger.exception(
                     f"Uncaught error returned by RPC handler for {method}. "
                     "Returning APPLICATION_ERROR instead. "
