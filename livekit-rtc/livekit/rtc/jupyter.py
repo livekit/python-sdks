@@ -1,8 +1,8 @@
-# type: ignore
 from __future__ import annotations
 
 import atexit
 import contextlib
+import html
 from IPython.core.display import HTML
 from IPython.display import display
 from importlib.resources import as_file, files
@@ -11,7 +11,7 @@ _resource_stack = contextlib.ExitStack()
 atexit.register(_resource_stack.close)
 
 
-def room_html(url: str, token: str) -> HTML:
+def room_html(url: str, token: str, *, width: str, height: str) -> HTML:
     """
     Generate the HTML needed to embed a LiveKit room.
 
@@ -35,10 +35,18 @@ def room_html(url: str, token: str) -> HTML:
     html_text = index_path.read_text()
     html_text = html_text.replace(token_placeholder, token)
     html_text = html_text.replace(url_placeholder, url)
-    return HTML(html_text)
+
+    escaped_content = html.escape(html_text, quote=True)
+    # the extra space in the iframe_html is to avoid IPython suggesting to use IFrame instead.
+    # it isn't possible in our case, as we need to use srcdoc.
+    iframe_html = (
+        f' <iframe width="{width}" height="{height}" frameborder="0" '
+        f'srcdoc="{escaped_content}"></iframe>'
+    )
+    return HTML(iframe_html)
 
 
-def display_room(url: str, token: str) -> None:
+def display_room(url: str, token: str, *, width: str = "100%", height: str = "110px") -> None:
     """
     Display a LiveKit room in a Jupyter notebook or Google Colab.
 
@@ -50,4 +58,4 @@ def display_room(url: str, token: str) -> None:
         The rendered HTML will include the provided `url` and `token` in plain text.
         Avoid using sensitive tokens in public notebooks (e.g., tokens with long expiration times).
     """
-    display(room_html(url, token))
+    display(room_html(url, token, width=width, height=height))
