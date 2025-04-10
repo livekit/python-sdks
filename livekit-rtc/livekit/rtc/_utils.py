@@ -55,7 +55,7 @@ class RingQueue(Generic[T]):
 
     def put(self, item: T) -> None:
         if self._capacity > 0 and len(self._queue) == self._capacity:
-            self._queue.pop()
+            self._queue.popleft()
         self._queue.append(item)
         self._event.set()
 
