@@ -35,10 +35,11 @@ protoc \
     $FFI_PROTOCOL/e2ee.proto \
     $FFI_PROTOCOL/stats.proto \
     $FFI_PROTOCOL/track_publication.proto \
-    $FFI_PROTOCOL/rpc.proto
+    $FFI_PROTOCOL/rpc.proto \
+    $FFI_PROTOCOL/data_stream.proto
 
 touch -a "$FFI_OUT_PYTHON/__init__.py"
 
 for f in "$FFI_OUT_PYTHON"/*.py "$FFI_OUT_PYTHON"/*.pyi; do
-    perl -i -pe 's|^(import (audio_frame_pb2\|ffi_pb2\|handle_pb2\|participant_pb2\|room_pb2\|track_pb2\|video_frame_pb2\|e2ee_pb2\|stats_pb2\|rpc_pb2\|track_publication_pb2))|from . $1|g' "$f"
+    perl -i -pe 's|^(import (audio_frame_pb2\|ffi_pb2\|handle_pb2\|participant_pb2\|room_pb2\|track_pb2\|video_frame_pb2\|e2ee_pb2\|stats_pb2\|rpc_pb2\|track_publication_pb2\|data_stream_pb2))|from . $1|g' "$f"
 done
