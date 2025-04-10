@@ -18,6 +18,7 @@ limitations under the License.
 
 import builtins
 import collections.abc
+import data_stream_pb2
 from . import e2ee_pb2
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
@@ -1268,6 +1269,8 @@ class RoomEvent(google.protobuf.message.Message):
     STREAM_CHUNK_RECEIVED_FIELD_NUMBER: builtins.int
     STREAM_TRAILER_RECEIVED_FIELD_NUMBER: builtins.int
     DATA_CHANNEL_LOW_THRESHOLD_CHANGED_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_OPENED_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_OPENED_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1330,13 +1333,21 @@ class RoomEvent(google.protobuf.message.Message):
     @property
     def chat_message(self) -> global___ChatMessageReceived: ...
     @property
-    def stream_header_received(self) -> global___DataStreamHeaderReceived: ...
+    def stream_header_received(self) -> global___DataStreamHeaderReceived:
+        """Data stream (low level)"""
+
     @property
     def stream_chunk_received(self) -> global___DataStreamChunkReceived: ...
     @property
     def stream_trailer_received(self) -> global___DataStreamTrailerReceived: ...
     @property
     def data_channel_low_threshold_changed(self) -> global___DataChannelBufferedAmountLowThresholdChanged: ...
+    @property
+    def byte_stream_opened(self) -> global___ByteStreamOpened:
+        """Data stream (high level)"""
+
+    @property
+    def text_stream_opened(self) -> global___TextStreamOpened: ...
     def __init__(
         self,
         *,
@@ -1373,10 +1384,12 @@ class RoomEvent(google.protobuf.message.Message):
         stream_chunk_received: global___DataStreamChunkReceived | None = ...,
         stream_trailer_received: global___DataStreamTrailerReceived | None = ...,
         data_channel_low_threshold_changed: global___DataChannelBufferedAmountLowThresholdChanged | None = ...,
+        byte_stream_opened: global___ByteStreamOpened | None = ...,
+        text_stream_opened: global___TextStreamOpened | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed"] | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed", "byte_stream_opened", "text_stream_opened"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -2532,3 +2545,43 @@ class DataChannelBufferedAmountLowThresholdChanged(google.protobuf.message.Messa
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "threshold", b"threshold"]) -> None: ...
 
 global___DataChannelBufferedAmountLowThresholdChanged = DataChannelBufferedAmountLowThresholdChanged
+
+@typing.final
+class ByteStreamOpened(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    READER_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def reader(self) -> data_stream_pb2.OwnedByteStreamReader: ...
+    def __init__(
+        self,
+        *,
+        reader: data_stream_pb2.OwnedByteStreamReader | None = ...,
+        participant_identity: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> None: ...
+
+global___ByteStreamOpened = ByteStreamOpened
+
+@typing.final
+class TextStreamOpened(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    READER_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def reader(self) -> data_stream_pb2.OwnedTextStreamReader: ...
+    def __init__(
+        self,
+        *,
+        reader: data_stream_pb2.OwnedTextStreamReader | None = ...,
+        participant_identity: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> None: ...
+
+global___TextStreamOpened = TextStreamOpened
