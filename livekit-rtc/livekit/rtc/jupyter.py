@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 import atexit
 import contextlib
 import html
@@ -36,14 +37,20 @@ def room_html(url: str, token: str, *, width: str, height: str) -> HTML:
     html_text = html_text.replace(token_placeholder, token)
     html_text = html_text.replace(url_placeholder, url)
 
-    escaped_content = html.escape(html_text, quote=True)
-    # the extra space in the iframe_html is to avoid IPython suggesting to use IFrame instead.
-    # it isn't possible in our case, as we need to use srcdoc.
-    iframe_html = (
-        f' <iframe width="{width}" height="{height}" frameborder="0" '
-        f'srcdoc="{escaped_content}"></iframe>'
-    )
-    return HTML(iframe_html)
+    IN_COLAB = "google.colab" in sys.modules
+
+    # Colab output already runs inside an iframe, so we don’t need to create an additional one.
+    # It also injects code into this iframe to handle microphone usage, so we need to preserve it.
+    if not IN_COLAB:
+        escaped_content = html.escape(html_text, quote=True)
+        # the extra space in the iframe_html is to avoid IPython suggesting to use IFrame instead.
+        # it isn't possible in our case, as we need to use srcdoc.
+        html_text = (
+            f' <iframe width="{width}" height="{height}" frameborder="0" '
+            f'srcdoc="{escaped_content}"></iframe>'
+        )
+
+    return HTML(html_text)
 
 
 def display_room(url: str, token: str, *, width: str = "100%", height: str = "110px") -> None:
