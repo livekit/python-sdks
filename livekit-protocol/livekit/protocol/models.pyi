@@ -83,6 +83,7 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     USER_UNAVAILABLE: _ClassVar[DisconnectReason]
     USER_REJECTED: _ClassVar[DisconnectReason]
     SIP_TRUNK_FAILURE: _ClassVar[DisconnectReason]
+    CONNECTION_TIMEOUT: _ClassVar[DisconnectReason]
 
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -152,6 +153,7 @@ ROOM_CLOSED: DisconnectReason
 USER_UNAVAILABLE: DisconnectReason
 USER_REJECTED: DisconnectReason
 SIP_TRUNK_FAILURE: DisconnectReason
+CONNECTION_TIMEOUT: DisconnectReason
 RR_UNKNOWN: ReconnectReason
 RR_SIGNAL_DISCONNECTED: ReconnectReason
 RR_PUBLISHER_FAILED: ReconnectReason
@@ -625,6 +627,7 @@ class ClientInfo(_message.Message):
         CPP: _ClassVar[ClientInfo.SDK]
         UNITY_WEB: _ClassVar[ClientInfo.SDK]
         NODE: _ClassVar[ClientInfo.SDK]
+        UNREAL: _ClassVar[ClientInfo.SDK]
     UNKNOWN: ClientInfo.SDK
     JS: ClientInfo.SDK
     SWIFT: ClientInfo.SDK
@@ -638,6 +641,7 @@ class ClientInfo(_message.Message):
     CPP: ClientInfo.SDK
     UNITY_WEB: ClientInfo.SDK
     NODE: ClientInfo.SDK
+    UNREAL: ClientInfo.SDK
     SDK_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
@@ -981,3 +985,11 @@ class DataStream(_message.Message):
         attributes: _containers.ScalarMap[str, str]
         def __init__(self, stream_id: _Optional[str] = ..., reason: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
     def __init__(self) -> None: ...
+
+class WebhookConfig(_message.Message):
+    __slots__ = ("url", "signing_key")
+    URL_FIELD_NUMBER: _ClassVar[int]
+    SIGNING_KEY_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    signing_key: str
+    def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ...) -> None: ...

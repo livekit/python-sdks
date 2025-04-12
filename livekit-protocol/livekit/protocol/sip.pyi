@@ -749,7 +749,7 @@ class SIPParticipantInfo(_message.Message):
     def __init__(self, participant_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., room_name: _Optional[str] = ..., sip_call_id: _Optional[str] = ...) -> None: ...
 
 class TransferSIPParticipantRequest(_message.Message):
-    __slots__ = ("participant_identity", "room_name", "transfer_to", "play_dialtone", "headers")
+    __slots__ = ("participant_identity", "room_name", "transfer_to", "play_dialtone", "headers", "ringing_timeout")
     class HeadersEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -762,12 +762,14 @@ class TransferSIPParticipantRequest(_message.Message):
     TRANSFER_TO_FIELD_NUMBER: _ClassVar[int]
     PLAY_DIALTONE_FIELD_NUMBER: _ClassVar[int]
     HEADERS_FIELD_NUMBER: _ClassVar[int]
+    RINGING_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     participant_identity: str
     room_name: str
     transfer_to: str
     play_dialtone: bool
     headers: _containers.ScalarMap[str, str]
-    def __init__(self, participant_identity: _Optional[str] = ..., room_name: _Optional[str] = ..., transfer_to: _Optional[str] = ..., play_dialtone: bool = ..., headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    ringing_timeout: _duration_pb2.Duration
+    def __init__(self, participant_identity: _Optional[str] = ..., room_name: _Optional[str] = ..., transfer_to: _Optional[str] = ..., play_dialtone: bool = ..., headers: _Optional[_Mapping[str, str]] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class SIPCallInfo(_message.Message):
     __slots__ = ("call_id", "trunk_id", "dispatch_rule_id", "region", "room_name", "room_id", "participant_identity", "participant_attributes", "from_uri", "to_uri", "created_at", "started_at", "ended_at", "enabled_features", "call_direction", "call_status", "created_at_ns", "started_at_ns", "ended_at_ns", "disconnect_reason", "error", "call_status_code", "audio_codec", "media_encryption")
