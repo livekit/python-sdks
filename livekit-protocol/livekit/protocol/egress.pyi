@@ -99,7 +99,7 @@ EGRESS_SOURCE_TYPE_WEB: EgressSourceType
 EGRESS_SOURCE_TYPE_SDK: EgressSourceType
 
 class RoomCompositeEgressRequest(_message.Message):
-    __slots__ = ("room_name", "layout", "audio_only", "audio_mixing", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
+    __slots__ = ("room_name", "layout", "audio_only", "audio_mixing", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs", "webhooks")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     LAYOUT_FIELD_NUMBER: _ClassVar[int]
     AUDIO_ONLY_FIELD_NUMBER: _ClassVar[int]
@@ -115,6 +115,7 @@ class RoomCompositeEgressRequest(_message.Message):
     STREAM_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     layout: str
     audio_only: bool
@@ -130,10 +131,11 @@ class RoomCompositeEgressRequest(_message.Message):
     stream_outputs: _containers.RepeatedCompositeFieldContainer[StreamOutput]
     segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
     image_outputs: _containers.RepeatedCompositeFieldContainer[ImageOutput]
-    def __init__(self, room_name: _Optional[str] = ..., layout: _Optional[str] = ..., audio_only: bool = ..., audio_mixing: _Optional[_Union[AudioMixing, str]] = ..., video_only: bool = ..., custom_base_url: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, room_name: _Optional[str] = ..., layout: _Optional[str] = ..., audio_only: bool = ..., audio_mixing: _Optional[_Union[AudioMixing, str]] = ..., video_only: bool = ..., custom_base_url: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class WebEgressRequest(_message.Message):
-    __slots__ = ("url", "audio_only", "video_only", "await_start_signal", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
+    __slots__ = ("url", "audio_only", "video_only", "await_start_signal", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs", "webhooks")
     URL_FIELD_NUMBER: _ClassVar[int]
     AUDIO_ONLY_FIELD_NUMBER: _ClassVar[int]
     VIDEO_ONLY_FIELD_NUMBER: _ClassVar[int]
@@ -147,6 +149,7 @@ class WebEgressRequest(_message.Message):
     STREAM_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
     url: str
     audio_only: bool
     video_only: bool
@@ -160,10 +163,11 @@ class WebEgressRequest(_message.Message):
     stream_outputs: _containers.RepeatedCompositeFieldContainer[StreamOutput]
     segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
     image_outputs: _containers.RepeatedCompositeFieldContainer[ImageOutput]
-    def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class ParticipantEgressRequest(_message.Message):
-    __slots__ = ("room_name", "identity", "screen_share", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
+    __slots__ = ("room_name", "identity", "screen_share", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs", "webhooks")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     SCREEN_SHARE_FIELD_NUMBER: _ClassVar[int]
@@ -173,6 +177,7 @@ class ParticipantEgressRequest(_message.Message):
     STREAM_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     identity: str
     screen_share: bool
@@ -182,10 +187,11 @@ class ParticipantEgressRequest(_message.Message):
     stream_outputs: _containers.RepeatedCompositeFieldContainer[StreamOutput]
     segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
     image_outputs: _containers.RepeatedCompositeFieldContainer[ImageOutput]
-    def __init__(self, room_name: _Optional[str] = ..., identity: _Optional[str] = ..., screen_share: bool = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, room_name: _Optional[str] = ..., identity: _Optional[str] = ..., screen_share: bool = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class TrackCompositeEgressRequest(_message.Message):
-    __slots__ = ("room_name", "audio_track_id", "video_track_id", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs")
+    __slots__ = ("room_name", "audio_track_id", "video_track_id", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs", "webhooks")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     AUDIO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     VIDEO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
@@ -198,6 +204,7 @@ class TrackCompositeEgressRequest(_message.Message):
     STREAM_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     audio_track_id: str
     video_track_id: str
@@ -210,19 +217,22 @@ class TrackCompositeEgressRequest(_message.Message):
     stream_outputs: _containers.RepeatedCompositeFieldContainer[StreamOutput]
     segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
     image_outputs: _containers.RepeatedCompositeFieldContainer[ImageOutput]
-    def __init__(self, room_name: _Optional[str] = ..., audio_track_id: _Optional[str] = ..., video_track_id: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ...) -> None: ...
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, room_name: _Optional[str] = ..., audio_track_id: _Optional[str] = ..., video_track_id: _Optional[str] = ..., file: _Optional[_Union[EncodedFileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., stream_outputs: _Optional[_Iterable[_Union[StreamOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ..., image_outputs: _Optional[_Iterable[_Union[ImageOutput, _Mapping]]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class TrackEgressRequest(_message.Message):
-    __slots__ = ("room_name", "track_id", "file", "websocket_url")
+    __slots__ = ("room_name", "track_id", "file", "websocket_url", "webhooks")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     FILE_FIELD_NUMBER: _ClassVar[int]
     WEBSOCKET_URL_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     track_id: str
     file: DirectFileOutput
     websocket_url: str
-    def __init__(self, room_name: _Optional[str] = ..., track_id: _Optional[str] = ..., file: _Optional[_Union[DirectFileOutput, _Mapping]] = ..., websocket_url: _Optional[str] = ...) -> None: ...
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, room_name: _Optional[str] = ..., track_id: _Optional[str] = ..., file: _Optional[_Union[DirectFileOutput, _Mapping]] = ..., websocket_url: _Optional[str] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class EncodedFileOutput(_message.Message):
     __slots__ = ("file_type", "filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
