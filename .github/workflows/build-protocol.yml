@@ -30,6 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           submodules: true
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -84,6 +85,9 @@ jobs:
       id-token: write
     if: startsWith(github.ref, 'refs/tags/protocol-v')
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v4
         with:
           name: protocol-release
