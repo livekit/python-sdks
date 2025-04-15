@@ -65,7 +65,7 @@ jobs:
         include:
           - os: ubuntu-latest
             archs: x86_64
-          - os: buildjet-4vcpu-ubuntu-2204-arm
+          - os: namespace-profile-default-arm64
             archs: aarch64
           - os: windows-latest
             archs: AMD64
