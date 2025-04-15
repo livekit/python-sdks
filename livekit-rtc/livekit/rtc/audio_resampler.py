@@ -9,6 +9,8 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._utils import get_address
 from .audio_frame import AudioFrame
 
+import numpy as np
+
 
 @unique
 class AudioResamplerQuality(str, Enum):
@@ -95,9 +97,18 @@ class AudioResampler:
         """
         bdata = data if isinstance(data, bytearray) else data.data.cast("b")
 
+        # temp fix:
+        # define DITHERING + (1./32)*(int)(((ran1>>3)&31)-((ran2>>3)&31)
+        # soxr dithering seems to overflow the int16 range (it's unclear why it happens on our builds
+        # but not inside the soxr lib)
+        audio_array = np.frombuffer(bdata, dtype=np.int16).astype(np.float32)
+        scaled_int16 = (audio_array * 0.9).astype(np.int16)
+
+        audio_view = memoryview(scaled_int16)
+
         req = proto_ffi.FfiRequest()
         req.push_sox_resampler.resampler_handle = self._ffi_handle.handle
-        req.push_sox_resampler.data_ptr = get_address(memoryview(bdata))
+        req.push_sox_resampler.data_ptr = get_address(audio_view)
         req.push_sox_resampler.size = len(bdata)
 
         resp = FfiClient.instance.request(req)
@@ -111,6 +122,7 @@ class AudioResampler:
         cdata = (ctypes.c_int8 * resp.push_sox_resampler.size).from_address(
             resp.push_sox_resampler.output_ptr
         )
+
         output_data = bytearray(cdata)
         return [
             AudioFrame(
