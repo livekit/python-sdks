@@ -215,7 +215,7 @@ class RoomService(Service):
             SVC,
             "ForwardParticipant",
             forward,
-            self._auth_header(VideoGrants(room_admin=True, room=forward.room)),
+            self._auth_header(VideoGrants(room_admin=True, room=forward.room, destination_room=forward.destination_room)),
             ForwardParticipantResponse,
         )
 
