@@ -39,6 +39,9 @@ class VideoGrants:
     room_join: Optional[bool] = None
     room: str = ""
 
+    # allows forwarding participant to room
+    destination_room: Optional[str] = None
+
     # permissions within a room
     can_publish: bool = True
     can_subscribe: bool = True
