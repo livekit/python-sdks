@@ -198,3 +198,7 @@ class EventEmitter(Generic[T_contra]):
         """
         if event in self._events:
             self._events[event].discard(callback)
+
+    def off_all(self):
+        """Unregister all callbacks from all events."""
+        self._events.clear()
