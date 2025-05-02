@@ -340,13 +340,13 @@ class ByteStreamWriter(BaseStreamWriter):
             ]
 
             for chunk in chunked_data:
-                self._next_chunk_index += 1
                 chunk_msg = proto_DataStream.Chunk(
                     stream_id=self._header.stream_id,
                     chunk_index=self._next_chunk_index,
                     content=chunk,
                 )
                 await self._send_chunk(chunk_msg)
+                self._next_chunk_index += 1
 
     @property
     def info(self) -> ByteStreamInfo:
