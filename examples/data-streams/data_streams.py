@@ -13,6 +13,8 @@ async def main(room: rtc.Room):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
+    active_tasks = []
+
     async def greetParticipant(identity: str):
         text_writer = await room.local_participant.stream_text(
             destination_identities=[identity], topic="chat"
@@ -32,8 +34,8 @@ async def main(room: rtc.Room):
         logger.info("Received chat message from %s: '%s'", participant_identity, full_text)
 
     async def on_welcome_image_received(reader: rtc.ByteStreamReader, participant_identity: str):
-        logger.info("Received image from %s: '%s'", participant_identity, reader.info["name"])
-        with open(reader.info["name"], mode="wb") as f:
+        logger.info("Received image from %s: '%s'", participant_identity, reader.info.name)
+        with open(reader.info.name, mode="wb") as f:
             async for chunk in reader:
                 f.write(chunk)
 
@@ -44,19 +46,19 @@ async def main(room: rtc.Room):
         logger.info("participant connected: %s %s", participant.sid, participant.identity)
         asyncio.create_task(greetParticipant(participant.identity))
 
-    room.set_text_stream_handler(
-        "chat",
-        lambda reader, participant_identity: asyncio.create_task(
-            on_chat_message_received(reader, participant_identity)
-        ),
-    )
+    def _handle_chat_stream(reader, participant_identity):
+        task = asyncio.create_task(on_chat_message_received(reader, participant_identity))
+        active_tasks.append(task)
+        task.add_done_callback(lambda _: active_tasks.remove(task))
 
-    room.set_byte_stream_handler(
-        "files",
-        lambda reader, participant_identity: asyncio.create_task(
-            on_welcome_image_received(reader, participant_identity)
-        ),
-    )
+    room.set_text_stream_handler("chat", _handle_chat_stream)
+
+    def _handle_welcome_image_stream(reader, participant_identity):
+        task = asyncio.create_task(on_welcome_image_received(reader, participant_identity))
+        active_tasks.append(task)
+        task.add_done_callback(lambda _: active_tasks.remove(task))
+
+    room.set_byte_stream_handler("files", _handle_welcome_image_stream)
 
     # By default, autosubscribe is enabled. The participant will be subscribed to
     # all published tracks in the room
