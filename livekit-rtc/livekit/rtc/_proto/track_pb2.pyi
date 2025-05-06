@@ -90,6 +90,33 @@ STATE_ACTIVE: StreamState.ValueType  # 1
 STATE_PAUSED: StreamState.ValueType  # 2
 global___StreamState = StreamState
 
+class _AudioTrackFeature:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _AudioTrackFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_AudioTrackFeature.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    TF_STEREO: _AudioTrackFeature.ValueType  # 0
+    TF_NO_DTX: _AudioTrackFeature.ValueType  # 1
+    TF_AUTO_GAIN_CONTROL: _AudioTrackFeature.ValueType  # 2
+    TF_ECHO_CANCELLATION: _AudioTrackFeature.ValueType  # 3
+    TF_NOISE_SUPPRESSION: _AudioTrackFeature.ValueType  # 4
+    TF_ENHANCED_NOISE_CANCELLATION: _AudioTrackFeature.ValueType  # 5
+    TF_PRECONNECT_BUFFER: _AudioTrackFeature.ValueType  # 6
+    """client will buffer audio once available and send it to the server via bytes stream once connected"""
+
+class AudioTrackFeature(_AudioTrackFeature, metaclass=_AudioTrackFeatureEnumTypeWrapper): ...
+
+TF_STEREO: AudioTrackFeature.ValueType  # 0
+TF_NO_DTX: AudioTrackFeature.ValueType  # 1
+TF_AUTO_GAIN_CONTROL: AudioTrackFeature.ValueType  # 2
+TF_ECHO_CANCELLATION: AudioTrackFeature.ValueType  # 3
+TF_NOISE_SUPPRESSION: AudioTrackFeature.ValueType  # 4
+TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature.ValueType  # 5
+TF_PRECONNECT_BUFFER: AudioTrackFeature.ValueType  # 6
+"""client will buffer audio once available and send it to the server via bytes stream once connected"""
+global___AudioTrackFeature = AudioTrackFeature
+
 @typing.final
 class CreateVideoTrackRequest(google.protobuf.message.Message):
     """Create a new VideoTrack from a VideoSource"""
@@ -250,6 +277,7 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     MUTED_FIELD_NUMBER: builtins.int
     REMOTE_FIELD_NUMBER: builtins.int
     ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
+    AUDIO_FEATURES_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     kind: global___TrackKind.ValueType
@@ -261,6 +289,8 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     muted: builtins.bool
     remote: builtins.bool
     encryption_type: e2ee_pb2.EncryptionType.ValueType
+    @property
+    def audio_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___AudioTrackFeature.ValueType]: ...
     def __init__(
         self,
         *,
@@ -275,9 +305,10 @@ class TrackPublicationInfo(google.protobuf.message.Message):
         muted: builtins.bool | None = ...,
         remote: builtins.bool | None = ...,
         encryption_type: e2ee_pb2.EncryptionType.ValueType | None = ...,
+        audio_features: collections.abc.Iterable[global___AudioTrackFeature.ValueType] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
 global___TrackPublicationInfo = TrackPublicationInfo
 
