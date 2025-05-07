@@ -27,6 +27,7 @@ class ImageFileSuffix(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     IMAGE_SUFFIX_INDEX: _ClassVar[ImageFileSuffix]
     IMAGE_SUFFIX_TIMESTAMP: _ClassVar[ImageFileSuffix]
+    IMAGE_SUFFIX_NONE_OVERWRITE: _ClassVar[ImageFileSuffix]
 
 class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -74,6 +75,7 @@ INDEX: SegmentedFileSuffix
 TIMESTAMP: SegmentedFileSuffix
 IMAGE_SUFFIX_INDEX: ImageFileSuffix
 IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix
+IMAGE_SUFFIX_NONE_OVERWRITE: ImageFileSuffix
 DEFAULT_PROTOCOL: StreamProtocol
 RTMP: StreamProtocol
 SRT: StreamProtocol

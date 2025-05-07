@@ -107,6 +107,7 @@ class AudioTrackFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     TF_ECHO_CANCELLATION: _ClassVar[AudioTrackFeature]
     TF_NOISE_SUPPRESSION: _ClassVar[AudioTrackFeature]
     TF_ENHANCED_NOISE_CANCELLATION: _ClassVar[AudioTrackFeature]
+    TF_PRECONNECT_BUFFER: _ClassVar[AudioTrackFeature]
 DEFAULT_AC: AudioCodec
 OPUS: AudioCodec
 AAC: AudioCodec
@@ -168,6 +169,7 @@ TF_AUTO_GAIN_CONTROL: AudioTrackFeature
 TF_ECHO_CANCELLATION: AudioTrackFeature
 TF_NOISE_SUPPRESSION: AudioTrackFeature
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature
+TF_PRECONNECT_BUFFER: AudioTrackFeature
 
 class Pagination(_message.Message):
     __slots__ = ("after_id", "limit")

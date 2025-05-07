@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, cast
+from typing import List, Optional, cast
 import asyncio
 
 from ._ffi_client import FfiHandle, FfiClient
@@ -71,6 +71,10 @@ class TrackPublication:
     @property
     def encryption_type(self) -> proto_e2ee.EncryptionType.ValueType:
         return self._info.encryption_type
+
+    @property
+    def audio_features(self) -> List[proto_track.AudioTrackFeature.ValueType]:
+        return list(self._info.audio_features)
 
 
 class LocalTrackPublication(TrackPublication):
