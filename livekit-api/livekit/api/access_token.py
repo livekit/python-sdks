@@ -81,6 +81,7 @@ class Claims:
     identity: str = ""
     name: str = ""
     kind: str = ""
+    kind_detail: str = ""
     metadata: str = ""
     video: Optional[VideoGrants] = None
     sip: Optional[SIPGrants] = None
@@ -104,6 +105,7 @@ class Claims:
 
 class AccessToken:
     ParticipantKind = Literal["standard", "egress", "ingress", "sip", "agent"]
+    ParticipantKindDetail = Literal["forwarded", "cloud_agent"]
 
     def __init__(
         self,
@@ -142,6 +144,10 @@ class AccessToken:
 
     def with_kind(self, kind: ParticipantKind) -> "AccessToken":
         self.claims.kind = kind
+        return self
+
+    def with_kind_detail(self, kind_detail: ParticipantKindDetail) -> "AccessToken":
+        self.claims.kind_detail = kind_detail
         return self
 
     def with_name(self, name: str) -> "AccessToken":
