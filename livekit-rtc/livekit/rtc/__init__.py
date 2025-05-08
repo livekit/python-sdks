@@ -57,7 +57,7 @@ from .room import (
     RoomOptions,
     RtcConfiguration,
     SipDTMF,
-    SessionStats,
+    RtcStats,
 )
 from .track import (
     AudioTrack,
@@ -131,7 +131,7 @@ __all__ = [
     "RoomOptions",
     "RtcConfiguration",
     "SipDTMF",
-    "SessionStats",
+    "RtcStats",
     "DataPacket",
     "LocalAudioTrack",
     "LocalVideoTrack",

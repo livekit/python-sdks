@@ -122,7 +122,7 @@ class SipDTMF:
 
 
 @dataclass
-class SessionStats:
+class RtcStats:
     publisher_stats: list[proto_stats.RtcStats]
     subscriber_stats: list[proto_stats.RtcStats]
 
@@ -415,7 +415,7 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
-    async def get_session_stats(self) -> SessionStats:
+    async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
             raise RuntimeError("the room isn't connected")
 
@@ -436,7 +436,8 @@ class Room(EventEmitter[EventTypes]):
 
         publisher_stats = list(cb.get_session_stats.result.publisher_stats)
         subscriber_stats = list(cb.get_session_stats.result.subscriber_stats)
-        return SessionStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
+
+        return RtcStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
 
     def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
         existing_handler = self._byte_stream_handlers.get(topic)
