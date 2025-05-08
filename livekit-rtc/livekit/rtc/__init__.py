@@ -54,7 +54,15 @@ from .participant import (
     Participant,
     RemoteParticipant,
 )
-from .room import ConnectError, DataPacket, Room, RoomOptions, RtcConfiguration, SipDTMF
+from .room import (
+    ConnectError,
+    DataPacket,
+    Room,
+    RoomOptions,
+    RtcConfiguration,
+    SipDTMF,
+    RtcStats,
+)
 from .track import (
     AudioTrack,
     LocalAudioTrack,
@@ -127,6 +135,7 @@ __all__ = [
     "RoomOptions",
     "RtcConfiguration",
     "SipDTMF",
+    "RtcStats",
     "DataPacket",
     "LocalAudioTrack",
     "LocalVideoTrack",

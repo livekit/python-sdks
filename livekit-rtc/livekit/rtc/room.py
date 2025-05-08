@@ -24,6 +24,7 @@ from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
+from ._proto import stats_pb2 as proto_stats
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
@@ -118,6 +119,12 @@ class SipDTMF:
     """DTMF digit sent."""
     participant: RemoteParticipant | None = None
     """Participant who sent the DTMF digit. None when sent by a server SDK."""
+
+
+@dataclass
+class RtcStats:
+    publisher_stats: list[proto_stats.RtcStats]
+    subscriber_stats: list[proto_stats.RtcStats]
 
 
 class ConnectError(Exception):
@@ -408,6 +415,30 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
+    async def get_rtc_stats(self) -> RtcStats:
+        if not self.isconnected():
+            raise RuntimeError("the room isn't connected")
+
+        req = proto_ffi.FfiRequest()
+        req.get_session_stats.room_handle = self._ffi_handle.handle  # type: ignore
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.get_session_stats.async_id == resp.get_session_stats.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.get_session_stats.error:
+            raise RuntimeError(cb.get_session_stats.error)
+
+        publisher_stats = list(cb.get_session_stats.result.publisher_stats)
+        subscriber_stats = list(cb.get_session_stats.result.subscriber_stats)
+
+        return RtcStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
+
     def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
         existing_handler = self._byte_stream_handlers.get(topic)
         if existing_handler is None:
@@ -446,6 +477,7 @@ class Room(EventEmitter[EventTypes]):
             await queue.wait_for(lambda e: e.disconnect.async_id == resp.disconnect.async_id)
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
+
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
