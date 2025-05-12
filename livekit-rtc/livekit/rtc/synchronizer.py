@@ -175,7 +175,6 @@ class _FPSController:
             # check if significantly behind schedule
             if -sleep_time > self._max_delay_tolerance_secs:
                 logger.warning(f"Frame capture was behind schedule for {-sleep_time * 1000:.2f} ms")
-                self._next_frame_time = time.perf_counter()
 
     def after_process(self) -> None:
         """Update timing information after processing a frame."""
