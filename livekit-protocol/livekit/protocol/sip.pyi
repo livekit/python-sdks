@@ -89,6 +89,12 @@ class SIPCallStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     SCS_DISCONNECTED: _ClassVar[SIPCallStatus]
     SCS_ERROR: _ClassVar[SIPCallStatus]
 
+class SIPTransferStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    STS_TRANSFER_ONGOING: _ClassVar[SIPTransferStatus]
+    STS_TRANSFER_FAILED: _ClassVar[SIPTransferStatus]
+    STS_TRANSFER_SUCCESSFUL: _ClassVar[SIPTransferStatus]
+
 class SIPFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     NONE: _ClassVar[SIPFeature]
@@ -163,6 +169,9 @@ SCS_PARTICIPANT_JOINED: SIPCallStatus
 SCS_ACTIVE: SIPCallStatus
 SCS_DISCONNECTED: SIPCallStatus
 SCS_ERROR: SIPCallStatus
+STS_TRANSFER_ONGOING: SIPTransferStatus
+STS_TRANSFER_FAILED: SIPTransferStatus
+STS_TRANSFER_SUCCESSFUL: SIPTransferStatus
 NONE: SIPFeature
 KRISP_ENABLED: SIPFeature
 SCD_UNKNOWN: SIPCallDirection
@@ -835,6 +844,26 @@ class SIPCallInfo(_message.Message):
     audio_codec: str
     media_encryption: str
     def __init__(self, call_id: _Optional[str] = ..., trunk_id: _Optional[str] = ..., dispatch_rule_id: _Optional[str] = ..., region: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., from_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., to_uri: _Optional[_Union[SIPUri, _Mapping]] = ..., created_at: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., enabled_features: _Optional[_Iterable[_Union[SIPFeature, str]]] = ..., call_direction: _Optional[_Union[SIPCallDirection, str]] = ..., call_status: _Optional[_Union[SIPCallStatus, str]] = ..., created_at_ns: _Optional[int] = ..., started_at_ns: _Optional[int] = ..., ended_at_ns: _Optional[int] = ..., disconnect_reason: _Optional[_Union[_models.DisconnectReason, str]] = ..., error: _Optional[str] = ..., call_status_code: _Optional[_Union[SIPStatus, _Mapping]] = ..., audio_codec: _Optional[str] = ..., media_encryption: _Optional[str] = ...) -> None: ...
+
+class SIPTransferInfo(_message.Message):
+    __slots__ = ("transfer_id", "call_id", "transfer_to", "transfer_initiated_at_ns", "transfer_completed_at_ns", "transfer_status", "error", "transfer_status_code")
+    TRANSFER_ID_FIELD_NUMBER: _ClassVar[int]
+    CALL_ID_FIELD_NUMBER: _ClassVar[int]
+    TRANSFER_TO_FIELD_NUMBER: _ClassVar[int]
+    TRANSFER_INITIATED_AT_NS_FIELD_NUMBER: _ClassVar[int]
+    TRANSFER_COMPLETED_AT_NS_FIELD_NUMBER: _ClassVar[int]
+    TRANSFER_STATUS_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    TRANSFER_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
+    transfer_id: str
+    call_id: str
+    transfer_to: str
+    transfer_initiated_at_ns: int
+    transfer_completed_at_ns: int
+    transfer_status: SIPTransferStatus
+    error: str
+    transfer_status_code: SIPStatus
+    def __init__(self, transfer_id: _Optional[str] = ..., call_id: _Optional[str] = ..., transfer_to: _Optional[str] = ..., transfer_initiated_at_ns: _Optional[int] = ..., transfer_completed_at_ns: _Optional[int] = ..., transfer_status: _Optional[_Union[SIPTransferStatus, str]] = ..., error: _Optional[str] = ..., transfer_status_code: _Optional[_Union[SIPStatus, _Mapping]] = ...) -> None: ...
 
 class SIPUri(_message.Message):
     __slots__ = ("user", "host", "ip", "port", "transport")
