@@ -57,6 +57,8 @@ class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     SIP_CALL_INCOMING: _ClassVar[AnalyticsEventType]
     SIP_CALL_STARTED: _ClassVar[AnalyticsEventType]
     SIP_CALL_ENDED: _ClassVar[AnalyticsEventType]
+    SIP_TRANSFER_REQUESTED: _ClassVar[AnalyticsEventType]
+    SIP_TRANSFER_COMPLETE: _ClassVar[AnalyticsEventType]
     REPORT: _ClassVar[AnalyticsEventType]
     API_CALL: _ClassVar[AnalyticsEventType]
     WEBHOOK: _ClassVar[AnalyticsEventType]
@@ -100,6 +102,8 @@ SIP_PARTICIPANT_CREATED: AnalyticsEventType
 SIP_CALL_INCOMING: AnalyticsEventType
 SIP_CALL_STARTED: AnalyticsEventType
 SIP_CALL_ENDED: AnalyticsEventType
+SIP_TRANSFER_REQUESTED: AnalyticsEventType
+SIP_TRANSFER_COMPLETE: AnalyticsEventType
 REPORT: AnalyticsEventType
 API_CALL: AnalyticsEventType
 WEBHOOK: AnalyticsEventType
@@ -217,7 +221,7 @@ class AnalyticsClientMeta(_message.Message):
     def __init__(self, region: _Optional[str] = ..., node: _Optional[str] = ..., client_addr: _Optional[str] = ..., client_connect_time: _Optional[int] = ..., connection_type: _Optional[str] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., geo_hash: _Optional[str] = ..., country: _Optional[str] = ..., isp_asn: _Optional[int] = ...) -> None: ...
 
 class AnalyticsEvent(_message.Message):
-    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id", "sip_call_id", "sip_call", "sip_trunk_id", "sip_inbound_trunk", "sip_outbound_trunk", "sip_dispatch_rule_id", "sip_dispatch_rule", "report", "api_call", "webhook")
+    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id", "sip_call_id", "sip_call", "sip_trunk_id", "sip_inbound_trunk", "sip_outbound_trunk", "sip_dispatch_rule_id", "sip_dispatch_rule", "sip_transfer", "report", "api_call", "webhook")
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -248,6 +252,7 @@ class AnalyticsEvent(_message.Message):
     SIP_OUTBOUND_TRUNK_FIELD_NUMBER: _ClassVar[int]
     SIP_DISPATCH_RULE_ID_FIELD_NUMBER: _ClassVar[int]
     SIP_DISPATCH_RULE_FIELD_NUMBER: _ClassVar[int]
+    SIP_TRANSFER_FIELD_NUMBER: _ClassVar[int]
     REPORT_FIELD_NUMBER: _ClassVar[int]
     API_CALL_FIELD_NUMBER: _ClassVar[int]
     WEBHOOK_FIELD_NUMBER: _ClassVar[int]
@@ -281,10 +286,11 @@ class AnalyticsEvent(_message.Message):
     sip_outbound_trunk: _sip.SIPOutboundTrunkInfo
     sip_dispatch_rule_id: str
     sip_dispatch_rule: _sip.SIPDispatchRuleInfo
+    sip_transfer: _sip.SIPTransferInfo
     report: ReportInfo
     api_call: APICallInfo
     webhook: WebhookInfo
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., sip_transfer: _Optional[_Union[_sip.SIPTransferInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
     __slots__ = ("events",)

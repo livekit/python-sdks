@@ -224,3 +224,17 @@ class ForwardParticipantRequest(_message.Message):
 class ForwardParticipantResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
+
+class MoveParticipantRequest(_message.Message):
+    __slots__ = ("room", "identity", "destination_room")
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    DESTINATION_ROOM_FIELD_NUMBER: _ClassVar[int]
+    room: str
+    identity: str
+    destination_room: str
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., destination_room: _Optional[str] = ...) -> None: ...
+
+class MoveParticipantResponse(_message.Message):
+    __slots__ = ()
+    def __init__(self) -> None: ...
