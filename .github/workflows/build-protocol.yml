@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-    if: startsWith(github.ref, 'refs/tags/protocol-v')
+    if: startsWith(github.ref, 'refs/tags/protocol-v') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -90,9 +90,6 @@ jobs:
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
 
   docs:
     needs: [publish]
