@@ -243,7 +243,9 @@ class RoomService(Service):
             move,
             self._auth_header(
                 VideoGrants(
-                    room_admin=True, room=move.room, destination_room=move.destination_room,
+                    room_admin=True,
+                    room=move.room,
+                    destination_room=move.destination_room,
                 )
             ),
             MoveParticipantResponse,
