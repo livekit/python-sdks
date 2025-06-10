@@ -167,7 +167,7 @@ class AvailabilityRequest(_message.Message):
     def __init__(self, job: _Optional[_Union[Job, _Mapping]] = ..., resuming: bool = ...) -> None: ...
 
 class AvailabilityResponse(_message.Message):
-    __slots__ = ("job_id", "available", "supports_resume", "participant_name", "participant_identity", "participant_metadata", "participant_attributes")
+    __slots__ = ("job_id", "available", "supports_resume", "terminate", "participant_name", "participant_identity", "participant_metadata", "participant_attributes")
     class ParticipantAttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -178,6 +178,7 @@ class AvailabilityResponse(_message.Message):
     JOB_ID_FIELD_NUMBER: _ClassVar[int]
     AVAILABLE_FIELD_NUMBER: _ClassVar[int]
     SUPPORTS_RESUME_FIELD_NUMBER: _ClassVar[int]
+    TERMINATE_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_NAME_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -185,11 +186,12 @@ class AvailabilityResponse(_message.Message):
     job_id: str
     available: bool
     supports_resume: bool
+    terminate: bool
     participant_name: str
     participant_identity: str
     participant_metadata: str
     participant_attributes: _containers.ScalarMap[str, str]
-    def __init__(self, job_id: _Optional[str] = ..., available: bool = ..., supports_resume: bool = ..., participant_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, job_id: _Optional[str] = ..., available: bool = ..., supports_resume: bool = ..., terminate: bool = ..., participant_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpdateJobStatus(_message.Message):
     __slots__ = ("job_id", "status", "error")
