@@ -152,6 +152,7 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
     AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: builtins.int
     AUDIO_FILTER_OPTIONS_FIELD_NUMBER: builtins.int
+    FRAME_SIZE_MS_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___AudioStreamType.ValueType
     sample_rate: builtins.int
@@ -159,6 +160,7 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
     audio_filter_module_id: builtins.str
     """Unique identifier passed in LoadAudioFilterPluginRequest"""
     audio_filter_options: builtins.str
+    frame_size_ms: builtins.int
     def __init__(
         self,
         *,
@@ -168,9 +170,10 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
         num_channels: builtins.int | None = ...,
         audio_filter_module_id: builtins.str | None = ...,
         audio_filter_options: builtins.str | None = ...,
+        frame_size_ms: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewAudioStreamRequest = NewAudioStreamRequest
 
@@ -202,6 +205,7 @@ class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
     AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: builtins.int
     AUDIO_FILTER_OPTIONS_FIELD_NUMBER: builtins.int
+    FRAME_SIZE_MS_FIELD_NUMBER: builtins.int
     participant_handle: builtins.int
     type: global___AudioStreamType.ValueType
     track_source: track_pb2.TrackSource.ValueType
@@ -209,6 +213,7 @@ class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
     num_channels: builtins.int
     audio_filter_module_id: builtins.str
     audio_filter_options: builtins.str
+    frame_size_ms: builtins.int
     def __init__(
         self,
         *,
@@ -219,9 +224,10 @@ class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
         num_channels: builtins.int | None = ...,
         audio_filter_module_id: builtins.str | None = ...,
         audio_filter_options: builtins.str | None = ...,
+        frame_size_ms: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
 
 global___AudioStreamFromParticipantRequest = AudioStreamFromParticipantRequest
 
