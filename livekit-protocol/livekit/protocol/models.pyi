@@ -84,6 +84,7 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     USER_REJECTED: _ClassVar[DisconnectReason]
     SIP_TRUNK_FAILURE: _ClassVar[DisconnectReason]
     CONNECTION_TIMEOUT: _ClassVar[DisconnectReason]
+    MEDIA_FAILURE: _ClassVar[DisconnectReason]
 
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -155,6 +156,7 @@ USER_UNAVAILABLE: DisconnectReason
 USER_REJECTED: DisconnectReason
 SIP_TRUNK_FAILURE: DisconnectReason
 CONNECTION_TIMEOUT: DisconnectReason
+MEDIA_FAILURE: DisconnectReason
 RR_UNKNOWN: ReconnectReason
 RR_SIGNAL_DISCONNECTED: ReconnectReason
 RR_PUBLISHER_FAILED: ReconnectReason
