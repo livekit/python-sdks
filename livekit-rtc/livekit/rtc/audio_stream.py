@@ -61,6 +61,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions] = None,
         **kwargs,
     ) -> None:
@@ -97,6 +98,7 @@ class AudioStream:
         self._track: Track | None = track
         self._sample_rate = sample_rate
         self._num_channels = num_channels
+        self._frame_size_ms = frame_size_ms
         self._loop = loop or asyncio.get_event_loop()
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
@@ -129,6 +131,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
@@ -166,6 +169,7 @@ class AudioStream:
             sample_rate=sample_rate,
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
+            frame_size_ms=frame_size_ms,
         )
 
     @classmethod
@@ -177,6 +181,7 @@ class AudioStream:
         capacity: int = 0,
         sample_rate: int = 48000,
         num_channels: int = 1,
+        frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
@@ -210,6 +215,7 @@ class AudioStream:
             sample_rate=sample_rate,
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
+            frame_size_ms=frame_size_ms,
         )
 
     def __del__(self) -> None:
@@ -222,6 +228,8 @@ class AudioStream:
         new_audio_stream.track_handle = self._track._ffi_handle.handle
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
+        if self._frame_size_ms:
+            new_audio_stream.frame_size_ms = self._frame_size_ms
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         if self._audio_filter_module is not None:
             new_audio_stream.audio_filter_module_id = self._audio_filter_module
@@ -240,6 +248,9 @@ class AudioStream:
         audio_stream_from_participant.num_channels = self._num_channels
         audio_stream_from_participant.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         audio_stream_from_participant.track_source = track_source
+        if self._frame_size_ms:
+            audio_stream_from_participant.frame_size_ms = self._frame_size_ms
+
         if self._audio_filter_module is not None:
             audio_stream_from_participant.audio_filter_module_id = self._audio_filter_module
         if self._audio_filter_options is not None:
