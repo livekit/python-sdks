@@ -228,7 +228,8 @@ class AudioStream:
         new_audio_stream.track_handle = self._track._ffi_handle.handle
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
-        new_audio_stream.frame_size_ms = self._frame_size_ms
+        if self._frame_size_ms:
+            new_audio_stream.frame_size_ms = self._frame_size_ms
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         if self._audio_filter_module is not None:
             new_audio_stream.audio_filter_module_id = self._audio_filter_module
@@ -247,7 +248,9 @@ class AudioStream:
         audio_stream_from_participant.num_channels = self._num_channels
         audio_stream_from_participant.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         audio_stream_from_participant.track_source = track_source
-        audio_stream_from_participant.frame_size_ms = self._frame_size_ms
+        if self._frame_size_ms:
+            audio_stream_from_participant.frame_size_ms = self._frame_size_ms
+
         if self._audio_filter_module is not None:
             audio_stream_from_participant.audio_filter_module_id = self._audio_filter_module
         if self._audio_filter_options is not None:
