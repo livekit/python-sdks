@@ -386,6 +386,7 @@ class Room(EventEmitter[EventTypes]):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.connect.async_id == resp.connect.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -428,6 +429,7 @@ class Room(EventEmitter[EventTypes]):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.get_session_stats.async_id == resp.get_session_stats.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -475,6 +477,7 @@ class Room(EventEmitter[EventTypes]):
         try:
             resp = FfiClient.instance.request(req)
             await queue.wait_for(lambda e: e.disconnect.async_id == resp.disconnect.async_id)
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
