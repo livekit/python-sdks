@@ -237,56 +237,58 @@ class Room(EventEmitter[EventTypes]):
             E2EEManager: The E2EE manager instance.
         """
         return self._e2ee_manager
-    
+
     @property
     def num_participants(self) -> int:
         """Gets the number of participants in the room.
-        
+
         Returns:
             int: The number of participants in the room.
         """
         return self._info.num_participants
-    
+
     @property
     def num_publishers(self) -> int:
         """Gets the number of publishers in the room.
-        
+
         Returns:
             int: The number of publishers in the room.
         """
         return self._info.num_publishers
-    
+
     @property
     def creation_time(self) -> datetime.datetime:
         """Time when the room was created.
-        
+
         Returns:
             datetime.datetime: The creation time of the room.
         """
-        return datetime.datetime.fromtimestamp(self._info.creation_time / 1000, datetime.timezone.utc)
-    
+        return datetime.datetime.fromtimestamp(
+            self._info.creation_time / 1000, datetime.timezone.utc
+        )
+
     @property
     def is_recording(self) -> bool:
         """Whether the room is actively recording.
-        
+
         Returns:
             bool: True if actively recording, False otherwise.
         """
         return self._info.active_recording
-    
+
     @property
     def departure_timeout(self) -> float:
         """Amount of time to hold the room open after the last standard participant leaves.
-        
+
         Returns:
             float: The departure timeout of the room.
         """
         return float(self._info.departure_timeout)
-    
+
     @property
     def empty_timeout(self) -> float:
         """Amount of time to keep the room open if no participants join.
-        
+
         Returns:
             float: The empty timeout of the room.
         """
@@ -830,7 +832,7 @@ class Room(EventEmitter[EventTypes]):
             )
             self._data_stream_tasks.add(task)
             task.add_done_callback(self._data_stream_tasks.discard)
-        
+
         elif which == "room_updated":
             self._info = event.room_updated
             self.emit("room_updated")
