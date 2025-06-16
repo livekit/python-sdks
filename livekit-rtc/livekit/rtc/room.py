@@ -769,6 +769,9 @@ class Room(EventEmitter[EventTypes]):
             )
             self._data_stream_tasks.add(task)
             task.add_done_callback(self._data_stream_tasks.discard)
+        
+        elif which == "room_updated":
+            print(f"received room update: {event.room_updated}")
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
