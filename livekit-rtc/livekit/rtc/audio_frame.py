@@ -64,6 +64,7 @@ class AudioFrame:
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._samples_per_channel = samples_per_channel
+        self._userdata: dict[str, Any] = {}
 
     @staticmethod
     def create(sample_rate: int, num_channels: int, samples_per_channel: int) -> "AudioFrame":
@@ -99,6 +100,13 @@ class AudioFrame:
         audio_info.num_channels = self.num_channels
         audio_info.samples_per_channel = self.samples_per_channel
         return audio_info
+
+    @property
+    def userdata(self) -> dict[str, Any]:
+        """
+        Returns the user data associated with the audio frame.
+        """
+        return self._userdata
 
     @property
     def data(self) -> memoryview:
