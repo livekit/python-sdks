@@ -88,6 +88,7 @@ class _DisconnectReasonEnumTypeWrapper(google.protobuf.internal.enum_type_wrappe
     SIP_TRUNK_FAILURE: _DisconnectReason.ValueType  # 13
     """SIP protocol failure or unexpected response"""
     CONNECTION_TIMEOUT: _DisconnectReason.ValueType  # 14
+    MEDIA_FAILURE: _DisconnectReason.ValueType  # 15
 
 class DisconnectReason(_DisconnectReason, metaclass=_DisconnectReasonEnumTypeWrapper): ...
 
@@ -119,6 +120,7 @@ USER_REJECTED: DisconnectReason.ValueType  # 12
 SIP_TRUNK_FAILURE: DisconnectReason.ValueType  # 13
 """SIP protocol failure or unexpected response"""
 CONNECTION_TIMEOUT: DisconnectReason.ValueType  # 14
+MEDIA_FAILURE: DisconnectReason.ValueType  # 15
 global___DisconnectReason = DisconnectReason
 
 @typing.final
