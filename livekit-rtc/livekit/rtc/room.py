@@ -241,6 +241,7 @@ class Room(EventEmitter[EventTypes]):
     @property
     def num_participants(self) -> int:
         """Gets the number of participants in the room.
+        This value is updated periodically, and is eventually consistent.
 
         Returns:
             int: The number of participants in the room.
@@ -250,6 +251,7 @@ class Room(EventEmitter[EventTypes]):
     @property
     def num_publishers(self) -> int:
         """Gets the number of publishers in the room.
+        This value is updated periodically, and is eventually consistent.
 
         Returns:
             int: The number of publishers in the room.
