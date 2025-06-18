@@ -117,6 +117,10 @@ async def main(room: rtc.Room) -> None:
     def on_reconnected() -> None:
         logging.info("reconnected")
 
+    @room.on("room_updated")
+    def on_room_updated() -> None:
+        logging.info(f"room updated, participants: {room.num_participants}")
+
     token = (
         api.AccessToken()
         .with_identity("python-bot")
@@ -130,8 +134,8 @@ async def main(room: rtc.Room) -> None:
         .to_jwt()
     )
     await room.connect(os.getenv("LIVEKIT_URL"), token)
-    logging.info("connected to room %s", room.name)
-    logging.info("participants: %s", room.remote_participants)
+    logging.info(f"connected to room {room.name}, created {room.creation_time}")
+    logging.info(f"participants: {room.remote_participants}")
 
     await asyncio.sleep(2)
     await room.local_participant.publish_data("hello world")

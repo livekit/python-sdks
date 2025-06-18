@@ -13,6 +13,7 @@
 # limitations under the License.
 from __future__ import annotations
 
+import datetime
 import asyncio
 import ctypes
 import logging
@@ -70,6 +71,8 @@ EventTypes = Literal[
     "disconnected",
     "reconnecting",
     "reconnected",
+    "room_updated",
+    "moved",
 ]
 
 
@@ -235,6 +238,64 @@ class Room(EventEmitter[EventTypes]):
         """
         return self._e2ee_manager
 
+    @property
+    def num_participants(self) -> int:
+        """Gets the number of participants in the room.
+        This value is updated periodically, and is eventually consistent.
+
+        Returns:
+            int: The number of participants in the room.
+        """
+        return self._info.num_participants
+
+    @property
+    def num_publishers(self) -> int:
+        """Gets the number of publishers in the room.
+        This value is updated periodically, and is eventually consistent.
+
+        Returns:
+            int: The number of publishers in the room.
+        """
+        return self._info.num_publishers
+
+    @property
+    def creation_time(self) -> datetime.datetime:
+        """Time when the room was created.
+
+        Returns:
+            datetime.datetime: The creation time of the room.
+        """
+        return datetime.datetime.fromtimestamp(
+            self._info.creation_time / 1000, datetime.timezone.utc
+        )
+
+    @property
+    def is_recording(self) -> bool:
+        """Whether the room is actively recording.
+
+        Returns:
+            bool: True if actively recording, False otherwise.
+        """
+        return self._info.active_recording
+
+    @property
+    def departure_timeout(self) -> float:
+        """Amount of time to hold the room open after the last standard participant leaves.
+
+        Returns:
+            float: The departure timeout of the room.
+        """
+        return float(self._info.departure_timeout)
+
+    @property
+    def empty_timeout(self) -> float:
+        """Amount of time to keep the room open if no participants join.
+
+        Returns:
+            float: The empty timeout of the room.
+        """
+        return float(self._info.empty_timeout)
+
     def isconnected(self) -> bool:
         """Checks if the room is currently connected.
 
@@ -310,6 +371,10 @@ class Room(EventEmitter[EventTypes]):
             - **"reconnecting"**: Called when the room is attempting to reconnect.
                 - Arguments: None
             - **"reconnected"**: Called when the room has successfully reconnected.
+                - Arguments: None
+            - **"room_updated"**: Called when any information about the room is updated.
+                - Arguments: None
+            - **"moved"**: Called when the participant has been moved to another room.
                 - Arguments: None
 
         Example:
@@ -769,6 +834,20 @@ class Room(EventEmitter[EventTypes]):
             )
             self._data_stream_tasks.add(task)
             task.add_done_callback(self._data_stream_tasks.discard)
+
+        elif which == "room_updated":
+            self._info = event.room_updated
+            self.emit("room_updated")
+
+        elif which == "moved":
+            self._info = event.moved
+            self.emit("moved")
+
+        elif which == "participants_updated":
+            for info in event.participants_updated.participants:
+                participant = self._retrieve_participant(info.identity)
+                if participant:
+                    participant._info = info
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
