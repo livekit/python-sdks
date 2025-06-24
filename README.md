@@ -8,7 +8,8 @@
 
 <!--END_BANNER_IMAGE-->
 
-[![pypi-v](https://img.shields.io/pypi/v/livekit.svg)](https://pypi.org/project/livekit/)
+[![pypi-v](https://img.shields.io/pypi/v/livekit.svg?label=livekit)](https://pypi.org/project/livekit/)
+[![pypi-v](https://img.shields.io/pypi/v/livekit-api.svg?label=livekit-api)](https://pypi.org/project/livekit-api/)
 
 # 📹🎙️🐍 Python SDK for LiveKit
 
