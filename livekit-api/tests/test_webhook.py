@@ -1,10 +1,11 @@
 import base64
 import hashlib
+
 import pytest  # type: ignore
 from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
 
-TEST_API_KEY = "myapikey"
-TEST_API_SECRET = "thiskeyistotallyunsafe"
+TEST_API_KEY = 'myapikey'
+TEST_API_SECRET = 'thiskeyistotallyunsafe'
 TEST_EVENT = """
 {
   "event": "room_started",
@@ -60,10 +61,10 @@ def test_bad_hash():
     receiver = WebhookReceiver(token_verifier)
 
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET)
-    hash64 = base64.b64encode(hashlib.sha256("wrong_hash".encode()).digest()).decode()
+    hash64 = base64.b64encode(hashlib.sha256('wrong_hash'.encode()).digest()).decode()
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
-    with pytest.raises(Exception): # Using a broad Exception for existing test
+    with pytest.raises(Exception):  # Using a broad Exception for existing test
         receiver.receive(TEST_EVENT, jwt)
 
 
@@ -72,12 +73,13 @@ def test_invalid_body():
     receiver = WebhookReceiver(token_verifier)
 
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET)
-    body = "invalid body"
+    body = 'invalid body'
     hash64 = base64.b64encode(hashlib.sha256(body.encode()).digest()).decode()
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
-    with pytest.raises(Exception): # Using a broad Exception for existing test
+    with pytest.raises(Exception):  # Using a broad Exception for existing test
         receiver.receive(body, jwt)
+
 
 def test_malformed_jwt():
     """
@@ -86,7 +88,7 @@ def test_malformed_jwt():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     receiver = WebhookReceiver(token_verifier)
 
-    malformed_jwt = "this.is.not.a.valid.jwt" # A clearly malformed string
+    malformed_jwt = 'this.is.not.a.valid.jwt'  # A clearly malformed string
 
     with pytest.raises(Exception):
         receiver.receive(TEST_EVENT, malformed_jwt)
