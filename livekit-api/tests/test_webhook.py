@@ -1,6 +1,6 @@
 import base64
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC # Import UTC for timezone-aware datetime
 
 import pytest  # type: ignore
 from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
@@ -99,8 +99,11 @@ def test_mismatched_api_key_secret():
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
 
-    # Now using broad Exception, as requested
-    with pytest.raises(Exception, match="could not verify token signature"):
+    # The LiveKit API internally catches jwt.exceptions.InvalidSignatureError
+    # and re-raises it as a LiveKitError with a message starting "could not verify token: "
+    # followed by the original JWT error message.
+    expected_match = r"could not verify token: Signature verification failed"
+    with pytest.raises(Exception, match=expected_match):
         receiver.receive(TEST_EVENT, jwt)
 
 
@@ -116,10 +119,13 @@ def test_expired_token():
     token.claims.sha256 = hash64
 
     # Set the token's expiration to a time in the past
-    token.claims.exp = datetime.utcnow() - timedelta(seconds=60) # 1 minute ago
+    # Using datetime.now(UTC) to address the DeprecationWarning
+    token.claims.exp = datetime.now(UTC) - timedelta(seconds=60) # 1 minute ago
 
     jwt = token.to_jwt()
 
-    # Now using broad Exception, as requested
-    with pytest.raises(Exception):
+    # Similar to mismatched key, LiveKit API wraps the ExpiredSignatureError
+    # The message will start with "could not verify token: "
+    expected_match = r"could not verify token: Signature has expired"
+    with pytest.raises(Exception, match=expected_match):
         receiver.receive(TEST_EVENT, jwt)
