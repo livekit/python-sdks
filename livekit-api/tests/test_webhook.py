@@ -1,7 +1,5 @@
 import base64
 import hashlib
-from datetime import datetime, timedelta, UTC # Import UTC for timezone-aware datetime
-
 import pytest  # type: ignore
 from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
 
