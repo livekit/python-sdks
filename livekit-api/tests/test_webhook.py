@@ -3,9 +3,7 @@ import hashlib
 from datetime import datetime, timedelta
 
 import pytest  # type: ignore
-import jwt.exceptions  # Import for JWT specific exceptions
 from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
-from livekit.api.errors import LiveKitError # Import for LiveKit API specific errors
 
 TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"
