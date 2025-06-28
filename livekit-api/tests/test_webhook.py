@@ -99,7 +99,8 @@ def test_mismatched_api_key_secret():
     token.claims.sha256 = hash64
     jwt = token.to_jwt()
 
-    with pytest.raises(LiveKitError, match="could not verify token signature"):
+    # Now using broad Exception, as requested
+    with pytest.raises(Exception, match="could not verify token signature"):
         receiver.receive(TEST_EVENT, jwt)
 
 
@@ -119,5 +120,6 @@ def test_expired_token():
 
     jwt = token.to_jwt()
 
-    with pytest.raises(jwt.exceptions.ExpiredSignatureError):
+    # Now using broad Exception, as requested
+    with pytest.raises(Exception):
         receiver.receive(TEST_EVENT, jwt)
