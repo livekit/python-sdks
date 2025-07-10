@@ -10,6 +10,7 @@ SAMPLERATE = 48000
 BLOCKSIZE = 480  # 10ms chunks at 48kHz
 CHANNELS = 1
 
+
 class AudioBuffer:
     def __init__(self, blocksize=BLOCKSIZE):
         self.blocksize = blocksize
@@ -20,8 +21,8 @@ class AudioBuffer:
 
     def get_chunk(self):
         if len(self.buffer) >= self.blocksize:
-            chunk = self.buffer[:self.blocksize]
-            self.buffer = self.buffer[self.blocksize:]
+            chunk = self.buffer[: self.blocksize]
+            self.buffer = self.buffer[self.blocksize :]
             return chunk
         return None
 
@@ -33,6 +34,7 @@ class AudioBuffer:
             self.buffer = self.buffer[available:]
             return chunk
         return np.zeros(self.blocksize, dtype=np.int16)
+
 
 async def audio_player(queue: asyncio.Queue):
     """Pull from the queue and stream audio using sounddevice."""
@@ -62,13 +64,14 @@ async def audio_player(queue: asyncio.Queue):
         samplerate=SAMPLERATE,
         channels=CHANNELS,
         blocksize=BLOCKSIZE,
-        dtype='int16',
+        dtype="int16",
         callback=callback,
-        latency='low'
+        latency="low",
     )
     with stream:
         while True:
             await asyncio.sleep(0.1)  # keep the loop alive
+
 
 async def rtc_session(room, queue: asyncio.Queue):
     track: rtc.RemoteAudioTrack | None = None
@@ -88,7 +91,7 @@ async def rtc_session(room, queue: asyncio.Queue):
         track=track,
         sample_rate=SAMPLERATE,
         num_channels=1,
-        noise_cancellation=noise_cancellation.BVC(), # or NC()
+        noise_cancellation=noise_cancellation.BVC(),  # or NC()
     )
 
     print("playing stream")
@@ -109,6 +112,7 @@ async def rtc_session(room, queue: asyncio.Queue):
     finally:
         # Clean up the stream when done
         await stream.aclose()
+
 
 async def main():
     queue = asyncio.Queue(maxsize=50)
@@ -149,5 +153,6 @@ async def main():
             await player_task
         except asyncio.CancelledError:
             pass
+
 
 asyncio.run(main())
