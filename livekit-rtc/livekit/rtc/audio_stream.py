@@ -108,8 +108,6 @@ class AudioStream:
         if noise_cancellation is not None:
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
-        self._task = self._loop.create_task(self._run())
-        self._task.add_done_callback(task_done_logger)
 
         stream: Any = None
         if "participant" in kwargs:
@@ -120,6 +118,9 @@ class AudioStream:
             stream = self._create_owned_stream()
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
+        
+        self._task = self._loop.create_task(self._run())
+        self._task.add_done_callback(task_done_logger)
 
     @classmethod
     def from_participant(
@@ -261,18 +262,29 @@ class AudioStream:
         return resp.audio_stream_from_participant.stream
 
     async def _run(self):
-        while True:
-            event = await self._ffi_queue.wait_for(self._is_event)
-            audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event
+        """Run the audio stream.
 
-            if audio_event.HasField("frame_received"):
-                owned_buffer_info = audio_event.frame_received.frame
-                frame = AudioFrame._from_owned_info(owned_buffer_info)
-                event = AudioFrameEvent(frame)
-                self._queue.put(event)
-            elif audio_event.HasField("eos"):
-                self._queue.put(None)
-                break
+        This method is responsible for receiving audio frames from the audio stream and
+        putting them into the queue. It also handles the EOS event and unsubscribes from
+        the FFI queue.
+
+        It must be initialized after self._ffi_queue is subscribed.
+        """
+        while True:
+            try:
+                event = await self._ffi_queue.wait_for(self._is_event)
+                audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event
+
+                if audio_event.HasField("frame_received"):
+                    owned_buffer_info = audio_event.frame_received.frame
+                    frame = AudioFrame._from_owned_info(owned_buffer_info)
+                    event = AudioFrameEvent(frame)
+                    self._queue.put(event)
+                elif audio_event.HasField("eos"):
+                    self._queue.put(None)
+                    break
+            finally:
+                self._ffi_queue.task_done()
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
