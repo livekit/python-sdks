@@ -330,9 +330,9 @@ class SipService(Service):
         Only provided fields will be updated.
         """
         update = SIPDispatchRuleUpdate(
-            name=name, 
-            metadata=metadata, 
-            rule=rule, 
+            name=name,
+            metadata=metadata,
+            rule=rule,
             attributes=attributes,
             trunk_ids=ListUpdate(set=trunk_ids) if trunk_ids else None,
         )
