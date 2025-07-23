@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Optional, List, Literal, Any
+from typing import Optional, List, Literal
 from google.protobuf.json_format import MessageToDict, ParseDict
 
 from livekit.protocol.room import RoomConfiguration
