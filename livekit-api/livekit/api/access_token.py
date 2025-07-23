@@ -18,7 +18,7 @@ import re
 import datetime
 import os
 import jwt
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Any
 from google.protobuf.json_format import MessageToDict, ParseDict
 
 from livekit.protocol.room import RoomConfiguration
@@ -214,7 +214,10 @@ class TokenVerifier:
             algorithms=["HS256"],
             leeway=self._leeway.total_seconds(),
         )
+        return self.decode_claims(claims)
 
+    @staticmethod
+    def decode_claims(claims: dict[str, Any]) -> Claims:
         video_dict = claims.get("video", dict())
         video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
         video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
