@@ -199,25 +199,22 @@ class TokenVerifier:
         api_key = api_key or os.getenv("LIVEKIT_API_KEY")
         api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
 
-        if not api_key or not api_secret:
-            raise ValueError("api_key and api_secret must be set")
-
         self.api_key = api_key
         self.api_secret = api_secret
         self._leeway = leeway
 
-    def verify(self, token: str) -> Claims:
+    def verify(self, token: str, *, verify_signature: bool = True) -> Claims:
+        if verify_signature and (not self.api_key or not self.api_secret):
+            raise ValueError("api_key and api_secret must be set")
+
         claims = jwt.decode(
             token,
-            self.api_secret,
-            issuer=self.api_key,
+            key=self.api_secret or "",
+            issuer=self.api_key or "",
             algorithms=["HS256"],
             leeway=self._leeway.total_seconds(),
+            options={"verify_signature": verify_signature},
         )
-        return self.decode_claims(claims)
-
-    @staticmethod
-    def decode_claims(claims: dict[str, Any]) -> Claims:
         video_dict = claims.get("video", dict())
         video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
         video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
