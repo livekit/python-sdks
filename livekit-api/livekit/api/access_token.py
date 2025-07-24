@@ -77,6 +77,12 @@ class SIPGrants:
 
 
 @dataclasses.dataclass
+class InferenceGrants:
+    # perform inference
+    perform: bool = False
+
+
+@dataclasses.dataclass
 class Claims:
     identity: str = ""
     name: str = ""
@@ -84,6 +90,7 @@ class Claims:
     metadata: str = ""
     video: Optional[VideoGrants] = None
     sip: Optional[SIPGrants] = None
+    inference: Optional[InferenceGrants] = None
     attributes: Optional[dict[str, str]] = None
     sha256: Optional[str] = None
     room_preset: Optional[str] = None
@@ -134,6 +141,10 @@ class AccessToken:
 
     def with_sip_grants(self, grants: SIPGrants) -> "AccessToken":
         self.claims.sip = grants
+        return self
+
+    def with_inference_grants(self, grants: InferenceGrants) -> "AccessToken":
+        self.claims.inference = grants
         return self
 
     def with_identity(self, identity: str) -> "AccessToken":
@@ -225,11 +236,19 @@ class TokenVerifier:
         sip_dict = {k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__}
         sip = SIPGrants(**sip_dict)
 
+        inference_dict = claims.get("inference", dict())
+        inference_dict = {camel_to_snake(k): v for k, v in inference_dict.items()}
+        inference_dict = {
+            k: v for k, v in inference_dict.items() if k in InferenceGrants.__dataclass_fields__
+        }
+        inference = InferenceGrants(**inference_dict)
+
         grant_claims = Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
             video=video,
             sip=sip,
+            inference=inference,
             attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
