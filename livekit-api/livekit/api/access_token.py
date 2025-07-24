@@ -75,10 +75,12 @@ class SIPGrants:
     # make outbound calls
     call: bool = False
 
+
 @dataclasses.dataclass
 class InferenceGrants:
     # perform inference
     perform: bool = False
+
 
 @dataclasses.dataclass
 class Claims:
@@ -140,7 +142,7 @@ class AccessToken:
     def with_sip_grants(self, grants: SIPGrants) -> "AccessToken":
         self.claims.sip = grants
         return self
-    
+
     def with_inference_grants(self, grants: InferenceGrants) -> "AccessToken":
         self.claims.inference = grants
         return self
@@ -236,7 +238,9 @@ class TokenVerifier:
 
         inference_dict = claims.get("inference", dict())
         inference_dict = {camel_to_snake(k): v for k, v in inference_dict.items()}
-        inference_dict = {k: v for k, v in inference_dict.items() if k in InferenceGrants.__dataclass_fields__}
+        inference_dict = {
+            k: v for k, v in inference_dict.items() if k in InferenceGrants.__dataclass_fields__
+        }
         inference = InferenceGrants(**inference_dict)
 
         grant_claims = Claims(
