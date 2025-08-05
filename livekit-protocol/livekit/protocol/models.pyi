@@ -182,10 +182,15 @@ class Pagination(_message.Message):
     def __init__(self, after_id: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class ListUpdate(_message.Message):
-    __slots__ = ("set",)
+    __slots__ = ("set", "add", "clear")
     SET_FIELD_NUMBER: _ClassVar[int]
+    ADD_FIELD_NUMBER: _ClassVar[int]
+    DEL_FIELD_NUMBER: _ClassVar[int]
+    CLEAR_FIELD_NUMBER: _ClassVar[int]
     set: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, set: _Optional[_Iterable[str]] = ...) -> None: ...
+    add: _containers.RepeatedScalarFieldContainer[str]
+    clear: bool
+    def __init__(self, set: _Optional[_Iterable[str]] = ..., add: _Optional[_Iterable[str]] = ..., clear: bool = ..., **kwargs) -> None: ...
 
 class Room(_message.Message):
     __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "creation_time_ms", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
@@ -355,7 +360,7 @@ class SimulcastCodecInfo(_message.Message):
     def __init__(self, mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ...) -> None: ...
 
 class TrackInfo(_message.Message):
-    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features", "backup_codec_policy")
+    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features", "backup_codec_policy", "video_mode")
     SID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -376,6 +381,7 @@ class TrackInfo(_message.Message):
     VERSION_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FEATURES_FIELD_NUMBER: _ClassVar[int]
     BACKUP_CODEC_POLICY_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_MODE_FIELD_NUMBER: _ClassVar[int]
     sid: str
     type: TrackType
     name: str
@@ -396,24 +402,39 @@ class TrackInfo(_message.Message):
     version: TimedVersion
     audio_features: _containers.RepeatedScalarFieldContainer[AudioTrackFeature]
     backup_codec_policy: BackupCodecPolicy
-    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ...) -> None: ...
+    video_mode: VideoLayer.Mode
+    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ..., video_mode: _Optional[_Union[VideoLayer.Mode, str]] = ...) -> None: ...
 
 class VideoLayer(_message.Message):
-    __slots__ = ("quality", "width", "height", "bitrate", "ssrc")
+    __slots__ = ("quality", "width", "height", "bitrate", "ssrc", "spatial_layer", "rid")
+    class Mode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        UNUSED: _ClassVar[VideoLayer.Mode]
+        STANDARD: _ClassVar[VideoLayer.Mode]
+        SIMULCAST: _ClassVar[VideoLayer.Mode]
+        SVC: _ClassVar[VideoLayer.Mode]
+    UNUSED: VideoLayer.Mode
+    STANDARD: VideoLayer.Mode
+    SIMULCAST: VideoLayer.Mode
+    SVC: VideoLayer.Mode
     QUALITY_FIELD_NUMBER: _ClassVar[int]
     WIDTH_FIELD_NUMBER: _ClassVar[int]
     HEIGHT_FIELD_NUMBER: _ClassVar[int]
     BITRATE_FIELD_NUMBER: _ClassVar[int]
     SSRC_FIELD_NUMBER: _ClassVar[int]
+    SPATIAL_LAYER_FIELD_NUMBER: _ClassVar[int]
+    RID_FIELD_NUMBER: _ClassVar[int]
     quality: VideoQuality
     width: int
     height: int
     bitrate: int
     ssrc: int
-    def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ...) -> None: ...
+    spatial_layer: int
+    rid: str
+    def __init__(self, quality: _Optional[_Union[VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., bitrate: _Optional[int] = ..., ssrc: _Optional[int] = ..., spatial_layer: _Optional[int] = ..., rid: _Optional[str] = ...) -> None: ...
 
 class DataPacket(_message.Message):
-    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response", "stream_header", "stream_chunk", "stream_trailer")
+    __slots__ = ("kind", "participant_identity", "destination_identities", "user", "speaker", "sip_dtmf", "transcription", "metrics", "chat_message", "rpc_request", "rpc_ack", "rpc_response", "stream_header", "stream_chunk", "stream_trailer", "sequence", "participant_sid")
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         RELIABLE: _ClassVar[DataPacket.Kind]
@@ -435,6 +456,8 @@ class DataPacket(_message.Message):
     STREAM_HEADER_FIELD_NUMBER: _ClassVar[int]
     STREAM_CHUNK_FIELD_NUMBER: _ClassVar[int]
     STREAM_TRAILER_FIELD_NUMBER: _ClassVar[int]
+    SEQUENCE_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_SID_FIELD_NUMBER: _ClassVar[int]
     kind: DataPacket.Kind
     participant_identity: str
     destination_identities: _containers.RepeatedScalarFieldContainer[str]
@@ -450,7 +473,9 @@ class DataPacket(_message.Message):
     stream_header: DataStream.Header
     stream_chunk: DataStream.Chunk
     stream_trailer: DataStream.Trailer
-    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ..., stream_header: _Optional[_Union[DataStream.Header, _Mapping]] = ..., stream_chunk: _Optional[_Union[DataStream.Chunk, _Mapping]] = ..., stream_trailer: _Optional[_Union[DataStream.Trailer, _Mapping]] = ...) -> None: ...
+    sequence: int
+    participant_sid: str
+    def __init__(self, kind: _Optional[_Union[DataPacket.Kind, str]] = ..., participant_identity: _Optional[str] = ..., destination_identities: _Optional[_Iterable[str]] = ..., user: _Optional[_Union[UserPacket, _Mapping]] = ..., speaker: _Optional[_Union[ActiveSpeakerUpdate, _Mapping]] = ..., sip_dtmf: _Optional[_Union[SipDTMF, _Mapping]] = ..., transcription: _Optional[_Union[Transcription, _Mapping]] = ..., metrics: _Optional[_Union[_metrics.MetricsBatch, _Mapping]] = ..., chat_message: _Optional[_Union[ChatMessage, _Mapping]] = ..., rpc_request: _Optional[_Union[RpcRequest, _Mapping]] = ..., rpc_ack: _Optional[_Union[RpcAck, _Mapping]] = ..., rpc_response: _Optional[_Union[RpcResponse, _Mapping]] = ..., stream_header: _Optional[_Union[DataStream.Header, _Mapping]] = ..., stream_chunk: _Optional[_Union[DataStream.Chunk, _Mapping]] = ..., stream_trailer: _Optional[_Union[DataStream.Trailer, _Mapping]] = ..., sequence: _Optional[int] = ..., participant_sid: _Optional[str] = ...) -> None: ...
 
 class ActiveSpeakerUpdate(_message.Message):
     __slots__ = ("speakers",)
@@ -632,6 +657,7 @@ class ClientInfo(_message.Message):
         UNITY_WEB: _ClassVar[ClientInfo.SDK]
         NODE: _ClassVar[ClientInfo.SDK]
         UNREAL: _ClassVar[ClientInfo.SDK]
+        ESP32: _ClassVar[ClientInfo.SDK]
     UNKNOWN: ClientInfo.SDK
     JS: ClientInfo.SDK
     SWIFT: ClientInfo.SDK
@@ -646,6 +672,7 @@ class ClientInfo(_message.Message):
     UNITY_WEB: ClientInfo.SDK
     NODE: ClientInfo.SDK
     UNREAL: ClientInfo.SDK
+    ESP32: ClientInfo.SDK
     SDK_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
@@ -997,3 +1024,19 @@ class WebhookConfig(_message.Message):
     url: str
     signing_key: str
     def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ...) -> None: ...
+
+class Fragment(_message.Message):
+    __slots__ = ("packet_id", "fragment_number", "num_fragments", "fragment_size", "total_size", "data")
+    PACKET_ID_FIELD_NUMBER: _ClassVar[int]
+    FRAGMENT_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    NUM_FRAGMENTS_FIELD_NUMBER: _ClassVar[int]
+    FRAGMENT_SIZE_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_SIZE_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    packet_id: int
+    fragment_number: int
+    num_fragments: int
+    fragment_size: int
+    total_size: int
+    data: bytes
+    def __init__(self, packet_id: _Optional[int] = ..., fragment_number: _Optional[int] = ..., num_fragments: _Optional[int] = ..., fragment_size: _Optional[int] = ..., total_size: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
