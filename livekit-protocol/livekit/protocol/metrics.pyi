@@ -1,12 +1,9 @@
-import datetime
-
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -67,7 +64,7 @@ class MetricsBatch(_message.Message):
     str_data: _containers.RepeatedScalarFieldContainer[str]
     time_series: _containers.RepeatedCompositeFieldContainer[TimeSeriesMetric]
     events: _containers.RepeatedCompositeFieldContainer[EventMetric]
-    def __init__(self, timestamp_ms: _Optional[int] = ..., normalized_timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., str_data: _Optional[_Iterable[str]] = ..., time_series: _Optional[_Iterable[_Union[TimeSeriesMetric, _Mapping]]] = ..., events: _Optional[_Iterable[_Union[EventMetric, _Mapping]]] = ...) -> None: ...
+    def __init__(self, timestamp_ms: _Optional[int] = ..., normalized_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., str_data: _Optional[_Iterable[str]] = ..., time_series: _Optional[_Iterable[_Union[TimeSeriesMetric, _Mapping]]] = ..., events: _Optional[_Iterable[_Union[EventMetric, _Mapping]]] = ...) -> None: ...
 
 class TimeSeriesMetric(_message.Message):
     __slots__ = ("label", "participant_identity", "track_sid", "samples", "rid")
@@ -91,7 +88,7 @@ class MetricSample(_message.Message):
     timestamp_ms: int
     normalized_timestamp: _timestamp_pb2.Timestamp
     value: float
-    def __init__(self, timestamp_ms: _Optional[int] = ..., normalized_timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., value: _Optional[float] = ...) -> None: ...
+    def __init__(self, timestamp_ms: _Optional[int] = ..., normalized_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., value: _Optional[float] = ...) -> None: ...
 
 class EventMetric(_message.Message):
     __slots__ = ("label", "participant_identity", "track_sid", "start_timestamp_ms", "end_timestamp_ms", "normalized_start_timestamp", "normalized_end_timestamp", "metadata", "rid")
@@ -113,4 +110,4 @@ class EventMetric(_message.Message):
     normalized_end_timestamp: _timestamp_pb2.Timestamp
     metadata: str
     rid: int
-    def __init__(self, label: _Optional[int] = ..., participant_identity: _Optional[int] = ..., track_sid: _Optional[int] = ..., start_timestamp_ms: _Optional[int] = ..., end_timestamp_ms: _Optional[int] = ..., normalized_start_timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., normalized_end_timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[str] = ..., rid: _Optional[int] = ...) -> None: ...
+    def __init__(self, label: _Optional[int] = ..., participant_identity: _Optional[int] = ..., track_sid: _Optional[int] = ..., start_timestamp_ms: _Optional[int] = ..., end_timestamp_ms: _Optional[int] = ..., normalized_start_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., normalized_end_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[str] = ..., rid: _Optional[int] = ...) -> None: ...
