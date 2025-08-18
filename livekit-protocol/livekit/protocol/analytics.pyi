@@ -1,3 +1,5 @@
+import datetime
+
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import models as _models
 from . import egress as _egress
@@ -8,7 +10,8 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -23,6 +26,7 @@ class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ROOM_ENDED: _ClassVar[AnalyticsEventType]
     PARTICIPANT_JOINED: _ClassVar[AnalyticsEventType]
     PARTICIPANT_LEFT: _ClassVar[AnalyticsEventType]
+    PARTICIPANT_CONNECTION_ABORTED: _ClassVar[AnalyticsEventType]
     TRACK_PUBLISHED: _ClassVar[AnalyticsEventType]
     TRACK_PUBLISH_REQUESTED: _ClassVar[AnalyticsEventType]
     TRACK_UNPUBLISHED: _ClassVar[AnalyticsEventType]
@@ -68,6 +72,7 @@ ROOM_CREATED: AnalyticsEventType
 ROOM_ENDED: AnalyticsEventType
 PARTICIPANT_JOINED: AnalyticsEventType
 PARTICIPANT_LEFT: AnalyticsEventType
+PARTICIPANT_CONNECTION_ABORTED: AnalyticsEventType
 TRACK_PUBLISHED: AnalyticsEventType
 TRACK_PUBLISH_REQUESTED: AnalyticsEventType
 TRACK_UNPUBLISHED: AnalyticsEventType
@@ -158,7 +163,7 @@ class AnalyticsStream(_message.Message):
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     packets_out_of_order: int
-    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packets_out_of_order: _Optional[int] = ...) -> None: ...
+    def __init__(self, ssrc: _Optional[int] = ..., primary_packets: _Optional[int] = ..., primary_bytes: _Optional[int] = ..., retransmit_packets: _Optional[int] = ..., retransmit_bytes: _Optional[int] = ..., padding_packets: _Optional[int] = ..., padding_bytes: _Optional[int] = ..., packets_lost: _Optional[int] = ..., frames: _Optional[int] = ..., rtt: _Optional[int] = ..., jitter: _Optional[int] = ..., nacks: _Optional[int] = ..., plis: _Optional[int] = ..., firs: _Optional[int] = ..., video_layers: _Optional[_Iterable[_Union[AnalyticsVideoLayer, _Mapping]]] = ..., start_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., packets_out_of_order: _Optional[int] = ...) -> None: ...
 
 class AnalyticsStat(_message.Message):
     __slots__ = ("id", "analytics_key", "kind", "time_stamp", "node", "room_id", "room_name", "participant_id", "track_id", "score", "streams", "mime", "min_score", "median_score")
@@ -190,7 +195,7 @@ class AnalyticsStat(_message.Message):
     mime: str
     min_score: float
     median_score: float
-    def __init__(self, id: _Optional[str] = ..., analytics_key: _Optional[str] = ..., kind: _Optional[_Union[StreamType, str]] = ..., time_stamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., node: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., score: _Optional[float] = ..., streams: _Optional[_Iterable[_Union[AnalyticsStream, _Mapping]]] = ..., mime: _Optional[str] = ..., min_score: _Optional[float] = ..., median_score: _Optional[float] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., analytics_key: _Optional[str] = ..., kind: _Optional[_Union[StreamType, str]] = ..., time_stamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., node: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., score: _Optional[float] = ..., streams: _Optional[_Iterable[_Union[AnalyticsStream, _Mapping]]] = ..., mime: _Optional[str] = ..., min_score: _Optional[float] = ..., median_score: _Optional[float] = ...) -> None: ...
 
 class AnalyticsStats(_message.Message):
     __slots__ = ("stats",)
@@ -290,7 +295,7 @@ class AnalyticsEvent(_message.Message):
     report: ReportInfo
     api_call: APICallInfo
     webhook: WebhookInfo
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., sip_transfer: _Optional[_Union[_sip.SIPTransferInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., sip_transfer: _Optional[_Union[_sip.SIPTransferInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
     __slots__ = ("events",)
@@ -310,7 +315,7 @@ class AnalyticsRoomParticipant(_message.Message):
     name: str
     state: _models.ParticipantInfo.State
     joined_at: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., identity: _Optional[str] = ..., name: _Optional[str] = ..., state: _Optional[_Union[_models.ParticipantInfo.State, str]] = ..., joined_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., identity: _Optional[str] = ..., name: _Optional[str] = ..., state: _Optional[_Union[_models.ParticipantInfo.State, str]] = ..., joined_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AnalyticsRoom(_message.Message):
     __slots__ = ("id", "name", "project_id", "created_at", "participants")
@@ -324,7 +329,7 @@ class AnalyticsRoom(_message.Message):
     project_id: str
     created_at: _timestamp_pb2.Timestamp
     participants: _containers.RepeatedCompositeFieldContainer[AnalyticsRoomParticipant]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., project_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[AnalyticsRoomParticipant, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., project_id: _Optional[str] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., participants: _Optional[_Iterable[_Union[AnalyticsRoomParticipant, _Mapping]]] = ...) -> None: ...
 
 class AnalyticsNodeRooms(_message.Message):
     __slots__ = ("node_id", "sequence_number", "timestamp", "rooms")
@@ -336,7 +341,7 @@ class AnalyticsNodeRooms(_message.Message):
     sequence_number: int
     timestamp: _timestamp_pb2.Timestamp
     rooms: _containers.RepeatedCompositeFieldContainer[AnalyticsRoom]
-    def __init__(self, node_id: _Optional[str] = ..., sequence_number: _Optional[int] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rooms: _Optional[_Iterable[_Union[AnalyticsRoom, _Mapping]]] = ...) -> None: ...
+    def __init__(self, node_id: _Optional[str] = ..., sequence_number: _Optional[int] = ..., timestamp: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., rooms: _Optional[_Iterable[_Union[AnalyticsRoom, _Mapping]]] = ...) -> None: ...
 
 class ReportInfo(_message.Message):
     __slots__ = ("feature_usage",)
@@ -350,7 +355,7 @@ class TimeRange(_message.Message):
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
     started_at: _timestamp_pb2.Timestamp
     ended_at: _timestamp_pb2.Timestamp
-    def __init__(self, started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    def __init__(self, started_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., ended_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FeatureUsageInfo(_message.Message):
     __slots__ = ("feature", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "time_ranges")
@@ -434,7 +439,7 @@ class APICallInfo(_message.Message):
     track_id: str
     started_at: _timestamp_pb2.Timestamp
     duration_ns: int
-    def __init__(self, project_id: _Optional[str] = ..., request: _Optional[_Union[APICallRequest, _Mapping]] = ..., service: _Optional[str] = ..., method: _Optional[str] = ..., node_id: _Optional[str] = ..., status: _Optional[int] = ..., twirp_error_code: _Optional[str] = ..., twirp_error_message: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration_ns: _Optional[int] = ...) -> None: ...
+    def __init__(self, project_id: _Optional[str] = ..., request: _Optional[_Union[APICallRequest, _Mapping]] = ..., service: _Optional[str] = ..., method: _Optional[str] = ..., node_id: _Optional[str] = ..., status: _Optional[int] = ..., twirp_error_code: _Optional[str] = ..., twirp_error_message: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., started_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., duration_ns: _Optional[int] = ...) -> None: ...
 
 class WebhookInfo(_message.Message):
     __slots__ = ("event_id", "event", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "egress_id", "ingress_id", "created_at", "queued_at", "queue_duration_ns", "sent_at", "send_duration_ns", "url", "num_dropped", "is_dropped", "service_status", "service_error_code", "service_error", "send_error")
@@ -482,4 +487,4 @@ class WebhookInfo(_message.Message):
     service_error_code: int
     service_error: str
     send_error: str
-    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: bool = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ...) -> None: ...
+    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: _Optional[bool] = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ...) -> None: ...
