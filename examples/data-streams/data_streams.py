@@ -51,14 +51,14 @@ async def main(room: rtc.Room):
         active_tasks.append(task)
         task.add_done_callback(lambda _: active_tasks.remove(task))
 
-    room.set_text_stream_handler("chat", _handle_chat_stream)
+    room.register_text_stream_handler("chat", _handle_chat_stream)
 
     def _handle_welcome_image_stream(reader, participant_identity):
         task = asyncio.create_task(on_welcome_image_received(reader, participant_identity))
         active_tasks.append(task)
         task.add_done_callback(lambda _: active_tasks.remove(task))
 
-    room.set_byte_stream_handler("files", _handle_welcome_image_stream)
+    room.register_byte_stream_handler("files", _handle_welcome_image_stream)
 
     # By default, autosubscribe is enabled. The participant will be subscribed to
     # all published tracks in the room
