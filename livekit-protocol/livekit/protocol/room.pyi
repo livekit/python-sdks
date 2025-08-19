@@ -190,12 +190,11 @@ class UpdateRoomMetadataRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class RoomConfiguration(_message.Message):
-    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents")
+    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents")
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
     EGRESS_FIELD_NUMBER: _ClassVar[int]
     MIN_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
@@ -205,13 +204,12 @@ class RoomConfiguration(_message.Message):
     empty_timeout: int
     departure_timeout: int
     max_participants: int
-    metadata: str
     egress: RoomEgress
     min_playout_delay: int
     max_playout_delay: int
     sync_streams: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
-    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class ForwardParticipantRequest(_message.Message):
     __slots__ = ("room", "identity", "destination_room")

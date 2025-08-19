@@ -57,24 +57,20 @@ class Job(_message.Message):
     def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ...) -> None: ...
 
 class JobState(_message.Message):
-    __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id")
+    __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity")
     STATUS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
-    WORKER_ID_FIELD_NUMBER: _ClassVar[int]
-    AGENT_ID_FIELD_NUMBER: _ClassVar[int]
     status: JobStatus
     error: str
     started_at: int
     ended_at: int
     updated_at: int
     participant_identity: str
-    worker_id: str
-    agent_id: str
-    def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ..., worker_id: _Optional[str] = ..., agent_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ...) -> None: ...
 
 class WorkerMessage(_message.Message):
     __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job")
