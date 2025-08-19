@@ -323,7 +323,7 @@ class ImageOutput(_message.Message):
     def __init__(self, capture_interval: _Optional[int] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., filename_prefix: _Optional[str] = ..., filename_suffix: _Optional[_Union[ImageFileSuffix, str]] = ..., image_codec: _Optional[_Union[_models.ImageCodec, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
 
 class S3Upload(_message.Message):
-    __slots__ = ("access_key", "secret", "session_token", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
+    __slots__ = ("access_key", "secret", "session_token", "assume_role_arn", "assume_role_external_id", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
     class MetadataEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -334,6 +334,8 @@ class S3Upload(_message.Message):
     ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
     SECRET_FIELD_NUMBER: _ClassVar[int]
     SESSION_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    ASSUME_ROLE_ARN_FIELD_NUMBER: _ClassVar[int]
+    ASSUME_ROLE_EXTERNAL_ID_FIELD_NUMBER: _ClassVar[int]
     REGION_FIELD_NUMBER: _ClassVar[int]
     ENDPOINT_FIELD_NUMBER: _ClassVar[int]
     BUCKET_FIELD_NUMBER: _ClassVar[int]
@@ -345,6 +347,8 @@ class S3Upload(_message.Message):
     access_key: str
     secret: str
     session_token: str
+    assume_role_arn: str
+    assume_role_external_id: str
     region: str
     endpoint: str
     bucket: str
@@ -353,7 +357,7 @@ class S3Upload(_message.Message):
     tagging: str
     content_disposition: str
     proxy: ProxyConfig
-    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., session_token: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
+    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., session_token: _Optional[str] = ..., assume_role_arn: _Optional[str] = ..., assume_role_external_id: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
 
 class GCPUpload(_message.Message):
     __slots__ = ("credentials", "bucket", "proxy")
