@@ -23,6 +23,7 @@ class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ROOM_ENDED: _ClassVar[AnalyticsEventType]
     PARTICIPANT_JOINED: _ClassVar[AnalyticsEventType]
     PARTICIPANT_LEFT: _ClassVar[AnalyticsEventType]
+    PARTICIPANT_CONNECTION_ABORTED: _ClassVar[AnalyticsEventType]
     TRACK_PUBLISHED: _ClassVar[AnalyticsEventType]
     TRACK_PUBLISH_REQUESTED: _ClassVar[AnalyticsEventType]
     TRACK_UNPUBLISHED: _ClassVar[AnalyticsEventType]
@@ -68,6 +69,7 @@ ROOM_CREATED: AnalyticsEventType
 ROOM_ENDED: AnalyticsEventType
 PARTICIPANT_JOINED: AnalyticsEventType
 PARTICIPANT_LEFT: AnalyticsEventType
+PARTICIPANT_CONNECTION_ABORTED: AnalyticsEventType
 TRACK_PUBLISHED: AnalyticsEventType
 TRACK_PUBLISH_REQUESTED: AnalyticsEventType
 TRACK_UNPUBLISHED: AnalyticsEventType

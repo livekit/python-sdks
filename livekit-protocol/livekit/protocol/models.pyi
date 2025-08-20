@@ -348,19 +348,23 @@ class Encryption(_message.Message):
     def __init__(self) -> None: ...
 
 class SimulcastCodecInfo(_message.Message):
-    __slots__ = ("mime_type", "mid", "cid", "layers")
+    __slots__ = ("mime_type", "mid", "cid", "layers", "video_layer_mode", "sdp_cid")
     MIME_TYPE_FIELD_NUMBER: _ClassVar[int]
     MID_FIELD_NUMBER: _ClassVar[int]
     CID_FIELD_NUMBER: _ClassVar[int]
     LAYERS_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_LAYER_MODE_FIELD_NUMBER: _ClassVar[int]
+    SDP_CID_FIELD_NUMBER: _ClassVar[int]
     mime_type: str
     mid: str
     cid: str
     layers: _containers.RepeatedCompositeFieldContainer[VideoLayer]
-    def __init__(self, mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ...) -> None: ...
+    video_layer_mode: VideoLayer.Mode
+    sdp_cid: str
+    def __init__(self, mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., video_layer_mode: _Optional[_Union[VideoLayer.Mode, str]] = ..., sdp_cid: _Optional[str] = ...) -> None: ...
 
 class TrackInfo(_message.Message):
-    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features", "backup_codec_policy", "video_mode")
+    __slots__ = ("sid", "type", "name", "muted", "width", "height", "simulcast", "disable_dtx", "source", "layers", "mime_type", "mid", "codecs", "stereo", "disable_red", "encryption", "stream", "version", "audio_features", "backup_codec_policy")
     SID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
@@ -381,7 +385,6 @@ class TrackInfo(_message.Message):
     VERSION_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FEATURES_FIELD_NUMBER: _ClassVar[int]
     BACKUP_CODEC_POLICY_FIELD_NUMBER: _ClassVar[int]
-    VIDEO_MODE_FIELD_NUMBER: _ClassVar[int]
     sid: str
     type: TrackType
     name: str
@@ -402,21 +405,18 @@ class TrackInfo(_message.Message):
     version: TimedVersion
     audio_features: _containers.RepeatedScalarFieldContainer[AudioTrackFeature]
     backup_codec_policy: BackupCodecPolicy
-    video_mode: VideoLayer.Mode
-    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ..., video_mode: _Optional[_Union[VideoLayer.Mode, str]] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ...) -> None: ...
 
 class VideoLayer(_message.Message):
     __slots__ = ("quality", "width", "height", "bitrate", "ssrc", "spatial_layer", "rid")
     class Mode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
-        UNUSED: _ClassVar[VideoLayer.Mode]
-        STANDARD: _ClassVar[VideoLayer.Mode]
-        SIMULCAST: _ClassVar[VideoLayer.Mode]
-        SVC: _ClassVar[VideoLayer.Mode]
-    UNUSED: VideoLayer.Mode
-    STANDARD: VideoLayer.Mode
-    SIMULCAST: VideoLayer.Mode
-    SVC: VideoLayer.Mode
+        MODE_UNUSED: _ClassVar[VideoLayer.Mode]
+        ONE_SPATIAL_LAYER_PER_STREAM: _ClassVar[VideoLayer.Mode]
+        MULTIPLE_SPATIAL_LAYERS_PER_STREAM: _ClassVar[VideoLayer.Mode]
+    MODE_UNUSED: VideoLayer.Mode
+    ONE_SPATIAL_LAYER_PER_STREAM: VideoLayer.Mode
+    MULTIPLE_SPATIAL_LAYERS_PER_STREAM: VideoLayer.Mode
     QUALITY_FIELD_NUMBER: _ClassVar[int]
     WIDTH_FIELD_NUMBER: _ClassVar[int]
     HEIGHT_FIELD_NUMBER: _ClassVar[int]
@@ -1024,19 +1024,3 @@ class WebhookConfig(_message.Message):
     url: str
     signing_key: str
     def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ...) -> None: ...
-
-class Fragment(_message.Message):
-    __slots__ = ("packet_id", "fragment_number", "num_fragments", "fragment_size", "total_size", "data")
-    PACKET_ID_FIELD_NUMBER: _ClassVar[int]
-    FRAGMENT_NUMBER_FIELD_NUMBER: _ClassVar[int]
-    NUM_FRAGMENTS_FIELD_NUMBER: _ClassVar[int]
-    FRAGMENT_SIZE_FIELD_NUMBER: _ClassVar[int]
-    TOTAL_SIZE_FIELD_NUMBER: _ClassVar[int]
-    DATA_FIELD_NUMBER: _ClassVar[int]
-    packet_id: int
-    fragment_number: int
-    num_fragments: int
-    fragment_size: int
-    total_size: int
-    data: bytes
-    def __init__(self, packet_id: _Optional[int] = ..., fragment_number: _Optional[int] = ..., num_fragments: _Optional[int] = ..., fragment_size: _Optional[int] = ..., total_size: _Optional[int] = ..., data: _Optional[bytes] = ...) -> None: ...
