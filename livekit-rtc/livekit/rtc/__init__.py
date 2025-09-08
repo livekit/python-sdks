@@ -90,6 +90,11 @@ from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .audio_mixer import AudioMixer
 from .apm import AudioProcessingModule
+try:
+    from .media_devices import MediaDevices
+    _HAS_MEDIA_DEVICES = True
+except Exception:  # pragma: no cover - optional dependency (sounddevice)
+    _HAS_MEDIA_DEVICES = False
 from .utils import combine_audio_frames
 from .rpc import RpcError, RpcInvocationData
 from .synchronizer import AVSynchronizer
