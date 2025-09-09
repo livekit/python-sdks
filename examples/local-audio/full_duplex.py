@@ -95,7 +95,7 @@ async def main() -> None:
         logging.info("published local microphone")
 
         # Start playing mixed remote audio
-        play_task = asyncio.create_task(player.play(mixer))
+        asyncio.create_task(player.play(mixer))
 
         # Run until Ctrl+C
         while True:

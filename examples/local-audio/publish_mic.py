@@ -2,6 +2,7 @@ import os
 import sys
 import asyncio
 import logging
+from dotenv import load_dotenv, find_dotenv
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "livekit-rtc")))
 
@@ -10,6 +11,9 @@ from livekit.rtc import MediaDevices
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
+
+    # Load environment variables from a .env file if present
+    load_dotenv(find_dotenv())
 
     url = os.getenv("LIVEKIT_URL")
     token = os.getenv("LIVEKIT_TOKEN")
