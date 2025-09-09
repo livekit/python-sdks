@@ -60,6 +60,7 @@ class AnalyticsEventType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     SIP_CALL_ENDED: _ClassVar[AnalyticsEventType]
     SIP_TRANSFER_REQUESTED: _ClassVar[AnalyticsEventType]
     SIP_TRANSFER_COMPLETE: _ClassVar[AnalyticsEventType]
+    SIP_CALL_UPDATE: _ClassVar[AnalyticsEventType]
     REPORT: _ClassVar[AnalyticsEventType]
     API_CALL: _ClassVar[AnalyticsEventType]
     WEBHOOK: _ClassVar[AnalyticsEventType]
@@ -106,6 +107,7 @@ SIP_CALL_STARTED: AnalyticsEventType
 SIP_CALL_ENDED: AnalyticsEventType
 SIP_TRANSFER_REQUESTED: AnalyticsEventType
 SIP_TRANSFER_COMPLETE: AnalyticsEventType
+SIP_CALL_UPDATE: AnalyticsEventType
 REPORT: AnalyticsEventType
 API_CALL: AnalyticsEventType
 WEBHOOK: AnalyticsEventType
