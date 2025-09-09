@@ -184,3 +184,7 @@ __all__ = [
     "AudioProcessingModule",
     "__version__",
 ]
+
+# add MediaDevices if available
+if _HAS_MEDIA_DEVICES:
+    __all__.append("MediaDevices")
