@@ -148,9 +148,9 @@ class SipService(Service):
         self,
         trunk_id: str,
         *,
-        numbers: Optional[list[str]] = None,
-        allowed_addresses: Optional[list[str]] = None,
-        allowed_numbers: Optional[list[str]] = None,
+        numbers: Optional[ListUpdate | list[str]] = None,
+        allowed_addresses: Optional[ListUpdate | list[str]] = None,
+        allowed_numbers: Optional[ListUpdate | list[str]] = None,
         auth_username: Optional[str] = None,
         auth_password: Optional[str] = None,
         name: Optional[str] = None,
@@ -167,11 +167,20 @@ class SipService(Service):
             metadata=metadata,
         )
         if numbers is not None:
-            update.numbers.set.extend(numbers)
+            if isinstance(numbers, ListUpdate):
+                update.numbers = numbers
+            else:
+                update.numbers.set.extend(numbers)
         if allowed_addresses is not None:
-            update.allowed_addresses.set.extend(allowed_addresses)
+            if isinstance(allowed_addresses, ListUpdate):
+                update.allowed_addresses = allowed_addresses
+            else:
+                update.allowed_addresses.set.extend(allowed_addresses)
         if allowed_numbers is not None:
-            update.allowed_numbers.set.extend(allowed_numbers)
+            if isinstance(allowed_numbers, ListUpdate):
+                update.allowed_numbers = allowed_numbers
+            else:
+                update.allowed_numbers.set.extend(allowed_numbers)
 
         return await self._client.request(
             SVC,
@@ -314,7 +323,7 @@ class SipService(Service):
         *,
         address: str | None = None,
         transport: SIPTransport | None = None,
-        numbers: list[str] | None = None,
+        numbers: Optional[ListUpdate | list[str]] = None,
         auth_username: str | None = None,
         auth_password: str | None = None,
         name: str | None = None,
@@ -333,7 +342,11 @@ class SipService(Service):
             metadata=metadata,
         )
         if numbers is not None:
-            update.numbers.set.extend(numbers)
+            if isinstance(numbers, ListUpdate):
+                update.numbers = numbers
+            else:
+                update.numbers.set.extend(numbers)
+
         return await self._client.request(
             SVC,
             "UpdateSIPOutboundTrunk",
