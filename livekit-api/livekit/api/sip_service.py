@@ -168,17 +168,23 @@ class SipService(Service):
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
-                update.numbers = numbers
+                update.numbers.set.extend(numbers.set)
+                update.numbers.add.extend(numbers.add)
+                update.numbers.remove.extend(numbers.remove)
             else:
                 update.numbers.set.extend(numbers)
         if allowed_addresses is not None:
             if isinstance(allowed_addresses, ListUpdate):
-                update.allowed_addresses = allowed_addresses
+                update.allowed_addresses.set.extend(numbers.set)
+                update.allowed_addresses.add.extend(numbers.add)
+                update.allowed_addresses.remove.extend(numbers.remove)
             else:
                 update.allowed_addresses.set.extend(allowed_addresses)
         if allowed_numbers is not None:
             if isinstance(allowed_numbers, ListUpdate):
-                update.allowed_numbers = allowed_numbers
+                update.allowed_numbers.set.extend(numbers.set)
+                update.allowed_numbers.add.extend(numbers.add)
+                update.allowed_numbers.remove.extend(numbers.remove)
             else:
                 update.allowed_numbers.set.extend(allowed_numbers)
 
@@ -343,7 +349,9 @@ class SipService(Service):
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
-                update.numbers = numbers
+                update.numbers.set.extend(numbers.set)
+                update.numbers.add.extend(numbers.add)
+                update.numbers.remove.extend(numbers.remove)
             else:
                 update.numbers.set.extend(numbers)
 
