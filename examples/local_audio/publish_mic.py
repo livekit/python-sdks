@@ -21,7 +21,7 @@ async def main() -> None:
 
     # Create media devices helper and open default microphone with AEC enabled
     devices = rtc.MediaDevices()
-    mic = devices.open_microphone(enable_aec=True)
+    mic = devices.open_input(enable_aec=True)
 
     try:
         await room.connect(url, token)

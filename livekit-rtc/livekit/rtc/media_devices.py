@@ -34,12 +34,12 @@ Media device helpers built on top of the `sounddevice` library.
 This module provides a small, Pythonic helper around native audio I/O for
 LiveKit RTC usage:
 
-- Capture the default microphone and feed frames into `rtc.AudioSource`.
+- Capture the default audio input device and feed frames into `rtc.AudioSource`.
 - Optionally enable audio processing via `rtc.AudioProcessingModule` (AEC,
   noise suppression, high-pass filter, AGC). Frames are processed in 10 ms
   chunks as required by APM.
 - Play arbitrary audio frames to the default speaker. When AEC is enabled on
-  the microphone, the `OutputPlayer` can feed the APM reverse stream so echo
+  the input, the `OutputPlayer` can feed the APM reverse stream so echo
   cancellation has access to render (speaker) audio.
 
 Notes on AEC wiring:
@@ -83,8 +83,8 @@ class _APMDelayEstimator:
 
 
 @dataclass
-class MicrophoneCapture:
-    """Holds resources for an active microphone capture.
+class InputCapture:
+    """Holds resources for an active audio input capture.
 
     Attributes:
         source: `rtc.AudioSource` that receives captured frames. This can be
@@ -239,8 +239,8 @@ class MediaDevices:
     conventions and the `sounddevice` library. It provides:
 
     - Device enumeration helpers.
-    - Microphone capture into `rtc.AudioSource` with optional APM processing.
-    - Output player that can feed APM reverse stream for AEC.
+    - Audio input capture into `rtc.AudioSource` with optional APM processing.
+    - Audio output player that can feed APM reverse stream for AEC.
 
     Design notes:
     - APM operates on 10 ms frames; this module slices input/output audio into
@@ -301,7 +301,7 @@ class MediaDevices:
         return dev[1] if isinstance(dev, (list, tuple)) else None
 
     # Capture / Playback
-    def open_microphone(
+    def open_input(
         self,
         *,
         enable_aec: bool = True,
@@ -309,17 +309,17 @@ class MediaDevices:
         high_pass_filter: bool = True,
         auto_gain_control: bool = True,
         input_device: Optional[int] = None,
-        queue_capacity: int = 200,
+        queue_capacity: int = 50,
         input_channel_index: Optional[int] = None,
-    ) -> MicrophoneCapture:
-        """Open the default (or chosen) microphone and start capture.
+    ) -> InputCapture:
+        """Open the default (or chosen) audio input device and start capture.
 
         Frames are sliced into 10 ms chunks. If any processing option is enabled,
         an `AudioProcessingModule` is created and applied to each frame before it
         is queued for `AudioSource.capture_frame`.
 
         To enable AEC end-to-end, pass the returned `apm` to
-        `open_output_player(apm_for_reverse=...)` and route remote audio through
+        `open_output(apm_for_reverse=...)` and route remote audio through
         that player so reverse frames are provided to APM.
 
         Args:
@@ -333,7 +333,7 @@ class MediaDevices:
                 only that channel is opened (via sounddevice mapping) and used as mono input.
 
         Returns:
-            MicrophoneCapture: Holder with `source`, `apm`, and `aclose()`.
+            InputCapture: Holder with `source`, `apm`, and `aclose()`.
         """
         loop = self._loop
         source = AudioSource(self._in_sr, self._channels, loop=loop)
@@ -452,7 +452,7 @@ class MediaDevices:
                     pass
 
         task = asyncio.create_task(_pump())
-        return MicrophoneCapture(
+        return InputCapture(
             source=source,
             input_stream=input_stream,
             task=task,
@@ -460,7 +460,7 @@ class MediaDevices:
             delay_estimator=delay_estimator,
         )
 
-    def open_output_player(
+    def open_output(
         self,
         *,
         apm_for_reverse: Optional[AudioProcessingModule] = None,
@@ -469,7 +469,7 @@ class MediaDevices:
         """Create an `OutputPlayer` for rendering and (optionally) AEC reverse.
 
         Args:
-            apm_for_reverse: Pass the APM used by the microphone to enable AEC.
+            apm_for_reverse: Pass the APM used by the audio input device to enable AEC.
             output_device: Optional output device index (default system device if None).
         """
         return OutputPlayer(

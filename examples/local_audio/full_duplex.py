@@ -22,8 +22,8 @@ async def main() -> None:
     devices = rtc.MediaDevices()
 
     # Open microphone with AEC and prepare a player for remote audio feeding AEC reverse stream
-    mic = devices.open_microphone(enable_aec=True)
-    player = devices.open_output_player(apm_for_reverse=mic.apm)
+    mic = devices.open_input(enable_aec=True)
+    player = devices.open_output(apm_for_reverse=mic.apm)
 
     # Mixer for all remote audio streams
     mixer = rtc.AudioMixer(sample_rate=48000, num_channels=1)
