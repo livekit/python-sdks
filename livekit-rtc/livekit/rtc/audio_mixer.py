@@ -184,9 +184,6 @@ class AudioMixer:
             except StopAsyncIteration:
                 exhausted = True
                 break
-            # AudioStream may yield either AudioFrame or AudioFrameEvent; unwrap if needed
-            if hasattr(frame, "frame"):
-                frame = frame.frame  # type: ignore[assignment]
 
             new_data = np.frombuffer(frame.data.tobytes(), dtype=np.int16).reshape(
                 -1, self._num_channels

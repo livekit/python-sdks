@@ -96,6 +96,7 @@ class MicrophoneCapture:
             instance to `open_output_player` so reverse frames are provided.
         delay_estimator: Internal helper used to combine capture and render delays.
     """
+
     source: AudioSource
     input_stream: sd.InputStream
     task: asyncio.Task
@@ -124,6 +125,7 @@ class OutputPlayer:
     renders (in 10 ms frames) into the APM reverse path so that echo
     cancellation can correlate mic input with speaker output.
     """
+
     def __init__(
         self,
         *,
@@ -343,21 +345,27 @@ class MediaDevices:
                 high_pass_filter=high_pass_filter,
                 auto_gain_control=auto_gain_control,
             )
-        delay_estimator: Optional[_APMDelayEstimator] = _APMDelayEstimator() if apm is not None else None
+        delay_estimator: Optional[_APMDelayEstimator] = (
+            _APMDelayEstimator() if apm is not None else None
+        )
         # Store the shared estimator on the device helper so the output player can reuse it
         self._delay_estimator = delay_estimator
 
         # Queue from callback to async task
         q: asyncio.Queue[AudioFrame] = asyncio.Queue(maxsize=queue_capacity)
 
-        def _input_callback(indata: np.ndarray, frame_count: int, time_info: Any, status: Any) -> None:
+        def _input_callback(
+            indata: np.ndarray, frame_count: int, time_info: Any, status: Any
+        ) -> None:
             # Slice into 10 ms frames, optionally APM, enqueue for async capture
             # Compute input (capture) delay using PortAudio timing; combine with last
             # measured output delay to provide APM stream delay in milliseconds.
             if apm is not None:
                 try:
                     input_delay_sec = float(time_info.currentTime - time_info.inputBufferAdcTime)
-                    output_delay_sec = float(delay_estimator.get_output_delay()) if delay_estimator else 0.0
+                    output_delay_sec = (
+                        float(delay_estimator.get_output_delay()) if delay_estimator else 0.0
+                    )
                     total_delay_ms = int(max((input_delay_sec + output_delay_sec) * 1000.0, 0.0))
                     try:
                         apm.set_stream_delay_ms(total_delay_ms)
@@ -444,7 +452,13 @@ class MediaDevices:
                     pass
 
         task = asyncio.create_task(_pump())
-        return MicrophoneCapture(source=source, input_stream=input_stream, task=task, apm=apm, delay_estimator=delay_estimator)
+        return MicrophoneCapture(
+            source=source,
+            input_stream=input_stream,
+            task=task,
+            apm=apm,
+            delay_estimator=delay_estimator,
+        )
 
     def open_output_player(
         self,
@@ -466,5 +480,3 @@ class MediaDevices:
             output_device=output_device,
             delay_estimator=self._delay_estimator,
         )
-
-

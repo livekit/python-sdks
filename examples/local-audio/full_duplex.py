@@ -11,14 +11,14 @@ async def main() -> None:
 
     # Load environment variables from a .env file if present
     load_dotenv(find_dotenv())
-    
+
     url = os.getenv("LIVEKIT_URL")
     token = os.getenv("LIVEKIT_TOKEN")
     if not url or not token:
         raise RuntimeError("LIVEKIT_URL and LIVEKIT_TOKEN must be set in env")
 
     room = rtc.Room()
-    
+
     devices = rtc.MediaDevices()
 
     # Open microphone with AEC and prepare a player for remote audio feeding AEC reverse stream
@@ -32,7 +32,9 @@ async def main() -> None:
     streams_by_pub: dict[str, rtc.AudioStream] = {}
     streams_by_participant: dict[str, set[rtc.AudioStream]] = {}
 
-    async def _remove_stream(stream: rtc.AudioStream, participant_sid: str | None = None, pub_sid: str | None = None) -> None:
+    async def _remove_stream(
+        stream: rtc.AudioStream, participant_sid: str | None = None, pub_sid: str | None = None
+    ) -> None:
         try:
             mixer.remove_stream(stream)
         except Exception:
@@ -48,17 +50,40 @@ async def main() -> None:
         if pub_sid is not None:
             streams_by_pub.pop(pub_sid, None)
 
-    def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
+    class _FrameOnlyStream:
+        def __init__(self, inner: rtc.AudioStream) -> None:
+            self._inner = inner
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self) -> rtc.AudioFrame:
+            event = await self._inner.__anext__()
+            return event.frame
+
+        async def aclose(self) -> None:
+            await self._inner.aclose()
+
+    def on_track_subscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
-            stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
-            streams_by_pub[publication.sid] = stream
-            streams_by_participant.setdefault(participant.sid, set()).add(stream)
-            mixer.add_stream(stream)
+            event_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
+            frame_stream = _FrameOnlyStream(event_stream)
+            streams_by_pub[publication.sid] = frame_stream
+            streams_by_participant.setdefault(participant.sid, set()).add(frame_stream)
+            mixer.add_stream(frame_stream)
             logging.info("subscribed to audio from %s", participant.identity)
 
     room.on("track_subscribed", on_track_subscribed)
 
-    def on_track_unsubscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
+    def on_track_unsubscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ):
         stream = streams_by_pub.get(publication.sid)
         if stream is not None:
             asyncio.create_task(_remove_stream(stream, participant.sid, publication.sid))
@@ -66,7 +91,9 @@ async def main() -> None:
 
     room.on("track_unsubscribed", on_track_unsubscribed)
 
-    def on_track_unpublished(publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
+    def on_track_unpublished(
+        publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
+    ):
         stream = streams_by_pub.get(publication.sid)
         if stream is not None:
             asyncio.create_task(_remove_stream(stream, participant.sid, publication.sid))
@@ -119,5 +146,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
