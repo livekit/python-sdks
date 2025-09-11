@@ -1,5 +1,4 @@
 import os
-import sys
 import asyncio
 import logging
 from dotenv import load_dotenv, find_dotenv
