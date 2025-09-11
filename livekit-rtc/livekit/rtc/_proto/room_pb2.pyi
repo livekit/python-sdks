@@ -1049,12 +1049,14 @@ class TrackPublishOptions(google.protobuf.message.Message):
     SIMULCAST_FIELD_NUMBER: builtins.int
     SOURCE_FIELD_NUMBER: builtins.int
     STREAM_FIELD_NUMBER: builtins.int
+    PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
     dtx: builtins.bool
     red: builtins.bool
     simulcast: builtins.bool
     source: track_pb2.TrackSource.ValueType
     stream: builtins.str
+    preconnect_buffer: builtins.bool
     @property
     def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
@@ -1072,9 +1074,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
         simulcast: builtins.bool | None = ...,
         source: track_pb2.TrackSource.ValueType | None = ...,
         stream: builtins.str | None = ...,
+        preconnect_buffer: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 
