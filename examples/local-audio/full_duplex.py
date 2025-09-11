@@ -50,31 +50,16 @@ async def main() -> None:
         if pub_sid is not None:
             streams_by_pub.pop(pub_sid, None)
 
-    class _FrameOnlyStream:
-        def __init__(self, inner: rtc.AudioStream) -> None:
-            self._inner = inner
-
-        def __aiter__(self):
-            return self
-
-        async def __anext__(self) -> rtc.AudioFrame:
-            event = await self._inner.__anext__()
-            return event.frame
-
-        async def aclose(self) -> None:
-            await self._inner.aclose()
-
     def on_track_subscribed(
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
-            event_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
-            frame_stream = _FrameOnlyStream(event_stream)
-            streams_by_pub[publication.sid] = frame_stream
-            streams_by_participant.setdefault(participant.sid, set()).add(frame_stream)
-            mixer.add_stream(frame_stream)
+            stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
+            streams_by_pub[publication.sid] = stream
+            streams_by_participant.setdefault(participant.sid, set()).add(stream)
+            mixer.add_stream(stream)
             logging.info("subscribed to audio from %s", participant.identity)
 
     room.on("track_subscribed", on_track_subscribed)
