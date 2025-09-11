@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+from dotenv import load_dotenv, find_dotenv
 
 from livekit import rtc
 
@@ -8,12 +9,16 @@ from livekit import rtc
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
+    # Load environment variables from a .env file if present
+    load_dotenv(find_dotenv())
+    
     url = os.getenv("LIVEKIT_URL")
     token = os.getenv("LIVEKIT_TOKEN")
     if not url or not token:
         raise RuntimeError("LIVEKIT_URL and LIVEKIT_TOKEN must be set in env")
 
     room = rtc.Room()
+    
     devices = rtc.MediaDevices()
 
     # Open microphone with AEC and prepare a player for remote audio feeding AEC reverse stream
@@ -43,7 +48,7 @@ async def main() -> None:
         if pub_sid is not None:
             streams_by_pub.pop(pub_sid, None)
 
-    async def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
+    def on_track_subscribed(track: rtc.Track, publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
             streams_by_pub[publication.sid] = stream

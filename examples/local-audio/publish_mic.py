@@ -4,10 +4,7 @@ import asyncio
 import logging
 from dotenv import load_dotenv, find_dotenv
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "livekit-rtc")))
-
 from livekit import rtc
-from livekit.rtc import MediaDevices
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
@@ -23,7 +20,7 @@ async def main() -> None:
     room = rtc.Room()
 
     # Create media devices helper and open default microphone with AEC enabled
-    devices = MediaDevices()
+    devices = rtc.MediaDevices()
     mic = devices.open_microphone(enable_aec=True)
 
     try:

@@ -181,7 +181,7 @@ class OutputPlayer:
                         break
                     render_chunk = outdata[start:end, 0]
                     render_frame = AudioFrame(
-                        render_chunk.tobytes(), FRAME_SAMPLES, 1, FRAME_SAMPLES
+                        render_chunk.tobytes(), self._sample_rate, 1, FRAME_SAMPLES
                     )
                     try:
                         self._apm.process_reverse_stream(render_frame)
