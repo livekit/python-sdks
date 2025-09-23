@@ -142,6 +142,7 @@ class AudioSource:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.capture_audio_frame.async_id == resp.capture_audio_frame.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
