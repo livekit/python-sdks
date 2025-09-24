@@ -65,8 +65,7 @@ class _APMDelayEstimator:
 
     The sounddevice callbacks are invoked on PortAudio's threads. This helper allows
     sharing the latest output delay measurement with the input callback so we can set
-    APM's combined stream delay (render + capture), following the approach in
-    stream_example.py.
+    APM's combined stream delay (render + capture).
     """
 
     def __init__(self) -> None:
@@ -234,9 +233,6 @@ class OutputPlayer:
 
 class MediaDevices:
     """High-level interface to native audio devices.
-
-    This class is inspired by the browser `MediaDevices` concept but uses Python
-    conventions and the `sounddevice` library. It provides:
 
     - Device enumeration helpers.
     - Audio input capture into `rtc.AudioSource` with optional APM processing.
