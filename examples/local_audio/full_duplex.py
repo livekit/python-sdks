@@ -100,7 +100,7 @@ async def main() -> None:
         logging.info("participant disconnected: %s", participant.identity)
 
     room.on("participant_disconnected", on_participant_disconnected)
-    
+
     token = (
         api.AccessToken(api_key, api_secret)
         .with_identity("local-audio")
