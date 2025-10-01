@@ -622,7 +622,6 @@ class SipService(Service):
             metadata=metadata,
             rule=rule,
             attributes=attributes,
-            trunk_ids=ListUpdate(set=trunk_ids) if trunk_ids else None,
         )
         if trunk_ids is not None:
             if isinstance(trunk_ids, ListUpdate):
