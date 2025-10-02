@@ -403,35 +403,15 @@ class MediaDevices:
             channels_arg = 1
             mapping = [int(input_channel_index) + 1]
 
-        # Build kwargs and conditionally include 'mapping' based on sounddevice version
-        stream_kwargs: dict[str, Any] = {
-            "callback": _input_callback,
-            "dtype": "int16",
-            "channels": channels_arg,
-            "device": input_device,
-            "samplerate": self._in_sr,
-            "blocksize": self._blocksize,
-        }
-        try:
-            init_params = inspect.signature(sd.InputStream.__init__).parameters
-            if "mapping" in init_params and mapping is not None:
-                stream_kwargs["mapping"] = mapping
-            elif mapping is not None:
-                logging.getLogger(__name__).warning(
-                    "sounddevice.InputStream does not support 'mapping' in this version; "
-                    "ignoring input_channel_index=%s",
-                    input_channel_index,
-                )
-        except Exception:
-            # If inspection fails for any reason, fall back without mapping
-            if mapping is not None:
-                logging.getLogger(__name__).warning(
-                    "Unable to inspect sounddevice.InputStream.__init__; "
-                    "ignoring input_channel_index=%s",
-                    input_channel_index,
-                )
-
-        input_stream = sd.InputStream(**stream_kwargs)
+        input_stream = sd.InputStream(
+            callback=_input_callback,
+            dtype="int16",
+            channels=channels_arg,
+            device=input_device,
+            samplerate=self._in_sr,
+            blocksize=self._blocksize,
+            mapping=mapping,
+        )
         input_stream.start()
 
         async def _pump() -> None:

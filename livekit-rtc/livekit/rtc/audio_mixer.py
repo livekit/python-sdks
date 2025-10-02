@@ -169,7 +169,7 @@ class AudioMixer:
         await self._queue.put(None)
 
     async def _get_contribution(
-        self, stream: AsyncIterator[AudioFrame], buf: np.ndarray
+        self, stream: AsyncIterator[AudioFrame | AudioFrameEvent], buf: np.ndarray
     ) -> _Contribution:
         had_data = buf.shape[0] > 0
         exhausted = False
