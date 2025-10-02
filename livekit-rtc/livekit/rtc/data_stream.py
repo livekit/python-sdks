@@ -182,6 +182,7 @@ class BaseStreamWriter:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.send_stream_header.async_id == resp.send_stream_header.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -206,6 +207,7 @@ class BaseStreamWriter:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.send_stream_chunk.async_id == resp.send_stream_chunk.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -227,6 +229,7 @@ class BaseStreamWriter:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.send_stream_trailer.async_id == resp.send_stream_trailer.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
