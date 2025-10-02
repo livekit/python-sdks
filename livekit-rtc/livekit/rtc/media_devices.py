@@ -120,9 +120,6 @@ class InputCapture:
 class OutputPlayer:
     """Simple audio output helper using `sounddevice.OutputStream`.
 
-    When `apm_for_reverse` is provided, this player will feed the same PCM it
-    renders (in 10 ms frames) into the APM reverse path so that echo
-    cancellation can correlate mic input with speaker output.
     """
 
     def __init__(
@@ -262,6 +259,10 @@ class MediaDevices:
         self._channels = num_channels
         self._blocksize = blocksize
         self._delay_estimator: Optional[_APMDelayEstimator] = None
+        # Internal: last opened input's APM instance (if any). automatically associated with output player for AEC.
+        self._apm: Optional[AudioProcessingModule] = None
+        # Track a single output player
+        self._output: Optional[OutputPlayer] = None
 
     # Device enumeration
     def list_input_devices(self) -> list[dict[str, Any]]:
@@ -314,9 +315,9 @@ class MediaDevices:
         an `AudioProcessingModule` is created and applied to each frame before it
         is queued for `AudioSource.capture_frame`.
 
-        To enable AEC end-to-end, pass the returned `apm` to
-        `open_output(apm_for_reverse=...)` and route remote audio through
-        that player so reverse frames are provided to APM.
+        To enable AEC end-to-end, open the output on the same `MediaDevices`
+        instance after opening input with processing enabled. The APM will be
+        automatically associated so reverse frames are provided for AEC.
 
         Args:
             enable_aec: Enable acoustic echo cancellation.
@@ -341,11 +342,18 @@ class MediaDevices:
                 high_pass_filter=high_pass_filter,
                 auto_gain_control=auto_gain_control,
             )
-        delay_estimator: Optional[_APMDelayEstimator] = (
-            _APMDelayEstimator() if apm is not None else None
-        )
-        # Store the shared estimator on the device helper so the output player can reuse it
-        self._delay_estimator = delay_estimator
+            # Ensure we have a shared delay estimator when processing is enabled
+            if self._delay_estimator is None:
+                self._delay_estimator = _APMDelayEstimator()
+        # Store APM internally for automatic association with output
+        self._apm = apm
+        # Update existing output player so order of creation doesn't matter
+        if self._output is not None:
+            try:
+                self._output._apm = self._apm
+                self._output._delay_estimator = self._delay_estimator
+            except Exception:
+                pass
 
         # Queue from callback to async task
         q: asyncio.Queue[AudioFrame] = asyncio.Queue(maxsize=queue_capacity)
@@ -439,20 +447,30 @@ class MediaDevices:
     def open_output(
         self,
         *,
-        apm_for_reverse: Optional[AudioProcessingModule] = None,
         output_device: Optional[int] = None,
     ) -> OutputPlayer:
-        """Create an `OutputPlayer` for rendering and (optionally) AEC reverse.
+        """Create an `OutputPlayer` for rendering.
 
         Args:
-            apm_for_reverse: Pass the APM used by the audio input device to enable AEC.
             output_device: Optional output device index (default system device if None).
         """
-        return OutputPlayer(
+        # If an output player already exists, warn and return it
+        if self._output is not None:
+            logging.warning("OutputPlayer already created on this MediaDevices; returning existing instance")
+            return self._output
+
+        # Ensure we have a shared delay estimator so output can report render delay
+        if self._delay_estimator is None:
+            self._delay_estimator = _APMDelayEstimator()
+
+        player = OutputPlayer(
             sample_rate=self._out_sr,
             num_channels=self._channels,
             blocksize=self._blocksize,
-            apm_for_reverse=apm_for_reverse,
+            apm_for_reverse=self._apm,
             output_device=output_device,
             delay_estimator=self._delay_estimator,
         )
+        # Track player for future APM/delay updates when input is opened later
+        self._output = player
+        return player
