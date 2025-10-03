@@ -262,6 +262,7 @@ class MediaDevices:
         self._channels = num_channels
         self._blocksize = blocksize
         self._delay_estimator: Optional[_APMDelayEstimator] = None
+        self._apm: Optional[AudioProcessingModule] = None
 
     # Device enumeration
     def list_input_devices(self) -> list[dict[str, Any]]:
@@ -314,9 +315,9 @@ class MediaDevices:
         an `AudioProcessingModule` is created and applied to each frame before it
         is queued for `AudioSource.capture_frame`.
 
-        To enable AEC end-to-end, pass the returned `apm` to
-        `open_output(apm_for_reverse=...)` and route remote audio through
-        that player so reverse frames are provided to APM.
+        To enable AEC end-to-end, call `open_output()` after opening the input
+        device. The output player will automatically use the input's APM for
+        reverse stream processing, enabling echo cancellation.
 
         Args:
             enable_aec: Enable acoustic echo cancellation.
@@ -344,8 +345,9 @@ class MediaDevices:
         delay_estimator: Optional[_APMDelayEstimator] = (
             _APMDelayEstimator() if apm is not None else None
         )
-        # Store the shared estimator on the device helper so the output player can reuse it
+        # Store the shared estimator and APM on the device helper so the output player can reuse them
         self._delay_estimator = delay_estimator
+        self._apm = apm
 
         # Queue from callback to async task
         q: asyncio.Queue[AudioFrame] = asyncio.Queue(maxsize=queue_capacity)
@@ -432,20 +434,21 @@ class MediaDevices:
     def open_output(
         self,
         *,
-        apm_for_reverse: Optional[AudioProcessingModule] = None,
         output_device: Optional[int] = None,
     ) -> OutputPlayer:
         """Create an `OutputPlayer` for rendering and (optionally) AEC reverse.
 
+        If an input device was opened with AEC enabled, the output player will
+        automatically feed the APM's reverse stream for echo cancellation.
+
         Args:
-            apm_for_reverse: Pass the APM used by the audio input device to enable AEC.
             output_device: Optional output device index (default system device if None).
         """
         return OutputPlayer(
             sample_rate=self._out_sr,
             num_channels=self._channels,
             blocksize=self._blocksize,
-            apm_for_reverse=apm_for_reverse,
+            apm_for_reverse=self._apm,
             output_device=output_device,
             delay_estimator=self._delay_estimator,
         )
