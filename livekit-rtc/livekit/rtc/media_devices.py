@@ -395,22 +395,15 @@ class MediaDevices:
                 except Exception:
                     pass
 
-        # If a specific device channel is requested, map to that channel only.
-        # sounddevice's channel mapping is 1-based (PortAudio convention).
-        mapping = None
-        channels_arg = self._channels
-        if input_channel_index is not None:
-            channels_arg = 1
-            mapping = [int(input_channel_index) + 1]
-
+        # Note: input_channel_index is currently not used as sounddevice mapping
+        # parameter is not supported in all versions.
         input_stream = sd.InputStream(
             callback=_input_callback,
             dtype="int16",
-            channels=channels_arg,
+            channels=self._channels,
             device=input_device,
             samplerate=self._in_sr,
             blocksize=self._blocksize,
-            mapping=mapping,
         )
         input_stream.start()
 
