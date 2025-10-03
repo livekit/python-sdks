@@ -17,6 +17,7 @@ import re
 import datetime
 import os
 import jwt
+import dataclasses
 from dataclasses import dataclass
 from typing import Optional, List, Literal
 from google.protobuf.json_format import MessageToDict, ParseDict
@@ -150,7 +151,7 @@ class AccessToken:
         self.claims.sip = grants
         return self
 
-    def with_observability_grants(self, grants: ObservabiliyGrants) -> "AccessToken":
+    def with_observability_grants(self, grants: ObservabilityGrants) -> "AccessToken":
         self.claims.observability = grants
         return self
 
