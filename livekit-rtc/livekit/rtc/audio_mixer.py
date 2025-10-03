@@ -4,6 +4,7 @@ import contextlib
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 from .audio_frame import AudioFrame
+from .audio_stream import AudioFrameEvent
 from .log import logger
 
 _Stream = AsyncIterator[AudioFrame]
