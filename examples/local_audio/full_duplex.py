@@ -1,9 +1,12 @@
 import os
 import asyncio
 import logging
+import threading
+import queue
 from dotenv import load_dotenv, find_dotenv
 
 from livekit import api, rtc
+from db_meter import calculate_db_level, display_dual_db_meters
 
 
 async def main() -> None:
@@ -22,17 +25,22 @@ async def main() -> None:
 
     devices = rtc.MediaDevices()
 
-    # Open microphone with AEC and prepare a player for remote audio feeding AEC reverse stream
-    mic = devices.open_input(enable_aec=True)
+    # Open microphone & speaker
+    mic = devices.open_input()
     player = devices.open_output()
 
     # Mixer for all remote audio streams
     mixer = rtc.AudioMixer(sample_rate=48000, num_channels=1)
 
+    # dB level monitoring
+    mic_db_queue = queue.Queue()
+    room_db_queue = queue.Queue()
+
     # Track stream bookkeeping for cleanup
     streams_by_pub: dict[str, rtc.AudioStream] = {}
     streams_by_participant: dict[str, set[rtc.AudioStream]] = {}
-
+    
+    # remove stream from mixer and close it
     async def _remove_stream(
         stream: rtc.AudioStream, participant_sid: str | None = None, pub_sid: str | None = None
     ) -> None:
@@ -125,8 +133,56 @@ async def main() -> None:
         await room.local_participant.publish_track(track, pub_opts)
         logging.info("published local microphone")
 
-        # Start playing mixed remote audio
-        asyncio.create_task(player.play(mixer))
+        # Start dB meter display in a separate thread
+        meter_thread = threading.Thread(
+            target=display_dual_db_meters,
+            args=(mic_db_queue, room_db_queue),
+            daemon=True
+        )
+        meter_thread.start()
+
+        # Create a monitoring wrapper for the mixer that calculates dB levels
+        # while passing frames through to the player
+        async def monitored_mixer():
+            try:
+                async for frame in mixer:
+                    # Calculate dB level for room audio
+                    samples = list(frame.data)
+                    db_level = calculate_db_level(samples)
+                    try:
+                        room_db_queue.put_nowait(db_level)
+                    except queue.Full:
+                        pass  # Drop if queue is full
+                    # Yield the frame for playback
+                    yield frame
+            except Exception:
+                pass
+
+        # Start playing mixed remote audio with monitoring
+        asyncio.create_task(player.play(monitored_mixer()))
+
+        # Monitor microphone dB levels
+        async def monitor_mic_db():
+            mic_stream = rtc.AudioStream(
+                track, sample_rate=48000, num_channels=1
+            )
+            try:
+                async for frame_event in mic_stream:
+                    frame = frame_event.frame
+                    # Convert frame data to list of samples
+                    samples = list(frame.data)
+                    db_level = calculate_db_level(samples)
+                    # Update queue with latest value (non-blocking)
+                    try:
+                        mic_db_queue.put_nowait(db_level)
+                    except queue.Full:
+                        pass  # Drop if queue is full
+            except Exception:
+                pass
+            finally:
+                await mic_stream.aclose()
+
+        asyncio.create_task(monitor_mic_db())
 
         # Run until Ctrl+C
         while True:
