@@ -6,6 +6,7 @@ from raw audio samples, useful for monitoring microphone input and room audio le
 """
 
 import math
+import queue
 import time
 from typing import List
 
@@ -147,7 +148,6 @@ def display_dual_db_meters(mic_db_receiver, room_db_receiver) -> None:
         last_update = time.time()
         current_mic_db = -60.0
         current_room_db = -60.0
-        first_display = True
 
         print()  # Start on a new line
         print("\x1b[92mAudio Levels Monitor\x1b[0m")
@@ -159,14 +159,14 @@ def display_dual_db_meters(mic_db_receiver, room_db_receiver) -> None:
                 while True:  # Drain all available data
                     mic_db = mic_db_receiver.get_nowait()
                     current_mic_db = mic_db
-            except:
+            except queue.Empty:
                 pass  # No more data available
 
             try:
                 while True:  # Drain all available data
                     room_db = room_db_receiver.get_nowait()
                     current_room_db = room_db
-            except:
+            except queue.Empty:
                 pass  # No more data available
 
             # Update display at regular intervals
@@ -208,7 +208,7 @@ def display_single_db_meter(db_receiver, label: str = "Mic Level: ") -> None:
                 while True:  # Drain all available data
                     db_level = db_receiver.get_nowait()
                     current_db = db_level
-            except:
+            except queue.Empty:
                 pass  # No more data available
 
             # Update display at regular intervals
