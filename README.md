@@ -173,6 +173,98 @@ except Exception as e:
 
 You may find it useful to adjust the `response_timeout` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
 
+## Using local media devices
+
+The `MediaDevices` class provides a high-level interface for working with local audio input (microphone) and output (speakers) devices. It's built on top of the `sounddevice` library and integrates seamlessly with LiveKit's audio processing features.  In order to use `MediaDevices`, you must have the `sounddevice` library installed in your local Python environment, if it's not available, `MediaDevices` will not work.
+
+### Capturing microphone input
+
+```python
+from livekit import rtc
+
+# Create a MediaDevices instance
+devices = rtc.MediaDevices()
+
+# Open the default microphone with audio processing enabled
+mic = devices.open_input(
+    enable_aec=True,          # Acoustic Echo Cancellation
+    noise_suppression=True,   # Noise suppression
+    high_pass_filter=True,    # High-pass filter
+    auto_gain_control=True    # Automatic gain control
+)
+
+# Use the audio source to create a track and publish it
+track = rtc.LocalAudioTrack.create_audio_track("microphone", mic.source)
+await room.local_participant.publish_track(track)
+
+# Clean up when done
+await mic.aclose()
+```
+
+### Playing audio to speakers
+
+```python
+# Open the default output device
+player = devices.open_output()
+
+# Add remote audio tracks to the player (typically in a track_subscribed handler)
+@room.on("track_subscribed")
+def on_track_subscribed(track: rtc.Track, publication, participant):
+    if track.kind == rtc.TrackKind.KIND_AUDIO:
+        player.add_track(track)
+
+# Start playback (mixes all added tracks)
+await player.start()
+
+# Clean up when done
+await player.aclose()
+```
+
+### Full duplex audio (microphone + speakers)
+
+For full duplex audio with echo cancellation, open the input device first (with AEC enabled), then open the output device. The output player will automatically feed the APM's reverse stream for effective echo cancellation:
+
+```python
+devices = rtc.MediaDevices()
+
+# Open microphone with AEC
+mic = devices.open_input(enable_aec=True)
+
+# Open speakers - automatically uses the mic's APM for echo cancellation
+player = devices.open_output()
+
+# Publish microphone
+track = rtc.LocalAudioTrack.create_audio_track("mic", mic.source)
+await room.local_participant.publish_track(track)
+
+# Add remote tracks and start playback
+player.add_track(remote_audio_track)
+await player.start()
+```
+
+### Listing available devices
+
+```python
+devices = rtc.MediaDevices()
+
+# List input devices
+input_devices = devices.list_input_devices()
+for device in input_devices:
+    print(f"{device['index']}: {device['name']}")
+
+# List output devices  
+output_devices = devices.list_output_devices()
+for device in output_devices:
+    print(f"{device['index']}: {device['name']}")
+
+# Get default device indices
+default_input = devices.default_input_device()
+default_output = devices.default_output_device()
+```
+
+See [publish_mic.py](examples/local_audio/publish_mic.py) and [full_duplex.py](examples/local_audio/full_duplex.py) for complete examples.
+
+
 #### Errors
 
 LiveKit is a dynamic realtime environment and calls can fail for various reasons.
