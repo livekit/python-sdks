@@ -136,7 +136,7 @@ async def main() -> None:
         # Start dB meter display in a separate thread
         meter_thread = threading.Thread(
             target=display_dual_db_meters,
-            args=(mic_db_queue, room_db_queue),
+            args=(mic_db_queue, room_db_queue, room.name),
             daemon=True
         )
         meter_thread.start()

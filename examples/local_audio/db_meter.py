@@ -136,13 +136,14 @@ def format_dual_meters(mic_db: float, room_db: float) -> str:
     return f"{mic_meter}{room_meter}"
 
 
-def display_dual_db_meters(mic_db_receiver, room_db_receiver) -> None:
+def display_dual_db_meters(mic_db_receiver, room_db_receiver, room_name: str = "Audio Levels Monitor") -> None:
     """
     Display dual dB meters continuously until interrupted.
 
     Args:
         mic_db_receiver: Queue or receiver for microphone dB levels
         room_db_receiver: Queue or receiver for room dB levels
+        room_name: Name of the room to display as the title
     """
     try:
         last_update = time.time()
@@ -150,7 +151,7 @@ def display_dual_db_meters(mic_db_receiver, room_db_receiver) -> None:
         current_room_db = -60.0
 
         print()  # Start on a new line
-        print("\x1b[92mAudio Levels Monitor\x1b[0m")
+        print(f"\x1b[92mRoom [{room_name}]\x1b[0m")
         print("\x1b[2m────────────────────────────────────────────────────────────────────────────────\x1b[0m")
 
         while True:
