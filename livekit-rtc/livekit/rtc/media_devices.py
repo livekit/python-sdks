@@ -25,6 +25,9 @@ import threading
 from . import AudioSource
 from .audio_frame import AudioFrame
 from .apm import AudioProcessingModule
+from .audio_mixer import AudioMixer
+from .audio_stream import AudioStream
+from .track import Track
 
 """
 Media device helpers built on top of the `sounddevice` library.
@@ -121,6 +124,10 @@ class OutputPlayer:
     When `apm_for_reverse` is provided, this player will feed the same PCM it
     renders (in 10 ms frames) into the APM reverse path so that echo
     cancellation can correlate mic input with speaker output.
+
+    The OutputPlayer includes an internal `AudioMixer` for convenient multi-track
+    playback. Use `add_track()` and `remove_track()` to dynamically manage tracks,
+    then call `start()` to begin playback.
     """
 
     def __init__(
@@ -142,6 +149,10 @@ class OutputPlayer:
         self._play_task: Optional[asyncio.Task] = None
         self._running = False
         self._delay_estimator = delay_estimator
+        
+        # Internal mixer for add_track/remove_track API
+        self._mixer: Optional[AudioMixer] = None
+        self._track_streams: dict[str, AudioStream] = {}  # track.sid -> AudioStream
 
         def _callback(outdata: np.ndarray, frame_count: int, time_info: Any, status: Any) -> None:
             # Pull PCM int16 from buffer; zero if not enough
@@ -197,31 +208,133 @@ class OutputPlayer:
             blocksize=blocksize,
         )
 
-    async def play(self, stream: AsyncIterator[AudioFrame]) -> None:
-        """Render an async iterator of `AudioFrame` to the output device.
+    def add_track(self, track: Track) -> None:
+        """Add an audio track to the internal mixer for playback.
 
-        The raw PCM data is appended to an internal buffer consumed by the
-        realtime callback. If an APM was supplied, reverse frames are fed for AEC.
+        This creates an `AudioStream` from the track and adds it to the internal
+        mixer. The mixer is created lazily on first track addition. Call `start()`
+        to begin playback of all added tracks.
+
+        Args:
+            track: The audio track to add (typically from a remote participant).
+
+        Raises:
+            ValueError: If the track is not an audio track or has already been added.
         """
-        self._running = True
-        self._stream.start()
-        try:
-            async for frame in stream:
-                if not self._running:
-                    break
-                # Append raw PCM bytes for callback consumption
-                self._buffer.extend(frame.data.tobytes())
-        finally:
-            self._running = False
+        if track.sid in self._track_streams:
+            raise ValueError(f"Track {track.sid} already added to player")
+        
+        # Create mixer on first track addition
+        if self._mixer is None:
+            self._mixer = AudioMixer(
+                sample_rate=self._sample_rate,
+                num_channels=self._num_channels
+            )
+        
+        # Create audio stream for this track
+        stream = AudioStream(
+            track,
+            sample_rate=self._sample_rate,
+            num_channels=self._num_channels
+        )
+        
+        self._track_streams[track.sid] = stream
+        self._mixer.add_stream(stream)
+
+    async def remove_track(self, track: Track) -> None:
+        """Remove an audio track from the internal mixer.
+
+        This removes the track's stream from the mixer and closes it.
+
+        Args:
+            track: The audio track to remove.
+        """
+        stream = self._track_streams.pop(track.sid, None)
+        if stream is None:
+            return
+        
+        if self._mixer is not None:
             try:
-                self._stream.stop()
-                self._stream.close()
+                self._mixer.remove_stream(stream)
             except Exception:
                 pass
+        
+        try:
+            await stream.aclose()
+        except Exception:
+            pass
+
+    async def start(self) -> None:
+        """Start playback of all tracks in the internal mixer.
+
+        This begins a background task that consumes frames from the internal mixer
+        and sends them to the output device. Tracks can be added or removed
+        dynamically using `add_track()` and `remove_track()`.
+
+        Raises:
+            RuntimeError: If playback is already started or no mixer is available.
+        """
+        if self._play_task is not None and not self._play_task.done():
+            raise RuntimeError("Playback already started")
+        
+        if self._mixer is None:
+            self._mixer = AudioMixer(
+                sample_rate=self._sample_rate,
+                num_channels=self._num_channels
+            )
+        
+        async def _playback_loop():
+            """Internal playback loop that consumes frames from the mixer."""
+            self._running = True
+            self._stream.start()
+            try:
+                async for frame in self._mixer:
+                    if not self._running:
+                        break
+                    # Append raw PCM bytes for callback consumption
+                    self._buffer.extend(frame.data.tobytes())
+            finally:
+                self._running = False
+                try:
+                    self._stream.stop()
+                    self._stream.close()
+                except Exception:
+                    pass
+        
+        self._play_task = asyncio.create_task(_playback_loop())
 
     async def aclose(self) -> None:
-        """Stop playback and close the output stream."""
+        """Stop playback and close the output stream.
+        
+        This also cleans up all added tracks and the internal mixer.
+        """
         self._running = False
+        
+        # Cancel playback task if running
+        if self._play_task is not None and not self._play_task.done():
+            self._play_task.cancel()
+            try:
+                await self._play_task
+            except asyncio.CancelledError:
+                pass
+        
+        # Clean up all track streams
+        for stream in list(self._track_streams.values()):
+            try:
+                await stream.aclose()
+            except Exception:
+                pass
+        self._track_streams.clear()
+        
+        # Close mixer
+        if self._mixer is not None:
+            try:
+                await self._mixer.aclose()
+            except Exception:
+                pass
+            self._mixer = None
+        
+        # Close output stream
         try:
             self._stream.stop()
             self._stream.close()
