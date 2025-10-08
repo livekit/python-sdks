@@ -13,6 +13,7 @@ class AudioCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     DEFAULT_AC: _ClassVar[AudioCodec]
     OPUS: _ClassVar[AudioCodec]
     AAC: _ClassVar[AudioCodec]
+    AC_MP3: _ClassVar[AudioCodec]
 
 class VideoCodec(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -112,6 +113,7 @@ class AudioTrackFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 DEFAULT_AC: AudioCodec
 OPUS: AudioCodec
 AAC: AudioCodec
+AC_MP3: AudioCodec
 DEFAULT_VC: VideoCodec
 H264_BASELINE: VideoCodec
 H264_MAIN: VideoCodec
@@ -1067,3 +1069,11 @@ class WebhookConfig(_message.Message):
     url: str
     signing_key: str
     def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ...) -> None: ...
+
+class SubscribedAudioCodec(_message.Message):
+    __slots__ = ("codec", "enabled")
+    CODEC_FIELD_NUMBER: _ClassVar[int]
+    ENABLED_FIELD_NUMBER: _ClassVar[int]
+    codec: str
+    enabled: bool
+    def __init__(self, codec: _Optional[str] = ..., enabled: bool = ...) -> None: ...

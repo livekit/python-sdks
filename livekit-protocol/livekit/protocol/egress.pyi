@@ -12,6 +12,7 @@ class EncodedFileType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     DEFAULT_FILETYPE: _ClassVar[EncodedFileType]
     MP4: _ClassVar[EncodedFileType]
     OGG: _ClassVar[EncodedFileType]
+    MP3: _ClassVar[EncodedFileType]
 
 class SegmentedFileProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -69,6 +70,7 @@ class EgressSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 DEFAULT_FILETYPE: EncodedFileType
 MP4: EncodedFileType
 OGG: EncodedFileType
+MP3: EncodedFileType
 DEFAULT_SEGMENTED_FILE_PROTOCOL: SegmentedFileProtocol
 HLS_PROTOCOL: SegmentedFileProtocol
 INDEX: SegmentedFileSuffix
