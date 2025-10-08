@@ -70,7 +70,7 @@ mv "$API_OUT_PYTHON/livekit_sip_pb2.pyi" "$API_OUT_PYTHON/sip.pyi"
 mv "$API_OUT_PYTHON/livekit_metrics_pb2.py" "$API_OUT_PYTHON/metrics.py"
 mv "$API_OUT_PYTHON/livekit_metrics_pb2.pyi" "$API_OUT_PYTHON/metrics.pyi"
 
-mkdir "$API_OUT_PYTHON/agent_pb"
+mkdir -p "$API_OUT_PYTHON/agent_pb"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
 
