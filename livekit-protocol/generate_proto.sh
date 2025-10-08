@@ -69,8 +69,10 @@ mv "$API_OUT_PYTHON/livekit_sip_pb2.py" "$API_OUT_PYTHON/sip.py"
 mv "$API_OUT_PYTHON/livekit_sip_pb2.pyi" "$API_OUT_PYTHON/sip.pyi"
 mv "$API_OUT_PYTHON/livekit_metrics_pb2.py" "$API_OUT_PYTHON/metrics.py"
 mv "$API_OUT_PYTHON/livekit_metrics_pb2.pyi" "$API_OUT_PYTHON/metrics.pyi"
-mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent/agent_session.py"
-mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent/agent_session.pyi"
+
+mkdir "$API_OUT_PYTHON/agent_pb"
+mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
 
 perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_agent_session_pb2))|from . $1|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
 
