@@ -111,3 +111,11 @@ class EventMetric(_message.Message):
     metadata: str
     rid: int
     def __init__(self, label: _Optional[int] = ..., participant_identity: _Optional[int] = ..., track_sid: _Optional[int] = ..., start_timestamp_ms: _Optional[int] = ..., end_timestamp_ms: _Optional[int] = ..., normalized_start_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., normalized_end_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[str] = ..., rid: _Optional[int] = ...) -> None: ...
+
+class MetricsRecordingHeader(_message.Message):
+    __slots__ = ("room_id", "enable_user_data_training")
+    ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    ENABLE_USER_DATA_TRAINING_FIELD_NUMBER: _ClassVar[int]
+    room_id: str
+    enable_user_data_training: bool
+    def __init__(self, room_id: _Optional[str] = ..., enable_user_data_training: bool = ...) -> None: ...
