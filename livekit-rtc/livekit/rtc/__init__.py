@@ -38,6 +38,13 @@ from ._proto.track_pb2 import (
     ParticipantTrackPermission,
 )
 from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
+
+# Import BackupCodecPolicy from protocol package
+try:
+    from livekit.protocol.models import BackupCodecPolicy
+except ImportError:
+    # Fallback if protocol package is not available
+    BackupCodecPolicy = None  # type: ignore
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream, NoiseCancellationOptions
@@ -118,6 +125,7 @@ __all__ = [
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
+    "BackupCodecPolicy",
     "stats",
     "AudioFrame",
     "AudioSource",
