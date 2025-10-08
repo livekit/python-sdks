@@ -701,7 +701,7 @@ class SIPOutboundConfig(_message.Message):
     def __init__(self, hostname: _Optional[str] = ..., destination_country: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateSIPParticipantRequest(_message.Message):
-    __slots__ = ("sip_trunk_id", "trunk", "sip_call_to", "sip_number", "room_name", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "dtmf", "play_ringtone", "play_dialtone", "hide_phone_number", "headers", "include_headers", "ringing_timeout", "max_call_duration", "krisp_enabled", "media_encryption", "wait_until_answered")
+    __slots__ = ("sip_trunk_id", "trunk", "sip_call_to", "sip_number", "room_name", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "dtmf", "play_ringtone", "play_dialtone", "hide_phone_number", "headers", "include_headers", "ringing_timeout", "max_call_duration", "krisp_enabled", "media_encryption", "wait_until_answered", "display_name")
     class ParticipantAttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -736,6 +736,7 @@ class CreateSIPParticipantRequest(_message.Message):
     KRISP_ENABLED_FIELD_NUMBER: _ClassVar[int]
     MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
     WAIT_UNTIL_ANSWERED_FIELD_NUMBER: _ClassVar[int]
+    DISPLAY_NAME_FIELD_NUMBER: _ClassVar[int]
     sip_trunk_id: str
     trunk: SIPOutboundConfig
     sip_call_to: str
@@ -756,7 +757,8 @@ class CreateSIPParticipantRequest(_message.Message):
     krisp_enabled: bool
     media_encryption: SIPMediaEncryption
     wait_until_answered: bool
-    def __init__(self, sip_trunk_id: _Optional[str] = ..., trunk: _Optional[_Union[SIPOutboundConfig, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_number: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., dtmf: _Optional[str] = ..., play_ringtone: bool = ..., play_dialtone: bool = ..., hide_phone_number: bool = ..., headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., max_call_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., wait_until_answered: bool = ...) -> None: ...
+    display_name: str
+    def __init__(self, sip_trunk_id: _Optional[str] = ..., trunk: _Optional[_Union[SIPOutboundConfig, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_number: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., dtmf: _Optional[str] = ..., play_ringtone: bool = ..., play_dialtone: bool = ..., hide_phone_number: bool = ..., headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., max_call_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., wait_until_answered: bool = ..., display_name: _Optional[str] = ...) -> None: ...
 
 class SIPParticipantInfo(_message.Message):
     __slots__ = ("participant_id", "participant_identity", "room_name", "sip_call_id")
