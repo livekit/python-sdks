@@ -62,6 +62,7 @@ EventTypes = Literal[
     "participant_name_changed",
     "participant_attributes_changed",
     "connection_quality_changed",
+    "participant_encryption_status_changed",
     "data_received",
     "sip_dtmf_received",
     "transcription_received",
@@ -352,6 +353,8 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `participant` (Participant), `old_name` (str), `new_name` (str)
             - **"participant_attributes_changed"**: Called when a participant's attributes change.
                 - Arguments: `changed_attributes` (dict), `participant` (Participant)
+            - **"participant_encryption_status_changed"**: Called when a participant's encryption status changes.
+                - Arguments `is_encrypted` (bool), `participant` (Participant)
             - **"connection_quality_changed"**: Called when a participant's connection quality changes.
                 - Arguments: `participant` (Participant), `quality` (ConnectionQuality)
             - **"transcription_received"**: Called when a transcription is received.
@@ -734,6 +737,14 @@ class Room(EventEmitter[EventTypes]):
                 "participant_attributes_changed",
                 changed_attributes,
                 participant,
+            )
+        elif which == "participant_encryption_status_changed":
+            identity = event.participant_encryption_status_changed.participant_identity
+            participant = self._retrieve_participant(identity)
+            self.emit(
+                "participant_encryption_status_changed",
+                event.participant_encryption_status_changed.is_encrypted,
+                event.connection_quality_changed.quality,
             )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
