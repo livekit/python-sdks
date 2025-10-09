@@ -19,6 +19,7 @@ import ctypes
 import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast, Mapping
+import warnings
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -98,6 +99,8 @@ class RoomOptions:
     """Automatically subscribe to tracks when participants join."""
     dynacast: bool = False
     e2ee: E2EEOptions | None = None
+    """Deprecated, use `encryption` field instead"""
+    encryption: E2EEOptions | None = None
     """Options for end-to-end encryption."""
     rtc_config: RtcConfiguration | None = None
     """WebRTC-related configuration."""
@@ -422,6 +425,12 @@ class Room(EventEmitter[EventTypes]):
         req.connect.options.dynacast = options.dynacast
 
         if options.e2ee:
+            warnings.warn(
+                "options.e2ee is deprecated, use options.encryption instead",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
             req.connect.options.e2ee.key_provider_options.shared_key = (
                 options.e2ee.key_provider_options.shared_key  # type: ignore
@@ -434,6 +443,21 @@ class Room(EventEmitter[EventTypes]):
             )
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = (
                 options.e2ee.key_provider_options.ratchet_window_size
+            )
+
+        if options.encryption:
+            req.connect.options.encryption.encryption_type = options.encryption.encryption_type
+            req.connect.options.encryption.key_provider_options.shared_key = (
+                options.encryption.key_provider_options.shared_key  # type: ignore
+            )
+            req.connect.options.encryption.key_provider_options.ratchet_salt = (
+                options.encryption.key_provider_options.ratchet_salt
+            )
+            req.connect.options.encryption.key_provider_options.failure_tolerance = (
+                options.encryption.key_provider_options.failure_tolerance
+            )
+            req.connect.options.encryption.key_provider_options.ratchet_window_size = (
+                options.encryption.key_provider_options.ratchet_window_size
             )
 
         if options.rtc_config:
