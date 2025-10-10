@@ -57,17 +57,13 @@ async def main() -> None:
 
         # Start dB meter display in a separate thread
         meter_thread = threading.Thread(
-            target=display_single_db_meter,
-            args=(mic_db_queue, "Mic: "),
-            daemon=True
+            target=display_single_db_meter, args=(mic_db_queue, "Mic: "), daemon=True
         )
         meter_thread.start()
 
         # Monitor microphone dB levels
         async def monitor_mic_db():
-            mic_stream = rtc.AudioStream(
-                track, sample_rate=48000, num_channels=1
-            )
+            mic_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
             try:
                 async for frame_event in mic_stream:
                     frame = frame_event.frame

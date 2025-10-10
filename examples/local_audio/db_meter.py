@@ -136,7 +136,9 @@ def format_dual_meters(mic_db: float, room_db: float) -> str:
     return f"{mic_meter}{room_meter}"
 
 
-def display_dual_db_meters(mic_db_receiver, room_db_receiver, room_name: str = "Audio Levels Monitor") -> None:
+def display_dual_db_meters(
+    mic_db_receiver, room_db_receiver, room_name: str = "Audio Levels Monitor"
+) -> None:
     """
     Display dual dB meters continuously until interrupted.
 
@@ -152,7 +154,9 @@ def display_dual_db_meters(mic_db_receiver, room_db_receiver, room_name: str = "
 
         print()  # Start on a new line
         print(f"\x1b[92mRoom [{room_name}]\x1b[0m")
-        print("\x1b[2m────────────────────────────────────────────────────────────────────────────────\x1b[0m")
+        print(
+            "\x1b[2m────────────────────────────────────────────────────────────────────────────────\x1b[0m"
+        )
 
         while True:
             # Check for new data (non-blocking)
@@ -174,7 +178,11 @@ def display_dual_db_meters(mic_db_receiver, room_db_receiver, room_name: str = "
             current_time = time.time()
             if current_time - last_update >= DB_METER_UPDATE_INTERVAL_MS / 1000.0:
                 # Clear current line and display meters in place
-                print(f"\r\x1b[K{format_dual_meters(current_mic_db, current_room_db)}", end="", flush=True)
+                print(
+                    f"\r\x1b[K{format_dual_meters(current_mic_db, current_room_db)}",
+                    end="",
+                    flush=True,
+                )
                 last_update = current_time
 
             # Small sleep to prevent busy waiting

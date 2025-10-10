@@ -149,7 +149,7 @@ class OutputPlayer:
         self._play_task: Optional[asyncio.Task] = None
         self._running = False
         self._delay_estimator = delay_estimator
-        
+
         # Internal mixer for add_track/remove_track API
         self._mixer: Optional[AudioMixer] = None
         self._track_streams: dict[str, AudioStream] = {}  # track.sid -> AudioStream
@@ -223,21 +223,14 @@ class OutputPlayer:
         """
         if track.sid in self._track_streams:
             raise ValueError(f"Track {track.sid} already added to player")
-        
+
         # Create mixer on first track addition
         if self._mixer is None:
-            self._mixer = AudioMixer(
-                sample_rate=self._sample_rate,
-                num_channels=self._num_channels
-            )
-        
+            self._mixer = AudioMixer(sample_rate=self._sample_rate, num_channels=self._num_channels)
+
         # Create audio stream for this track
-        stream = AudioStream(
-            track,
-            sample_rate=self._sample_rate,
-            num_channels=self._num_channels
-        )
-        
+        stream = AudioStream(track, sample_rate=self._sample_rate, num_channels=self._num_channels)
+
         self._track_streams[track.sid] = stream
         self._mixer.add_stream(stream)
 
@@ -252,13 +245,13 @@ class OutputPlayer:
         stream = self._track_streams.pop(track.sid, None)
         if stream is None:
             return
-        
+
         if self._mixer is not None:
             try:
                 self._mixer.remove_stream(stream)
             except Exception:
                 pass
-        
+
         try:
             await stream.aclose()
         except Exception:
@@ -276,13 +269,10 @@ class OutputPlayer:
         """
         if self._play_task is not None and not self._play_task.done():
             raise RuntimeError("Playback already started")
-        
+
         if self._mixer is None:
-            self._mixer = AudioMixer(
-                sample_rate=self._sample_rate,
-                num_channels=self._num_channels
-            )
-        
+            self._mixer = AudioMixer(sample_rate=self._sample_rate, num_channels=self._num_channels)
+
         async def _playback_loop():
             """Internal playback loop that consumes frames from the mixer."""
             self._running = True
@@ -300,16 +290,16 @@ class OutputPlayer:
                     self._stream.close()
                 except Exception:
                     pass
-        
+
         self._play_task = asyncio.create_task(_playback_loop())
 
     async def aclose(self) -> None:
         """Stop playback and close the output stream.
-        
+
         This also cleans up all added tracks and the internal mixer.
         """
         self._running = False
-        
+
         # Cancel playback task if running
         if self._play_task is not None and not self._play_task.done():
             self._play_task.cancel()
@@ -317,7 +307,7 @@ class OutputPlayer:
                 await self._play_task
             except asyncio.CancelledError:
                 pass
-        
+
         # Clean up all track streams
         for stream in list(self._track_streams.values()):
             try:
@@ -325,7 +315,7 @@ class OutputPlayer:
             except Exception:
                 pass
         self._track_streams.clear()
-        
+
         # Close mixer
         if self._mixer is not None:
             try:
@@ -333,7 +323,7 @@ class OutputPlayer:
             except Exception:
                 pass
             self._mixer = None
-        
+
         # Close output stream
         try:
             self._stream.stop()
