@@ -148,9 +148,9 @@ class SipService(Service):
         self,
         trunk_id: str,
         *,
-        numbers: Optional[list[str]] = None,
-        allowed_addresses: Optional[list[str]] = None,
-        allowed_numbers: Optional[list[str]] = None,
+        numbers: Optional[ListUpdate | list[str]] = None,
+        allowed_addresses: Optional[ListUpdate | list[str]] = None,
+        allowed_numbers: Optional[ListUpdate | list[str]] = None,
         auth_username: Optional[str] = None,
         auth_password: Optional[str] = None,
         name: Optional[str] = None,
@@ -167,11 +167,26 @@ class SipService(Service):
             metadata=metadata,
         )
         if numbers is not None:
-            update.numbers.set.extend(numbers)
+            if isinstance(numbers, ListUpdate):
+                update.numbers.set.extend(numbers.set)
+                update.numbers.add.extend(numbers.add)
+                update.numbers.remove.extend(numbers.remove)
+            else:
+                update.numbers.set.extend(numbers)
         if allowed_addresses is not None:
-            update.allowed_addresses.set.extend(allowed_addresses)
+            if isinstance(allowed_addresses, ListUpdate):
+                update.allowed_addresses.set.extend(allowed_addresses.set)
+                update.allowed_addresses.add.extend(allowed_addresses.add)
+                update.allowed_addresses.remove.extend(allowed_addresses.remove)
+            else:
+                update.allowed_addresses.set.extend(allowed_addresses)
         if allowed_numbers is not None:
-            update.allowed_numbers.set.extend(allowed_numbers)
+            if isinstance(allowed_numbers, ListUpdate):
+                update.allowed_numbers.set.extend(allowed_numbers.set)
+                update.allowed_numbers.add.extend(allowed_numbers.add)
+                update.allowed_numbers.remove.extend(allowed_numbers.remove)
+            else:
+                update.allowed_numbers.set.extend(allowed_numbers)
 
         return await self._client.request(
             SVC,
@@ -314,7 +329,7 @@ class SipService(Service):
         *,
         address: str | None = None,
         transport: SIPTransport | None = None,
-        numbers: list[str] | None = None,
+        numbers: Optional[ListUpdate | list[str]] = None,
         auth_username: str | None = None,
         auth_password: str | None = None,
         name: str | None = None,
@@ -333,7 +348,13 @@ class SipService(Service):
             metadata=metadata,
         )
         if numbers is not None:
-            update.numbers.set.extend(numbers)
+            if isinstance(numbers, ListUpdate):
+                update.numbers.set.extend(numbers.set)
+                update.numbers.add.extend(numbers.add)
+                update.numbers.remove.extend(numbers.remove)
+            else:
+                update.numbers.set.extend(numbers)
+
         return await self._client.request(
             SVC,
             "UpdateSIPOutboundTrunk",
@@ -586,7 +607,7 @@ class SipService(Service):
         self,
         rule_id: str,
         *,
-        trunk_ids: Optional[list[str]] = None,
+        trunk_ids: Optional[ListUpdate | list[str]] = None,
         rule: Optional[SIPDispatchRule] = None,
         name: Optional[str] = None,
         metadata: Optional[str] = None,
@@ -601,8 +622,15 @@ class SipService(Service):
             metadata=metadata,
             rule=rule,
             attributes=attributes,
-            trunk_ids=ListUpdate(set=trunk_ids) if trunk_ids else None,
         )
+        if trunk_ids is not None:
+            if isinstance(trunk_ids, ListUpdate):
+                update.trunk_ids.set.extend(trunk_ids.set)
+                update.trunk_ids.add.extend(trunk_ids.add)
+                update.trunk_ids.remove.extend(trunk_ids.remove)
+            else:
+                update.trunk_ids.set.extend(trunk_ids)
+
         return await self._client.request(
             SVC,
             "UpdateSIPDispatchRule",

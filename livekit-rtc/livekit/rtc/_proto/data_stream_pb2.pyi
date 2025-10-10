@@ -516,6 +516,76 @@ class StreamSendFileCallback(google.protobuf.message.Message):
 global___StreamSendFileCallback = StreamSendFileCallback
 
 @typing.final
+class StreamSendBytesRequest(google.protobuf.message.Message):
+    """MARK: - Send bytes
+
+    Sends bytes over a data stream.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    BYTES_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    bytes: builtins.bytes
+    """Bytes to send."""
+    @property
+    def options(self) -> global___StreamByteOptions: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int | None = ...,
+        options: global___StreamByteOptions | None = ...,
+        bytes: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
+
+global___StreamSendBytesRequest = StreamSendBytesRequest
+
+@typing.final
+class StreamSendBytesResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___StreamSendBytesResponse = StreamSendBytesResponse
+
+@typing.final
+class StreamSendBytesCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    @property
+    def info(self) -> global___ByteStreamInfo: ...
+    @property
+    def error(self) -> global___StreamError: ...
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        info: global___ByteStreamInfo | None = ...,
+        error: global___StreamError | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["info", "error"] | None: ...
+
+global___StreamSendBytesCallback = StreamSendBytesCallback
+
+@typing.final
 class StreamSendTextRequest(google.protobuf.message.Message):
     """MARK: - Send text
 

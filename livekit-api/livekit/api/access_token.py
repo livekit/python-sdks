@@ -13,11 +13,12 @@
 # limitations under the License.
 
 import calendar
-import dataclasses
 import re
 import datetime
 import os
 import jwt
+import dataclasses
+from dataclasses import dataclass
 from typing import Optional, List, Literal
 from google.protobuf.json_format import MessageToDict, ParseDict
 
@@ -27,7 +28,7 @@ DEFAULT_TTL = datetime.timedelta(hours=6)
 DEFAULT_LEEWAY = datetime.timedelta(minutes=1)
 
 
-@dataclasses.dataclass
+@dataclass
 class VideoGrants:
     # actions on rooms
     room_create: Optional[bool] = None
@@ -68,7 +69,7 @@ class VideoGrants:
     agent: Optional[bool] = None
 
 
-@dataclasses.dataclass
+@dataclass
 class SIPGrants:
     # manage sip resources
     admin: bool = False
@@ -76,13 +77,19 @@ class SIPGrants:
     call: bool = False
 
 
-@dataclasses.dataclass
+@dataclass
 class InferenceGrants:
     # perform inference
     perform: bool = False
 
 
-@dataclasses.dataclass
+@dataclass
+class ObservabilityGrants:
+    # write grants to publish observability data
+    write: bool = False
+
+
+@dataclass
 class Claims:
     identity: str = ""
     name: str = ""
@@ -91,13 +98,14 @@ class Claims:
     video: Optional[VideoGrants] = None
     sip: Optional[SIPGrants] = None
     inference: Optional[InferenceGrants] = None
+    observability: Optional[ObservabilityGrants] = None
     attributes: Optional[dict[str, str]] = None
     sha256: Optional[str] = None
     room_preset: Optional[str] = None
     room_config: Optional[RoomConfiguration] = None
 
     def asdict(self) -> dict:
-        # in order to produce minimal JWT size, exclude None or empty values
+        # in order to produce minimal jwt size, exclude None or empty values
         claims = dataclasses.asdict(
             self,
             dict_factory=lambda items: {
@@ -141,6 +149,10 @@ class AccessToken:
 
     def with_sip_grants(self, grants: SIPGrants) -> "AccessToken":
         self.claims.sip = grants
+        return self
+
+    def with_observability_grants(self, grants: ObservabilityGrants) -> "AccessToken":
+        self.claims.observability = grants
         return self
 
     def with_inference_grants(self, grants: InferenceGrants) -> "AccessToken":

@@ -240,3 +240,23 @@ class MoveParticipantRequest(_message.Message):
 class MoveParticipantResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
+
+class PerformRpcRequest(_message.Message):
+    __slots__ = ("room", "destination_identity", "method", "payload", "response_timeout_ms")
+    ROOM_FIELD_NUMBER: _ClassVar[int]
+    DESTINATION_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    METHOD_FIELD_NUMBER: _ClassVar[int]
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    RESPONSE_TIMEOUT_MS_FIELD_NUMBER: _ClassVar[int]
+    room: str
+    destination_identity: str
+    method: str
+    payload: str
+    response_timeout_ms: int
+    def __init__(self, room: _Optional[str] = ..., destination_identity: _Optional[str] = ..., method: _Optional[str] = ..., payload: _Optional[str] = ..., response_timeout_ms: _Optional[int] = ...) -> None: ...
+
+class PerformRpcResponse(_message.Message):
+    __slots__ = ("payload",)
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    payload: str
+    def __init__(self, payload: _Optional[str] = ...) -> None: ...
