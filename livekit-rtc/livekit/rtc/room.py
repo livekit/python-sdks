@@ -767,8 +767,8 @@ class Room(EventEmitter[EventTypes]):
             participant = self._retrieve_participant(identity)
             self.emit(
                 "participant_encryption_status_changed",
+                participant,
                 event.participant_encryption_status_changed.is_encrypted,
-                event.connection_quality_changed.quality,
             )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
