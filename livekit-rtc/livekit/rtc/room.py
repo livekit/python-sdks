@@ -18,7 +18,7 @@ import asyncio
 import ctypes
 import logging
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping
+from typing import Callable, Dict, Literal, Optional, cast, Mapping, Any
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -864,7 +864,11 @@ class Room(EventEmitter[EventTypes]):
 
             text_reader = TextStreamReader(header)
             self._text_stream_readers[header.stream_id] = text_reader
-            text_stream_handler(text_reader, participant_identity)
+            task: asyncio.Task[Any]  = asyncio.create_task(
+                text_stream_handler(text_reader, participant_identity)  # type: ignore
+            )
+            self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
         elif stream_type == "byte_header":
             byte_stream_handler = self._byte_stream_handlers.get(header.topic)
             if byte_stream_handler is None:
@@ -876,7 +880,11 @@ class Room(EventEmitter[EventTypes]):
 
             byte_reader = ByteStreamReader(header)
             self._byte_stream_readers[header.stream_id] = byte_reader
-            byte_stream_handler(byte_reader, participant_identity)
+            task = asyncio.create_task(
+                byte_stream_handler(byte_reader, participant_identity)  # type: ignore
+            )
+            self._data_stream_tasks.add(task)
+            task.add_done_callback(self._data_stream_tasks.discard)
         else:
             logging.warning("received unknown header type, %s", stream_type)
         pass
