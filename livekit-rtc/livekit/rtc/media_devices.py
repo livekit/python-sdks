@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Any, Optional
 
 import numpy as np
-import sounddevice as sd
+import sounddevice as sd  # type: ignore[import-untyped]
 import threading
 
 from . import AudioSource

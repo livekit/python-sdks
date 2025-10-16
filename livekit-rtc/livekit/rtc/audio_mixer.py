@@ -4,7 +4,6 @@ import contextlib
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 from .audio_frame import AudioFrame
-from .audio_stream import AudioFrameEvent
 from .log import logger
 
 _Stream = AsyncIterator[AudioFrame]
@@ -170,7 +169,7 @@ class AudioMixer:
         await self._queue.put(None)
 
     async def _get_contribution(
-        self, stream: AsyncIterator[AudioFrame | AudioFrameEvent], buf: np.ndarray
+        self, stream: AsyncIterator[AudioFrame], buf: np.ndarray
     ) -> _Contribution:
         had_data = buf.shape[0] > 0
         exhausted = False
@@ -185,10 +184,6 @@ class AudioMixer:
             except StopAsyncIteration:
                 exhausted = True
                 break
-            # AudioStream may yield either AudioFrame or AudioFrameEvent; unwrap if needed
-            if hasattr(frame, "frame"):
-                frame = frame.frame  # type: ignore[assignment]
-
             new_data = np.frombuffer(frame.data.tobytes(), dtype=np.int16).reshape(
                 -1, self._num_channels
             )
