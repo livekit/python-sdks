@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, AsyncIterator, Optional
 
 import numpy as np
 import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
@@ -55,6 +55,27 @@ DEFAULT_SAMPLE_RATE = 48000
 DEFAULT_CHANNELS = 1
 FRAME_SAMPLES = 480  # 10 ms at 48 kHz
 BLOCKSIZE = 4800  # 100 ms I/O buffer size for sounddevice
+
+
+class _AudioStreamIterator:
+    """Adapter to convert AudioStream (AsyncIterator[AudioFrameEvent]) to AsyncIterator[AudioFrame].
+
+    This adapter wraps an AudioStream and extracts the frame from each AudioFrameEvent,
+    making it compatible with AudioMixer which expects AsyncIterator[AudioFrame].
+    """
+
+    def __init__(self, audio_stream: AudioStream) -> None:
+        self._audio_stream = audio_stream
+
+    def __aiter__(self) -> AsyncIterator[AudioFrame]:
+        return self
+
+    async def __anext__(self) -> AudioFrame:
+        event = await self._audio_stream.__anext__()
+        return event.frame
+
+    async def aclose(self) -> None:
+        await self._audio_stream.aclose()
 
 
 def _ensure_loop(loop: Optional[asyncio.AbstractEventLoop]) -> asyncio.AbstractEventLoop:
@@ -152,7 +173,7 @@ class OutputPlayer:
 
         # Internal mixer for add_track/remove_track API
         self._mixer: Optional[AudioMixer] = None
-        self._track_streams: dict[str, AudioStream] = {}  # track.sid -> AudioStream
+        self._track_streams: dict[str, tuple[AudioStream, _AudioStreamIterator]] = {}  # track.sid -> (AudioStream, adapter)
 
         def _callback(outdata: np.ndarray, frame_count: int, time_info: Any, status: Any) -> None:
             # Pull PCM int16 from buffer; zero if not enough
@@ -230,9 +251,11 @@ class OutputPlayer:
 
         # Create audio stream for this track
         stream = AudioStream(track, sample_rate=self._sample_rate, num_channels=self._num_channels)
+        # Wrap the stream with an adapter to convert AudioFrameEvent to AudioFrame
+        stream_iterator = _AudioStreamIterator(stream)
 
-        self._track_streams[track.sid] = stream
-        self._mixer.add_stream(stream)
+        self._track_streams[track.sid] = (stream, stream_iterator)
+        self._mixer.add_stream(stream_iterator)
 
     async def remove_track(self, track: Track) -> None:
         """Remove an audio track from the internal mixer.
@@ -242,13 +265,14 @@ class OutputPlayer:
         Args:
             track: The audio track to remove.
         """
-        stream = self._track_streams.pop(track.sid, None)
-        if stream is None:
+        entry = self._track_streams.pop(track.sid, None)
+        if entry is None:
             return
 
+        stream, stream_iterator = entry
         if self._mixer is not None:
             try:
-                self._mixer.remove_stream(stream)
+                self._mixer.remove_stream(stream_iterator)
             except Exception:
                 pass
 
@@ -309,7 +333,7 @@ class OutputPlayer:
                 pass
 
         # Clean up all track streams
-        for stream in list(self._track_streams.values()):
+        for stream, _ in list(self._track_streams.values()):
             try:
                 await stream.aclose()
             except Exception:
