@@ -16,10 +16,10 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Optional
+from typing import Any, Optional
 
 import numpy as np
-import sounddevice as sd  # type: ignore[import-not-found]
+import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
 import threading
 
 from . import AudioSource
