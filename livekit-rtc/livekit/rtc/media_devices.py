@@ -173,7 +173,9 @@ class OutputPlayer:
 
         # Internal mixer for add_track/remove_track API
         self._mixer: Optional[AudioMixer] = None
-        self._track_streams: dict[str, tuple[AudioStream, _AudioStreamIterator]] = {}  # track.sid -> (AudioStream, adapter)
+        self._track_streams: dict[
+            str, tuple[AudioStream, _AudioStreamIterator]
+        ] = {}  # track.sid -> (AudioStream, adapter)
 
         def _callback(outdata: np.ndarray, frame_count: int, time_info: Any, status: Any) -> None:
             # Pull PCM int16 from buffer; zero if not enough
