@@ -16,11 +16,13 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Optional
+from typing import TYPE_CHECKING, Any, AsyncIterator, Optional
 
 import numpy as np
-import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
 import threading
+
+if TYPE_CHECKING:
+    import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
 
 from . import AudioSource
 from .audio_frame import AudioFrame
@@ -119,7 +121,7 @@ class InputCapture:
     """
 
     source: AudioSource
-    input_stream: sd.InputStream
+    input_stream: "sd.InputStream"
     task: asyncio.Task
     apm: Optional[AudioProcessingModule]
     delay_estimator: Optional[_APMDelayEstimator]
@@ -161,6 +163,8 @@ class OutputPlayer:
         output_device: Optional[int] = None,
         delay_estimator: Optional[_APMDelayEstimator] = None,
     ) -> None:
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._blocksize = blocksize
@@ -398,6 +402,8 @@ class MediaDevices:
         Returns a list of dictionaries with the `sounddevice` metadata and an
         added `index` key corresponding to the device index.
         """
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         devices = sd.query_devices()
         result: list[dict[str, Any]] = []
         for idx, dev in enumerate(devices):
@@ -407,6 +413,8 @@ class MediaDevices:
 
     def list_output_devices(self) -> list[dict[str, Any]]:
         """List available output devices with indices."""
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         devices = sd.query_devices()
         result: list[dict[str, Any]] = []
         for idx, dev in enumerate(devices):
@@ -416,11 +424,15 @@ class MediaDevices:
 
     def default_input_device(self) -> Optional[int]:
         """Return the default input device index (or None)."""
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         dev = sd.default.device
         return dev[0] if isinstance(dev, (list, tuple)) else None
 
     def default_output_device(self) -> Optional[int]:
         """Return the default output device index (or None)."""
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         dev = sd.default.device
         return dev[1] if isinstance(dev, (list, tuple)) else None
 
@@ -459,6 +471,8 @@ class MediaDevices:
         Returns:
             InputCapture: Holder with `source`, `apm`, and `aclose()`.
         """
+        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
         loop = self._loop
         source = AudioSource(self._in_sr, self._channels, loop=loop)
         apm: Optional[AudioProcessingModule] = None
