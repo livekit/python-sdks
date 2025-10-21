@@ -487,7 +487,9 @@ class Room(EventEmitter[EventTypes]):
 
         self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
 
-        self._e2ee_manager = E2EEManager(self._ffi_handle.handle, options.e2ee)
+        self._e2ee_manager = E2EEManager(
+            self._ffi_handle.handle, options.encryption or options.e2ee
+        )
 
         self._info = cb.connect.result.room.info
         self._connection_state = ConnectionState.CONN_CONNECTED
