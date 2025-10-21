@@ -19,6 +19,7 @@ import ctypes
 import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast, Mapping
+import warnings
 
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
@@ -62,6 +63,7 @@ EventTypes = Literal[
     "participant_name_changed",
     "participant_attributes_changed",
     "connection_quality_changed",
+    "participant_encryption_status_changed",
     "data_received",
     "sip_dtmf_received",
     "transcription_received",
@@ -97,6 +99,8 @@ class RoomOptions:
     """Automatically subscribe to tracks when participants join."""
     dynacast: bool = False
     e2ee: E2EEOptions | None = None
+    """Deprecated, use `encryption` field instead"""
+    encryption: E2EEOptions | None = None
     """Options for end-to-end encryption."""
     rtc_config: RtcConfiguration | None = None
     """WebRTC-related configuration."""
@@ -352,6 +356,8 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `participant` (Participant), `old_name` (str), `new_name` (str)
             - **"participant_attributes_changed"**: Called when a participant's attributes change.
                 - Arguments: `changed_attributes` (dict), `participant` (Participant)
+            - **"participant_encryption_status_changed"**: Called when a participant's encryption status changes.
+                - Arguments `is_encrypted` (bool), `participant` (Participant)
             - **"connection_quality_changed"**: Called when a participant's connection quality changes.
                 - Arguments: `participant` (Participant), `quality` (ConnectionQuality)
             - **"transcription_received"**: Called when a transcription is received.
@@ -419,6 +425,12 @@ class Room(EventEmitter[EventTypes]):
         req.connect.options.dynacast = options.dynacast
 
         if options.e2ee:
+            warnings.warn(
+                "options.e2ee is deprecated, use options.encryption instead",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
             req.connect.options.e2ee.key_provider_options.shared_key = (
                 options.e2ee.key_provider_options.shared_key  # type: ignore
@@ -431,6 +443,21 @@ class Room(EventEmitter[EventTypes]):
             )
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = (
                 options.e2ee.key_provider_options.ratchet_window_size
+            )
+
+        if options.encryption:
+            req.connect.options.encryption.encryption_type = options.encryption.encryption_type
+            req.connect.options.encryption.key_provider_options.shared_key = (
+                options.encryption.key_provider_options.shared_key  # type: ignore
+            )
+            req.connect.options.encryption.key_provider_options.ratchet_salt = (
+                options.encryption.key_provider_options.ratchet_salt
+            )
+            req.connect.options.encryption.key_provider_options.failure_tolerance = (
+                options.encryption.key_provider_options.failure_tolerance
+            )
+            req.connect.options.encryption.key_provider_options.ratchet_window_size = (
+                options.encryption.key_provider_options.ratchet_window_size
             )
 
         if options.rtc_config:
@@ -460,7 +487,9 @@ class Room(EventEmitter[EventTypes]):
 
         self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
 
-        self._e2ee_manager = E2EEManager(self._ffi_handle.handle, options.e2ee)
+        self._e2ee_manager = E2EEManager(
+            self._ffi_handle.handle, options.encryption or options.e2ee
+        )
 
         self._info = cb.connect.result.room.info
         self._connection_state = ConnectionState.CONN_CONNECTED
@@ -734,6 +763,14 @@ class Room(EventEmitter[EventTypes]):
                 "participant_attributes_changed",
                 changed_attributes,
                 participant,
+            )
+        elif which == "participant_encryption_status_changed":
+            identity = event.participant_encryption_status_changed.participant_identity
+            participant = self._retrieve_participant(identity)
+            self.emit(
+                "participant_encryption_status_changed",
+                participant,
+                event.participant_encryption_status_changed.is_encrypted,
             )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
