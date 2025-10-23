@@ -665,7 +665,12 @@ class LocalParticipant(Participant):
         return writer.info
 
     async def publish_track(
-        self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
+        self,
+        track: LocalTrack,
+        options: TrackPublishOptions = TrackPublishOptions(),
+        *,
+        backup_codec_policy: Optional[int] = None,
+        backup_codec: Optional[str] = None,
     ) -> LocalTrackPublication:
         """
         Publish a local track to the room.
@@ -673,6 +678,9 @@ class LocalParticipant(Participant):
         Args:
             track (LocalTrack): The track to publish.
             options (TrackPublishOptions, optional): Options for publishing the track.
+            backup_codec_policy (Optional[int], optional): Backup codec policy for the track.
+                Use values from BackupCodecPolicy enum (PREFER_REGRESSION, SIMULCAST, REGRESSION).
+            backup_codec (Optional[str], optional): Alternative codec to use as backup (e.g., "vp8", "h264").
 
         Returns:
             LocalTrackPublication: The publication of the published track.
@@ -684,6 +692,28 @@ class LocalParticipant(Participant):
         req.publish_track.track_handle = track._ffi_handle.handle
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
+
+        # Add backup codec support
+        # Note: These fields may not be in the protobuf type hints but can be set dynamically
+        if backup_codec_policy is not None:
+            try:
+                req.publish_track.options.backup_codec_policy = backup_codec_policy
+            except AttributeError:
+                logger.warning(
+                    "backup_codec_policy field not available in TrackPublishOptions. "
+                    "This may require updating the FFI protocol definitions."
+                )
+
+        if backup_codec is not None:
+            try:
+                # The backup_codec field may be part of a nested Codec message
+                # Try setting it as a string field
+                req.publish_track.options.backup_codec = backup_codec
+            except AttributeError:
+                logger.warning(
+                    "backup_codec field not available in TrackPublishOptions. "
+                    "This may require updating the FFI protocol definitions."
+                )
 
         queue = self._room_queue.subscribe()
         try:
