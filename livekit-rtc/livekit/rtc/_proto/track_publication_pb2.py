@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17track_publication.proto\x12\rlivekit.proto\"X\n#EnableRemoteTrackPublicationRequest\x12 \n\x18track_publication_handle\x18\x01 \x02(\x04\x12\x0f\n\x07\x65nabled\x18\x02 \x02(\x08\"&\n$EnableRemoteTrackPublicationResponse\"o\n,UpdateRemoteTrackPublicationDimensionRequest\x12 \n\x18track_publication_handle\x18\x01 \x02(\x04\x12\r\n\x05width\x18\x02 \x02(\r\x12\x0e\n\x06height\x18\x03 \x02(\r\"/\n-UpdateRemoteTrackPublicationDimensionResponseB\x10\xaa\x02\rLiveKit.Proto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17track_publication.proto\x12\rlivekit.proto\"X\n#EnableRemoteTrackPublicationRequest\x12 \n\x18track_publication_handle\x18\x01 \x02(\x04\x12\x0f\n\x07\x65nabled\x18\x02 \x02(\x08\"&\n$EnableRemoteTrackPublicationResponse\"o\n,UpdateRemoteTrackPublicationDimensionRequest\x12 \n\x18track_publication_handle\x18\x01 \x02(\x04\x12\r\n\x05width\x18\x02 \x02(\r\x12\x0e\n\x06height\x18\x03 \x02(\r\"/\n-UpdateRemoteTrackPublicationDimensionResponse\"y\n\'SetRemoteTrackPublicationQualityRequest\x12 \n\x18track_publication_handle\x18\x01 \x02(\x04\x12,\n\x07quality\x18\x02 \x02(\x0e\x32\x1b.livekit.proto.VideoQuality\"*\n(SetRemoteTrackPublicationQualityResponse*W\n\x0cVideoQuality\x12\x15\n\x11VIDEO_QUALITY_LOW\x10\x00\x12\x18\n\x14VIDEO_QUALITY_MEDIUM\x10\x01\x12\x16\n\x12VIDEO_QUALITY_HIGH\x10\x02\x42\x10\xaa\x02\rLiveKit.Proto')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,6 +22,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'track_publication_pb2', _gl
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
+  _globals['_VIDEOQUALITY']._serialized_start=501
+  _globals['_VIDEOQUALITY']._serialized_end=588
   _globals['_ENABLEREMOTETRACKPUBLICATIONREQUEST']._serialized_start=42
   _globals['_ENABLEREMOTETRACKPUBLICATIONREQUEST']._serialized_end=130
   _globals['_ENABLEREMOTETRACKPUBLICATIONRESPONSE']._serialized_start=132
@@ -30,4 +32,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_UPDATEREMOTETRACKPUBLICATIONDIMENSIONREQUEST']._serialized_end=283
   _globals['_UPDATEREMOTETRACKPUBLICATIONDIMENSIONRESPONSE']._serialized_start=285
   _globals['_UPDATEREMOTETRACKPUBLICATIONDIMENSIONRESPONSE']._serialized_end=332
+  _globals['_SETREMOTETRACKPUBLICATIONQUALITYREQUEST']._serialized_start=334
+  _globals['_SETREMOTETRACKPUBLICATIONQUALITYREQUEST']._serialized_end=455
+  _globals['_SETREMOTETRACKPUBLICATIONQUALITYRESPONSE']._serialized_start=457
+  _globals['_SETREMOTETRACKPUBLICATIONQUALITYRESPONSE']._serialized_end=499
 # @@protoc_insertion_point(module_scope)
