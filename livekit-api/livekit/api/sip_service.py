@@ -6,6 +6,7 @@ from typing import Optional
 
 from livekit.protocol.models import ListUpdate
 from livekit.protocol.sip import (
+    SIPOutboundConfig,
     SIPTrunkInfo,
     CreateSIPInboundTrunkRequest,
     UpdateSIPInboundTrunkRequest,
@@ -755,12 +756,16 @@ class SipService(Service):
         create: CreateSIPParticipantRequest,
         *,
         timeout: Optional[float] = None,
+        trunk_id: Optional[str] = None,
+        outbound_trunk_config: Optional[SIPOutboundConfig] = None,
     ) -> SIPParticipantInfo:
         """Create a new SIP participant.
 
         Args:
             create: Request containing participant details
             timeout: Optional request timeout in seconds
+            trunk_id: Optional SIP trunk ID to use for the participant
+            outbound_trunk_config: Optional outbound trunk configuration for the participant
 
         Returns:
             Created SIP participant
@@ -780,6 +785,12 @@ class SipService(Service):
                 and self._client._session.timeout.total < 20
             ):
                 client_timeout = aiohttp.ClientTimeout(total=20)
+
+        if trunk_id:
+            create.sip_trunk_id = trunk_id
+
+        if outbound_trunk_config:
+            create.trunk = outbound_trunk_config
 
         return await self._client.request(
             SVC,
