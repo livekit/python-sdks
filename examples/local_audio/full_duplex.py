@@ -92,8 +92,16 @@ async def main() -> None:
         # Monitor microphone dB levels
         async def monitor_mic_db():
             mic_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
+            frame_count = 0
+            sample_interval = 5  # Process every 5th frame to reduce load
+            
             try:
                 async for frame_event in mic_stream:
+                    # Skip frames to reduce processing load
+                    frame_count += 1
+                    if frame_count % sample_interval != 0:
+                        continue
+                    
                     frame = frame_event.frame
                     # Convert frame data to list of samples
                     samples = list(frame.data)
