@@ -18,8 +18,10 @@ async def main() -> None:
     url = os.getenv("LIVEKIT_URL")
     api_key = os.getenv("LIVEKIT_API_KEY")
     api_secret = os.getenv("LIVEKIT_API_SECRET")
-    if not url or not api_key or not api_secret:
-        raise RuntimeError("LIVEKIT_URL and LIVEKIT_TOKEN must be set in env")
+    token = os.getenv("LIVEKIT_TOKEN")
+    # check for either token or api_key and api_secret
+    if not url or (not token and (not api_key or not api_secret)):
+        raise RuntimeError("LIVEKIT_TOKEN or LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in env")
 
     room = rtc.Room()
 
@@ -53,18 +55,20 @@ async def main() -> None:
 
     room.on("track_unsubscribed", on_track_unsubscribed)
 
-    token = (
-        api.AccessToken(api_key, api_secret)
-        .with_identity("local-audio")
-        .with_name("Local Audio")
-        .with_grants(
-            api.VideoGrants(
-                room_join=True,
-                room="local-audio",
+    # generate token if not provided
+    if not token:
+        token = (
+            api.AccessToken(api_key, api_secret)
+            .with_identity("local-audio")
+            .with_name("Local Audio")
+            .with_grants(
+                api.VideoGrants(
+                    room_join=True,
+                    room="local-audio",
+                )
             )
+            .to_jwt()
         )
-        .to_jwt()
-    )
 
     try:
         await room.connect(url, token)
