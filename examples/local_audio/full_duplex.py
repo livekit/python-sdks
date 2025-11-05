@@ -21,7 +21,9 @@ async def main() -> None:
     token = os.getenv("LIVEKIT_TOKEN")
     # check for either token or api_key and api_secret
     if not url or (not token and (not api_key or not api_secret)):
-        raise RuntimeError("LIVEKIT_TOKEN or LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in env")
+        raise RuntimeError(
+            "LIVEKIT_TOKEN or LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in env"
+        )
 
     room = rtc.Room()
 
@@ -98,14 +100,14 @@ async def main() -> None:
             mic_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
             frame_count = 0
             sample_interval = 5  # Process every 5th frame to reduce load
-            
+
             try:
                 async for frame_event in mic_stream:
                     # Skip frames to reduce processing load
                     frame_count += 1
                     if frame_count % sample_interval != 0:
                         continue
-                    
+
                     frame = frame_event.frame
                     # Convert frame data to list of samples
                     samples = list(frame.data)
