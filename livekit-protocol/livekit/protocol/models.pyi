@@ -292,11 +292,13 @@ class ParticipantInfo(_message.Message):
         EGRESS: _ClassVar[ParticipantInfo.Kind]
         SIP: _ClassVar[ParticipantInfo.Kind]
         AGENT: _ClassVar[ParticipantInfo.Kind]
+        CONNECTOR: _ClassVar[ParticipantInfo.Kind]
     STANDARD: ParticipantInfo.Kind
     INGRESS: ParticipantInfo.Kind
     EGRESS: ParticipantInfo.Kind
     SIP: ParticipantInfo.Kind
     AGENT: ParticipantInfo.Kind
+    CONNECTOR: ParticipantInfo.Kind
     class KindDetail(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         CLOUD_AGENT: _ClassVar[ParticipantInfo.KindDetail]
@@ -1062,13 +1064,23 @@ class DataStream(_message.Message):
         def __init__(self, stream_id: _Optional[str] = ..., reason: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
     def __init__(self) -> None: ...
 
+class FilterParams(_message.Message):
+    __slots__ = ("include_events", "exclude_events")
+    INCLUDE_EVENTS_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_EVENTS_FIELD_NUMBER: _ClassVar[int]
+    include_events: _containers.RepeatedScalarFieldContainer[str]
+    exclude_events: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, include_events: _Optional[_Iterable[str]] = ..., exclude_events: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class WebhookConfig(_message.Message):
-    __slots__ = ("url", "signing_key")
+    __slots__ = ("url", "signing_key", "filter_params")
     URL_FIELD_NUMBER: _ClassVar[int]
     SIGNING_KEY_FIELD_NUMBER: _ClassVar[int]
+    FILTER_PARAMS_FIELD_NUMBER: _ClassVar[int]
     url: str
     signing_key: str
-    def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ...) -> None: ...
+    filter_params: FilterParams
+    def __init__(self, url: _Optional[str] = ..., signing_key: _Optional[str] = ..., filter_params: _Optional[_Union[FilterParams, _Mapping]] = ...) -> None: ...
 
 class SubscribedAudioCodec(_message.Message):
     __slots__ = ("codec", "enabled")
