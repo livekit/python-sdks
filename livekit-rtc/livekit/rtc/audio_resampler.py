@@ -94,6 +94,8 @@ class AudioResampler:
             Exception: If there is an error during resampling.
         """
         bdata = data if isinstance(data, bytearray) else data.data.cast("b")
+        if not bdata:
+            return []
 
         req = proto_ffi.FfiRequest()
         req.push_sox_resampler.resampler_handle = self._ffi_handle.handle
