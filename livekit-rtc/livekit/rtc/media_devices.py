@@ -235,7 +235,7 @@ class OutputPlayer:
             blocksize=blocksize,
         )
 
-    def add_track(self, track: Track) -> None:
+    async def add_track(self, track: Track) -> None:
         """Add an audio track to the internal mixer for playback.
 
         This creates an `AudioStream` from the track and adds it to the internal

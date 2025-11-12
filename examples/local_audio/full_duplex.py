@@ -42,7 +42,7 @@ async def main() -> None:
         participant: rtc.RemoteParticipant,
     ):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
-            player.add_track(track)
+            asyncio.create_task(player.add_track(track))
             logging.info("subscribed to audio from %s", participant.identity)
 
     room.on("track_subscribed", on_track_subscribed)
