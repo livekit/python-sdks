@@ -5,6 +5,7 @@ from .egress_service import EgressService
 from .ingress_service import IngressService
 from .sip_service import SipService
 from .agent_dispatch_service import AgentDispatchService
+from .connector_service import ConnectorService
 from typing import Optional
 
 
@@ -63,6 +64,7 @@ class LiveKitAPI:
         self._egress = EgressService(self._session, url, api_key, api_secret)
         self._sip = SipService(self._session, url, api_key, api_secret)
         self._agent_dispatch = AgentDispatchService(self._session, url, api_key, api_secret)
+        self._connector = ConnectorService(self._session, url, api_key, api_secret)
 
     @property
     def agent_dispatch(self) -> AgentDispatchService:
@@ -88,6 +90,11 @@ class LiveKitAPI:
     def sip(self) -> SipService:
         """Instance of the SipService"""
         return self._sip
+
+    @property
+    def connector(self) -> ConnectorService:
+        """Instance of the ConnectorService"""
+        return self._connector
 
     async def aclose(self):
         """Close the API client
