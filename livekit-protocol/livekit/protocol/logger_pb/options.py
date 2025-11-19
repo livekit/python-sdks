@@ -25,12 +25,12 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:/\n\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xd1\x86\x03 \x01(\x08\x42$Z\"github.com/livekit/protocol/loggerb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:/\n\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xd1\x86\x03 \x01(\x08:6\n\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\xd2\x86\x03 \x01(\tB,Z*github.com/livekit/protocol/livekit/loggerb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'logger.options_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\"github.com/livekit/protocol/logger'
+  _globals['DESCRIPTOR']._serialized_options = b'Z*github.com/livekit/protocol/livekit/logger'
 # @@protoc_insertion_point(module_scope)

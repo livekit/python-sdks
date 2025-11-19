@@ -5,3 +5,5 @@ from typing import ClassVar as _ClassVar
 DESCRIPTOR: _descriptor.FileDescriptor
 REDACT_FIELD_NUMBER: _ClassVar[int]
 redact: _descriptor.FieldDescriptor
+REDACT_FORMAT_FIELD_NUMBER: _ClassVar[int]
+redact_format: _descriptor.FieldDescriptor
