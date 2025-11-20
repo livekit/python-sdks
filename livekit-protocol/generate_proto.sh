@@ -96,3 +96,5 @@ perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_p
 perl -i -pe 's|livekit_(\w+)_pb2|${1}|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
 
 perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from .logger_pb import options as $1|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
+
+perl -i -pe 's|^(\w+_FIELD_NUMBER): _ClassVar\[int\]|$1: int|g' "$API_OUT_PYTHON/logger_pb/options.pyi"
