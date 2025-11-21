@@ -1,4 +1,5 @@
 from . import models as _models
+from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -542,7 +543,7 @@ class StreamInfoList(_message.Message):
     def __init__(self, info: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ...) -> None: ...
 
 class StreamInfo(_message.Message):
-    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error")
+    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         ACTIVE: _ClassVar[StreamInfo.Status]
@@ -557,13 +558,17 @@ class StreamInfo(_message.Message):
     DURATION_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
+    LAST_RETRY_AT_FIELD_NUMBER: _ClassVar[int]
+    RETRIES_FIELD_NUMBER: _ClassVar[int]
     url: str
     started_at: int
     ended_at: int
     duration: int
     status: StreamInfo.Status
     error: str
-    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ...) -> None: ...
+    last_retry_at: int
+    retries: int
+    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ..., last_retry_at: _Optional[int] = ..., retries: _Optional[int] = ...) -> None: ...
 
 class FileInfo(_message.Message):
     __slots__ = ("filename", "started_at", "ended_at", "duration", "size", "location")
