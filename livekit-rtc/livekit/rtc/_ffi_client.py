@@ -241,6 +241,5 @@ class FfiClient:
         resp_data = ctypes.string_at(resp_ptr, resp_len.value)
         resp = proto_ffi.FfiResponse()
         resp.ParseFromString(resp_data)
-
-        FfiHandle(handle)
+        FfiHandle(handle).dispose()
         return resp

@@ -90,7 +90,7 @@ class AudioFrame:
         size = info.num_channels * info.samples_per_channel
         cdata = (ctypes.c_int16 * size).from_address(info.data_ptr)
         data = bytearray(cdata)
-        FfiHandle(owned_info.handle.id)
+        FfiHandle(owned_info.handle.id).dispose()
         return AudioFrame(data, info.sample_rate, info.num_channels, info.samples_per_channel)
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:

@@ -811,7 +811,7 @@ class Room(EventEmitter[EventTypes]):
                 ).contents
 
                 data = bytes(native_data)
-                FfiHandle(owned_buffer_info.handle.id)
+                FfiHandle(owned_buffer_info.handle.id).dispose()
                 rparticipant = cast(
                     RemoteParticipant,
                     self._retrieve_remote_participant(packet.participant_identity),
