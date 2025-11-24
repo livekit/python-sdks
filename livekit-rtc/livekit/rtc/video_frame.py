@@ -105,7 +105,7 @@ class VideoFrame:
             type=info.type,
             data=data,
         )
-        FfiHandle(owned_info.handle.id)
+        FfiHandle(owned_info.handle.id).dispose()
         return frame
 
     def _proto_info(self) -> proto_video.VideoBufferInfo:
