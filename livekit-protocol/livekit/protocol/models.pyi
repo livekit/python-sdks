@@ -1,5 +1,6 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import metrics as _metrics
+from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -303,8 +304,12 @@ class ParticipantInfo(_message.Message):
         __slots__ = ()
         CLOUD_AGENT: _ClassVar[ParticipantInfo.KindDetail]
         FORWARDED: _ClassVar[ParticipantInfo.KindDetail]
+        CONNECTOR_WHATSAPP: _ClassVar[ParticipantInfo.KindDetail]
+        CONNECTOR_TWILIO: _ClassVar[ParticipantInfo.KindDetail]
     CLOUD_AGENT: ParticipantInfo.KindDetail
     FORWARDED: ParticipantInfo.KindDetail
+    CONNECTOR_WHATSAPP: ParticipantInfo.KindDetail
+    CONNECTOR_TWILIO: ParticipantInfo.KindDetail
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
