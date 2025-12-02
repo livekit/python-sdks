@@ -75,6 +75,7 @@ EventTypes = Literal[
     "reconnected",
     "room_updated",
     "moved",
+    "token_refreshed",
 ]
 
 
@@ -167,6 +168,9 @@ class Room(EventEmitter[EventTypes]):
         self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
         self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
         self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
+
+        self._token: str | None = None
+        self._server_url: str | None = None
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -416,6 +420,8 @@ class Room(EventEmitter[EventTypes]):
             await room.connect("ws://localhost:7880", "your_token")
             ```
         """
+        self._server_url = url
+        self._token = token
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
@@ -885,6 +891,10 @@ class Room(EventEmitter[EventTypes]):
                 participant = self._retrieve_participant(info.identity)
                 if participant:
                     participant._info = info
+
+        elif which == "token_refreshed":
+            self._token = event.token_refreshed.token
+            self.emit("token_refreshed")
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
