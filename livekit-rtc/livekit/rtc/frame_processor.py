@@ -16,13 +16,16 @@ class FrameProcessor(Generic[T], ABC):
     def set_enabled(self, enable: bool): ...
 
     @abstractmethod
-    def _set_context(
+    def _update_stream_info(
         self,
         *,
         room_name: str,
         participant_identity: str,
         publication_sid: str,
     ): ...
+
+    @abstractmethod
+    def _update_credentials(self, *, token: str, url: str): ...
 
     @abstractmethod
     def _process(self, frame: T) -> T: ...
