@@ -108,6 +108,7 @@ from .data_stream import (
     ByteStreamWriter,
     ByteStreamReader,
 )
+from .frame_processor import FrameProcessor
 
 __all__ = [
     "ConnectionQuality",
@@ -184,6 +185,7 @@ __all__ = [
     "ByteStreamReader",
     "ByteStreamWriter",
     "AudioProcessingModule",
+    "FrameProcessor",
     "__version__",
 ]
 

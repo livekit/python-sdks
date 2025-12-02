@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 T = TypeVar("T", bound=Union[AudioFrame, VideoFrame])
 
 
-class SyncFrameProcessor(Generic[T], ABC):
+class FrameProcessor(Generic[T], ABC):
     @property
     @abstractmethod
     def is_enabled(self) -> bool: ...

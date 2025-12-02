@@ -27,7 +27,7 @@ from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .participant import Participant
 from .track import Track
-from .frame_processor import SyncFrameProcessor
+from .frame_processor import FrameProcessor
 
 
 @dataclass
@@ -63,9 +63,7 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
         frame_size_ms: int | None = None,
-        noise_cancellation: Optional[
-            NoiseCancellationOptions | SyncFrameProcessor[AudioFrame]
-        ] = None,
+        noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -79,8 +77,8 @@ class AudioStream:
             sample_rate (int, optional): The sample rate for the audio stream in Hz.
                 Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
-            noise_cancellation (Optional[NoiseCancellationOptions | SyncFrameProcessor[AudioFrame]], optional):
-                If noise cancellation is used, pass a `NoiseCancellationOptions` or `SyncFrameProcessor[AudioFrame]` instance
+            noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
 
         Example:
@@ -111,7 +109,7 @@ class AudioStream:
         if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
-        elif isinstance(noise_cancellation, SyncFrameProcessor):
+        elif isinstance(noise_cancellation, FrameProcessor):
             self._processor = noise_cancellation
 
         self._task = self._loop.create_task(self._run())
