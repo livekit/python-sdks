@@ -136,7 +136,7 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
         frame_size_ms: int | None = None,
-        noise_cancellation: Optional[NoiseCancellationOptions] = None,
+        noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -186,7 +186,7 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
         frame_size_ms: int | None = None,
-        noise_cancellation: Optional[NoiseCancellationOptions] = None,
+        noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
