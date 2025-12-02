@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, TypeVar, Union
-
-if TYPE_CHECKING:
-    from .audio_frame import AudioFrame
-    from .video_frame import VideoFrame
+from typing import Generic, TypeVar, Union
+from .audio_frame import AudioFrame
+from .video_frame import VideoFrame
 
 
 T = TypeVar("T", bound=Union[AudioFrame, VideoFrame])
