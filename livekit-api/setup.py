@@ -53,7 +53,7 @@ setuptools.setup(
         "aiohttp>=3.9.0",
         "protobuf>=4",
         "types-protobuf>=4",
-        "livekit-protocol>=1.0.4,<2.0.0",
+        "livekit-protocol>=1.1.1,<2.0.0",
     ],
     package_data={
         "livekit.api": ["py.typed", "*.pyi", "**/*.pyi"],
