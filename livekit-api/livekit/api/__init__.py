@@ -33,6 +33,8 @@ from livekit.protocol.models import *
 from livekit.protocol.room import *
 from livekit.protocol.webhook import *
 from livekit.protocol.sip import *
+from livekit.protocol.connector_whatsapp import *
+from livekit.protocol.connector_twilio import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
@@ -54,6 +56,7 @@ __all__ = [
     "ingress_service",
     "sip_service",
     "agent_dispatch_service",
+    "connector_service",
     "InferenceGrants",
     "ObservabilityGrants",
     "VideoGrants",

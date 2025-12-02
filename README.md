@@ -86,6 +86,9 @@ sip_svc = lkapi.sip
 
 # Agent Dispatch
 dispatch_svc = lkapi.agent_dispatch
+
+# Connector Service
+connector_svc = lkapi.connector
 ```
 
 ## Using Real-time SDK
