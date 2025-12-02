@@ -27,6 +27,7 @@ from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
 from .participant import Participant
 from .track import Track
+from .frame_processor import SyncFrameProcessor
 
 
 @dataclass
@@ -62,7 +63,9 @@ class AudioStream:
         sample_rate: int = 48000,
         num_channels: int = 1,
         frame_size_ms: int | None = None,
-        noise_cancellation: Optional[NoiseCancellationOptions] = None,
+        noise_cancellation: Optional[
+            NoiseCancellationOptions | SyncFrameProcessor[AudioFrame]
+        ] = None,
         **kwargs,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -76,8 +79,8 @@ class AudioStream:
             sample_rate (int, optional): The sample rate for the audio stream in Hz.
                 Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
-            noise_cancellation (Optional[NoiseCancellationOptions], optional):
-                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+            noise_cancellation (Optional[NoiseCancellationOptions | SyncFrameProcessor[AudioFrame]], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` or `SyncFrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
 
         Example:
@@ -105,9 +108,12 @@ class AudioStream:
 
         self._audio_filter_module = None
         self._audio_filter_options = None
-        if noise_cancellation is not None:
+        if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
+        elif isinstance(noise_cancellation, SyncFrameProcessor):
+            self._processor = noise_cancellation
+
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
 
@@ -268,6 +274,8 @@ class AudioStream:
             if audio_event.HasField("frame_received"):
                 owned_buffer_info = audio_event.frame_received.frame
                 frame = AudioFrame._from_owned_info(owned_buffer_info)
+                if self._processor is not None:
+                    frame = self._processor._process(frame)
                 event = AudioFrameEvent(frame)
                 self._queue.put(event)
             elif audio_event.HasField("eos"):
