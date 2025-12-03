@@ -80,6 +80,10 @@ class PublishTranscriptionError(Exception):
         self.message = message
 
 
+class ParticipantError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
 class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
@@ -491,9 +495,11 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.set_local_metadata.async_id == resp.set_local_metadata.async_id
             )
+            if cb.set_local_metadata.error:
+                raise ParticipantError(cb.set_local_metadata.error)
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -513,9 +519,12 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.set_local_name.async_id == resp.set_local_name.async_id
             )
+
+            if cb.set_local_name.error:
+                raise ParticipantError(cb.set_local_name.error)
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -543,9 +552,13 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            await queue.wait_for(
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.set_local_attributes.async_id == resp.set_local_attributes.async_id
             )
+
+            if cb.set_local_attributes.error:
+                raise ParticipantError(cb.set_local_attributes.error)
+
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
