@@ -122,8 +122,12 @@ class VideoStream:
     ) -> Any:
         req = proto_ffi.FfiRequest()
         video_stream_from_participant = req.video_stream_from_participant
-        video_stream_from_participant.participant_handle = participant._ffi_handle.handle
-        video_stream_from_participant.type = proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
+        video_stream_from_participant.participant_handle = (
+            participant._ffi_handle.handle
+        )
+        video_stream_from_participant.type = (
+            proto_video_frame.VideoStreamType.VIDEO_STREAM_NATIVE
+        )
         video_stream_from_participant.track_source = track_source
         video_stream_from_participant.normalize_stride = True
         if self._format is not None:
@@ -133,22 +137,25 @@ class VideoStream:
 
     async def _run(self) -> None:
         while True:
-            event = await self._ffi_queue.wait_for(self._is_event)
-            video_event = event.video_stream_event
+            try:
+                event = await self._ffi_queue.wait_for(self._is_event)
+                video_event = event.video_stream_event
 
-            if video_event.HasField("frame_received"):
-                owned_buffer_info = video_event.frame_received.buffer
-                frame = VideoFrame._from_owned_info(owned_buffer_info)
+                if video_event.HasField("frame_received"):
+                    owned_buffer_info = video_event.frame_received.buffer
+                    frame = VideoFrame._from_owned_info(owned_buffer_info)
 
-                event = VideoFrameEvent(
-                    frame=frame,
-                    timestamp_us=video_event.frame_received.timestamp_us,
-                    rotation=video_event.frame_received.rotation,
-                )
+                    event = VideoFrameEvent(
+                        frame=frame,
+                        timestamp_us=video_event.frame_received.timestamp_us,
+                        rotation=video_event.frame_received.rotation,
+                    )
 
-                self._queue.put(event)
-            elif video_event.HasField("eos"):
-                break
+                    self._queue.put(event)
+                elif video_event.HasField("eos"):
+                    break
+            finally:
+                self._ffi_queue.task_done()
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 

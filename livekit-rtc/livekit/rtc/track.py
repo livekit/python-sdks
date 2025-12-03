@@ -58,6 +58,7 @@ class Track:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.get_stats.async_id == resp.get_stats.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 

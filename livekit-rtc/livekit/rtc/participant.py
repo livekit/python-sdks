@@ -210,6 +210,7 @@ class LocalParticipant(Participant):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_data.async_id == resp.publish_data.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -238,6 +239,7 @@ class LocalParticipant(Participant):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_sip_dtmf.async_id == resp.publish_sip_dtmf.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -278,6 +280,7 @@ class LocalParticipant(Participant):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.publish_transcription.async_id == resp.publish_transcription.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -321,6 +324,7 @@ class LocalParticipant(Participant):
             cb = await queue.wait_for(
                 lambda e: (e.perform_rpc.async_id == resp.perform_rpc.async_id)
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -494,6 +498,7 @@ class LocalParticipant(Participant):
             await queue.wait_for(
                 lambda e: e.set_local_metadata.async_id == resp.set_local_metadata.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -516,6 +521,7 @@ class LocalParticipant(Participant):
             await queue.wait_for(
                 lambda e: e.set_local_name.async_id == resp.set_local_name.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
@@ -546,6 +552,7 @@ class LocalParticipant(Participant):
             await queue.wait_for(
                 lambda e: e.set_local_attributes.async_id == resp.set_local_attributes.async_id
             )
+            queue.task_done()
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
