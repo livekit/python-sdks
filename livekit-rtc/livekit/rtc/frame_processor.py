@@ -15,7 +15,6 @@ class FrameProcessor(Generic[T], ABC):
     @abstractmethod
     def set_enabled(self, enable: bool): ...
 
-    @abstractmethod
     def _update_stream_info(
         self,
         *,
@@ -24,7 +23,6 @@ class FrameProcessor(Generic[T], ABC):
         publication_sid: str,
     ): ...
 
-    @abstractmethod
     def _update_credentials(self, *, token: str, url: str): ...
 
     @abstractmethod
