@@ -25,6 +25,7 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .audio_frame import AudioFrame
+from .log import logger
 from .participant import Participant
 from .track import Track
 from .frame_processor import FrameProcessor
@@ -273,7 +274,13 @@ class AudioStream:
                 owned_buffer_info = audio_event.frame_received.frame
                 frame = AudioFrame._from_owned_info(owned_buffer_info)
                 if self._processor is not None:
-                    frame = self._processor._process(frame)
+                    try:
+                        frame = self._processor._process(frame)
+                    except Exception:
+                        logger.warning(
+                            "Frame processing failed, passing through original frame",
+                            exc_info=True,
+                        )
                 event = AudioFrameEvent(frame)
                 self._queue.put(event)
             elif audio_event.HasField("eos"):
