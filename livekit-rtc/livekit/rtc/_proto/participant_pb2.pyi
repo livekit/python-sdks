@@ -44,6 +44,7 @@ class _ParticipantKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper
     PARTICIPANT_KIND_EGRESS: _ParticipantKind.ValueType  # 2
     PARTICIPANT_KIND_SIP: _ParticipantKind.ValueType  # 3
     PARTICIPANT_KIND_AGENT: _ParticipantKind.ValueType  # 4
+    PARTICIPANT_KIND_CONNECTOR: _ParticipantKind.ValueType  # 5
 
 class ParticipantKind(_ParticipantKind, metaclass=_ParticipantKindEnumTypeWrapper): ...
 
@@ -52,6 +53,7 @@ PARTICIPANT_KIND_INGRESS: ParticipantKind.ValueType  # 1
 PARTICIPANT_KIND_EGRESS: ParticipantKind.ValueType  # 2
 PARTICIPANT_KIND_SIP: ParticipantKind.ValueType  # 3
 PARTICIPANT_KIND_AGENT: ParticipantKind.ValueType  # 4
+PARTICIPANT_KIND_CONNECTOR: ParticipantKind.ValueType  # 5
 global___ParticipantKind = ParticipantKind
 
 class _DisconnectReason:
