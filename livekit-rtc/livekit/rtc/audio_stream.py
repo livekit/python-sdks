@@ -273,7 +273,7 @@ class AudioStream:
             if audio_event.HasField("frame_received"):
                 owned_buffer_info = audio_event.frame_received.frame
                 frame = AudioFrame._from_owned_info(owned_buffer_info)
-                if self._processor is not None:
+                if self._processor is not None and self._processor.enabled:
                     try:
                         frame = self._processor._process(frame)
                     except Exception:

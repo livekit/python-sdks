@@ -10,10 +10,11 @@ T = TypeVar("T", bound=Union[AudioFrame, VideoFrame])
 class FrameProcessor(Generic[T], ABC):
     @property
     @abstractmethod
-    def is_enabled(self) -> bool: ...
+    def enabled(self) -> bool: ...
 
+    @enabled.setter
     @abstractmethod
-    def set_enabled(self, enable: bool): ...
+    def enabled(self, value: bool) -> None: ...
 
     def _update_stream_info(
         self,
