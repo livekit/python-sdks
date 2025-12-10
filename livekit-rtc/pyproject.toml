@@ -22,4 +22,4 @@ manylinux-pypy_i686-image = "manylinux_2_28"
 manylinux-pypy_aarch64-image = "manylinux_2_28"
 
 [tool.cibuildwheel.linux]
-before-all = "yum install -y libXrandr libXrandr-devel"
+repair-wheel-command = "auditwheel repair --exclude libXrandr.so.2 --exclude libXfixes.so.3 --exclude libXdamage.so.1 --exclude libXcomposite.so.1 --exclude libXext.so.6 -w {dest_dir} {wheel}"
