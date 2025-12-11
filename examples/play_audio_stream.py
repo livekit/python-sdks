@@ -4,7 +4,7 @@ import numpy as np
 import sounddevice as sd
 
 from livekit import rtc, api
-from livekit.plugins import noise_cancellation
+from livekit.plugins import ai_coustics
 
 SAMPLERATE = 48000
 BLOCKSIZE = 480  # 10ms chunks at 48kHz
@@ -91,7 +91,7 @@ async def rtc_session(room, queue: asyncio.Queue):
         track=track,
         sample_rate=SAMPLERATE,
         num_channels=1,
-        noise_cancellation=noise_cancellation.BVC(),  # or NC()
+        noise_cancellation=ai_coustics.audio_enhancement(),
     )
 
     print("playing stream")
