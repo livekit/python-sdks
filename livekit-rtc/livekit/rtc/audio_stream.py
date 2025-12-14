@@ -105,8 +105,9 @@ class AudioStream:
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
-        self._audio_filter_module = None
-        self._audio_filter_options = None
+        self._audio_filter_module: str | None = None
+        self._audio_filter_options: dict[str, Any] | None = None
+        self._processor: FrameProcessor[AudioFrame] | None = None
         if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
