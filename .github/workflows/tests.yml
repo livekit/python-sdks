@@ -24,7 +24,7 @@ jobs:
           python-version: '3.13' 
       - name: Run tests
         run: |
+          pip3 install -r livekit-rtc/dev-requirements.txt
           python3 ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
           pip3 install ./livekit-protocol ./livekit-api ./livekit-rtc
-          pip3 install -r dev-requirements.txt
           pytest . --ignore=livekit-rtc/rust-sdks
