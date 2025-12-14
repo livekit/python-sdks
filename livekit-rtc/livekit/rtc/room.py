@@ -27,6 +27,7 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
+from ._proto.participant_pb2 import DisconnectReason
 from ._proto.room_pb2 import ConnectionState
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
@@ -581,6 +582,14 @@ class Room(EventEmitter[EventTypes]):
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
+        # we should manually flip the state, since the connection could have been torn down before
+        # the callbacks were processed
+        if self._connection_state != ConnectionState.CONN_DISCONNECTED:
+            self.local_participant._info.disconnect_reason = DisconnectReason.CLIENT_INITIATED
+            self._connection_state = ConnectionState.CONN_DISCONNECTED
+            self.emit("connection_state_changed", self._connection_state)
+            self.emit("disconnected", DisconnectReason.CLIENT_INITIATED)
+
     async def _listen_task(self) -> None:
         # listen to incoming room events
         while True:
@@ -853,8 +862,6 @@ class Room(EventEmitter[EventTypes]):
             connection_state = event.connection_state_changed.state
             self._connection_state = connection_state
             self.emit("connection_state_changed", connection_state)
-        elif which == "connected":
-            self.emit("connected")
         elif which == "disconnected":
             self.emit("disconnected", event.disconnected.reason)
         elif which == "reconnecting":
