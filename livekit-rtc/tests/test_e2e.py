@@ -225,7 +225,10 @@ async def test_audio_stream_subscribe():
 
         assert avg_received_energy > 0, "Received audio has no energy"
         assert avg_published_energy > 0, "Published audio has no energy"
-        assert avg_received_energy > avg_published_energy * 0.9 and avg_received_energy < avg_published_energy * 1.1, "Received audio energy is not within range"
+        assert (
+            avg_received_energy > avg_published_energy * 0.9
+            and avg_received_energy < avg_published_energy * 1.1
+        ), "Received audio energy is not within range"
 
     finally:
         await publisher_room.disconnect()
