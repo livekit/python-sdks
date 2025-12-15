@@ -1,35 +1,14 @@
 # type: ignore
 
-from typing import AsyncIterator
 import numpy as np
 import pytest
 import matplotlib.pyplot as plt
 
 from livekit.rtc import AudioMixer
-from livekit.rtc.audio_frame import AudioFrame
+from livekit.rtc.utils import sine_wave_generator
 
 SAMPLE_RATE = 48000
-# Use 100ms blocks (i.e. 1600 samples per frame)
 BLOCKSIZE = SAMPLE_RATE // 10
-
-
-async def sine_wave_generator(freq: float, duration: float) -> AsyncIterator[AudioFrame]:
-    total_frames = int((duration * SAMPLE_RATE) // BLOCKSIZE)
-    t_frame = np.arange(BLOCKSIZE) / SAMPLE_RATE
-    for i in range(total_frames):
-        # Shift the time for each frame so that the sine wave is continuous
-        t = t_frame + i * BLOCKSIZE / SAMPLE_RATE
-        # Create a sine wave with amplitude 0.3 (to avoid clipping when summing)
-        signal = 0.3 * np.sin(2 * np.pi * freq * t)
-        # Convert from float [-0.5, 0.5] to int16 values
-        signal_int16 = np.int16(signal * 32767)
-        frame = AudioFrame(
-            signal_int16.tobytes(),
-            SAMPLE_RATE,
-            1,
-            BLOCKSIZE,
-        )
-        yield frame
 
 
 @pytest.mark.asyncio
@@ -46,8 +25,8 @@ async def test_mixer_two_sine_waves():
         stream_timeout_ms=100,
         capacity=100,
     )
-    stream1 = sine_wave_generator(440, duration)
-    stream2 = sine_wave_generator(880, duration)
+    stream1 = sine_wave_generator(440, duration, SAMPLE_RATE)
+    stream2 = sine_wave_generator(880, duration, SAMPLE_RATE)
     mixer.add_stream(stream1)
     mixer.add_stream(stream2)
     mixer.end_input()
@@ -65,7 +44,7 @@ async def test_mixer_two_sine_waves():
     mixed_signal = np.concatenate(mixed_signals)
 
     plt.figure(figsize=(10, 4))
-    plt.plot(mixed_signal[:1000])  # plot 1000
+    plt.plot(mixed_signal[:1000])
     plt.title("Mixed Signal")
     plt.xlabel("Sample")
     plt.ylabel("Amplitude")

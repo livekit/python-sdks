@@ -14,15 +14,22 @@ jobs:
     name: Run tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
           lfs: true
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13' 
       - name: Run tests
+        env:
+          LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
+          pip3 install -r dev-requirements.txt
           python3 ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
           pip3 install ./livekit-protocol ./livekit-api ./livekit-rtc
-          pip3 install -r dev-requirements.txt
           pytest . --ignore=livekit-rtc/rust-sdks
+        
