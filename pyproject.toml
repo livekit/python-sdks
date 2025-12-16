@@ -67,7 +67,10 @@ addopts = ["--import-mode=importlib", "--ignore=examples"]
 
 
 [tool.mypy]
+exclude = "(build|setup\\.py|livekit-rtc/rust-sdks.*)"
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "livekit-protocol:livekit-api:livekit-rtc"
 strict = true
 disallow_any_generics = false
 plugins = ["pydantic.mypy"]
-namespace_packages = true
