@@ -32,10 +32,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Download ffi
-        run: uv run python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
-
-      - name: Install packages
-        run: uv add ./livekit-api ./livekit-protocol ./livekit-rtc
+        run: uv run python livekit-rtc/rust-sdks/download_ffi.py --output .venv/lib/python3.9/site-packages/livekit/rtc/resources
 
       - name: Check Types
-        run: uv run mypy -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
+        run: uv run mypy livekit-protocol livekit-api livekit-rtc
