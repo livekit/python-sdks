@@ -1,0 +1,71 @@
+[project]
+name = "python-sdks"
+version = "0.1.0"
+description = "LiveKit Python SDKs monorepo"
+requires-python = ">=3.9"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
+
+[tool.uv.sources]
+livekit = { workspace = true }
+livekit-api = { workspace = true }
+livekit-protocol = { workspace = true }
+
+[tool.uv]
+dev-dependencies = [
+    # Linting and type checking
+    "ruff>=0.8.5",
+    "mypy>=1.13.0",
+    # Testing
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.24.0",
+    # Build and packaging
+    "requests",
+    "wheel",
+    "setuptools",
+    "twine",
+    "auditwheel; sys_platform == 'linux'",
+    "cibuildwheel",
+    # Additional dependencies
+    "matplotlib",
+    "pydantic",
+    "numpy",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+exclude = [".github"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["livekit"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = ["--import-mode=importlib", "--ignore=examples"]
+
+
+[tool.mypy]
+strict = true
+disallow_any_generics = false
+plugins = ["pydantic.mypy"]

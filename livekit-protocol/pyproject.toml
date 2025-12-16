@@ -3,12 +3,12 @@ requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "livekit-api"
-version = "0.8.0"
-description = "Python Server API for LiveKit"
-readme = "README.md"
-requires-python = ">=3.9.0"
+name = "livekit-protocol"
+version = "1.1.1"
+description = "Python protocol stubs for LiveKit"
+requires-python = ">=3.7.0"
 license = "Apache-2.0"
+readme = { content-type = "text/plain", text = "Python protocol stubs for LiveKit" }
 keywords = ["webrtc", "realtime", "audio", "video", "livekit"]
 authors = [
     { name = "LiveKit", email = "support@livekit.io" }
@@ -16,9 +16,6 @@ authors = [
 classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",
-    "Topic :: Multimedia :: Sound/Audio",
-    "Topic :: Multimedia :: Video",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
@@ -27,17 +24,11 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "pyjwt>=2.0.0",
-    "aiohttp>=3.9.0",
     "protobuf>=4",
     "types-protobuf>=4",
-    "livekit-protocol>=1.1.1,<2.0.0",
 ]
 
 [project.urls]
 Documentation = "https://docs.livekit.io"
 Website = "https://livekit.io/"
 Source = "https://github.com/livekit/python-sdks/"
-
-[tool.uv.sources]
-livekit-protocol = { workspace = true }

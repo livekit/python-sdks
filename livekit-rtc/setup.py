@@ -45,7 +45,6 @@ setuptools.setup(
     },
     classifiers=[
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: Apache Software License",
         "Topic :: Multimedia :: Sound/Audio",
         "Topic :: Multimedia :: Video",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -55,7 +54,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     keywords=["webrtc", "realtime", "audio", "video", "livekit"],
-    license="Apache-2.0",
     packages=setuptools.find_namespace_packages(include=["livekit.*"]),
     python_requires=">=3.9.0",
     install_requires=["protobuf>=4.25.0", "types-protobuf>=3", "aiofiles>=24", "numpy>=1.26"],
