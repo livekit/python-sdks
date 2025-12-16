@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "requests"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "requests"]
+build-backend = "hatchling.build"
 
 [project]
 name = "livekit"
-version = "0.16.8"
+dynamic = ["version"]
 description = "Python Real-time SDK for LiveKit"
 readme = "README.md"
 requires-python = ">=3.9.0"
@@ -34,6 +34,23 @@ dependencies = [
 Documentation = "https://docs.livekit.io"
 Website = "https://livekit.io/"
 Source = "https://github.com/livekit/python-sdks/"
+
+[tool.hatch.version]
+path = "livekit/rtc/version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["livekit"]
+artifacts = [
+    "livekit/rtc/resources/*.so",
+    "livekit/rtc/resources/*.dylib",
+    "livekit/rtc/resources/*.dll",
+]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "hatch_build.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["/livekit", "/rust-sdks"]
 
 [tool.cibuildwheel]
 build = "cp39-*"
