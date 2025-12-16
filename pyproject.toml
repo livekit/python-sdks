@@ -3,7 +3,7 @@ name = "python-sdks"
 version = "0.1.0"
 description = "LiveKit Python SDKs monorepo"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = ["livekit", "livekit-api", "livekit-protocol"]
 
 [tool.uv.workspace]
 members = ["livekit-rtc", "livekit-api", "livekit-protocol"]

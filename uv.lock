@@ -3199,6 +3199,11 @@ wheels = [
 name = "python-sdks"
 version = "0.1.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "livekit" },
+    { name = "livekit-api" },
+    { name = "livekit-protocol" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -3229,6 +3234,11 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "livekit", editable = "livekit-rtc" },
+    { name = "livekit-api", editable = "livekit-api" },
+    { name = "livekit-protocol", editable = "livekit-protocol" },
+]
 
 [package.metadata.requires-dev]
 dev = [
