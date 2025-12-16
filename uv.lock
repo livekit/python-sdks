@@ -1714,7 +1714,6 @@ wheels = [
 
 [[package]]
 name = "livekit"
-version = "0.16.8"
 source = { editable = "livekit-rtc" }
 dependencies = [
     { name = "aiofiles" },
@@ -1735,7 +1734,6 @@ requires-dist = [
 
 [[package]]
 name = "livekit-api"
-version = "0.8.0"
 source = { editable = "livekit-api" }
 dependencies = [
     { name = "aiohttp" },
@@ -1756,7 +1754,6 @@ requires-dist = [
 
 [[package]]
 name = "livekit-protocol"
-version = "1.1.1"
 source = { editable = "livekit-protocol" }
 dependencies = [
     { name = "protobuf" },
