@@ -26,7 +26,6 @@ dev = [
     # Build and packaging
     "requests",
     "wheel",
-    "setuptools",
     "twine",
     "auditwheel; sys_platform == 'linux'",
     "cibuildwheel",
