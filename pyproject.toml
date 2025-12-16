@@ -18,6 +18,8 @@ dev = [
     # Linting and type checking
     "ruff>=0.8.5",
     "mypy>=1.13.0",
+    "types-aiofiles>=24",
+    "ipython>=8.0.0",
     # Testing
     "pytest>=8.3.4",
     "pytest-asyncio>=0.24.0",
@@ -69,3 +71,4 @@ addopts = ["--import-mode=importlib", "--ignore=examples"]
 strict = true
 disallow_any_generics = false
 plugins = ["pydantic.mypy"]
+namespace_packages = true

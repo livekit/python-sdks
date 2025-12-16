@@ -31,6 +31,9 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
+      - name: Install workspace packages
+        run: uv pip install -e livekit-protocol -e livekit-api -e livekit-rtc
+
       - name: Download ffi
         run: uv run python livekit-rtc/rust-sdks/download_ffi.py --output .venv/lib/python3.9/site-packages/livekit/rtc/resources
 
