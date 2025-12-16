@@ -13,8 +13,8 @@ livekit = { workspace = true }
 livekit-api = { workspace = true }
 livekit-protocol = { workspace = true }
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     # Linting and type checking
     "ruff>=0.8.5",
     "mypy>=1.13.0",
