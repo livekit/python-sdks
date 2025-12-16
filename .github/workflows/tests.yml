@@ -40,5 +40,6 @@ jobs:
         run: |
           
           uv run python ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
+          uv add ./livekit-rtc ./livekit-api ./livekit-protocol
           uv run pytest . --ignore=livekit-rtc/rust-sdks
         
