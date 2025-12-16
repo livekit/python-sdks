@@ -19,7 +19,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Ruff livekit-api
-        run: uv ruff check --output-format=github .
+        run: uvx ruff check --output-format=github .
 
       - name: Check format
         run: uvx ruff format --check .
