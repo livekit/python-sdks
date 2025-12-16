@@ -38,4 +38,4 @@ jobs:
         run: uv add ./livekit-api ./livekit-protocol ./livekit-rtc
 
       - name: Check Types
-        run: uv run mypy --non-interactive -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
+        run: uv run mypy -p 'livekit-protocol' -p 'livekit-api' -p 'livekit-rtc'
