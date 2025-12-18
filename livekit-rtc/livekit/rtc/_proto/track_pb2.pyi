@@ -50,7 +50,7 @@ class TrackKind(_TrackKind, metaclass=_TrackKindEnumTypeWrapper): ...
 KIND_UNKNOWN: TrackKind.ValueType  # 0
 KIND_AUDIO: TrackKind.ValueType  # 1
 KIND_VIDEO: TrackKind.ValueType  # 2
-Global___TrackKind: typing_extensions.TypeAlias = TrackKind
+global___TrackKind = TrackKind
 
 class _TrackSource:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -71,7 +71,7 @@ SOURCE_CAMERA: TrackSource.ValueType  # 1
 SOURCE_MICROPHONE: TrackSource.ValueType  # 2
 SOURCE_SCREENSHARE: TrackSource.ValueType  # 3
 SOURCE_SCREENSHARE_AUDIO: TrackSource.ValueType  # 4
-Global___TrackSource: typing_extensions.TypeAlias = TrackSource
+global___TrackSource = TrackSource
 
 class _StreamState:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -88,7 +88,7 @@ class StreamState(_StreamState, metaclass=_StreamStateEnumTypeWrapper): ...
 STATE_UNKNOWN: StreamState.ValueType  # 0
 STATE_ACTIVE: StreamState.ValueType  # 1
 STATE_PAUSED: StreamState.ValueType  # 2
-Global___StreamState: typing_extensions.TypeAlias = StreamState
+global___StreamState = StreamState
 
 class _AudioTrackFeature:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -115,7 +115,7 @@ TF_NOISE_SUPPRESSION: AudioTrackFeature.ValueType  # 4
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature.ValueType  # 5
 TF_PRECONNECT_BUFFER: AudioTrackFeature.ValueType  # 6
 """client will buffer audio once available and send it to the server via bytes stream once connected"""
-Global___AudioTrackFeature: typing_extensions.TypeAlias = AudioTrackFeature
+global___AudioTrackFeature = AudioTrackFeature
 
 @typing.final
 class CreateVideoTrackRequest(google.protobuf.message.Message):
@@ -136,7 +136,7 @@ class CreateVideoTrackRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
-Global___CreateVideoTrackRequest: typing_extensions.TypeAlias = CreateVideoTrackRequest
+global___CreateVideoTrackRequest = CreateVideoTrackRequest
 
 @typing.final
 class CreateVideoTrackResponse(google.protobuf.message.Message):
@@ -144,16 +144,16 @@ class CreateVideoTrackResponse(google.protobuf.message.Message):
 
     TRACK_FIELD_NUMBER: builtins.int
     @property
-    def track(self) -> Global___OwnedTrack: ...
+    def track(self) -> global___OwnedTrack: ...
     def __init__(
         self,
         *,
-        track: Global___OwnedTrack | None = ...,
+        track: global___OwnedTrack | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
-Global___CreateVideoTrackResponse: typing_extensions.TypeAlias = CreateVideoTrackResponse
+global___CreateVideoTrackResponse = CreateVideoTrackResponse
 
 @typing.final
 class CreateAudioTrackRequest(google.protobuf.message.Message):
@@ -174,7 +174,7 @@ class CreateAudioTrackRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
-Global___CreateAudioTrackRequest: typing_extensions.TypeAlias = CreateAudioTrackRequest
+global___CreateAudioTrackRequest = CreateAudioTrackRequest
 
 @typing.final
 class CreateAudioTrackResponse(google.protobuf.message.Message):
@@ -182,16 +182,16 @@ class CreateAudioTrackResponse(google.protobuf.message.Message):
 
     TRACK_FIELD_NUMBER: builtins.int
     @property
-    def track(self) -> Global___OwnedTrack: ...
+    def track(self) -> global___OwnedTrack: ...
     def __init__(
         self,
         *,
-        track: Global___OwnedTrack | None = ...,
+        track: global___OwnedTrack | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
-Global___CreateAudioTrackResponse: typing_extensions.TypeAlias = CreateAudioTrackResponse
+global___CreateAudioTrackResponse = CreateAudioTrackResponse
 
 @typing.final
 class GetStatsRequest(google.protobuf.message.Message):
@@ -207,7 +207,7 @@ class GetStatsRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
 
-Global___GetStatsRequest: typing_extensions.TypeAlias = GetStatsRequest
+global___GetStatsRequest = GetStatsRequest
 
 @typing.final
 class GetStatsResponse(google.protobuf.message.Message):
@@ -223,7 +223,7 @@ class GetStatsResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___GetStatsResponse: typing_extensions.TypeAlias = GetStatsResponse
+global___GetStatsResponse = GetStatsResponse
 
 @typing.final
 class GetStatsCallback(google.protobuf.message.Message):
@@ -246,7 +246,7 @@ class GetStatsCallback(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
 
-Global___GetStatsCallback: typing_extensions.TypeAlias = GetStatsCallback
+global___GetStatsCallback = GetStatsCallback
 
 @typing.final
 class TrackEvent(google.protobuf.message.Message):
@@ -260,7 +260,7 @@ class TrackEvent(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-Global___TrackEvent: typing_extensions.TypeAlias = TrackEvent
+global___TrackEvent = TrackEvent
 
 @typing.final
 class TrackPublicationInfo(google.protobuf.message.Message):
@@ -280,8 +280,8 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     AUDIO_FEATURES_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
-    kind: Global___TrackKind.ValueType
-    source: Global___TrackSource.ValueType
+    kind: global___TrackKind.ValueType
+    source: global___TrackSource.ValueType
     simulcasted: builtins.bool
     width: builtins.int
     height: builtins.int
@@ -290,14 +290,14 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     remote: builtins.bool
     encryption_type: e2ee_pb2.EncryptionType.ValueType
     @property
-    def audio_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[Global___AudioTrackFeature.ValueType]: ...
+    def audio_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___AudioTrackFeature.ValueType]: ...
     def __init__(
         self,
         *,
         sid: builtins.str | None = ...,
         name: builtins.str | None = ...,
-        kind: Global___TrackKind.ValueType | None = ...,
-        source: Global___TrackSource.ValueType | None = ...,
+        kind: global___TrackKind.ValueType | None = ...,
+        source: global___TrackSource.ValueType | None = ...,
         simulcasted: builtins.bool | None = ...,
         width: builtins.int | None = ...,
         height: builtins.int | None = ...,
@@ -305,12 +305,12 @@ class TrackPublicationInfo(google.protobuf.message.Message):
         muted: builtins.bool | None = ...,
         remote: builtins.bool | None = ...,
         encryption_type: e2ee_pb2.EncryptionType.ValueType | None = ...,
-        audio_features: collections.abc.Iterable[Global___AudioTrackFeature.ValueType] | None = ...,
+        audio_features: collections.abc.Iterable[global___AudioTrackFeature.ValueType] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
-Global___TrackPublicationInfo: typing_extensions.TypeAlias = TrackPublicationInfo
+global___TrackPublicationInfo = TrackPublicationInfo
 
 @typing.final
 class OwnedTrackPublication(google.protobuf.message.Message):
@@ -321,17 +321,17 @@ class OwnedTrackPublication(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> Global___TrackPublicationInfo: ...
+    def info(self) -> global___TrackPublicationInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___TrackPublicationInfo | None = ...,
+        info: global___TrackPublicationInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedTrackPublication: typing_extensions.TypeAlias = OwnedTrackPublication
+global___OwnedTrackPublication = OwnedTrackPublication
 
 @typing.final
 class TrackInfo(google.protobuf.message.Message):
@@ -345,8 +345,8 @@ class TrackInfo(google.protobuf.message.Message):
     REMOTE_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
-    kind: Global___TrackKind.ValueType
-    stream_state: Global___StreamState.ValueType
+    kind: global___TrackKind.ValueType
+    stream_state: global___StreamState.ValueType
     muted: builtins.bool
     remote: builtins.bool
     def __init__(
@@ -354,15 +354,15 @@ class TrackInfo(google.protobuf.message.Message):
         *,
         sid: builtins.str | None = ...,
         name: builtins.str | None = ...,
-        kind: Global___TrackKind.ValueType | None = ...,
-        stream_state: Global___StreamState.ValueType | None = ...,
+        kind: global___TrackKind.ValueType | None = ...,
+        stream_state: global___StreamState.ValueType | None = ...,
         muted: builtins.bool | None = ...,
         remote: builtins.bool | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> None: ...
 
-Global___TrackInfo: typing_extensions.TypeAlias = TrackInfo
+global___TrackInfo = TrackInfo
 
 @typing.final
 class OwnedTrack(google.protobuf.message.Message):
@@ -373,17 +373,17 @@ class OwnedTrack(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> Global___TrackInfo: ...
+    def info(self) -> global___TrackInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___TrackInfo | None = ...,
+        info: global___TrackInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedTrack: typing_extensions.TypeAlias = OwnedTrack
+global___OwnedTrack = OwnedTrack
 
 @typing.final
 class LocalTrackMuteRequest(google.protobuf.message.Message):
@@ -404,7 +404,7 @@ class LocalTrackMuteRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
 
-Global___LocalTrackMuteRequest: typing_extensions.TypeAlias = LocalTrackMuteRequest
+global___LocalTrackMuteRequest = LocalTrackMuteRequest
 
 @typing.final
 class LocalTrackMuteResponse(google.protobuf.message.Message):
@@ -420,7 +420,7 @@ class LocalTrackMuteResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["muted", b"muted"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["muted", b"muted"]) -> None: ...
 
-Global___LocalTrackMuteResponse: typing_extensions.TypeAlias = LocalTrackMuteResponse
+global___LocalTrackMuteResponse = LocalTrackMuteResponse
 
 @typing.final
 class EnableRemoteTrackRequest(google.protobuf.message.Message):
@@ -441,7 +441,7 @@ class EnableRemoteTrackRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
 
-Global___EnableRemoteTrackRequest: typing_extensions.TypeAlias = EnableRemoteTrackRequest
+global___EnableRemoteTrackRequest = EnableRemoteTrackRequest
 
 @typing.final
 class EnableRemoteTrackResponse(google.protobuf.message.Message):
@@ -457,7 +457,7 @@ class EnableRemoteTrackResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
-Global___EnableRemoteTrackResponse: typing_extensions.TypeAlias = EnableRemoteTrackResponse
+global___EnableRemoteTrackResponse = EnableRemoteTrackResponse
 
 @typing.final
 class SetTrackSubscriptionPermissionsRequest(google.protobuf.message.Message):
@@ -469,18 +469,18 @@ class SetTrackSubscriptionPermissionsRequest(google.protobuf.message.Message):
     local_participant_handle: builtins.int
     all_participants_allowed: builtins.bool
     @property
-    def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[Global___ParticipantTrackPermission]: ...
+    def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ParticipantTrackPermission]: ...
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
         all_participants_allowed: builtins.bool | None = ...,
-        permissions: collections.abc.Iterable[Global___ParticipantTrackPermission] | None = ...,
+        permissions: collections.abc.Iterable[global___ParticipantTrackPermission] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle", "permissions", b"permissions"]) -> None: ...
 
-Global___SetTrackSubscriptionPermissionsRequest: typing_extensions.TypeAlias = SetTrackSubscriptionPermissionsRequest
+global___SetTrackSubscriptionPermissionsRequest = SetTrackSubscriptionPermissionsRequest
 
 @typing.final
 class ParticipantTrackPermission(google.protobuf.message.Message):
@@ -507,7 +507,7 @@ class ParticipantTrackPermission(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["allow_all", b"allow_all", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["allow_all", b"allow_all", "allowed_track_sids", b"allowed_track_sids", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantTrackPermission: typing_extensions.TypeAlias = ParticipantTrackPermission
+global___ParticipantTrackPermission = ParticipantTrackPermission
 
 @typing.final
 class SetTrackSubscriptionPermissionsResponse(google.protobuf.message.Message):
@@ -517,4 +517,4 @@ class SetTrackSubscriptionPermissionsResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-Global___SetTrackSubscriptionPermissionsResponse: typing_extensions.TypeAlias = SetTrackSubscriptionPermissionsResponse
+global___SetTrackSubscriptionPermissionsResponse = SetTrackSubscriptionPermissionsResponse

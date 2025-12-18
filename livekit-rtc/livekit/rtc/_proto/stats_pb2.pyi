@@ -49,7 +49,7 @@ DC_CONNECTING: DataChannelState.ValueType  # 0
 DC_OPEN: DataChannelState.ValueType  # 1
 DC_CLOSING: DataChannelState.ValueType  # 2
 DC_CLOSED: DataChannelState.ValueType  # 3
-Global___DataChannelState: typing_extensions.TypeAlias = DataChannelState
+global___DataChannelState = DataChannelState
 
 class _QualityLimitationReason:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -68,7 +68,7 @@ LIMITATION_NONE: QualityLimitationReason.ValueType  # 0
 LIMITATION_CPU: QualityLimitationReason.ValueType  # 1
 LIMITATION_BANDWIDTH: QualityLimitationReason.ValueType  # 2
 LIMITATION_OTHER: QualityLimitationReason.ValueType  # 3
-Global___QualityLimitationReason: typing_extensions.TypeAlias = QualityLimitationReason
+global___QualityLimitationReason = QualityLimitationReason
 
 class _IceRole:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -85,7 +85,7 @@ class IceRole(_IceRole, metaclass=_IceRoleEnumTypeWrapper): ...
 ICE_UNKNOWN: IceRole.ValueType  # 0
 ICE_CONTROLLING: IceRole.ValueType  # 1
 ICE_CONTROLLED: IceRole.ValueType  # 2
-Global___IceRole: typing_extensions.TypeAlias = IceRole
+global___IceRole = IceRole
 
 class _DtlsTransportState:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -106,7 +106,7 @@ DTLS_TRANSPORT_CONNECTING: DtlsTransportState.ValueType  # 1
 DTLS_TRANSPORT_CONNECTED: DtlsTransportState.ValueType  # 2
 DTLS_TRANSPORT_CLOSED: DtlsTransportState.ValueType  # 3
 DTLS_TRANSPORT_FAILED: DtlsTransportState.ValueType  # 4
-Global___DtlsTransportState: typing_extensions.TypeAlias = DtlsTransportState
+global___DtlsTransportState = DtlsTransportState
 
 class _IceTransportState:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -131,7 +131,7 @@ ICE_TRANSPORT_COMPLETED: IceTransportState.ValueType  # 3
 ICE_TRANSPORT_DISCONNECTED: IceTransportState.ValueType  # 4
 ICE_TRANSPORT_FAILED: IceTransportState.ValueType  # 5
 ICE_TRANSPORT_CLOSED: IceTransportState.ValueType  # 6
-Global___IceTransportState: typing_extensions.TypeAlias = IceTransportState
+global___IceTransportState = IceTransportState
 
 class _DtlsRole:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -148,7 +148,7 @@ class DtlsRole(_DtlsRole, metaclass=_DtlsRoleEnumTypeWrapper): ...
 DTLS_CLIENT: DtlsRole.ValueType  # 0
 DTLS_SERVER: DtlsRole.ValueType  # 1
 DTLS_UNKNOWN: DtlsRole.ValueType  # 2
-Global___DtlsRole: typing_extensions.TypeAlias = DtlsRole
+global___DtlsRole = DtlsRole
 
 class _IceCandidatePairState:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -169,7 +169,7 @@ PAIR_WAITING: IceCandidatePairState.ValueType  # 1
 PAIR_IN_PROGRESS: IceCandidatePairState.ValueType  # 2
 PAIR_FAILED: IceCandidatePairState.ValueType  # 3
 PAIR_SUCCEEDED: IceCandidatePairState.ValueType  # 4
-Global___IceCandidatePairState: typing_extensions.TypeAlias = IceCandidatePairState
+global___IceCandidatePairState = IceCandidatePairState
 
 class _IceCandidateType:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -188,7 +188,7 @@ HOST: IceCandidateType.ValueType  # 0
 SRFLX: IceCandidateType.ValueType  # 1
 PRFLX: IceCandidateType.ValueType  # 2
 RELAY: IceCandidateType.ValueType  # 3
-Global___IceCandidateType: typing_extensions.TypeAlias = IceCandidateType
+global___IceCandidateType = IceCandidateType
 
 class _IceServerTransportProtocol:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -205,7 +205,7 @@ class IceServerTransportProtocol(_IceServerTransportProtocol, metaclass=_IceServ
 TRANSPORT_UDP: IceServerTransportProtocol.ValueType  # 0
 TRANSPORT_TCP: IceServerTransportProtocol.ValueType  # 1
 TRANSPORT_TLS: IceServerTransportProtocol.ValueType  # 2
-Global___IceServerTransportProtocol: typing_extensions.TypeAlias = IceServerTransportProtocol
+global___IceServerTransportProtocol = IceServerTransportProtocol
 
 class _IceTcpCandidateType:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -222,7 +222,7 @@ class IceTcpCandidateType(_IceTcpCandidateType, metaclass=_IceTcpCandidateTypeEn
 CANDIDATE_ACTIVE: IceTcpCandidateType.ValueType  # 0
 CANDIDATE_PASSIVE: IceTcpCandidateType.ValueType  # 1
 CANDIDATE_SO: IceTcpCandidateType.ValueType  # 2
-Global___IceTcpCandidateType: typing_extensions.TypeAlias = IceTcpCandidateType
+global___IceTcpCandidateType = IceTcpCandidateType
 
 @typing.final
 class RtcStats(google.protobuf.message.Message):
@@ -235,14 +235,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         CODEC_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def codec(self) -> Global___CodecStats: ...
+        def codec(self) -> global___CodecStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            codec: Global___CodecStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            codec: global___CodecStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["codec", b"codec", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["codec", b"codec", "rtc", b"rtc"]) -> None: ...
@@ -256,20 +256,20 @@ class RtcStats(google.protobuf.message.Message):
         RECEIVED_FIELD_NUMBER: builtins.int
         INBOUND_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def stream(self) -> Global___RtpStreamStats: ...
+        def stream(self) -> global___RtpStreamStats: ...
         @property
-        def received(self) -> Global___ReceivedRtpStreamStats: ...
+        def received(self) -> global___ReceivedRtpStreamStats: ...
         @property
-        def inbound(self) -> Global___InboundRtpStreamStats: ...
+        def inbound(self) -> global___InboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            stream: Global___RtpStreamStats | None = ...,
-            received: Global___ReceivedRtpStreamStats | None = ...,
-            inbound: Global___InboundRtpStreamStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___RtpStreamStats | None = ...,
+            received: global___ReceivedRtpStreamStats | None = ...,
+            inbound: global___InboundRtpStreamStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]) -> None: ...
@@ -283,20 +283,20 @@ class RtcStats(google.protobuf.message.Message):
         SENT_FIELD_NUMBER: builtins.int
         OUTBOUND_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def stream(self) -> Global___RtpStreamStats: ...
+        def stream(self) -> global___RtpStreamStats: ...
         @property
-        def sent(self) -> Global___SentRtpStreamStats: ...
+        def sent(self) -> global___SentRtpStreamStats: ...
         @property
-        def outbound(self) -> Global___OutboundRtpStreamStats: ...
+        def outbound(self) -> global___OutboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            stream: Global___RtpStreamStats | None = ...,
-            sent: Global___SentRtpStreamStats | None = ...,
-            outbound: Global___OutboundRtpStreamStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___RtpStreamStats | None = ...,
+            sent: global___SentRtpStreamStats | None = ...,
+            outbound: global___OutboundRtpStreamStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> None: ...
@@ -310,20 +310,20 @@ class RtcStats(google.protobuf.message.Message):
         RECEIVED_FIELD_NUMBER: builtins.int
         REMOTE_INBOUND_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def stream(self) -> Global___RtpStreamStats: ...
+        def stream(self) -> global___RtpStreamStats: ...
         @property
-        def received(self) -> Global___ReceivedRtpStreamStats: ...
+        def received(self) -> global___ReceivedRtpStreamStats: ...
         @property
-        def remote_inbound(self) -> Global___RemoteInboundRtpStreamStats: ...
+        def remote_inbound(self) -> global___RemoteInboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            stream: Global___RtpStreamStats | None = ...,
-            received: Global___ReceivedRtpStreamStats | None = ...,
-            remote_inbound: Global___RemoteInboundRtpStreamStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___RtpStreamStats | None = ...,
+            received: global___ReceivedRtpStreamStats | None = ...,
+            remote_inbound: global___RemoteInboundRtpStreamStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]) -> None: ...
@@ -337,20 +337,20 @@ class RtcStats(google.protobuf.message.Message):
         SENT_FIELD_NUMBER: builtins.int
         REMOTE_OUTBOUND_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def stream(self) -> Global___RtpStreamStats: ...
+        def stream(self) -> global___RtpStreamStats: ...
         @property
-        def sent(self) -> Global___SentRtpStreamStats: ...
+        def sent(self) -> global___SentRtpStreamStats: ...
         @property
-        def remote_outbound(self) -> Global___RemoteOutboundRtpStreamStats: ...
+        def remote_outbound(self) -> global___RemoteOutboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            stream: Global___RtpStreamStats | None = ...,
-            sent: Global___SentRtpStreamStats | None = ...,
-            remote_outbound: Global___RemoteOutboundRtpStreamStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___RtpStreamStats | None = ...,
+            sent: global___SentRtpStreamStats | None = ...,
+            remote_outbound: global___RemoteOutboundRtpStreamStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> None: ...
@@ -364,20 +364,20 @@ class RtcStats(google.protobuf.message.Message):
         AUDIO_FIELD_NUMBER: builtins.int
         VIDEO_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def source(self) -> Global___MediaSourceStats: ...
+        def source(self) -> global___MediaSourceStats: ...
         @property
-        def audio(self) -> Global___AudioSourceStats: ...
+        def audio(self) -> global___AudioSourceStats: ...
         @property
-        def video(self) -> Global___VideoSourceStats: ...
+        def video(self) -> global___VideoSourceStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            source: Global___MediaSourceStats | None = ...,
-            audio: Global___AudioSourceStats | None = ...,
-            video: Global___VideoSourceStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            source: global___MediaSourceStats | None = ...,
+            audio: global___AudioSourceStats | None = ...,
+            video: global___VideoSourceStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]) -> None: ...
@@ -389,14 +389,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         AUDIO_PLAYOUT_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def audio_playout(self) -> Global___AudioPlayoutStats: ...
+        def audio_playout(self) -> global___AudioPlayoutStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            audio_playout: Global___AudioPlayoutStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            audio_playout: global___AudioPlayoutStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]) -> None: ...
@@ -408,14 +408,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         PC_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def pc(self) -> Global___PeerConnectionStats: ...
+        def pc(self) -> global___PeerConnectionStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            pc: Global___PeerConnectionStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            pc: global___PeerConnectionStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["pc", b"pc", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["pc", b"pc", "rtc", b"rtc"]) -> None: ...
@@ -427,14 +427,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         DC_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def dc(self) -> Global___DataChannelStats: ...
+        def dc(self) -> global___DataChannelStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            dc: Global___DataChannelStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            dc: global___DataChannelStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["dc", b"dc", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["dc", b"dc", "rtc", b"rtc"]) -> None: ...
@@ -446,14 +446,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         TRANSPORT_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def transport(self) -> Global___TransportStats: ...
+        def transport(self) -> global___TransportStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            transport: Global___TransportStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            transport: global___TransportStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["rtc", b"rtc", "transport", b"transport"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["rtc", b"rtc", "transport", b"transport"]) -> None: ...
@@ -465,14 +465,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         CANDIDATE_PAIR_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def candidate_pair(self) -> Global___CandidatePairStats: ...
+        def candidate_pair(self) -> global___CandidatePairStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            candidate_pair: Global___CandidatePairStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            candidate_pair: global___CandidatePairStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]) -> None: ...
@@ -484,14 +484,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         CANDIDATE_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def candidate(self) -> Global___IceCandidateStats: ...
+        def candidate(self) -> global___IceCandidateStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            candidate: Global___IceCandidateStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            candidate: global___IceCandidateStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> None: ...
@@ -503,14 +503,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         CANDIDATE_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def candidate(self) -> Global___IceCandidateStats: ...
+        def candidate(self) -> global___IceCandidateStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            candidate: Global___IceCandidateStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            candidate: global___IceCandidateStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> None: ...
@@ -522,14 +522,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         CERTIFICATE_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def certificate(self) -> Global___CertificateStats: ...
+        def certificate(self) -> global___CertificateStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            certificate: Global___CertificateStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            certificate: global___CertificateStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["certificate", b"certificate", "rtc", b"rtc"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["certificate", b"certificate", "rtc", b"rtc"]) -> None: ...
@@ -541,14 +541,14 @@ class RtcStats(google.protobuf.message.Message):
         RTC_FIELD_NUMBER: builtins.int
         STREAM_FIELD_NUMBER: builtins.int
         @property
-        def rtc(self) -> Global___RtcStatsData: ...
+        def rtc(self) -> global___RtcStatsData: ...
         @property
-        def stream(self) -> Global___StreamStats: ...
+        def stream(self) -> global___StreamStats: ...
         def __init__(
             self,
             *,
-            rtc: Global___RtcStatsData | None = ...,
-            stream: Global___StreamStats | None = ...,
+            rtc: global___RtcStatsData | None = ...,
+            stream: global___StreamStats | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
         def ClearField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> None: ...
@@ -580,62 +580,62 @@ class RtcStats(google.protobuf.message.Message):
     STREAM_FIELD_NUMBER: builtins.int
     TRACK_FIELD_NUMBER: builtins.int
     @property
-    def codec(self) -> Global___RtcStats.Codec: ...
+    def codec(self) -> global___RtcStats.Codec: ...
     @property
-    def inbound_rtp(self) -> Global___RtcStats.InboundRtp: ...
+    def inbound_rtp(self) -> global___RtcStats.InboundRtp: ...
     @property
-    def outbound_rtp(self) -> Global___RtcStats.OutboundRtp: ...
+    def outbound_rtp(self) -> global___RtcStats.OutboundRtp: ...
     @property
-    def remote_inbound_rtp(self) -> Global___RtcStats.RemoteInboundRtp: ...
+    def remote_inbound_rtp(self) -> global___RtcStats.RemoteInboundRtp: ...
     @property
-    def remote_outbound_rtp(self) -> Global___RtcStats.RemoteOutboundRtp: ...
+    def remote_outbound_rtp(self) -> global___RtcStats.RemoteOutboundRtp: ...
     @property
-    def media_source(self) -> Global___RtcStats.MediaSource: ...
+    def media_source(self) -> global___RtcStats.MediaSource: ...
     @property
-    def media_playout(self) -> Global___RtcStats.MediaPlayout: ...
+    def media_playout(self) -> global___RtcStats.MediaPlayout: ...
     @property
-    def peer_connection(self) -> Global___RtcStats.PeerConnection: ...
+    def peer_connection(self) -> global___RtcStats.PeerConnection: ...
     @property
-    def data_channel(self) -> Global___RtcStats.DataChannel: ...
+    def data_channel(self) -> global___RtcStats.DataChannel: ...
     @property
-    def transport(self) -> Global___RtcStats.Transport: ...
+    def transport(self) -> global___RtcStats.Transport: ...
     @property
-    def candidate_pair(self) -> Global___RtcStats.CandidatePair: ...
+    def candidate_pair(self) -> global___RtcStats.CandidatePair: ...
     @property
-    def local_candidate(self) -> Global___RtcStats.LocalCandidate: ...
+    def local_candidate(self) -> global___RtcStats.LocalCandidate: ...
     @property
-    def remote_candidate(self) -> Global___RtcStats.RemoteCandidate: ...
+    def remote_candidate(self) -> global___RtcStats.RemoteCandidate: ...
     @property
-    def certificate(self) -> Global___RtcStats.Certificate: ...
+    def certificate(self) -> global___RtcStats.Certificate: ...
     @property
-    def stream(self) -> Global___RtcStats.Stream: ...
+    def stream(self) -> global___RtcStats.Stream: ...
     @property
-    def track(self) -> Global___RtcStats.Track: ...
+    def track(self) -> global___RtcStats.Track: ...
     def __init__(
         self,
         *,
-        codec: Global___RtcStats.Codec | None = ...,
-        inbound_rtp: Global___RtcStats.InboundRtp | None = ...,
-        outbound_rtp: Global___RtcStats.OutboundRtp | None = ...,
-        remote_inbound_rtp: Global___RtcStats.RemoteInboundRtp | None = ...,
-        remote_outbound_rtp: Global___RtcStats.RemoteOutboundRtp | None = ...,
-        media_source: Global___RtcStats.MediaSource | None = ...,
-        media_playout: Global___RtcStats.MediaPlayout | None = ...,
-        peer_connection: Global___RtcStats.PeerConnection | None = ...,
-        data_channel: Global___RtcStats.DataChannel | None = ...,
-        transport: Global___RtcStats.Transport | None = ...,
-        candidate_pair: Global___RtcStats.CandidatePair | None = ...,
-        local_candidate: Global___RtcStats.LocalCandidate | None = ...,
-        remote_candidate: Global___RtcStats.RemoteCandidate | None = ...,
-        certificate: Global___RtcStats.Certificate | None = ...,
-        stream: Global___RtcStats.Stream | None = ...,
-        track: Global___RtcStats.Track | None = ...,
+        codec: global___RtcStats.Codec | None = ...,
+        inbound_rtp: global___RtcStats.InboundRtp | None = ...,
+        outbound_rtp: global___RtcStats.OutboundRtp | None = ...,
+        remote_inbound_rtp: global___RtcStats.RemoteInboundRtp | None = ...,
+        remote_outbound_rtp: global___RtcStats.RemoteOutboundRtp | None = ...,
+        media_source: global___RtcStats.MediaSource | None = ...,
+        media_playout: global___RtcStats.MediaPlayout | None = ...,
+        peer_connection: global___RtcStats.PeerConnection | None = ...,
+        data_channel: global___RtcStats.DataChannel | None = ...,
+        transport: global___RtcStats.Transport | None = ...,
+        candidate_pair: global___RtcStats.CandidatePair | None = ...,
+        local_candidate: global___RtcStats.LocalCandidate | None = ...,
+        remote_candidate: global___RtcStats.RemoteCandidate | None = ...,
+        certificate: global___RtcStats.Certificate | None = ...,
+        stream: global___RtcStats.Stream | None = ...,
+        track: global___RtcStats.Track | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["stats", b"stats"]) -> typing.Literal["codec", "inbound_rtp", "outbound_rtp", "remote_inbound_rtp", "remote_outbound_rtp", "media_source", "media_playout", "peer_connection", "data_channel", "transport", "candidate_pair", "local_candidate", "remote_candidate", "certificate", "stream", "track"] | None: ...
 
-Global___RtcStats: typing_extensions.TypeAlias = RtcStats
+global___RtcStats = RtcStats
 
 @typing.final
 class RtcStatsData(google.protobuf.message.Message):
@@ -654,7 +654,7 @@ class RtcStatsData(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["id", b"id", "timestamp", b"timestamp"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["id", b"id", "timestamp", b"timestamp"]) -> None: ...
 
-Global___RtcStatsData: typing_extensions.TypeAlias = RtcStatsData
+global___RtcStatsData = RtcStatsData
 
 @typing.final
 class CodecStats(google.protobuf.message.Message):
@@ -685,7 +685,7 @@ class CodecStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]) -> None: ...
 
-Global___CodecStats: typing_extensions.TypeAlias = CodecStats
+global___CodecStats = CodecStats
 
 @typing.final
 class RtpStreamStats(google.protobuf.message.Message):
@@ -710,7 +710,7 @@ class RtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]) -> None: ...
 
-Global___RtpStreamStats: typing_extensions.TypeAlias = RtpStreamStats
+global___RtpStreamStats = RtpStreamStats
 
 @typing.final
 class ReceivedRtpStreamStats(google.protobuf.message.Message):
@@ -732,7 +732,7 @@ class ReceivedRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]) -> None: ...
 
-Global___ReceivedRtpStreamStats: typing_extensions.TypeAlias = ReceivedRtpStreamStats
+global___ReceivedRtpStreamStats = ReceivedRtpStreamStats
 
 @typing.final
 class InboundRtpStreamStats(google.protobuf.message.Message):
@@ -904,7 +904,7 @@ class InboundRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]) -> None: ...
 
-Global___InboundRtpStreamStats: typing_extensions.TypeAlias = InboundRtpStreamStats
+global___InboundRtpStreamStats = InboundRtpStreamStats
 
 @typing.final
 class SentRtpStreamStats(google.protobuf.message.Message):
@@ -923,7 +923,7 @@ class SentRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]) -> None: ...
 
-Global___SentRtpStreamStats: typing_extensions.TypeAlias = SentRtpStreamStats
+global___SentRtpStreamStats = SentRtpStreamStats
 
 @typing.final
 class OutboundRtpStreamStats(google.protobuf.message.Message):
@@ -996,7 +996,7 @@ class OutboundRtpStreamStats(google.protobuf.message.Message):
     qp_sum: builtins.int
     total_encode_time: builtins.float
     total_packet_send_delay: builtins.float
-    quality_limitation_reason: Global___QualityLimitationReason.ValueType
+    quality_limitation_reason: global___QualityLimitationReason.ValueType
     quality_limitation_resolution_changes: builtins.int
     nack_count: builtins.int
     fir_count: builtins.int
@@ -1030,7 +1030,7 @@ class OutboundRtpStreamStats(google.protobuf.message.Message):
         qp_sum: builtins.int | None = ...,
         total_encode_time: builtins.float | None = ...,
         total_packet_send_delay: builtins.float | None = ...,
-        quality_limitation_reason: Global___QualityLimitationReason.ValueType | None = ...,
+        quality_limitation_reason: global___QualityLimitationReason.ValueType | None = ...,
         quality_limitation_durations: collections.abc.Mapping[builtins.str, builtins.float] | None = ...,
         quality_limitation_resolution_changes: builtins.int | None = ...,
         nack_count: builtins.int | None = ...,
@@ -1044,7 +1044,7 @@ class OutboundRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_durations", b"quality_limitation_durations", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]) -> None: ...
 
-Global___OutboundRtpStreamStats: typing_extensions.TypeAlias = OutboundRtpStreamStats
+global___OutboundRtpStreamStats = OutboundRtpStreamStats
 
 @typing.final
 class RemoteInboundRtpStreamStats(google.protobuf.message.Message):
@@ -1072,7 +1072,7 @@ class RemoteInboundRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> None: ...
 
-Global___RemoteInboundRtpStreamStats: typing_extensions.TypeAlias = RemoteInboundRtpStreamStats
+global___RemoteInboundRtpStreamStats = RemoteInboundRtpStreamStats
 
 @typing.final
 class RemoteOutboundRtpStreamStats(google.protobuf.message.Message):
@@ -1103,7 +1103,7 @@ class RemoteOutboundRtpStreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> None: ...
 
-Global___RemoteOutboundRtpStreamStats: typing_extensions.TypeAlias = RemoteOutboundRtpStreamStats
+global___RemoteOutboundRtpStreamStats = RemoteOutboundRtpStreamStats
 
 @typing.final
 class MediaSourceStats(google.protobuf.message.Message):
@@ -1122,7 +1122,7 @@ class MediaSourceStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]) -> None: ...
 
-Global___MediaSourceStats: typing_extensions.TypeAlias = MediaSourceStats
+global___MediaSourceStats = MediaSourceStats
 
 @typing.final
 class AudioSourceStats(google.protobuf.message.Message):
@@ -1162,7 +1162,7 @@ class AudioSourceStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]) -> None: ...
 
-Global___AudioSourceStats: typing_extensions.TypeAlias = AudioSourceStats
+global___AudioSourceStats = AudioSourceStats
 
 @typing.final
 class VideoSourceStats(google.protobuf.message.Message):
@@ -1187,7 +1187,7 @@ class VideoSourceStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]) -> None: ...
 
-Global___VideoSourceStats: typing_extensions.TypeAlias = VideoSourceStats
+global___VideoSourceStats = VideoSourceStats
 
 @typing.final
 class AudioPlayoutStats(google.protobuf.message.Message):
@@ -1218,7 +1218,7 @@ class AudioPlayoutStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]) -> None: ...
 
-Global___AudioPlayoutStats: typing_extensions.TypeAlias = AudioPlayoutStats
+global___AudioPlayoutStats = AudioPlayoutStats
 
 @typing.final
 class PeerConnectionStats(google.protobuf.message.Message):
@@ -1237,7 +1237,7 @@ class PeerConnectionStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]) -> None: ...
 
-Global___PeerConnectionStats: typing_extensions.TypeAlias = PeerConnectionStats
+global___PeerConnectionStats = PeerConnectionStats
 
 @typing.final
 class DataChannelStats(google.protobuf.message.Message):
@@ -1254,7 +1254,7 @@ class DataChannelStats(google.protobuf.message.Message):
     label: builtins.str
     protocol: builtins.str
     data_channel_identifier: builtins.int
-    state: Global___DataChannelState.ValueType
+    state: global___DataChannelState.ValueType
     messages_sent: builtins.int
     bytes_sent: builtins.int
     messages_received: builtins.int
@@ -1265,7 +1265,7 @@ class DataChannelStats(google.protobuf.message.Message):
         label: builtins.str | None = ...,
         protocol: builtins.str | None = ...,
         data_channel_identifier: builtins.int | None = ...,
-        state: Global___DataChannelState.ValueType | None = ...,
+        state: global___DataChannelState.ValueType | None = ...,
         messages_sent: builtins.int | None = ...,
         bytes_sent: builtins.int | None = ...,
         messages_received: builtins.int | None = ...,
@@ -1274,7 +1274,7 @@ class DataChannelStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]) -> None: ...
 
-Global___DataChannelStats: typing_extensions.TypeAlias = DataChannelStats
+global___DataChannelStats = DataChannelStats
 
 @typing.final
 class TransportStats(google.protobuf.message.Message):
@@ -1300,16 +1300,16 @@ class TransportStats(google.protobuf.message.Message):
     packets_received: builtins.int
     bytes_sent: builtins.int
     bytes_received: builtins.int
-    ice_role: Global___IceRole.ValueType
+    ice_role: global___IceRole.ValueType
     ice_local_username_fragment: builtins.str
-    dtls_state: Global___DtlsTransportState.ValueType
-    ice_state: Global___IceTransportState.ValueType
+    dtls_state: global___DtlsTransportState.ValueType
+    ice_state: global___IceTransportState.ValueType
     selected_candidate_pair_id: builtins.str
     local_certificate_id: builtins.str
     remote_certificate_id: builtins.str
     tls_version: builtins.str
     dtls_cipher: builtins.str
-    dtls_role: Global___DtlsRole.ValueType
+    dtls_role: global___DtlsRole.ValueType
     srtp_cipher: builtins.str
     selected_candidate_pair_changes: builtins.int
     def __init__(
@@ -1319,23 +1319,23 @@ class TransportStats(google.protobuf.message.Message):
         packets_received: builtins.int | None = ...,
         bytes_sent: builtins.int | None = ...,
         bytes_received: builtins.int | None = ...,
-        ice_role: Global___IceRole.ValueType | None = ...,
+        ice_role: global___IceRole.ValueType | None = ...,
         ice_local_username_fragment: builtins.str | None = ...,
-        dtls_state: Global___DtlsTransportState.ValueType | None = ...,
-        ice_state: Global___IceTransportState.ValueType | None = ...,
+        dtls_state: global___DtlsTransportState.ValueType | None = ...,
+        ice_state: global___IceTransportState.ValueType | None = ...,
         selected_candidate_pair_id: builtins.str | None = ...,
         local_certificate_id: builtins.str | None = ...,
         remote_certificate_id: builtins.str | None = ...,
         tls_version: builtins.str | None = ...,
         dtls_cipher: builtins.str | None = ...,
-        dtls_role: Global___DtlsRole.ValueType | None = ...,
+        dtls_role: global___DtlsRole.ValueType | None = ...,
         srtp_cipher: builtins.str | None = ...,
         selected_candidate_pair_changes: builtins.int | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]) -> None: ...
 
-Global___TransportStats: typing_extensions.TypeAlias = TransportStats
+global___TransportStats = TransportStats
 
 @typing.final
 class CandidatePairStats(google.protobuf.message.Message):
@@ -1366,7 +1366,7 @@ class CandidatePairStats(google.protobuf.message.Message):
     transport_id: builtins.str
     local_candidate_id: builtins.str
     remote_candidate_id: builtins.str
-    state: Global___IceCandidatePairState.ValueType
+    state: global___IceCandidatePairState.ValueType
     nominated: builtins.bool
     packets_sent: builtins.int
     packets_received: builtins.int
@@ -1391,7 +1391,7 @@ class CandidatePairStats(google.protobuf.message.Message):
         transport_id: builtins.str | None = ...,
         local_candidate_id: builtins.str | None = ...,
         remote_candidate_id: builtins.str | None = ...,
-        state: Global___IceCandidatePairState.ValueType | None = ...,
+        state: global___IceCandidatePairState.ValueType | None = ...,
         nominated: builtins.bool | None = ...,
         packets_sent: builtins.int | None = ...,
         packets_received: builtins.int | None = ...,
@@ -1414,7 +1414,7 @@ class CandidatePairStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]) -> None: ...
 
-Global___CandidatePairStats: typing_extensions.TypeAlias = CandidatePairStats
+global___CandidatePairStats = CandidatePairStats
 
 @typing.final
 class IceCandidateStats(google.protobuf.message.Message):
@@ -1437,15 +1437,15 @@ class IceCandidateStats(google.protobuf.message.Message):
     address: builtins.str
     port: builtins.int
     protocol: builtins.str
-    candidate_type: Global___IceCandidateType.ValueType
+    candidate_type: global___IceCandidateType.ValueType
     priority: builtins.int
     url: builtins.str
-    relay_protocol: Global___IceServerTransportProtocol.ValueType
+    relay_protocol: global___IceServerTransportProtocol.ValueType
     foundation: builtins.str
     related_address: builtins.str
     related_port: builtins.int
     username_fragment: builtins.str
-    tcp_type: Global___IceTcpCandidateType.ValueType
+    tcp_type: global___IceTcpCandidateType.ValueType
     def __init__(
         self,
         *,
@@ -1453,20 +1453,20 @@ class IceCandidateStats(google.protobuf.message.Message):
         address: builtins.str | None = ...,
         port: builtins.int | None = ...,
         protocol: builtins.str | None = ...,
-        candidate_type: Global___IceCandidateType.ValueType | None = ...,
+        candidate_type: global___IceCandidateType.ValueType | None = ...,
         priority: builtins.int | None = ...,
         url: builtins.str | None = ...,
-        relay_protocol: Global___IceServerTransportProtocol.ValueType | None = ...,
+        relay_protocol: global___IceServerTransportProtocol.ValueType | None = ...,
         foundation: builtins.str | None = ...,
         related_address: builtins.str | None = ...,
         related_port: builtins.int | None = ...,
         username_fragment: builtins.str | None = ...,
-        tcp_type: Global___IceTcpCandidateType.ValueType | None = ...,
+        tcp_type: global___IceTcpCandidateType.ValueType | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]) -> None: ...
 
-Global___IceCandidateStats: typing_extensions.TypeAlias = IceCandidateStats
+global___IceCandidateStats = IceCandidateStats
 
 @typing.final
 class CertificateStats(google.protobuf.message.Message):
@@ -1491,7 +1491,7 @@ class CertificateStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]) -> None: ...
 
-Global___CertificateStats: typing_extensions.TypeAlias = CertificateStats
+global___CertificateStats = CertificateStats
 
 @typing.final
 class StreamStats(google.protobuf.message.Message):
@@ -1511,4 +1511,4 @@ class StreamStats(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> None: ...
 
-Global___StreamStats: typing_extensions.TypeAlias = StreamStats
+global___StreamStats = StreamStats
