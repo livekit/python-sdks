@@ -48,7 +48,7 @@ class EncryptionType(_EncryptionType, metaclass=_EncryptionTypeEnumTypeWrapper):
 NONE: EncryptionType.ValueType  # 0
 GCM: EncryptionType.ValueType  # 1
 CUSTOM: EncryptionType.ValueType  # 2
-global___EncryptionType = EncryptionType
+Global___EncryptionType: typing_extensions.TypeAlias = EncryptionType
 
 class _EncryptionState:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -73,7 +73,7 @@ DECRYPTION_FAILED: EncryptionState.ValueType  # 3
 MISSING_KEY: EncryptionState.ValueType  # 4
 KEY_RATCHETED: EncryptionState.ValueType  # 5
 INTERNAL_ERROR: EncryptionState.ValueType  # 6
-global___EncryptionState = EncryptionState
+Global___EncryptionState: typing_extensions.TypeAlias = EncryptionState
 
 @typing.final
 class FrameCryptor(google.protobuf.message.Message):
@@ -98,7 +98,7 @@ class FrameCryptor(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled", "key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-global___FrameCryptor = FrameCryptor
+Global___FrameCryptor: typing_extensions.TypeAlias = FrameCryptor
 
 @typing.final
 class KeyProviderOptions(google.protobuf.message.Message):
@@ -125,7 +125,7 @@ class KeyProviderOptions(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> None: ...
 
-global___KeyProviderOptions = KeyProviderOptions
+Global___KeyProviderOptions: typing_extensions.TypeAlias = KeyProviderOptions
 
 @typing.final
 class E2eeOptions(google.protobuf.message.Message):
@@ -133,19 +133,19 @@ class E2eeOptions(google.protobuf.message.Message):
 
     ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
     KEY_PROVIDER_OPTIONS_FIELD_NUMBER: builtins.int
-    encryption_type: global___EncryptionType.ValueType
+    encryption_type: Global___EncryptionType.ValueType
     @property
-    def key_provider_options(self) -> global___KeyProviderOptions: ...
+    def key_provider_options(self) -> Global___KeyProviderOptions: ...
     def __init__(
         self,
         *,
-        encryption_type: global___EncryptionType.ValueType | None = ...,
-        key_provider_options: global___KeyProviderOptions | None = ...,
+        encryption_type: Global___EncryptionType.ValueType | None = ...,
+        key_provider_options: Global___KeyProviderOptions | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "key_provider_options", b"key_provider_options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "key_provider_options", b"key_provider_options"]) -> None: ...
 
-global___E2eeOptions = E2eeOptions
+Global___E2eeOptions: typing_extensions.TypeAlias = E2eeOptions
 
 @typing.final
 class E2eeManagerSetEnabledRequest(google.protobuf.message.Message):
@@ -161,7 +161,7 @@ class E2eeManagerSetEnabledRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
-global___E2eeManagerSetEnabledRequest = E2eeManagerSetEnabledRequest
+Global___E2eeManagerSetEnabledRequest: typing_extensions.TypeAlias = E2eeManagerSetEnabledRequest
 
 @typing.final
 class E2eeManagerSetEnabledResponse(google.protobuf.message.Message):
@@ -171,7 +171,7 @@ class E2eeManagerSetEnabledResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___E2eeManagerSetEnabledResponse = E2eeManagerSetEnabledResponse
+Global___E2eeManagerSetEnabledResponse: typing_extensions.TypeAlias = E2eeManagerSetEnabledResponse
 
 @typing.final
 class E2eeManagerGetFrameCryptorsRequest(google.protobuf.message.Message):
@@ -181,7 +181,7 @@ class E2eeManagerGetFrameCryptorsRequest(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___E2eeManagerGetFrameCryptorsRequest = E2eeManagerGetFrameCryptorsRequest
+Global___E2eeManagerGetFrameCryptorsRequest: typing_extensions.TypeAlias = E2eeManagerGetFrameCryptorsRequest
 
 @typing.final
 class E2eeManagerGetFrameCryptorsResponse(google.protobuf.message.Message):
@@ -189,15 +189,15 @@ class E2eeManagerGetFrameCryptorsResponse(google.protobuf.message.Message):
 
     FRAME_CRYPTORS_FIELD_NUMBER: builtins.int
     @property
-    def frame_cryptors(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___FrameCryptor]: ...
+    def frame_cryptors(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[Global___FrameCryptor]: ...
     def __init__(
         self,
         *,
-        frame_cryptors: collections.abc.Iterable[global___FrameCryptor] | None = ...,
+        frame_cryptors: collections.abc.Iterable[Global___FrameCryptor] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing.Literal["frame_cryptors", b"frame_cryptors"]) -> None: ...
 
-global___E2eeManagerGetFrameCryptorsResponse = E2eeManagerGetFrameCryptorsResponse
+Global___E2eeManagerGetFrameCryptorsResponse: typing_extensions.TypeAlias = E2eeManagerGetFrameCryptorsResponse
 
 @typing.final
 class FrameCryptorSetEnabledRequest(google.protobuf.message.Message):
@@ -219,7 +219,7 @@ class FrameCryptorSetEnabledRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-global___FrameCryptorSetEnabledRequest = FrameCryptorSetEnabledRequest
+Global___FrameCryptorSetEnabledRequest: typing_extensions.TypeAlias = FrameCryptorSetEnabledRequest
 
 @typing.final
 class FrameCryptorSetEnabledResponse(google.protobuf.message.Message):
@@ -229,7 +229,7 @@ class FrameCryptorSetEnabledResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___FrameCryptorSetEnabledResponse = FrameCryptorSetEnabledResponse
+Global___FrameCryptorSetEnabledResponse: typing_extensions.TypeAlias = FrameCryptorSetEnabledResponse
 
 @typing.final
 class FrameCryptorSetKeyIndexRequest(google.protobuf.message.Message):
@@ -251,7 +251,7 @@ class FrameCryptorSetKeyIndexRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-global___FrameCryptorSetKeyIndexRequest = FrameCryptorSetKeyIndexRequest
+Global___FrameCryptorSetKeyIndexRequest: typing_extensions.TypeAlias = FrameCryptorSetKeyIndexRequest
 
 @typing.final
 class FrameCryptorSetKeyIndexResponse(google.protobuf.message.Message):
@@ -261,7 +261,7 @@ class FrameCryptorSetKeyIndexResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___FrameCryptorSetKeyIndexResponse = FrameCryptorSetKeyIndexResponse
+Global___FrameCryptorSetKeyIndexResponse: typing_extensions.TypeAlias = FrameCryptorSetKeyIndexResponse
 
 @typing.final
 class SetSharedKeyRequest(google.protobuf.message.Message):
@@ -280,7 +280,7 @@ class SetSharedKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index", "shared_key", b"shared_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index", "shared_key", b"shared_key"]) -> None: ...
 
-global___SetSharedKeyRequest = SetSharedKeyRequest
+Global___SetSharedKeyRequest: typing_extensions.TypeAlias = SetSharedKeyRequest
 
 @typing.final
 class SetSharedKeyResponse(google.protobuf.message.Message):
@@ -290,7 +290,7 @@ class SetSharedKeyResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___SetSharedKeyResponse = SetSharedKeyResponse
+Global___SetSharedKeyResponse: typing_extensions.TypeAlias = SetSharedKeyResponse
 
 @typing.final
 class RatchetSharedKeyRequest(google.protobuf.message.Message):
@@ -306,7 +306,7 @@ class RatchetSharedKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index"]) -> None: ...
 
-global___RatchetSharedKeyRequest = RatchetSharedKeyRequest
+Global___RatchetSharedKeyRequest: typing_extensions.TypeAlias = RatchetSharedKeyRequest
 
 @typing.final
 class RatchetSharedKeyResponse(google.protobuf.message.Message):
@@ -322,7 +322,7 @@ class RatchetSharedKeyResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["new_key", b"new_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["new_key", b"new_key"]) -> None: ...
 
-global___RatchetSharedKeyResponse = RatchetSharedKeyResponse
+Global___RatchetSharedKeyResponse: typing_extensions.TypeAlias = RatchetSharedKeyResponse
 
 @typing.final
 class GetSharedKeyRequest(google.protobuf.message.Message):
@@ -338,7 +338,7 @@ class GetSharedKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index"]) -> None: ...
 
-global___GetSharedKeyRequest = GetSharedKeyRequest
+Global___GetSharedKeyRequest: typing_extensions.TypeAlias = GetSharedKeyRequest
 
 @typing.final
 class GetSharedKeyResponse(google.protobuf.message.Message):
@@ -354,7 +354,7 @@ class GetSharedKeyResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key", b"key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key", b"key"]) -> None: ...
 
-global___GetSharedKeyResponse = GetSharedKeyResponse
+Global___GetSharedKeyResponse: typing_extensions.TypeAlias = GetSharedKeyResponse
 
 @typing.final
 class SetKeyRequest(google.protobuf.message.Message):
@@ -376,7 +376,7 @@ class SetKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key", b"key", "key_index", b"key_index", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key", b"key", "key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___SetKeyRequest = SetKeyRequest
+Global___SetKeyRequest: typing_extensions.TypeAlias = SetKeyRequest
 
 @typing.final
 class SetKeyResponse(google.protobuf.message.Message):
@@ -386,7 +386,7 @@ class SetKeyResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___SetKeyResponse = SetKeyResponse
+Global___SetKeyResponse: typing_extensions.TypeAlias = SetKeyResponse
 
 @typing.final
 class RatchetKeyRequest(google.protobuf.message.Message):
@@ -405,7 +405,7 @@ class RatchetKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___RatchetKeyRequest = RatchetKeyRequest
+Global___RatchetKeyRequest: typing_extensions.TypeAlias = RatchetKeyRequest
 
 @typing.final
 class RatchetKeyResponse(google.protobuf.message.Message):
@@ -421,7 +421,7 @@ class RatchetKeyResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["new_key", b"new_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["new_key", b"new_key"]) -> None: ...
 
-global___RatchetKeyResponse = RatchetKeyResponse
+Global___RatchetKeyResponse: typing_extensions.TypeAlias = RatchetKeyResponse
 
 @typing.final
 class GetKeyRequest(google.protobuf.message.Message):
@@ -440,7 +440,7 @@ class GetKeyRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key_index", b"key_index", "participant_identity", b"participant_identity"]) -> None: ...
 
-global___GetKeyRequest = GetKeyRequest
+Global___GetKeyRequest: typing_extensions.TypeAlias = GetKeyRequest
 
 @typing.final
 class GetKeyResponse(google.protobuf.message.Message):
@@ -456,7 +456,7 @@ class GetKeyResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["key", b"key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["key", b"key"]) -> None: ...
 
-global___GetKeyResponse = GetKeyResponse
+Global___GetKeyResponse: typing_extensions.TypeAlias = GetKeyResponse
 
 @typing.final
 class E2eeRequest(google.protobuf.message.Message):
@@ -475,45 +475,45 @@ class E2eeRequest(google.protobuf.message.Message):
     GET_KEY_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
-    def manager_set_enabled(self) -> global___E2eeManagerSetEnabledRequest: ...
+    def manager_set_enabled(self) -> Global___E2eeManagerSetEnabledRequest: ...
     @property
-    def manager_get_frame_cryptors(self) -> global___E2eeManagerGetFrameCryptorsRequest: ...
+    def manager_get_frame_cryptors(self) -> Global___E2eeManagerGetFrameCryptorsRequest: ...
     @property
-    def cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledRequest: ...
+    def cryptor_set_enabled(self) -> Global___FrameCryptorSetEnabledRequest: ...
     @property
-    def cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexRequest: ...
+    def cryptor_set_key_index(self) -> Global___FrameCryptorSetKeyIndexRequest: ...
     @property
-    def set_shared_key(self) -> global___SetSharedKeyRequest: ...
+    def set_shared_key(self) -> Global___SetSharedKeyRequest: ...
     @property
-    def ratchet_shared_key(self) -> global___RatchetSharedKeyRequest: ...
+    def ratchet_shared_key(self) -> Global___RatchetSharedKeyRequest: ...
     @property
-    def get_shared_key(self) -> global___GetSharedKeyRequest: ...
+    def get_shared_key(self) -> Global___GetSharedKeyRequest: ...
     @property
-    def set_key(self) -> global___SetKeyRequest: ...
+    def set_key(self) -> Global___SetKeyRequest: ...
     @property
-    def ratchet_key(self) -> global___RatchetKeyRequest: ...
+    def ratchet_key(self) -> Global___RatchetKeyRequest: ...
     @property
-    def get_key(self) -> global___GetKeyRequest: ...
+    def get_key(self) -> Global___GetKeyRequest: ...
     def __init__(
         self,
         *,
         room_handle: builtins.int | None = ...,
-        manager_set_enabled: global___E2eeManagerSetEnabledRequest | None = ...,
-        manager_get_frame_cryptors: global___E2eeManagerGetFrameCryptorsRequest | None = ...,
-        cryptor_set_enabled: global___FrameCryptorSetEnabledRequest | None = ...,
-        cryptor_set_key_index: global___FrameCryptorSetKeyIndexRequest | None = ...,
-        set_shared_key: global___SetSharedKeyRequest | None = ...,
-        ratchet_shared_key: global___RatchetSharedKeyRequest | None = ...,
-        get_shared_key: global___GetSharedKeyRequest | None = ...,
-        set_key: global___SetKeyRequest | None = ...,
-        ratchet_key: global___RatchetKeyRequest | None = ...,
-        get_key: global___GetKeyRequest | None = ...,
+        manager_set_enabled: Global___E2eeManagerSetEnabledRequest | None = ...,
+        manager_get_frame_cryptors: Global___E2eeManagerGetFrameCryptorsRequest | None = ...,
+        cryptor_set_enabled: Global___FrameCryptorSetEnabledRequest | None = ...,
+        cryptor_set_key_index: Global___FrameCryptorSetKeyIndexRequest | None = ...,
+        set_shared_key: Global___SetSharedKeyRequest | None = ...,
+        ratchet_shared_key: Global___RatchetSharedKeyRequest | None = ...,
+        get_shared_key: Global___GetSharedKeyRequest | None = ...,
+        set_key: Global___SetKeyRequest | None = ...,
+        ratchet_key: Global___RatchetKeyRequest | None = ...,
+        get_key: Global___GetKeyRequest | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "ratchet_key", b"ratchet_key", "ratchet_shared_key", b"ratchet_shared_key", "room_handle", b"room_handle", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "ratchet_key", b"ratchet_key", "ratchet_shared_key", b"ratchet_shared_key", "room_handle", b"room_handle", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["manager_set_enabled", "manager_get_frame_cryptors", "cryptor_set_enabled", "cryptor_set_key_index", "set_shared_key", "ratchet_shared_key", "get_shared_key", "set_key", "ratchet_key", "get_key"] | None: ...
 
-global___E2eeRequest = E2eeRequest
+Global___E2eeRequest: typing_extensions.TypeAlias = E2eeRequest
 
 @typing.final
 class E2eeResponse(google.protobuf.message.Message):
@@ -530,41 +530,41 @@ class E2eeResponse(google.protobuf.message.Message):
     RATCHET_KEY_FIELD_NUMBER: builtins.int
     GET_KEY_FIELD_NUMBER: builtins.int
     @property
-    def manager_set_enabled(self) -> global___E2eeManagerSetEnabledResponse: ...
+    def manager_set_enabled(self) -> Global___E2eeManagerSetEnabledResponse: ...
     @property
-    def manager_get_frame_cryptors(self) -> global___E2eeManagerGetFrameCryptorsResponse: ...
+    def manager_get_frame_cryptors(self) -> Global___E2eeManagerGetFrameCryptorsResponse: ...
     @property
-    def cryptor_set_enabled(self) -> global___FrameCryptorSetEnabledResponse: ...
+    def cryptor_set_enabled(self) -> Global___FrameCryptorSetEnabledResponse: ...
     @property
-    def cryptor_set_key_index(self) -> global___FrameCryptorSetKeyIndexResponse: ...
+    def cryptor_set_key_index(self) -> Global___FrameCryptorSetKeyIndexResponse: ...
     @property
-    def set_shared_key(self) -> global___SetSharedKeyResponse: ...
+    def set_shared_key(self) -> Global___SetSharedKeyResponse: ...
     @property
-    def ratchet_shared_key(self) -> global___RatchetSharedKeyResponse: ...
+    def ratchet_shared_key(self) -> Global___RatchetSharedKeyResponse: ...
     @property
-    def get_shared_key(self) -> global___GetSharedKeyResponse: ...
+    def get_shared_key(self) -> Global___GetSharedKeyResponse: ...
     @property
-    def set_key(self) -> global___SetKeyResponse: ...
+    def set_key(self) -> Global___SetKeyResponse: ...
     @property
-    def ratchet_key(self) -> global___RatchetKeyResponse: ...
+    def ratchet_key(self) -> Global___RatchetKeyResponse: ...
     @property
-    def get_key(self) -> global___GetKeyResponse: ...
+    def get_key(self) -> Global___GetKeyResponse: ...
     def __init__(
         self,
         *,
-        manager_set_enabled: global___E2eeManagerSetEnabledResponse | None = ...,
-        manager_get_frame_cryptors: global___E2eeManagerGetFrameCryptorsResponse | None = ...,
-        cryptor_set_enabled: global___FrameCryptorSetEnabledResponse | None = ...,
-        cryptor_set_key_index: global___FrameCryptorSetKeyIndexResponse | None = ...,
-        set_shared_key: global___SetSharedKeyResponse | None = ...,
-        ratchet_shared_key: global___RatchetSharedKeyResponse | None = ...,
-        get_shared_key: global___GetSharedKeyResponse | None = ...,
-        set_key: global___SetKeyResponse | None = ...,
-        ratchet_key: global___RatchetKeyResponse | None = ...,
-        get_key: global___GetKeyResponse | None = ...,
+        manager_set_enabled: Global___E2eeManagerSetEnabledResponse | None = ...,
+        manager_get_frame_cryptors: Global___E2eeManagerGetFrameCryptorsResponse | None = ...,
+        cryptor_set_enabled: Global___FrameCryptorSetEnabledResponse | None = ...,
+        cryptor_set_key_index: Global___FrameCryptorSetKeyIndexResponse | None = ...,
+        set_shared_key: Global___SetSharedKeyResponse | None = ...,
+        ratchet_shared_key: Global___RatchetSharedKeyResponse | None = ...,
+        get_shared_key: Global___GetSharedKeyResponse | None = ...,
+        set_key: Global___SetKeyResponse | None = ...,
+        ratchet_key: Global___RatchetKeyResponse | None = ...,
+        get_key: Global___GetKeyResponse | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "ratchet_key", b"ratchet_key", "ratchet_shared_key", b"ratchet_shared_key", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["cryptor_set_enabled", b"cryptor_set_enabled", "cryptor_set_key_index", b"cryptor_set_key_index", "get_key", b"get_key", "get_shared_key", b"get_shared_key", "manager_get_frame_cryptors", b"manager_get_frame_cryptors", "manager_set_enabled", b"manager_set_enabled", "message", b"message", "ratchet_key", b"ratchet_key", "ratchet_shared_key", b"ratchet_shared_key", "set_key", b"set_key", "set_shared_key", b"set_shared_key"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["manager_set_enabled", "manager_get_frame_cryptors", "cryptor_set_enabled", "cryptor_set_key_index", "set_shared_key", "ratchet_shared_key", "get_shared_key", "set_key", "ratchet_key", "get_key"] | None: ...
 
-global___E2eeResponse = E2eeResponse
+Global___E2eeResponse: typing_extensions.TypeAlias = E2eeResponse

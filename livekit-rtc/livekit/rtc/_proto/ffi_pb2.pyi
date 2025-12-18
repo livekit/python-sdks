@@ -59,7 +59,7 @@ LOG_WARN: LogLevel.ValueType  # 1
 LOG_INFO: LogLevel.ValueType  # 2
 LOG_DEBUG: LogLevel.ValueType  # 3
 LOG_TRACE: LogLevel.ValueType  # 4
-global___LogLevel = LogLevel
+Global___LogLevel: typing_extensions.TypeAlias = LogLevel
 
 @typing.final
 class FfiRequest(google.protobuf.message.Message):
@@ -163,7 +163,7 @@ class FfiRequest(google.protobuf.message.Message):
     SEND_BYTES_FIELD_NUMBER: builtins.int
     SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: builtins.int
     @property
-    def dispose(self) -> global___DisposeRequest: ...
+    def dispose(self) -> Global___DisposeRequest: ...
     @property
     def connect(self) -> room_pb2.ConnectRequest:
         """Room"""
@@ -319,7 +319,7 @@ class FfiRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        dispose: global___DisposeRequest | None = ...,
+        dispose: Global___DisposeRequest | None = ...,
         connect: room_pb2.ConnectRequest | None = ...,
         disconnect: room_pb2.DisconnectRequest | None = ...,
         publish_track: room_pb2.PublishTrackRequest | None = ...,
@@ -391,7 +391,7 @@ class FfiRequest(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "e2ee", "audio_stream_from_participant", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "edit_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"] | None: ...
 
-global___FfiRequest = FfiRequest
+Global___FfiRequest: typing_extensions.TypeAlias = FfiRequest
 
 @typing.final
 class FfiResponse(google.protobuf.message.Message):
@@ -466,7 +466,7 @@ class FfiResponse(google.protobuf.message.Message):
     SEND_BYTES_FIELD_NUMBER: builtins.int
     SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: builtins.int
     @property
-    def dispose(self) -> global___DisposeResponse: ...
+    def dispose(self) -> Global___DisposeResponse: ...
     @property
     def connect(self) -> room_pb2.ConnectResponse:
         """Room"""
@@ -620,7 +620,7 @@ class FfiResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        dispose: global___DisposeResponse | None = ...,
+        dispose: Global___DisposeResponse | None = ...,
         connect: room_pb2.ConnectResponse | None = ...,
         disconnect: room_pb2.DisconnectResponse | None = ...,
         publish_track: room_pb2.PublishTrackResponse | None = ...,
@@ -691,7 +691,7 @@ class FfiResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "audio_stream_from_participant", "e2ee", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"] | None: ...
 
-global___FfiResponse = FfiResponse
+Global___FfiResponse: typing_extensions.TypeAlias = FfiResponse
 
 @typing.final
 class FfiEvent(google.protobuf.message.Message):
@@ -755,7 +755,7 @@ class FfiEvent(google.protobuf.message.Message):
     @property
     def disconnect(self) -> room_pb2.DisconnectCallback: ...
     @property
-    def dispose(self) -> global___DisposeCallback: ...
+    def dispose(self) -> Global___DisposeCallback: ...
     @property
     def publish_track(self) -> room_pb2.PublishTrackCallback: ...
     @property
@@ -775,11 +775,11 @@ class FfiEvent(google.protobuf.message.Message):
     @property
     def get_stats(self) -> track_pb2.GetStatsCallback: ...
     @property
-    def logs(self) -> global___LogBatch: ...
+    def logs(self) -> Global___LogBatch: ...
     @property
     def get_session_stats(self) -> room_pb2.GetSessionStatsCallback: ...
     @property
-    def panic(self) -> global___Panic: ...
+    def panic(self) -> Global___Panic: ...
     @property
     def publish_sip_dtmf(self) -> room_pb2.PublishSipDtmfCallback: ...
     @property
@@ -835,7 +835,7 @@ class FfiEvent(google.protobuf.message.Message):
         audio_stream_event: audio_frame_pb2.AudioStreamEvent | None = ...,
         connect: room_pb2.ConnectCallback | None = ...,
         disconnect: room_pb2.DisconnectCallback | None = ...,
-        dispose: global___DisposeCallback | None = ...,
+        dispose: Global___DisposeCallback | None = ...,
         publish_track: room_pb2.PublishTrackCallback | None = ...,
         unpublish_track: room_pb2.UnpublishTrackCallback | None = ...,
         publish_data: room_pb2.PublishDataCallback | None = ...,
@@ -845,9 +845,9 @@ class FfiEvent(google.protobuf.message.Message):
         set_local_name: room_pb2.SetLocalNameCallback | None = ...,
         set_local_attributes: room_pb2.SetLocalAttributesCallback | None = ...,
         get_stats: track_pb2.GetStatsCallback | None = ...,
-        logs: global___LogBatch | None = ...,
+        logs: Global___LogBatch | None = ...,
         get_session_stats: room_pb2.GetSessionStatsCallback | None = ...,
-        panic: global___Panic | None = ...,
+        panic: Global___Panic | None = ...,
         publish_sip_dtmf: room_pb2.PublishSipDtmfCallback | None = ...,
         chat_message: room_pb2.SendChatMessageCallback | None = ...,
         perform_rpc: rpc_pb2.PerformRpcCallback | None = ...,
@@ -874,7 +874,7 @@ class FfiEvent(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "byte_stream_open", b"byte_stream_open", "byte_stream_reader_event", b"byte_stream_reader_event", "byte_stream_reader_read_all", b"byte_stream_reader_read_all", "byte_stream_reader_write_to_file", b"byte_stream_reader_write_to_file", "byte_stream_writer_close", b"byte_stream_writer_close", "byte_stream_writer_write", b"byte_stream_writer_write", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_bytes", b"send_bytes", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "text_stream_open", b"text_stream_open", "text_stream_reader_event", b"text_stream_reader_event", "text_stream_reader_read_all", b"text_stream_reader_read_all", "text_stream_writer_close", b"text_stream_writer_close", "text_stream_writer_write", b"text_stream_writer_write", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf", "chat_message", "perform_rpc", "rpc_method_invocation", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "byte_stream_reader_event", "byte_stream_reader_read_all", "byte_stream_reader_write_to_file", "byte_stream_open", "byte_stream_writer_write", "byte_stream_writer_close", "send_file", "text_stream_reader_event", "text_stream_reader_read_all", "text_stream_open", "text_stream_writer_write", "text_stream_writer_close", "send_text", "send_bytes"] | None: ...
 
-global___FfiEvent = FfiEvent
+Global___FfiEvent: typing_extensions.TypeAlias = FfiEvent
 
 @typing.final
 class DisposeRequest(google.protobuf.message.Message):
@@ -892,7 +892,7 @@ class DisposeRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async", b"async"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async", b"async"]) -> None: ...
 
-global___DisposeRequest = DisposeRequest
+Global___DisposeRequest: typing_extensions.TypeAlias = DisposeRequest
 
 @typing.final
 class DisposeResponse(google.protobuf.message.Message):
@@ -909,7 +909,7 @@ class DisposeResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___DisposeResponse = DisposeResponse
+Global___DisposeResponse: typing_extensions.TypeAlias = DisposeResponse
 
 @typing.final
 class DisposeCallback(google.protobuf.message.Message):
@@ -925,7 +925,7 @@ class DisposeCallback(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___DisposeCallback = DisposeCallback
+Global___DisposeCallback: typing_extensions.TypeAlias = DisposeCallback
 
 @typing.final
 class LogRecord(google.protobuf.message.Message):
@@ -937,7 +937,7 @@ class LogRecord(google.protobuf.message.Message):
     FILE_FIELD_NUMBER: builtins.int
     LINE_FIELD_NUMBER: builtins.int
     MESSAGE_FIELD_NUMBER: builtins.int
-    level: global___LogLevel.ValueType
+    level: Global___LogLevel.ValueType
     target: builtins.str
     """e.g "livekit", "libwebrtc", "tokio-tungstenite", etc..."""
     module_path: builtins.str
@@ -947,7 +947,7 @@ class LogRecord(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        level: global___LogLevel.ValueType | None = ...,
+        level: Global___LogLevel.ValueType | None = ...,
         target: builtins.str | None = ...,
         module_path: builtins.str | None = ...,
         file: builtins.str | None = ...,
@@ -957,7 +957,7 @@ class LogRecord(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> None: ...
 
-global___LogRecord = LogRecord
+Global___LogRecord: typing_extensions.TypeAlias = LogRecord
 
 @typing.final
 class LogBatch(google.protobuf.message.Message):
@@ -965,15 +965,15 @@ class LogBatch(google.protobuf.message.Message):
 
     RECORDS_FIELD_NUMBER: builtins.int
     @property
-    def records(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___LogRecord]: ...
+    def records(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[Global___LogRecord]: ...
     def __init__(
         self,
         *,
-        records: collections.abc.Iterable[global___LogRecord] | None = ...,
+        records: collections.abc.Iterable[Global___LogRecord] | None = ...,
     ) -> None: ...
     def ClearField(self, field_name: typing.Literal["records", b"records"]) -> None: ...
 
-global___LogBatch = LogBatch
+Global___LogBatch: typing_extensions.TypeAlias = LogBatch
 
 @typing.final
 class Panic(google.protobuf.message.Message):
@@ -989,4 +989,4 @@ class Panic(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["message", b"message"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["message", b"message"]) -> None: ...
 
-global___Panic = Panic
+Global___Panic: typing_extensions.TypeAlias = Panic

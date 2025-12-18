@@ -19,7 +19,13 @@ limitations under the License.
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
+import sys
 import typing
+
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
@@ -48,4 +54,4 @@ class FfiOwnedHandle(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["id", b"id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["id", b"id"]) -> None: ...
 
-global___FfiOwnedHandle = FfiOwnedHandle
+Global___FfiOwnedHandle: typing_extensions.TypeAlias = FfiOwnedHandle

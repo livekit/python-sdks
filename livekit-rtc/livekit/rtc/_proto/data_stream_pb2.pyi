@@ -48,17 +48,17 @@ class OwnedTextStreamReader(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> global___TextStreamInfo: ...
+    def info(self) -> Global___TextStreamInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___TextStreamInfo | None = ...,
+        info: Global___TextStreamInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-global___OwnedTextStreamReader = OwnedTextStreamReader
+Global___OwnedTextStreamReader: typing_extensions.TypeAlias = OwnedTextStreamReader
 
 @typing.final
 class TextStreamReaderReadIncrementalRequest(google.protobuf.message.Message):
@@ -76,7 +76,7 @@ class TextStreamReaderReadIncrementalRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
 
-global___TextStreamReaderReadIncrementalRequest = TextStreamReaderReadIncrementalRequest
+Global___TextStreamReaderReadIncrementalRequest: typing_extensions.TypeAlias = TextStreamReaderReadIncrementalRequest
 
 @typing.final
 class TextStreamReaderReadIncrementalResponse(google.protobuf.message.Message):
@@ -86,7 +86,7 @@ class TextStreamReaderReadIncrementalResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___TextStreamReaderReadIncrementalResponse = TextStreamReaderReadIncrementalResponse
+Global___TextStreamReaderReadIncrementalResponse: typing_extensions.TypeAlias = TextStreamReaderReadIncrementalResponse
 
 @typing.final
 class TextStreamReaderReadAllRequest(google.protobuf.message.Message):
@@ -104,7 +104,7 @@ class TextStreamReaderReadAllRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
 
-global___TextStreamReaderReadAllRequest = TextStreamReaderReadAllRequest
+Global___TextStreamReaderReadAllRequest: typing_extensions.TypeAlias = TextStreamReaderReadAllRequest
 
 @typing.final
 class TextStreamReaderReadAllResponse(google.protobuf.message.Message):
@@ -120,7 +120,7 @@ class TextStreamReaderReadAllResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___TextStreamReaderReadAllResponse = TextStreamReaderReadAllResponse
+Global___TextStreamReaderReadAllResponse: typing_extensions.TypeAlias = TextStreamReaderReadAllResponse
 
 @typing.final
 class TextStreamReaderReadAllCallback(google.protobuf.message.Message):
@@ -132,19 +132,19 @@ class TextStreamReaderReadAllCallback(google.protobuf.message.Message):
     async_id: builtins.int
     content: builtins.str
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
         content: builtins.str | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "content", b"content", "error", b"error", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "content", b"content", "error", b"error", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["content", "error"] | None: ...
 
-global___TextStreamReaderReadAllCallback = TextStreamReaderReadAllCallback
+Global___TextStreamReaderReadAllCallback: typing_extensions.TypeAlias = TextStreamReaderReadAllCallback
 
 @typing.final
 class TextStreamReaderEvent(google.protobuf.message.Message):
@@ -155,21 +155,21 @@ class TextStreamReaderEvent(google.protobuf.message.Message):
     EOS_FIELD_NUMBER: builtins.int
     reader_handle: builtins.int
     @property
-    def chunk_received(self) -> global___TextStreamReaderChunkReceived: ...
+    def chunk_received(self) -> Global___TextStreamReaderChunkReceived: ...
     @property
-    def eos(self) -> global___TextStreamReaderEOS: ...
+    def eos(self) -> Global___TextStreamReaderEOS: ...
     def __init__(
         self,
         *,
         reader_handle: builtins.int | None = ...,
-        chunk_received: global___TextStreamReaderChunkReceived | None = ...,
-        eos: global___TextStreamReaderEOS | None = ...,
+        chunk_received: Global___TextStreamReaderChunkReceived | None = ...,
+        eos: Global___TextStreamReaderEOS | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["chunk_received", b"chunk_received", "detail", b"detail", "eos", b"eos", "reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["chunk_received", b"chunk_received", "detail", b"detail", "eos", b"eos", "reader_handle", b"reader_handle"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["detail", b"detail"]) -> typing.Literal["chunk_received", "eos"] | None: ...
 
-global___TextStreamReaderEvent = TextStreamReaderEvent
+Global___TextStreamReaderEvent: typing_extensions.TypeAlias = TextStreamReaderEvent
 
 @typing.final
 class TextStreamReaderChunkReceived(google.protobuf.message.Message):
@@ -185,7 +185,7 @@ class TextStreamReaderChunkReceived(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["content", b"content"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["content", b"content"]) -> None: ...
 
-global___TextStreamReaderChunkReceived = TextStreamReaderChunkReceived
+Global___TextStreamReaderChunkReceived: typing_extensions.TypeAlias = TextStreamReaderChunkReceived
 
 @typing.final
 class TextStreamReaderEOS(google.protobuf.message.Message):
@@ -193,16 +193,16 @@ class TextStreamReaderEOS(google.protobuf.message.Message):
 
     ERROR_FIELD_NUMBER: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-global___TextStreamReaderEOS = TextStreamReaderEOS
+Global___TextStreamReaderEOS: typing_extensions.TypeAlias = TextStreamReaderEOS
 
 @typing.final
 class OwnedByteStreamReader(google.protobuf.message.Message):
@@ -218,17 +218,17 @@ class OwnedByteStreamReader(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> global___ByteStreamInfo: ...
+    def info(self) -> Global___ByteStreamInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___ByteStreamInfo | None = ...,
+        info: Global___ByteStreamInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-global___OwnedByteStreamReader = OwnedByteStreamReader
+Global___OwnedByteStreamReader: typing_extensions.TypeAlias = OwnedByteStreamReader
 
 @typing.final
 class ByteStreamReaderReadIncrementalRequest(google.protobuf.message.Message):
@@ -246,7 +246,7 @@ class ByteStreamReaderReadIncrementalRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
 
-global___ByteStreamReaderReadIncrementalRequest = ByteStreamReaderReadIncrementalRequest
+Global___ByteStreamReaderReadIncrementalRequest: typing_extensions.TypeAlias = ByteStreamReaderReadIncrementalRequest
 
 @typing.final
 class ByteStreamReaderReadIncrementalResponse(google.protobuf.message.Message):
@@ -256,7 +256,7 @@ class ByteStreamReaderReadIncrementalResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___ByteStreamReaderReadIncrementalResponse = ByteStreamReaderReadIncrementalResponse
+Global___ByteStreamReaderReadIncrementalResponse: typing_extensions.TypeAlias = ByteStreamReaderReadIncrementalResponse
 
 @typing.final
 class ByteStreamReaderReadAllRequest(google.protobuf.message.Message):
@@ -274,7 +274,7 @@ class ByteStreamReaderReadAllRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
 
-global___ByteStreamReaderReadAllRequest = ByteStreamReaderReadAllRequest
+Global___ByteStreamReaderReadAllRequest: typing_extensions.TypeAlias = ByteStreamReaderReadAllRequest
 
 @typing.final
 class ByteStreamReaderReadAllResponse(google.protobuf.message.Message):
@@ -290,7 +290,7 @@ class ByteStreamReaderReadAllResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___ByteStreamReaderReadAllResponse = ByteStreamReaderReadAllResponse
+Global___ByteStreamReaderReadAllResponse: typing_extensions.TypeAlias = ByteStreamReaderReadAllResponse
 
 @typing.final
 class ByteStreamReaderReadAllCallback(google.protobuf.message.Message):
@@ -302,19 +302,19 @@ class ByteStreamReaderReadAllCallback(google.protobuf.message.Message):
     async_id: builtins.int
     content: builtins.bytes
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
         content: builtins.bytes | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "content", b"content", "error", b"error", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "content", b"content", "error", b"error", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["content", "error"] | None: ...
 
-global___ByteStreamReaderReadAllCallback = ByteStreamReaderReadAllCallback
+Global___ByteStreamReaderReadAllCallback: typing_extensions.TypeAlias = ByteStreamReaderReadAllCallback
 
 @typing.final
 class ByteStreamReaderWriteToFileRequest(google.protobuf.message.Message):
@@ -345,7 +345,7 @@ class ByteStreamReaderWriteToFileRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle"]) -> None: ...
 
-global___ByteStreamReaderWriteToFileRequest = ByteStreamReaderWriteToFileRequest
+Global___ByteStreamReaderWriteToFileRequest: typing_extensions.TypeAlias = ByteStreamReaderWriteToFileRequest
 
 @typing.final
 class ByteStreamReaderWriteToFileResponse(google.protobuf.message.Message):
@@ -361,7 +361,7 @@ class ByteStreamReaderWriteToFileResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___ByteStreamReaderWriteToFileResponse = ByteStreamReaderWriteToFileResponse
+Global___ByteStreamReaderWriteToFileResponse: typing_extensions.TypeAlias = ByteStreamReaderWriteToFileResponse
 
 @typing.final
 class ByteStreamReaderWriteToFileCallback(google.protobuf.message.Message):
@@ -374,19 +374,19 @@ class ByteStreamReaderWriteToFileCallback(google.protobuf.message.Message):
     file_path: builtins.str
     """Path the file was written to."""
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
         file_path: builtins.str | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "file_path", b"file_path", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "file_path", b"file_path", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["file_path", "error"] | None: ...
 
-global___ByteStreamReaderWriteToFileCallback = ByteStreamReaderWriteToFileCallback
+Global___ByteStreamReaderWriteToFileCallback: typing_extensions.TypeAlias = ByteStreamReaderWriteToFileCallback
 
 @typing.final
 class ByteStreamReaderEvent(google.protobuf.message.Message):
@@ -397,21 +397,21 @@ class ByteStreamReaderEvent(google.protobuf.message.Message):
     EOS_FIELD_NUMBER: builtins.int
     reader_handle: builtins.int
     @property
-    def chunk_received(self) -> global___ByteStreamReaderChunkReceived: ...
+    def chunk_received(self) -> Global___ByteStreamReaderChunkReceived: ...
     @property
-    def eos(self) -> global___ByteStreamReaderEOS: ...
+    def eos(self) -> Global___ByteStreamReaderEOS: ...
     def __init__(
         self,
         *,
         reader_handle: builtins.int | None = ...,
-        chunk_received: global___ByteStreamReaderChunkReceived | None = ...,
-        eos: global___ByteStreamReaderEOS | None = ...,
+        chunk_received: Global___ByteStreamReaderChunkReceived | None = ...,
+        eos: Global___ByteStreamReaderEOS | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["chunk_received", b"chunk_received", "detail", b"detail", "eos", b"eos", "reader_handle", b"reader_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["chunk_received", b"chunk_received", "detail", b"detail", "eos", b"eos", "reader_handle", b"reader_handle"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["detail", b"detail"]) -> typing.Literal["chunk_received", "eos"] | None: ...
 
-global___ByteStreamReaderEvent = ByteStreamReaderEvent
+Global___ByteStreamReaderEvent: typing_extensions.TypeAlias = ByteStreamReaderEvent
 
 @typing.final
 class ByteStreamReaderChunkReceived(google.protobuf.message.Message):
@@ -427,7 +427,7 @@ class ByteStreamReaderChunkReceived(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["content", b"content"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["content", b"content"]) -> None: ...
 
-global___ByteStreamReaderChunkReceived = ByteStreamReaderChunkReceived
+Global___ByteStreamReaderChunkReceived: typing_extensions.TypeAlias = ByteStreamReaderChunkReceived
 
 @typing.final
 class ByteStreamReaderEOS(google.protobuf.message.Message):
@@ -435,16 +435,16 @@ class ByteStreamReaderEOS(google.protobuf.message.Message):
 
     ERROR_FIELD_NUMBER: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-global___ByteStreamReaderEOS = ByteStreamReaderEOS
+Global___ByteStreamReaderEOS: typing_extensions.TypeAlias = ByteStreamReaderEOS
 
 @typing.final
 class StreamSendFileRequest(google.protobuf.message.Message):
@@ -462,18 +462,18 @@ class StreamSendFileRequest(google.protobuf.message.Message):
     file_path: builtins.str
     """Path of the file to send (must be readable by the current process)."""
     @property
-    def options(self) -> global___StreamByteOptions: ...
+    def options(self) -> Global___StreamByteOptions: ...
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
-        options: global___StreamByteOptions | None = ...,
+        options: Global___StreamByteOptions | None = ...,
         file_path: builtins.str | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
 
-global___StreamSendFileRequest = StreamSendFileRequest
+Global___StreamSendFileRequest: typing_extensions.TypeAlias = StreamSendFileRequest
 
 @typing.final
 class StreamSendFileResponse(google.protobuf.message.Message):
@@ -489,7 +489,7 @@ class StreamSendFileResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___StreamSendFileResponse = StreamSendFileResponse
+Global___StreamSendFileResponse: typing_extensions.TypeAlias = StreamSendFileResponse
 
 @typing.final
 class StreamSendFileCallback(google.protobuf.message.Message):
@@ -500,21 +500,21 @@ class StreamSendFileCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def info(self) -> global___ByteStreamInfo: ...
+    def info(self) -> Global___ByteStreamInfo: ...
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        info: global___ByteStreamInfo | None = ...,
-        error: global___StreamError | None = ...,
+        info: Global___ByteStreamInfo | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["info", "error"] | None: ...
 
-global___StreamSendFileCallback = StreamSendFileCallback
+Global___StreamSendFileCallback: typing_extensions.TypeAlias = StreamSendFileCallback
 
 @typing.final
 class StreamSendBytesRequest(google.protobuf.message.Message):
@@ -532,18 +532,18 @@ class StreamSendBytesRequest(google.protobuf.message.Message):
     bytes: builtins.bytes
     """Bytes to send."""
     @property
-    def options(self) -> global___StreamByteOptions: ...
+    def options(self) -> Global___StreamByteOptions: ...
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
-        options: global___StreamByteOptions | None = ...,
+        options: Global___StreamByteOptions | None = ...,
         bytes: builtins.bytes | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
 
-global___StreamSendBytesRequest = StreamSendBytesRequest
+Global___StreamSendBytesRequest: typing_extensions.TypeAlias = StreamSendBytesRequest
 
 @typing.final
 class StreamSendBytesResponse(google.protobuf.message.Message):
@@ -559,7 +559,7 @@ class StreamSendBytesResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___StreamSendBytesResponse = StreamSendBytesResponse
+Global___StreamSendBytesResponse: typing_extensions.TypeAlias = StreamSendBytesResponse
 
 @typing.final
 class StreamSendBytesCallback(google.protobuf.message.Message):
@@ -570,21 +570,21 @@ class StreamSendBytesCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def info(self) -> global___ByteStreamInfo: ...
+    def info(self) -> Global___ByteStreamInfo: ...
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        info: global___ByteStreamInfo | None = ...,
-        error: global___StreamError | None = ...,
+        info: Global___ByteStreamInfo | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["info", "error"] | None: ...
 
-global___StreamSendBytesCallback = StreamSendBytesCallback
+Global___StreamSendBytesCallback: typing_extensions.TypeAlias = StreamSendBytesCallback
 
 @typing.final
 class StreamSendTextRequest(google.protobuf.message.Message):
@@ -602,18 +602,18 @@ class StreamSendTextRequest(google.protobuf.message.Message):
     text: builtins.str
     """Text to send."""
     @property
-    def options(self) -> global___StreamTextOptions: ...
+    def options(self) -> Global___StreamTextOptions: ...
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
-        options: global___StreamTextOptions | None = ...,
+        options: Global___StreamTextOptions | None = ...,
         text: builtins.str | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "text", b"text"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "text", b"text"]) -> None: ...
 
-global___StreamSendTextRequest = StreamSendTextRequest
+Global___StreamSendTextRequest: typing_extensions.TypeAlias = StreamSendTextRequest
 
 @typing.final
 class StreamSendTextResponse(google.protobuf.message.Message):
@@ -629,7 +629,7 @@ class StreamSendTextResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___StreamSendTextResponse = StreamSendTextResponse
+Global___StreamSendTextResponse: typing_extensions.TypeAlias = StreamSendTextResponse
 
 @typing.final
 class StreamSendTextCallback(google.protobuf.message.Message):
@@ -640,21 +640,21 @@ class StreamSendTextCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def info(self) -> global___TextStreamInfo: ...
+    def info(self) -> Global___TextStreamInfo: ...
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        info: global___TextStreamInfo | None = ...,
-        error: global___StreamError | None = ...,
+        info: Global___TextStreamInfo | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "info", b"info", "result", b"result"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["info", "error"] | None: ...
 
-global___StreamSendTextCallback = StreamSendTextCallback
+Global___StreamSendTextCallback: typing_extensions.TypeAlias = StreamSendTextCallback
 
 @typing.final
 class OwnedByteStreamWriter(google.protobuf.message.Message):
@@ -667,17 +667,17 @@ class OwnedByteStreamWriter(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> global___ByteStreamInfo: ...
+    def info(self) -> Global___ByteStreamInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___ByteStreamInfo | None = ...,
+        info: Global___ByteStreamInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-global___OwnedByteStreamWriter = OwnedByteStreamWriter
+Global___OwnedByteStreamWriter: typing_extensions.TypeAlias = OwnedByteStreamWriter
 
 @typing.final
 class ByteStreamOpenRequest(google.protobuf.message.Message):
@@ -691,19 +691,19 @@ class ByteStreamOpenRequest(google.protobuf.message.Message):
     OPTIONS_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     @property
-    def options(self) -> global___StreamByteOptions:
+    def options(self) -> Global___StreamByteOptions:
         """Options to use for opening the stream."""
 
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
-        options: global___StreamByteOptions | None = ...,
+        options: Global___StreamByteOptions | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
 
-global___ByteStreamOpenRequest = ByteStreamOpenRequest
+Global___ByteStreamOpenRequest: typing_extensions.TypeAlias = ByteStreamOpenRequest
 
 @typing.final
 class ByteStreamOpenResponse(google.protobuf.message.Message):
@@ -719,7 +719,7 @@ class ByteStreamOpenResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___ByteStreamOpenResponse = ByteStreamOpenResponse
+Global___ByteStreamOpenResponse: typing_extensions.TypeAlias = ByteStreamOpenResponse
 
 @typing.final
 class ByteStreamOpenCallback(google.protobuf.message.Message):
@@ -730,21 +730,21 @@ class ByteStreamOpenCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def writer(self) -> global___OwnedByteStreamWriter: ...
+    def writer(self) -> Global___OwnedByteStreamWriter: ...
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        writer: global___OwnedByteStreamWriter | None = ...,
-        error: global___StreamError | None = ...,
+        writer: Global___OwnedByteStreamWriter | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "writer", b"writer"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "writer", b"writer"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["writer", "error"] | None: ...
 
-global___ByteStreamOpenCallback = ByteStreamOpenCallback
+Global___ByteStreamOpenCallback: typing_extensions.TypeAlias = ByteStreamOpenCallback
 
 @typing.final
 class ByteStreamWriterWriteRequest(google.protobuf.message.Message):
@@ -765,7 +765,7 @@ class ByteStreamWriterWriteRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["bytes", b"bytes", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "writer_handle", b"writer_handle"]) -> None: ...
 
-global___ByteStreamWriterWriteRequest = ByteStreamWriterWriteRequest
+Global___ByteStreamWriterWriteRequest: typing_extensions.TypeAlias = ByteStreamWriterWriteRequest
 
 @typing.final
 class ByteStreamWriterWriteResponse(google.protobuf.message.Message):
@@ -781,7 +781,7 @@ class ByteStreamWriterWriteResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___ByteStreamWriterWriteResponse = ByteStreamWriterWriteResponse
+Global___ByteStreamWriterWriteResponse: typing_extensions.TypeAlias = ByteStreamWriterWriteResponse
 
 @typing.final
 class ByteStreamWriterWriteCallback(google.protobuf.message.Message):
@@ -791,17 +791,17 @@ class ByteStreamWriterWriteCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-global___ByteStreamWriterWriteCallback = ByteStreamWriterWriteCallback
+Global___ByteStreamWriterWriteCallback: typing_extensions.TypeAlias = ByteStreamWriterWriteCallback
 
 @typing.final
 class ByteStreamWriterCloseRequest(google.protobuf.message.Message):
@@ -822,7 +822,7 @@ class ByteStreamWriterCloseRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> None: ...
 
-global___ByteStreamWriterCloseRequest = ByteStreamWriterCloseRequest
+Global___ByteStreamWriterCloseRequest: typing_extensions.TypeAlias = ByteStreamWriterCloseRequest
 
 @typing.final
 class ByteStreamWriterCloseResponse(google.protobuf.message.Message):
@@ -838,7 +838,7 @@ class ByteStreamWriterCloseResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___ByteStreamWriterCloseResponse = ByteStreamWriterCloseResponse
+Global___ByteStreamWriterCloseResponse: typing_extensions.TypeAlias = ByteStreamWriterCloseResponse
 
 @typing.final
 class ByteStreamWriterCloseCallback(google.protobuf.message.Message):
@@ -848,17 +848,17 @@ class ByteStreamWriterCloseCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-global___ByteStreamWriterCloseCallback = ByteStreamWriterCloseCallback
+Global___ByteStreamWriterCloseCallback: typing_extensions.TypeAlias = ByteStreamWriterCloseCallback
 
 @typing.final
 class OwnedTextStreamWriter(google.protobuf.message.Message):
@@ -871,17 +871,17 @@ class OwnedTextStreamWriter(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> global___TextStreamInfo: ...
+    def info(self) -> Global___TextStreamInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___TextStreamInfo | None = ...,
+        info: Global___TextStreamInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-global___OwnedTextStreamWriter = OwnedTextStreamWriter
+Global___OwnedTextStreamWriter: typing_extensions.TypeAlias = OwnedTextStreamWriter
 
 @typing.final
 class TextStreamOpenRequest(google.protobuf.message.Message):
@@ -895,19 +895,19 @@ class TextStreamOpenRequest(google.protobuf.message.Message):
     OPTIONS_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     @property
-    def options(self) -> global___StreamTextOptions:
+    def options(self) -> Global___StreamTextOptions:
         """Options to use for opening the stream."""
 
     def __init__(
         self,
         *,
         local_participant_handle: builtins.int | None = ...,
-        options: global___StreamTextOptions | None = ...,
+        options: Global___StreamTextOptions | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
 
-global___TextStreamOpenRequest = TextStreamOpenRequest
+Global___TextStreamOpenRequest: typing_extensions.TypeAlias = TextStreamOpenRequest
 
 @typing.final
 class TextStreamOpenResponse(google.protobuf.message.Message):
@@ -923,7 +923,7 @@ class TextStreamOpenResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___TextStreamOpenResponse = TextStreamOpenResponse
+Global___TextStreamOpenResponse: typing_extensions.TypeAlias = TextStreamOpenResponse
 
 @typing.final
 class TextStreamOpenCallback(google.protobuf.message.Message):
@@ -934,21 +934,21 @@ class TextStreamOpenCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def writer(self) -> global___OwnedTextStreamWriter: ...
+    def writer(self) -> Global___OwnedTextStreamWriter: ...
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        writer: global___OwnedTextStreamWriter | None = ...,
-        error: global___StreamError | None = ...,
+        writer: Global___OwnedTextStreamWriter | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "writer", b"writer"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "writer", b"writer"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["writer", "error"] | None: ...
 
-global___TextStreamOpenCallback = TextStreamOpenCallback
+Global___TextStreamOpenCallback: typing_extensions.TypeAlias = TextStreamOpenCallback
 
 @typing.final
 class TextStreamWriterWriteRequest(google.protobuf.message.Message):
@@ -969,7 +969,7 @@ class TextStreamWriterWriteRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["text", b"text", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["text", b"text", "writer_handle", b"writer_handle"]) -> None: ...
 
-global___TextStreamWriterWriteRequest = TextStreamWriterWriteRequest
+Global___TextStreamWriterWriteRequest: typing_extensions.TypeAlias = TextStreamWriterWriteRequest
 
 @typing.final
 class TextStreamWriterWriteResponse(google.protobuf.message.Message):
@@ -985,7 +985,7 @@ class TextStreamWriterWriteResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___TextStreamWriterWriteResponse = TextStreamWriterWriteResponse
+Global___TextStreamWriterWriteResponse: typing_extensions.TypeAlias = TextStreamWriterWriteResponse
 
 @typing.final
 class TextStreamWriterWriteCallback(google.protobuf.message.Message):
@@ -995,17 +995,17 @@ class TextStreamWriterWriteCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-global___TextStreamWriterWriteCallback = TextStreamWriterWriteCallback
+Global___TextStreamWriterWriteCallback: typing_extensions.TypeAlias = TextStreamWriterWriteCallback
 
 @typing.final
 class TextStreamWriterCloseRequest(google.protobuf.message.Message):
@@ -1026,7 +1026,7 @@ class TextStreamWriterCloseRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> None: ...
 
-global___TextStreamWriterCloseRequest = TextStreamWriterCloseRequest
+Global___TextStreamWriterCloseRequest: typing_extensions.TypeAlias = TextStreamWriterCloseRequest
 
 @typing.final
 class TextStreamWriterCloseResponse(google.protobuf.message.Message):
@@ -1042,7 +1042,7 @@ class TextStreamWriterCloseResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-global___TextStreamWriterCloseResponse = TextStreamWriterCloseResponse
+Global___TextStreamWriterCloseResponse: typing_extensions.TypeAlias = TextStreamWriterCloseResponse
 
 @typing.final
 class TextStreamWriterCloseCallback(google.protobuf.message.Message):
@@ -1052,17 +1052,17 @@ class TextStreamWriterCloseCallback(google.protobuf.message.Message):
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
     @property
-    def error(self) -> global___StreamError: ...
+    def error(self) -> Global___StreamError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
-        error: global___StreamError | None = ...,
+        error: Global___StreamError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-global___TextStreamWriterCloseCallback = TextStreamWriterCloseCallback
+Global___TextStreamWriterCloseCallback: typing_extensions.TypeAlias = TextStreamWriterCloseCallback
 
 @typing.final
 class TextStreamInfo(google.protobuf.message.Message):
@@ -1126,7 +1126,7 @@ class TextStreamInfo(google.protobuf.message.Message):
     topic: builtins.str
     total_length: builtins.int
     """only populated for finite streams, if it's a stream of unknown size this stays empty"""
-    operation_type: global___TextStreamInfo.OperationType.ValueType
+    operation_type: Global___TextStreamInfo.OperationType.ValueType
     version: builtins.int
     """Optional: Version for updates/edits"""
     reply_to_stream_id: builtins.str
@@ -1151,7 +1151,7 @@ class TextStreamInfo(google.protobuf.message.Message):
         topic: builtins.str | None = ...,
         total_length: builtins.int | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
-        operation_type: global___TextStreamInfo.OperationType.ValueType | None = ...,
+        operation_type: Global___TextStreamInfo.OperationType.ValueType | None = ...,
         version: builtins.int | None = ...,
         reply_to_stream_id: builtins.str | None = ...,
         attached_stream_ids: collections.abc.Iterable[builtins.str] | None = ...,
@@ -1161,7 +1161,7 @@ class TextStreamInfo(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "generated", b"generated", "mime_type", b"mime_type", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "stream_id", b"stream_id", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length", "version", b"version"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "attributes", b"attributes", "encryption_type", b"encryption_type", "generated", b"generated", "mime_type", b"mime_type", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "stream_id", b"stream_id", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length", "version", b"version"]) -> None: ...
 
-global___TextStreamInfo = TextStreamInfo
+Global___TextStreamInfo: typing_extensions.TypeAlias = TextStreamInfo
 
 @typing.final
 class ByteStreamInfo(google.protobuf.message.Message):
@@ -1221,7 +1221,7 @@ class ByteStreamInfo(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "mime_type", b"mime_type", "name", b"name", "stream_id", b"stream_id", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "encryption_type", b"encryption_type", "mime_type", b"mime_type", "name", b"name", "stream_id", b"stream_id", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
 
-global___ByteStreamInfo = ByteStreamInfo
+Global___ByteStreamInfo: typing_extensions.TypeAlias = ByteStreamInfo
 
 @typing.final
 class StreamTextOptions(google.protobuf.message.Message):
@@ -1255,7 +1255,7 @@ class StreamTextOptions(google.protobuf.message.Message):
     GENERATED_FIELD_NUMBER: builtins.int
     topic: builtins.str
     id: builtins.str
-    operation_type: global___TextStreamInfo.OperationType.ValueType
+    operation_type: Global___TextStreamInfo.OperationType.ValueType
     version: builtins.int
     reply_to_stream_id: builtins.str
     generated: builtins.bool
@@ -1272,7 +1272,7 @@ class StreamTextOptions(google.protobuf.message.Message):
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
         id: builtins.str | None = ...,
-        operation_type: global___TextStreamInfo.OperationType.ValueType | None = ...,
+        operation_type: Global___TextStreamInfo.OperationType.ValueType | None = ...,
         version: builtins.int | None = ...,
         reply_to_stream_id: builtins.str | None = ...,
         attached_stream_ids: collections.abc.Iterable[builtins.str] | None = ...,
@@ -1281,7 +1281,7 @@ class StreamTextOptions(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "topic", b"topic", "version", b"version"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "attributes", b"attributes", "destination_identities", b"destination_identities", "generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "topic", b"topic", "version", b"version"]) -> None: ...
 
-global___StreamTextOptions = StreamTextOptions
+Global___StreamTextOptions: typing_extensions.TypeAlias = StreamTextOptions
 
 @typing.final
 class StreamByteOptions(google.protobuf.message.Message):
@@ -1334,7 +1334,7 @@ class StreamByteOptions(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["id", b"id", "mime_type", b"mime_type", "name", b"name", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "destination_identities", b"destination_identities", "id", b"id", "mime_type", b"mime_type", "name", b"name", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
 
-global___StreamByteOptions = StreamByteOptions
+Global___StreamByteOptions: typing_extensions.TypeAlias = StreamByteOptions
 
 @typing.final
 class StreamError(google.protobuf.message.Message):
@@ -1353,4 +1353,4 @@ class StreamError(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["description", b"description"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["description", b"description"]) -> None: ...
 
-global___StreamError = StreamError
+Global___StreamError: typing_extensions.TypeAlias = StreamError

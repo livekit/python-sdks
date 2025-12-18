@@ -120,6 +120,11 @@ class Participant(ABC):
         return self._info.kind
 
     @property
+    def kind_details(self) -> List[proto_participant.ParticipantKindDetail.ValueType]:
+        """Participant's kind details (e.g., cloud agent, forwarded, connector whatsapp, connector twilio)."""
+        return list(self._info.kind_details)
+
+    @property
     def disconnect_reason(
         self,
     ) -> Optional[proto_participant.DisconnectReason.ValueType]:

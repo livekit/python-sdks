@@ -54,7 +54,26 @@ PARTICIPANT_KIND_EGRESS: ParticipantKind.ValueType  # 2
 PARTICIPANT_KIND_SIP: ParticipantKind.ValueType  # 3
 PARTICIPANT_KIND_AGENT: ParticipantKind.ValueType  # 4
 PARTICIPANT_KIND_CONNECTOR: ParticipantKind.ValueType  # 5
-global___ParticipantKind = ParticipantKind
+Global___ParticipantKind: typing_extensions.TypeAlias = ParticipantKind
+
+class _ParticipantKindDetail:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ParticipantKindDetailEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ParticipantKindDetail.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PARTICIPANT_KIND_DETAIL_CLOUD_AGENT: _ParticipantKindDetail.ValueType  # 0
+    PARTICIPANT_KIND_DETAIL_FORWARDED: _ParticipantKindDetail.ValueType  # 1
+    PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: _ParticipantKindDetail.ValueType  # 2
+    PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: _ParticipantKindDetail.ValueType  # 3
+
+class ParticipantKindDetail(_ParticipantKindDetail, metaclass=_ParticipantKindDetailEnumTypeWrapper): ...
+
+PARTICIPANT_KIND_DETAIL_CLOUD_AGENT: ParticipantKindDetail.ValueType  # 0
+PARTICIPANT_KIND_DETAIL_FORWARDED: ParticipantKindDetail.ValueType  # 1
+PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: ParticipantKindDetail.ValueType  # 2
+PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: ParticipantKindDetail.ValueType  # 3
+Global___ParticipantKindDetail: typing_extensions.TypeAlias = ParticipantKindDetail
 
 class _DisconnectReason:
     ValueType = typing.NewType("ValueType", builtins.int)
@@ -123,7 +142,7 @@ SIP_TRUNK_FAILURE: DisconnectReason.ValueType  # 13
 """SIP protocol failure or unexpected response"""
 CONNECTION_TIMEOUT: DisconnectReason.ValueType  # 14
 MEDIA_FAILURE: DisconnectReason.ValueType  # 15
-global___DisconnectReason = DisconnectReason
+Global___DisconnectReason: typing_extensions.TypeAlias = DisconnectReason
 
 @typing.final
 class ParticipantInfo(google.protobuf.message.Message):
@@ -153,14 +172,17 @@ class ParticipantInfo(google.protobuf.message.Message):
     ATTRIBUTES_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
     DISCONNECT_REASON_FIELD_NUMBER: builtins.int
+    KIND_DETAILS_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
     metadata: builtins.str
-    kind: global___ParticipantKind.ValueType
-    disconnect_reason: global___DisconnectReason.ValueType
+    kind: Global___ParticipantKind.ValueType
+    disconnect_reason: Global___DisconnectReason.ValueType
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def kind_details(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[Global___ParticipantKindDetail.ValueType]: ...
     def __init__(
         self,
         *,
@@ -169,13 +191,14 @@ class ParticipantInfo(google.protobuf.message.Message):
         identity: builtins.str | None = ...,
         metadata: builtins.str | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
-        kind: global___ParticipantKind.ValueType | None = ...,
-        disconnect_reason: global___DisconnectReason.ValueType | None = ...,
+        kind: Global___ParticipantKind.ValueType | None = ...,
+        disconnect_reason: Global___DisconnectReason.ValueType | None = ...,
+        kind_details: collections.abc.Iterable[Global___ParticipantKindDetail.ValueType] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
 
-global___ParticipantInfo = ParticipantInfo
+Global___ParticipantInfo: typing_extensions.TypeAlias = ParticipantInfo
 
 @typing.final
 class OwnedParticipant(google.protobuf.message.Message):
@@ -186,14 +209,14 @@ class OwnedParticipant(google.protobuf.message.Message):
     @property
     def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     @property
-    def info(self) -> global___ParticipantInfo: ...
+    def info(self) -> Global___ParticipantInfo: ...
     def __init__(
         self,
         *,
         handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___ParticipantInfo | None = ...,
+        info: Global___ParticipantInfo | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-global___OwnedParticipant = OwnedParticipant
+Global___OwnedParticipant: typing_extensions.TypeAlias = OwnedParticipant

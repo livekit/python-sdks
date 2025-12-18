@@ -46,7 +46,7 @@ class VideoQuality(_VideoQuality, metaclass=_VideoQualityEnumTypeWrapper):
 VIDEO_QUALITY_LOW: VideoQuality.ValueType  # 0
 VIDEO_QUALITY_MEDIUM: VideoQuality.ValueType  # 1
 VIDEO_QUALITY_HIGH: VideoQuality.ValueType  # 2
-global___VideoQuality = VideoQuality
+Global___VideoQuality: typing_extensions.TypeAlias = VideoQuality
 
 @typing.final
 class EnableRemoteTrackPublicationRequest(google.protobuf.message.Message):
@@ -67,7 +67,7 @@ class EnableRemoteTrackPublicationRequest(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> None: ...
 
-global___EnableRemoteTrackPublicationRequest = EnableRemoteTrackPublicationRequest
+Global___EnableRemoteTrackPublicationRequest: typing_extensions.TypeAlias = EnableRemoteTrackPublicationRequest
 
 @typing.final
 class EnableRemoteTrackPublicationResponse(google.protobuf.message.Message):
@@ -77,7 +77,7 @@ class EnableRemoteTrackPublicationResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___EnableRemoteTrackPublicationResponse = EnableRemoteTrackPublicationResponse
+Global___EnableRemoteTrackPublicationResponse: typing_extensions.TypeAlias = EnableRemoteTrackPublicationResponse
 
 @typing.final
 class UpdateRemoteTrackPublicationDimensionRequest(google.protobuf.message.Message):
@@ -101,7 +101,7 @@ class UpdateRemoteTrackPublicationDimensionRequest(google.protobuf.message.Messa
     def HasField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> None: ...
 
-global___UpdateRemoteTrackPublicationDimensionRequest = UpdateRemoteTrackPublicationDimensionRequest
+Global___UpdateRemoteTrackPublicationDimensionRequest: typing_extensions.TypeAlias = UpdateRemoteTrackPublicationDimensionRequest
 
 @typing.final
 class UpdateRemoteTrackPublicationDimensionResponse(google.protobuf.message.Message):
@@ -111,7 +111,7 @@ class UpdateRemoteTrackPublicationDimensionResponse(google.protobuf.message.Mess
         self,
     ) -> None: ...
 
-global___UpdateRemoteTrackPublicationDimensionResponse = UpdateRemoteTrackPublicationDimensionResponse
+Global___UpdateRemoteTrackPublicationDimensionResponse: typing_extensions.TypeAlias = UpdateRemoteTrackPublicationDimensionResponse
 
 @typing.final
 class SetRemoteTrackPublicationQualityRequest(google.protobuf.message.Message):
@@ -122,17 +122,17 @@ class SetRemoteTrackPublicationQualityRequest(google.protobuf.message.Message):
     TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
     QUALITY_FIELD_NUMBER: builtins.int
     track_publication_handle: builtins.int
-    quality: global___VideoQuality.ValueType
+    quality: Global___VideoQuality.ValueType
     def __init__(
         self,
         *,
         track_publication_handle: builtins.int | None = ...,
-        quality: global___VideoQuality.ValueType | None = ...,
+        quality: Global___VideoQuality.ValueType | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]) -> None: ...
 
-global___SetRemoteTrackPublicationQualityRequest = SetRemoteTrackPublicationQualityRequest
+Global___SetRemoteTrackPublicationQualityRequest: typing_extensions.TypeAlias = SetRemoteTrackPublicationQualityRequest
 
 @typing.final
 class SetRemoteTrackPublicationQualityResponse(google.protobuf.message.Message):
@@ -142,4 +142,4 @@ class SetRemoteTrackPublicationQualityResponse(google.protobuf.message.Message):
         self,
     ) -> None: ...
 
-global___SetRemoteTrackPublicationQualityResponse = SetRemoteTrackPublicationQualityResponse
+Global___SetRemoteTrackPublicationQualityResponse: typing_extensions.TypeAlias = SetRemoteTrackPublicationQualityResponse
