@@ -24,7 +24,7 @@ import os
 import platform
 import atexit
 import threading
-from typing import Any, Generic, List, Optional, TypeVar
+from typing import Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
