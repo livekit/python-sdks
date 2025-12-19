@@ -49,6 +49,7 @@ from .log import logger
 from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
+    TextStreamInfo,
     ByteStreamWriter,
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
@@ -160,7 +161,7 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
 
     @property
@@ -327,7 +328,7 @@ class LocalParticipant(Participant):
         if cb.perform_rpc.HasField("error"):
             raise RpcError._from_proto(cb.perform_rpc.error)
 
-        return cb.perform_rpc.payload
+        return cast(str, cb.perform_rpc.payload)
 
     def register_rpc_method(
         self,
@@ -587,7 +588,7 @@ class LocalParticipant(Participant):
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
-    ):
+    ) -> TextStreamInfo:
         total_size = len(text.encode())
         writer = await self.stream_text(
             destination_identities=destination_identities,
@@ -743,7 +744,7 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self._track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, RemoteTrackPublication] = {}
 
     @property
     def track_publications(self) -> Mapping[str, RemoteTrackPublication]:
