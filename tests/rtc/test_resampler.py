@@ -1,14 +1,16 @@
-from livekit.rtc import AudioResampler, AudioResamplerQuality
+from livekit.rtc import AudioResampler, AudioResamplerQuality, AudioFrame
 import time
 import wave
 import os
+from typing import List
 
 # Test fixture directory
 FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
 
 
-def test_audio_resampler():
-    wav_file_path = os.path.join(FIXTURES_DIR, "test_audio.wav")
+def test_audio_resampler() -> None:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    wav_file_path = os.path.join(current_dir, "test_audio.wav")
 
     # Open the wave file
     with wave.open(wav_file_path, "rb") as wf_in:
@@ -29,9 +31,9 @@ def test_audio_resampler():
     ]
 
     for quality in qualities:
-        total_time = 0
+        total_time = 0.0
         nb_runs = 20
-        output_frames = []
+        output_frames: List[AudioFrame] = []
         for i in range(nb_runs):
             output_frames = []
             resampler = AudioResampler(44100, 8000, quality=quality)

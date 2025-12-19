@@ -45,7 +45,7 @@ TEST_EVENT = """
 """
 
 
-def test_webhook_receiver():
+def test_webhook_receiver() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     receiver = WebhookReceiver(token_verifier)
 
@@ -56,7 +56,7 @@ def test_webhook_receiver():
     receiver.receive(TEST_EVENT, jwt)
 
 
-def test_bad_hash():
+def test_bad_hash() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     receiver = WebhookReceiver(token_verifier)
 
@@ -68,7 +68,7 @@ def test_bad_hash():
         receiver.receive(TEST_EVENT, jwt)
 
 
-def test_invalid_body():
+def test_invalid_body() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     receiver = WebhookReceiver(token_verifier)
 
