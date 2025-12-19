@@ -1,6 +1,6 @@
 import datetime
 
-import pytest  # type: ignore
+import pytest
 from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
