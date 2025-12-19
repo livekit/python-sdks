@@ -66,10 +66,10 @@ class TextStreamReader:
         )
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
 
-    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
+    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk) -> None:
         await self._queue.put(chunk)
 
-    async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+    async def _on_stream_close(self, trailer: proto_DataStream.Trailer) -> None:
         self.info.attributes = self.info.attributes or {}
         self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
@@ -114,10 +114,10 @@ class ByteStreamReader:
         )
         self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(capacity)
 
-    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk):
+    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk) -> None:
         await self._queue.put(chunk)
 
-    async def _on_stream_close(self, trailer: proto_DataStream.Trailer):
+    async def _on_stream_close(self, trailer: proto_DataStream.Trailer) -> None:
         self.info.attributes = self.info.attributes or {}
         self.info.attributes.update(trailer.attributes)
         await self._queue.put(None)
@@ -166,7 +166,7 @@ class BaseStreamWriter:
         self._sender_identity = sender_identity or self._local_participant.identity
         self._closed = False
 
-    async def _send_header(self):
+    async def _send_header(self) -> None:
         req = proto_ffi.FfiRequest(
             send_stream_header=proto_room.SendStreamHeaderRequest(
                 header=self._header,
@@ -188,7 +188,7 @@ class BaseStreamWriter:
         if cb.send_stream_header.error:
             raise ConnectionError(cb.send_stream_header.error)
 
-    async def _send_chunk(self, chunk: proto_DataStream.Chunk):
+    async def _send_chunk(self, chunk: proto_DataStream.Chunk) -> None:
         if self._closed:
             raise RuntimeError(f"Cannot send chunk after stream is closed: {chunk}")
         req = proto_ffi.FfiRequest(
@@ -212,7 +212,7 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_chunk.error)
 
-    async def _send_trailer(self, trailer: proto_DataStream.Trailer):
+    async def _send_trailer(self, trailer: proto_DataStream.Trailer) -> None:
         req = proto_ffi.FfiRequest(
             send_stream_trailer=proto_room.SendStreamTrailerRequest(
                 trailer=trailer,
@@ -233,7 +233,7 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None):
+    async def aclose(self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None) -> None:
         if self._closed:
             raise RuntimeError("Stream already closed")
         self._closed = True
@@ -281,7 +281,7 @@ class TextStreamWriter(BaseStreamWriter):
         )
         self._write_lock = asyncio.Lock()
 
-    async def write(self, text: str):
+    async def write(self, text: str) -> None:
         async with self._write_lock:
             for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
                 content = chunk
@@ -333,7 +333,7 @@ class ByteStreamWriter(BaseStreamWriter):
         )
         self._write_lock = asyncio.Lock()
 
-    async def write(self, data: bytes):
+    async def write(self, data: bytes) -> None:
         async with self._write_lock:
             chunked_data = [
                 data[i : i + STREAM_CHUNK_SIZE] for i in range(0, len(data), STREAM_CHUNK_SIZE)
