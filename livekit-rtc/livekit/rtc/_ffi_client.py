@@ -24,7 +24,7 @@ import os
 import platform
 import atexit
 import threading
-from typing import Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
@@ -34,7 +34,7 @@ _resource_files = ExitStack()
 atexit.register(_resource_files.close)
 
 
-def get_ffi_lib():
+def get_ffi_lib() -> ctypes.CDLL:
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
     if libpath:
@@ -92,7 +92,7 @@ class FfiHandle:
         self.handle = handle
         self._disposed = False
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.dispose()
 
     @property
@@ -142,7 +142,7 @@ class FfiQueue(Generic[T]):
                     break
 
 
-@ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
+@ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)  # type: ignore[untyped-decorator]
 def ffi_event_callback(
     data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     data_len: ctypes.c_size_t,
@@ -219,7 +219,7 @@ class FfiClient:
         )
 
         @atexit.register
-        def _dispose_lk_ffi():
+        def _dispose_lk_ffi() -> None:
             ffi_lib.livekit_ffi_dispose()
 
     @property

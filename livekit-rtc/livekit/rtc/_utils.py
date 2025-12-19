@@ -17,16 +17,16 @@ import logging
 from collections import deque
 import ctypes
 import random
-from typing import Callable, Generator, Generic, List, TypeVar
+from typing import Any, Callable, Generator, Generic, List, TypeVar
 
 logger = logging.getLogger("livekit")
 
 
 class classproperty(object):
-    def __init__(self, f):
-        self.f = classmethod(f)
+    def __init__(self, f: Callable[..., Any]) -> None:
+        self.f: Any = classmethod(f)
 
-    def __get__(self, *a):
+    def __get__(self, *a: Any) -> Any:
         return self.f.__get__(*a)()
 
 
@@ -118,7 +118,7 @@ class BroadcastQueue(Generic[T]):
 _base62_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def generate_random_base62(length=12):
+def generate_random_base62(length: int = 12) -> str:
     """
     Generate a random base62 encoded string of a specified length.
 

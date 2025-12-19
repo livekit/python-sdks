@@ -22,7 +22,7 @@ import numpy as np
 import threading
 
 if TYPE_CHECKING:
-    import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+    import sounddevice as sd  # type: ignore[import-not-found]
 
 from . import AudioSource
 from .audio_frame import AudioFrame
@@ -163,7 +163,7 @@ class OutputPlayer:
         output_device: Optional[int] = None,
         delay_estimator: Optional[_APMDelayEstimator] = None,
     ) -> None:
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -303,16 +303,17 @@ class OutputPlayer:
         if self._mixer is None:
             self._mixer = AudioMixer(sample_rate=self._sample_rate, num_channels=self._num_channels)
 
-        async def _playback_loop():
+        async def _playback_loop() -> None:
             """Internal playback loop that consumes frames from the mixer."""
             self._running = True
             self._stream.start()
             try:
-                async for frame in self._mixer:
-                    if not self._running:
-                        break
-                    # Append raw PCM bytes for callback consumption
-                    self._buffer.extend(frame.data.tobytes())
+                if self._mixer is not None:
+                    async for frame in self._mixer:
+                        if not self._running:
+                            break
+                        # Append raw PCM bytes for callback consumption
+                        self._buffer.extend(frame.data.tobytes())
             finally:
                 self._running = False
                 try:
@@ -402,7 +403,7 @@ class MediaDevices:
         Returns a list of dictionaries with the `sounddevice` metadata and an
         added `index` key corresponding to the device index.
         """
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         devices = sd.query_devices()
         result: list[dict[str, Any]] = []
@@ -413,7 +414,7 @@ class MediaDevices:
 
     def list_output_devices(self) -> list[dict[str, Any]]:
         """List available output devices with indices."""
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         devices = sd.query_devices()
         result: list[dict[str, Any]] = []
@@ -424,14 +425,14 @@ class MediaDevices:
 
     def default_input_device(self) -> Optional[int]:
         """Return the default input device index (or None)."""
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         dev = sd.default.device
         return dev[0] if isinstance(dev, (list, tuple)) else None
 
     def default_output_device(self) -> Optional[int]:
         """Return the default output device index (or None)."""
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         dev = sd.default.device
         return dev[1] if isinstance(dev, (list, tuple)) else None
@@ -471,7 +472,7 @@ class MediaDevices:
         Returns:
             InputCapture: Holder with `source`, `apm`, and `aclose()`.
         """
-        import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+        import sounddevice as sd
 
         loop = self._loop
         source = AudioSource(self._in_sr, self._channels, loop=loop)
