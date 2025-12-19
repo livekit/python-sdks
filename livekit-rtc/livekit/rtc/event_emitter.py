@@ -1,6 +1,6 @@
 import inspect
 import asyncio
-from typing import Callable, Dict, Set, Optional, Generic, TypeVar
+from typing import Any, Callable, Dict, Set, Optional, Generic, TypeVar
 
 from .log import logger
 
@@ -14,7 +14,7 @@ class EventEmitter(Generic[T_contra]):
         """
         self._events: Dict[T_contra, Set[Callable]] = dict()
 
-    def emit(self, event: T_contra, *args) -> None:
+    def emit(self, event: T_contra, *args: Any) -> None:
         """
         Trigger all callbacks associated with the given event.
 
@@ -104,7 +104,7 @@ class EventEmitter(Generic[T_contra]):
         """
         if callback is not None:
 
-            def once_callback(*args, **kwargs):
+            def once_callback(*args: Any, **kwargs: Any) -> None:
                 self.off(event, once_callback)
                 callback(*args, **kwargs)
 
