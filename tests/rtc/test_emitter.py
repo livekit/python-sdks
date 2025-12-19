@@ -1,6 +1,6 @@
 from livekit.rtc import EventEmitter
 from typing import Any, Literal
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 
 def test_events() -> None:
