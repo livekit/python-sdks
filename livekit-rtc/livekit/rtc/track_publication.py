@@ -106,7 +106,7 @@ class RemoteTrackPublication(TrackPublication):
     def subscribed(self) -> bool:
         return self._subscribed
 
-    def set_subscribed(self, subscribed: bool):
+    def set_subscribed(self, subscribed: bool) -> None:
         req = proto_ffi.FfiRequest()
         req.set_subscribed.subscribe = subscribed
         req.set_subscribed.publication_handle = self._ffi_handle.handle
