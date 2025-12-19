@@ -233,7 +233,9 @@ class BaseStreamWriter:
         if cb.send_stream_chunk.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
-    async def aclose(self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None) -> None:
+    async def aclose(
+        self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
+    ) -> None:
         if self._closed:
             raise RuntimeError("Stream already closed")
         self._closed = True
