@@ -1,5 +1,5 @@
 .PHONY: help install format format-check lint lint-fix check type-check clean build \
-        build-rtc download-ffi status doctor
+        build-rtc build-wheel generate-proto download-ffi status doctor
 
 # Colors for output
 CYAN := \033[36m
@@ -27,7 +27,7 @@ help: ## Show this help message
 	@echo "$(BOLD)$(CYAN)Available targets:$(RESET)"
 	@echo ""
 	@echo "$(BOLD)Development Workflows:$(RESET)"
-	@grep -E '^(build-rtc|download-ffi|status|doctor):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
+	@grep -E '^(build-rtc|build-wheel|download-ffi|status|doctor):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "$(BOLD)Code Quality:$(RESET)"
 	@grep -E '^(format|format-check|lint|lint-fix|type-check|check):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
@@ -130,6 +130,30 @@ build-rtc: ## Build livekit-ffi from local rust-sdks and generate proto
 	echo ""; \
 	echo "$(BOLD)$(YELLOW)📋 To use the local rust lib, export the following:$(RESET)"; \
 	echo "$(BOLD)   export LIVEKIT_LIB_PATH=$$RUST_LIB_PATH$(RESET)"
+
+build-wheel: ## Build wheel for a package (usage: make build-wheel PACKAGE=livekit-rtc)
+	@echo "$(BOLD)$(CYAN)📦 Building wheel...$(RESET)"
+	@set -e; \
+	if [ -z "$(PACKAGE)" ]; then \
+		echo "$(BOLD)$(RED)✗ Error: PACKAGE parameter is required$(RESET)"; \
+		echo "$(YELLOW)Usage: make build-wheel PACKAGE=<package-name>$(RESET)"; \
+		echo "$(YELLOW)Available packages: livekit-rtc, livekit-api, livekit-protocol$(RESET)"; \
+		exit 1; \
+	fi; \
+	PACKAGE_PATH="$(MAKEFILE_DIR)/$(PACKAGE)"; \
+	if [ ! -d "$$PACKAGE_PATH" ]; then \
+		echo "$(BOLD)$(RED)✗ Error: Package directory not found: $$PACKAGE_PATH$(RESET)"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$$PACKAGE_PATH/pyproject.toml" ]; then \
+		echo "$(BOLD)$(RED)✗ Error: pyproject.toml not found in $$PACKAGE_PATH$(RESET)"; \
+		exit 1; \
+	fi; \
+	echo "$(CYAN)   Package: $(PACKAGE)$(RESET)"; \
+	echo "$(CYAN)   Building in: $$PACKAGE_PATH$(RESET)"; \
+	cd "$$PACKAGE_PATH" && uv build --out-dir ./dist; \
+	echo "$(BOLD)$(GREEN)✅ Wheel built successfully$(RESET)"; \
+	echo "$(CYAN)   Output: $$PACKAGE_PATH/dist/$(RESET)"
 
 status: ## Show current development environment status
 	@echo "$(BOLD)$(CYAN)📍 Current status:$(RESET)"
