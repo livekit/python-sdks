@@ -66,6 +66,3 @@ manylinux-s390x-image = "manylinux_2_28"
 manylinux-pypy_x86_64-image = "manylinux_2_28"
 manylinux-pypy_i686-image = "manylinux_2_28"
 manylinux-pypy_aarch64-image = "manylinux_2_28"
-
-[tool.cibuildwheel.linux]
-before-build = "pip install requests && python rust-sdks/download_ffi.py --output livekit/rtc/resources && yum install -y libX11-devel libXrandr-devel libXext-devel libXfixes-devel libXdamage-devel libXcomposite-devel libXi-devel mesa-libGL-devel || apt install -y xorg-dev"
