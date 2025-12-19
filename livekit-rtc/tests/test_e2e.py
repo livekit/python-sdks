@@ -23,10 +23,10 @@ import os
 import uuid
 from typing import Any, Callable, Dict, List, TypeVar
 import numpy as np
-import pytest  # type: ignore[import-not-found]
+import pytest
 
 from livekit import rtc, api
-from livekit.rtc.utils import sine_wave_generator  # type: ignore[attr-defined]
+from livekit.rtc.utils import sine_wave_generator
 
 
 SAMPLE_RATE = 48000
@@ -82,8 +82,8 @@ def unique_room_name(base: str) -> str:
     return f"{base}-{uuid.uuid4().hex[:8]}"
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@skip_if_no_credentials()  # type: ignore[misc]
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_publish_track() -> None:
     """Test that a published track can be subscribed by another participant"""
     room_name = unique_room_name("test-publish-track")
@@ -141,8 +141,8 @@ async def test_publish_track() -> None:
         await subscriber_room.disconnect()
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@skip_if_no_credentials()  # type: ignore[misc]
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_audio_stream_subscribe() -> None:
     """Test that published audio can be consumed and has similar energy levels"""
     room_name = unique_room_name("test-audio-stream")
@@ -237,8 +237,8 @@ async def test_audio_stream_subscribe() -> None:
         await subscriber_room.disconnect()
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@skip_if_no_credentials()  # type: ignore[misc]
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_room_lifecycle_events() -> None:
     """Test that room lifecycle and track events are fired properly"""
     room_name = unique_room_name("test-lifecycle-events")
@@ -391,8 +391,8 @@ async def test_room_lifecycle_events() -> None:
             await room2.disconnect()
 
 
-@pytest.mark.asyncio  # type: ignore[misc]
-@skip_if_no_credentials()  # type: ignore[misc]
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_connection_state_transitions() -> None:
     """Test that connection state transitions work correctly"""
     room_name = unique_room_name("test-connection-state")
