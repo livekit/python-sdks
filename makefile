@@ -1,4 +1,4 @@
-.PHONY: help install format format-check lint lint-fix check type-check clean build \
+.PHONY: help bootstrap install format format-check lint lint-fix check type-check clean build \
         build-rtc build-wheel generate-proto download-ffi status doctor
 
 # Colors for output
@@ -27,7 +27,7 @@ help: ## Show this help message
 	@echo "$(BOLD)$(CYAN)Available targets:$(RESET)"
 	@echo ""
 	@echo "$(BOLD)Development Workflows:$(RESET)"
-	@grep -E '^(build-rtc|build-wheel|download-ffi|status|doctor):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
+	@grep -E '^(bootstrap|build-rtc|build-wheel|download-ffi|status|doctor):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "$(BOLD)Code Quality:$(RESET)"
 	@grep -E '^(format|format-check|lint|lint-fix|type-check|check):.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'
@@ -303,3 +303,12 @@ doctor: ## Check development environment health
 		echo "$(BOLD)$(RED)⚠️  Found $$ISSUES issue(s). Please fix the errors above.$(RESET)"; \
 		exit 1; \
 	fi
+
+bootstrap: ## Sync repo, deps, and assets to a working dev state (safe to re-run)
+	@echo "$(BOLD)$(CYAN)🔄 Syncing development environment...$(RESET)"
+	@git submodule update --init --recursive
+	@git lfs install
+	@git lfs pull
+	@$(MAKE) install
+	@$(MAKE) download-ffi
+	@echo "$(BOLD)$(GREEN)✓ Sync complete$(RESET)"
