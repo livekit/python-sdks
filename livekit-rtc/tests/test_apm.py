@@ -5,7 +5,7 @@ import numpy as np
 from livekit.rtc import AudioProcessingModule, AudioFrame
 
 
-def test_audio_processing():
+def test_audio_processing() -> None:
     sample_rate = 48000
     num_channels = 1
     frames_per_chunk = sample_rate // 100

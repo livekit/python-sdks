@@ -202,7 +202,7 @@ class VideoFrame:
         return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={proto_video.VideoBufferType.Name(self.type)})"
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, *_: Any):
+    def __get_pydantic_core_schema__(cls, *_: Any) -> Any:
         from pydantic_core import core_schema
         import base64
 

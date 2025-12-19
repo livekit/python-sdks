@@ -80,14 +80,14 @@ class LocalAudioTrack(Track):
         resp = FfiClient.instance.request(req)
         return LocalAudioTrack(resp.create_audio_track.track)
 
-    def mute(self):
+    def mute(self) -> None:
         req = proto_ffi.FfiRequest()
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = True
         FfiClient.instance.request(req)
         self._info.muted = True
 
-    def unmute(self):
+    def unmute(self) -> None:
         req = proto_ffi.FfiRequest()
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = False
@@ -111,14 +111,14 @@ class LocalVideoTrack(Track):
         resp = FfiClient.instance.request(req)
         return LocalVideoTrack(resp.create_video_track.track)
 
-    def mute(self):
+    def mute(self) -> None:
         req = proto_ffi.FfiRequest()
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = True
         FfiClient.instance.request(req)
         self._info.muted = True
 
-    def unmute(self):
+    def unmute(self) -> None:
         req = proto_ffi.FfiRequest()
         req.local_track_mute.track_handle = self._ffi_handle.handle
         req.local_track_mute.mute = False

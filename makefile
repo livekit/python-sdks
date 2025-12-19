@@ -70,11 +70,7 @@ lint-fix: ## Run ruff linter and fix issues automatically
 
 type-check: ## Run mypy type checker
 	@echo "$(BOLD)$(CYAN)Running type checker...$(RESET)"
-	@uv pip install pip 2>/dev/null || true
-	@if uv run mypy --install-types --non-interactive \
-		-p livekit.rtc \
-		-p livekit.api \
-		-p livekit.protocol; then \
+	@if uv run mypy livekit-protocol livekit-api livekit-rtc; then \
 		echo "$(BOLD)$(GREEN)✓ Type checking passed$(RESET)"; \
 	else \
 		echo "$(BOLD)$(RED)✗ Type checking failed$(RESET)"; \
