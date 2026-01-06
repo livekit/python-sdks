@@ -33,6 +33,7 @@ class AudioFrame:
         sample_rate: int,
         num_channels: int,
         samples_per_channel: int,
+        *,
         userdata: dict[str, Any] | None = None,
     ) -> None:
         """
@@ -65,7 +66,7 @@ class AudioFrame:
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._samples_per_channel = samples_per_channel
-        self._userdata: dict[str, Any] = userdata
+        self._userdata: = {} if userdata is None else userdata
 
     @staticmethod
     def create(sample_rate: int, num_channels: int, samples_per_channel: int) -> "AudioFrame":
