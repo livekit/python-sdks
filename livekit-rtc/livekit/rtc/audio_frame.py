@@ -33,7 +33,7 @@ class AudioFrame:
         sample_rate: int,
         num_channels: int,
         samples_per_channel: int,
-        userdata: dict[str, Any] = {},
+        userdata: dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize an AudioFrame instance.
