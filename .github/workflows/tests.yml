@@ -76,5 +76,5 @@ jobs:
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
           uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
-          uv run pytest . --ignore=livekit-rtc/rust-sdks
+          uv run pytest tests/
         
