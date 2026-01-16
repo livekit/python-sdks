@@ -115,8 +115,9 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           uv venv .test-venv
-          .test-venv\Scripts\activate
-          uv pip install rtc-wheel\*.whl .\livekit-api .\livekit-protocol
+          .test-venv\Scripts\Activate.ps1
+          $wheel = (Get-ChildItem rtc-wheel\*.whl)[0].FullName
+          uv pip install $wheel .\livekit-api .\livekit-protocol
           uv pip install pytest pytest-asyncio numpy matplotlib
         shell: pwsh
 
@@ -137,7 +138,7 @@ jobs:
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
-          .test-venv\Scripts\activate
+          .test-venv\Scripts\Activate.ps1
           pytest tests/
         shell: pwsh
         
