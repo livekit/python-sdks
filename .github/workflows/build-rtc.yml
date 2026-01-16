@@ -120,21 +120,6 @@ jobs:
           name: rtc-release-sdist
           path: livekit-rtc/dist/*.tar.gz
 
-  publish:
-    name: Publish RTC release
-    needs: [build_wheels, make_sdist]
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    if: startsWith(github.ref, 'refs/tags/rtc-v') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: rtc-release-*
-          path: dist
-          merge-multiple: true
-
-      - uses: pypa/gh-action-pypi-publish@release/v1
 
   test:
     name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
@@ -182,6 +167,22 @@ jobs:
       LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
       LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
       LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+
+  publish:
+    name: Publish RTC release
+    needs: [build_wheels, make_sdist, test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    if: startsWith(github.ref, 'refs/tags/rtc-v') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rtc-release-*
+          path: dist
+          merge-multiple: true
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
 
   docs:
     needs: [publish]
