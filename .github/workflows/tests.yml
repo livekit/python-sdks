@@ -93,23 +93,23 @@ jobs:
           ")
           echo "wheel=$WHEEL" >> $GITHUB_OUTPUT
 
-      - name: Create venv and install dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Create venv and install dependencies (Unix)
+        if: runner.os != 'Windows'
         run: |
           uv venv .test-venv
           source .test-venv/bin/activate
           uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
           uv pip install pytest pytest-asyncio numpy matplotlib
 
-      - name: Create venv and install dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          uv venv .test-venv
-          source .test-venv/bin/activate
-          # Use pip for wheel install to avoid uv's strict platform compatibility check
-          pip install "${{ steps.select-wheel-macos.outputs.wheel }}"
-          uv pip install ./livekit-api ./livekit-protocol
-          uv pip install pytest pytest-asyncio numpy matplotlib
+      # - name: Create venv and install dependencies (macOS)
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     uv venv .test-venv
+      #     source .test-venv/bin/activate
+      #     # Use pip for wheel install to avoid uv's strict platform compatibility check
+      #     pip install "${{ steps.select-wheel-macos.outputs.wheel }}"
+      #     uv pip install ./livekit-api ./livekit-protocol
+      #     uv pip install pytest pytest-asyncio numpy matplotlib
 
       - name: Create venv and install dependencies (Windows)
         if: runner.os == 'Windows'
