@@ -54,18 +54,9 @@ include = ["/livekit", "/rust-sdks"]
 
 [tool.cibuildwheel]
 build = "cp39-*"
-skip = "*-musllinux_*" # not supported (libwebrtc is using glibc)
-
+skip = "*-musllinux_*"  # not supported (libwebrtc requires glibc)
 before-build = "pip install requests && python rust-sdks/download_ffi.py --output livekit/rtc/resources"
-
-manylinux-x86_64-image = "manylinux_2_28"
-manylinux-i686-image = "manylinux_2_28"
-manylinux-aarch64-image = "manylinux_2_28"
-manylinux-ppc64le-image = "manylinux_2_28"
-manylinux-s390x-image = "manylinux_2_28"
-manylinux-pypy_x86_64-image = "manylinux_2_28"
-manylinux-pypy_i686-image = "manylinux_2_28"
-manylinux-pypy_aarch64-image = "manylinux_2_28"
+# Note: manylinux_2_28 is the default in cibuildwheel 3.x, no explicit config needed
 
 # macOS deployment targets must match the FFI binaries (see rust-sdks/.github/workflows/ffi-builds.yml)
 # x86_64 supports macOS 10.15+, arm64 requires macOS 11.0+

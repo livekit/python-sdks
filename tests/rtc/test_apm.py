@@ -4,16 +4,18 @@ import numpy as np
 
 from livekit.rtc import AudioProcessingModule, AudioFrame
 
+# Test fixture directory
+FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+
 
 def test_audio_processing():
     sample_rate = 48000
     num_channels = 1
     frames_per_chunk = sample_rate // 100
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    capture_wav = os.path.join(current_dir, "test_echo_capture.wav")
-    render_wav = os.path.join(current_dir, "test_echo_render.wav")
-    output_wav = os.path.join(current_dir, "test_processed.wav")
+    capture_wav = os.path.join(FIXTURES_DIR, "test_echo_capture.wav")
+    render_wav = os.path.join(FIXTURES_DIR, "test_echo_render.wav")
+    output_wav = os.path.join(FIXTURES_DIR, "test_processed.wav")
 
     # Initialize APM with echo cancellation enabled
     apm = AudioProcessingModule(
