@@ -79,18 +79,13 @@ jobs:
         with:
           submodules: true
 
-      - uses: actions/setup-python@v4
-
-      - name: Install cibuildwheel
-        if: runner.os != 'macOS'
-        run: python3 -m pip install cibuildwheel==2.17.0
-
-      - name: Install cibuildwheel on macOS
-        if: runner.os == 'macOS'
-        run: python3 -m pip install --break-system-packages cibuildwheel==2.17.0
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.11"
 
       - name: Build wheels
-        run: python3 -m cibuildwheel --output-dir dist
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
 
@@ -120,9 +115,57 @@ jobs:
           name: rtc-release-sdist
           path: livekit-rtc/dist/*.tar.gz
 
+
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    needs: [build_wheels]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64 tests
+          - os: ubuntu-latest
+            python-version: "3.9"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.10"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.11"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.12"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.13"
+            artifact: rtc-release-ubuntu-latest
+          # macOS tests (arm64 runner)
+          - os: macos-latest
+            python-version: "3.9"
+            artifact: rtc-release-macos-latest
+          - os: macos-latest
+            python-version: "3.12"
+            artifact: rtc-release-macos-latest
+          # Windows tests
+          - os: windows-latest
+            python-version: "3.9"
+            artifact: rtc-release-windows-latest
+          - os: windows-latest
+            python-version: "3.12"
+            artifact: rtc-release-windows-latest
+    uses: ./.github/workflows/tests.yml
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      artifact-name: ${{ matrix.artifact }}
+    secrets:
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+
   publish:
     name: Publish RTC release
-    needs: [build_wheels, make_sdist]
+    needs: [build_wheels, make_sdist, test]
     runs-on: ubuntu-latest
     permissions:
       id-token: write

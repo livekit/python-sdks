@@ -1,45 +1,140 @@
 name: Tests
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      os:
+        description: "Runner OS (e.g., ubuntu-latest, macos-latest, windows-latest)"
+        required: true
+        type: string
+      python-version:
+        description: "Python version to test"
+        required: true
+        type: string
+      artifact-name:
+        description: "Name of the wheel artifact to download"
+        required: true
+        type: string
+      run-id:
+        description: "Workflow run ID to download artifacts from (optional, uses current run if not specified)"
+        required: false
+        type: string
+    secrets:
+      LIVEKIT_URL:
+        required: true
+      LIVEKIT_API_KEY:
+        required: true
+      LIVEKIT_API_SECRET:
+        required: true
 
 jobs:
-  tests:
-    name: Run tests
-    runs-on: ubuntu-latest
+  test:
+    name: Test (${{ inputs.os }}, Python ${{ inputs.python-version }})
+    runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: true
-      - name: Install uv
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
-      - uses: actions/setup-python@v6
+      - name: Download livekit-rtc wheel (current run)
+        if: ${{ inputs.run-id == '' }}
+        uses: actions/download-artifact@v4
         with:
-          python-version: '3.13' 
+          name: ${{ inputs.artifact-name }}
+          path: rtc-wheel
 
-      - name: Run tests
+      - name: Download livekit-rtc wheel (from specific run)
+        if: ${{ inputs.run-id != '' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: rtc-wheel
+          run-id: ${{ inputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: Select compatible wheel (macOS)
+        if: runner.os == 'macOS'
+        id: select-wheel-macos
+        run: |
+          # macOS artifacts contain both x86_64 and arm64 wheels, select the right one
+          WHEEL=$(python3 -c "
+          import glob
+          import platform
+          import sys
+
+          wheels = glob.glob('rtc-wheel/*.whl')
+          machine = platform.machine().lower()
+
+          arch_map = {
+              'x86_64': ['x86_64'],
+              'arm64': ['arm64'],
+          }
+          patterns = arch_map.get(machine, [machine])
+
+          for wheel in wheels:
+              wheel_lower = wheel.lower()
+              if any(p in wheel_lower for p in patterns):
+                  print(wheel)
+                  sys.exit(0)
+
+          print(f'No matching wheel found for {machine}', file=sys.stderr)
+          sys.exit(1)
+          ")
+          echo "wheel=$WHEEL" >> $GITHUB_OUTPUT
+
+      - name: Create venv and install dependencies (Unix)
+        if: runner.os == 'Linux'
+        run: |
+          uv venv .test-venv
+          source .test-venv/bin/activate
+          uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
+          uv pip install pytest pytest-asyncio numpy matplotlib
+
+      - name: Create venv and install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          uv venv .test-venv
+          source .test-venv/bin/activate
+          uv pip install "${{ steps.select-wheel-macos.outputs.wheel }}"
+          uv pip install ./livekit-api ./livekit-protocol
+          uv pip install pytest pytest-asyncio numpy matplotlib
+
+      - name: Create venv and install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          uv venv .test-venv
+          $wheel = (Get-ChildItem rtc-wheel\*.whl)[0].FullName
+          uv pip install --python .test-venv $wheel .\livekit-api .\livekit-protocol
+          uv pip install --python .test-venv pytest pytest-asyncio numpy matplotlib
+        shell: pwsh
+
+      - name: Run tests (Unix)
+        if: runner.os != 'Windows'
         env:
           LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
-          
-          uv run python ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
-          uv add ./livekit-rtc ./livekit-api ./livekit-protocol
-          uv run pytest . --ignore=livekit-rtc/rust-sdks
+          source .test-venv/bin/activate
+          pytest tests/
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
+        env:
+          LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+        run: .test-venv\Scripts\python.exe -m pytest tests/
+        shell: pwsh
         

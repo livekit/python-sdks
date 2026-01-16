@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
 
 from livekit.rtc import AudioMixer
 from livekit.rtc.utils import sine_wave_generator
@@ -42,13 +41,6 @@ async def test_mixer_two_sine_waves():
         pytest.fail("No frames were produced by the mixer.")
 
     mixed_signal = np.concatenate(mixed_signals)
-
-    plt.figure(figsize=(10, 4))
-    plt.plot(mixed_signal[:1000])
-    plt.title("Mixed Signal")
-    plt.xlabel("Sample")
-    plt.ylabel("Amplitude")
-    plt.show()
 
     # Use FFT to analyze frequency components.
     fft = np.fft.rfft(mixed_signal)
