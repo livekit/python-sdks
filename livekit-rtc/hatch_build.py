@@ -12,11 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from sysconfig import get_platform
+
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
 
 class CustomBuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
-        """Force platform-specific wheel due to native libraries"""
+        """Force platform-specific wheel with py3-none tag.
+
+        The native libraries (.so, .dylib, .dll) are not Python C extensions -
+        they're standalone FFI libraries loaded at runtime. This means they
+        don't depend on a specific Python version's ABI, so we use py3-none
+        to indicate compatibility with any Python 3.x version.
+        """
         build_data["pure_python"] = False
-        build_data["infer_tag"] = True
+        build_data["infer_tag"] = False
+        build_data["tag"] = f"py3-none-{get_platform().replace('-', '_').replace('.', '_')}"
