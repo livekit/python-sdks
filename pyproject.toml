@@ -71,6 +71,6 @@ exclude = "(build|setup\\.py|livekit-rtc/rust-sdks.*)"
 namespace_packages = true
 explicit_package_bases = true
 mypy_path = "livekit-protocol:livekit-api:livekit-rtc"
-strict = false # TODO re-enable strict checking
+strict = true
 disallow_any_generics = false
 plugins = ["pydantic.mypy"]
