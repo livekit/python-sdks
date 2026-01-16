@@ -79,18 +79,13 @@ jobs:
         with:
           submodules: true
 
-      - uses: actions/setup-python@v4
-
-      - name: Install cibuildwheel
-        if: runner.os != 'macOS'
-        run: python3 -m pip install cibuildwheel==2.17.0
-
-      - name: Install cibuildwheel on macOS
-        if: runner.os == 'macOS'
-        run: python3 -m pip install --break-system-packages cibuildwheel==2.17.0
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.11"
 
       - name: Build wheels
-        run: python3 -m cibuildwheel --output-dir dist
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
 
