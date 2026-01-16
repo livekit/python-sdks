@@ -66,3 +66,13 @@ manylinux-s390x-image = "manylinux_2_28"
 manylinux-pypy_x86_64-image = "manylinux_2_28"
 manylinux-pypy_i686-image = "manylinux_2_28"
 manylinux-pypy_aarch64-image = "manylinux_2_28"
+
+# macOS deployment targets must match the FFI binaries (see rust-sdks/.github/workflows/ffi-builds.yml)
+# x86_64 supports macOS 10.15+, arm64 requires macOS 11.0+
+[[tool.cibuildwheel.overrides]]
+select = "*macosx_x86_64"
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
+
+[[tool.cibuildwheel.overrides]]
+select = "*macosx_arm64"
+environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }

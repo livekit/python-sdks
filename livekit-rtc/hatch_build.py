@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import platform
 import sys
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
@@ -29,17 +31,55 @@ class CustomBuildHook(BuildHookInterface):
         build_data["pure_python"] = False
         build_data["infer_tag"] = False
 
-        # Get the platform tag using hatchling's logic (handles MACOSX_DEPLOYMENT_TARGET, etc.)
-        from packaging.tags import sys_tags
-
-        tag = next(
-            t for t in sys_tags() if "manylinux" not in t.platform and "musllinux" not in t.platform
-        )
-        platform = tag.platform
-
         if sys.platform == "darwin":
-            from hatchling.builders.macos import process_macos_plat_tag
+            plat_tag = self._get_macos_platform_tag()
+        else:
+            from packaging.tags import sys_tags
 
-            platform = process_macos_plat_tag(platform, compat=True)
+            tag = next(
+                t
+                for t in sys_tags()
+                if "manylinux" not in t.platform and "musllinux" not in t.platform
+            )
+            plat_tag = tag.platform
 
-        build_data["tag"] = f"py3-none-{platform}"
+        build_data["tag"] = f"py3-none-{plat_tag}"
+
+    def _get_macos_platform_tag(self):
+        """Build macOS platform tag from MACOSX_DEPLOYMENT_TARGET env var."""
+        deployment_target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
+        if not deployment_target:
+            # Fall back to current macOS version
+            deployment_target = platform.mac_ver()[0]
+            # Use only major.minor
+            parts = deployment_target.split(".")
+            deployment_target = f"{parts[0]}.{parts[1] if len(parts) > 1 else '0'}"
+
+        # Convert version to wheel tag format (e.g., "11.0" -> "11_0")
+        version_tag = deployment_target.replace(".", "_")
+
+        # Get target architecture from ARCHFLAGS (set by cibuildwheel for cross-compilation)
+        # or fall back to host machine architecture
+        arch = self._get_macos_target_arch()
+
+        return f"macosx_{version_tag}_{arch}"
+
+    def _get_macos_target_arch(self):
+        """Detect target architecture for macOS builds.
+
+        Cibuildwheel sets ARCHFLAGS for cross-compilation (e.g., "-arch x86_64").
+        Falls back to host machine architecture if not set.
+        """
+        archflags = os.environ.get("ARCHFLAGS", "")
+        if "-arch arm64" in archflags:
+            return "arm64"
+        elif "-arch x86_64" in archflags:
+            return "x86_64"
+
+        # Fall back to host architecture
+        machine = platform.machine()
+        if machine == "x86_64":
+            return "x86_64"
+        elif machine == "arm64":
+            return "arm64"
+        return machine
