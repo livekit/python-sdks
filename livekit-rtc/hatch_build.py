@@ -58,13 +58,28 @@ class CustomBuildHook(BuildHookInterface):
         # Convert version to wheel tag format (e.g., "11.0" -> "11_0")
         version_tag = deployment_target.replace(".", "_")
 
-        # Get architecture
-        machine = platform.machine()
-        if machine == "x86_64":
-            arch = "x86_64"
-        elif machine == "arm64":
-            arch = "arm64"
-        else:
-            arch = machine
+        # Get target architecture from ARCHFLAGS (set by cibuildwheel for cross-compilation)
+        # or fall back to host machine architecture
+        arch = self._get_macos_target_arch()
 
         return f"macosx_{version_tag}_{arch}"
+
+    def _get_macos_target_arch(self):
+        """Detect target architecture for macOS builds.
+
+        Cibuildwheel sets ARCHFLAGS for cross-compilation (e.g., "-arch x86_64").
+        Falls back to host machine architecture if not set.
+        """
+        archflags = os.environ.get("ARCHFLAGS", "")
+        if "-arch arm64" in archflags:
+            return "arm64"
+        elif "-arch x86_64" in archflags:
+            return "x86_64"
+
+        # Fall back to host architecture
+        machine = platform.machine()
+        if machine == "x86_64":
+            return "x86_64"
+        elif machine == "arm64":
+            return "arm64"
+        return machine
