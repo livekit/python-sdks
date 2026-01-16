@@ -136,6 +136,53 @@ jobs:
 
       - uses: pypa/gh-action-pypi-publish@release/v1
 
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    needs: [build_wheels]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64 tests
+          - os: ubuntu-latest
+            python-version: "3.9"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.10"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.11"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.12"
+            artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.13"
+            artifact: rtc-release-ubuntu-latest
+          # macOS tests (arm64 runner)
+          - os: macos-latest
+            python-version: "3.9"
+            artifact: rtc-release-macos-latest
+          - os: macos-latest
+            python-version: "3.12"
+            artifact: rtc-release-macos-latest
+          # Windows tests
+          - os: windows-latest
+            python-version: "3.9"
+            artifact: rtc-release-windows-latest
+          - os: windows-latest
+            python-version: "3.12"
+            artifact: rtc-release-windows-latest
+    uses: ./.github/workflows/tests.yml
+    with:
+      os: ${{ matrix.os }}
+      python-version: ${{ matrix.python-version }}
+      artifact-name: ${{ matrix.artifact }}
+    secrets:
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
+
   docs:
     needs: [publish]
     uses: ./.github/workflows/build-docs.yml
