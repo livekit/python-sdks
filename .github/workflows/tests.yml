@@ -66,8 +66,12 @@ jobs:
           name: rtc-wheel
           path: rtc-wheel
 
-      - name: Install the project
-        run: uv sync --all-extras --dev
+      - name: Create venv and install dependencies
+        run: |
+          uv venv .test-venv
+          source .test-venv/bin/activate
+          uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
+          uv pip install pytest pytest-asyncio numpy matplotlib
 
       - name: Run tests
         env:
@@ -75,7 +79,6 @@ jobs:
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
-          uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
-          rm -rf livekit-rtc/livekit
-          uv run pytest tests/
+          source .test-venv/bin/activate
+          pytest tests/
         
