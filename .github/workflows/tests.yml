@@ -10,27 +10,64 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
-    name: Run tests
+  build-rtc:
+    name: Build livekit-rtc wheel
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: true
-          lfs: true
-      - name: Install uv
 
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.9"
+
+      - name: Install cibuildwheel
+        run: python3 -m pip install cibuildwheel==2.17.0
+
+      - name: Build wheel
+        working-directory: ./livekit-rtc
+        run: python3 -m cibuildwheel --output-dir dist
+        env:
+          CIBW_ARCHS: x86_64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rtc-wheel
+          path: livekit-rtc/dist/*.whl
+
+  tests:
+    name: Run tests (Python ${{ matrix.python-version }})
+    needs: build-rtc
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+          lfs: true
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
+      - name: Download livekit-rtc wheel
+        uses: actions/download-artifact@v4
+        with:
+          name: rtc-wheel
+          path: rtc-wheel
+
       - name: Install the project
         run: uv sync --all-extras --dev
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.13' 
 
       - name: Run tests
         env:
@@ -38,8 +75,6 @@ jobs:
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
-          
-          uv run python ./livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
-          uv add ./livekit-rtc ./livekit-api ./livekit-protocol
+          uv add rtc-wheel/*.whl ./livekit-api ./livekit-protocol
           uv run pytest . --ignore=livekit-rtc/rust-sdks
         
