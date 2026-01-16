@@ -106,7 +106,9 @@ jobs:
         run: |
           uv venv .test-venv
           source .test-venv/bin/activate
-          uv pip install "${{ steps.select-wheel-macos.outputs.wheel }}" ./livekit-api ./livekit-protocol
+          # Use pip for wheel install to avoid uv's strict platform compatibility check
+          pip install "${{ steps.select-wheel-macos.outputs.wheel }}"
+          uv pip install ./livekit-api ./livekit-protocol
           uv pip install pytest pytest-asyncio numpy matplotlib
 
       - name: Create venv and install dependencies (Windows)
