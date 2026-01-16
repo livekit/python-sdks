@@ -80,11 +80,12 @@ jobs:
           submodules: true
 
       - uses: actions/setup-python@v5
+        id: setup-python
         with:
           python-version: "3.11"
 
       - name: Build wheels
-        run: pipx run cibuildwheel==3.3.1 --output-dir dist
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
         env:
           CIBW_ARCHS: ${{ matrix.archs }}
 
