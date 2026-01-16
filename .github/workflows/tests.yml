@@ -63,12 +63,50 @@ jobs:
           run-id: ${{ inputs.run-id }}
           github-token: ${{ github.token }}
 
-      - name: Create venv and install dependencies (Unix)
-        if: runner.os != 'Windows'
+      - name: Select compatible wheel (macOS)
+        if: runner.os == 'macOS'
+        id: select-wheel-macos
+        run: |
+          # macOS artifacts contain both x86_64 and arm64 wheels, select the right one
+          WHEEL=$(python3 -c "
+          import glob
+          import platform
+          import sys
+
+          wheels = glob.glob('rtc-wheel/*.whl')
+          machine = platform.machine().lower()
+
+          arch_map = {
+              'x86_64': ['x86_64'],
+              'arm64': ['arm64'],
+          }
+          patterns = arch_map.get(machine, [machine])
+
+          for wheel in wheels:
+              wheel_lower = wheel.lower()
+              if any(p in wheel_lower for p in patterns):
+                  print(wheel)
+                  sys.exit(0)
+
+          print(f'No matching wheel found for {machine}', file=sys.stderr)
+          sys.exit(1)
+          ")
+          echo "wheel=$WHEEL" >> $GITHUB_OUTPUT
+
+      - name: Create venv and install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           uv venv .test-venv
           source .test-venv/bin/activate
           uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
+          uv pip install pytest pytest-asyncio numpy matplotlib
+
+      - name: Create venv and install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          uv venv .test-venv
+          source .test-venv/bin/activate
+          uv pip install "${{ steps.select-wheel-macos.outputs.wheel }}" ./livekit-api ./livekit-protocol
           uv pip install pytest pytest-asyncio numpy matplotlib
 
       - name: Create venv and install dependencies (Windows)
@@ -76,7 +114,7 @@ jobs:
         run: |
           uv venv .test-venv
           .test-venv\Scripts\activate
-          uv pip install (Get-ChildItem rtc-wheel\*.whl).FullName .\livekit-api .\livekit-protocol
+          uv pip install rtc-wheel\*.whl .\livekit-api .\livekit-protocol
           uv pip install pytest pytest-asyncio numpy matplotlib
         shell: pwsh
 
