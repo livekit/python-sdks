@@ -94,7 +94,7 @@ jobs:
           echo "wheel=$WHEEL" >> $GITHUB_OUTPUT
 
       - name: Create venv and install dependencies (Unix)
-        if: runner.os != 'Linux'
+        if: runner.os == 'Linux'
         run: |
           uv venv .test-venv
           source .test-venv/bin/activate
