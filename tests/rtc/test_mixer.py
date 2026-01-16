@@ -42,7 +42,6 @@ async def test_mixer_two_sine_waves():
 
     mixed_signal = np.concatenate(mixed_signals)
 
-
     # Use FFT to analyze frequency components.
     fft = np.fft.rfft(mixed_signal)
     freqs = np.fft.rfftfreq(len(mixed_signal), 1 / SAMPLE_RATE)
