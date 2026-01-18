@@ -39,6 +39,8 @@ Source = "https://github.com/livekit/python-sdks/"
 path = "livekit/rtc/version.py"
 
 [tool.hatch.build.targets.wheel]
+python-tag = "py3"
+abi-tag = "none"
 packages = ["livekit"]
 artifacts = [
     "livekit/rtc/resources/*.so",
@@ -46,8 +48,6 @@ artifacts = [
     "livekit/rtc/resources/*.dll",
 ]
 
-[tool.hatch.build.targets.wheel.hooks.custom]
-path = "hatch_build.py"
 
 [tool.hatch.build.targets.sdist]
 include = ["/livekit", "/rust-sdks"]
