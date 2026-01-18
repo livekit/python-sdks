@@ -1,10 +1,61 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=61",
     "wheel",
     "requests",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "livekit"
+dynamic = ["version"]
+description = "Python Real-time SDK for LiveKit"
+readme = "README.md"
+requires-python = ">=3.9.0"
+license = "Apache-2.0"
+keywords = ["webrtc", "realtime", "audio", "video", "livekit"]
+authors = [
+    { name = "LiveKit", email = "support@livekit.io" }
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "protobuf>=4.25.0",
+    "types-protobuf>=3",
+    "aiofiles>=24",
+    "numpy>=1.26",
+]
+
+[project.urls]
+Documentation = "https://docs.livekit.io"
+Website = "https://livekit.io/"
+Source = "https://github.com/livekit/python-sdks/"
+
+[tool.setuptools.dynamic]
+version = { attr = "livekit.rtc.version.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["livekit.*"]
+
+[tool.setuptools.package-data]
+"livekit.rtc" = ["_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"]
+"livekit.rtc.resources" = [
+    "*.so",
+    "*.dylib",
+    "*.dll",
+    "LICENSE.md",
+    "*.h",
+    "jupyter-html/index.html",
+]
 
 [tool.cibuildwheel]
 build = "cp39-*"
