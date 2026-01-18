@@ -14,11 +14,11 @@
 
 import os
 import pathlib
-from sysconfig import get_platform
+import platform
+import sys
 from typing import Any, Dict
 
 import setuptools  # type: ignore
-import setuptools.command.build_py  # type: ignore
 from wheel.bdist_wheel import bdist_wheel as _bdist_wheel  # type: ignore
 
 here = pathlib.Path(__file__).parent.resolve()
@@ -27,9 +27,47 @@ with open(os.path.join(here, "livekit", "rtc", "version.py"), "r") as f:
     exec(f.read(), about)
 
 
+def get_platform_tag():
+    """Get the wheel platform tag for the current/target platform.
+
+    On macOS, we must respect MACOSX_DEPLOYMENT_TARGET and ARCHFLAGS environment
+    variables that cibuildwheel sets, rather than using sysconfig.get_platform()
+    which returns Python's compile-time values.
+    """
+    if sys.platform == "darwin":
+        # Get deployment target from environment (set by cibuildwheel) or fall back
+        target = os.environ.get("MACOSX_DEPLOYMENT_TARGET")
+        if not target:
+            target = platform.mac_ver()[0]
+            parts = target.split(".")
+            target = f"{parts[0]}.{parts[1] if len(parts) > 1 else '0'}"
+
+        version_tag = target.replace(".", "_")
+
+        # Check ARCHFLAGS for cross-compilation (cibuildwheel sets this)
+        archflags = os.environ.get("ARCHFLAGS", "")
+        if "-arch arm64" in archflags:
+            arch = "arm64"
+        elif "-arch x86_64" in archflags:
+            arch = "x86_64"
+        else:
+            arch = platform.machine()
+
+        return f"macosx_{version_tag}_{arch}"
+    elif sys.platform == "linux":
+        return f"linux_{platform.machine()}"
+    elif sys.platform == "win32":
+        arch = platform.machine()
+        if arch == "AMD64":
+            arch = "amd64"
+        return f"win_{arch}"
+    else:
+        return f"{platform.system().lower()}_{platform.machine()}"
+
+
 class bdist_wheel(_bdist_wheel):
     def finalize_options(self):
-        self.plat_name = get_platform()  # force a platform tag
+        self.plat_name = get_platform_tag()
         _bdist_wheel.finalize_options(self)
 
 
