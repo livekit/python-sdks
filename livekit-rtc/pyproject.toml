@@ -1,69 +1,12 @@
 [build-system]
-requires = ["hatchling", "requests"]
-build-backend = "hatchling.build"
-
-[project]
-name = "livekit"
-dynamic = ["version"]
-description = "Python Real-time SDK for LiveKit"
-readme = "README.md"
-requires-python = ">=3.9.0"
-license = "Apache-2.0"
-keywords = ["webrtc", "realtime", "audio", "video", "livekit"]
-authors = [
-    { name = "LiveKit", email = "support@livekit.io" }
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "requests",
 ]
-classifiers = [
-    "Intended Audience :: Developers",
-    "Topic :: Multimedia :: Sound/Audio",
-    "Topic :: Multimedia :: Video",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3 :: Only",
-]
-dependencies = [
-    "protobuf>=4.25.0",
-    "types-protobuf>=3",
-    "aiofiles>=24",
-    "numpy>=1.26",
-]
-
-[project.urls]
-Documentation = "https://docs.livekit.io"
-Website = "https://livekit.io/"
-Source = "https://github.com/livekit/python-sdks/"
-
-[tool.hatch.version]
-path = "livekit/rtc/version.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["livekit"]
-artifacts = [
-    "livekit/rtc/resources/*.so",
-    "livekit/rtc/resources/*.dylib",
-    "livekit/rtc/resources/*.dll",
-]
-
-[tool.hatch.build.targets.wheel.hooks.custom]
-path = "hatch_build.py"
-
-[tool.hatch.build.targets.sdist]
-include = ["/livekit", "/rust-sdks"]
+build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 build = "cp39-*"
 skip = "*-musllinux_*"  # not supported (libwebrtc requires glibc)
 before-build = "pip install requests && python rust-sdks/download_ffi.py --output livekit/rtc/resources"
-# Note: manylinux_2_28 is the default in cibuildwheel 3.x, no explicit config needed
-
-# macOS deployment targets must match the FFI binaries (see rust-sdks/.github/workflows/ffi-builds.yml)
-# x86_64 supports macOS 10.15+, arm64 requires macOS 11.0+
-[[tool.cibuildwheel.overrides]]
-select = "*macosx_x86_64"
-environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
-
-[[tool.cibuildwheel.overrides]]
-select = "*macosx_arm64"
-environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
