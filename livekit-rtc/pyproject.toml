@@ -1,6 +1,10 @@
 [build-system]
-requires = ["hatchling", "requests"]
-build-backend = "hatchling.build"
+requires = [
+    "setuptools>=61",
+    "wheel",
+    "requests",
+]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "livekit"
@@ -35,28 +39,27 @@ Documentation = "https://docs.livekit.io"
 Website = "https://livekit.io/"
 Source = "https://github.com/livekit/python-sdks/"
 
-[tool.hatch.version]
-path = "livekit/rtc/version.py"
+[tool.setuptools.dynamic]
+version = { attr = "livekit.rtc.version.__version__" }
 
-[tool.hatch.build.targets.wheel]
-packages = ["livekit"]
-artifacts = [
-    "livekit/rtc/resources/*.so",
-    "livekit/rtc/resources/*.dylib",
-    "livekit/rtc/resources/*.dll",
+[tool.setuptools.packages.find]
+include = ["livekit.*"]
+
+[tool.setuptools.package-data]
+"livekit.rtc" = ["_proto/*.py", "py.typed", "*.pyi", "**/*.pyi"]
+"livekit.rtc.resources" = [
+    "*.so",
+    "*.dylib",
+    "*.dll",
+    "LICENSE.md",
+    "*.h",
+    "jupyter-html/index.html",
 ]
-
-[tool.hatch.build.targets.wheel.hooks.custom]
-path = "hatch_build.py"
-
-[tool.hatch.build.targets.sdist]
-include = ["/livekit", "/rust-sdks"]
 
 [tool.cibuildwheel]
 build = "cp39-*"
 skip = "*-musllinux_*"  # not supported (libwebrtc requires glibc)
 before-build = "pip install requests && python rust-sdks/download_ffi.py --output livekit/rtc/resources"
-# Note: manylinux_2_28 is the default in cibuildwheel 3.x, no explicit config needed
 
 # macOS deployment targets must match the FFI binaries (see rust-sdks/.github/workflows/ffi-builds.yml)
 # x86_64 supports macOS 10.15+, arm64 requires macOS 11.0+
