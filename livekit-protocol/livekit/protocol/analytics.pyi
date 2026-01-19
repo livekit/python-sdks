@@ -357,13 +357,22 @@ class TimeRange(_message.Message):
     def __init__(self, started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FeatureUsageInfo(_message.Message):
-    __slots__ = ("feature", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "time_ranges")
+    __slots__ = ("feature", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "time_ranges", "feature_info")
     class Feature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         KRISP_NOISE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
         KRISP_BACKGROUND_VOICE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
+        AIC_AUDIO_ENHANCEMENT: _ClassVar[FeatureUsageInfo.Feature]
     KRISP_NOISE_CANCELLATION: FeatureUsageInfo.Feature
     KRISP_BACKGROUND_VOICE_CANCELLATION: FeatureUsageInfo.Feature
+    AIC_AUDIO_ENHANCEMENT: FeatureUsageInfo.Feature
+    class FeatureInfoEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     FEATURE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -372,6 +381,7 @@ class FeatureUsageInfo(_message.Message):
     PARTICIPANT_ID_FIELD_NUMBER: _ClassVar[int]
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     TIME_RANGES_FIELD_NUMBER: _ClassVar[int]
+    FEATURE_INFO_FIELD_NUMBER: _ClassVar[int]
     feature: FeatureUsageInfo.Feature
     project_id: str
     room_name: str
@@ -380,7 +390,8 @@ class FeatureUsageInfo(_message.Message):
     participant_id: str
     track_id: str
     time_ranges: _containers.RepeatedCompositeFieldContainer[TimeRange]
-    def __init__(self, feature: _Optional[_Union[FeatureUsageInfo.Feature, str]] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., time_ranges: _Optional[_Iterable[_Union[TimeRange, _Mapping]]] = ...) -> None: ...
+    feature_info: _containers.ScalarMap[str, str]
+    def __init__(self, feature: _Optional[_Union[FeatureUsageInfo.Feature, str]] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., time_ranges: _Optional[_Iterable[_Union[TimeRange, _Mapping]]] = ..., feature_info: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class APICallRequest(_message.Message):
     __slots__ = ("create_room_request", "list_rooms_request", "delete_room_request", "list_participants_request", "room_participant_identity", "mute_room_track_request", "update_participant_request", "update_subscriptions_request", "send_data_request", "update_room_metadata_request")

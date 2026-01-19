@@ -79,7 +79,7 @@ class JobState(_message.Message):
     def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ..., worker_id: _Optional[str] = ..., agent_id: _Optional[str] = ...) -> None: ...
 
 class WorkerMessage(_message.Message):
-    __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job")
+    __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job", "text_response", "push_text")
     REGISTER_FIELD_NUMBER: _ClassVar[int]
     AVAILABILITY_FIELD_NUMBER: _ClassVar[int]
     UPDATE_WORKER_FIELD_NUMBER: _ClassVar[int]
@@ -87,6 +87,8 @@ class WorkerMessage(_message.Message):
     PING_FIELD_NUMBER: _ClassVar[int]
     SIMULATE_JOB_FIELD_NUMBER: _ClassVar[int]
     MIGRATE_JOB_FIELD_NUMBER: _ClassVar[int]
+    TEXT_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    PUSH_TEXT_FIELD_NUMBER: _ClassVar[int]
     register: RegisterWorkerRequest
     availability: AvailabilityResponse
     update_worker: UpdateWorkerStatus
@@ -94,21 +96,25 @@ class WorkerMessage(_message.Message):
     ping: WorkerPing
     simulate_job: SimulateJobRequest
     migrate_job: MigrateJobRequest
-    def __init__(self, register: _Optional[_Union[RegisterWorkerRequest, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityResponse, _Mapping]] = ..., update_worker: _Optional[_Union[UpdateWorkerStatus, _Mapping]] = ..., update_job: _Optional[_Union[UpdateJobStatus, _Mapping]] = ..., ping: _Optional[_Union[WorkerPing, _Mapping]] = ..., simulate_job: _Optional[_Union[SimulateJobRequest, _Mapping]] = ..., migrate_job: _Optional[_Union[MigrateJobRequest, _Mapping]] = ...) -> None: ...
+    text_response: TextMessageResponse
+    push_text: PushTextRequest
+    def __init__(self, register: _Optional[_Union[RegisterWorkerRequest, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityResponse, _Mapping]] = ..., update_worker: _Optional[_Union[UpdateWorkerStatus, _Mapping]] = ..., update_job: _Optional[_Union[UpdateJobStatus, _Mapping]] = ..., ping: _Optional[_Union[WorkerPing, _Mapping]] = ..., simulate_job: _Optional[_Union[SimulateJobRequest, _Mapping]] = ..., migrate_job: _Optional[_Union[MigrateJobRequest, _Mapping]] = ..., text_response: _Optional[_Union[TextMessageResponse, _Mapping]] = ..., push_text: _Optional[_Union[PushTextRequest, _Mapping]] = ...) -> None: ...
 
 class ServerMessage(_message.Message):
-    __slots__ = ("register", "availability", "assignment", "termination", "pong")
+    __slots__ = ("register", "availability", "assignment", "termination", "pong", "text_request")
     REGISTER_FIELD_NUMBER: _ClassVar[int]
     AVAILABILITY_FIELD_NUMBER: _ClassVar[int]
     ASSIGNMENT_FIELD_NUMBER: _ClassVar[int]
     TERMINATION_FIELD_NUMBER: _ClassVar[int]
     PONG_FIELD_NUMBER: _ClassVar[int]
+    TEXT_REQUEST_FIELD_NUMBER: _ClassVar[int]
     register: RegisterWorkerResponse
     availability: AvailabilityRequest
     assignment: JobAssignment
     termination: JobTermination
     pong: WorkerPong
-    def __init__(self, register: _Optional[_Union[RegisterWorkerResponse, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityRequest, _Mapping]] = ..., assignment: _Optional[_Union[JobAssignment, _Mapping]] = ..., termination: _Optional[_Union[JobTermination, _Mapping]] = ..., pong: _Optional[_Union[WorkerPong, _Mapping]] = ...) -> None: ...
+    text_request: TextMessageRequest
+    def __init__(self, register: _Optional[_Union[RegisterWorkerResponse, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityRequest, _Mapping]] = ..., assignment: _Optional[_Union[JobAssignment, _Mapping]] = ..., termination: _Optional[_Union[JobTermination, _Mapping]] = ..., pong: _Optional[_Union[WorkerPong, _Mapping]] = ..., text_request: _Optional[_Union[TextMessageRequest, _Mapping]] = ...) -> None: ...
 
 class SimulateJobRequest(_message.Message):
     __slots__ = ("type", "room", "participant")
@@ -234,3 +240,37 @@ class JobTermination(_message.Message):
     JOB_ID_FIELD_NUMBER: _ClassVar[int]
     job_id: str
     def __init__(self, job_id: _Optional[str] = ...) -> None: ...
+
+class TextMessageRequest(_message.Message):
+    __slots__ = ("message_id", "session_id", "agent_name", "metadata", "session_data", "text")
+    MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    SESSION_ID_FIELD_NUMBER: _ClassVar[int]
+    AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    SESSION_DATA_FIELD_NUMBER: _ClassVar[int]
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    message_id: str
+    session_id: str
+    agent_name: str
+    metadata: str
+    session_data: bytes
+    text: str
+    def __init__(self, message_id: _Optional[str] = ..., session_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., session_data: _Optional[bytes] = ..., text: _Optional[str] = ...) -> None: ...
+
+class PushTextRequest(_message.Message):
+    __slots__ = ("message_id", "content")
+    MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_FIELD_NUMBER: _ClassVar[int]
+    message_id: str
+    content: str
+    def __init__(self, message_id: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
+
+class TextMessageResponse(_message.Message):
+    __slots__ = ("message_id", "session_data", "error")
+    MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
+    SESSION_DATA_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    message_id: str
+    session_data: bytes
+    error: str
+    def __init__(self, message_id: _Optional[str] = ..., session_data: _Optional[bytes] = ..., error: _Optional[str] = ...) -> None: ...

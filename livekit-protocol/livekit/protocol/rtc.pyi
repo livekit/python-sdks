@@ -32,7 +32,7 @@ TCP: CandidateProtocol
 TLS: CandidateProtocol
 
 class SignalRequest(_message.Message):
-    __slots__ = ("offer", "answer", "trickle", "add_track", "mute", "subscription", "track_setting", "leave", "update_layers", "subscription_permission", "sync_state", "simulate", "ping", "update_metadata", "ping_req", "update_audio_track", "update_video_track")
+    __slots__ = ("offer", "answer", "trickle", "add_track", "mute", "subscription", "track_setting", "leave", "update_layers", "subscription_permission", "sync_state", "simulate", "ping", "update_metadata", "ping_req", "update_audio_track", "update_video_track", "publish_data_track_request", "unpublish_data_track_request", "update_data_subscription")
     OFFER_FIELD_NUMBER: _ClassVar[int]
     ANSWER_FIELD_NUMBER: _ClassVar[int]
     TRICKLE_FIELD_NUMBER: _ClassVar[int]
@@ -50,6 +50,9 @@ class SignalRequest(_message.Message):
     PING_REQ_FIELD_NUMBER: _ClassVar[int]
     UPDATE_AUDIO_TRACK_FIELD_NUMBER: _ClassVar[int]
     UPDATE_VIDEO_TRACK_FIELD_NUMBER: _ClassVar[int]
+    PUBLISH_DATA_TRACK_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    UNPUBLISH_DATA_TRACK_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    UPDATE_DATA_SUBSCRIPTION_FIELD_NUMBER: _ClassVar[int]
     offer: SessionDescription
     answer: SessionDescription
     trickle: TrickleRequest
@@ -67,10 +70,13 @@ class SignalRequest(_message.Message):
     ping_req: Ping
     update_audio_track: UpdateLocalAudioTrack
     update_video_track: UpdateLocalVideoTrack
-    def __init__(self, offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., add_track: _Optional[_Union[AddTrackRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., track_setting: _Optional[_Union[UpdateTrackSettings, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., update_layers: _Optional[_Union[UpdateVideoLayers, _Mapping]] = ..., subscription_permission: _Optional[_Union[SubscriptionPermission, _Mapping]] = ..., sync_state: _Optional[_Union[SyncState, _Mapping]] = ..., simulate: _Optional[_Union[SimulateScenario, _Mapping]] = ..., ping: _Optional[int] = ..., update_metadata: _Optional[_Union[UpdateParticipantMetadata, _Mapping]] = ..., ping_req: _Optional[_Union[Ping, _Mapping]] = ..., update_audio_track: _Optional[_Union[UpdateLocalAudioTrack, _Mapping]] = ..., update_video_track: _Optional[_Union[UpdateLocalVideoTrack, _Mapping]] = ...) -> None: ...
+    publish_data_track_request: PublishDataTrackRequest
+    unpublish_data_track_request: UnpublishDataTrackRequest
+    update_data_subscription: UpdateDataSubscription
+    def __init__(self, offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., add_track: _Optional[_Union[AddTrackRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., track_setting: _Optional[_Union[UpdateTrackSettings, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., update_layers: _Optional[_Union[UpdateVideoLayers, _Mapping]] = ..., subscription_permission: _Optional[_Union[SubscriptionPermission, _Mapping]] = ..., sync_state: _Optional[_Union[SyncState, _Mapping]] = ..., simulate: _Optional[_Union[SimulateScenario, _Mapping]] = ..., ping: _Optional[int] = ..., update_metadata: _Optional[_Union[UpdateParticipantMetadata, _Mapping]] = ..., ping_req: _Optional[_Union[Ping, _Mapping]] = ..., update_audio_track: _Optional[_Union[UpdateLocalAudioTrack, _Mapping]] = ..., update_video_track: _Optional[_Union[UpdateLocalVideoTrack, _Mapping]] = ..., publish_data_track_request: _Optional[_Union[PublishDataTrackRequest, _Mapping]] = ..., unpublish_data_track_request: _Optional[_Union[UnpublishDataTrackRequest, _Mapping]] = ..., update_data_subscription: _Optional[_Union[UpdateDataSubscription, _Mapping]] = ...) -> None: ...
 
 class SignalResponse(_message.Message):
-    __slots__ = ("join", "answer", "offer", "trickle", "update", "track_published", "leave", "mute", "speakers_changed", "room_update", "connection_quality", "stream_state_update", "subscribed_quality_update", "subscription_permission_update", "refresh_token", "track_unpublished", "pong", "reconnect", "pong_resp", "subscription_response", "request_response", "track_subscribed", "room_moved", "media_sections_requirement", "subscribed_audio_codec_update")
+    __slots__ = ("join", "answer", "offer", "trickle", "update", "track_published", "leave", "mute", "speakers_changed", "room_update", "connection_quality", "stream_state_update", "subscribed_quality_update", "subscription_permission_update", "refresh_token", "track_unpublished", "pong", "reconnect", "pong_resp", "subscription_response", "request_response", "track_subscribed", "room_moved", "media_sections_requirement", "subscribed_audio_codec_update", "publish_data_track_response", "unpublish_data_track_response", "data_track_subscriber_handles")
     JOIN_FIELD_NUMBER: _ClassVar[int]
     ANSWER_FIELD_NUMBER: _ClassVar[int]
     OFFER_FIELD_NUMBER: _ClassVar[int]
@@ -96,6 +102,9 @@ class SignalResponse(_message.Message):
     ROOM_MOVED_FIELD_NUMBER: _ClassVar[int]
     MEDIA_SECTIONS_REQUIREMENT_FIELD_NUMBER: _ClassVar[int]
     SUBSCRIBED_AUDIO_CODEC_UPDATE_FIELD_NUMBER: _ClassVar[int]
+    PUBLISH_DATA_TRACK_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    UNPUBLISH_DATA_TRACK_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    DATA_TRACK_SUBSCRIBER_HANDLES_FIELD_NUMBER: _ClassVar[int]
     join: JoinResponse
     answer: SessionDescription
     offer: SessionDescription
@@ -121,7 +130,10 @@ class SignalResponse(_message.Message):
     room_moved: RoomMovedResponse
     media_sections_requirement: MediaSectionsRequirement
     subscribed_audio_codec_update: SubscribedAudioCodecUpdate
-    def __init__(self, join: _Optional[_Union[JoinResponse, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., update: _Optional[_Union[ParticipantUpdate, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublishedResponse, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., speakers_changed: _Optional[_Union[SpeakersChanged, _Mapping]] = ..., room_update: _Optional[_Union[RoomUpdate, _Mapping]] = ..., connection_quality: _Optional[_Union[ConnectionQualityUpdate, _Mapping]] = ..., stream_state_update: _Optional[_Union[StreamStateUpdate, _Mapping]] = ..., subscribed_quality_update: _Optional[_Union[SubscribedQualityUpdate, _Mapping]] = ..., subscription_permission_update: _Optional[_Union[SubscriptionPermissionUpdate, _Mapping]] = ..., refresh_token: _Optional[str] = ..., track_unpublished: _Optional[_Union[TrackUnpublishedResponse, _Mapping]] = ..., pong: _Optional[int] = ..., reconnect: _Optional[_Union[ReconnectResponse, _Mapping]] = ..., pong_resp: _Optional[_Union[Pong, _Mapping]] = ..., subscription_response: _Optional[_Union[SubscriptionResponse, _Mapping]] = ..., request_response: _Optional[_Union[RequestResponse, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., room_moved: _Optional[_Union[RoomMovedResponse, _Mapping]] = ..., media_sections_requirement: _Optional[_Union[MediaSectionsRequirement, _Mapping]] = ..., subscribed_audio_codec_update: _Optional[_Union[SubscribedAudioCodecUpdate, _Mapping]] = ...) -> None: ...
+    publish_data_track_response: PublishDataTrackResponse
+    unpublish_data_track_response: UnpublishDataTrackResponse
+    data_track_subscriber_handles: DataTrackSubscriberHandles
+    def __init__(self, join: _Optional[_Union[JoinResponse, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., update: _Optional[_Union[ParticipantUpdate, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublishedResponse, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., speakers_changed: _Optional[_Union[SpeakersChanged, _Mapping]] = ..., room_update: _Optional[_Union[RoomUpdate, _Mapping]] = ..., connection_quality: _Optional[_Union[ConnectionQualityUpdate, _Mapping]] = ..., stream_state_update: _Optional[_Union[StreamStateUpdate, _Mapping]] = ..., subscribed_quality_update: _Optional[_Union[SubscribedQualityUpdate, _Mapping]] = ..., subscription_permission_update: _Optional[_Union[SubscriptionPermissionUpdate, _Mapping]] = ..., refresh_token: _Optional[str] = ..., track_unpublished: _Optional[_Union[TrackUnpublishedResponse, _Mapping]] = ..., pong: _Optional[int] = ..., reconnect: _Optional[_Union[ReconnectResponse, _Mapping]] = ..., pong_resp: _Optional[_Union[Pong, _Mapping]] = ..., subscription_response: _Optional[_Union[SubscriptionResponse, _Mapping]] = ..., request_response: _Optional[_Union[RequestResponse, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., room_moved: _Optional[_Union[RoomMovedResponse, _Mapping]] = ..., media_sections_requirement: _Optional[_Union[MediaSectionsRequirement, _Mapping]] = ..., subscribed_audio_codec_update: _Optional[_Union[SubscribedAudioCodecUpdate, _Mapping]] = ..., publish_data_track_response: _Optional[_Union[PublishDataTrackResponse, _Mapping]] = ..., unpublish_data_track_response: _Optional[_Union[UnpublishDataTrackResponse, _Mapping]] = ..., data_track_subscriber_handles: _Optional[_Union[DataTrackSubscriberHandles, _Mapping]] = ...) -> None: ...
 
 class SimulcastCodec(_message.Message):
     __slots__ = ("codec", "cid", "layers", "video_layer_mode")
@@ -172,6 +184,56 @@ class AddTrackRequest(_message.Message):
     backup_codec_policy: _models.BackupCodecPolicy
     audio_features: _containers.RepeatedScalarFieldContainer[_models.AudioTrackFeature]
     def __init__(self, cid: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[_models.TrackType, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., muted: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[_models.TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., simulcast_codecs: _Optional[_Iterable[_Union[SimulcastCodec, _Mapping]]] = ..., sid: _Optional[str] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ..., stream: _Optional[str] = ..., backup_codec_policy: _Optional[_Union[_models.BackupCodecPolicy, str]] = ..., audio_features: _Optional[_Iterable[_Union[_models.AudioTrackFeature, str]]] = ...) -> None: ...
+
+class PublishDataTrackRequest(_message.Message):
+    __slots__ = ("pub_handle", "name", "encryption")
+    PUB_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    pub_handle: int
+    name: str
+    encryption: _models.Encryption.Type
+    def __init__(self, pub_handle: _Optional[int] = ..., name: _Optional[str] = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ...) -> None: ...
+
+class PublishDataTrackResponse(_message.Message):
+    __slots__ = ("info",)
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: _models.DataTrackInfo
+    def __init__(self, info: _Optional[_Union[_models.DataTrackInfo, _Mapping]] = ...) -> None: ...
+
+class UnpublishDataTrackRequest(_message.Message):
+    __slots__ = ("pub_handle",)
+    PUB_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    pub_handle: int
+    def __init__(self, pub_handle: _Optional[int] = ...) -> None: ...
+
+class UnpublishDataTrackResponse(_message.Message):
+    __slots__ = ("info",)
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    info: _models.DataTrackInfo
+    def __init__(self, info: _Optional[_Union[_models.DataTrackInfo, _Mapping]] = ...) -> None: ...
+
+class DataTrackSubscriberHandles(_message.Message):
+    __slots__ = ("sub_handles",)
+    class PublishedDataTrack(_message.Message):
+        __slots__ = ("publisher_identity", "publisher_sid", "track_sid")
+        PUBLISHER_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+        PUBLISHER_SID_FIELD_NUMBER: _ClassVar[int]
+        TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+        publisher_identity: str
+        publisher_sid: str
+        track_sid: str
+        def __init__(self, publisher_identity: _Optional[str] = ..., publisher_sid: _Optional[str] = ..., track_sid: _Optional[str] = ...) -> None: ...
+    class SubHandlesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: int
+        value: DataTrackSubscriberHandles.PublishedDataTrack
+        def __init__(self, key: _Optional[int] = ..., value: _Optional[_Union[DataTrackSubscriberHandles.PublishedDataTrack, _Mapping]] = ...) -> None: ...
+    SUB_HANDLES_FIELD_NUMBER: _ClassVar[int]
+    sub_handles: _containers.MessageMap[int, DataTrackSubscriberHandles.PublishedDataTrack]
+    def __init__(self, sub_handles: _Optional[_Mapping[int, DataTrackSubscriberHandles.PublishedDataTrack]] = ...) -> None: ...
 
 class TrickleRequest(_message.Message):
     __slots__ = ("candidateInit", "target", "final")
@@ -285,6 +347,21 @@ class UpdateSubscription(_message.Message):
     subscribe: bool
     participant_tracks: _containers.RepeatedCompositeFieldContainer[_models.ParticipantTracks]
     def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., subscribe: bool = ..., participant_tracks: _Optional[_Iterable[_Union[_models.ParticipantTracks, _Mapping]]] = ...) -> None: ...
+
+class UpdateDataSubscription(_message.Message):
+    __slots__ = ("updates",)
+    class Update(_message.Message):
+        __slots__ = ("track_sid", "subscribe", "options")
+        TRACK_SID_FIELD_NUMBER: _ClassVar[int]
+        SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
+        OPTIONS_FIELD_NUMBER: _ClassVar[int]
+        track_sid: str
+        subscribe: bool
+        options: _models.DataTrackSubscriptionOptions
+        def __init__(self, track_sid: _Optional[str] = ..., subscribe: bool = ..., options: _Optional[_Union[_models.DataTrackSubscriptionOptions, _Mapping]] = ...) -> None: ...
+    UPDATES_FIELD_NUMBER: _ClassVar[int]
+    updates: _containers.RepeatedCompositeFieldContainer[UpdateDataSubscription.Update]
+    def __init__(self, updates: _Optional[_Iterable[_Union[UpdateDataSubscription.Update, _Mapping]]] = ...) -> None: ...
 
 class UpdateTrackSettings(_message.Message):
     __slots__ = ("track_sids", "disabled", "quality", "width", "height", "fps", "priority")
@@ -500,7 +577,7 @@ class RoomMovedResponse(_message.Message):
     def __init__(self, room: _Optional[_Union[_models.Room, _Mapping]] = ..., token: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., other_participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ...) -> None: ...
 
 class SyncState(_message.Message):
-    __slots__ = ("answer", "subscription", "publish_tracks", "data_channels", "offer", "track_sids_disabled", "datachannel_receive_states")
+    __slots__ = ("answer", "subscription", "publish_tracks", "data_channels", "offer", "track_sids_disabled", "datachannel_receive_states", "publish_data_tracks")
     ANSWER_FIELD_NUMBER: _ClassVar[int]
     SUBSCRIPTION_FIELD_NUMBER: _ClassVar[int]
     PUBLISH_TRACKS_FIELD_NUMBER: _ClassVar[int]
@@ -508,6 +585,7 @@ class SyncState(_message.Message):
     OFFER_FIELD_NUMBER: _ClassVar[int]
     TRACK_SIDS_DISABLED_FIELD_NUMBER: _ClassVar[int]
     DATACHANNEL_RECEIVE_STATES_FIELD_NUMBER: _ClassVar[int]
+    PUBLISH_DATA_TRACKS_FIELD_NUMBER: _ClassVar[int]
     answer: SessionDescription
     subscription: UpdateSubscription
     publish_tracks: _containers.RepeatedCompositeFieldContainer[TrackPublishedResponse]
@@ -515,7 +593,8 @@ class SyncState(_message.Message):
     offer: SessionDescription
     track_sids_disabled: _containers.RepeatedScalarFieldContainer[str]
     datachannel_receive_states: _containers.RepeatedCompositeFieldContainer[DataChannelReceiveState]
-    def __init__(self, answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., publish_tracks: _Optional[_Iterable[_Union[TrackPublishedResponse, _Mapping]]] = ..., data_channels: _Optional[_Iterable[_Union[DataChannelInfo, _Mapping]]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., track_sids_disabled: _Optional[_Iterable[str]] = ..., datachannel_receive_states: _Optional[_Iterable[_Union[DataChannelReceiveState, _Mapping]]] = ...) -> None: ...
+    publish_data_tracks: _containers.RepeatedCompositeFieldContainer[PublishDataTrackResponse]
+    def __init__(self, answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., publish_tracks: _Optional[_Iterable[_Union[TrackPublishedResponse, _Mapping]]] = ..., data_channels: _Optional[_Iterable[_Union[DataChannelInfo, _Mapping]]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., track_sids_disabled: _Optional[_Iterable[str]] = ..., datachannel_receive_states: _Optional[_Iterable[_Union[DataChannelReceiveState, _Mapping]]] = ..., publish_data_tracks: _Optional[_Iterable[_Union[PublishDataTrackResponse, _Mapping]]] = ...) -> None: ...
 
 class DataChannelReceiveState(_message.Message):
     __slots__ = ("publisher_sid", "last_seq")
@@ -598,7 +677,7 @@ class SubscriptionResponse(_message.Message):
     def __init__(self, track_sid: _Optional[str] = ..., err: _Optional[_Union[_models.SubscriptionError, str]] = ...) -> None: ...
 
 class RequestResponse(_message.Message):
-    __slots__ = ("request_id", "reason", "message", "trickle", "add_track", "mute", "update_metadata", "update_audio_track", "update_video_track")
+    __slots__ = ("request_id", "reason", "message", "trickle", "add_track", "mute", "update_metadata", "update_audio_track", "update_video_track", "publish_data_track", "unpublish_data_track")
     class Reason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         OK: _ClassVar[RequestResponse.Reason]
@@ -608,6 +687,10 @@ class RequestResponse(_message.Message):
         QUEUED: _ClassVar[RequestResponse.Reason]
         UNSUPPORTED_TYPE: _ClassVar[RequestResponse.Reason]
         UNCLASSIFIED_ERROR: _ClassVar[RequestResponse.Reason]
+        INVALID_HANDLE: _ClassVar[RequestResponse.Reason]
+        INVALID_NAME: _ClassVar[RequestResponse.Reason]
+        DUPLICATE_HANDLE: _ClassVar[RequestResponse.Reason]
+        DUPLICATE_NAME: _ClassVar[RequestResponse.Reason]
     OK: RequestResponse.Reason
     NOT_FOUND: RequestResponse.Reason
     NOT_ALLOWED: RequestResponse.Reason
@@ -615,6 +698,10 @@ class RequestResponse(_message.Message):
     QUEUED: RequestResponse.Reason
     UNSUPPORTED_TYPE: RequestResponse.Reason
     UNCLASSIFIED_ERROR: RequestResponse.Reason
+    INVALID_HANDLE: RequestResponse.Reason
+    INVALID_NAME: RequestResponse.Reason
+    DUPLICATE_HANDLE: RequestResponse.Reason
+    DUPLICATE_NAME: RequestResponse.Reason
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     REASON_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
@@ -624,6 +711,8 @@ class RequestResponse(_message.Message):
     UPDATE_METADATA_FIELD_NUMBER: _ClassVar[int]
     UPDATE_AUDIO_TRACK_FIELD_NUMBER: _ClassVar[int]
     UPDATE_VIDEO_TRACK_FIELD_NUMBER: _ClassVar[int]
+    PUBLISH_DATA_TRACK_FIELD_NUMBER: _ClassVar[int]
+    UNPUBLISH_DATA_TRACK_FIELD_NUMBER: _ClassVar[int]
     request_id: int
     reason: RequestResponse.Reason
     message: str
@@ -633,7 +722,9 @@ class RequestResponse(_message.Message):
     update_metadata: UpdateParticipantMetadata
     update_audio_track: UpdateLocalAudioTrack
     update_video_track: UpdateLocalVideoTrack
-    def __init__(self, request_id: _Optional[int] = ..., reason: _Optional[_Union[RequestResponse.Reason, str]] = ..., message: _Optional[str] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., add_track: _Optional[_Union[AddTrackRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., update_metadata: _Optional[_Union[UpdateParticipantMetadata, _Mapping]] = ..., update_audio_track: _Optional[_Union[UpdateLocalAudioTrack, _Mapping]] = ..., update_video_track: _Optional[_Union[UpdateLocalVideoTrack, _Mapping]] = ...) -> None: ...
+    publish_data_track: PublishDataTrackRequest
+    unpublish_data_track: UnpublishDataTrackRequest
+    def __init__(self, request_id: _Optional[int] = ..., reason: _Optional[_Union[RequestResponse.Reason, str]] = ..., message: _Optional[str] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., add_track: _Optional[_Union[AddTrackRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., update_metadata: _Optional[_Union[UpdateParticipantMetadata, _Mapping]] = ..., update_audio_track: _Optional[_Union[UpdateLocalAudioTrack, _Mapping]] = ..., update_video_track: _Optional[_Union[UpdateLocalVideoTrack, _Mapping]] = ..., publish_data_track: _Optional[_Union[PublishDataTrackRequest, _Mapping]] = ..., unpublish_data_track: _Optional[_Union[UnpublishDataTrackRequest, _Mapping]] = ...) -> None: ...
 
 class TrackSubscribed(_message.Message):
     __slots__ = ("track_sid",)
@@ -642,16 +733,18 @@ class TrackSubscribed(_message.Message):
     def __init__(self, track_sid: _Optional[str] = ...) -> None: ...
 
 class ConnectionSettings(_message.Message):
-    __slots__ = ("auto_subscribe", "adaptive_stream", "subscriber_allow_pause", "disable_ice_lite")
+    __slots__ = ("auto_subscribe", "adaptive_stream", "subscriber_allow_pause", "disable_ice_lite", "auto_subscribe_data_track")
     AUTO_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     ADAPTIVE_STREAM_FIELD_NUMBER: _ClassVar[int]
     SUBSCRIBER_ALLOW_PAUSE_FIELD_NUMBER: _ClassVar[int]
     DISABLE_ICE_LITE_FIELD_NUMBER: _ClassVar[int]
+    AUTO_SUBSCRIBE_DATA_TRACK_FIELD_NUMBER: _ClassVar[int]
     auto_subscribe: bool
     adaptive_stream: bool
     subscriber_allow_pause: bool
     disable_ice_lite: bool
-    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., subscriber_allow_pause: bool = ..., disable_ice_lite: bool = ...) -> None: ...
+    auto_subscribe_data_track: bool
+    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., subscriber_allow_pause: bool = ..., disable_ice_lite: bool = ..., auto_subscribe_data_track: bool = ...) -> None: ...
 
 class JoinRequest(_message.Message):
     __slots__ = ("client_info", "connection_settings", "metadata", "participant_attributes", "add_track_requests", "publisher_offer", "reconnect", "reconnect_reason", "participant_sid", "sync_state")
