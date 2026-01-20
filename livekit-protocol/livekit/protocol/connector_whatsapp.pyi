@@ -60,12 +60,20 @@ class DialWhatsAppCallResponse(_message.Message):
     def __init__(self, whatsapp_call_id: _Optional[str] = ..., room_name: _Optional[str] = ...) -> None: ...
 
 class DisconnectWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_call_id", "whatsapp_api_key")
+    __slots__ = ("whatsapp_call_id", "whatsapp_api_key", "disconnect_reason")
+    class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        BUSINESS_INITIATED: _ClassVar[DisconnectWhatsAppCallRequest.DisconnectReason]
+        USER_INITIATED: _ClassVar[DisconnectWhatsAppCallRequest.DisconnectReason]
+    BUSINESS_INITIATED: DisconnectWhatsAppCallRequest.DisconnectReason
+    USER_INITIATED: DisconnectWhatsAppCallRequest.DisconnectReason
     WHATSAPP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     WHATSAPP_API_KEY_FIELD_NUMBER: _ClassVar[int]
+    DISCONNECT_REASON_FIELD_NUMBER: _ClassVar[int]
     whatsapp_call_id: str
     whatsapp_api_key: str
-    def __init__(self, whatsapp_call_id: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ...) -> None: ...
+    disconnect_reason: DisconnectWhatsAppCallRequest.DisconnectReason
+    def __init__(self, whatsapp_call_id: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ..., disconnect_reason: _Optional[_Union[DisconnectWhatsAppCallRequest.DisconnectReason, str]] = ...) -> None: ...
 
 class DisconnectWhatsAppCallResponse(_message.Message):
     __slots__ = ()
