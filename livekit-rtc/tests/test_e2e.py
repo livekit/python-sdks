@@ -21,7 +21,7 @@ Usage:
 import asyncio
 import os
 import uuid
-from typing import Callable, TypeVar
+from typing import Any, Callable, Dict, List, TypeVar
 import numpy as np
 import pytest
 
@@ -55,7 +55,7 @@ async def assert_eventually(
     raise AssertionError(f"{message} (last result: {last_result})")
 
 
-def skip_if_no_credentials():
+def skip_if_no_credentials() -> Any:
     required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
     missing = [var for var in required_vars if not os.getenv(var)]
     return pytest.mark.skipif(
@@ -83,11 +83,12 @@ def unique_room_name(base: str) -> str:
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_publish_track():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_publish_track() -> None:
     """Test that a published track can be subscribed by another participant"""
     room_name = unique_room_name("test-publish-track")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     subscriber_room = rtc.Room()
@@ -102,7 +103,7 @@ async def test_publish_track():
     @subscriber_room.on("track_published")
     def on_track_published(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         track_published_event.set()
 
     @subscriber_room.on("track_subscribed")
@@ -110,7 +111,7 @@ async def test_publish_track():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         nonlocal subscribed_track
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             subscribed_track = track
@@ -141,11 +142,12 @@ async def test_publish_track():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_audio_stream_subscribe():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_audio_stream_subscribe() -> None:
     """Test that published audio can be consumed and has similar energy levels"""
     room_name = unique_room_name("test-audio-stream")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     subscriber_room = rtc.Room()
@@ -161,7 +163,7 @@ async def test_audio_stream_subscribe():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         nonlocal subscribed_track
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             subscribed_track = track
@@ -178,9 +180,9 @@ async def test_audio_stream_subscribe():
         await publisher_room.local_participant.publish_track(track, options)
         target_duration = 5.0
 
-        published_energy = []
+        published_energy: List[Any] = []
 
-        async def publish_audio():
+        async def publish_audio() -> None:
             async for frame in sine_wave_generator(440, target_duration, SAMPLE_RATE):
                 data = np.frombuffer(frame.data.tobytes(), dtype=np.int16)
                 energy = np.mean(np.abs(data.astype(np.float32)))
@@ -236,11 +238,12 @@ async def test_audio_stream_subscribe():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_room_lifecycle_events():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_room_lifecycle_events() -> None:
     """Test that room lifecycle and track events are fired properly"""
     room_name = unique_room_name("test-lifecycle-events")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     room1 = rtc.Room()
     room2 = rtc.Room()
@@ -248,7 +251,7 @@ async def test_room_lifecycle_events():
     token1 = create_token("participant-1", room_name)
     token2 = create_token("participant-2", room_name)
 
-    events = {
+    events: Dict[str, List[str]] = {
         "disconnected": [],
         "participant_connected": [],
         "participant_disconnected": [],
@@ -263,37 +266,37 @@ async def test_room_lifecycle_events():
     }
 
     @room1.on("disconnected")
-    def on_room1_disconnected(reason):
+    def on_room1_disconnected(reason: Any) -> None:
         events["disconnected"].append("room1")
 
     @room1.on("participant_connected")
-    def on_room1_participant_connected(participant: rtc.RemoteParticipant):
+    def on_room1_participant_connected(participant: rtc.RemoteParticipant) -> None:
         events["participant_connected"].append(f"room1-{participant.identity}")
 
     @room1.on("participant_disconnected")
-    def on_room1_participant_disconnected(participant: rtc.RemoteParticipant):
+    def on_room1_participant_disconnected(participant: rtc.RemoteParticipant) -> None:
         events["participant_disconnected"].append(f"room1-{participant.identity}")
 
     @room1.on("local_track_published")
-    def on_room1_local_track_published(publication: rtc.LocalTrackPublication, track):
+    def on_room1_local_track_published(publication: rtc.LocalTrackPublication, track: Any) -> None:
         events["local_track_published"].append(f"room1-{publication.sid}")
 
     @room1.on("local_track_unpublished")
-    def on_room1_local_track_unpublished(publication: rtc.LocalTrackPublication):
+    def on_room1_local_track_unpublished(publication: rtc.LocalTrackPublication) -> None:
         events["local_track_unpublished"].append(f"room1-{publication.sid}")
 
     @room1.on("room_updated")
-    def on_room1_room_updated():
+    def on_room1_room_updated() -> None:
         events["room_updated"].append("room1")
 
     @room1.on("connection_state_changed")
-    def on_room1_connection_state_changed(state: rtc.ConnectionState):
+    def on_room1_connection_state_changed(state: rtc.ConnectionState) -> None:
         events["connection_state_changed"].append(f"room1-{state}")
 
     @room2.on("track_published")
     def on_room2_track_published(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         events["track_published"].append(f"room2-{publication.sid}")
 
     @room2.on("track_subscribed")
@@ -301,13 +304,13 @@ async def test_room_lifecycle_events():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         events["track_subscribed"].append(f"room2-{publication.sid}")
 
     @room2.on("track_unpublished")
     def on_room2_track_unpublished(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         events["track_unpublished"].append(f"room2-{publication.sid}")
 
     try:
@@ -389,19 +392,20 @@ async def test_room_lifecycle_events():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_connection_state_transitions():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_connection_state_transitions() -> None:
     """Test that connection state transitions work correctly"""
     room_name = unique_room_name("test-connection-state")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     room = rtc.Room()
     token = create_token("state-test", room_name)
 
-    states = []
+    states: List[rtc.ConnectionState] = []
 
     @room.on("connection_state_changed")
-    def on_state_changed(state: rtc.ConnectionState):
+    def on_state_changed(state: rtc.ConnectionState) -> None:
         states.append(state)
 
     try:
@@ -414,7 +418,7 @@ async def test_connection_state_transitions():
             message="Room did not reach CONN_CONNECTED state",
         )
         await assert_eventually(
-            lambda: rtc.ConnectionState.CONN_CONNECTED in states,
+            lambda: rtc.ConnectionState.CONN_CONNECTED in states,  # type: ignore[comparison-overlap]
             message="CONN_CONNECTED state not in state change events",
         )
 

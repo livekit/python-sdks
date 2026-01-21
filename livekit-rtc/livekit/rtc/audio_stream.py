@@ -65,7 +65,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
 
@@ -266,7 +266,7 @@ class AudioStream:
         resp = FfiClient.instance.request(req)
         return resp.audio_stream_from_participant.stream
 
-    async def _run(self):
+    async def _run(self) -> None:
         while True:
             event = await self._ffi_queue.wait_for(self._is_event)
             audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event

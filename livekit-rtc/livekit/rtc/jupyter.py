@@ -50,7 +50,7 @@ def room_html(url: str, token: str, *, width: str, height: str) -> HTML:
             f'srcdoc="{escaped_content}"></iframe>'
         )
 
-    return HTML(html_text)
+    return HTML(html_text)  # type: ignore[no-untyped-call]
 
 
 def display_room(url: str, token: str, *, width: str = "100%", height: str = "110px") -> None:
@@ -65,4 +65,4 @@ def display_room(url: str, token: str, *, width: str = "100%", height: str = "11
         The rendered HTML will include the provided `url` and `token` in plain text.
         Avoid using sensitive tokens in public notebooks (e.g., tokens with long expiration times).
     """
-    display(room_html(url, token, width=width, height=height))
+    display(room_html(url, token, width=width, height=height))  # type: ignore[no-untyped-call]
