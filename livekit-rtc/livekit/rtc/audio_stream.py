@@ -102,7 +102,11 @@ class AudioStream:
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
+        # Only subscribe to audio_stream_event to avoid unnecessary memory allocations
+        # from other event types (room_event, track_event, etc.)
+        self._ffi_queue = FfiClient.instance.queue.subscribe(
+            self._loop, event_types={"audio_stream_event"}
+        )
         self._queue: RingQueue[AudioFrameEvent | None] = RingQueue(capacity)
 
         self._audio_filter_module: str | None = None

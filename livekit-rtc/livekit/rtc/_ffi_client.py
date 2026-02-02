@@ -24,7 +24,7 @@ import os
 import platform
 import atexit
 import threading
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, List, Optional, Set, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
@@ -95,11 +95,26 @@ T = TypeVar("T")
 class FfiQueue(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._subscribers: List[tuple[Queue[T], asyncio.AbstractEventLoop]] = []
+        # Format: (queue, loop, event_types or None)
+        self._subscribers: List[
+            tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Set[str]]]
+        ] = []
 
     def put(self, item: T) -> None:
+        # Get event type for filtering (if item has WhichOneof method)
+        which = None
+        try:
+            which = item.WhichOneof("message")  # type: ignore
+        except Exception:
+            pass
+
         with self._lock:
-            for queue, loop in self._subscribers:
+            for queue, loop, event_types in self._subscribers:
+                # Filter: if event_types specified and we know the type, skip non-matching
+                if event_types is not None and which is not None:
+                    if which not in event_types:
+                        continue
+
                 try:
                     loop.call_soon_threadsafe(queue.put_nowait, item)
                 except Exception as e:
@@ -107,17 +122,31 @@ class FfiQueue(Generic[T]):
                     # it's not good when it does occur, but we should not fail the entire runloop
                     logger.error("error putting to queue: %s", e)
 
-    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> Queue[T]:
+    def subscribe(
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        event_types: Optional[Set[str]] = None,
+    ) -> Queue[T]:
+        """Subscribe to FFI events.
+
+        Args:
+            loop: Event loop to use (defaults to current).
+            event_types: Optional set of event type names to receive (e.g., {"audio_stream_event"}).
+                        If None, receives all events (original behavior).
+
+        Returns:
+            Queue to receive events from.
+        """
         with self._lock:
             queue = Queue[T]()
             loop = loop or asyncio.get_event_loop()
-            self._subscribers.append((queue, loop))
+            self._subscribers.append((queue, loop, event_types))
             return queue
 
     def unsubscribe(self, queue: Queue[T]) -> None:
         with self._lock:
             # looping here is ok, since we don't expect a lot of subscribers
-            for i, (q, _) in enumerate(self._subscribers):
+            for i, (q, _, _) in enumerate(self._subscribers):
                 if q == queue:
                     self._subscribers.pop(i)
                     break
