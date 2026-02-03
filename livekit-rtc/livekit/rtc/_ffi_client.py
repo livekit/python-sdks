@@ -24,7 +24,7 @@ import os
 import platform
 import atexit
 import threading
-from typing import Generic, List, Optional, Set, TypeVar
+from typing import Callable, Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
@@ -95,25 +95,21 @@ T = TypeVar("T")
 class FfiQueue(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        # Format: (queue, loop, event_types or None)
+        # Format: (queue, loop, filter_fn or None)
         self._subscribers: List[
-            tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Set[str]]]
+            tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Callable[[T], bool]]]
         ] = []
 
     def put(self, item: T) -> None:
-        # Get event type for filtering (if item has WhichOneof method)
-        which = None
-        try:
-            which = item.WhichOneof("message")  # type: ignore
-        except Exception:
-            pass
-
         with self._lock:
-            for queue, loop, event_types in self._subscribers:
-                # Filter: if event_types specified and we know the type, skip non-matching
-                if event_types is not None and which is not None:
-                    if which not in event_types:
-                        continue
+            for queue, loop, filter_fn in self._subscribers:
+                # If filter provided, skip items that don't match
+                if filter_fn is not None:
+                    try:
+                        if not filter_fn(item):
+                            continue
+                    except Exception:
+                        pass  # On filter error, deliver the item
 
                 try:
                     loop.call_soon_threadsafe(queue.put_nowait, item)
@@ -125,14 +121,15 @@ class FfiQueue(Generic[T]):
     def subscribe(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-        event_types: Optional[Set[str]] = None,
+        filter_fn: Optional[Callable[[T], bool]] = None,
     ) -> Queue[T]:
         """Subscribe to FFI events.
 
         Args:
             loop: Event loop to use (defaults to current).
-            event_types: Optional set of event type names to receive (e.g., {"audio_stream_event"}).
-                        If None, receives all events (original behavior).
+            filter_fn: Optional filter function. If provided, only items where
+                      filter_fn(item) returns True will be delivered.
+                      If None, receives all events (original behavior).
 
         Returns:
             Queue to receive events from.
@@ -140,7 +137,7 @@ class FfiQueue(Generic[T]):
         with self._lock:
             queue = Queue[T]()
             loop = loop or asyncio.get_event_loop()
-            self._subscribers.append((queue, loop, event_types))
+            self._subscribers.append((queue, loop, filter_fn))
             return queue
 
     def unsubscribe(self, queue: Queue[T]) -> None:
