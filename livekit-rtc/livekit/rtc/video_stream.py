@@ -47,7 +47,12 @@ class VideoStream:
         **kwargs,
     ) -> None:
         self._loop = loop or asyncio.get_event_loop()
-        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
+        # Only subscribe to video_stream_event to avoid unnecessary memory allocations
+        # from other event types (room_event, track_event, etc.)
+        self._ffi_queue = FfiClient.instance.queue.subscribe(
+            self._loop,
+            filter_fn=lambda e: e.WhichOneof("message") == "video_stream_event",
+        )
         self._queue: RingQueue[VideoFrameEvent | None] = RingQueue(capacity)
         self._track: Track | None = track
         self._format = format
