@@ -241,21 +241,31 @@ class JobTermination(_message.Message):
     job_id: str
     def __init__(self, job_id: _Optional[str] = ...) -> None: ...
 
+class AgentSessionState(_message.Message):
+    __slots__ = ("version", "snapshot", "delta")
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    SNAPSHOT_FIELD_NUMBER: _ClassVar[int]
+    DELTA_FIELD_NUMBER: _ClassVar[int]
+    version: int
+    snapshot: bytes
+    delta: bytes
+    def __init__(self, version: _Optional[int] = ..., snapshot: _Optional[bytes] = ..., delta: _Optional[bytes] = ...) -> None: ...
+
 class TextMessageRequest(_message.Message):
-    __slots__ = ("message_id", "session_id", "agent_name", "metadata", "session_data", "text")
+    __slots__ = ("message_id", "session_id", "agent_name", "metadata", "session_state", "text")
     MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
     SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
-    SESSION_DATA_FIELD_NUMBER: _ClassVar[int]
+    SESSION_STATE_FIELD_NUMBER: _ClassVar[int]
     TEXT_FIELD_NUMBER: _ClassVar[int]
     message_id: str
     session_id: str
     agent_name: str
     metadata: str
-    session_data: bytes
+    session_state: AgentSessionState
     text: str
-    def __init__(self, message_id: _Optional[str] = ..., session_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., session_data: _Optional[bytes] = ..., text: _Optional[str] = ...) -> None: ...
+    def __init__(self, message_id: _Optional[str] = ..., session_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., session_state: _Optional[_Union[AgentSessionState, _Mapping]] = ..., text: _Optional[str] = ...) -> None: ...
 
 class PushTextRequest(_message.Message):
     __slots__ = ("message_id", "content")
@@ -266,11 +276,11 @@ class PushTextRequest(_message.Message):
     def __init__(self, message_id: _Optional[str] = ..., content: _Optional[str] = ...) -> None: ...
 
 class TextMessageResponse(_message.Message):
-    __slots__ = ("message_id", "session_data", "error")
+    __slots__ = ("message_id", "session_state", "error")
     MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
-    SESSION_DATA_FIELD_NUMBER: _ClassVar[int]
+    SESSION_STATE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     message_id: str
-    session_data: bytes
+    session_state: AgentSessionState
     error: str
-    def __init__(self, message_id: _Optional[str] = ..., session_data: _Optional[bytes] = ..., error: _Optional[str] = ...) -> None: ...
+    def __init__(self, message_id: _Optional[str] = ..., session_state: _Optional[_Union[AgentSessionState, _Mapping]] = ..., error: _Optional[str] = ...) -> None: ...
