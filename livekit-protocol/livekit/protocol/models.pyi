@@ -260,7 +260,7 @@ class PlayoutDelay(_message.Message):
     def __init__(self, enabled: bool = ..., min: _Optional[int] = ..., max: _Optional[int] = ...) -> None: ...
 
 class ParticipantPermission(_message.Message):
-    __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent", "can_subscribe_metrics")
+    __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent", "can_subscribe_metrics", "can_manage_agent_session")
     CAN_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_FIELD_NUMBER: _ClassVar[int]
     CAN_PUBLISH_DATA_FIELD_NUMBER: _ClassVar[int]
@@ -270,6 +270,7 @@ class ParticipantPermission(_message.Message):
     CAN_UPDATE_METADATA_FIELD_NUMBER: _ClassVar[int]
     AGENT_FIELD_NUMBER: _ClassVar[int]
     CAN_SUBSCRIBE_METRICS_FIELD_NUMBER: _ClassVar[int]
+    CAN_MANAGE_AGENT_SESSION_FIELD_NUMBER: _ClassVar[int]
     can_subscribe: bool
     can_publish: bool
     can_publish_data: bool
@@ -279,7 +280,8 @@ class ParticipantPermission(_message.Message):
     can_update_metadata: bool
     agent: bool
     can_subscribe_metrics: bool
-    def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ...) -> None: ...
+    can_manage_agent_session: bool
+    def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ..., can_manage_agent_session: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
     __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks")
