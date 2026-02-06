@@ -314,9 +314,11 @@ async def test_room_lifecycle_events():
         await room1.connect(url, token1)
 
         await assert_eventually(
-            lambda: len(events["connection_state_changed"]) > 0
-            and events["connection_state_changed"][-1]
-            == f"room1-{rtc.ConnectionState.CONN_CONNECTED}",
+            lambda: (
+                len(events["connection_state_changed"]) > 0
+                and events["connection_state_changed"][-1]
+                == f"room1-{rtc.ConnectionState.CONN_CONNECTED}"
+            ),
             message="room1 connection_state_changed event not fired or did not reach CONN_CONNECTED state",
         )
 
@@ -370,9 +372,13 @@ async def test_room_lifecycle_events():
         await room1.disconnect()
 
         await assert_eventually(
-            lambda: lambda: len(events["connection_state_changed"]) > 0
-            and events["connection_state_changed"][-1]
-            == f"room1-{rtc.ConnectionState.CONN_DISCONNECTED}",
+            lambda: (
+                lambda: (
+                    len(events["connection_state_changed"]) > 0
+                    and events["connection_state_changed"][-1]
+                    == f"room1-{rtc.ConnectionState.CONN_DISCONNECTED}"
+                )
+            ),
             message="room1 disconnected event not fired",
         )
 
