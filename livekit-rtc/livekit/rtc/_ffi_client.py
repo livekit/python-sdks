@@ -34,22 +34,27 @@ _resource_files = ExitStack()
 atexit.register(_resource_files.close)
 
 
+def _lib_name():
+    if platform.system() == "Linux":
+        return "liblivekit_ffi.so"
+    elif platform.system() == "Darwin":
+        return "liblivekit_ffi.dylib"
+    elif platform.system() == "Windows":
+        return "livekit_ffi.dll"
+    return None
+
+
 def get_ffi_lib():
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
     if libpath:
         return ctypes.CDLL(libpath)
 
-    if platform.system() == "Linux":
-        libname = "liblivekit_ffi.so"
-    elif platform.system() == "Darwin":
-        libname = "liblivekit_ffi.dylib"
-    elif platform.system() == "Windows":
-        libname = "livekit_ffi.dll"
-    else:
+    libname = _lib_name()
+    if libname is None:
         raise Exception(
-            f"no ffi library found for platform {platform.system()}. \
-                Set LIVEKIT_LIB_PATH to specify a the lib path"
+            f"no ffi library found for platform {platform.system()}. "
+            "Set LIVEKIT_LIB_PATH to specify the lib path"
         )
 
     res = importlib.resources.files("livekit.rtc.resources") / libname
@@ -58,31 +63,7 @@ def get_ffi_lib():
     return ctypes.CDLL(str(path))
 
 
-ffi_lib = get_ffi_lib()
 ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
-
-# C function types
-ffi_lib.livekit_ffi_initialize.argtypes = [
-    ffi_cb_fnc,
-    ctypes.c_bool,
-    ctypes.c_char_p,
-    ctypes.c_char_p,
-]
-
-ffi_lib.livekit_ffi_request.argtypes = [
-    ctypes.POINTER(ctypes.c_ubyte),
-    ctypes.c_size_t,
-    ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte)),
-    ctypes.POINTER(ctypes.c_size_t),
-]
-ffi_lib.livekit_ffi_request.restype = ctypes.c_uint64
-
-ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_uint64]
-ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
-
-
-ffi_lib.livekit_ffi_dispose.argtypes = []
-ffi_lib.livekit_ffi_dispose.restype = None
 
 INVALID_HANDLE = 0
 
@@ -102,7 +83,9 @@ class FfiHandle:
     def dispose(self) -> None:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True
-            assert ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
+            assert FfiClient.instance._ffi_lib.livekit_ffi_drop_handle(
+                ctypes.c_uint64(self.handle)
+            )
 
     def __repr__(self) -> str:
         return f"FfiHandle({self.handle})"
@@ -214,9 +197,39 @@ class FfiClient:
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
-        ffi_lib.livekit_ffi_initialize(
+        try:
+            self._ffi_lib = get_ffi_lib()
+        except Exception as e:
+            libname = _lib_name() or "livekit_ffi"
+            raise ImportError(
+                "failed to load %s: %s\n"
+                "Install the livekit package with: pip install livekit\n"
+                "Or set LIVEKIT_LIB_PATH to the path of the native library."
+                % (libname, e)
+            ) from None
+        self._ffi_lib.livekit_ffi_initialize.argtypes = [
+            ffi_cb_fnc,
+            ctypes.c_bool,
+            ctypes.c_char_p,
+            ctypes.c_char_p,
+        ]
+        self._ffi_lib.livekit_ffi_request.argtypes = [
+            ctypes.POINTER(ctypes.c_ubyte),
+            ctypes.c_size_t,
+            ctypes.POINTER(ctypes.POINTER(ctypes.c_ubyte)),
+            ctypes.POINTER(ctypes.c_size_t),
+        ]
+        self._ffi_lib.livekit_ffi_request.restype = ctypes.c_uint64
+        self._ffi_lib.livekit_ffi_drop_handle.argtypes = [ctypes.c_uint64]
+        self._ffi_lib.livekit_ffi_drop_handle.restype = ctypes.c_bool
+        self._ffi_lib.livekit_ffi_dispose.argtypes = []
+        self._ffi_lib.livekit_ffi_dispose.restype = None
+
+        self._ffi_lib.livekit_ffi_initialize(
             ffi_event_callback, True, b"python", __version__.encode("ascii")
         )
+
+        ffi_lib = self._ffi_lib
 
         @atexit.register
         def _dispose_lk_ffi():
@@ -233,7 +246,7 @@ class FfiClient:
 
         resp_ptr = ctypes.POINTER(ctypes.c_ubyte)()
         resp_len = ctypes.c_size_t()
-        handle = ffi_lib.livekit_ffi_request(
+        handle = self._ffi_lib.livekit_ffi_request(
             data, proto_len, ctypes.byref(resp_ptr), ctypes.byref(resp_len)
         )
         assert handle != INVALID_HANDLE
