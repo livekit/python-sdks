@@ -83,9 +83,7 @@ class FfiHandle:
     def dispose(self) -> None:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True
-            assert FfiClient.instance._ffi_lib.livekit_ffi_drop_handle(
-                ctypes.c_uint64(self.handle)
-            )
+            assert FfiClient.instance._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
 
     def __repr__(self) -> str:
         return f"FfiHandle({self.handle})"
@@ -204,8 +202,7 @@ class FfiClient:
             raise ImportError(
                 "failed to load %s: %s\n"
                 "Install the livekit package with: pip install livekit\n"
-                "Or set LIVEKIT_LIB_PATH to the path of the native library."
-                % (libname, e)
+                "Or set LIVEKIT_LIB_PATH to the path of the native library." % (libname, e)
             ) from None
         self._ffi_lib.livekit_ffi_initialize.argtypes = [
             ffi_cb_fnc,
