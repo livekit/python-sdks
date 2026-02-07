@@ -318,9 +318,7 @@ class LocalParticipant(Participant):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
-            cb = await queue.wait_for(
-                lambda e: (e.perform_rpc.async_id == resp.perform_rpc.async_id)
-            )
+            cb = await queue.wait_for(lambda e: e.perform_rpc.async_id == resp.perform_rpc.async_id)
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
