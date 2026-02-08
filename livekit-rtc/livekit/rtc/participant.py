@@ -120,6 +120,11 @@ class Participant(ABC):
         return self._info.kind
 
     @property
+    def permissions(self) -> proto_participant.ParticipantPermission:
+        """The participant's permissions within the room."""
+        return self._info.permission
+
+    @property
     def disconnect_reason(
         self,
     ) -> Optional[proto_participant.DisconnectReason.ValueType]:
