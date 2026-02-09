@@ -541,6 +541,34 @@ class Room(EventEmitter[EventTypes]):
 
         return RtcStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
 
+    async def restart_publisher(self) -> None:
+        """Restart the publisher PeerConnection with an ICE restart.
+
+        This is useful when the publisher connection fails while the subscriber still works.
+        For example, when sending data (stream_text/publish_data) times out but receiving
+        audio/video still works.
+
+        Raises:
+            NotImplementedError: This method requires FFI bindings in rust-sdks.
+                See: https://github.com/livekit/rust-sdks/issues/XXX
+
+        Example:
+            ```python
+            try:
+                await room.local_participant.publish_data(data)
+            except TimeoutError:
+                # Publisher might be stuck, try to restart it
+                await room.restart_publisher()
+                # Retry the operation
+                await room.local_participant.publish_data(data)
+            ```
+        """
+        raise NotImplementedError(
+            "restart_publisher() requires FFI bindings in livekit/rust-sdks. "
+            "This is a placeholder for future implementation. "
+            "See: https://github.com/livekit/python-sdks/pull/571"
+        )
+
     def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
         existing_handler = self._byte_stream_handlers.get(topic)
         if existing_handler is None:
