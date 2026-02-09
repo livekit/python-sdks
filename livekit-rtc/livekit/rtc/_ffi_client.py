@@ -24,7 +24,7 @@ import os
 import platform
 import atexit
 import threading
-from typing import Generic, List, Optional, TypeVar
+from typing import Callable, Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
 from ._utils import Queue, classproperty
@@ -95,11 +95,22 @@ T = TypeVar("T")
 class FfiQueue(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._subscribers: List[tuple[Queue[T], asyncio.AbstractEventLoop]] = []
+        # Format: (queue, loop, filter_fn or None)
+        self._subscribers: List[
+            tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Callable[[T], bool]]]
+        ] = []
 
     def put(self, item: T) -> None:
         with self._lock:
-            for queue, loop in self._subscribers:
+            for queue, loop, filter_fn in self._subscribers:
+                # If filter provided, skip items that don't match
+                if filter_fn is not None:
+                    try:
+                        if not filter_fn(item):
+                            continue
+                    except Exception:
+                        pass  # On filter error, deliver the item
+
                 try:
                     loop.call_soon_threadsafe(queue.put_nowait, item)
                 except Exception as e:
@@ -107,17 +118,32 @@ class FfiQueue(Generic[T]):
                     # it's not good when it does occur, but we should not fail the entire runloop
                     logger.error("error putting to queue: %s", e)
 
-    def subscribe(self, loop: Optional[asyncio.AbstractEventLoop] = None) -> Queue[T]:
+    def subscribe(
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        filter_fn: Optional[Callable[[T], bool]] = None,
+    ) -> Queue[T]:
+        """Subscribe to FFI events.
+
+        Args:
+            loop: Event loop to use (defaults to current).
+            filter_fn: Optional filter function. If provided, only items where
+                      filter_fn(item) returns True will be delivered.
+                      If None, receives all events (original behavior).
+
+        Returns:
+            Queue to receive events from.
+        """
         with self._lock:
             queue = Queue[T]()
             loop = loop or asyncio.get_event_loop()
-            self._subscribers.append((queue, loop))
+            self._subscribers.append((queue, loop, filter_fn))
             return queue
 
     def unsubscribe(self, queue: Queue[T]) -> None:
         with self._lock:
             # looping here is ok, since we don't expect a lot of subscribers
-            for i, (q, _) in enumerate(self._subscribers):
+            for i, (q, _, _) in enumerate(self._subscribers):
                 if q == queue:
                     self._subscribers.pop(i)
                     break
