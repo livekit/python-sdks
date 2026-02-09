@@ -24,6 +24,7 @@ import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
 import sys
+from . import track_pb2
 import typing
 
 if sys.version_info >= (3, 10):
@@ -45,6 +46,7 @@ class _ParticipantKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper
     PARTICIPANT_KIND_SIP: _ParticipantKind.ValueType  # 3
     PARTICIPANT_KIND_AGENT: _ParticipantKind.ValueType  # 4
     PARTICIPANT_KIND_CONNECTOR: _ParticipantKind.ValueType  # 5
+    PARTICIPANT_KIND_BRIDGE: _ParticipantKind.ValueType  # 6
 
 class ParticipantKind(_ParticipantKind, metaclass=_ParticipantKindEnumTypeWrapper): ...
 
@@ -54,6 +56,7 @@ PARTICIPANT_KIND_EGRESS: ParticipantKind.ValueType  # 2
 PARTICIPANT_KIND_SIP: ParticipantKind.ValueType  # 3
 PARTICIPANT_KIND_AGENT: ParticipantKind.ValueType  # 4
 PARTICIPANT_KIND_CONNECTOR: ParticipantKind.ValueType  # 5
+PARTICIPANT_KIND_BRIDGE: ParticipantKind.ValueType  # 6
 global___ParticipantKind = ParticipantKind
 
 class _ParticipantKindDetail:
@@ -66,6 +69,7 @@ class _ParticipantKindDetailEnumTypeWrapper(google.protobuf.internal.enum_type_w
     PARTICIPANT_KIND_DETAIL_FORWARDED: _ParticipantKindDetail.ValueType  # 1
     PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: _ParticipantKindDetail.ValueType  # 2
     PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: _ParticipantKindDetail.ValueType  # 3
+    PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: _ParticipantKindDetail.ValueType  # 4
 
 class ParticipantKindDetail(_ParticipantKindDetail, metaclass=_ParticipantKindDetailEnumTypeWrapper): ...
 
@@ -73,6 +77,7 @@ PARTICIPANT_KIND_DETAIL_CLOUD_AGENT: ParticipantKindDetail.ValueType  # 0
 PARTICIPANT_KIND_DETAIL_FORWARDED: ParticipantKindDetail.ValueType  # 1
 PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: ParticipantKindDetail.ValueType  # 2
 PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: ParticipantKindDetail.ValueType  # 3
+PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: ParticipantKindDetail.ValueType  # 4
 global___ParticipantKindDetail = ParticipantKindDetail
 
 class _DisconnectReason:
@@ -173,6 +178,7 @@ class ParticipantInfo(google.protobuf.message.Message):
     KIND_FIELD_NUMBER: builtins.int
     DISCONNECT_REASON_FIELD_NUMBER: builtins.int
     KIND_DETAILS_FIELD_NUMBER: builtins.int
+    PERMISSION_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
@@ -183,6 +189,8 @@ class ParticipantInfo(google.protobuf.message.Message):
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
     def kind_details(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___ParticipantKindDetail.ValueType]: ...
+    @property
+    def permission(self) -> global___ParticipantPermission: ...
     def __init__(
         self,
         *,
@@ -194,9 +202,10 @@ class ParticipantInfo(google.protobuf.message.Message):
         kind: global___ParticipantKind.ValueType | None = ...,
         disconnect_reason: global___DisconnectReason.ValueType | None = ...,
         kind_details: collections.abc.Iterable[global___ParticipantKindDetail.ValueType] | None = ...,
+        permission: global___ParticipantPermission | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "sid", b"sid"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 
@@ -220,3 +229,52 @@ class OwnedParticipant(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
 global___OwnedParticipant = OwnedParticipant
+
+@typing.final
+class ParticipantPermission(google.protobuf.message.Message):
+    """copied from livekit-protocol/protocol/protobufs/livekit_models.proto and removed deprecated fields"""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CAN_SUBSCRIBE_FIELD_NUMBER: builtins.int
+    CAN_PUBLISH_FIELD_NUMBER: builtins.int
+    CAN_PUBLISH_DATA_FIELD_NUMBER: builtins.int
+    CAN_PUBLISH_SOURCES_FIELD_NUMBER: builtins.int
+    HIDDEN_FIELD_NUMBER: builtins.int
+    CAN_UPDATE_METADATA_FIELD_NUMBER: builtins.int
+    CAN_SUBSCRIBE_METRICS_FIELD_NUMBER: builtins.int
+    CAN_MANAGE_AGENT_SESSION_FIELD_NUMBER: builtins.int
+    can_subscribe: builtins.bool
+    """allow participant to subscribe to other tracks in the room"""
+    can_publish: builtins.bool
+    """allow participant to publish new tracks to room"""
+    can_publish_data: builtins.bool
+    """allow participant to publish data"""
+    hidden: builtins.bool
+    """indicates that it's hidden to others"""
+    can_update_metadata: builtins.bool
+    """indicates that participant can update own metadata and attributes"""
+    can_subscribe_metrics: builtins.bool
+    """if a participant can subscribe to metrics"""
+    can_manage_agent_session: builtins.bool
+    """if a participant can manage an agent session via RemoteSession (control and access state)"""
+    @property
+    def can_publish_sources(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[track_pb2.TrackSource.ValueType]:
+        """sources that are allowed to be published"""
+
+    def __init__(
+        self,
+        *,
+        can_subscribe: builtins.bool | None = ...,
+        can_publish: builtins.bool | None = ...,
+        can_publish_data: builtins.bool | None = ...,
+        can_publish_sources: collections.abc.Iterable[track_pb2.TrackSource.ValueType] | None = ...,
+        hidden: builtins.bool | None = ...,
+        can_update_metadata: builtins.bool | None = ...,
+        can_subscribe_metrics: builtins.bool | None = ...,
+        can_manage_agent_session: builtins.bool | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["can_manage_agent_session", b"can_manage_agent_session", "can_publish", b"can_publish", "can_publish_data", b"can_publish_data", "can_subscribe", b"can_subscribe", "can_subscribe_metrics", b"can_subscribe_metrics", "can_update_metadata", b"can_update_metadata", "hidden", b"hidden"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["can_manage_agent_session", b"can_manage_agent_session", "can_publish", b"can_publish", "can_publish_data", b"can_publish_data", "can_publish_sources", b"can_publish_sources", "can_subscribe", b"can_subscribe", "can_subscribe_metrics", b"can_subscribe_metrics", "can_update_metadata", b"can_update_metadata", "hidden", b"hidden"]) -> None: ...
+
+global___ParticipantPermission = ParticipantPermission

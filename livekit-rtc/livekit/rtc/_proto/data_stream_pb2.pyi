@@ -95,14 +95,17 @@ class TextStreamReaderReadAllRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     READER_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     reader_handle: builtins.int
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         reader_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___TextStreamReaderReadAllRequest = TextStreamReaderReadAllRequest
 
@@ -265,14 +268,17 @@ class ByteStreamReaderReadAllRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     READER_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     reader_handle: builtins.int
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         reader_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___ByteStreamReaderReadAllRequest = ByteStreamReaderReadAllRequest
 
@@ -323,9 +329,11 @@ class ByteStreamReaderWriteToFileRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     READER_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     DIRECTORY_FIELD_NUMBER: builtins.int
     NAME_OVERRIDE_FIELD_NUMBER: builtins.int
     reader_handle: builtins.int
+    request_async_id: builtins.int
     directory: builtins.str
     """Directory to write the file in (must be writable by the current process).
     If not provided, the file will be written to the system's temp directory.
@@ -339,11 +347,12 @@ class ByteStreamReaderWriteToFileRequest(google.protobuf.message.Message):
         self,
         *,
         reader_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
         directory: builtins.str | None = ...,
         name_override: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["directory", b"directory", "name_override", b"name_override", "reader_handle", b"reader_handle", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___ByteStreamReaderWriteToFileRequest = ByteStreamReaderWriteToFileRequest
 
@@ -458,9 +467,11 @@ class StreamSendFileRequest(google.protobuf.message.Message):
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     FILE_PATH_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     file_path: builtins.str
     """Path of the file to send (must be readable by the current process)."""
+    request_async_id: builtins.int
     @property
     def options(self) -> global___StreamByteOptions: ...
     def __init__(
@@ -469,9 +480,10 @@ class StreamSendFileRequest(google.protobuf.message.Message):
         local_participant_handle: builtins.int | None = ...,
         options: global___StreamByteOptions | None = ...,
         file_path: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["file_path", b"file_path", "local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___StreamSendFileRequest = StreamSendFileRequest
 
@@ -528,9 +540,11 @@ class StreamSendBytesRequest(google.protobuf.message.Message):
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     BYTES_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     bytes: builtins.bytes
     """Bytes to send."""
+    request_async_id: builtins.int
     @property
     def options(self) -> global___StreamByteOptions: ...
     def __init__(
@@ -539,9 +553,10 @@ class StreamSendBytesRequest(google.protobuf.message.Message):
         local_participant_handle: builtins.int | None = ...,
         options: global___StreamByteOptions | None = ...,
         bytes: builtins.bytes | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___StreamSendBytesRequest = StreamSendBytesRequest
 
@@ -598,9 +613,11 @@ class StreamSendTextRequest(google.protobuf.message.Message):
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     TEXT_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     text: builtins.str
     """Text to send."""
+    request_async_id: builtins.int
     @property
     def options(self) -> global___StreamTextOptions: ...
     def __init__(
@@ -609,9 +626,10 @@ class StreamSendTextRequest(google.protobuf.message.Message):
         local_participant_handle: builtins.int | None = ...,
         options: global___StreamTextOptions | None = ...,
         text: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "text", b"text"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "text", b"text"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "text", b"text"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "text", b"text"]) -> None: ...
 
 global___StreamSendTextRequest = StreamSendTextRequest
 
@@ -689,7 +707,9 @@ class ByteStreamOpenRequest(google.protobuf.message.Message):
 
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
+    request_async_id: builtins.int
     @property
     def options(self) -> global___StreamByteOptions:
         """Options to use for opening the stream."""
@@ -699,9 +719,10 @@ class ByteStreamOpenRequest(google.protobuf.message.Message):
         *,
         local_participant_handle: builtins.int | None = ...,
         options: global___StreamByteOptions | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___ByteStreamOpenRequest = ByteStreamOpenRequest
 
@@ -754,16 +775,19 @@ class ByteStreamWriterWriteRequest(google.protobuf.message.Message):
 
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     BYTES_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     bytes: builtins.bytes
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         bytes: builtins.bytes | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bytes", b"bytes", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "writer_handle", b"writer_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["bytes", b"bytes", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["bytes", b"bytes", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___ByteStreamWriterWriteRequest = ByteStreamWriterWriteRequest
 
@@ -811,16 +835,19 @@ class ByteStreamWriterCloseRequest(google.protobuf.message.Message):
 
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     REASON_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     reason: builtins.str
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         reason: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___ByteStreamWriterCloseRequest = ByteStreamWriterCloseRequest
 
@@ -893,7 +920,9 @@ class TextStreamOpenRequest(google.protobuf.message.Message):
 
     LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
+    request_async_id: builtins.int
     @property
     def options(self) -> global___StreamTextOptions:
         """Options to use for opening the stream."""
@@ -903,9 +932,10 @@ class TextStreamOpenRequest(google.protobuf.message.Message):
         *,
         local_participant_handle: builtins.int | None = ...,
         options: global___StreamTextOptions | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> None: ...
 
 global___TextStreamOpenRequest = TextStreamOpenRequest
 
@@ -958,16 +988,19 @@ class TextStreamWriterWriteRequest(google.protobuf.message.Message):
 
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     TEXT_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     text: builtins.str
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         text: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["text", b"text", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["text", b"text", "writer_handle", b"writer_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "text", b"text", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "text", b"text", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___TextStreamWriterWriteRequest = TextStreamWriterWriteRequest
 
@@ -1015,16 +1048,19 @@ class TextStreamWriterCloseRequest(google.protobuf.message.Message):
 
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     REASON_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     reason: builtins.str
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         reason: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reason", b"reason", "writer_handle", b"writer_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___TextStreamWriterCloseRequest = TextStreamWriterCloseRequest
 

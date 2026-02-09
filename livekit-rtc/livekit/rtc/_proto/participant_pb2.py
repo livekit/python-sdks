@@ -13,9 +13,10 @@ _sym_db = _symbol_database.Default()
 
 
 from . import handle_pb2 as handle__pb2
+from . import track_pb2 as track__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11participant.proto\x12\rlivekit.proto\x1a\x0chandle.proto\"\xed\x02\n\x0fParticipantInfo\x12\x0b\n\x03sid\x18\x01 \x02(\t\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x10\n\x08identity\x18\x03 \x02(\t\x12\x10\n\x08metadata\x18\x04 \x02(\t\x12\x42\n\nattributes\x18\x05 \x03(\x0b\x32..livekit.proto.ParticipantInfo.AttributesEntry\x12,\n\x04kind\x18\x06 \x02(\x0e\x32\x1e.livekit.proto.ParticipantKind\x12:\n\x11\x64isconnect_reason\x18\x07 \x02(\x0e\x32\x1f.livekit.proto.DisconnectReason\x12:\n\x0ckind_details\x18\x08 \x03(\x0e\x32$.livekit.proto.ParticipantKindDetail\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"o\n\x10OwnedParticipant\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.ParticipantInfo*\xc1\x01\n\x0fParticipantKind\x12\x1d\n\x19PARTICIPANT_KIND_STANDARD\x10\x00\x12\x1c\n\x18PARTICIPANT_KIND_INGRESS\x10\x01\x12\x1b\n\x17PARTICIPANT_KIND_EGRESS\x10\x02\x12\x18\n\x14PARTICIPANT_KIND_SIP\x10\x03\x12\x1a\n\x16PARTICIPANT_KIND_AGENT\x10\x04\x12\x1e\n\x1aPARTICIPANT_KIND_CONNECTOR\x10\x05*\xc5\x01\n\x15ParticipantKindDetail\x12\'\n#PARTICIPANT_KIND_DETAIL_CLOUD_AGENT\x10\x00\x12%\n!PARTICIPANT_KIND_DETAIL_FORWARDED\x10\x01\x12.\n*PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP\x10\x02\x12,\n(PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO\x10\x03*\xd7\x02\n\x10\x44isconnectReason\x12\x12\n\x0eUNKNOWN_REASON\x10\x00\x12\x14\n\x10\x43LIENT_INITIATED\x10\x01\x12\x16\n\x12\x44UPLICATE_IDENTITY\x10\x02\x12\x13\n\x0fSERVER_SHUTDOWN\x10\x03\x12\x17\n\x13PARTICIPANT_REMOVED\x10\x04\x12\x10\n\x0cROOM_DELETED\x10\x05\x12\x12\n\x0eSTATE_MISMATCH\x10\x06\x12\x10\n\x0cJOIN_FAILURE\x10\x07\x12\r\n\tMIGRATION\x10\x08\x12\x10\n\x0cSIGNAL_CLOSE\x10\t\x12\x0f\n\x0bROOM_CLOSED\x10\n\x12\x14\n\x10USER_UNAVAILABLE\x10\x0b\x12\x11\n\rUSER_REJECTED\x10\x0c\x12\x15\n\x11SIP_TRUNK_FAILURE\x10\r\x12\x16\n\x12\x43ONNECTION_TIMEOUT\x10\x0e\x12\x11\n\rMEDIA_FAILURE\x10\x0f\x42\x10\xaa\x02\rLiveKit.Proto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11participant.proto\x12\rlivekit.proto\x1a\x0chandle.proto\x1a\x0btrack.proto\"\xa7\x03\n\x0fParticipantInfo\x12\x0b\n\x03sid\x18\x01 \x02(\t\x12\x0c\n\x04name\x18\x02 \x02(\t\x12\x10\n\x08identity\x18\x03 \x02(\t\x12\x10\n\x08metadata\x18\x04 \x02(\t\x12\x42\n\nattributes\x18\x05 \x03(\x0b\x32..livekit.proto.ParticipantInfo.AttributesEntry\x12,\n\x04kind\x18\x06 \x02(\x0e\x32\x1e.livekit.proto.ParticipantKind\x12:\n\x11\x64isconnect_reason\x18\x07 \x02(\x0e\x32\x1f.livekit.proto.DisconnectReason\x12:\n\x0ckind_details\x18\x08 \x03(\x0e\x32$.livekit.proto.ParticipantKindDetail\x12\x38\n\npermission\x18\t \x01(\x0b\x32$.livekit.proto.ParticipantPermission\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"o\n\x10OwnedParticipant\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.ParticipantInfo\"\x84\x02\n\x15ParticipantPermission\x12\x15\n\rcan_subscribe\x18\x01 \x02(\x08\x12\x13\n\x0b\x63\x61n_publish\x18\x02 \x02(\x08\x12\x18\n\x10\x63\x61n_publish_data\x18\x03 \x02(\x08\x12\x37\n\x13\x63\x61n_publish_sources\x18\t \x03(\x0e\x32\x1a.livekit.proto.TrackSource\x12\x0e\n\x06hidden\x18\x07 \x02(\x08\x12\x1b\n\x13\x63\x61n_update_metadata\x18\n \x02(\x08\x12\x1d\n\x15\x63\x61n_subscribe_metrics\x18\x0c \x02(\x08\x12 \n\x18\x63\x61n_manage_agent_session\x18\r \x02(\x08*\xde\x01\n\x0fParticipantKind\x12\x1d\n\x19PARTICIPANT_KIND_STANDARD\x10\x00\x12\x1c\n\x18PARTICIPANT_KIND_INGRESS\x10\x01\x12\x1b\n\x17PARTICIPANT_KIND_EGRESS\x10\x02\x12\x18\n\x14PARTICIPANT_KIND_SIP\x10\x03\x12\x1a\n\x16PARTICIPANT_KIND_AGENT\x10\x04\x12\x1e\n\x1aPARTICIPANT_KIND_CONNECTOR\x10\x05\x12\x1b\n\x17PARTICIPANT_KIND_BRIDGE\x10\x06*\xee\x01\n\x15ParticipantKindDetail\x12\'\n#PARTICIPANT_KIND_DETAIL_CLOUD_AGENT\x10\x00\x12%\n!PARTICIPANT_KIND_DETAIL_FORWARDED\x10\x01\x12.\n*PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP\x10\x02\x12,\n(PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO\x10\x03\x12\'\n#PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP\x10\x04*\xd7\x02\n\x10\x44isconnectReason\x12\x12\n\x0eUNKNOWN_REASON\x10\x00\x12\x14\n\x10\x43LIENT_INITIATED\x10\x01\x12\x16\n\x12\x44UPLICATE_IDENTITY\x10\x02\x12\x13\n\x0fSERVER_SHUTDOWN\x10\x03\x12\x17\n\x13PARTICIPANT_REMOVED\x10\x04\x12\x10\n\x0cROOM_DELETED\x10\x05\x12\x12\n\x0eSTATE_MISMATCH\x10\x06\x12\x10\n\x0cJOIN_FAILURE\x10\x07\x12\r\n\tMIGRATION\x10\x08\x12\x10\n\x0cSIGNAL_CLOSE\x10\t\x12\x0f\n\x0bROOM_CLOSED\x10\n\x12\x14\n\x10USER_UNAVAILABLE\x10\x0b\x12\x11\n\rUSER_REJECTED\x10\x0c\x12\x15\n\x11SIP_TRUNK_FAILURE\x10\r\x12\x16\n\x12\x43ONNECTION_TIMEOUT\x10\x0e\x12\x11\n\rMEDIA_FAILURE\x10\x0f\x42\x10\xaa\x02\rLiveKit.Proto')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,16 +26,18 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
   _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._options = None
   _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_options = b'8\001'
-  _globals['_PARTICIPANTKIND']._serialized_start=532
-  _globals['_PARTICIPANTKIND']._serialized_end=725
-  _globals['_PARTICIPANTKINDDETAIL']._serialized_start=728
-  _globals['_PARTICIPANTKINDDETAIL']._serialized_end=925
-  _globals['_DISCONNECTREASON']._serialized_start=928
-  _globals['_DISCONNECTREASON']._serialized_end=1271
-  _globals['_PARTICIPANTINFO']._serialized_start=51
-  _globals['_PARTICIPANTINFO']._serialized_end=416
-  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_start=367
-  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_end=416
-  _globals['_OWNEDPARTICIPANT']._serialized_start=418
-  _globals['_OWNEDPARTICIPANT']._serialized_end=529
+  _globals['_PARTICIPANTKIND']._serialized_start=866
+  _globals['_PARTICIPANTKIND']._serialized_end=1088
+  _globals['_PARTICIPANTKINDDETAIL']._serialized_start=1091
+  _globals['_PARTICIPANTKINDDETAIL']._serialized_end=1329
+  _globals['_DISCONNECTREASON']._serialized_start=1332
+  _globals['_DISCONNECTREASON']._serialized_end=1675
+  _globals['_PARTICIPANTINFO']._serialized_start=64
+  _globals['_PARTICIPANTINFO']._serialized_end=487
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_start=438
+  _globals['_PARTICIPANTINFO_ATTRIBUTESENTRY']._serialized_end=487
+  _globals['_OWNEDPARTICIPANT']._serialized_start=489
+  _globals['_OWNEDPARTICIPANT']._serialized_end=600
+  _globals['_PARTICIPANTPERMISSION']._serialized_start=603
+  _globals['_PARTICIPANTPERMISSION']._serialized_end=863
 # @@protoc_insertion_point(module_scope)

@@ -198,14 +198,17 @@ class GetStatsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
         track_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> None: ...
 
 global___GetStatsRequest = GetStatsRequest
 
