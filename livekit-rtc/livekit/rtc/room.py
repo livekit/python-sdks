@@ -65,7 +65,7 @@ EventTypes = Literal[
     "participant_attributes_changed",
     "connection_quality_changed",
     "participant_encryption_status_changed",
-    "participant_permission_changed",
+    "participant_permissions_changed",
     "data_received",
     "sip_dtmf_received",
     "transcription_received",
@@ -788,13 +788,13 @@ class Room(EventEmitter[EventTypes]):
                 participant,
                 event.participant_encryption_status_changed.is_encrypted,
             )
-        elif which == "participant_permission_changed":
+        elif which == "participant_permissions_changed":
             identity = event.participant_permission_changed.participant_identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
             participant._info.permission.CopyFrom(event.participant_permission_changed.permission)
             self.emit(
-                "participant_permission_changed",
+                "participant_permissions_changed",
                 participant,
                 participant.permissions,
             )
