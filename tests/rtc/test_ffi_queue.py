@@ -14,79 +14,16 @@
 
 """Tests for FfiQueue filter_fn functionality.
 
-These tests verify the filter_fn feature of FfiQueue without
-requiring the native FFI library.
+These tests verify the filter_fn feature of FfiQueue.
+FfiQueue can be imported without loading the native FFI library.
 """
 
 import asyncio
-import threading
 from dataclasses import dataclass
-from typing import Callable, Generic, List, Optional, TypeVar
-from unittest.mock import MagicMock
 
 import pytest
 
-# Re-implement FfiQueue locally for testing (avoids FFI library dependency)
-T = TypeVar("T")
-
-
-class Queue(Generic[T]):
-    """Simple asyncio-compatible queue for testing."""
-
-    def __init__(self) -> None:
-        self._items: List[T] = []
-
-    def put_nowait(self, item: T) -> None:
-        self._items.append(item)
-
-    def get_nowait(self) -> T:
-        return self._items.pop(0)
-
-    def empty(self) -> bool:
-        return len(self._items) == 0
-
-
-class FfiQueue(Generic[T]):
-    """Copy of FfiQueue with filter_fn for testing."""
-
-    def __init__(self) -> None:
-        self._lock = threading.RLock()
-        self._subscribers: List[
-            tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Callable[[T], bool]]]
-        ] = []
-
-    def put(self, item: T) -> None:
-        with self._lock:
-            for queue, loop, filter_fn in self._subscribers:
-                if filter_fn is not None:
-                    try:
-                        if not filter_fn(item):
-                            continue
-                    except Exception:
-                        pass  # On filter error, deliver the item
-
-                try:
-                    loop.call_soon_threadsafe(queue.put_nowait, item)
-                except Exception:
-                    pass
-
-    def subscribe(
-        self,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        filter_fn: Optional[Callable[[T], bool]] = None,
-    ) -> Queue[T]:
-        with self._lock:
-            queue = Queue[T]()
-            loop = loop or asyncio.get_event_loop()
-            self._subscribers.append((queue, loop, filter_fn))
-            return queue
-
-    def unsubscribe(self, queue: Queue[T]) -> None:
-        with self._lock:
-            for i, (q, _, _) in enumerate(self._subscribers):
-                if q == queue:
-                    self._subscribers.pop(i)
-                    break
+from livekit.rtc._ffi_client import FfiQueue
 
 
 @dataclass
