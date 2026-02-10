@@ -147,8 +147,9 @@ class TestFfiQueueFilterFn:
         queue = FfiQueue()
         sub = queue.subscribe(
             event_loop,
-            filter_fn=lambda e: e.WhichOneof("message")
-            in {"audio_stream_event", "video_stream_event"},
+            filter_fn=lambda e: (
+                e.WhichOneof("message") in {"audio_stream_event", "video_stream_event"}
+            ),
         )
 
         events = [

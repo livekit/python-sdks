@@ -139,6 +139,9 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.13"
             artifact: rtc-release-ubuntu-latest
+          - os: ubuntu-latest
+            python-version: "3.14"
+            artifact: rtc-release-ubuntu-latest
           # macOS tests (arm64 runner)
           - os: macos-latest
             python-version: "3.9"
@@ -146,12 +149,18 @@ jobs:
           - os: macos-latest
             python-version: "3.12"
             artifact: rtc-release-macos-latest
+          - os: macos-latest
+            python-version: "3.14"
+            artifact: rtc-release-macos-latest
           # Windows tests
           - os: windows-latest
             python-version: "3.9"
             artifact: rtc-release-windows-latest
           - os: windows-latest
             python-version: "3.12"
+            artifact: rtc-release-windows-latest
+          - os: windows-latest
+            python-version: "3.14"
             artifact: rtc-release-windows-latest
     uses: ./.github/workflows/tests.yml
     with:
