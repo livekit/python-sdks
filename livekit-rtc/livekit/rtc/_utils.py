@@ -48,7 +48,9 @@ def get_address(data) -> int:
     if isinstance(data, bytearray):
         return ctypes.addressof(ctypes.c_char.from_buffer(data))
     if isinstance(data, bytes):
-        return ctypes.cast(ctypes.c_char_p(data), ctypes.c_void_p).value
+        addr = ctypes.cast(ctypes.c_char_p(data), ctypes.c_void_p).value
+        assert addr is not None
+        return addr
     raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
 
 

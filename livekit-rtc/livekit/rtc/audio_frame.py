@@ -50,7 +50,7 @@ class AudioFrame:
             ValueError: If the length of `data` is smaller than the required size.
         """
         if isinstance(data, memoryview):
-            data = data.obj
+            data = data.obj  # type: ignore[assignment]
 
         min_size = num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16)
         data_len = len(data)
