@@ -37,6 +37,7 @@ protoc \
     $API_PROTOCOL/livekit_analytics.proto \
     $API_PROTOCOL/livekit_rtc.proto \
     $API_PROTOCOL/agent/livekit_agent_session.proto \
+    $API_PROTOCOL/agent/livekit_agent_text.proto \
     $API_PROTOCOL/logger/options.proto \
     $API_PROTOCOL/livekit_connector_whatsapp.proto \
     $API_PROTOCOL/livekit_connector_twilio.proto \
