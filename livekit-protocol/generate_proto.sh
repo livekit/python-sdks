@@ -87,6 +87,8 @@ mv "$API_OUT_PYTHON/livekit_connector_pb2.pyi" "$API_OUT_PYTHON/connector.pyi"
 mkdir -p "$API_OUT_PYTHON/agent_pb"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
+mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_text.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_text.pyi"
 
 mkdir -p "$API_OUT_PYTHON/logger_pb"
 mv "$API_OUT_PYTHON/logger/options_pb2.py" "$API_OUT_PYTHON/logger_pb/options.py"
