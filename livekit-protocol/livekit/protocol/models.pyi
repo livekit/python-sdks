@@ -284,7 +284,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ..., can_manage_agent_session: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks", "client_protocol")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -347,6 +347,7 @@ class ParticipantInfo(_message.Message):
     DISCONNECT_REASON_FIELD_NUMBER: _ClassVar[int]
     KIND_DETAILS_FIELD_NUMBER: _ClassVar[int]
     DATA_TRACKS_FIELD_NUMBER: _ClassVar[int]
+    CLIENT_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
     sid: str
     identity: str
     state: ParticipantInfo.State
@@ -364,7 +365,8 @@ class ParticipantInfo(_message.Message):
     disconnect_reason: DisconnectReason
     kind_details: _containers.RepeatedScalarFieldContainer[ParticipantInfo.KindDetail]
     data_tracks: _containers.RepeatedCompositeFieldContainer[DataTrackInfo]
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ...) -> None: ...
+    client_protocol: int
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ..., client_protocol: _Optional[int] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
@@ -735,7 +737,7 @@ class ServerInfo(_message.Message):
     def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ..., agent_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientInfo(_message.Message):
-    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network", "other_sdks")
+    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network", "other_sdks", "client_protocol")
     class SDK(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         UNKNOWN: _ClassVar[ClientInfo.SDK]
@@ -779,6 +781,7 @@ class ClientInfo(_message.Message):
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     NETWORK_FIELD_NUMBER: _ClassVar[int]
     OTHER_SDKS_FIELD_NUMBER: _ClassVar[int]
+    CLIENT_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
     sdk: ClientInfo.SDK
     version: str
     protocol: int
@@ -790,7 +793,8 @@ class ClientInfo(_message.Message):
     address: str
     network: str
     other_sdks: str
-    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ..., other_sdks: _Optional[str] = ...) -> None: ...
+    client_protocol: int
+    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ..., other_sdks: _Optional[str] = ..., client_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientConfiguration(_message.Message):
     __slots__ = ("video", "screen", "resume_connection", "disabled_codecs", "force_relay")
