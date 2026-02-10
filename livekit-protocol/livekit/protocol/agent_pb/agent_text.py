@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from . import agent_session as agent_dot_livekit__agent__session__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x61gent/livekit_agent_text.proto\x12\rlivekit.agent\x1a!agent/livekit_agent_session.proto\"Q\n\x11\x41gentSessionState\x12\x0f\n\x07version\x18\x01 \x01(\x04\x12\x12\n\x08snapshot\x18\x02 \x01(\x0cH\x00\x12\x0f\n\x05\x64\x65lta\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"\xe8\x01\n\x12TextMessageRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x17\n\nmessage_id\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x17\n\nsession_id\x18\x03 \x01(\tH\x01\x88\x01\x01\x12\x12\n\nagent_name\x18\x04 \x01(\t\x12\x10\n\x08metadata\x18\x05 \x01(\t\x12<\n\rsession_state\x18\x06 \x01(\x0b\x32 .livekit.agent.AgentSessionStateH\x02\x88\x01\x01\x42\r\n\x0b_message_idB\r\n\x0b_session_idB\x10\n\x0e_session_state\"<\n\x12TextSessionStarted\x12\x12\n\nsession_id\x18\x01 \x01(\t\x12\x12\n\nmessage_id\x18\x02 \x01(\t\"Z\n\x11TextResponseEvent\x12\x12\n\nmessage_id\x18\x01 \x01(\t\x12\x31\n\x04item\x18\x02 \x01(\x0b\x32#.livekit.agent.ChatContext.ChatItem\"\xb8\x01\n\x13TextSessionComplete\x12\x12\n\nmessage_id\x18\x01 \x01(\t\x12<\n\rsession_state\x18\x02 \x01(\x0b\x32 .livekit.agent.AgentSessionStateH\x00\x88\x01\x01\x12\x33\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x1f.livekit.agent.TextMessageErrorH\x01\x88\x01\x01\x42\x10\n\x0e_session_stateB\x08\n\x06_error\"V\n\x10TextMessageError\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x31\n\x04\x63ode\x18\x02 \x01(\x0e\x32#.livekit.agent.TextMessageErrorCode*}\n\x14TextMessageErrorCode\x12\x10\n\x0cTME_INTERNAL\x10\x00\x12\x1f\n\x1bTME_SESSION_STATE_NOT_FOUND\x10\x01\x12\x1a\n\x16TME_TEXT_HANDLER_ERROR\x10\x02\x12\x16\n\x12TME_PROCESS_CLOSED\x10\x03\x42LZ)github.com/livekit/protocol/livekit/agent\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x61gent/livekit_agent_text.proto\x12\rlivekit.agent\x1a!agent/livekit_agent_session.proto\"\xc0\x01\n\x12TextMessageRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\nmessage_id\x18\x02 \x01(\t\x12\x12\n\nsession_id\x18\x03 \x01(\t\x12\x12\n\nagent_name\x18\x04 \x01(\t\x12\x10\n\x08metadata\x18\x05 \x01(\t\x12<\n\rsession_state\x18\x06 \x01(\x0b\x32 .livekit.agent.AgentSessionStateH\x00\x88\x01\x01\x42\x10\n\x0e_session_state\"\xdc\x02\n\x13TextMessageResponse\x12\x12\n\nmessage_id\x18\x01 \x01(\t\x12\x12\n\nsession_id\x18\x02 \x01(\t\x12-\n\x07message\x18\x03 \x01(\x0b\x32\x1a.livekit.agent.ChatMessageH\x00\x12\x34\n\rfunction_call\x18\x04 \x01(\x0b\x32\x1b.livekit.agent.FunctionCallH\x00\x12\x41\n\x14\x66unction_call_output\x18\x05 \x01(\x0b\x32!.livekit.agent.FunctionCallOutputH\x00\x12\x34\n\ragent_handoff\x18\x06 \x01(\x0b\x32\x1b.livekit.agent.AgentHandoffH\x00\x12\x36\n\x08\x63omplete\x18\x07 \x01(\x0b\x32\".livekit.agent.TextMessageCompleteH\x00\x42\x07\n\x05\x65vent\"\x8c\x01\n\x13TextMessageComplete\x12\x39\n\rsession_state\x18\x01 \x01(\x0b\x32 .livekit.agent.AgentSessionStateH\x00\x12\x30\n\x05\x65rror\x18\x02 \x01(\x0b\x32\x1f.livekit.agent.TextMessageErrorH\x00\x42\x08\n\x06result\"Q\n\x11\x41gentSessionState\x12\x0f\n\x07version\x18\x01 \x01(\x04\x12\x12\n\x08snapshot\x18\x02 \x01(\x0cH\x00\x12\x0f\n\x05\x64\x65lta\x18\x03 \x01(\x0cH\x00\x42\x06\n\x04\x64\x61ta\"V\n\x10TextMessageError\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x31\n\x04\x63ode\x18\x02 \x01(\x0e\x32#.livekit.agent.TextMessageErrorCode*s\n\x14TextMessageErrorCode\x12\x12\n\x0eINTERNAL_ERROR\x10\x00\x12\x1b\n\x17SESSION_STATE_NOT_FOUND\x10\x01\x12\x16\n\x12TEXT_HANDLER_ERROR\x10\x02\x12\x12\n\x0ePROCESS_CLOSED\x10\x03\x42LZ)github.com/livekit/protocol/livekit/agent\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,18 +23,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'agent.livekit_agent_text_pb
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z)github.com/livekit/protocol/livekit/agent\252\002\rLiveKit.Proto\352\002\016LiveKit::Proto'
-  _globals['_TEXTMESSAGEERRORCODE']._serialized_start=831
-  _globals['_TEXTMESSAGEERRORCODE']._serialized_end=956
-  _globals['_AGENTSESSIONSTATE']._serialized_start=84
-  _globals['_AGENTSESSIONSTATE']._serialized_end=165
-  _globals['_TEXTMESSAGEREQUEST']._serialized_start=168
-  _globals['_TEXTMESSAGEREQUEST']._serialized_end=400
-  _globals['_TEXTSESSIONSTARTED']._serialized_start=402
-  _globals['_TEXTSESSIONSTARTED']._serialized_end=462
-  _globals['_TEXTRESPONSEEVENT']._serialized_start=464
-  _globals['_TEXTRESPONSEEVENT']._serialized_end=554
-  _globals['_TEXTSESSIONCOMPLETE']._serialized_start=557
-  _globals['_TEXTSESSIONCOMPLETE']._serialized_end=741
-  _globals['_TEXTMESSAGEERROR']._serialized_start=743
-  _globals['_TEXTMESSAGEERROR']._serialized_end=829
+  _globals['_TEXTMESSAGEERRORCODE']._serialized_start=944
+  _globals['_TEXTMESSAGEERRORCODE']._serialized_end=1059
+  _globals['_TEXTMESSAGEREQUEST']._serialized_start=85
+  _globals['_TEXTMESSAGEREQUEST']._serialized_end=277
+  _globals['_TEXTMESSAGERESPONSE']._serialized_start=280
+  _globals['_TEXTMESSAGERESPONSE']._serialized_end=628
+  _globals['_TEXTMESSAGECOMPLETE']._serialized_start=631
+  _globals['_TEXTMESSAGECOMPLETE']._serialized_end=771
+  _globals['_AGENTSESSIONSTATE']._serialized_start=773
+  _globals['_AGENTSESSIONSTATE']._serialized_end=854
+  _globals['_TEXTMESSAGEERROR']._serialized_start=856
+  _globals['_TEXTMESSAGEERROR']._serialized_end=942
 # @@protoc_insertion_point(module_scope)
