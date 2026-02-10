@@ -100,7 +100,7 @@ class AudioFrame:
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:
         audio_info = proto_audio.AudioFrameBufferInfo()
-        audio_info.data_ptr = get_address(memoryview(self._data))
+        audio_info.data_ptr = get_address(self._data)
         audio_info.sample_rate = self.sample_rate
         audio_info.num_channels = self.num_channels
         audio_info.samples_per_channel = self.samples_per_channel
