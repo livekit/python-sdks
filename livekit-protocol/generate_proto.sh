@@ -100,5 +100,7 @@ perl -i -pe 's|livekit_(\w+)_pb2|${1}|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHO
 
 perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from .logger_pb import options as $1|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
 
+perl -i -pe 's|from agent import livekit_agent_(\w+)_pb2 as ([^ ]+)|from . import agent_$1 as $2|g' "$API_OUT_PYTHON"/agent_pb/*.py "$API_OUT_PYTHON"/agent_pb/*.pyi
+
 # fixes - error: ClassVar can only be used for assignments in class body  [misc]
 perl -i -pe 's|^(\w+_FIELD_NUMBER): _ClassVar\[int\]|$1: int|g' "$API_OUT_PYTHON/logger_pb/options.pyi"
