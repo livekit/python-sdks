@@ -40,8 +40,16 @@ def task_done_logger(task: asyncio.Task) -> None:
         return
 
 
-def get_address(mv: memoryview) -> int:
-    return ctypes.addressof(ctypes.c_char.from_buffer(mv))
+def get_address(data) -> int:
+    if isinstance(data, memoryview):
+        if not data.readonly:
+            return ctypes.addressof(ctypes.c_char.from_buffer(data))
+        data = data.obj
+    if isinstance(data, bytearray):
+        return ctypes.addressof(ctypes.c_char.from_buffer(data))
+    if isinstance(data, bytes):
+        return ctypes.cast(ctypes.c_char_p(data), ctypes.c_void_p).value
+    raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
 
 
 T = TypeVar("T")

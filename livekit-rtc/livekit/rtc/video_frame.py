@@ -51,7 +51,7 @@ class VideoFrame:
         self._width = width
         self._height = height
         self._type = type
-        self._data = bytearray(data)
+        self._data = data
 
     @property
     def width(self) -> int:
