@@ -246,18 +246,22 @@ class UpdateIngressRequest(_message.Message):
     def __init__(self, ingress_id: _Optional[str] = ..., name: _Optional[str] = ..., room_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., bypass_transcoding: bool = ..., enable_transcoding: bool = ..., audio: _Optional[_Union[IngressAudioOptions, _Mapping]] = ..., video: _Optional[_Union[IngressVideoOptions, _Mapping]] = ..., enabled: bool = ...) -> None: ...
 
 class ListIngressRequest(_message.Message):
-    __slots__ = ("room_name", "ingress_id")
+    __slots__ = ("page_token", "room_name", "ingress_id")
+    PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     INGRESS_ID_FIELD_NUMBER: _ClassVar[int]
+    page_token: _models.TokenPagination
     room_name: str
     ingress_id: str
-    def __init__(self, room_name: _Optional[str] = ..., ingress_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ..., room_name: _Optional[str] = ..., ingress_id: _Optional[str] = ...) -> None: ...
 
 class ListIngressResponse(_message.Message):
-    __slots__ = ("items",)
+    __slots__ = ("next_page_token", "items")
+    NEXT_PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     ITEMS_FIELD_NUMBER: _ClassVar[int]
+    next_page_token: _models.TokenPagination
     items: _containers.RepeatedCompositeFieldContainer[IngressInfo]
-    def __init__(self, items: _Optional[_Iterable[_Union[IngressInfo, _Mapping]]] = ...) -> None: ...
+    def __init__(self, next_page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ..., items: _Optional[_Iterable[_Union[IngressInfo, _Mapping]]] = ...) -> None: ...
 
 class DeleteIngressRequest(_message.Message):
     __slots__ = ("ingress_id",)
