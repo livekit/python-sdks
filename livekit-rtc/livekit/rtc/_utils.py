@@ -17,7 +17,7 @@ import logging
 from collections import deque
 import ctypes
 import random
-from typing import Callable, Generator, Generic, List, TypeVar
+from typing import Callable, Generator, Generic, List, TypeVar, Union
 
 logger = logging.getLogger("livekit")
 
@@ -40,8 +40,25 @@ def task_done_logger(task: asyncio.Task) -> None:
         return
 
 
+def _buffer_supported_or_raise(
+    data: Union[bytes, bytearray, memoryview],
+) -> None:
+    """Validate a buffer for FFI use.
+
+    Raises clear errors for non-contiguous or sliced memoryviews.
+    """
+    if isinstance(data, memoryview):
+        if not data.contiguous:
+            raise ValueError("memoryview must be contiguous")
+        if data.nbytes != len(data.obj):
+            raise ValueError("sliced memoryviews are not supported")
+    elif not isinstance(data, (bytes, bytearray)):
+        raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
+
+
 def get_address(data) -> int:
     if isinstance(data, memoryview):
+        _buffer_supported_or_raise(data)
         if not data.readonly:
             return ctypes.addressof(ctypes.c_char.from_buffer(data))
         data = data.obj
