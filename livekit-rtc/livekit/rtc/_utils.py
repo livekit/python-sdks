@@ -50,7 +50,7 @@ def _buffer_supported_or_raise(
     if isinstance(data, memoryview):
         if not data.contiguous:
             raise ValueError("memoryview must be contiguous")
-        if data.nbytes != len(data.obj):
+        if data.nbytes != len(data.obj):  # type: ignore[arg-type]
             raise ValueError("sliced memoryviews are not supported")
     elif not isinstance(data, (bytes, bytearray)):
         raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
