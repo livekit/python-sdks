@@ -15,7 +15,7 @@
 import ctypes
 from ._ffi_client import FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio
-from ._utils import get_address
+from ._utils import _buffer_supported_or_raise, get_address
 from typing import Any, Union
 
 
@@ -49,19 +49,21 @@ class AudioFrame:
         Raises:
             ValueError: If the length of `data` is smaller than the required size.
         """
-        data = memoryview(data).cast("B")
+        _buffer_supported_or_raise(data)
 
-        if len(data) < num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16):
+        min_size = num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16)
+        data_len = len(data)
+
+        if data_len < min_size:
             raise ValueError(
                 "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
             )
 
-        if len(data) % ctypes.sizeof(ctypes.c_int16) != 0:
+        if data_len % ctypes.sizeof(ctypes.c_int16) != 0:
             # can happen if data is bigger than needed
             raise ValueError("data length must be a multiple of sizeof(int16)")
 
-        n = len(data) // ctypes.sizeof(ctypes.c_int16)
-        self._data = (ctypes.c_int16 * n).from_buffer_copy(data)
+        self._data = data
 
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -97,7 +99,7 @@ class AudioFrame:
 
     def _proto_info(self) -> proto_audio.AudioFrameBufferInfo:
         audio_info = proto_audio.AudioFrameBufferInfo()
-        audio_info.data_ptr = get_address(memoryview(self._data))
+        audio_info.data_ptr = get_address(self._data)
         audio_info.sample_rate = self.sample_rate
         audio_info.num_channels = self.num_channels
         audio_info.samples_per_channel = self.samples_per_channel
