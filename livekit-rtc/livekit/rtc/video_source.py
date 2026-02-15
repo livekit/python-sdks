@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video
@@ -19,11 +21,12 @@ from .video_frame import VideoFrame
 
 
 class VideoSource:
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, is_screencast: bool = False) -> None:
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = proto_video.VideoSourceType.VIDEO_SOURCE_NATIVE
         req.new_video_source.resolution.width = width
         req.new_video_source.resolution.height = height
+        req.new_video_source.is_screencast = is_screencast
 
         resp = FfiClient.instance.request(req)
         self._info = resp.new_video_source.source
