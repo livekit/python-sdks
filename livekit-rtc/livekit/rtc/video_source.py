@@ -21,7 +21,7 @@ from .video_frame import VideoFrame
 
 
 class VideoSource:
-    def __init__(self, width: int, height: int, is_screencast: bool = False) -> None:
+    def __init__(self, width: int, height: int, *, is_screencast: bool = False) -> None:
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = proto_video.VideoSourceType.VIDEO_SOURCE_NATIVE
         req.new_video_source.resolution.width = width
