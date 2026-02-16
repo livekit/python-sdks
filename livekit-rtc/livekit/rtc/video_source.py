@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video
@@ -19,11 +21,32 @@ from .video_frame import VideoFrame
 
 
 class VideoSource:
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, *, is_screencast: bool = False) -> None:
+        """
+        Create a new video source.
+
+        Args:
+            width (int): Initial width of the video source.
+            height (int): Initial height of the video source.
+            is_screencast (bool, optional): Optimize the WebRTC pipeline for screen content.
+                Defaults to False.
+
+                When True, WebRTC will:
+
+                - Maintain resolution under congestion by dropping frames instead of
+                  downscaling (keeps text crisp)
+                - Disable quality scaling and denoising to preserve text/UI readability
+                - Guarantee a minimum 1200 kbps bitrate floor
+                - Enable zero-hertz mode, stopping frame transmission when the screen
+                  is static to save bandwidth
+                - Set content type to screen, adjusting encoder configuration throughout
+                  the pipeline (VP9 inter-layer prediction, simulcast layer allocation, etc.)
+        """
         req = proto_ffi.FfiRequest()
         req.new_video_source.type = proto_video.VideoSourceType.VIDEO_SOURCE_NATIVE
         req.new_video_source.resolution.width = width
         req.new_video_source.resolution.height = height
+        req.new_video_source.is_screencast = is_screencast
 
         resp = FfiClient.instance.request(req)
         self._info = resp.new_video_source.source
