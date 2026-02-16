@@ -1179,10 +1179,16 @@ class RoomOptions(google.protobuf.message.Message):
     RTC_CONFIG_FIELD_NUMBER: builtins.int
     JOIN_RETRIES_FIELD_NUMBER: builtins.int
     ENCRYPTION_FIELD_NUMBER: builtins.int
+    SINGLE_PEER_CONNECTION_FIELD_NUMBER: builtins.int
+    CONNECT_TIMEOUT_MS_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
     join_retries: builtins.int
+    single_peer_connection: builtins.bool
+    """use single peer connection for both publish/subscribe (default: false)"""
+    connect_timeout_ms: builtins.int
+    """timeout in milliseconds for each signal connection attempt (default: 5000)"""
     @property
     def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
     @property
@@ -1201,9 +1207,11 @@ class RoomOptions(google.protobuf.message.Message):
         rtc_config: global___RtcConfig | None = ...,
         join_retries: builtins.int | None = ...,
         encryption: e2ee_pb2.E2eeOptions | None = ...,
+        single_peer_connection: builtins.bool | None = ...,
+        connect_timeout_ms: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
 
 global___RoomOptions = RoomOptions
 
