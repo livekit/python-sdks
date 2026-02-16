@@ -48,12 +48,15 @@ class AudioProcessingModule:
         Important:
             Audio frames must be exactly 10 ms in duration.
         """
-        bdata = data.data.cast("b")
+        if isinstance(data._data, bytes) or (
+            isinstance(data._data, memoryview) and data._data.readonly
+        ):
+            data._data = bytearray(data._data)
 
         req = proto_ffi.FfiRequest()
         req.apm_process_stream.apm_handle = self._ffi_handle.handle
-        req.apm_process_stream.data_ptr = get_address(memoryview(bdata))
-        req.apm_process_stream.size = len(bdata)
+        req.apm_process_stream.data_ptr = get_address(data._data)
+        req.apm_process_stream.size = len(data._data)
         req.apm_process_stream.sample_rate = data.sample_rate
         req.apm_process_stream.num_channels = data.num_channels
 
@@ -73,12 +76,15 @@ class AudioProcessingModule:
         Important:
             Audio frames must be exactly 10 ms in duration.
         """
-        bdata = data.data.cast("b")
+        if isinstance(data._data, bytes) or (
+            isinstance(data._data, memoryview) and data._data.readonly
+        ):
+            data._data = bytearray(data._data)
 
         req = proto_ffi.FfiRequest()
         req.apm_process_reverse_stream.apm_handle = self._ffi_handle.handle
-        req.apm_process_reverse_stream.data_ptr = get_address(memoryview(bdata))
-        req.apm_process_reverse_stream.size = len(bdata)
+        req.apm_process_reverse_stream.data_ptr = get_address(data._data)
+        req.apm_process_reverse_stream.size = len(data._data)
         req.apm_process_reverse_stream.sample_rate = data.sample_rate
         req.apm_process_reverse_stream.num_channels = data.num_channels
 
