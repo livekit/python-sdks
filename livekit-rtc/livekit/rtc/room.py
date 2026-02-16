@@ -107,6 +107,10 @@ class RoomOptions:
     """Options for end-to-end encryption."""
     rtc_config: RtcConfiguration | None = None
     """WebRTC-related configuration."""
+    connect_timeout_ms: int | None = None
+    """Timeout in milliseconds for each signal connection attempt. When None, uses the default (5000ms)."""
+    single_peer_connection: bool | None = None
+    """Use a single peer connection for both publish and subscribe. When None, uses the default (true)."""
 
 
 @dataclass
@@ -431,6 +435,12 @@ class Room(EventEmitter[EventTypes]):
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
+
+        if options.connect_timeout_ms is not None:
+            req.connect.options.connect_timeout_ms = options.connect_timeout_ms
+
+        if options.single_peer_connection is not None:
+            req.connect.options.single_peer_connection = options.single_peer_connection
 
         if options.e2ee:
             warnings.warn(
