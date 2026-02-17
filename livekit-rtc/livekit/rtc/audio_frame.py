@@ -49,6 +49,9 @@ class AudioFrame:
         Raises:
             ValueError: If the length of `data` is smaller than the required size.
         """
+        if isinstance(data, memoryview):
+            data = data.cast("B")
+
         data = _ensure_compatible_buffer(data)
 
         min_size = num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16)
