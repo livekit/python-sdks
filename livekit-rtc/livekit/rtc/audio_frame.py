@@ -15,7 +15,7 @@
 import ctypes
 from ._ffi_client import FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio
-from ._utils import _buffer_supported_or_raise, get_address
+from ._utils import _ensure_compatible_buffer, get_address
 from typing import Any, Union
 
 
@@ -49,7 +49,7 @@ class AudioFrame:
         Raises:
             ValueError: If the length of `data` is smaller than the required size.
         """
-        _buffer_supported_or_raise(data)
+        data = _ensure_compatible_buffer(data)
 
         min_size = num_channels * samples_per_channel * ctypes.sizeof(ctypes.c_int16)
         data_len = len(data)

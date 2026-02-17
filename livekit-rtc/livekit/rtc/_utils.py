@@ -40,28 +40,29 @@ def task_done_logger(task: asyncio.Task) -> None:
         return
 
 
-def _buffer_supported_or_raise(
+def _ensure_compatible_buffer(
     data: Union[bytes, bytearray, memoryview],
-) -> None:
-    """Validate a buffer for FFI use.
+) -> Union[bytes, bytearray, memoryview]:
+    """Validate and normalize a buffer for FFI use.
 
-    Raises clear errors for non-contiguous or sliced memoryviews.
+    Sliced memoryviews are materialized because get_address cannot
+    reliably resolve their offset for all buffer types.
     """
     if isinstance(data, memoryview):
         if not data.contiguous:
             raise ValueError("memoryview must be contiguous")
         if data.nbytes != len(data.obj):  # type: ignore[arg-type]
-            raise ValueError("sliced memoryviews are not supported")
+            return bytearray(data) if not data.readonly else bytes(data)
     elif not isinstance(data, (bytes, bytearray)):
         raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
+    return data
 
 
-def get_address(data) -> int:
+def get_address(data: Union[bytes, bytearray, memoryview]) -> int:
     if isinstance(data, memoryview):
-        _buffer_supported_or_raise(data)
         if not data.readonly:
             return ctypes.addressof(ctypes.c_char.from_buffer(data))
-        data = data.obj
+        data = data.obj  # type: ignore[assignment]
     if isinstance(data, bytearray):
         return ctypes.addressof(ctypes.c_char.from_buffer(data))
     if isinstance(data, bytes):

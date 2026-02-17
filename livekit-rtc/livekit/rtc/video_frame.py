@@ -18,7 +18,7 @@ from ._proto import video_frame_pb2 as proto_video
 from ._proto import ffi_pb2 as proto
 from typing import List, Optional
 from ._ffi_client import FfiClient, FfiHandle
-from ._utils import _buffer_supported_or_raise, get_address
+from ._utils import _ensure_compatible_buffer, get_address
 
 from typing import Any
 
@@ -48,7 +48,7 @@ class VideoFrame:
                 (e.g., RGBA, BGRA, RGB24, etc.).
             data (Union[bytes, bytearray, memoryview]): The raw pixel data for the video frame.
         """
-        _buffer_supported_or_raise(data)
+        data = _ensure_compatible_buffer(data)
 
         self._width = width
         self._height = height
