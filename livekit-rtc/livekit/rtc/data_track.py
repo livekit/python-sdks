@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, Union
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -74,7 +74,7 @@ class LocalDataTrack:
 
     def try_push(
         self,
-        payload: bytes,
+        payload: Union[bytes, bytearray, memoryview],
         *,
         user_timestamp: Optional[int] = None,
     ) -> None:
