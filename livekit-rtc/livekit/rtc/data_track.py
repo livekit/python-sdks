@@ -24,12 +24,21 @@ from ._proto import data_track_pb2 as proto_data_track
 
 
 class SubscribeDataTrackError(Exception):
+    """An error that can occur when subscribing to a data track."""
+
     def __init__(self, message: str) -> None:
         self.message = message
 
 
 class PushFrameError(Exception):
-    """Frame could not be pushed to a data track."""
+    """Frame could not be pushed to a data track.
+
+    Pushing a frame can fail for several reasons:
+
+    - The track has been unpublished by the local participant or SFU
+    - The room is no longer connected
+    - Frames are being pushed too fast
+    """
 
     def __init__(self, message: str) -> None:
         self.message = message
@@ -37,11 +46,20 @@ class PushFrameError(Exception):
 
 @dataclass
 class DataTrackInfo:
-    """Metadata about a data track."""
+    """Information about a published data track."""
 
     sid: str
+    """Unique track identifier assigned by the SFU.
+
+    This identifier may change if a reconnect occurs. Use ``name`` if a
+    stable identifier is needed.
+    """
+
     name: str
+    """Name of the track assigned by the publisher."""
+
     uses_e2ee: bool
+    """Whether or not frames sent on the track use end-to-end encryption."""
 
 
 @dataclass
@@ -49,7 +67,7 @@ class DataTrackOptions:
     """Options for publishing a data track."""
 
     name: str
-    """Track name used to identify the track to other participants.
+    """The track name is used to identify the track to other participants.
 
     Must not be empty and must be unique per publisher.
     """
@@ -60,24 +78,35 @@ class DataTrackFrame:
     """A frame published on a data track, consisting of a payload and optional metadata."""
 
     payload: bytes
+    """The frame's payload."""
+
     user_timestamp: Optional[int] = None
+    """The frame's user timestamp, if one is associated."""
 
     @staticmethod
     def _timestamp_now() -> int:
         return int(time.time() * 1000)
 
     def with_user_timestamp_now(self) -> DataTrackFrame:
-        """Returns a copy of this frame with the user timestamp set to the current time."""
+        """Associates the current Unix timestamp (in milliseconds) with the frame.
+
+        Returns a new ``DataTrackFrame`` with the timestamp set; the original is
+        not modified.
+        """
         return DataTrackFrame(
             payload=self.payload,
             user_timestamp=self._timestamp_now(),
         )
 
     def duration_since_timestamp(self) -> Optional[float]:
-        """Calculates how long has passed since the frame's user timestamp.
+        """If the frame has a user timestamp, calculate how long has passed
+        relative to the current system time.
+
+        The timestamp is assumed to be a Unix timestamp in milliseconds
+        (as set by :meth:`with_user_timestamp_now` on the publisher side).
 
         Returns:
-            The elapsed duration in seconds, or None if no timestamp is set.
+            The elapsed duration in seconds, or ``None`` if no timestamp is set.
         """
         if self.user_timestamp is None:
             return None
@@ -86,7 +115,7 @@ class DataTrackFrame:
 
 
 class LocalDataTrack:
-    """A locally published data track that can push frames to subscribers."""
+    """Data track published by the local participant."""
 
     def __init__(self, owned_info: proto_data_track.OwnedLocalDataTrack) -> None:
         self._info = DataTrackInfo(
@@ -98,16 +127,19 @@ class LocalDataTrack:
 
     @property
     def info(self) -> DataTrackInfo:
+        """Information about the data track."""
         return self._info
 
     def try_push(self, frame: DataTrackFrame) -> None:
-        """Push a frame to subscribers of this track.
+        """Try pushing a frame to subscribers of the track.
+
+        See :class:`DataTrackFrame` for how to construct a frame and attach metadata.
 
         Args:
             frame: The data track frame to send.
 
         Raises:
-            PushFrameError: If the push fails (e.g. track not published).
+            PushFrameError: If the push fails.
         """
         proto_frame = proto_data_track.DataTrackFrame(payload=bytes(frame.payload))
         if frame.user_timestamp is not None:
@@ -122,7 +154,7 @@ class LocalDataTrack:
             raise PushFrameError(resp.local_data_track_try_push.error)
 
     def is_published(self) -> bool:
-        """Check whether this track is still published."""
+        """Whether or not the track is still published."""
         req = proto_ffi.FfiRequest()
         req.local_data_track_is_published.track_handle = self._ffi_handle.handle
 
@@ -130,7 +162,7 @@ class LocalDataTrack:
         return resp.local_data_track_is_published.is_published
 
     def unpublish(self) -> None:
-        """Unpublish this track."""
+        """Unpublishes the track."""
         req = proto_ffi.FfiRequest()
         req.local_data_track_unpublish.track_handle = self._ffi_handle.handle
         FfiClient.instance.request(req)
@@ -140,7 +172,7 @@ class LocalDataTrack:
 
 
 class RemoteDataTrack:
-    """A data track published by a remote participant."""
+    """Data track published by a remote participant."""
 
     def __init__(self, owned_info: proto_data_track.OwnedRemoteDataTrack) -> None:
         self._info = DataTrackInfo(
@@ -153,17 +185,19 @@ class RemoteDataTrack:
 
     @property
     def info(self) -> DataTrackInfo:
+        """Information about the data track."""
         return self._info
 
     @property
     def publisher_identity(self) -> str:
+        """Identity of the participant who published the track."""
         return self._publisher_identity
 
     async def subscribe(self) -> DataTrackSubscription:
-        """Subscribe to this data track and receive frames.
+        """Subscribes to the data track to receive frames.
 
-        Returns:
-            A DataTrackSubscription that can be used as an async iterator.
+        Returns a :class:`DataTrackSubscription` that yields
+        :class:`DataTrackFrame` instances as they arrive.
 
         Raises:
             SubscribeDataTrackError: If subscription fails.
@@ -190,7 +224,7 @@ class RemoteDataTrack:
         return DataTrackSubscription(cb.subscribe_data_track.subscription)
 
     def is_published(self) -> bool:
-        """Check whether this remote track is still published."""
+        """Whether or not the track is still published."""
         req = proto_ffi.FfiRequest()
         req.remote_data_track_is_published.track_handle = self._ffi_handle.handle
 

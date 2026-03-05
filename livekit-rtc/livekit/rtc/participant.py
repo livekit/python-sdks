@@ -678,14 +678,15 @@ class LocalParticipant(Participant):
         self,
         options: Union[str, DataTrackOptions],
     ) -> LocalDataTrack:
-        """Publish a data track to the room.
+        """Publishes a data track.
 
         Args:
-            options: Either a track name string or a DataTrackOptions object.
-                When a string is provided, it is used as the track name.
+            options: Either a track name string or a :class:`DataTrackOptions`
+                object. When a string is provided, it is used as the track name.
 
         Returns:
-            LocalDataTrack: The published data track.
+            The published data track. Use :meth:`LocalDataTrack.try_push` to
+            send data frames on the track.
 
         Raises:
             PublishDataTrackError: If there is an error publishing the data track.
