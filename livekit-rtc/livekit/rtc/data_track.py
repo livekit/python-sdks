@@ -22,12 +22,14 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import data_track_pb2 as proto_data_track
 
 
-class PublishDataTrackError(Exception):
+class SubscribeDataTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
 
-class SubscribeDataTrackError(Exception):
+class PushFrameError(Exception):
+    """Frame could not be pushed to a data track."""
+
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -95,7 +97,7 @@ class LocalDataTrack:
 
         resp = FfiClient.instance.request(req)
         if resp.local_data_track_try_push.HasField("error"):
-            raise RuntimeError(resp.local_data_track_try_push.error)
+            raise PushFrameError(resp.local_data_track_try_push.error)
 
     def is_published(self) -> bool:
         """Check whether this track is still published."""

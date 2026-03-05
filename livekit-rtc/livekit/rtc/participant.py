@@ -53,7 +53,7 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
-from .data_track import LocalDataTrack, DataTrackOptions, PublishDataTrackError
+from .data_track import LocalDataTrack, DataTrackOptions
 from ._proto import data_track_pb2 as proto_data_track
 
 
@@ -78,6 +78,11 @@ class PublishDTMFError(Exception):
 
 
 class PublishTranscriptionError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
+class PublishDataTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
