@@ -53,6 +53,8 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
+from .data_track import LocalDataTrack, PublishDataTrackError
+from ._proto import data_track_pb2 as proto_data_track
 
 
 class PublishTrackError(Exception):
@@ -666,6 +668,44 @@ class LocalParticipant(Participant):
         await writer.aclose()
 
         return writer.info
+
+    async def publish_data_track(
+        self,
+        options: Union[str, proto_data_track.DataTrackOptions],
+    ) -> LocalDataTrack:
+        """Publish a data track to the room.
+
+        Args:
+            options: Either a track name string or a DataTrackOptions object.
+                When a string is provided, it is used as the track name.
+
+        Returns:
+            LocalDataTrack: The published data track.
+
+        Raises:
+            PublishDataTrackError: If there is an error publishing the data track.
+        """
+        if isinstance(options, str):
+            options = proto_data_track.DataTrackOptions(name=options)
+
+        req = proto_ffi.FfiRequest()
+        req.publish_data_track.local_participant_handle = self._ffi_handle.handle
+        req.publish_data_track.options.CopyFrom(options)
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.publish_data_track.async_id
+                == resp.publish_data_track.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.publish_data_track.HasField("error"):
+            raise PublishDataTrackError(cb.publish_data_track.error)
+
+        return LocalDataTrack(cb.publish_data_track.track)
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
