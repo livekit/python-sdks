@@ -16,7 +16,11 @@ async def subscribe(track: rtc.RemoteDataTrack):
     )
     subscription = await track.subscribe()
     async for frame in subscription:
-        logging.info("Received frame (%d bytes): %s", len(frame.payload), frame)
+        logging.info("Received frame (%d bytes)", len(frame.payload))
+
+        latency = frame.duration_since_timestamp()
+        if latency is not None:
+            logging.info("Latency: %.3f s", latency)
 
 async def main(room: rtc.Room):
     logging.basicConfig(level=logging.INFO)

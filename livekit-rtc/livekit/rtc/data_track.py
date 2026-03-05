@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
@@ -60,6 +61,28 @@ class DataTrackFrame:
 
     payload: bytes
     user_timestamp: Optional[int] = None
+
+    @staticmethod
+    def _timestamp_now() -> int:
+        return int(time.time() * 1000)
+
+    def with_user_timestamp_now(self) -> DataTrackFrame:
+        """Returns a copy of this frame with the user timestamp set to the current time."""
+        return DataTrackFrame(
+            payload=self.payload,
+            user_timestamp=self._timestamp_now(),
+        )
+
+    def duration_since_timestamp(self) -> Optional[float]:
+        """Calculates how long has passed since the frame's user timestamp.
+
+        Returns:
+            The elapsed duration in seconds, or None if no timestamp is set.
+        """
+        if self.user_timestamp is None:
+            return None
+        elapsed_ms = self._timestamp_now() - self.user_timestamp
+        return elapsed_ms / 1000.0
 
 
 class LocalDataTrack:
