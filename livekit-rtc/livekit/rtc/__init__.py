@@ -113,8 +113,8 @@ from .data_track import (
     RemoteDataTrack,
     DataTrackSubscription,
     DataTrackFrame,
+    DataTrackOptions,
 )
-from ._proto.data_track_pb2 import DataTrackOptions
 from .frame_processor import FrameProcessor
 
 __all__ = [

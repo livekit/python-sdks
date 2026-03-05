@@ -53,7 +53,7 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
-from .data_track import LocalDataTrack, PublishDataTrackError
+from .data_track import LocalDataTrack, DataTrackOptions, PublishDataTrackError
 from ._proto import data_track_pb2 as proto_data_track
 
 
@@ -671,7 +671,7 @@ class LocalParticipant(Participant):
 
     async def publish_data_track(
         self,
-        options: Union[str, proto_data_track.DataTrackOptions],
+        options: Union[str, DataTrackOptions],
     ) -> LocalDataTrack:
         """Publish a data track to the room.
 
@@ -686,11 +686,13 @@ class LocalParticipant(Participant):
             PublishDataTrackError: If there is an error publishing the data track.
         """
         if isinstance(options, str):
-            options = proto_data_track.DataTrackOptions(name=options)
+            options = DataTrackOptions(name=options)
+
+        proto_opts = proto_data_track.DataTrackOptions(name=options.name)
 
         req = proto_ffi.FfiRequest()
         req.publish_data_track.local_participant_handle = self._ffi_handle.handle
-        req.publish_data_track.options.CopyFrom(options)
+        req.publish_data_track.options.CopyFrom(proto_opts)
 
         queue = FfiClient.instance.queue.subscribe()
         try:

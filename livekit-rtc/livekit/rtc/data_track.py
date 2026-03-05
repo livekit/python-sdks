@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional, Union
+from typing import AsyncIterator, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -30,6 +30,17 @@ class PublishDataTrackError(Exception):
 class SubscribeDataTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
+
+
+@dataclass
+class DataTrackOptions:
+    """Options for publishing a data track."""
+
+    name: str
+    """Track name used to identify the track to other participants.
+
+    Must not be empty and must be unique per publisher.
+    """
 
 
 @dataclass
