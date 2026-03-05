@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional, Union
+from typing import AsyncIterator, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -47,10 +47,10 @@ class DataTrackOptions:
 
 @dataclass
 class DataTrackFrame:
-    """A frame received on a data track."""
+    """A frame published on a data track, consisting of a payload and optional metadata."""
 
     payload: bytes
-    user_timestamp: Optional[int]
+    user_timestamp: Optional[int] = None
 
 
 class LocalDataTrack:
@@ -72,28 +72,22 @@ class LocalDataTrack:
     def uses_e2ee(self) -> bool:
         return self._info.uses_e2ee
 
-    def try_push(
-        self,
-        payload: Union[bytes, bytearray, memoryview],
-        *,
-        user_timestamp: Optional[int] = None,
-    ) -> None:
+    def try_push(self, frame: DataTrackFrame) -> None:
         """Push a frame to subscribers of this track.
 
         Args:
-            payload: The raw bytes to send.
-            user_timestamp: Optional application-defined timestamp.
+            frame: The data track frame to send.
 
         Raises:
-            RuntimeError: If the push fails (e.g. track not published).
+            PushFrameError: If the push fails (e.g. track not published).
         """
-        frame = proto_data_track.DataTrackFrame(payload=payload)
-        if user_timestamp is not None:
-            frame.user_timestamp = user_timestamp
+        proto_frame = proto_data_track.DataTrackFrame(payload=bytes(frame.payload))
+        if frame.user_timestamp is not None:
+            proto_frame.user_timestamp = frame.user_timestamp
 
         req = proto_ffi.FfiRequest()
         req.local_data_track_try_push.track_handle = self._ffi_handle.handle
-        req.local_data_track_try_push.frame.CopyFrom(frame)
+        req.local_data_track_try_push.frame.CopyFrom(proto_frame)
 
         resp = FfiClient.instance.request(req)
         if resp.local_data_track_try_push.HasField("error"):
