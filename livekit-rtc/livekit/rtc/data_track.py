@@ -35,6 +35,15 @@ class PushFrameError(Exception):
 
 
 @dataclass
+class DataTrackInfo:
+    """Metadata about a data track."""
+
+    sid: str
+    name: str
+    uses_e2ee: bool
+
+
+@dataclass
 class DataTrackOptions:
     """Options for publishing a data track."""
 
@@ -57,20 +66,16 @@ class LocalDataTrack:
     """A locally published data track that can push frames to subscribers."""
 
     def __init__(self, owned_info: proto_data_track.OwnedLocalDataTrack) -> None:
-        self._info = owned_info.info
+        self._info = DataTrackInfo(
+            sid=owned_info.info.sid,
+            name=owned_info.info.name,
+            uses_e2ee=owned_info.info.uses_e2ee,
+        )
         self._ffi_handle = FfiHandle(owned_info.handle.id)
 
     @property
-    def sid(self) -> str:
-        return self._info.sid
-
-    @property
-    def name(self) -> str:
-        return self._info.name
-
-    @property
-    def uses_e2ee(self) -> bool:
-        return self._info.uses_e2ee
+    def info(self) -> DataTrackInfo:
+        return self._info
 
     def try_push(self, frame: DataTrackFrame) -> None:
         """Push a frame to subscribers of this track.
@@ -108,28 +113,24 @@ class LocalDataTrack:
         FfiClient.instance.request(req)
 
     def __repr__(self) -> str:
-        return f"rtc.LocalDataTrack(sid={self.sid}, name={self.name})"
+        return f"rtc.LocalDataTrack(sid={self._info.sid}, name={self._info.name})"
 
 
 class RemoteDataTrack:
     """A data track published by a remote participant."""
 
     def __init__(self, owned_info: proto_data_track.OwnedRemoteDataTrack) -> None:
-        self._info = owned_info.info
+        self._info = DataTrackInfo(
+            sid=owned_info.info.sid,
+            name=owned_info.info.name,
+            uses_e2ee=owned_info.info.uses_e2ee,
+        )
         self._ffi_handle = FfiHandle(owned_info.handle.id)
         self._publisher_identity = owned_info.publisher_identity
 
     @property
-    def sid(self) -> str:
-        return self._info.sid
-
-    @property
-    def name(self) -> str:
-        return self._info.name
-
-    @property
-    def uses_e2ee(self) -> bool:
-        return self._info.uses_e2ee
+    def info(self) -> DataTrackInfo:
+        return self._info
 
     @property
     def publisher_identity(self) -> str:
@@ -175,8 +176,8 @@ class RemoteDataTrack:
 
     def __repr__(self) -> str:
         return (
-            f"rtc.RemoteDataTrack(sid={self.sid}, name={self.name}, "
-            f"publisher_identity={self.publisher_identity})"
+            f"rtc.RemoteDataTrack(sid={self._info.sid}, name={self._info.name}, "
+            f"publisher_identity={self._publisher_identity})"
         )
 
 

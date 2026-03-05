@@ -113,6 +113,7 @@ from .data_track import (
     RemoteDataTrack,
     DataTrackSubscription,
     DataTrackFrame,
+    DataTrackInfo,
     DataTrackOptions,
     PushFrameError,
 )
@@ -198,8 +199,9 @@ __all__ = [
     "RemoteDataTrack",
     "DataTrackSubscription",
     "DataTrackFrame",
+    "DataTrackInfo",
     "DataTrackOptions",
-    "TryPushError",
+    "PushFrameError",
     "__version__",
 ]
 
