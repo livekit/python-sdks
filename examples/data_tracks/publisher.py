@@ -8,9 +8,11 @@ from livekit import rtc
 TOKEN = os.environ.get("LIVEKIT_TOKEN")
 URL = os.environ.get("LIVEKIT_URL")
 
+
 async def read_sensor() -> bytes:
     # Dynamically read some sensor data...
     return bytes([0xFA] * 256)
+
 
 async def push_frames(track: rtc.LocalDataTrack):
     while True:
@@ -23,6 +25,7 @@ async def push_frames(track: rtc.LocalDataTrack):
             logging.error("Failed to push frame: %s", e)
         await asyncio.sleep(0.5)
 
+
 async def main(room: rtc.Room):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
@@ -32,6 +35,7 @@ async def main(room: rtc.Room):
 
     track = await room.local_participant.publish_data_track("my_sensor_data")
     await push_frames(track)
+
 
 if __name__ == "__main__":
     logging.basicConfig(

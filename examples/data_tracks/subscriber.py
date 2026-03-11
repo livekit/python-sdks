@@ -8,6 +8,7 @@ from livekit import rtc
 TOKEN = os.environ.get("LIVEKIT_TOKEN")
 URL = os.environ.get("LIVEKIT_URL")
 
+
 async def subscribe(track: rtc.RemoteDataTrack):
     logging.info(
         "Subscribing to '%s' published by '%s'",
@@ -21,6 +22,7 @@ async def subscribe(track: rtc.RemoteDataTrack):
         latency = frame.duration_since_timestamp()
         if latency is not None:
             logging.info("Latency: %.3f s", latency)
+
 
 async def main(room: rtc.Room):
     logging.basicConfig(level=logging.INFO)
