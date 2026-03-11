@@ -14,9 +14,11 @@ async def read_sensor() -> bytes:
 
 async def push_frames(track: rtc.LocalDataTrack):
     while True:
+        logging.info("Pushing frame")
         data = await read_sensor()
         try:
-            track.try_push(rtc.DataTrackFrame(payload=data).with_user_timestamp_now())
+            frame = rtc.DataTrackFrame(payload=data).with_user_timestamp_now()
+            track.try_push(frame)
         except rtc.PushFrameError as e:
             logging.error("Failed to push frame: %s", e)
         await asyncio.sleep(0.5)
