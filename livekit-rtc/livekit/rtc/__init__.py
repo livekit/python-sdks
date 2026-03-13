@@ -108,6 +108,15 @@ from .data_stream import (
     ByteStreamWriter,
     ByteStreamReader,
 )
+from .data_track import (
+    LocalDataTrack,
+    RemoteDataTrack,
+    DataTrackSubscription,
+    DataTrackFrame,
+    DataTrackInfo,
+    DataTrackOptions,
+    PushFrameError,
+)
 from .frame_processor import FrameProcessor
 
 __all__ = [
@@ -186,6 +195,13 @@ __all__ = [
     "ByteStreamWriter",
     "AudioProcessingModule",
     "FrameProcessor",
+    "LocalDataTrack",
+    "RemoteDataTrack",
+    "DataTrackSubscription",
+    "DataTrackFrame",
+    "DataTrackInfo",
+    "DataTrackOptions",
+    "PushFrameError",
     "__version__",
 ]
 

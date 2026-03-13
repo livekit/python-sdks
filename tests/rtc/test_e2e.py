@@ -2,7 +2,7 @@
 End-to-end tests for LiveKit RTC library.
 
 These tests verify core functionality of the LiveKit RTC library including:
-- Publishing and subscribing to audio tracks
+- Publishing and subscribing to audio & data tracks
 - Audio stream consumption and energy verification
 - Room lifecycle events (connect, disconnect, track publish/unpublish)
 - Connection state transitions
@@ -434,3 +434,82 @@ async def test_connection_state_transitions():
     finally:
         if room.isconnected():
             await room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()
+async def test_data_track():
+    """Test that a published data track delivers frames with correct payloads and timestamps."""
+    FRAME_COUNT = 5
+    PAYLOAD_SIZE = 64
+
+    TRACK_NAME = "test-track"
+    PUBLISHER_IDENTITY = "dt-publisher"
+    SUBSCRIBER_IDENTITY = "dt-subscriber"
+
+    room_name = unique_room_name("test-data-track")
+    url = os.getenv("LIVEKIT_URL")
+
+    publisher_room = rtc.Room()
+    subscriber_room = rtc.Room()
+
+    publisher_token = create_token(PUBLISHER_IDENTITY, room_name)
+    subscriber_token = create_token(SUBSCRIBER_IDENTITY, room_name)
+
+    remote_track_event = asyncio.Event()
+    remote_track = None
+
+    @subscriber_room.on("remote_data_track_published")
+    def on_remote_data_track_published(track: rtc.RemoteDataTrack):
+        nonlocal remote_track
+        remote_track = track
+        remote_track_event.set()
+
+    try:
+        await subscriber_room.connect(url, subscriber_token)
+        await publisher_room.connect(url, publisher_token)
+
+        local_track = await publisher_room.local_participant.publish_data_track(TRACK_NAME)
+        assert local_track.info.sid is not None
+        assert local_track.info.name == TRACK_NAME
+        assert local_track.is_published()
+
+        await asyncio.wait_for(remote_track_event.wait(), timeout=10.0)
+        assert remote_track is not None
+        assert remote_track.info.name == TRACK_NAME
+        assert remote_track.publisher_identity == PUBLISHER_IDENTITY
+        assert remote_track.is_published()
+
+        subscription = await remote_track.subscribe()
+
+        async def push_frames():
+            for i in range(FRAME_COUNT):
+                frame = rtc.DataTrackFrame(
+                    payload=bytes([i] * PAYLOAD_SIZE)
+                ).with_user_timestamp_now()
+                local_track.try_push(frame)
+                await asyncio.sleep(0.1)
+            local_track.unpublish()
+
+        async def publish_and_receive():
+            push_task = asyncio.create_task(push_frames())
+            recv_count = 0
+            async for frame in subscription:
+                first_byte = frame.payload[0]
+                assert all(b == first_byte for b in frame.payload), "Payload bytes are not uniform"
+                assert len(frame.payload) == PAYLOAD_SIZE
+                assert frame.user_timestamp is not None
+                latency = frame.duration_since_timestamp()
+                assert latency is not None and latency < 5.0, (
+                    f"Timestamp latency too high or missing: {latency}"
+                )
+                recv_count += 1
+            await push_task
+            return recv_count
+
+        recv_count = await asyncio.wait_for(publish_and_receive(), timeout=10.0)
+        assert recv_count > 0, "No frames were received"
+
+    finally:
+        await publisher_room.disconnect()
+        await subscriber_room.disconnect()

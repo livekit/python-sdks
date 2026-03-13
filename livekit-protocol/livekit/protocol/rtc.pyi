@@ -148,7 +148,7 @@ class SimulcastCodec(_message.Message):
     def __init__(self, codec: _Optional[str] = ..., cid: _Optional[str] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., video_layer_mode: _Optional[_Union[_models.VideoLayer.Mode, str]] = ...) -> None: ...
 
 class AddTrackRequest(_message.Message):
-    __slots__ = ("cid", "name", "type", "width", "height", "muted", "disable_dtx", "source", "layers", "simulcast_codecs", "sid", "stereo", "disable_red", "encryption", "stream", "backup_codec_policy", "audio_features")
+    __slots__ = ("cid", "name", "type", "width", "height", "muted", "disable_dtx", "source", "layers", "simulcast_codecs", "sid", "stereo", "disable_red", "encryption", "stream", "backup_codec_policy", "audio_features", "packet_trailer_features")
     CID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -166,6 +166,7 @@ class AddTrackRequest(_message.Message):
     STREAM_FIELD_NUMBER: _ClassVar[int]
     BACKUP_CODEC_POLICY_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FEATURES_FIELD_NUMBER: _ClassVar[int]
+    PACKET_TRAILER_FEATURES_FIELD_NUMBER: _ClassVar[int]
     cid: str
     name: str
     type: _models.TrackType
@@ -183,7 +184,8 @@ class AddTrackRequest(_message.Message):
     stream: str
     backup_codec_policy: _models.BackupCodecPolicy
     audio_features: _containers.RepeatedScalarFieldContainer[_models.AudioTrackFeature]
-    def __init__(self, cid: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[_models.TrackType, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., muted: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[_models.TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., simulcast_codecs: _Optional[_Iterable[_Union[SimulcastCodec, _Mapping]]] = ..., sid: _Optional[str] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ..., stream: _Optional[str] = ..., backup_codec_policy: _Optional[_Union[_models.BackupCodecPolicy, str]] = ..., audio_features: _Optional[_Iterable[_Union[_models.AudioTrackFeature, str]]] = ...) -> None: ...
+    packet_trailer_features: _containers.RepeatedScalarFieldContainer[_models.PacketTrailerFeature]
+    def __init__(self, cid: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[_models.TrackType, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., muted: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[_models.TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., simulcast_codecs: _Optional[_Iterable[_Union[SimulcastCodec, _Mapping]]] = ..., sid: _Optional[str] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ..., stream: _Optional[str] = ..., backup_codec_policy: _Optional[_Union[_models.BackupCodecPolicy, str]] = ..., audio_features: _Optional[_Iterable[_Union[_models.AudioTrackFeature, str]]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[_models.PacketTrailerFeature, str]]] = ...) -> None: ...
 
 class PublishDataTrackRequest(_message.Message):
     __slots__ = ("pub_handle", "name", "encryption")
