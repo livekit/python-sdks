@@ -596,12 +596,14 @@ class SIPDispatchRuleDirect(_message.Message):
     def __init__(self, room_name: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
 
 class SIPDispatchRuleIndividual(_message.Message):
-    __slots__ = ("room_prefix", "pin")
+    __slots__ = ("room_prefix", "pin", "no_randomness")
     ROOM_PREFIX_FIELD_NUMBER: _ClassVar[int]
     PIN_FIELD_NUMBER: _ClassVar[int]
+    NO_RANDOMNESS_FIELD_NUMBER: _ClassVar[int]
     room_prefix: str
     pin: str
-    def __init__(self, room_prefix: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
+    no_randomness: bool
+    def __init__(self, room_prefix: _Optional[str] = ..., pin: _Optional[str] = ..., no_randomness: bool = ...) -> None: ...
 
 class SIPDispatchRuleCallee(_message.Message):
     __slots__ = ("room_prefix", "pin", "randomize")

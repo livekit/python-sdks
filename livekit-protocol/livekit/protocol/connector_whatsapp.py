@@ -12,12 +12,13 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb2
 from . import agent_dispatch as _agent__dispatch_
 from . import rtc as _rtc_
 from .logger_pb import options as logger_dot_options__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n livekit_connector_whatsapp.proto\x12\x07livekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x98\x05\n\x17\x44ialWhatsAppCallRequest\x12 \n\x18whatsapp_phone_number_id\x18\x01 \x01(\t\x12&\n\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12\x1e\n\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01\x12\"\n\x1awhatsapp_cloud_api_version\x18\x0c \x01(\t\x12)\n!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\t\x12\x11\n\troom_name\x18\x05 \x01(\t\x12*\n\x06\x61gents\x18\x06 \x03(\x0b\x32\x1a.livekit.RoomAgentDispatch\x12\x1c\n\x14participant_identity\x18\x07 \x01(\t\x12@\n\x10participant_name\x18\x08 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x44\n\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x83\x01\n\x16participant_attributes\x18\n \x03(\x0b\x32;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x1b\n\x13\x64\x65stination_country\x18\x0b \x01(\t\x1a<\n\x1aParticipantAttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"G\n\x18\x44ialWhatsAppCallResponse\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x11\n\troom_name\x18\x02 \x01(\t\"\xed\x01\n\x1d\x44isconnectWhatsAppCallRequest\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x1e\n\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12R\n\x11\x64isconnect_reason\x18\x03 \x01(\x0e\x32\x37.livekit.DisconnectWhatsAppCallRequest.DisconnectReason\">\n\x10\x44isconnectReason\x12\x16\n\x12\x42USINESS_INITIATED\x10\x00\x12\x12\n\x0eUSER_INITIATED\x10\x01\" \n\x1e\x44isconnectWhatsAppCallResponse\"`\n\x1a\x43onnectWhatsAppCallRequest\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12(\n\x03sdp\x18\x02 \x01(\x0b\x32\x1b.livekit.SessionDescription\"\x1d\n\x1b\x43onnectWhatsAppCallResponse\"\xb8\x05\n\x19\x41\x63\x63\x65ptWhatsAppCallRequest\x12 \n\x18whatsapp_phone_number_id\x18\x01 \x01(\t\x12\x1e\n\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12\"\n\x1awhatsapp_cloud_api_version\x18\r \x01(\t\x12\x18\n\x10whatsapp_call_id\x18\x03 \x01(\t\x12)\n!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\t\x12(\n\x03sdp\x18\x05 \x01(\x0b\x32\x1b.livekit.SessionDescription\x12\x11\n\troom_name\x18\x06 \x01(\t\x12*\n\x06\x61gents\x18\x07 \x03(\x0b\x32\x1a.livekit.RoomAgentDispatch\x12\x1c\n\x14participant_identity\x18\x08 \x01(\t\x12@\n\x10participant_name\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x44\n\x14participant_metadata\x18\n \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x85\x01\n\x16participant_attributes\x18\x0b \x03(\x0b\x32=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x1b\n\x13\x64\x65stination_country\x18\x0c \x01(\t\x1a<\n\x1aParticipantAttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"/\n\x1a\x41\x63\x63\x65ptWhatsAppCallResponse\x12\x11\n\troom_name\x18\x01 \x01(\t\"[\n\x0cWhatsAppCall\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x31\n\tdirection\x18\x02 \x01(\x0e\x32\x1e.livekit.WhatsAppCallDirection*b\n\x15WhatsAppCallDirection\x12#\n\x1fWHATSAPP_CALL_DIRECTION_INBOUND\x10\x00\x12$\n WHATSAPP_CALL_DIRECTION_OUTBOUND\x10\x02\x42\x46Z#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n livekit_connector_whatsapp.proto\x12\x07livekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xcc\x05\n\x17\x44ialWhatsAppCallRequest\x12 \n\x18whatsapp_phone_number_id\x18\x01 \x01(\t\x12&\n\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12\x1e\n\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01\x12\"\n\x1awhatsapp_cloud_api_version\x18\x0c \x01(\t\x12)\n!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\t\x12\x11\n\troom_name\x18\x05 \x01(\t\x12*\n\x06\x61gents\x18\x06 \x03(\x0b\x32\x1a.livekit.RoomAgentDispatch\x12\x1c\n\x14participant_identity\x18\x07 \x01(\t\x12@\n\x10participant_name\x18\x08 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x44\n\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x83\x01\n\x16participant_attributes\x18\n \x03(\x0b\x32;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x1b\n\x13\x64\x65stination_country\x18\x0b \x01(\t\x12\x32\n\x0fringing_timeout\x18\r \x01(\x0b\x32\x19.google.protobuf.Duration\x1a<\n\x1aParticipantAttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"G\n\x18\x44ialWhatsAppCallResponse\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x11\n\troom_name\x18\x02 \x01(\t\"\xed\x01\n\x1d\x44isconnectWhatsAppCallRequest\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x1e\n\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12R\n\x11\x64isconnect_reason\x18\x03 \x01(\x0e\x32\x37.livekit.DisconnectWhatsAppCallRequest.DisconnectReason\">\n\x10\x44isconnectReason\x12\x16\n\x12\x42USINESS_INITIATED\x10\x00\x12\x12\n\x0eUSER_INITIATED\x10\x01\" \n\x1e\x44isconnectWhatsAppCallResponse\"`\n\x1a\x43onnectWhatsAppCallRequest\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12(\n\x03sdp\x18\x02 \x01(\x0b\x32\x1b.livekit.SessionDescription\"\x1d\n\x1b\x43onnectWhatsAppCallResponse\"\x89\x06\n\x19\x41\x63\x63\x65ptWhatsAppCallRequest\x12 \n\x18whatsapp_phone_number_id\x18\x01 \x01(\t\x12\x1e\n\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01\x12\"\n\x1awhatsapp_cloud_api_version\x18\r \x01(\t\x12\x18\n\x10whatsapp_call_id\x18\x03 \x01(\t\x12)\n!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\t\x12(\n\x03sdp\x18\x05 \x01(\x0b\x32\x1b.livekit.SessionDescription\x12\x11\n\troom_name\x18\x06 \x01(\t\x12*\n\x06\x61gents\x18\x07 \x03(\x0b\x32\x1a.livekit.RoomAgentDispatch\x12\x1c\n\x14participant_identity\x18\x08 \x01(\t\x12@\n\x10participant_name\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x44\n\x14participant_metadata\x18\n \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x85\x01\n\x16participant_attributes\x18\x0b \x03(\x0b\x32=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>\x12\x1b\n\x13\x64\x65stination_country\x18\x0c \x01(\t\x12\x32\n\x0fringing_timeout\x18\x0e \x01(\x0b\x32\x19.google.protobuf.Duration\x12\x1b\n\x13wait_until_answered\x18\x0f \x01(\x08\x1a<\n\x1aParticipantAttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"/\n\x1a\x41\x63\x63\x65ptWhatsAppCallResponse\x12\x11\n\troom_name\x18\x01 \x01(\t\"[\n\x0cWhatsAppCall\x12\x18\n\x10whatsapp_call_id\x18\x01 \x01(\t\x12\x31\n\tdirection\x18\x02 \x01(\x0e\x32\x1e.livekit.WhatsAppCallDirection*b\n\x15WhatsAppCallDirection\x12#\n\x1fWHATSAPP_CALL_DIRECTION_INBOUND\x10\x00\x12$\n WHATSAPP_CALL_DIRECTION_OUTBOUND\x10\x02\x42\x46Z#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -49,30 +50,30 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_ACCEPTWHATSAPPCALLREQUEST'].fields_by_name['participant_metadata']._serialized_options = b'\210\354,\001\222\354,\036<redacted ({{ .Size }} bytes)>'
   _globals['_ACCEPTWHATSAPPCALLREQUEST'].fields_by_name['participant_attributes']._options = None
   _globals['_ACCEPTWHATSAPPCALLREQUEST'].fields_by_name['participant_attributes']._serialized_options = b'\210\354,\001\222\354,\036<redacted ({{ .Size }} bytes)>'
-  _globals['_WHATSAPPCALLDIRECTION']._serialized_start=2100
-  _globals['_WHATSAPPCALLDIRECTION']._serialized_end=2198
-  _globals['_DIALWHATSAPPCALLREQUEST']._serialized_start=117
-  _globals['_DIALWHATSAPPCALLREQUEST']._serialized_end=781
-  _globals['_DIALWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_start=721
-  _globals['_DIALWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_end=781
-  _globals['_DIALWHATSAPPCALLRESPONSE']._serialized_start=783
-  _globals['_DIALWHATSAPPCALLRESPONSE']._serialized_end=854
-  _globals['_DISCONNECTWHATSAPPCALLREQUEST']._serialized_start=857
-  _globals['_DISCONNECTWHATSAPPCALLREQUEST']._serialized_end=1094
-  _globals['_DISCONNECTWHATSAPPCALLREQUEST_DISCONNECTREASON']._serialized_start=1032
-  _globals['_DISCONNECTWHATSAPPCALLREQUEST_DISCONNECTREASON']._serialized_end=1094
-  _globals['_DISCONNECTWHATSAPPCALLRESPONSE']._serialized_start=1096
-  _globals['_DISCONNECTWHATSAPPCALLRESPONSE']._serialized_end=1128
-  _globals['_CONNECTWHATSAPPCALLREQUEST']._serialized_start=1130
-  _globals['_CONNECTWHATSAPPCALLREQUEST']._serialized_end=1226
-  _globals['_CONNECTWHATSAPPCALLRESPONSE']._serialized_start=1228
-  _globals['_CONNECTWHATSAPPCALLRESPONSE']._serialized_end=1257
-  _globals['_ACCEPTWHATSAPPCALLREQUEST']._serialized_start=1260
-  _globals['_ACCEPTWHATSAPPCALLREQUEST']._serialized_end=1956
-  _globals['_ACCEPTWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_start=721
-  _globals['_ACCEPTWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_end=781
-  _globals['_ACCEPTWHATSAPPCALLRESPONSE']._serialized_start=1958
-  _globals['_ACCEPTWHATSAPPCALLRESPONSE']._serialized_end=2005
-  _globals['_WHATSAPPCALL']._serialized_start=2007
-  _globals['_WHATSAPPCALL']._serialized_end=2098
+  _globals['_WHATSAPPCALLDIRECTION']._serialized_start=2265
+  _globals['_WHATSAPPCALLDIRECTION']._serialized_end=2363
+  _globals['_DIALWHATSAPPCALLREQUEST']._serialized_start=149
+  _globals['_DIALWHATSAPPCALLREQUEST']._serialized_end=865
+  _globals['_DIALWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_start=805
+  _globals['_DIALWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_end=865
+  _globals['_DIALWHATSAPPCALLRESPONSE']._serialized_start=867
+  _globals['_DIALWHATSAPPCALLRESPONSE']._serialized_end=938
+  _globals['_DISCONNECTWHATSAPPCALLREQUEST']._serialized_start=941
+  _globals['_DISCONNECTWHATSAPPCALLREQUEST']._serialized_end=1178
+  _globals['_DISCONNECTWHATSAPPCALLREQUEST_DISCONNECTREASON']._serialized_start=1116
+  _globals['_DISCONNECTWHATSAPPCALLREQUEST_DISCONNECTREASON']._serialized_end=1178
+  _globals['_DISCONNECTWHATSAPPCALLRESPONSE']._serialized_start=1180
+  _globals['_DISCONNECTWHATSAPPCALLRESPONSE']._serialized_end=1212
+  _globals['_CONNECTWHATSAPPCALLREQUEST']._serialized_start=1214
+  _globals['_CONNECTWHATSAPPCALLREQUEST']._serialized_end=1310
+  _globals['_CONNECTWHATSAPPCALLRESPONSE']._serialized_start=1312
+  _globals['_CONNECTWHATSAPPCALLRESPONSE']._serialized_end=1341
+  _globals['_ACCEPTWHATSAPPCALLREQUEST']._serialized_start=1344
+  _globals['_ACCEPTWHATSAPPCALLREQUEST']._serialized_end=2121
+  _globals['_ACCEPTWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_start=805
+  _globals['_ACCEPTWHATSAPPCALLREQUEST_PARTICIPANTATTRIBUTESENTRY']._serialized_end=865
+  _globals['_ACCEPTWHATSAPPCALLRESPONSE']._serialized_start=2123
+  _globals['_ACCEPTWHATSAPPCALLRESPONSE']._serialized_end=2170
+  _globals['_WHATSAPPCALL']._serialized_start=2172
+  _globals['_WHATSAPPCALL']._serialized_end=2263
 # @@protoc_insertion_point(module_scope)
