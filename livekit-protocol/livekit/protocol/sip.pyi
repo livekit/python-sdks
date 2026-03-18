@@ -1,6 +1,7 @@
 from google.protobuf import any_pb2 as _any_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import empty_pb2 as _empty_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import models as _models
 from . import room as _room
 from .logger_pb import options as _options_pb2
@@ -346,7 +347,7 @@ class UpdateSIPInboundTrunkRequest(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., replace: _Optional[_Union[SIPInboundTrunkInfo, _Mapping]] = ..., update: _Optional[_Union[SIPInboundTrunkUpdate, _Mapping]] = ...) -> None: ...
 
 class SIPInboundTrunkInfo(_message.Message):
-    __slots__ = ("sip_trunk_id", "name", "metadata", "numbers", "allowed_addresses", "allowed_numbers", "auth_username", "auth_password", "headers", "headers_to_attributes", "attributes_to_headers", "include_headers", "ringing_timeout", "max_call_duration", "krisp_enabled", "media_encryption")
+    __slots__ = ("sip_trunk_id", "name", "metadata", "numbers", "allowed_addresses", "allowed_numbers", "auth_username", "auth_password", "headers", "headers_to_attributes", "attributes_to_headers", "include_headers", "ringing_timeout", "max_call_duration", "krisp_enabled", "media_encryption", "created_at", "updated_at")
     class HeadersEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -384,6 +385,8 @@ class SIPInboundTrunkInfo(_message.Message):
     MAX_CALL_DURATION_FIELD_NUMBER: _ClassVar[int]
     KRISP_ENABLED_FIELD_NUMBER: _ClassVar[int]
     MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     sip_trunk_id: str
     name: str
     metadata: str
@@ -400,7 +403,9 @@ class SIPInboundTrunkInfo(_message.Message):
     max_call_duration: _duration_pb2.Duration
     krisp_enabled: bool
     media_encryption: SIPMediaEncryption
-    def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., numbers: _Optional[_Iterable[str]] = ..., allowed_addresses: _Optional[_Iterable[str]] = ..., allowed_numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers: _Optional[_Mapping[str, str]] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., max_call_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ...) -> None: ...
+    created_at: _timestamp_pb2.Timestamp
+    updated_at: _timestamp_pb2.Timestamp
+    def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., numbers: _Optional[_Iterable[str]] = ..., allowed_addresses: _Optional[_Iterable[str]] = ..., allowed_numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers: _Optional[_Mapping[str, str]] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., max_call_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class SIPInboundTrunkUpdate(_message.Message):
     __slots__ = ("numbers", "allowed_addresses", "allowed_numbers", "auth_username", "auth_password", "name", "metadata", "media_encryption")
@@ -439,7 +444,7 @@ class UpdateSIPOutboundTrunkRequest(_message.Message):
     def __init__(self, sip_trunk_id: _Optional[str] = ..., replace: _Optional[_Union[SIPOutboundTrunkInfo, _Mapping]] = ..., update: _Optional[_Union[SIPOutboundTrunkUpdate, _Mapping]] = ...) -> None: ...
 
 class SIPOutboundTrunkInfo(_message.Message):
-    __slots__ = ("sip_trunk_id", "name", "metadata", "address", "destination_country", "transport", "numbers", "auth_username", "auth_password", "headers", "headers_to_attributes", "attributes_to_headers", "include_headers", "media_encryption")
+    __slots__ = ("sip_trunk_id", "name", "metadata", "address", "destination_country", "transport", "numbers", "auth_username", "auth_password", "headers", "headers_to_attributes", "attributes_to_headers", "include_headers", "media_encryption", "from_host", "created_at", "updated_at")
     class HeadersEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -475,6 +480,9 @@ class SIPOutboundTrunkInfo(_message.Message):
     ATTRIBUTES_TO_HEADERS_FIELD_NUMBER: _ClassVar[int]
     INCLUDE_HEADERS_FIELD_NUMBER: _ClassVar[int]
     MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    FROM_HOST_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     sip_trunk_id: str
     name: str
     metadata: str
@@ -489,10 +497,13 @@ class SIPOutboundTrunkInfo(_message.Message):
     attributes_to_headers: _containers.ScalarMap[str, str]
     include_headers: SIPHeaderOptions
     media_encryption: SIPMediaEncryption
-    def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., address: _Optional[str] = ..., destination_country: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers: _Optional[_Mapping[str, str]] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ...) -> None: ...
+    from_host: str
+    created_at: _timestamp_pb2.Timestamp
+    updated_at: _timestamp_pb2.Timestamp
+    def __init__(self, sip_trunk_id: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., address: _Optional[str] = ..., destination_country: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., numbers: _Optional[_Iterable[str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers: _Optional[_Mapping[str, str]] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ..., include_headers: _Optional[_Union[SIPHeaderOptions, str]] = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., from_host: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class SIPOutboundTrunkUpdate(_message.Message):
-    __slots__ = ("address", "transport", "destination_country", "numbers", "auth_username", "auth_password", "name", "metadata", "media_encryption")
+    __slots__ = ("address", "transport", "destination_country", "numbers", "auth_username", "auth_password", "name", "metadata", "media_encryption", "from_host")
     ADDRESS_FIELD_NUMBER: _ClassVar[int]
     TRANSPORT_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_COUNTRY_FIELD_NUMBER: _ClassVar[int]
@@ -502,6 +513,7 @@ class SIPOutboundTrunkUpdate(_message.Message):
     NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    FROM_HOST_FIELD_NUMBER: _ClassVar[int]
     address: str
     transport: SIPTransport
     destination_country: str
@@ -511,7 +523,8 @@ class SIPOutboundTrunkUpdate(_message.Message):
     name: str
     metadata: str
     media_encryption: SIPMediaEncryption
-    def __init__(self, address: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., destination_country: _Optional[str] = ..., numbers: _Optional[_Union[_models.ListUpdate, _Mapping]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ...) -> None: ...
+    from_host: str
+    def __init__(self, address: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., destination_country: _Optional[str] = ..., numbers: _Optional[_Union[_models.ListUpdate, _Mapping]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., from_host: _Optional[str] = ...) -> None: ...
 
 class GetSIPInboundTrunkRequest(_message.Message):
     __slots__ = ("sip_trunk_id",)
@@ -596,12 +609,14 @@ class SIPDispatchRuleDirect(_message.Message):
     def __init__(self, room_name: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
 
 class SIPDispatchRuleIndividual(_message.Message):
-    __slots__ = ("room_prefix", "pin")
+    __slots__ = ("room_prefix", "pin", "no_randomness")
     ROOM_PREFIX_FIELD_NUMBER: _ClassVar[int]
     PIN_FIELD_NUMBER: _ClassVar[int]
+    NO_RANDOMNESS_FIELD_NUMBER: _ClassVar[int]
     room_prefix: str
     pin: str
-    def __init__(self, room_prefix: _Optional[str] = ..., pin: _Optional[str] = ...) -> None: ...
+    no_randomness: bool
+    def __init__(self, room_prefix: _Optional[str] = ..., pin: _Optional[str] = ..., no_randomness: bool = ...) -> None: ...
 
 class SIPDispatchRuleCallee(_message.Message):
     __slots__ = ("room_prefix", "pin", "randomize")
@@ -665,7 +680,7 @@ class UpdateSIPDispatchRuleRequest(_message.Message):
     def __init__(self, sip_dispatch_rule_id: _Optional[str] = ..., replace: _Optional[_Union[SIPDispatchRuleInfo, _Mapping]] = ..., update: _Optional[_Union[SIPDispatchRuleUpdate, _Mapping]] = ...) -> None: ...
 
 class SIPDispatchRuleInfo(_message.Message):
-    __slots__ = ("sip_dispatch_rule_id", "rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "numbers", "name", "metadata", "attributes", "room_preset", "room_config", "krisp_enabled", "media_encryption")
+    __slots__ = ("sip_dispatch_rule_id", "rule", "trunk_ids", "hide_phone_number", "inbound_numbers", "numbers", "name", "metadata", "attributes", "room_preset", "room_config", "krisp_enabled", "media_encryption", "created_at", "updated_at")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -686,6 +701,8 @@ class SIPDispatchRuleInfo(_message.Message):
     ROOM_CONFIG_FIELD_NUMBER: _ClassVar[int]
     KRISP_ENABLED_FIELD_NUMBER: _ClassVar[int]
     MEDIA_ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
     sip_dispatch_rule_id: str
     rule: SIPDispatchRule
     trunk_ids: _containers.RepeatedScalarFieldContainer[str]
@@ -699,7 +716,9 @@ class SIPDispatchRuleInfo(_message.Message):
     room_config: _room.RoomConfiguration
     krisp_enabled: bool
     media_encryption: SIPMediaEncryption
-    def __init__(self, sip_dispatch_rule_id: _Optional[str] = ..., rule: _Optional[_Union[SIPDispatchRule, _Mapping]] = ..., trunk_ids: _Optional[_Iterable[str]] = ..., hide_phone_number: bool = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., numbers: _Optional[_Iterable[str]] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., room_preset: _Optional[str] = ..., room_config: _Optional[_Union[_room.RoomConfiguration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ...) -> None: ...
+    created_at: _timestamp_pb2.Timestamp
+    updated_at: _timestamp_pb2.Timestamp
+    def __init__(self, sip_dispatch_rule_id: _Optional[str] = ..., rule: _Optional[_Union[SIPDispatchRule, _Mapping]] = ..., trunk_ids: _Optional[_Iterable[str]] = ..., hide_phone_number: bool = ..., inbound_numbers: _Optional[_Iterable[str]] = ..., numbers: _Optional[_Iterable[str]] = ..., name: _Optional[str] = ..., metadata: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., room_preset: _Optional[str] = ..., room_config: _Optional[_Union[_room.RoomConfiguration, _Mapping]] = ..., krisp_enabled: bool = ..., media_encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class SIPDispatchRuleUpdate(_message.Message):
     __slots__ = ("trunk_ids", "rule", "name", "metadata", "attributes", "media_encryption")
@@ -747,7 +766,7 @@ class DeleteSIPDispatchRuleRequest(_message.Message):
     def __init__(self, sip_dispatch_rule_id: _Optional[str] = ...) -> None: ...
 
 class SIPOutboundConfig(_message.Message):
-    __slots__ = ("hostname", "destination_country", "transport", "auth_username", "auth_password", "headers_to_attributes", "attributes_to_headers")
+    __slots__ = ("hostname", "destination_country", "transport", "auth_username", "auth_password", "headers_to_attributes", "attributes_to_headers", "from_host")
     class HeadersToAttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -769,6 +788,7 @@ class SIPOutboundConfig(_message.Message):
     AUTH_PASSWORD_FIELD_NUMBER: _ClassVar[int]
     HEADERS_TO_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_TO_HEADERS_FIELD_NUMBER: _ClassVar[int]
+    FROM_HOST_FIELD_NUMBER: _ClassVar[int]
     hostname: str
     destination_country: str
     transport: SIPTransport
@@ -776,7 +796,8 @@ class SIPOutboundConfig(_message.Message):
     auth_password: str
     headers_to_attributes: _containers.ScalarMap[str, str]
     attributes_to_headers: _containers.ScalarMap[str, str]
-    def __init__(self, hostname: _Optional[str] = ..., destination_country: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    from_host: str
+    def __init__(self, hostname: _Optional[str] = ..., destination_country: _Optional[str] = ..., transport: _Optional[_Union[SIPTransport, str]] = ..., auth_username: _Optional[str] = ..., auth_password: _Optional[str] = ..., headers_to_attributes: _Optional[_Mapping[str, str]] = ..., attributes_to_headers: _Optional[_Mapping[str, str]] = ..., from_host: _Optional[str] = ...) -> None: ...
 
 class CreateSIPParticipantRequest(_message.Message):
     __slots__ = ("sip_trunk_id", "trunk", "sip_call_to", "sip_number", "room_name", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "dtmf", "play_ringtone", "play_dialtone", "hide_phone_number", "headers", "include_headers", "ringing_timeout", "max_call_duration", "krisp_enabled", "media_encryption", "wait_until_answered", "display_name", "destination")
