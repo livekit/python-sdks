@@ -4,6 +4,7 @@ from . import egress as _egress
 from . import ingress as _ingress
 from . import sip as _sip
 from . import room as _room
+from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
