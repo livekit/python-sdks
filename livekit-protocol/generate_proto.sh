@@ -91,11 +91,15 @@ mkdir -p "$API_OUT_PYTHON/logger_pb"
 mv "$API_OUT_PYTHON/logger/options_pb2.py" "$API_OUT_PYTHON/logger_pb/options.py"
 mv "$API_OUT_PYTHON/logger/options_pb2.pyi" "$API_OUT_PYTHON/logger_pb/options.pyi"
 
-perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|options_pb2))|from . $1|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
+find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|options_pb2))|from . $1|g'
 
-perl -i -pe 's|livekit_(\w+)_pb2|${1}|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
+find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|livekit_(\w+)_pb2|${1}|g'
 
-perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from .logger_pb import options as $1|g' "$API_OUT_PYTHON"/**.py "$API_OUT_PYTHON"/**.pyi
+# fix logger imports for top-level files
+find "$API_OUT_PYTHON" -maxdepth 1 -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from .logger_pb import options as $1|g'
+
+# fix logger imports for files in subdirectories (need parent-relative import)
+find "$API_OUT_PYTHON" -mindepth 2 -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from ..logger_pb import options as $1|g'
 
 # fixes - error: ClassVar can only be used for assignments in class body  [misc]
 perl -i -pe 's|^(\w+_FIELD_NUMBER): _ClassVar\[int\]|$1: int|g' "$API_OUT_PYTHON/logger_pb/options.pyi"
