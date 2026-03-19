@@ -193,8 +193,15 @@ class RemoteDataTrack:
         """Identity of the participant who published the track."""
         return self._publisher_identity
 
-    async def subscribe(self) -> DataTrackSubscription:
+    async def subscribe(
+        self, *, buffer_size: Optional[int] = None
+    ) -> DataTrackSubscription:
         """Subscribes to the data track to receive frames.
+
+        Args:
+            buffer_size: Maximum number of received frames to buffer internally.
+                When ``None``, the default buffer size is used.
+                Zero is not a valid buffer size; if a value of zero is provided, it will be clamped to one.
 
         Returns a :class:`DataTrackSubscription` that yields
         :class:`DataTrackFrame` instances as they arrive.
@@ -202,11 +209,13 @@ class RemoteDataTrack:
         Raises:
             SubscribeDataTrackError: If subscription fails.
         """
+        opts = proto_data_track.DataTrackSubscribeOptions()
+        if buffer_size is not None:
+            opts.buffer_size = buffer_size
+
         req = proto_ffi.FfiRequest()
         req.subscribe_data_track.track_handle = self._ffi_handle.handle
-        req.subscribe_data_track.options.CopyFrom(
-            proto_data_track.DataTrackSubscribeOptions()
-        )
+        req.subscribe_data_track.options.CopyFrom(opts)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
