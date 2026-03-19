@@ -341,9 +341,16 @@ class DataTrackSubscribeOptions(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    BUFFER_SIZE_FIELD_NUMBER: builtins.int
+    buffer_size: builtins.int
+    """Maximum number of frames to buffer internally."""
     def __init__(
         self,
+        *,
+        buffer_size: builtins.int | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer_size", b"buffer_size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer_size", b"buffer_size"]) -> None: ...
 
 global___DataTrackSubscribeOptions = DataTrackSubscribeOptions
 

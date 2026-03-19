@@ -248,7 +248,9 @@ class NewVideoSourceRequest(google.protobuf.message.Message):
 
     TYPE_FIELD_NUMBER: builtins.int
     RESOLUTION_FIELD_NUMBER: builtins.int
+    IS_SCREENCAST_FIELD_NUMBER: builtins.int
     type: global___VideoSourceType.ValueType
+    is_screencast: builtins.bool
     @property
     def resolution(self) -> global___VideoSourceResolution:
         """Used to determine which encodings to use + simulcast layers
@@ -260,9 +262,10 @@ class NewVideoSourceRequest(google.protobuf.message.Message):
         *,
         type: global___VideoSourceType.ValueType | None = ...,
         resolution: global___VideoSourceResolution | None = ...,
+        is_screencast: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["resolution", b"resolution", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["resolution", b"resolution", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["is_screencast", b"is_screencast", "resolution", b"resolution", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["is_screencast", b"is_screencast", "resolution", b"resolution", "type", b"type"]) -> None: ...
 
 global___NewVideoSourceRequest = NewVideoSourceRequest
 
