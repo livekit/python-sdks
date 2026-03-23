@@ -573,7 +573,9 @@ class Room(EventEmitter[EventTypes]):
         if self._text_stream_handlers.get(topic):
             self._text_stream_handlers.pop(topic)
 
-    async def disconnect(self) -> None:
+    async def disconnect(
+        self, *, reason: DisconnectReason = DisconnectReason.CLIENT_INITIATED
+    ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
             return
@@ -583,6 +585,7 @@ class Room(EventEmitter[EventTypes]):
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
+        req.disconnect.reason = reason  # type: ignore
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -596,10 +599,10 @@ class Room(EventEmitter[EventTypes]):
         # we should manually flip the state, since the connection could have been torn down before
         # the callbacks were processed
         if self._connection_state != ConnectionState.CONN_DISCONNECTED:
-            self.local_participant._info.disconnect_reason = DisconnectReason.CLIENT_INITIATED
+            self.local_participant._info.disconnect_reason = reason
             self._connection_state = ConnectionState.CONN_DISCONNECTED
             self.emit("connection_state_changed", self._connection_state)
-            self.emit("disconnected", DisconnectReason.CLIENT_INITIATED)
+            self.emit("disconnected", reason)
 
     async def _listen_task(self) -> None:
         # listen to incoming room events
