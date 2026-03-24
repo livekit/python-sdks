@@ -704,8 +704,7 @@ class LocalParticipant(Participant):
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.publish_data_track.async_id
-                == resp.publish_data_track.async_id
+                lambda e: e.publish_data_track.async_id == resp.publish_data_track.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)

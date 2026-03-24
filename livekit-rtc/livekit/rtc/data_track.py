@@ -193,9 +193,7 @@ class RemoteDataTrack:
         """Identity of the participant who published the track."""
         return self._publisher_identity
 
-    async def subscribe(
-        self, *, buffer_size: Optional[int] = None
-    ) -> DataTrackSubscription:
+    async def subscribe(self, *, buffer_size: Optional[int] = None) -> DataTrackSubscription:
         """Subscribes to the data track to receive frames.
 
         Args:
@@ -221,8 +219,7 @@ class RemoteDataTrack:
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.subscribe_data_track.async_id
-                == resp.subscribe_data_track.async_id
+                lambda e: e.subscribe_data_track.async_id == resp.subscribe_data_track.async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
@@ -259,9 +256,7 @@ class DataTrackSubscription:
     Dropping or closing the subscription unsubscribes from the track.
     """
 
-    def __init__(
-        self, owned_info: proto_data_track.OwnedDataTrackSubscription
-    ) -> None:
+    def __init__(self, owned_info: proto_data_track.OwnedDataTrackSubscription) -> None:
         self._ffi_handle = FfiHandle(owned_info.handle.id)
         handle_id = owned_info.handle.id
 
@@ -303,9 +298,7 @@ class DataTrackSubscription:
 
     def _send_read_request(self) -> None:
         req = proto_ffi.FfiRequest()
-        req.data_track_subscription_read.subscription_handle = (
-            self._ffi_handle.handle
-        )
+        req.data_track_subscription_read.subscription_handle = self._ffi_handle.handle
         FfiClient.instance.request(req)
 
     def _close(self) -> None:
