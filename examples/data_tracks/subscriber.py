@@ -30,8 +30,8 @@ async def main(room: rtc.Room):
 
     active_tasks = []
 
-    @room.on("remote_data_track_published")
-    def on_remote_data_track_published(track: rtc.RemoteDataTrack):
+    @room.on("data_track_published")
+    def on_data_track_published(track: rtc.RemoteDataTrack):
         task = asyncio.create_task(subscribe(track))
         active_tasks.append(task)
         task.add_done_callback(lambda _: active_tasks.remove(task))

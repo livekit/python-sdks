@@ -459,8 +459,8 @@ async def test_data_track():
     remote_track_event = asyncio.Event()
     remote_track = None
 
-    @subscriber_room.on("remote_data_track_published")
-    def on_remote_data_track_published(track: rtc.RemoteDataTrack):
+    @subscriber_room.on("data_track_published")
+    def on_data_track_published(track: rtc.RemoteDataTrack):
         nonlocal remote_track
         remote_track = track
         remote_track_event.set()
