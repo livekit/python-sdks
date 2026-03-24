@@ -280,6 +280,7 @@ class DataTrackSubscription:
         if self._closed:
             raise StopAsyncIteration
 
+        self._send_read_request()
         event: proto_ffi.FfiEvent = await self._queue.get()
         sub_event = event.data_track_subscription_event
         detail = sub_event.WhichOneof("detail")
@@ -299,6 +300,13 @@ class DataTrackSubscription:
         else:
             self._close()
             raise StopAsyncIteration
+
+    def _send_read_request(self) -> None:
+        req = proto_ffi.FfiRequest()
+        req.data_track_subscription_read.subscription_handle = (
+            self._ffi_handle.handle
+        )
+        FfiClient.instance.request(req)
 
     def _close(self) -> None:
         if not self._closed:
