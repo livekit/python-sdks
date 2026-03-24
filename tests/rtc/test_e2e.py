@@ -458,12 +458,20 @@ async def test_data_track():
 
     remote_track_event = asyncio.Event()
     remote_track = None
+    unpublished_event = asyncio.Event()
+    unpublished_sid = None
 
     @subscriber_room.on("data_track_published")
     def on_data_track_published(track: rtc.RemoteDataTrack):
         nonlocal remote_track
         remote_track = track
         remote_track_event.set()
+
+    @subscriber_room.on("data_track_unpublished")
+    def on_data_track_unpublished(sid: str):
+        nonlocal unpublished_sid
+        unpublished_sid = sid
+        unpublished_event.set()
 
     try:
         await subscriber_room.connect(url, subscriber_token)
@@ -509,6 +517,9 @@ async def test_data_track():
 
         recv_count = await asyncio.wait_for(publish_and_receive(), timeout=10.0)
         assert recv_count > 0, "No frames were received"
+
+        await asyncio.wait_for(unpublished_event.wait(), timeout=5.0)
+        assert unpublished_sid == local_track.info.sid
 
     finally:
         await publisher_room.disconnect()

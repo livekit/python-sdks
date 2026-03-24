@@ -80,6 +80,7 @@ EventTypes = Literal[
     "moved",
     "token_refreshed",
     "data_track_published",
+    "data_track_unpublished",
 ]
 
 
@@ -396,6 +397,8 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: None
             - **"data_track_published"**: Called when a remote participant publishes a data track.
                 - Arguments: `track` (RemoteDataTrack)
+            - **"data_track_unpublished"**: Called when a remote participant unpublishes a data track.
+                - Arguments: `sid` (str)
 
         Example:
             ```python
@@ -931,6 +934,9 @@ class Room(EventEmitter[EventTypes]):
         elif which == "data_track_published":
             remote_data_track = RemoteDataTrack(event.data_track_published.track)
             self.emit("data_track_published", remote_data_track)
+
+        elif which == "data_track_unpublished":
+            self.emit("data_track_unpublished", event.data_track_unpublished.sid)
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
