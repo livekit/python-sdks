@@ -50,6 +50,21 @@ GCM: EncryptionType.ValueType  # 1
 CUSTOM: EncryptionType.ValueType  # 2
 global___EncryptionType = EncryptionType
 
+class _KeyDerivationFunction:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _KeyDerivationFunctionEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_KeyDerivationFunction.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PBKDF2: _KeyDerivationFunction.ValueType  # 0
+    HKDF: _KeyDerivationFunction.ValueType  # 1
+
+class KeyDerivationFunction(_KeyDerivationFunction, metaclass=_KeyDerivationFunctionEnumTypeWrapper): ...
+
+PBKDF2: KeyDerivationFunction.ValueType  # 0
+HKDF: KeyDerivationFunction.ValueType  # 1
+global___KeyDerivationFunction = KeyDerivationFunction
+
 class _EncryptionState:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -108,12 +123,16 @@ class KeyProviderOptions(google.protobuf.message.Message):
     RATCHET_WINDOW_SIZE_FIELD_NUMBER: builtins.int
     RATCHET_SALT_FIELD_NUMBER: builtins.int
     FAILURE_TOLERANCE_FIELD_NUMBER: builtins.int
+    KEY_RING_SIZE_FIELD_NUMBER: builtins.int
+    KEY_DERIVATION_FUNCTION_FIELD_NUMBER: builtins.int
     shared_key: builtins.bytes
     """Only specify if you want to use a shared_key"""
     ratchet_window_size: builtins.int
     ratchet_salt: builtins.bytes
     failure_tolerance: builtins.int
     """-1 = no tolerance"""
+    key_ring_size: builtins.int
+    key_derivation_function: global___KeyDerivationFunction.ValueType
     def __init__(
         self,
         *,
@@ -121,9 +140,11 @@ class KeyProviderOptions(google.protobuf.message.Message):
         ratchet_window_size: builtins.int | None = ...,
         ratchet_salt: builtins.bytes | None = ...,
         failure_tolerance: builtins.int | None = ...,
+        key_ring_size: builtins.int | None = ...,
+        key_derivation_function: global___KeyDerivationFunction.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "key_derivation_function", b"key_derivation_function", "key_ring_size", b"key_ring_size", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["failure_tolerance", b"failure_tolerance", "key_derivation_function", b"key_derivation_function", "key_ring_size", b"key_ring_size", "ratchet_salt", b"ratchet_salt", "ratchet_window_size", b"ratchet_window_size", "shared_key", b"shared_key"]) -> None: ...
 
 global___KeyProviderOptions = KeyProviderOptions
 

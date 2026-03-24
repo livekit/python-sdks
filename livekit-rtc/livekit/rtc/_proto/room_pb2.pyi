@@ -248,16 +248,19 @@ class DisconnectRequest(google.protobuf.message.Message):
 
     ROOM_HANDLE_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    REASON_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     request_async_id: builtins.int
+    reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
         room_handle: builtins.int | None = ...,
         request_async_id: builtins.int | None = ...,
+        reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> None: ...
 
 global___DisconnectRequest = DisconnectRequest
 

@@ -454,6 +454,39 @@ class SubscribeDataTrackCallback(google.protobuf.message.Message):
 global___SubscribeDataTrackCallback = SubscribeDataTrackCallback
 
 @typing.final
+class DataTrackSubscriptionReadRequest(google.protobuf.message.Message):
+    """Signal readiness to handle the next frame.
+
+    This allows the client to put backpressure on the internal receive buffer.
+    Sending this request will cause the next frame to be sent via `DataTrackSubscriptionFrameReceived`
+    once one is available.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SUBSCRIPTION_HANDLE_FIELD_NUMBER: builtins.int
+    subscription_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        subscription_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["subscription_handle", b"subscription_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["subscription_handle", b"subscription_handle"]) -> None: ...
+
+global___DataTrackSubscriptionReadRequest = DataTrackSubscriptionReadRequest
+
+@typing.final
+class DataTrackSubscriptionReadResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___DataTrackSubscriptionReadResponse = DataTrackSubscriptionReadResponse
+
+@typing.final
 class DataTrackSubscriptionEvent(google.protobuf.message.Message):
     """Event emitted on an active subscription."""
 
