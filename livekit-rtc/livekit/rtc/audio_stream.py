@@ -239,6 +239,7 @@ class AudioStream:
         new_audio_stream.track_handle = self._track._ffi_handle.handle
         new_audio_stream.sample_rate = self._sample_rate
         new_audio_stream.num_channels = self._num_channels
+        new_audio_stream.queue_size_frames = 0
         if self._frame_size_ms:
             new_audio_stream.frame_size_ms = self._frame_size_ms
         new_audio_stream.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
@@ -257,6 +258,7 @@ class AudioStream:
         audio_stream_from_participant.participant_handle = participant._ffi_handle.handle
         audio_stream_from_participant.sample_rate = self._sample_rate
         audio_stream_from_participant.num_channels = self._num_channels
+        audio_stream_from_participant.queue_size_frames = 0
         audio_stream_from_participant.type = proto_audio_frame.AudioStreamType.AUDIO_STREAM_NATIVE
         audio_stream_from_participant.track_source = track_source
         if self._frame_size_ms:
