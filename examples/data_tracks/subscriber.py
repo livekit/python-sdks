@@ -15,13 +15,15 @@ async def subscribe(track: rtc.RemoteDataTrack):
         track.info.name,
         track.publisher_identity,
     )
-    subscription = await track.subscribe()
-    async for frame in subscription:
-        logging.info("Received frame (%d bytes)", len(frame.payload))
+    try:
+        async for frame in track.subscribe():
+            logging.info("Received frame (%d bytes)", len(frame.payload))
 
-        latency = frame.duration_since_timestamp()
-        if latency is not None:
-            logging.info("Latency: %.3f s", latency)
+            latency = frame.duration_since_timestamp()
+            if latency is not None:
+                logging.info("Latency: %.3f s", latency)
+    except rtc.SubscribeDataTrackError as e:
+        logging.error("Failed to subscribe to '%s': %s", track.info.name, e.message)
 
 
 async def main(room: rtc.Room):

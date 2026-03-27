@@ -116,6 +116,7 @@ from .data_track import (
     DataTrackInfo,
     DataTrackOptions,
     PushFrameError,
+    SubscribeDataTrackError,
 )
 from .frame_processor import FrameProcessor
 
@@ -202,6 +203,7 @@ __all__ = [
     "DataTrackInfo",
     "DataTrackOptions",
     "PushFrameError",
+    "SubscribeDataTrackError",
     "__version__",
 ]
 

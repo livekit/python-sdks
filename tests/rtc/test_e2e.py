@@ -488,7 +488,7 @@ async def test_data_track():
         assert remote_track.publisher_identity == PUBLISHER_IDENTITY
         assert remote_track.is_published()
 
-        subscription = await remote_track.subscribe()
+        subscription = remote_track.subscribe()
 
         async def push_frames():
             for i in range(FRAME_COUNT):

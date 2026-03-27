@@ -193,7 +193,7 @@ class RemoteDataTrack:
         """Identity of the participant who published the track."""
         return self._publisher_identity
 
-    async def subscribe(self, *, buffer_size: Optional[int] = None) -> DataTrackSubscription:
+    def subscribe(self, *, buffer_size: Optional[int] = None) -> DataTrackSubscription:
         """Subscribes to the data track to receive frames.
 
         Args:
@@ -202,10 +202,9 @@ class RemoteDataTrack:
                 Zero is not a valid buffer size; if a value of zero is provided, it will be clamped to one.
 
         Returns a :class:`DataTrackSubscription` that yields
-        :class:`DataTrackFrame` instances as they arrive.
-
-        Raises:
-            SubscribeDataTrackError: If subscription fails.
+        :class:`DataTrackFrame` instances as they arrive. If the
+        subscription encounters an error, it is raised as
+        :class:`SubscribeDataTrackError` when iteration ends.
         """
         opts = proto_data_track.DataTrackSubscribeOptions()
         if buffer_size is not None:
@@ -215,19 +214,8 @@ class RemoteDataTrack:
         req.subscribe_data_track.track_handle = self._ffi_handle.handle
         req.subscribe_data_track.options.CopyFrom(opts)
 
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.subscribe_data_track.async_id == resp.subscribe_data_track.async_id
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
-
-        if cb.subscribe_data_track.HasField("error"):
-            raise SubscribeDataTrackError(cb.subscribe_data_track.error)
-
-        return DataTrackSubscription(cb.subscribe_data_track.subscription)
+        resp = FfiClient.instance.request(req)
+        return DataTrackSubscription(resp.subscribe_data_track.subscription)
 
     def is_published(self) -> bool:
         """Whether or not the track is still published."""
@@ -249,11 +237,14 @@ class DataTrackSubscription:
 
     Use as an async iterator to receive frames::
 
-        subscription = await remote_track.subscribe()
+        subscription = remote_track.subscribe()
         async for frame in subscription:
             process(frame.payload)
 
     Dropping or closing the subscription unsubscribes from the track.
+
+    If subscribing to the track fails, :class:`SubscribeDataTrackError`
+    is raised when iteration ends instead of a normal ``StopAsyncIteration``.
     """
 
     def __init__(self, owned_info: proto_data_track.OwnedDataTrackSubscription) -> None:
@@ -291,6 +282,8 @@ class DataTrackSubscription:
             )
         elif detail == "eos":
             self._close()
+            if sub_event.eos.HasField("error"):
+                raise SubscribeDataTrackError(sub_event.eos.error)
             raise StopAsyncIteration
         else:
             self._close()
