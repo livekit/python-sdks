@@ -694,7 +694,7 @@ class LocalParticipant(Participant):
         if isinstance(options, str):
             options = DataTrackOptions(name=options)
 
-        proto_opts = proto_data_track.DataTrackOptions(name=options.name)
+        proto_opts = proto_data_track.DataTrackOptions(name=options["name"])
 
         req = proto_ffi.FfiRequest()
         req.publish_data_track.local_participant_handle = self._ffi_handle.handle

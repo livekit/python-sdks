@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator, Optional, TypedDict
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -62,8 +62,7 @@ class DataTrackInfo:
     """Whether or not frames sent on the track use end-to-end encryption."""
 
 
-@dataclass
-class DataTrackOptions:
+class DataTrackOptions(TypedDict):
     """Options for publishing a data track."""
 
     name: str
