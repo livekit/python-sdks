@@ -396,9 +396,7 @@ class SubscribeDataTrackRequest(google.protobuf.message.Message):
 
     TRACK_HANDLE_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
-    request_async_id: builtins.int
     @property
     def options(self) -> global___DataTrackSubscribeOptions: ...
     def __init__(
@@ -406,10 +404,9 @@ class SubscribeDataTrackRequest(google.protobuf.message.Message):
         *,
         track_handle: builtins.int | None = ...,
         options: global___DataTrackSubscribeOptions | None = ...,
-        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> None: ...
 
 global___SubscribeDataTrackRequest = SubscribeDataTrackRequest
 
@@ -417,41 +414,18 @@ global___SubscribeDataTrackRequest = SubscribeDataTrackRequest
 class SubscribeDataTrackResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    def __init__(
-        self,
-        *,
-        async_id: builtins.int | None = ...,
-    ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
-
-global___SubscribeDataTrackResponse = SubscribeDataTrackResponse
-
-@typing.final
-class SubscribeDataTrackCallback(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: builtins.int
     SUBSCRIPTION_FIELD_NUMBER: builtins.int
-    ERROR_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    error: builtins.str
     @property
     def subscription(self) -> global___OwnedDataTrackSubscription: ...
     def __init__(
         self,
         *,
-        async_id: builtins.int | None = ...,
         subscription: global___OwnedDataTrackSubscription | None = ...,
-        error: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "subscription", b"subscription"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "subscription", b"subscription"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["subscription", "error"] | None: ...
+    def HasField(self, field_name: typing.Literal["subscription", b"subscription"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["subscription", b"subscription"]) -> None: ...
 
-global___SubscribeDataTrackCallback = SubscribeDataTrackCallback
+global___SubscribeDataTrackResponse = SubscribeDataTrackResponse
 
 @typing.final
 class DataTrackSubscriptionReadRequest(google.protobuf.message.Message):
@@ -538,8 +512,17 @@ class DataTrackSubscriptionEOS(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """If the track could not be subscribed to, a message describing the error.
+    Absent if the stream ended normally.
+    """
     def __init__(
         self,
+        *,
+        error: builtins.str | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
 global___DataTrackSubscriptionEOS = DataTrackSubscriptionEOS
