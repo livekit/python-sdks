@@ -477,7 +477,7 @@ async def test_data_track():
         await subscriber_room.connect(url, subscriber_token)
         await publisher_room.connect(url, publisher_token)
 
-        local_track = await publisher_room.local_participant.publish_data_track(TRACK_NAME)
+        local_track = await publisher_room.local_participant.publish_data_track({"name": TRACK_NAME})
         assert local_track.info.sid is not None
         assert local_track.info.name == TRACK_NAME
         assert local_track.is_published()

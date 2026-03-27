@@ -33,7 +33,7 @@ async def main(room: rtc.Room):
     await room.connect(URL, TOKEN)
     logger.info("connected to room %s", room.name)
 
-    track = await room.local_participant.publish_data_track("my_sensor_data")
+    track = await room.local_participant.publish_data_track({"name": "my_sensor_data"})
     await push_frames(track)
 
 

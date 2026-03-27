@@ -676,13 +676,12 @@ class LocalParticipant(Participant):
 
     async def publish_data_track(
         self,
-        options: Union[str, DataTrackOptions],
+        options: DataTrackOptions,
     ) -> LocalDataTrack:
         """Publishes a data track.
 
         Args:
-            options: Either a track name string or a :class:`DataTrackOptions`
-                object. When a string is provided, it is used as the track name.
+            options: Options for publishing the data track.
 
         Returns:
             The published data track. Use :meth:`LocalDataTrack.try_push` to
@@ -691,9 +690,6 @@ class LocalParticipant(Participant):
         Raises:
             PublishDataTrackError: If there is an error publishing the data track.
         """
-        if isinstance(options, str):
-            options = DataTrackOptions(name=options)
-
         proto_opts = proto_data_track.DataTrackOptions(name=options["name"])
 
         req = proto_ffi.FfiRequest()
