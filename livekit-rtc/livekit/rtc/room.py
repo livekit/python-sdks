@@ -584,7 +584,7 @@ class Room(EventEmitter[EventTypes]):
             self._text_stream_handlers.pop(topic)
 
     async def disconnect(
-        self, *, reason: DisconnectReason = DisconnectReason.CLIENT_INITIATED
+        self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
@@ -671,11 +671,9 @@ class Room(EventEmitter[EventTypes]):
             rparticipant._info.disconnect_reason = event.participant_disconnected.disconnect_reason
             self.emit("participant_disconnected", rparticipant)
         elif which == "participant_active":
-            rparticipant = self._retrieve_remote_participant(
-                event.participant_active.participant_identity
-            )
-            if rparticipant:
-                self.emit("participant_active", rparticipant)
+            rp = self._retrieve_remote_participant(event.participant_active.participant_identity)
+            if rp:
+                self.emit("participant_active", rp)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
