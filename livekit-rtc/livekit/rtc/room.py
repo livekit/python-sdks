@@ -49,6 +49,7 @@ from .data_track import RemoteDataTrack
 EventTypes = Literal[
     "participant_connected",
     "participant_disconnected",
+    "participant_active",
     "local_track_published",
     "local_track_unpublished",
     "local_track_subscribed",
@@ -338,6 +339,8 @@ class Room(EventEmitter[EventTypes]):
             - **"participant_connected"**: Called when a new participant joins the room.
                 - Arguments: `participant` (RemoteParticipant)
             - **"participant_disconnected"**: Called when a participant leaves the room.
+                - Arguments: `participant` (RemoteParticipant)
+            - **"participant_active"**: Called when a remote participant becomes active and is ready to receive data messages.
                 - Arguments: `participant` (RemoteParticipant)
             - **"local_track_published"**: Called when a local track is published.
                 - Arguments: `publication` (LocalTrackPublication), `track` (Track)
@@ -667,6 +670,10 @@ class Room(EventEmitter[EventTypes]):
             rparticipant = self._remote_participants.pop(identity)
             rparticipant._info.disconnect_reason = event.participant_disconnected.disconnect_reason
             self.emit("participant_disconnected", rparticipant)
+        elif which == "participant_active":
+            identity = event.participant_active.participant_identity
+            rparticipant = self._remote_participants[identity]
+            self.emit("participant_active", rparticipant)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]

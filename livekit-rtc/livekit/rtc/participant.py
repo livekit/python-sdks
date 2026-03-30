@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ctypes
 import asyncio
+import datetime
 import os
 import mimetypes
 import aiofiles
@@ -125,6 +126,20 @@ class Participant(ABC):
     def kind(self) -> proto_participant.ParticipantKind.ValueType:
         """Participant's kind (e.g., regular participant, ingress, egress, sip, agent)."""
         return self._info.kind
+
+    @property
+    def state(self) -> proto_participant.ParticipantState.ValueType:
+        """Participant's connection state (joining, joined, active, disconnected)."""
+        return self._info.state
+
+    @property
+    def joined_at(self) -> datetime.datetime | None:
+        """Timestamp of when the participant joined the room, or None if not yet joined."""
+        if self._info.joined_at == 0:
+            return None
+        return datetime.datetime.fromtimestamp(
+            self._info.joined_at / 1000, tz=datetime.timezone.utc
+        )
 
     @property
     def permissions(self) -> proto_participant.ParticipantPermission:
