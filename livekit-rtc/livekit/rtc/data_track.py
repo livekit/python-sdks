@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional, TypedDict
+from typing import AsyncIterator, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
@@ -60,16 +60,6 @@ class DataTrackInfo:
 
     uses_e2ee: bool
     """Whether or not frames sent on the track use end-to-end encryption."""
-
-
-class DataTrackOptions(TypedDict):
-    """Options for publishing a data track."""
-
-    name: str
-    """The track name is used to identify the track to other participants.
-
-    Must not be empty and must be unique per publisher.
-    """
 
 
 @dataclass

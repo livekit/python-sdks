@@ -53,7 +53,7 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
-from .data_track import LocalDataTrack, DataTrackOptions
+from .data_track import LocalDataTrack
 from ._proto import data_track_pb2 as proto_data_track
 
 
@@ -676,12 +676,14 @@ class LocalParticipant(Participant):
 
     async def publish_data_track(
         self,
-        options: DataTrackOptions,
+        *,
+        name: str,
     ) -> LocalDataTrack:
         """Publishes a data track.
 
         Args:
-            options: Options for publishing the data track.
+            name: The track name used to identify the track to other participants.
+                Must not be empty and must be unique per publisher.
 
         Returns:
             The published data track. Use :meth:`LocalDataTrack.try_push` to
@@ -690,7 +692,7 @@ class LocalParticipant(Participant):
         Raises:
             PublishDataTrackError: If there is an error publishing the data track.
         """
-        proto_opts = proto_data_track.DataTrackOptions(name=options["name"])
+        proto_opts = proto_data_track.DataTrackOptions(name=name)
 
         req = proto_ffi.FfiRequest()
         req.publish_data_track.local_participant_handle = self._ffi_handle.handle
