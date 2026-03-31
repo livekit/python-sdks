@@ -706,7 +706,7 @@ class LocalParticipant(Participant):
             FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.publish_data_track.HasField("error"):
-            raise PublishDataTrackError(cb.publish_data_track.error)
+            raise PublishDataTrackError(cb.publish_data_track.error.message)
 
         return LocalDataTrack(cb.publish_data_track.track)
 

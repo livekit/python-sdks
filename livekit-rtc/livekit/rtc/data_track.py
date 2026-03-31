@@ -150,7 +150,7 @@ class LocalDataTrack:
 
         resp = FfiClient.instance.request(req)
         if resp.local_data_track_try_push.HasField("error"):
-            raise PushFrameError(resp.local_data_track_try_push.error)
+            raise PushFrameError(resp.local_data_track_try_push.error.message)
 
     def is_published(self) -> bool:
         """Whether or not the track is still published."""
