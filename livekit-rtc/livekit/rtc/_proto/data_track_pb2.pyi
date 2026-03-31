@@ -18,11 +18,124 @@ limitations under the License.
 
 import builtins
 import google.protobuf.descriptor
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 from . import handle_pb2
+import sys
 import typing
 
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
+
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
+class _DataTrackErrorCode:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _DataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataTrackErrorCode.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    DATA_TRACK_ERROR_CODE_UNKNOWN: _DataTrackErrorCode.ValueType  # 0
+    DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _DataTrackErrorCode.ValueType  # 1
+    DATA_TRACK_ERROR_CODE_DUPLICATE_TRACK_NAME: _DataTrackErrorCode.ValueType  # 2
+    DATA_TRACK_ERROR_CODE_TRACK_UNPUBLISHED: _DataTrackErrorCode.ValueType  # 3
+    DATA_TRACK_ERROR_CODE_BUFFER_FULL: _DataTrackErrorCode.ValueType  # 4
+    DATA_TRACK_ERROR_CODE_SUBSCRIPTION_CLOSED: _DataTrackErrorCode.ValueType  # 5
+    DATA_TRACK_ERROR_CODE_CANCELLED: _DataTrackErrorCode.ValueType  # 6
+    DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: _DataTrackErrorCode.ValueType  # 7
+    DATA_TRACK_ERROR_CODE_INTERNAL: _DataTrackErrorCode.ValueType  # 8
+
+class DataTrackErrorCode(_DataTrackErrorCode, metaclass=_DataTrackErrorCodeEnumTypeWrapper): ...
+
+DATA_TRACK_ERROR_CODE_UNKNOWN: DataTrackErrorCode.ValueType  # 0
+DATA_TRACK_ERROR_CODE_INVALID_HANDLE: DataTrackErrorCode.ValueType  # 1
+DATA_TRACK_ERROR_CODE_DUPLICATE_TRACK_NAME: DataTrackErrorCode.ValueType  # 2
+DATA_TRACK_ERROR_CODE_TRACK_UNPUBLISHED: DataTrackErrorCode.ValueType  # 3
+DATA_TRACK_ERROR_CODE_BUFFER_FULL: DataTrackErrorCode.ValueType  # 4
+DATA_TRACK_ERROR_CODE_SUBSCRIPTION_CLOSED: DataTrackErrorCode.ValueType  # 5
+DATA_TRACK_ERROR_CODE_CANCELLED: DataTrackErrorCode.ValueType  # 6
+DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: DataTrackErrorCode.ValueType  # 7
+DATA_TRACK_ERROR_CODE_INTERNAL: DataTrackErrorCode.ValueType  # 8
+global___DataTrackErrorCode = DataTrackErrorCode
+
+class _PublishDataTrackErrorCode:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _PublishDataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PublishDataTrackErrorCode.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PUBLISH_DATA_TRACK_ERROR_CODE_UNKNOWN: _PublishDataTrackErrorCode.ValueType  # 0
+    PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _PublishDataTrackErrorCode.ValueType  # 1
+    PUBLISH_DATA_TRACK_ERROR_CODE_DUPLICATE_NAME: _PublishDataTrackErrorCode.ValueType  # 2
+    PUBLISH_DATA_TRACK_ERROR_CODE_TIMEOUT: _PublishDataTrackErrorCode.ValueType  # 3
+    PUBLISH_DATA_TRACK_ERROR_CODE_DISCONNECTED: _PublishDataTrackErrorCode.ValueType  # 4
+    PUBLISH_DATA_TRACK_ERROR_CODE_NOT_ALLOWED: _PublishDataTrackErrorCode.ValueType  # 5
+    PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_NAME: _PublishDataTrackErrorCode.ValueType  # 6
+    PUBLISH_DATA_TRACK_ERROR_CODE_LIMIT_REACHED: _PublishDataTrackErrorCode.ValueType  # 7
+    PUBLISH_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: _PublishDataTrackErrorCode.ValueType  # 8
+    PUBLISH_DATA_TRACK_ERROR_CODE_INTERNAL: _PublishDataTrackErrorCode.ValueType  # 9
+
+class PublishDataTrackErrorCode(_PublishDataTrackErrorCode, metaclass=_PublishDataTrackErrorCodeEnumTypeWrapper): ...
+
+PUBLISH_DATA_TRACK_ERROR_CODE_UNKNOWN: PublishDataTrackErrorCode.ValueType  # 0
+PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: PublishDataTrackErrorCode.ValueType  # 1
+PUBLISH_DATA_TRACK_ERROR_CODE_DUPLICATE_NAME: PublishDataTrackErrorCode.ValueType  # 2
+PUBLISH_DATA_TRACK_ERROR_CODE_TIMEOUT: PublishDataTrackErrorCode.ValueType  # 3
+PUBLISH_DATA_TRACK_ERROR_CODE_DISCONNECTED: PublishDataTrackErrorCode.ValueType  # 4
+PUBLISH_DATA_TRACK_ERROR_CODE_NOT_ALLOWED: PublishDataTrackErrorCode.ValueType  # 5
+PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_NAME: PublishDataTrackErrorCode.ValueType  # 6
+PUBLISH_DATA_TRACK_ERROR_CODE_LIMIT_REACHED: PublishDataTrackErrorCode.ValueType  # 7
+PUBLISH_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: PublishDataTrackErrorCode.ValueType  # 8
+PUBLISH_DATA_TRACK_ERROR_CODE_INTERNAL: PublishDataTrackErrorCode.ValueType  # 9
+global___PublishDataTrackErrorCode = PublishDataTrackErrorCode
+
+class _LocalDataTrackTryPushErrorCode:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _LocalDataTrackTryPushErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_LocalDataTrackTryPushErrorCode.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_UNKNOWN: _LocalDataTrackTryPushErrorCode.ValueType  # 0
+    LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INVALID_HANDLE: _LocalDataTrackTryPushErrorCode.ValueType  # 1
+    LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_TRACK_UNPUBLISHED: _LocalDataTrackTryPushErrorCode.ValueType  # 2
+    LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_QUEUE_FULL: _LocalDataTrackTryPushErrorCode.ValueType  # 3
+    LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INTERNAL: _LocalDataTrackTryPushErrorCode.ValueType  # 4
+
+class LocalDataTrackTryPushErrorCode(_LocalDataTrackTryPushErrorCode, metaclass=_LocalDataTrackTryPushErrorCodeEnumTypeWrapper): ...
+
+LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_UNKNOWN: LocalDataTrackTryPushErrorCode.ValueType  # 0
+LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INVALID_HANDLE: LocalDataTrackTryPushErrorCode.ValueType  # 1
+LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_TRACK_UNPUBLISHED: LocalDataTrackTryPushErrorCode.ValueType  # 2
+LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_QUEUE_FULL: LocalDataTrackTryPushErrorCode.ValueType  # 3
+LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INTERNAL: LocalDataTrackTryPushErrorCode.ValueType  # 4
+global___LocalDataTrackTryPushErrorCode = LocalDataTrackTryPushErrorCode
+
+class _SubscribeDataTrackErrorCode:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SubscribeDataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SubscribeDataTrackErrorCode.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNKNOWN: _SubscribeDataTrackErrorCode.ValueType  # 0
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _SubscribeDataTrackErrorCode.ValueType  # 1
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNPUBLISHED: _SubscribeDataTrackErrorCode.ValueType  # 2
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_TIMEOUT: _SubscribeDataTrackErrorCode.ValueType  # 3
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_DISCONNECTED: _SubscribeDataTrackErrorCode.ValueType  # 4
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: _SubscribeDataTrackErrorCode.ValueType  # 5
+    SUBSCRIBE_DATA_TRACK_ERROR_CODE_INTERNAL: _SubscribeDataTrackErrorCode.ValueType  # 6
+
+class SubscribeDataTrackErrorCode(_SubscribeDataTrackErrorCode, metaclass=_SubscribeDataTrackErrorCodeEnumTypeWrapper): ...
+
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNKNOWN: SubscribeDataTrackErrorCode.ValueType  # 0
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: SubscribeDataTrackErrorCode.ValueType  # 1
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNPUBLISHED: SubscribeDataTrackErrorCode.ValueType  # 2
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_TIMEOUT: SubscribeDataTrackErrorCode.ValueType  # 3
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_DISCONNECTED: SubscribeDataTrackErrorCode.ValueType  # 4
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: SubscribeDataTrackErrorCode.ValueType  # 5
+SUBSCRIBE_DATA_TRACK_ERROR_CODE_INTERNAL: SubscribeDataTrackErrorCode.ValueType  # 6
+global___SubscribeDataTrackErrorCode = SubscribeDataTrackErrorCode
 
 @typing.final
 class DataTrackInfo(google.protobuf.message.Message):
@@ -74,6 +187,82 @@ class DataTrackFrame(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["payload", b"payload", "user_timestamp", b"user_timestamp"]) -> None: ...
 
 global___DataTrackFrame = DataTrackFrame
+
+@typing.final
+class DataTrackError(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CODE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    code: global___DataTrackErrorCode.ValueType
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        code: global___DataTrackErrorCode.ValueType | None = ...,
+        message: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+
+global___DataTrackError = DataTrackError
+
+@typing.final
+class PublishDataTrackError(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CODE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    code: global___PublishDataTrackErrorCode.ValueType
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        code: global___PublishDataTrackErrorCode.ValueType | None = ...,
+        message: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+
+global___PublishDataTrackError = PublishDataTrackError
+
+@typing.final
+class LocalDataTrackTryPushError(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CODE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    code: global___LocalDataTrackTryPushErrorCode.ValueType
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        code: global___LocalDataTrackTryPushErrorCode.ValueType | None = ...,
+        message: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+
+global___LocalDataTrackTryPushError = LocalDataTrackTryPushError
+
+@typing.final
+class SubscribeDataTrackError(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CODE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    code: global___SubscribeDataTrackErrorCode.ValueType
+    message: builtins.str
+    def __init__(
+        self,
+        *,
+        code: global___SubscribeDataTrackErrorCode.ValueType | None = ...,
+        message: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+
+global___SubscribeDataTrackError = SubscribeDataTrackError
 
 @typing.final
 class DataTrackOptions(google.protobuf.message.Message):
@@ -149,15 +338,16 @@ class PublishDataTrackCallback(google.protobuf.message.Message):
     TRACK_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
     async_id: builtins.int
-    error: builtins.str
     @property
     def track(self) -> global___OwnedLocalDataTrack: ...
+    @property
+    def error(self) -> global___PublishDataTrackError: ...
     def __init__(
         self,
         *,
         async_id: builtins.int | None = ...,
         track: global___OwnedLocalDataTrack | None = ...,
-        error: builtins.str | None = ...,
+        error: global___PublishDataTrackError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]) -> None: ...
@@ -213,11 +403,12 @@ class LocalDataTrackTryPushResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ERROR_FIELD_NUMBER: builtins.int
-    error: builtins.str
+    @property
+    def error(self) -> global___LocalDataTrackTryPushError: ...
     def __init__(
         self,
         *,
-        error: builtins.str | None = ...,
+        error: global___LocalDataTrackTryPushError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
