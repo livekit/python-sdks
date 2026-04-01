@@ -76,6 +76,10 @@ class TrackPublication:
     def audio_features(self) -> List[proto_track.AudioTrackFeature.ValueType]:
         return list(self._info.audio_features)
 
+    @property
+    def packet_trailer_features(self) -> List[proto_track.PacketTrailerFeature.ValueType]:
+        return list(self._info.packet_trailer_features)
+
 
 class LocalTrackPublication(TrackPublication):
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):

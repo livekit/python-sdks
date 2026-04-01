@@ -16,15 +16,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import builtins
-import google.protobuf.descriptor
-import google.protobuf.message
-import typing
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+import builtins as _builtins
+import sys
+import typing as _typing
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+if sys.version_info >= (3, 10):
+    from typing import TypeAlias as _TypeAlias
+else:
+    from typing_extensions import TypeAlias as _TypeAlias
 
-@typing.final
-class FfiOwnedHandle(google.protobuf.message.Message):
+DESCRIPTOR: _descriptor.FileDescriptor
+
+@_typing.final
+class FfiOwnedHandle(_message.Message):
     """# Safety
     The foreign language is responsable for disposing handles
     Forgetting to dispose the handle may lead to memory leaks
@@ -36,16 +42,18 @@ class FfiOwnedHandle(google.protobuf.message.Message):
     (the variable name is suffixed with "_handle")
     """
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ID_FIELD_NUMBER: builtins.int
-    id: builtins.int
+    ID_FIELD_NUMBER: _builtins.int
+    id: _builtins.int
     def __init__(
         self,
         *,
-        id: builtins.int | None = ...,
+        id: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["id", b"id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["id", b"id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["id", b"id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___FfiOwnedHandle = FfiOwnedHandle
+Global___FfiOwnedHandle: _TypeAlias = FfiOwnedHandle  # noqa: Y015

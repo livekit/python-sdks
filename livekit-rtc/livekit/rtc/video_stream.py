@@ -25,7 +25,7 @@ from ._proto.track_pb2 import TrackSource
 from ._utils import RingQueue, task_done_logger
 from .participant import Participant
 from .track import Track
-from .video_frame import VideoFrame
+from .video_frame import FrameMetadata, VideoFrame
 
 
 @dataclass
@@ -33,6 +33,19 @@ class VideoFrameEvent:
     frame: VideoFrame
     timestamp_us: int
     rotation: proto_video_frame.VideoRotation
+    frame_metadata: Optional[FrameMetadata] = None
+
+    @property
+    def user_timestamp_us(self) -> Optional[int]:
+        if self.frame_metadata is None:
+            return None
+        return self.frame_metadata.user_timestamp_us
+
+    @property
+    def frame_id(self) -> Optional[int]:
+        if self.frame_metadata is None:
+            return None
+        return self.frame_metadata.frame_id
 
 
 class VideoStream:
@@ -144,11 +157,15 @@ class VideoStream:
             if video_event.HasField("frame_received"):
                 owned_buffer_info = video_event.frame_received.buffer
                 frame = VideoFrame._from_owned_info(owned_buffer_info)
+                frame_metadata = None
+                if video_event.frame_received.HasField("metadata"):
+                    frame_metadata = FrameMetadata.from_proto(video_event.frame_received.metadata)
 
                 event = VideoFrameEvent(
                     frame=frame,
                     timestamp_us=video_event.frame_received.timestamp_us,
                     rotation=video_event.frame_received.rotation,
+                    frame_metadata=frame_metadata,
                 )
 
                 self._queue.put(event)

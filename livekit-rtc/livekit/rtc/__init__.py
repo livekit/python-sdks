@@ -32,6 +32,9 @@ from ._proto.room_pb2 import (
     VideoEncoding,
 )
 from ._proto.track_pb2 import (
+    PTF_FRAME_ID,
+    PTF_USER_TIMESTAMP,
+    PacketTrailerFeature,
     StreamState,
     TrackKind,
     TrackSource,
@@ -82,9 +85,7 @@ from .track_publication import (
 )
 from .transcription import Transcription, TranscriptionSegment
 from .version import __version__
-from .video_frame import (
-    VideoFrame,
-)
+from .video_frame import FrameMetadata, VideoFrame
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
@@ -124,6 +125,9 @@ __all__ = [
     "TrackKind",
     "TrackSource",
     "ParticipantTrackPermission",
+    "PacketTrailerFeature",
+    "PTF_USER_TIMESTAMP",
+    "PTF_FRAME_ID",
     "VideoBufferType",
     "VideoRotation",
     "stats",
@@ -166,6 +170,7 @@ __all__ = [
     "TranscriptionSegment",
     "VideoCodec",
     "VideoEncoding",
+    "FrameMetadata",
     "VideoFrame",
     "VideoFrameEvent",
     "VideoSource",
