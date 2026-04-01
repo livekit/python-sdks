@@ -488,7 +488,7 @@ async def test_data_track():
         assert remote_track.publisher_identity == PUBLISHER_IDENTITY
         assert remote_track.is_published()
 
-        subscription = remote_track.subscribe()
+        stream = remote_track.subscribe()
 
         async def push_frames():
             for i in range(FRAME_COUNT):
@@ -502,7 +502,7 @@ async def test_data_track():
         async def publish_and_receive():
             push_task = asyncio.create_task(push_frames())
             recv_count = 0
-            async for frame in subscription:
+            async for frame in stream:
                 first_byte = frame.payload[0]
                 assert all(b == first_byte for b in frame.payload), "Payload bytes are not uniform"
                 assert len(frame.payload) == PAYLOAD_SIZE

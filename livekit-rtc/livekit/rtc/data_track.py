@@ -182,7 +182,7 @@ class RemoteDataTrack:
         """Identity of the participant who published the track."""
         return self._publisher_identity
 
-    def subscribe(self, *, buffer_size: Optional[int] = None) -> DataTrackSubscription:
+    def subscribe(self, *, buffer_size: Optional[int] = None) -> DataTrackStream:
         """Subscribes to the data track to receive frames.
 
         Args:
@@ -190,7 +190,7 @@ class RemoteDataTrack:
                 When ``None``, the default buffer size is used.
                 Zero is not a valid buffer size; if a value of zero is provided, it will be clamped to one.
 
-        Returns a :class:`DataTrackSubscription` that yields
+        Returns a :class:`DataTrackStream` that yields
         :class:`DataTrackFrame` instances as they arrive. If the
         subscription encounters an error, it is raised as
         :class:`SubscribeDataTrackError` when iteration ends.
@@ -204,7 +204,7 @@ class RemoteDataTrack:
         req.subscribe_data_track.options.CopyFrom(opts)
 
         resp = FfiClient.instance.request(req)
-        return DataTrackSubscription(resp.subscribe_data_track.subscription)
+        return DataTrackStream(resp.subscribe_data_track.stream)
 
     def is_published(self) -> bool:
         """Whether or not the track is still published."""
@@ -221,29 +221,29 @@ class RemoteDataTrack:
         )
 
 
-class DataTrackSubscription:
+class DataTrackStream:
     """An active subscription to a remote data track.
 
     Use as an async iterator to receive frames::
 
-        subscription = remote_track.subscribe()
-        async for frame in subscription:
+        stream = remote_track.subscribe()
+        async for frame in stream:
             process(frame.payload)
 
-    Dropping or closing the subscription unsubscribes from the track.
+    Dropping or closing the stream unsubscribes from the track.
 
     If subscribing to the track fails, :class:`SubscribeDataTrackError`
     is raised when iteration ends instead of a normal ``StopAsyncIteration``.
     """
 
-    def __init__(self, owned_info: proto_data_track.OwnedDataTrackSubscription) -> None:
+    def __init__(self, owned_info: proto_data_track.OwnedDataTrackStream) -> None:
         self._ffi_handle = FfiHandle(owned_info.handle.id)
         handle_id = owned_info.handle.id
 
         self._queue = FfiClient.instance.queue.subscribe(
             filter_fn=lambda e: (
-                e.WhichOneof("message") == "data_track_subscription_event"
-                and e.data_track_subscription_event.subscription_handle == handle_id
+                e.WhichOneof("message") == "data_track_stream_event"
+                and e.data_track_stream_event.stream_handle == handle_id
             ),
         )
         self._closed = False
@@ -257,11 +257,11 @@ class DataTrackSubscription:
 
         self._send_read_request()
         event: proto_ffi.FfiEvent = await self._queue.get()
-        sub_event = event.data_track_subscription_event
-        detail = sub_event.WhichOneof("detail")
+        stream_event = event.data_track_stream_event
+        detail = stream_event.WhichOneof("detail")
 
         if detail == "frame_received":
-            proto_frame = sub_event.frame_received.frame
+            proto_frame = stream_event.frame_received.frame
             user_ts: Optional[int] = None
             if proto_frame.HasField("user_timestamp"):
                 user_ts = proto_frame.user_timestamp
@@ -271,8 +271,8 @@ class DataTrackSubscription:
             )
         elif detail == "eos":
             self._close()
-            if sub_event.eos.HasField("error"):
-                raise SubscribeDataTrackError(sub_event.eos.error)
+            if stream_event.eos.HasField("error"):
+                raise SubscribeDataTrackError(stream_event.eos.error)
             raise StopAsyncIteration
         else:
             self._close()
@@ -280,7 +280,7 @@ class DataTrackSubscription:
 
     def _send_read_request(self) -> None:
         req = proto_ffi.FfiRequest()
-        req.data_track_subscription_read.subscription_handle = self._ffi_handle.handle
+        req.data_track_stream_read.stream_handle = self._ffi_handle.handle
         FfiClient.instance.request(req)
 
     def _close(self) -> None:

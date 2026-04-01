@@ -111,7 +111,7 @@ from .data_stream import (
 from .data_track import (
     LocalDataTrack,
     RemoteDataTrack,
-    DataTrackSubscription,
+    DataTrackStream,
     DataTrackFrame,
     DataTrackInfo,
     PushFrameError,
@@ -197,7 +197,7 @@ __all__ = [
     "FrameProcessor",
     "LocalDataTrack",
     "RemoteDataTrack",
-    "DataTrackSubscription",
+    "DataTrackStream",
     "DataTrackFrame",
     "DataTrackInfo",
     "PushFrameError",
