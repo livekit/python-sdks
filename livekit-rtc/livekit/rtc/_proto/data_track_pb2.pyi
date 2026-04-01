@@ -505,7 +505,7 @@ class OwnedRemoteDataTrack(google.protobuf.message.Message):
 global___OwnedRemoteDataTrack = OwnedRemoteDataTrack
 
 @typing.final
-class OwnedDataTrackSubscription(google.protobuf.message.Message):
+class OwnedDataTrackStream(google.protobuf.message.Message):
     """Handle to an active data track subscription.
 
     Dropping the handle will unsubscribe from the track.
@@ -524,7 +524,7 @@ class OwnedDataTrackSubscription(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["handle", b"handle"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["handle", b"handle"]) -> None: ...
 
-global___OwnedDataTrackSubscription = OwnedDataTrackSubscription
+global___OwnedDataTrackStream = OwnedDataTrackStream
 
 @typing.final
 class DataTrackSubscribeOptions(google.protobuf.message.Message):
@@ -605,81 +605,81 @@ global___SubscribeDataTrackRequest = SubscribeDataTrackRequest
 class SubscribeDataTrackResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SUBSCRIPTION_FIELD_NUMBER: builtins.int
+    STREAM_FIELD_NUMBER: builtins.int
     @property
-    def subscription(self) -> global___OwnedDataTrackSubscription: ...
+    def stream(self) -> global___OwnedDataTrackStream: ...
     def __init__(
         self,
         *,
-        subscription: global___OwnedDataTrackSubscription | None = ...,
+        stream: global___OwnedDataTrackStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["subscription", b"subscription"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["subscription", b"subscription"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
 
 global___SubscribeDataTrackResponse = SubscribeDataTrackResponse
 
 @typing.final
-class DataTrackSubscriptionReadRequest(google.protobuf.message.Message):
+class DataTrackStreamReadRequest(google.protobuf.message.Message):
     """Signal readiness to handle the next frame.
 
     This allows the client to put backpressure on the internal receive buffer.
-    Sending this request will cause the next frame to be sent via `DataTrackSubscriptionFrameReceived`
+    Sending this request will cause the next frame to be sent via `DataTrackStreamFrameReceived`
     once one is available.
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SUBSCRIPTION_HANDLE_FIELD_NUMBER: builtins.int
-    subscription_handle: builtins.int
+    STREAM_HANDLE_FIELD_NUMBER: builtins.int
+    stream_handle: builtins.int
     def __init__(
         self,
         *,
-        subscription_handle: builtins.int | None = ...,
+        stream_handle: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["subscription_handle", b"subscription_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["subscription_handle", b"subscription_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["stream_handle", b"stream_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["stream_handle", b"stream_handle"]) -> None: ...
 
-global___DataTrackSubscriptionReadRequest = DataTrackSubscriptionReadRequest
+global___DataTrackStreamReadRequest = DataTrackStreamReadRequest
 
 @typing.final
-class DataTrackSubscriptionReadResponse(google.protobuf.message.Message):
+class DataTrackStreamReadResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___DataTrackSubscriptionReadResponse = DataTrackSubscriptionReadResponse
+global___DataTrackStreamReadResponse = DataTrackStreamReadResponse
 
 @typing.final
-class DataTrackSubscriptionEvent(google.protobuf.message.Message):
-    """Event emitted on an active subscription."""
+class DataTrackStreamEvent(google.protobuf.message.Message):
+    """Event emitted on an active stream."""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SUBSCRIPTION_HANDLE_FIELD_NUMBER: builtins.int
+    STREAM_HANDLE_FIELD_NUMBER: builtins.int
     FRAME_RECEIVED_FIELD_NUMBER: builtins.int
     EOS_FIELD_NUMBER: builtins.int
-    subscription_handle: builtins.int
+    stream_handle: builtins.int
     @property
-    def frame_received(self) -> global___DataTrackSubscriptionFrameReceived: ...
+    def frame_received(self) -> global___DataTrackStreamFrameReceived: ...
     @property
-    def eos(self) -> global___DataTrackSubscriptionEOS: ...
+    def eos(self) -> global___DataTrackStreamEOS: ...
     def __init__(
         self,
         *,
-        subscription_handle: builtins.int | None = ...,
-        frame_received: global___DataTrackSubscriptionFrameReceived | None = ...,
-        eos: global___DataTrackSubscriptionEOS | None = ...,
+        stream_handle: builtins.int | None = ...,
+        frame_received: global___DataTrackStreamFrameReceived | None = ...,
+        eos: global___DataTrackStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "subscription_handle", b"subscription_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "subscription_handle", b"subscription_handle"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["detail", b"detail"]) -> typing.Literal["frame_received", "eos"] | None: ...
 
-global___DataTrackSubscriptionEvent = DataTrackSubscriptionEvent
+global___DataTrackStreamEvent = DataTrackStreamEvent
 
 @typing.final
-class DataTrackSubscriptionFrameReceived(google.protobuf.message.Message):
+class DataTrackStreamFrameReceived(google.protobuf.message.Message):
     """A frame was received."""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -695,11 +695,11 @@ class DataTrackSubscriptionFrameReceived(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["frame", b"frame"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["frame", b"frame"]) -> None: ...
 
-global___DataTrackSubscriptionFrameReceived = DataTrackSubscriptionFrameReceived
+global___DataTrackStreamFrameReceived = DataTrackStreamFrameReceived
 
 @typing.final
-class DataTrackSubscriptionEOS(google.protobuf.message.Message):
-    """Subscription has ended (end of stream)."""
+class DataTrackStreamEOS(google.protobuf.message.Message):
+    """Stream has ended."""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -716,4 +716,4 @@ class DataTrackSubscriptionEOS(google.protobuf.message.Message):
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-global___DataTrackSubscriptionEOS = DataTrackSubscriptionEOS
+global___DataTrackStreamEOS = DataTrackStreamEOS
