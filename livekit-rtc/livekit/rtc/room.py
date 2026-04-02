@@ -673,6 +673,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "participant_active":
             rp = self._retrieve_remote_participant(event.participant_active.participant_identity)
             if rp:
+                rp._info.state = proto_participant.PARTICIPANT_STATE_ACTIVE
                 self.emit("participant_active", rp)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
