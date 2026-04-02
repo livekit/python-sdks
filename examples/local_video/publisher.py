@@ -276,10 +276,16 @@ async def publish_track_with_fallback(
 def burn_timestamp(frame_bgr, timestamp_us: int) -> None:
     text = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp_us / 1_000_000))
     text = f"{text}.{(timestamp_us // 1_000) % 1000:03d}"
+    (_, text_height), baseline = cv2.getTextSize(
+        text,
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.9,
+        2,
+    )
     cv2.putText(
         frame_bgr,
         text,
-        (20, 40),
+        (20, frame_bgr.shape[0] - baseline - 20),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.9,
         (255, 255, 255),
