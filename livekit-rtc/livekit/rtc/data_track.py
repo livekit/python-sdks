@@ -296,5 +296,3 @@ class DataTrackStream:
     async def aclose(self) -> None:
         self.close()
 
-    def __del__(self) -> None:
-        self._close()
