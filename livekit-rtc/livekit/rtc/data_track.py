@@ -95,7 +95,7 @@ class DataTrackFrame:
         """
         if self.user_timestamp is None:
             return None
-        elapsed_ms = self._timestamp_now() - self.user_timestamp
+        elapsed_ms = int(time.time() * 1000) - self.user_timestamp
         return elapsed_ms / 1000.0
 
 
