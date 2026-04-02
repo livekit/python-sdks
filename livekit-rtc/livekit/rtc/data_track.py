@@ -244,6 +244,13 @@ class DataTrackStream:
         )
         self._closed = False
 
+    async def read(self) -> Optional[DataTrackFrame]:
+        """Read a single frame, or ``None`` if the stream has ended."""
+        try:
+            return await self.__anext__()
+        except StopAsyncIteration:
+            return None
+
     def __aiter__(self) -> AsyncIterator[DataTrackFrame]:
         return self
 
