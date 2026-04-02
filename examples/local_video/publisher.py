@@ -141,7 +141,7 @@ def list_cameras(max_camera_index: int) -> None:
         cap = cv2.VideoCapture(index)
         try:
             if not cap.isOpened():
-                continue
+                break
 
             found_any = True
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
