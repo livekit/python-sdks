@@ -7,3 +7,5 @@ REDACT_FIELD_NUMBER: int
 redact: _descriptor.FieldDescriptor
 REDACT_FORMAT_FIELD_NUMBER: int
 redact_format: _descriptor.FieldDescriptor
+NAME_FIELD_NUMBER: int
+name: _descriptor.FieldDescriptor

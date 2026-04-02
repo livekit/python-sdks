@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:/\n\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xc1\xcd\x05 \x01(\x08:6\n\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\xc2\xcd\x05 \x01(\tBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:/\n\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xc1\xcd\x05 \x01(\x08:6\n\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\xc2\xcd\x05 \x01(\t:-\n\x04name\x12\x1d.google.protobuf.FieldOptions\x18\xc3\xcd\x05 \x01(\tBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

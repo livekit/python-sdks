@@ -90,8 +90,8 @@ class AudioProcessingModule:
 
         resp = FfiClient.instance.request(req)
 
-        if resp.apm_process_stream.error:
-            raise RuntimeError(resp.apm_process_stream.error)
+        if resp.apm_process_reverse_stream.error:
+            raise RuntimeError(resp.apm_process_reverse_stream.error)
 
     def set_stream_delay_ms(self, delay_ms: int) -> None:
         """
