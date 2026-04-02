@@ -499,7 +499,7 @@ async def test_data_track():
                 )
                 local_track.try_push(frame)
                 await asyncio.sleep(0.1)
-            local_track.unpublish()
+            await local_track.unpublish()
 
         async def publish_and_receive():
             push_task = asyncio.create_task(push_frames())

@@ -119,7 +119,7 @@ class LocalDataTrack:
         resp = FfiClient.instance.request(req)
         return resp.local_data_track_is_published.is_published
 
-    def unpublish(self) -> None:
+    async def unpublish(self) -> None:
         """Unpublishes the track."""
         req = proto_ffi.FfiRequest()
         req.local_data_track_unpublish.track_handle = self._ffi_handle.handle
