@@ -293,5 +293,8 @@ class DataTrackStream:
         self._close()
         self._ffi_handle.dispose()
 
+    async def aclose(self) -> None:
+        self.close()
+
     def __del__(self) -> None:
         self._close()
