@@ -14,10 +14,12 @@
 
 from __future__ import annotations
 
+from typing import Optional
+
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video
-from .video_frame import VideoFrame
+from .video_frame import FrameMetadata, VideoFrame
 
 
 class VideoSource:
@@ -58,12 +60,17 @@ class VideoSource:
         *,
         timestamp_us: int = 0,
         rotation: proto_video.VideoRotation.ValueType = proto_video.VideoRotation.VIDEO_ROTATION_0,
+        frame_metadata: Optional[FrameMetadata] = None,
     ) -> None:
         req = proto_ffi.FfiRequest()
         req.capture_video_frame.source_handle = self._ffi_handle.handle
         req.capture_video_frame.buffer.CopyFrom(frame._proto_info())
         req.capture_video_frame.rotation = rotation
         req.capture_video_frame.timestamp_us = timestamp_us
+        if frame_metadata and (
+            frame_metadata.user_timestamp_us is not None or frame_metadata.frame_id is not None
+        ):
+            req.capture_video_frame.metadata.CopyFrom(frame_metadata.to_proto())
         FfiClient.instance.request(req)
 
     async def aclose(self) -> None:

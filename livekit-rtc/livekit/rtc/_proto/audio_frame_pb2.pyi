@@ -167,6 +167,11 @@ class NewAudioStreamRequest(google.protobuf.message.Message):
     of decoded PCM audio on the receive path. Omit this field to use the
     default bounded queue size of 10 frames. Set it to 0 to request unbounded
     buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
     """
     def __init__(
         self,
@@ -228,6 +233,11 @@ class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
     of decoded PCM audio on the receive path. Omit this field to use the
     default bounded queue size of 10 frames. Set it to 0 to request unbounded
     buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
     """
     def __init__(
         self,

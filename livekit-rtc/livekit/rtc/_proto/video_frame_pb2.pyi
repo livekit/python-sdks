@@ -155,12 +155,23 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
     TYPE_FIELD_NUMBER: builtins.int
     FORMAT_FIELD_NUMBER: builtins.int
     NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___VideoStreamType.ValueType
     format: global___VideoBufferType.ValueType
     """Get the frame on a specific format"""
     normalize_stride: builtins.bool
     """if true, stride will be set to width/chroma_width"""
+    queue_size_frames: builtins.int
+    """Maximum number of queued WebRTC sink frames on the receive path. Omit this
+    field to use the default bounded queue size of 1 frame. Set it to 0 to
+    request unbounded buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
+    """
     def __init__(
         self,
         *,
@@ -168,9 +179,10 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
         type: global___VideoStreamType.ValueType | None = ...,
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "queue_size_frames", b"queue_size_frames", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "queue_size_frames", b"queue_size_frames", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewVideoStreamRequest = NewVideoStreamRequest
 
@@ -202,11 +214,22 @@ class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
     TRACK_SOURCE_FIELD_NUMBER: builtins.int
     FORMAT_FIELD_NUMBER: builtins.int
     NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
     participant_handle: builtins.int
     type: global___VideoStreamType.ValueType
     track_source: track_pb2.TrackSource.ValueType
     format: global___VideoBufferType.ValueType
     normalize_stride: builtins.bool
+    queue_size_frames: builtins.int
+    """Maximum number of queued WebRTC sink frames on the receive path. Omit this
+    field to use the default bounded queue size of 1 frame. Set it to 0 to
+    request unbounded buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
+    """
     def __init__(
         self,
         *,
@@ -215,9 +238,10 @@ class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
         track_source: track_pb2.TrackSource.ValueType | None = ...,
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "track_source", b"track_source", "type", b"type"]) -> None: ...
 
 global___VideoStreamFromParticipantRequest = VideoStreamFromParticipantRequest
 
@@ -296,12 +320,15 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
     BUFFER_FIELD_NUMBER: builtins.int
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
     source_handle: builtins.int
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
     @property
     def buffer(self) -> global___VideoBufferInfo: ...
+    @property
+    def metadata(self) -> global___FrameMetadata: ...
     def __init__(
         self,
         *,
@@ -309,9 +336,10 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
         buffer: global___VideoBufferInfo | None = ...,
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
+        metadata: global___FrameMetadata | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___CaptureVideoFrameRequest = CaptureVideoFrameRequest
 
@@ -470,6 +498,25 @@ class OwnedVideoBuffer(google.protobuf.message.Message):
 global___OwnedVideoBuffer = OwnedVideoBuffer
 
 @typing.final
+class FrameMetadata(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USER_TIMESTAMP_US_FIELD_NUMBER: builtins.int
+    FRAME_ID_FIELD_NUMBER: builtins.int
+    user_timestamp_us: builtins.int
+    frame_id: builtins.int
+    def __init__(
+        self,
+        *,
+        user_timestamp_us: builtins.int | None = ...,
+        frame_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp_us", b"user_timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp_us", b"user_timestamp_us"]) -> None: ...
+
+global___FrameMetadata = FrameMetadata
+
+@typing.final
 class VideoStreamInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -538,20 +585,24 @@ class VideoFrameReceived(google.protobuf.message.Message):
     BUFFER_FIELD_NUMBER: builtins.int
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
     @property
     def buffer(self) -> global___OwnedVideoBuffer: ...
+    @property
+    def metadata(self) -> global___FrameMetadata: ...
     def __init__(
         self,
         *,
         buffer: global___OwnedVideoBuffer | None = ...,
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
+        metadata: global___FrameMetadata | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___VideoFrameReceived = VideoFrameReceived
 

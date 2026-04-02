@@ -13,14 +13,36 @@
 # limitations under the License.
 
 import ctypes
-from typing import Union
-from ._proto import video_frame_pb2 as proto_video
-from ._proto import ffi_pb2 as proto
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Any, List, Optional, Union
+
 from ._ffi_client import FfiClient, FfiHandle
+from ._proto import ffi_pb2 as proto
+from ._proto import video_frame_pb2 as proto_video
 from ._utils import _ensure_compatible_buffer, get_address
 
-from typing import Any
+
+@dataclass(frozen=True)
+class FrameMetadata:
+    user_timestamp_us: Optional[int] = None
+    frame_id: Optional[int] = None
+
+    @classmethod
+    def from_proto(cls, metadata: proto_video.FrameMetadata) -> "FrameMetadata":
+        return cls(
+            user_timestamp_us=(
+                metadata.user_timestamp_us if metadata.HasField("user_timestamp_us") else None
+            ),
+            frame_id=metadata.frame_id if metadata.HasField("frame_id") else None,
+        )
+
+    def to_proto(self) -> proto_video.FrameMetadata:
+        metadata = proto_video.FrameMetadata()
+        if self.user_timestamp_us is not None:
+            metadata.user_timestamp_us = self.user_timestamp_us
+        if self.frame_id is not None:
+            metadata.frame_id = self.frame_id
+        return metadata
 
 
 class VideoFrame:
