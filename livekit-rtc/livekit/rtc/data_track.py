@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import time
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional
 
@@ -71,32 +70,6 @@ class DataTrackFrame:
 
     user_timestamp: Optional[int] = None
     """The frame's user timestamp, if one is associated."""
-
-    def with_user_timestamp_now(self) -> DataTrackFrame:
-        """Associates the current Unix timestamp (in milliseconds) with the frame.
-
-        Returns a new ``DataTrackFrame`` with the timestamp set; the original is
-        not modified.
-        """
-        return DataTrackFrame(
-            payload=self.payload,
-            user_timestamp=int(time.time() * 1000),
-        )
-
-    def duration_since_timestamp(self) -> Optional[float]:
-        """If the frame has a user timestamp, calculate how long has passed
-        relative to the current system time.
-
-        The timestamp is assumed to be a Unix timestamp in milliseconds
-        (as set by :meth:`with_user_timestamp_now` on the publisher side).
-
-        Returns:
-            The elapsed duration in seconds, or ``None`` if no timestamp is set.
-        """
-        if self.user_timestamp is None:
-            return None
-        elapsed_ms = int(time.time() * 1000) - self.user_timestamp
-        return elapsed_ms / 1000.0
 
 
 class LocalDataTrack:

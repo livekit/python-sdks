@@ -20,6 +20,7 @@ Usage:
 
 import asyncio
 import os
+import time
 import uuid
 from typing import Callable, TypeVar
 import numpy as np
@@ -493,8 +494,9 @@ async def test_data_track():
         async def push_frames():
             for i in range(FRAME_COUNT):
                 frame = rtc.DataTrackFrame(
-                    payload=bytes([i] * PAYLOAD_SIZE)
-                ).with_user_timestamp_now()
+                    payload=bytes([i] * PAYLOAD_SIZE),
+                    user_timestamp=int(time.time() * 1000),
+                )
                 local_track.try_push(frame)
                 await asyncio.sleep(0.1)
             local_track.unpublish()
@@ -507,9 +509,9 @@ async def test_data_track():
                 assert all(b == first_byte for b in frame.payload), "Payload bytes are not uniform"
                 assert len(frame.payload) == PAYLOAD_SIZE
                 assert frame.user_timestamp is not None
-                latency = frame.duration_since_timestamp()
-                assert latency is not None and latency < 5.0, (
-                    f"Timestamp latency too high or missing: {latency}"
+                latency = (int(time.time() * 1000) - frame.user_timestamp) / 1000.0
+                assert latency < 5.0, (
+                    f"Timestamp latency too high: {latency}"
                 )
                 recv_count += 1
             await push_task

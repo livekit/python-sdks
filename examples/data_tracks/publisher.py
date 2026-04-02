@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+import time
 from signal import SIGINT, SIGTERM
 from livekit import rtc
 
@@ -19,7 +20,7 @@ async def push_frames(track: rtc.LocalDataTrack):
         logging.info("Pushing frame")
         data = await read_sensor()
         try:
-            frame = rtc.DataTrackFrame(payload=data).with_user_timestamp_now()
+            frame = rtc.DataTrackFrame(payload=data, user_timestamp=int(time.time() * 1000))
             track.try_push(frame)
         except rtc.PushFrameError as e:
             logging.error("Failed to push frame: %s", e)

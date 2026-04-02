@@ -1,6 +1,7 @@
 import os
 import logging
 import asyncio
+import time
 from signal import SIGINT, SIGTERM
 from livekit import rtc
 
@@ -19,8 +20,8 @@ async def subscribe(track: rtc.RemoteDataTrack):
         async for frame in track.subscribe():
             logging.info("Received frame (%d bytes)", len(frame.payload))
 
-            latency = frame.duration_since_timestamp()
-            if latency is not None:
+            if frame.user_timestamp is not None:
+                latency = (int(time.time() * 1000) - frame.user_timestamp) / 1000.0
                 logging.info("Latency: %.3f s", latency)
     except rtc.SubscribeDataTrackError as e:
         logging.error("Failed to subscribe to '%s': %s", track.info.name, e.message)
