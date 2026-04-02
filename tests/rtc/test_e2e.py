@@ -439,6 +439,10 @@ async def test_connection_state_transitions():
 
 @pytest.mark.asyncio
 @skip_if_no_credentials()
+@pytest.mark.skipif(
+    os.getenv("RUN_DATA_TRACK_TESTS") != "1",
+    reason="SFU support requires data tracks support to be enabled via config; remove once this is no longer the case.",
+)
 async def test_data_track():
     """Test that a published data track delivers frames with correct payloads and timestamps."""
     FRAME_COUNT = 5
