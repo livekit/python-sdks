@@ -302,7 +302,6 @@ async def capture_loop(
 ) -> None:
     target_interval = 1.0 / max(args.fps, 1)
     next_deadline = time.perf_counter()
-    started_us = monotonic_time_us_now()
     frame_counter = 1
     frames = 0
     last_log_at = time.perf_counter()
