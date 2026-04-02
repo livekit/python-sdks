@@ -16,31 +16,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections import abc as _abc
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-import builtins as _builtins
-from . import e2ee_pb2 as _e2ee_pb2
-from . import handle_pb2 as _handle_pb2
-from . import stats_pb2 as _stats_pb2
+import builtins
+import collections.abc
+from . import e2ee_pb2
+import google.protobuf.descriptor
+import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
+import google.protobuf.message
+from . import handle_pb2
+from . import stats_pb2
 import sys
-import typing as _typing
+import typing
 
 if sys.version_info >= (3, 10):
-    from typing import TypeAlias as _TypeAlias
+    import typing as typing_extensions
 else:
-    from typing_extensions import TypeAlias as _TypeAlias
+    import typing_extensions
 
-DESCRIPTOR: _descriptor.FileDescriptor
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class _TrackKind:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _TrackKindEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_TrackKind.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _TrackKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_TrackKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     KIND_UNKNOWN: _TrackKind.ValueType  # 0
     KIND_AUDIO: _TrackKind.ValueType  # 1
     KIND_VIDEO: _TrackKind.ValueType  # 2
@@ -50,14 +50,14 @@ class TrackKind(_TrackKind, metaclass=_TrackKindEnumTypeWrapper): ...
 KIND_UNKNOWN: TrackKind.ValueType  # 0
 KIND_AUDIO: TrackKind.ValueType  # 1
 KIND_VIDEO: TrackKind.ValueType  # 2
-Global___TrackKind: _TypeAlias = TrackKind  # noqa: Y015
+global___TrackKind = TrackKind
 
 class _TrackSource:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _TrackSourceEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_TrackSource.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _TrackSourceEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_TrackSource.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     SOURCE_UNKNOWN: _TrackSource.ValueType  # 0
     SOURCE_CAMERA: _TrackSource.ValueType  # 1
     SOURCE_MICROPHONE: _TrackSource.ValueType  # 2
@@ -71,14 +71,14 @@ SOURCE_CAMERA: TrackSource.ValueType  # 1
 SOURCE_MICROPHONE: TrackSource.ValueType  # 2
 SOURCE_SCREENSHARE: TrackSource.ValueType  # 3
 SOURCE_SCREENSHARE_AUDIO: TrackSource.ValueType  # 4
-Global___TrackSource: _TypeAlias = TrackSource  # noqa: Y015
+global___TrackSource = TrackSource
 
 class _StreamState:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _StreamStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_StreamState.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _StreamStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_StreamState.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     STATE_UNKNOWN: _StreamState.ValueType  # 0
     STATE_ACTIVE: _StreamState.ValueType  # 1
     STATE_PAUSED: _StreamState.ValueType  # 2
@@ -88,14 +88,14 @@ class StreamState(_StreamState, metaclass=_StreamStateEnumTypeWrapper): ...
 STATE_UNKNOWN: StreamState.ValueType  # 0
 STATE_ACTIVE: StreamState.ValueType  # 1
 STATE_PAUSED: StreamState.ValueType  # 2
-Global___StreamState: _TypeAlias = StreamState  # noqa: Y015
+global___StreamState = StreamState
 
 class _AudioTrackFeature:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _AudioTrackFeatureEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_AudioTrackFeature.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _AudioTrackFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_AudioTrackFeature.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     TF_STEREO: _AudioTrackFeature.ValueType  # 0
     TF_NO_DTX: _AudioTrackFeature.ValueType  # 1
     TF_AUTO_GAIN_CONTROL: _AudioTrackFeature.ValueType  # 2
@@ -115,14 +115,14 @@ TF_NOISE_SUPPRESSION: AudioTrackFeature.ValueType  # 4
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature.ValueType  # 5
 TF_PRECONNECT_BUFFER: AudioTrackFeature.ValueType  # 6
 """client will buffer audio once available and send it to the server via bytes stream once connected"""
-Global___AudioTrackFeature: _TypeAlias = AudioTrackFeature  # noqa: Y015
+global___AudioTrackFeature = AudioTrackFeature
 
 class _PacketTrailerFeature:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _PacketTrailerFeatureEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_PacketTrailerFeature.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _PacketTrailerFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PacketTrailerFeature.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     PTF_USER_TIMESTAMP: _PacketTrailerFeature.ValueType  # 0
     PTF_FRAME_ID: _PacketTrailerFeature.ValueType  # 1
 
@@ -130,447 +130,413 @@ class PacketTrailerFeature(_PacketTrailerFeature, metaclass=_PacketTrailerFeatur
 
 PTF_USER_TIMESTAMP: PacketTrailerFeature.ValueType  # 0
 PTF_FRAME_ID: PacketTrailerFeature.ValueType  # 1
-Global___PacketTrailerFeature: _TypeAlias = PacketTrailerFeature  # noqa: Y015
+global___PacketTrailerFeature = PacketTrailerFeature
 
-@_typing.final
-class CreateVideoTrackRequest(_message.Message):
+@typing.final
+class CreateVideoTrackRequest(google.protobuf.message.Message):
     """Create a new VideoTrack from a VideoSource"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    NAME_FIELD_NUMBER: _builtins.int
-    SOURCE_HANDLE_FIELD_NUMBER: _builtins.int
-    name: _builtins.str
-    source_handle: _builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    name: builtins.str
+    source_handle: builtins.int
     def __init__(
         self,
         *,
-        name: _builtins.str | None = ...,
-        source_handle: _builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        source_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "source_handle", b"source_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "source_handle", b"source_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
-Global___CreateVideoTrackRequest: _TypeAlias = CreateVideoTrackRequest  # noqa: Y015
+global___CreateVideoTrackRequest = CreateVideoTrackRequest
 
-@_typing.final
-class CreateVideoTrackResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class CreateVideoTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def track(self) -> Global___OwnedTrack: ...
+    TRACK_FIELD_NUMBER: builtins.int
+    @property
+    def track(self) -> global___OwnedTrack: ...
     def __init__(
         self,
         *,
-        track: Global___OwnedTrack | None = ...,
+        track: global___OwnedTrack | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
-Global___CreateVideoTrackResponse: _TypeAlias = CreateVideoTrackResponse  # noqa: Y015
+global___CreateVideoTrackResponse = CreateVideoTrackResponse
 
-@_typing.final
-class CreateAudioTrackRequest(_message.Message):
+@typing.final
+class CreateAudioTrackRequest(google.protobuf.message.Message):
     """Create a new AudioTrack from a AudioSource"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    NAME_FIELD_NUMBER: _builtins.int
-    SOURCE_HANDLE_FIELD_NUMBER: _builtins.int
-    name: _builtins.str
-    source_handle: _builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    name: builtins.str
+    source_handle: builtins.int
     def __init__(
         self,
         *,
-        name: _builtins.str | None = ...,
-        source_handle: _builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        source_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "source_handle", b"source_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "source_handle", b"source_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "source_handle", b"source_handle"]) -> None: ...
 
-Global___CreateAudioTrackRequest: _TypeAlias = CreateAudioTrackRequest  # noqa: Y015
+global___CreateAudioTrackRequest = CreateAudioTrackRequest
 
-@_typing.final
-class CreateAudioTrackResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class CreateAudioTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def track(self) -> Global___OwnedTrack: ...
+    TRACK_FIELD_NUMBER: builtins.int
+    @property
+    def track(self) -> global___OwnedTrack: ...
     def __init__(
         self,
         *,
-        track: Global___OwnedTrack | None = ...,
+        track: global___OwnedTrack | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
-Global___CreateAudioTrackResponse: _TypeAlias = CreateAudioTrackResponse  # noqa: Y015
+global___CreateAudioTrackResponse = CreateAudioTrackResponse
 
-@_typing.final
-class GetStatsRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetStatsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    track_handle: _builtins.int
-    request_async_id: _builtins.int
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
-        track_handle: _builtins.int | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        track_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> None: ...
 
-Global___GetStatsRequest: _TypeAlias = GetStatsRequest  # noqa: Y015
+global___GetStatsRequest = GetStatsRequest
 
-@_typing.final
-class GetStatsResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetStatsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___GetStatsResponse: _TypeAlias = GetStatsResponse  # noqa: Y015
+global___GetStatsResponse = GetStatsResponse
 
-@_typing.final
-class GetStatsCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetStatsCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    STATS_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def stats(self) -> _containers.RepeatedCompositeFieldContainer[_stats_pb2.RtcStats]: ...
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    STATS_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
-        stats: _abc.Iterable[_stats_pb2.RtcStats] | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "stats", b"stats"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "stats", b"stats"]) -> None: ...
 
-Global___GetStatsCallback: _TypeAlias = GetStatsCallback  # noqa: Y015
+global___GetStatsCallback = GetStatsCallback
 
-@_typing.final
-class TrackEvent(_message.Message):
+@typing.final
+class TrackEvent(google.protobuf.message.Message):
     """
     Track
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___TrackEvent: _TypeAlias = TrackEvent  # noqa: Y015
+global___TrackEvent = TrackEvent
 
-@_typing.final
-class TrackPublicationInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackPublicationInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SID_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    KIND_FIELD_NUMBER: _builtins.int
-    SOURCE_FIELD_NUMBER: _builtins.int
-    SIMULCASTED_FIELD_NUMBER: _builtins.int
-    WIDTH_FIELD_NUMBER: _builtins.int
-    HEIGHT_FIELD_NUMBER: _builtins.int
-    MIME_TYPE_FIELD_NUMBER: _builtins.int
-    MUTED_FIELD_NUMBER: _builtins.int
-    REMOTE_FIELD_NUMBER: _builtins.int
-    ENCRYPTION_TYPE_FIELD_NUMBER: _builtins.int
-    AUDIO_FEATURES_FIELD_NUMBER: _builtins.int
-    PACKET_TRAILER_FEATURES_FIELD_NUMBER: _builtins.int
-    sid: _builtins.str
-    name: _builtins.str
-    kind: Global___TrackKind.ValueType
-    source: Global___TrackSource.ValueType
-    simulcasted: _builtins.bool
-    width: _builtins.int
-    height: _builtins.int
-    mime_type: _builtins.str
-    muted: _builtins.bool
-    remote: _builtins.bool
-    encryption_type: _e2ee_pb2.EncryptionType.ValueType
-    @_builtins.property
-    def audio_features(self) -> _containers.RepeatedScalarFieldContainer[Global___AudioTrackFeature.ValueType]: ...
-    @_builtins.property
-    def packet_trailer_features(self) -> _containers.RepeatedScalarFieldContainer[Global___PacketTrailerFeature.ValueType]: ...
-    def __init__(
-        self,
-        *,
-        sid: _builtins.str | None = ...,
-        name: _builtins.str | None = ...,
-        kind: Global___TrackKind.ValueType | None = ...,
-        source: Global___TrackSource.ValueType | None = ...,
-        simulcasted: _builtins.bool | None = ...,
-        width: _builtins.int | None = ...,
-        height: _builtins.int | None = ...,
-        mime_type: _builtins.str | None = ...,
-        muted: _builtins.bool | None = ...,
-        remote: _builtins.bool | None = ...,
-        encryption_type: _e2ee_pb2.EncryptionType.ValueType | None = ...,
-        audio_features: _abc.Iterable[Global___AudioTrackFeature.ValueType] | None = ...,
-        packet_trailer_features: _abc.Iterable[Global___PacketTrailerFeature.ValueType] | None = ...,
-    ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "packet_trailer_features", b"packet_trailer_features", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-
-Global___TrackPublicationInfo: _TypeAlias = TrackPublicationInfo  # noqa: Y015
-
-@_typing.final
-class OwnedTrackPublication(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___TrackPublicationInfo: ...
+    SID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
+    SOURCE_FIELD_NUMBER: builtins.int
+    SIMULCASTED_FIELD_NUMBER: builtins.int
+    WIDTH_FIELD_NUMBER: builtins.int
+    HEIGHT_FIELD_NUMBER: builtins.int
+    MIME_TYPE_FIELD_NUMBER: builtins.int
+    MUTED_FIELD_NUMBER: builtins.int
+    REMOTE_FIELD_NUMBER: builtins.int
+    ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
+    AUDIO_FEATURES_FIELD_NUMBER: builtins.int
+    PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
+    sid: builtins.str
+    name: builtins.str
+    kind: global___TrackKind.ValueType
+    source: global___TrackSource.ValueType
+    simulcasted: builtins.bool
+    width: builtins.int
+    height: builtins.int
+    mime_type: builtins.str
+    muted: builtins.bool
+    remote: builtins.bool
+    encryption_type: e2ee_pb2.EncryptionType.ValueType
+    @property
+    def audio_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___AudioTrackFeature.ValueType]: ...
+    @property
+    def packet_trailer_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___PacketTrailerFeature.ValueType]: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___TrackPublicationInfo | None = ...,
+        sid: builtins.str | None = ...,
+        name: builtins.str | None = ...,
+        kind: global___TrackKind.ValueType | None = ...,
+        source: global___TrackSource.ValueType | None = ...,
+        simulcasted: builtins.bool | None = ...,
+        width: builtins.int | None = ...,
+        height: builtins.int | None = ...,
+        mime_type: builtins.str | None = ...,
+        muted: builtins.bool | None = ...,
+        remote: builtins.bool | None = ...,
+        encryption_type: e2ee_pb2.EncryptionType.ValueType | None = ...,
+        audio_features: collections.abc.Iterable[global___AudioTrackFeature.ValueType] | None = ...,
+        packet_trailer_features: collections.abc.Iterable[global___PacketTrailerFeature.ValueType] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "packet_trailer_features", b"packet_trailer_features", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
-Global___OwnedTrackPublication: _TypeAlias = OwnedTrackPublication  # noqa: Y015
+global___TrackPublicationInfo = TrackPublicationInfo
 
-@_typing.final
-class TrackInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedTrackPublication(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SID_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    KIND_FIELD_NUMBER: _builtins.int
-    STREAM_STATE_FIELD_NUMBER: _builtins.int
-    MUTED_FIELD_NUMBER: _builtins.int
-    REMOTE_FIELD_NUMBER: _builtins.int
-    sid: _builtins.str
-    name: _builtins.str
-    kind: Global___TrackKind.ValueType
-    stream_state: Global___StreamState.ValueType
-    muted: _builtins.bool
-    remote: _builtins.bool
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___TrackPublicationInfo: ...
     def __init__(
         self,
         *,
-        sid: _builtins.str | None = ...,
-        name: _builtins.str | None = ...,
-        kind: Global___TrackKind.ValueType | None = ...,
-        stream_state: Global___StreamState.ValueType | None = ...,
-        muted: _builtins.bool | None = ...,
-        remote: _builtins.bool | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___TrackPublicationInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___TrackInfo: _TypeAlias = TrackInfo  # noqa: Y015
+global___OwnedTrackPublication = OwnedTrackPublication
 
-@_typing.final
-class OwnedTrack(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___TrackInfo: ...
+    SID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
+    STREAM_STATE_FIELD_NUMBER: builtins.int
+    MUTED_FIELD_NUMBER: builtins.int
+    REMOTE_FIELD_NUMBER: builtins.int
+    sid: builtins.str
+    name: builtins.str
+    kind: global___TrackKind.ValueType
+    stream_state: global___StreamState.ValueType
+    muted: builtins.bool
+    remote: builtins.bool
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___TrackInfo | None = ...,
+        sid: builtins.str | None = ...,
+        name: builtins.str | None = ...,
+        kind: global___TrackKind.ValueType | None = ...,
+        stream_state: global___StreamState.ValueType | None = ...,
+        muted: builtins.bool | None = ...,
+        remote: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "stream_state", b"stream_state"]) -> None: ...
 
-Global___OwnedTrack: _TypeAlias = OwnedTrack  # noqa: Y015
+global___TrackInfo = TrackInfo
 
-@_typing.final
-class LocalTrackMuteRequest(_message.Message):
+@typing.final
+class OwnedTrack(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___TrackInfo: ...
+    def __init__(
+        self,
+        *,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___TrackInfo | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+
+global___OwnedTrack = OwnedTrack
+
+@typing.final
+class LocalTrackMuteRequest(google.protobuf.message.Message):
     """Mute/UnMute a track"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
-    MUTE_FIELD_NUMBER: _builtins.int
-    track_handle: _builtins.int
-    mute: _builtins.bool
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    MUTE_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    mute: builtins.bool
     def __init__(
         self,
         *,
-        track_handle: _builtins.int | None = ...,
-        mute: _builtins.bool | None = ...,
+        track_handle: builtins.int | None = ...,
+        mute: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["mute", b"mute", "track_handle", b"track_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["mute", b"mute", "track_handle", b"track_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["mute", b"mute", "track_handle", b"track_handle"]) -> None: ...
 
-Global___LocalTrackMuteRequest: _TypeAlias = LocalTrackMuteRequest  # noqa: Y015
+global___LocalTrackMuteRequest = LocalTrackMuteRequest
 
-@_typing.final
-class LocalTrackMuteResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LocalTrackMuteResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    MUTED_FIELD_NUMBER: _builtins.int
-    muted: _builtins.bool
+    MUTED_FIELD_NUMBER: builtins.int
+    muted: builtins.bool
     def __init__(
         self,
         *,
-        muted: _builtins.bool | None = ...,
+        muted: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["muted", b"muted"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["muted", b"muted"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["muted", b"muted"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["muted", b"muted"]) -> None: ...
 
-Global___LocalTrackMuteResponse: _TypeAlias = LocalTrackMuteResponse  # noqa: Y015
+global___LocalTrackMuteResponse = LocalTrackMuteResponse
 
-@_typing.final
-class EnableRemoteTrackRequest(_message.Message):
+@typing.final
+class EnableRemoteTrackRequest(google.protobuf.message.Message):
     """Enable/Disable a remote track"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
-    ENABLED_FIELD_NUMBER: _builtins.int
-    track_handle: _builtins.int
-    enabled: _builtins.bool
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    ENABLED_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    enabled: builtins.bool
     def __init__(
         self,
         *,
-        track_handle: _builtins.int | None = ...,
-        enabled: _builtins.bool | None = ...,
+        track_handle: builtins.int | None = ...,
+        enabled: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_handle", b"track_handle"]) -> None: ...
 
-Global___EnableRemoteTrackRequest: _TypeAlias = EnableRemoteTrackRequest  # noqa: Y015
+global___EnableRemoteTrackRequest = EnableRemoteTrackRequest
 
-@_typing.final
-class EnableRemoteTrackResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class EnableRemoteTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ENABLED_FIELD_NUMBER: _builtins.int
-    enabled: _builtins.bool
+    ENABLED_FIELD_NUMBER: builtins.int
+    enabled: builtins.bool
     def __init__(
         self,
         *,
-        enabled: _builtins.bool | None = ...,
+        enabled: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["enabled", b"enabled"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["enabled", b"enabled"]) -> None: ...
 
-Global___EnableRemoteTrackResponse: _TypeAlias = EnableRemoteTrackResponse  # noqa: Y015
+global___EnableRemoteTrackResponse = EnableRemoteTrackResponse
 
-@_typing.final
-class SetTrackSubscriptionPermissionsRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetTrackSubscriptionPermissionsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    ALL_PARTICIPANTS_ALLOWED_FIELD_NUMBER: _builtins.int
-    PERMISSIONS_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    all_participants_allowed: _builtins.bool
-    @_builtins.property
-    def permissions(self) -> _containers.RepeatedCompositeFieldContainer[Global___ParticipantTrackPermission]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ALL_PARTICIPANTS_ALLOWED_FIELD_NUMBER: builtins.int
+    PERMISSIONS_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    all_participants_allowed: builtins.bool
+    @property
+    def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ParticipantTrackPermission]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        all_participants_allowed: _builtins.bool | None = ...,
-        permissions: _abc.Iterable[Global___ParticipantTrackPermission] | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        all_participants_allowed: builtins.bool | None = ...,
+        permissions: collections.abc.Iterable[global___ParticipantTrackPermission] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle", "permissions", b"permissions"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["all_participants_allowed", b"all_participants_allowed", "local_participant_handle", b"local_participant_handle", "permissions", b"permissions"]) -> None: ...
 
-Global___SetTrackSubscriptionPermissionsRequest: _TypeAlias = SetTrackSubscriptionPermissionsRequest  # noqa: Y015
+global___SetTrackSubscriptionPermissionsRequest = SetTrackSubscriptionPermissionsRequest
 
-@_typing.final
-class ParticipantTrackPermission(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantTrackPermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    ALLOW_ALL_FIELD_NUMBER: _builtins.int
-    ALLOWED_TRACK_SIDS_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    ALLOW_ALL_FIELD_NUMBER: builtins.int
+    ALLOWED_TRACK_SIDS_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
     """The participant identity this permission applies to."""
-    allow_all: _builtins.bool
+    allow_all: builtins.bool
     """Grant permission to all all tracks. Takes precedence over allowedTrackSids."""
-    @_builtins.property
-    def allowed_track_sids(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]:
+    @property
+    def allowed_track_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """List of track sids to grant permission to."""
 
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        allow_all: _builtins.bool | None = ...,
-        allowed_track_sids: _abc.Iterable[_builtins.str] | None = ...,
+        participant_identity: builtins.str | None = ...,
+        allow_all: builtins.bool | None = ...,
+        allowed_track_sids: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["allow_all", b"allow_all", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["allow_all", b"allow_all", "allowed_track_sids", b"allowed_track_sids", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["allow_all", b"allow_all", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["allow_all", b"allow_all", "allowed_track_sids", b"allowed_track_sids", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantTrackPermission: _TypeAlias = ParticipantTrackPermission  # noqa: Y015
+global___ParticipantTrackPermission = ParticipantTrackPermission
 
-@_typing.final
-class SetTrackSubscriptionPermissionsResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetTrackSubscriptionPermissionsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___SetTrackSubscriptionPermissionsResponse: _TypeAlias = SetTrackSubscriptionPermissionsResponse  # noqa: Y015
+global___SetTrackSubscriptionPermissionsResponse = SetTrackSubscriptionPermissionsResponse

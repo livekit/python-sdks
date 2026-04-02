@@ -16,36 +16,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections import abc as _abc
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-from . import audio_frame_pb2 as _audio_frame_pb2
-import builtins as _builtins
-from . import data_stream_pb2 as _data_stream_pb2
-from . import e2ee_pb2 as _e2ee_pb2
-from . import room_pb2 as _room_pb2
-from . import rpc_pb2 as _rpc_pb2
+from . import audio_frame_pb2
+import builtins
+import collections.abc
+from . import data_stream_pb2
+from . import e2ee_pb2
+import google.protobuf.descriptor
+import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
+import google.protobuf.message
+from . import room_pb2
+from . import rpc_pb2
 import sys
-from . import track_pb2 as _track_pb2
-from . import track_publication_pb2 as _track_publication_pb2
-import typing as _typing
-from . import video_frame_pb2 as _video_frame_pb2
+from . import track_pb2
+from . import track_publication_pb2
+import typing
+from . import video_frame_pb2
 
 if sys.version_info >= (3, 10):
-    from typing import TypeAlias as _TypeAlias
+    import typing as typing_extensions
 else:
-    from typing_extensions import TypeAlias as _TypeAlias
+    import typing_extensions
 
-DESCRIPTOR: _descriptor.FileDescriptor
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class _LogLevel:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _LogLevelEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_LogLevel.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _LogLevelEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_LogLevel.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     LOG_ERROR: _LogLevel.ValueType  # 0
     LOG_WARN: _LogLevel.ValueType  # 1
     LOG_INFO: _LogLevel.ValueType  # 2
@@ -59,10 +59,10 @@ LOG_WARN: LogLevel.ValueType  # 1
 LOG_INFO: LogLevel.ValueType  # 2
 LOG_DEBUG: LogLevel.ValueType  # 3
 LOG_TRACE: LogLevel.ValueType  # 4
-Global___LogLevel: _TypeAlias = LogLevel  # noqa: Y015
+global___LogLevel = LogLevel
 
-@_typing.final
-class FfiRequest(_message.Message):
+@typing.final
+class FfiRequest(google.protobuf.message.Message):
     """**How is the livekit-ffi working:
     We refer as the ffi server the Rust server that is running the LiveKit client implementation, and we
     refer as the ffi client the foreign language that commumicates with the ffi server. (e.g Python SDK, Unity SDK, etc...)
@@ -93,923 +93,900 @@ class FfiRequest(_message.Message):
     We always expect a response (FFIResponse, even if it's empty)
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    DISPOSE_FIELD_NUMBER: _builtins.int
-    CONNECT_FIELD_NUMBER: _builtins.int
-    DISCONNECT_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    UNPUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    PUBLISH_DATA_FIELD_NUMBER: _builtins.int
-    SET_SUBSCRIBED_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_METADATA_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_NAME_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    GET_SESSION_STATS_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: _builtins.int
-    PUBLISH_SIP_DTMF_FIELD_NUMBER: _builtins.int
-    CREATE_VIDEO_TRACK_FIELD_NUMBER: _builtins.int
-    CREATE_AUDIO_TRACK_FIELD_NUMBER: _builtins.int
-    LOCAL_TRACK_MUTE_FIELD_NUMBER: _builtins.int
-    ENABLE_REMOTE_TRACK_FIELD_NUMBER: _builtins.int
-    GET_STATS_FIELD_NUMBER: _builtins.int
-    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: _builtins.int
-    NEW_VIDEO_STREAM_FIELD_NUMBER: _builtins.int
-    NEW_VIDEO_SOURCE_FIELD_NUMBER: _builtins.int
-    CAPTURE_VIDEO_FRAME_FIELD_NUMBER: _builtins.int
-    VIDEO_CONVERT_FIELD_NUMBER: _builtins.int
-    VIDEO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_STREAM_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_SOURCE_FIELD_NUMBER: _builtins.int
-    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: _builtins.int
-    CLEAR_AUDIO_BUFFER_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_RESAMPLER_FIELD_NUMBER: _builtins.int
-    REMIX_AND_RESAMPLE_FIELD_NUMBER: _builtins.int
-    E2EE_FIELD_NUMBER: _builtins.int
-    AUDIO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: _builtins.int
-    NEW_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    PUSH_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    FLUSH_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    SEND_CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    EDIT_CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    PERFORM_RPC_FIELD_NUMBER: _builtins.int
-    REGISTER_RPC_METHOD_FIELD_NUMBER: _builtins.int
-    UNREGISTER_RPC_METHOD_FIELD_NUMBER: _builtins.int
-    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: _builtins.int
-    ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: _builtins.int
-    UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_HEADER_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_CHUNK_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_TRAILER_FIELD_NUMBER: _builtins.int
-    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: _builtins.int
-    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: _builtins.int
-    NEW_APM_FIELD_NUMBER: _builtins.int
-    APM_PROCESS_STREAM_FIELD_NUMBER: _builtins.int
-    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: _builtins.int
-    APM_SET_STREAM_DELAY_FIELD_NUMBER: _builtins.int
-    BYTE_READ_INCREMENTAL_FIELD_NUMBER: _builtins.int
-    BYTE_READ_ALL_FIELD_NUMBER: _builtins.int
-    BYTE_WRITE_TO_FILE_FIELD_NUMBER: _builtins.int
-    TEXT_READ_INCREMENTAL_FIELD_NUMBER: _builtins.int
-    TEXT_READ_ALL_FIELD_NUMBER: _builtins.int
-    SEND_FILE_FIELD_NUMBER: _builtins.int
-    SEND_TEXT_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_WRITE_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_CLOSE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_WRITE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_CLOSE_FIELD_NUMBER: _builtins.int
-    SEND_BYTES_FIELD_NUMBER: _builtins.int
-    SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def dispose(self) -> Global___DisposeRequest: ...
-    @_builtins.property
-    def connect(self) -> _room_pb2.ConnectRequest:
+    DISPOSE_FIELD_NUMBER: builtins.int
+    CONNECT_FIELD_NUMBER: builtins.int
+    DISCONNECT_FIELD_NUMBER: builtins.int
+    PUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    UNPUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    PUBLISH_DATA_FIELD_NUMBER: builtins.int
+    SET_SUBSCRIBED_FIELD_NUMBER: builtins.int
+    SET_LOCAL_METADATA_FIELD_NUMBER: builtins.int
+    SET_LOCAL_NAME_FIELD_NUMBER: builtins.int
+    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: builtins.int
+    GET_SESSION_STATS_FIELD_NUMBER: builtins.int
+    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: builtins.int
+    PUBLISH_SIP_DTMF_FIELD_NUMBER: builtins.int
+    CREATE_VIDEO_TRACK_FIELD_NUMBER: builtins.int
+    CREATE_AUDIO_TRACK_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_MUTE_FIELD_NUMBER: builtins.int
+    ENABLE_REMOTE_TRACK_FIELD_NUMBER: builtins.int
+    GET_STATS_FIELD_NUMBER: builtins.int
+    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: builtins.int
+    NEW_VIDEO_STREAM_FIELD_NUMBER: builtins.int
+    NEW_VIDEO_SOURCE_FIELD_NUMBER: builtins.int
+    CAPTURE_VIDEO_FRAME_FIELD_NUMBER: builtins.int
+    VIDEO_CONVERT_FIELD_NUMBER: builtins.int
+    VIDEO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_STREAM_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_SOURCE_FIELD_NUMBER: builtins.int
+    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: builtins.int
+    CLEAR_AUDIO_BUFFER_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_RESAMPLER_FIELD_NUMBER: builtins.int
+    REMIX_AND_RESAMPLE_FIELD_NUMBER: builtins.int
+    E2EE_FIELD_NUMBER: builtins.int
+    AUDIO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: builtins.int
+    NEW_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    PUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    FLUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    SEND_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    EDIT_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    REGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    UNREGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
+    ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: builtins.int
+    UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
+    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: builtins.int
+    NEW_APM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_STREAM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: builtins.int
+    APM_SET_STREAM_DELAY_FIELD_NUMBER: builtins.int
+    BYTE_READ_INCREMENTAL_FIELD_NUMBER: builtins.int
+    BYTE_READ_ALL_FIELD_NUMBER: builtins.int
+    BYTE_WRITE_TO_FILE_FIELD_NUMBER: builtins.int
+    TEXT_READ_INCREMENTAL_FIELD_NUMBER: builtins.int
+    TEXT_READ_ALL_FIELD_NUMBER: builtins.int
+    SEND_FILE_FIELD_NUMBER: builtins.int
+    SEND_TEXT_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_WRITE_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_CLOSE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_WRITE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_CLOSE_FIELD_NUMBER: builtins.int
+    SEND_BYTES_FIELD_NUMBER: builtins.int
+    SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: builtins.int
+    @property
+    def dispose(self) -> global___DisposeRequest: ...
+    @property
+    def connect(self) -> room_pb2.ConnectRequest:
         """Room"""
 
-    @_builtins.property
-    def disconnect(self) -> _room_pb2.DisconnectRequest: ...
-    @_builtins.property
-    def publish_track(self) -> _room_pb2.PublishTrackRequest: ...
-    @_builtins.property
-    def unpublish_track(self) -> _room_pb2.UnpublishTrackRequest: ...
-    @_builtins.property
-    def publish_data(self) -> _room_pb2.PublishDataRequest: ...
-    @_builtins.property
-    def set_subscribed(self) -> _room_pb2.SetSubscribedRequest: ...
-    @_builtins.property
-    def set_local_metadata(self) -> _room_pb2.SetLocalMetadataRequest: ...
-    @_builtins.property
-    def set_local_name(self) -> _room_pb2.SetLocalNameRequest: ...
-    @_builtins.property
-    def set_local_attributes(self) -> _room_pb2.SetLocalAttributesRequest: ...
-    @_builtins.property
-    def get_session_stats(self) -> _room_pb2.GetSessionStatsRequest: ...
-    @_builtins.property
-    def publish_transcription(self) -> _room_pb2.PublishTranscriptionRequest: ...
-    @_builtins.property
-    def publish_sip_dtmf(self) -> _room_pb2.PublishSipDtmfRequest: ...
-    @_builtins.property
-    def create_video_track(self) -> _track_pb2.CreateVideoTrackRequest:
+    @property
+    def disconnect(self) -> room_pb2.DisconnectRequest: ...
+    @property
+    def publish_track(self) -> room_pb2.PublishTrackRequest: ...
+    @property
+    def unpublish_track(self) -> room_pb2.UnpublishTrackRequest: ...
+    @property
+    def publish_data(self) -> room_pb2.PublishDataRequest: ...
+    @property
+    def set_subscribed(self) -> room_pb2.SetSubscribedRequest: ...
+    @property
+    def set_local_metadata(self) -> room_pb2.SetLocalMetadataRequest: ...
+    @property
+    def set_local_name(self) -> room_pb2.SetLocalNameRequest: ...
+    @property
+    def set_local_attributes(self) -> room_pb2.SetLocalAttributesRequest: ...
+    @property
+    def get_session_stats(self) -> room_pb2.GetSessionStatsRequest: ...
+    @property
+    def publish_transcription(self) -> room_pb2.PublishTranscriptionRequest: ...
+    @property
+    def publish_sip_dtmf(self) -> room_pb2.PublishSipDtmfRequest: ...
+    @property
+    def create_video_track(self) -> track_pb2.CreateVideoTrackRequest:
         """Track"""
 
-    @_builtins.property
-    def create_audio_track(self) -> _track_pb2.CreateAudioTrackRequest: ...
-    @_builtins.property
-    def local_track_mute(self) -> _track_pb2.LocalTrackMuteRequest: ...
-    @_builtins.property
-    def enable_remote_track(self) -> _track_pb2.EnableRemoteTrackRequest: ...
-    @_builtins.property
-    def get_stats(self) -> _track_pb2.GetStatsRequest: ...
-    @_builtins.property
-    def set_track_subscription_permissions(self) -> _track_pb2.SetTrackSubscriptionPermissionsRequest: ...
-    @_builtins.property
-    def new_video_stream(self) -> _video_frame_pb2.NewVideoStreamRequest:
+    @property
+    def create_audio_track(self) -> track_pb2.CreateAudioTrackRequest: ...
+    @property
+    def local_track_mute(self) -> track_pb2.LocalTrackMuteRequest: ...
+    @property
+    def enable_remote_track(self) -> track_pb2.EnableRemoteTrackRequest: ...
+    @property
+    def get_stats(self) -> track_pb2.GetStatsRequest: ...
+    @property
+    def set_track_subscription_permissions(self) -> track_pb2.SetTrackSubscriptionPermissionsRequest: ...
+    @property
+    def new_video_stream(self) -> video_frame_pb2.NewVideoStreamRequest:
         """Video"""
 
-    @_builtins.property
-    def new_video_source(self) -> _video_frame_pb2.NewVideoSourceRequest: ...
-    @_builtins.property
-    def capture_video_frame(self) -> _video_frame_pb2.CaptureVideoFrameRequest: ...
-    @_builtins.property
-    def video_convert(self) -> _video_frame_pb2.VideoConvertRequest: ...
-    @_builtins.property
-    def video_stream_from_participant(self) -> _video_frame_pb2.VideoStreamFromParticipantRequest: ...
-    @_builtins.property
-    def new_audio_stream(self) -> _audio_frame_pb2.NewAudioStreamRequest:
+    @property
+    def new_video_source(self) -> video_frame_pb2.NewVideoSourceRequest: ...
+    @property
+    def capture_video_frame(self) -> video_frame_pb2.CaptureVideoFrameRequest: ...
+    @property
+    def video_convert(self) -> video_frame_pb2.VideoConvertRequest: ...
+    @property
+    def video_stream_from_participant(self) -> video_frame_pb2.VideoStreamFromParticipantRequest: ...
+    @property
+    def new_audio_stream(self) -> audio_frame_pb2.NewAudioStreamRequest:
         """Audio"""
 
-    @_builtins.property
-    def new_audio_source(self) -> _audio_frame_pb2.NewAudioSourceRequest: ...
-    @_builtins.property
-    def capture_audio_frame(self) -> _audio_frame_pb2.CaptureAudioFrameRequest: ...
-    @_builtins.property
-    def clear_audio_buffer(self) -> _audio_frame_pb2.ClearAudioBufferRequest: ...
-    @_builtins.property
-    def new_audio_resampler(self) -> _audio_frame_pb2.NewAudioResamplerRequest: ...
-    @_builtins.property
-    def remix_and_resample(self) -> _audio_frame_pb2.RemixAndResampleRequest: ...
-    @_builtins.property
-    def e2ee(self) -> _e2ee_pb2.E2eeRequest: ...
-    @_builtins.property
-    def audio_stream_from_participant(self) -> _audio_frame_pb2.AudioStreamFromParticipantRequest: ...
-    @_builtins.property
-    def new_sox_resampler(self) -> _audio_frame_pb2.NewSoxResamplerRequest: ...
-    @_builtins.property
-    def push_sox_resampler(self) -> _audio_frame_pb2.PushSoxResamplerRequest: ...
-    @_builtins.property
-    def flush_sox_resampler(self) -> _audio_frame_pb2.FlushSoxResamplerRequest: ...
-    @_builtins.property
-    def send_chat_message(self) -> _room_pb2.SendChatMessageRequest: ...
-    @_builtins.property
-    def edit_chat_message(self) -> _room_pb2.EditChatMessageRequest: ...
-    @_builtins.property
-    def perform_rpc(self) -> _rpc_pb2.PerformRpcRequest:
+    @property
+    def new_audio_source(self) -> audio_frame_pb2.NewAudioSourceRequest: ...
+    @property
+    def capture_audio_frame(self) -> audio_frame_pb2.CaptureAudioFrameRequest: ...
+    @property
+    def clear_audio_buffer(self) -> audio_frame_pb2.ClearAudioBufferRequest: ...
+    @property
+    def new_audio_resampler(self) -> audio_frame_pb2.NewAudioResamplerRequest: ...
+    @property
+    def remix_and_resample(self) -> audio_frame_pb2.RemixAndResampleRequest: ...
+    @property
+    def e2ee(self) -> e2ee_pb2.E2eeRequest: ...
+    @property
+    def audio_stream_from_participant(self) -> audio_frame_pb2.AudioStreamFromParticipantRequest: ...
+    @property
+    def new_sox_resampler(self) -> audio_frame_pb2.NewSoxResamplerRequest: ...
+    @property
+    def push_sox_resampler(self) -> audio_frame_pb2.PushSoxResamplerRequest: ...
+    @property
+    def flush_sox_resampler(self) -> audio_frame_pb2.FlushSoxResamplerRequest: ...
+    @property
+    def send_chat_message(self) -> room_pb2.SendChatMessageRequest: ...
+    @property
+    def edit_chat_message(self) -> room_pb2.EditChatMessageRequest: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcRequest:
         """RPC"""
 
-    @_builtins.property
-    def register_rpc_method(self) -> _rpc_pb2.RegisterRpcMethodRequest: ...
-    @_builtins.property
-    def unregister_rpc_method(self) -> _rpc_pb2.UnregisterRpcMethodRequest: ...
-    @_builtins.property
-    def rpc_method_invocation_response(self) -> _rpc_pb2.RpcMethodInvocationResponseRequest: ...
-    @_builtins.property
-    def enable_remote_track_publication(self) -> _track_publication_pb2.EnableRemoteTrackPublicationRequest:
+    @property
+    def register_rpc_method(self) -> rpc_pb2.RegisterRpcMethodRequest: ...
+    @property
+    def unregister_rpc_method(self) -> rpc_pb2.UnregisterRpcMethodRequest: ...
+    @property
+    def rpc_method_invocation_response(self) -> rpc_pb2.RpcMethodInvocationResponseRequest: ...
+    @property
+    def enable_remote_track_publication(self) -> track_publication_pb2.EnableRemoteTrackPublicationRequest:
         """Track Publication"""
 
-    @_builtins.property
-    def update_remote_track_publication_dimension(self) -> _track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest: ...
-    @_builtins.property
-    def send_stream_header(self) -> _room_pb2.SendStreamHeaderRequest:
+    @property
+    def update_remote_track_publication_dimension(self) -> track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderRequest:
         """Data Streams (low level)"""
 
-    @_builtins.property
-    def send_stream_chunk(self) -> _room_pb2.SendStreamChunkRequest: ...
-    @_builtins.property
-    def send_stream_trailer(self) -> _room_pb2.SendStreamTrailerRequest: ...
-    @_builtins.property
-    def set_data_channel_buffered_amount_low_threshold(self) -> _room_pb2.SetDataChannelBufferedAmountLowThresholdRequest:
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkRequest: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerRequest: ...
+    @property
+    def set_data_channel_buffered_amount_low_threshold(self) -> room_pb2.SetDataChannelBufferedAmountLowThresholdRequest:
         """Data Channel"""
 
-    @_builtins.property
-    def load_audio_filter_plugin(self) -> _audio_frame_pb2.LoadAudioFilterPluginRequest:
+    @property
+    def load_audio_filter_plugin(self) -> audio_frame_pb2.LoadAudioFilterPluginRequest:
         """Audio Filter Plugin"""
 
-    @_builtins.property
-    def new_apm(self) -> _audio_frame_pb2.NewApmRequest: ...
-    @_builtins.property
-    def apm_process_stream(self) -> _audio_frame_pb2.ApmProcessStreamRequest: ...
-    @_builtins.property
-    def apm_process_reverse_stream(self) -> _audio_frame_pb2.ApmProcessReverseStreamRequest: ...
-    @_builtins.property
-    def apm_set_stream_delay(self) -> _audio_frame_pb2.ApmSetStreamDelayRequest: ...
-    @_builtins.property
-    def byte_read_incremental(self) -> _data_stream_pb2.ByteStreamReaderReadIncrementalRequest:
+    @property
+    def new_apm(self) -> audio_frame_pb2.NewApmRequest: ...
+    @property
+    def apm_process_stream(self) -> audio_frame_pb2.ApmProcessStreamRequest: ...
+    @property
+    def apm_process_reverse_stream(self) -> audio_frame_pb2.ApmProcessReverseStreamRequest: ...
+    @property
+    def apm_set_stream_delay(self) -> audio_frame_pb2.ApmSetStreamDelayRequest: ...
+    @property
+    def byte_read_incremental(self) -> data_stream_pb2.ByteStreamReaderReadIncrementalRequest:
         """Data Streams (high level)"""
 
-    @_builtins.property
-    def byte_read_all(self) -> _data_stream_pb2.ByteStreamReaderReadAllRequest: ...
-    @_builtins.property
-    def byte_write_to_file(self) -> _data_stream_pb2.ByteStreamReaderWriteToFileRequest: ...
-    @_builtins.property
-    def text_read_incremental(self) -> _data_stream_pb2.TextStreamReaderReadIncrementalRequest: ...
-    @_builtins.property
-    def text_read_all(self) -> _data_stream_pb2.TextStreamReaderReadAllRequest: ...
-    @_builtins.property
-    def send_file(self) -> _data_stream_pb2.StreamSendFileRequest: ...
-    @_builtins.property
-    def send_text(self) -> _data_stream_pb2.StreamSendTextRequest: ...
-    @_builtins.property
-    def byte_stream_open(self) -> _data_stream_pb2.ByteStreamOpenRequest: ...
-    @_builtins.property
-    def byte_stream_write(self) -> _data_stream_pb2.ByteStreamWriterWriteRequest: ...
-    @_builtins.property
-    def byte_stream_close(self) -> _data_stream_pb2.ByteStreamWriterCloseRequest: ...
-    @_builtins.property
-    def text_stream_open(self) -> _data_stream_pb2.TextStreamOpenRequest: ...
-    @_builtins.property
-    def text_stream_write(self) -> _data_stream_pb2.TextStreamWriterWriteRequest: ...
-    @_builtins.property
-    def text_stream_close(self) -> _data_stream_pb2.TextStreamWriterCloseRequest: ...
-    @_builtins.property
-    def send_bytes(self) -> _data_stream_pb2.StreamSendBytesRequest: ...
-    @_builtins.property
-    def set_remote_track_publication_quality(self) -> _track_publication_pb2.SetRemoteTrackPublicationQualityRequest: ...
+    @property
+    def byte_read_all(self) -> data_stream_pb2.ByteStreamReaderReadAllRequest: ...
+    @property
+    def byte_write_to_file(self) -> data_stream_pb2.ByteStreamReaderWriteToFileRequest: ...
+    @property
+    def text_read_incremental(self) -> data_stream_pb2.TextStreamReaderReadIncrementalRequest: ...
+    @property
+    def text_read_all(self) -> data_stream_pb2.TextStreamReaderReadAllRequest: ...
+    @property
+    def send_file(self) -> data_stream_pb2.StreamSendFileRequest: ...
+    @property
+    def send_text(self) -> data_stream_pb2.StreamSendTextRequest: ...
+    @property
+    def byte_stream_open(self) -> data_stream_pb2.ByteStreamOpenRequest: ...
+    @property
+    def byte_stream_write(self) -> data_stream_pb2.ByteStreamWriterWriteRequest: ...
+    @property
+    def byte_stream_close(self) -> data_stream_pb2.ByteStreamWriterCloseRequest: ...
+    @property
+    def text_stream_open(self) -> data_stream_pb2.TextStreamOpenRequest: ...
+    @property
+    def text_stream_write(self) -> data_stream_pb2.TextStreamWriterWriteRequest: ...
+    @property
+    def text_stream_close(self) -> data_stream_pb2.TextStreamWriterCloseRequest: ...
+    @property
+    def send_bytes(self) -> data_stream_pb2.StreamSendBytesRequest: ...
+    @property
+    def set_remote_track_publication_quality(self) -> track_publication_pb2.SetRemoteTrackPublicationQualityRequest: ...
     def __init__(
         self,
         *,
-        dispose: Global___DisposeRequest | None = ...,
-        connect: _room_pb2.ConnectRequest | None = ...,
-        disconnect: _room_pb2.DisconnectRequest | None = ...,
-        publish_track: _room_pb2.PublishTrackRequest | None = ...,
-        unpublish_track: _room_pb2.UnpublishTrackRequest | None = ...,
-        publish_data: _room_pb2.PublishDataRequest | None = ...,
-        set_subscribed: _room_pb2.SetSubscribedRequest | None = ...,
-        set_local_metadata: _room_pb2.SetLocalMetadataRequest | None = ...,
-        set_local_name: _room_pb2.SetLocalNameRequest | None = ...,
-        set_local_attributes: _room_pb2.SetLocalAttributesRequest | None = ...,
-        get_session_stats: _room_pb2.GetSessionStatsRequest | None = ...,
-        publish_transcription: _room_pb2.PublishTranscriptionRequest | None = ...,
-        publish_sip_dtmf: _room_pb2.PublishSipDtmfRequest | None = ...,
-        create_video_track: _track_pb2.CreateVideoTrackRequest | None = ...,
-        create_audio_track: _track_pb2.CreateAudioTrackRequest | None = ...,
-        local_track_mute: _track_pb2.LocalTrackMuteRequest | None = ...,
-        enable_remote_track: _track_pb2.EnableRemoteTrackRequest | None = ...,
-        get_stats: _track_pb2.GetStatsRequest | None = ...,
-        set_track_subscription_permissions: _track_pb2.SetTrackSubscriptionPermissionsRequest | None = ...,
-        new_video_stream: _video_frame_pb2.NewVideoStreamRequest | None = ...,
-        new_video_source: _video_frame_pb2.NewVideoSourceRequest | None = ...,
-        capture_video_frame: _video_frame_pb2.CaptureVideoFrameRequest | None = ...,
-        video_convert: _video_frame_pb2.VideoConvertRequest | None = ...,
-        video_stream_from_participant: _video_frame_pb2.VideoStreamFromParticipantRequest | None = ...,
-        new_audio_stream: _audio_frame_pb2.NewAudioStreamRequest | None = ...,
-        new_audio_source: _audio_frame_pb2.NewAudioSourceRequest | None = ...,
-        capture_audio_frame: _audio_frame_pb2.CaptureAudioFrameRequest | None = ...,
-        clear_audio_buffer: _audio_frame_pb2.ClearAudioBufferRequest | None = ...,
-        new_audio_resampler: _audio_frame_pb2.NewAudioResamplerRequest | None = ...,
-        remix_and_resample: _audio_frame_pb2.RemixAndResampleRequest | None = ...,
-        e2ee: _e2ee_pb2.E2eeRequest | None = ...,
-        audio_stream_from_participant: _audio_frame_pb2.AudioStreamFromParticipantRequest | None = ...,
-        new_sox_resampler: _audio_frame_pb2.NewSoxResamplerRequest | None = ...,
-        push_sox_resampler: _audio_frame_pb2.PushSoxResamplerRequest | None = ...,
-        flush_sox_resampler: _audio_frame_pb2.FlushSoxResamplerRequest | None = ...,
-        send_chat_message: _room_pb2.SendChatMessageRequest | None = ...,
-        edit_chat_message: _room_pb2.EditChatMessageRequest | None = ...,
-        perform_rpc: _rpc_pb2.PerformRpcRequest | None = ...,
-        register_rpc_method: _rpc_pb2.RegisterRpcMethodRequest | None = ...,
-        unregister_rpc_method: _rpc_pb2.UnregisterRpcMethodRequest | None = ...,
-        rpc_method_invocation_response: _rpc_pb2.RpcMethodInvocationResponseRequest | None = ...,
-        enable_remote_track_publication: _track_publication_pb2.EnableRemoteTrackPublicationRequest | None = ...,
-        update_remote_track_publication_dimension: _track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest | None = ...,
-        send_stream_header: _room_pb2.SendStreamHeaderRequest | None = ...,
-        send_stream_chunk: _room_pb2.SendStreamChunkRequest | None = ...,
-        send_stream_trailer: _room_pb2.SendStreamTrailerRequest | None = ...,
-        set_data_channel_buffered_amount_low_threshold: _room_pb2.SetDataChannelBufferedAmountLowThresholdRequest | None = ...,
-        load_audio_filter_plugin: _audio_frame_pb2.LoadAudioFilterPluginRequest | None = ...,
-        new_apm: _audio_frame_pb2.NewApmRequest | None = ...,
-        apm_process_stream: _audio_frame_pb2.ApmProcessStreamRequest | None = ...,
-        apm_process_reverse_stream: _audio_frame_pb2.ApmProcessReverseStreamRequest | None = ...,
-        apm_set_stream_delay: _audio_frame_pb2.ApmSetStreamDelayRequest | None = ...,
-        byte_read_incremental: _data_stream_pb2.ByteStreamReaderReadIncrementalRequest | None = ...,
-        byte_read_all: _data_stream_pb2.ByteStreamReaderReadAllRequest | None = ...,
-        byte_write_to_file: _data_stream_pb2.ByteStreamReaderWriteToFileRequest | None = ...,
-        text_read_incremental: _data_stream_pb2.TextStreamReaderReadIncrementalRequest | None = ...,
-        text_read_all: _data_stream_pb2.TextStreamReaderReadAllRequest | None = ...,
-        send_file: _data_stream_pb2.StreamSendFileRequest | None = ...,
-        send_text: _data_stream_pb2.StreamSendTextRequest | None = ...,
-        byte_stream_open: _data_stream_pb2.ByteStreamOpenRequest | None = ...,
-        byte_stream_write: _data_stream_pb2.ByteStreamWriterWriteRequest | None = ...,
-        byte_stream_close: _data_stream_pb2.ByteStreamWriterCloseRequest | None = ...,
-        text_stream_open: _data_stream_pb2.TextStreamOpenRequest | None = ...,
-        text_stream_write: _data_stream_pb2.TextStreamWriterWriteRequest | None = ...,
-        text_stream_close: _data_stream_pb2.TextStreamWriterCloseRequest | None = ...,
-        send_bytes: _data_stream_pb2.StreamSendBytesRequest | None = ...,
-        set_remote_track_publication_quality: _track_publication_pb2.SetRemoteTrackPublicationQualityRequest | None = ...,
+        dispose: global___DisposeRequest | None = ...,
+        connect: room_pb2.ConnectRequest | None = ...,
+        disconnect: room_pb2.DisconnectRequest | None = ...,
+        publish_track: room_pb2.PublishTrackRequest | None = ...,
+        unpublish_track: room_pb2.UnpublishTrackRequest | None = ...,
+        publish_data: room_pb2.PublishDataRequest | None = ...,
+        set_subscribed: room_pb2.SetSubscribedRequest | None = ...,
+        set_local_metadata: room_pb2.SetLocalMetadataRequest | None = ...,
+        set_local_name: room_pb2.SetLocalNameRequest | None = ...,
+        set_local_attributes: room_pb2.SetLocalAttributesRequest | None = ...,
+        get_session_stats: room_pb2.GetSessionStatsRequest | None = ...,
+        publish_transcription: room_pb2.PublishTranscriptionRequest | None = ...,
+        publish_sip_dtmf: room_pb2.PublishSipDtmfRequest | None = ...,
+        create_video_track: track_pb2.CreateVideoTrackRequest | None = ...,
+        create_audio_track: track_pb2.CreateAudioTrackRequest | None = ...,
+        local_track_mute: track_pb2.LocalTrackMuteRequest | None = ...,
+        enable_remote_track: track_pb2.EnableRemoteTrackRequest | None = ...,
+        get_stats: track_pb2.GetStatsRequest | None = ...,
+        set_track_subscription_permissions: track_pb2.SetTrackSubscriptionPermissionsRequest | None = ...,
+        new_video_stream: video_frame_pb2.NewVideoStreamRequest | None = ...,
+        new_video_source: video_frame_pb2.NewVideoSourceRequest | None = ...,
+        capture_video_frame: video_frame_pb2.CaptureVideoFrameRequest | None = ...,
+        video_convert: video_frame_pb2.VideoConvertRequest | None = ...,
+        video_stream_from_participant: video_frame_pb2.VideoStreamFromParticipantRequest | None = ...,
+        new_audio_stream: audio_frame_pb2.NewAudioStreamRequest | None = ...,
+        new_audio_source: audio_frame_pb2.NewAudioSourceRequest | None = ...,
+        capture_audio_frame: audio_frame_pb2.CaptureAudioFrameRequest | None = ...,
+        clear_audio_buffer: audio_frame_pb2.ClearAudioBufferRequest | None = ...,
+        new_audio_resampler: audio_frame_pb2.NewAudioResamplerRequest | None = ...,
+        remix_and_resample: audio_frame_pb2.RemixAndResampleRequest | None = ...,
+        e2ee: e2ee_pb2.E2eeRequest | None = ...,
+        audio_stream_from_participant: audio_frame_pb2.AudioStreamFromParticipantRequest | None = ...,
+        new_sox_resampler: audio_frame_pb2.NewSoxResamplerRequest | None = ...,
+        push_sox_resampler: audio_frame_pb2.PushSoxResamplerRequest | None = ...,
+        flush_sox_resampler: audio_frame_pb2.FlushSoxResamplerRequest | None = ...,
+        send_chat_message: room_pb2.SendChatMessageRequest | None = ...,
+        edit_chat_message: room_pb2.EditChatMessageRequest | None = ...,
+        perform_rpc: rpc_pb2.PerformRpcRequest | None = ...,
+        register_rpc_method: rpc_pb2.RegisterRpcMethodRequest | None = ...,
+        unregister_rpc_method: rpc_pb2.UnregisterRpcMethodRequest | None = ...,
+        rpc_method_invocation_response: rpc_pb2.RpcMethodInvocationResponseRequest | None = ...,
+        enable_remote_track_publication: track_publication_pb2.EnableRemoteTrackPublicationRequest | None = ...,
+        update_remote_track_publication_dimension: track_publication_pb2.UpdateRemoteTrackPublicationDimensionRequest | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderRequest | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkRequest | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerRequest | None = ...,
+        set_data_channel_buffered_amount_low_threshold: room_pb2.SetDataChannelBufferedAmountLowThresholdRequest | None = ...,
+        load_audio_filter_plugin: audio_frame_pb2.LoadAudioFilterPluginRequest | None = ...,
+        new_apm: audio_frame_pb2.NewApmRequest | None = ...,
+        apm_process_stream: audio_frame_pb2.ApmProcessStreamRequest | None = ...,
+        apm_process_reverse_stream: audio_frame_pb2.ApmProcessReverseStreamRequest | None = ...,
+        apm_set_stream_delay: audio_frame_pb2.ApmSetStreamDelayRequest | None = ...,
+        byte_read_incremental: data_stream_pb2.ByteStreamReaderReadIncrementalRequest | None = ...,
+        byte_read_all: data_stream_pb2.ByteStreamReaderReadAllRequest | None = ...,
+        byte_write_to_file: data_stream_pb2.ByteStreamReaderWriteToFileRequest | None = ...,
+        text_read_incremental: data_stream_pb2.TextStreamReaderReadIncrementalRequest | None = ...,
+        text_read_all: data_stream_pb2.TextStreamReaderReadAllRequest | None = ...,
+        send_file: data_stream_pb2.StreamSendFileRequest | None = ...,
+        send_text: data_stream_pb2.StreamSendTextRequest | None = ...,
+        byte_stream_open: data_stream_pb2.ByteStreamOpenRequest | None = ...,
+        byte_stream_write: data_stream_pb2.ByteStreamWriterWriteRequest | None = ...,
+        byte_stream_close: data_stream_pb2.ByteStreamWriterCloseRequest | None = ...,
+        text_stream_open: data_stream_pb2.TextStreamOpenRequest | None = ...,
+        text_stream_write: data_stream_pb2.TextStreamWriterWriteRequest | None = ...,
+        text_stream_close: data_stream_pb2.TextStreamWriterCloseRequest | None = ...,
+        send_bytes: data_stream_pb2.StreamSendBytesRequest | None = ...,
+        set_remote_track_publication_quality: track_publication_pb2.SetRemoteTrackPublicationQualityRequest | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "e2ee", "audio_stream_from_participant", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "edit_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "edit_chat_message", b"edit_chat_message", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "e2ee", "audio_stream_from_participant", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "edit_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"] | None: ...
 
-Global___FfiRequest: _TypeAlias = FfiRequest  # noqa: Y015
+global___FfiRequest = FfiRequest
 
-@_typing.final
-class FfiResponse(_message.Message):
+@typing.final
+class FfiResponse(google.protobuf.message.Message):
     """This is the output of livekit_ffi_request function."""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    DISPOSE_FIELD_NUMBER: _builtins.int
-    CONNECT_FIELD_NUMBER: _builtins.int
-    DISCONNECT_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    UNPUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    PUBLISH_DATA_FIELD_NUMBER: _builtins.int
-    SET_SUBSCRIBED_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_METADATA_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_NAME_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    GET_SESSION_STATS_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: _builtins.int
-    PUBLISH_SIP_DTMF_FIELD_NUMBER: _builtins.int
-    CREATE_VIDEO_TRACK_FIELD_NUMBER: _builtins.int
-    CREATE_AUDIO_TRACK_FIELD_NUMBER: _builtins.int
-    LOCAL_TRACK_MUTE_FIELD_NUMBER: _builtins.int
-    ENABLE_REMOTE_TRACK_FIELD_NUMBER: _builtins.int
-    GET_STATS_FIELD_NUMBER: _builtins.int
-    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: _builtins.int
-    NEW_VIDEO_STREAM_FIELD_NUMBER: _builtins.int
-    NEW_VIDEO_SOURCE_FIELD_NUMBER: _builtins.int
-    CAPTURE_VIDEO_FRAME_FIELD_NUMBER: _builtins.int
-    VIDEO_CONVERT_FIELD_NUMBER: _builtins.int
-    VIDEO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_STREAM_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_SOURCE_FIELD_NUMBER: _builtins.int
-    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: _builtins.int
-    CLEAR_AUDIO_BUFFER_FIELD_NUMBER: _builtins.int
-    NEW_AUDIO_RESAMPLER_FIELD_NUMBER: _builtins.int
-    REMIX_AND_RESAMPLE_FIELD_NUMBER: _builtins.int
-    AUDIO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: _builtins.int
-    E2EE_FIELD_NUMBER: _builtins.int
-    NEW_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    PUSH_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    FLUSH_SOX_RESAMPLER_FIELD_NUMBER: _builtins.int
-    SEND_CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    PERFORM_RPC_FIELD_NUMBER: _builtins.int
-    REGISTER_RPC_METHOD_FIELD_NUMBER: _builtins.int
-    UNREGISTER_RPC_METHOD_FIELD_NUMBER: _builtins.int
-    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: _builtins.int
-    ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: _builtins.int
-    UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_HEADER_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_CHUNK_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_TRAILER_FIELD_NUMBER: _builtins.int
-    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: _builtins.int
-    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: _builtins.int
-    NEW_APM_FIELD_NUMBER: _builtins.int
-    APM_PROCESS_STREAM_FIELD_NUMBER: _builtins.int
-    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: _builtins.int
-    APM_SET_STREAM_DELAY_FIELD_NUMBER: _builtins.int
-    BYTE_READ_INCREMENTAL_FIELD_NUMBER: _builtins.int
-    BYTE_READ_ALL_FIELD_NUMBER: _builtins.int
-    BYTE_WRITE_TO_FILE_FIELD_NUMBER: _builtins.int
-    TEXT_READ_INCREMENTAL_FIELD_NUMBER: _builtins.int
-    TEXT_READ_ALL_FIELD_NUMBER: _builtins.int
-    SEND_FILE_FIELD_NUMBER: _builtins.int
-    SEND_TEXT_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_WRITE_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_CLOSE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_WRITE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_CLOSE_FIELD_NUMBER: _builtins.int
-    SEND_BYTES_FIELD_NUMBER: _builtins.int
-    SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def dispose(self) -> Global___DisposeResponse: ...
-    @_builtins.property
-    def connect(self) -> _room_pb2.ConnectResponse:
+    DISPOSE_FIELD_NUMBER: builtins.int
+    CONNECT_FIELD_NUMBER: builtins.int
+    DISCONNECT_FIELD_NUMBER: builtins.int
+    PUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    UNPUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    PUBLISH_DATA_FIELD_NUMBER: builtins.int
+    SET_SUBSCRIBED_FIELD_NUMBER: builtins.int
+    SET_LOCAL_METADATA_FIELD_NUMBER: builtins.int
+    SET_LOCAL_NAME_FIELD_NUMBER: builtins.int
+    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: builtins.int
+    GET_SESSION_STATS_FIELD_NUMBER: builtins.int
+    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: builtins.int
+    PUBLISH_SIP_DTMF_FIELD_NUMBER: builtins.int
+    CREATE_VIDEO_TRACK_FIELD_NUMBER: builtins.int
+    CREATE_AUDIO_TRACK_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_MUTE_FIELD_NUMBER: builtins.int
+    ENABLE_REMOTE_TRACK_FIELD_NUMBER: builtins.int
+    GET_STATS_FIELD_NUMBER: builtins.int
+    SET_TRACK_SUBSCRIPTION_PERMISSIONS_FIELD_NUMBER: builtins.int
+    NEW_VIDEO_STREAM_FIELD_NUMBER: builtins.int
+    NEW_VIDEO_SOURCE_FIELD_NUMBER: builtins.int
+    CAPTURE_VIDEO_FRAME_FIELD_NUMBER: builtins.int
+    VIDEO_CONVERT_FIELD_NUMBER: builtins.int
+    VIDEO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_STREAM_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_SOURCE_FIELD_NUMBER: builtins.int
+    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: builtins.int
+    CLEAR_AUDIO_BUFFER_FIELD_NUMBER: builtins.int
+    NEW_AUDIO_RESAMPLER_FIELD_NUMBER: builtins.int
+    REMIX_AND_RESAMPLE_FIELD_NUMBER: builtins.int
+    AUDIO_STREAM_FROM_PARTICIPANT_FIELD_NUMBER: builtins.int
+    E2EE_FIELD_NUMBER: builtins.int
+    NEW_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    PUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    FLUSH_SOX_RESAMPLER_FIELD_NUMBER: builtins.int
+    SEND_CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    REGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    UNREGISTER_RPC_METHOD_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_RESPONSE_FIELD_NUMBER: builtins.int
+    ENABLE_REMOTE_TRACK_PUBLICATION_FIELD_NUMBER: builtins.int
+    UPDATE_REMOTE_TRACK_PUBLICATION_DIMENSION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
+    SET_DATA_CHANNEL_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    LOAD_AUDIO_FILTER_PLUGIN_FIELD_NUMBER: builtins.int
+    NEW_APM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_STREAM_FIELD_NUMBER: builtins.int
+    APM_PROCESS_REVERSE_STREAM_FIELD_NUMBER: builtins.int
+    APM_SET_STREAM_DELAY_FIELD_NUMBER: builtins.int
+    BYTE_READ_INCREMENTAL_FIELD_NUMBER: builtins.int
+    BYTE_READ_ALL_FIELD_NUMBER: builtins.int
+    BYTE_WRITE_TO_FILE_FIELD_NUMBER: builtins.int
+    TEXT_READ_INCREMENTAL_FIELD_NUMBER: builtins.int
+    TEXT_READ_ALL_FIELD_NUMBER: builtins.int
+    SEND_FILE_FIELD_NUMBER: builtins.int
+    SEND_TEXT_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_WRITE_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_CLOSE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_WRITE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_CLOSE_FIELD_NUMBER: builtins.int
+    SEND_BYTES_FIELD_NUMBER: builtins.int
+    SET_REMOTE_TRACK_PUBLICATION_QUALITY_FIELD_NUMBER: builtins.int
+    @property
+    def dispose(self) -> global___DisposeResponse: ...
+    @property
+    def connect(self) -> room_pb2.ConnectResponse:
         """Room"""
 
-    @_builtins.property
-    def disconnect(self) -> _room_pb2.DisconnectResponse: ...
-    @_builtins.property
-    def publish_track(self) -> _room_pb2.PublishTrackResponse: ...
-    @_builtins.property
-    def unpublish_track(self) -> _room_pb2.UnpublishTrackResponse: ...
-    @_builtins.property
-    def publish_data(self) -> _room_pb2.PublishDataResponse: ...
-    @_builtins.property
-    def set_subscribed(self) -> _room_pb2.SetSubscribedResponse: ...
-    @_builtins.property
-    def set_local_metadata(self) -> _room_pb2.SetLocalMetadataResponse: ...
-    @_builtins.property
-    def set_local_name(self) -> _room_pb2.SetLocalNameResponse: ...
-    @_builtins.property
-    def set_local_attributes(self) -> _room_pb2.SetLocalAttributesResponse: ...
-    @_builtins.property
-    def get_session_stats(self) -> _room_pb2.GetSessionStatsResponse: ...
-    @_builtins.property
-    def publish_transcription(self) -> _room_pb2.PublishTranscriptionResponse: ...
-    @_builtins.property
-    def publish_sip_dtmf(self) -> _room_pb2.PublishSipDtmfResponse: ...
-    @_builtins.property
-    def create_video_track(self) -> _track_pb2.CreateVideoTrackResponse:
+    @property
+    def disconnect(self) -> room_pb2.DisconnectResponse: ...
+    @property
+    def publish_track(self) -> room_pb2.PublishTrackResponse: ...
+    @property
+    def unpublish_track(self) -> room_pb2.UnpublishTrackResponse: ...
+    @property
+    def publish_data(self) -> room_pb2.PublishDataResponse: ...
+    @property
+    def set_subscribed(self) -> room_pb2.SetSubscribedResponse: ...
+    @property
+    def set_local_metadata(self) -> room_pb2.SetLocalMetadataResponse: ...
+    @property
+    def set_local_name(self) -> room_pb2.SetLocalNameResponse: ...
+    @property
+    def set_local_attributes(self) -> room_pb2.SetLocalAttributesResponse: ...
+    @property
+    def get_session_stats(self) -> room_pb2.GetSessionStatsResponse: ...
+    @property
+    def publish_transcription(self) -> room_pb2.PublishTranscriptionResponse: ...
+    @property
+    def publish_sip_dtmf(self) -> room_pb2.PublishSipDtmfResponse: ...
+    @property
+    def create_video_track(self) -> track_pb2.CreateVideoTrackResponse:
         """Track"""
 
-    @_builtins.property
-    def create_audio_track(self) -> _track_pb2.CreateAudioTrackResponse: ...
-    @_builtins.property
-    def local_track_mute(self) -> _track_pb2.LocalTrackMuteResponse: ...
-    @_builtins.property
-    def enable_remote_track(self) -> _track_pb2.EnableRemoteTrackResponse: ...
-    @_builtins.property
-    def get_stats(self) -> _track_pb2.GetStatsResponse: ...
-    @_builtins.property
-    def set_track_subscription_permissions(self) -> _track_pb2.SetTrackSubscriptionPermissionsResponse: ...
-    @_builtins.property
-    def new_video_stream(self) -> _video_frame_pb2.NewVideoStreamResponse:
+    @property
+    def create_audio_track(self) -> track_pb2.CreateAudioTrackResponse: ...
+    @property
+    def local_track_mute(self) -> track_pb2.LocalTrackMuteResponse: ...
+    @property
+    def enable_remote_track(self) -> track_pb2.EnableRemoteTrackResponse: ...
+    @property
+    def get_stats(self) -> track_pb2.GetStatsResponse: ...
+    @property
+    def set_track_subscription_permissions(self) -> track_pb2.SetTrackSubscriptionPermissionsResponse: ...
+    @property
+    def new_video_stream(self) -> video_frame_pb2.NewVideoStreamResponse:
         """Video"""
 
-    @_builtins.property
-    def new_video_source(self) -> _video_frame_pb2.NewVideoSourceResponse: ...
-    @_builtins.property
-    def capture_video_frame(self) -> _video_frame_pb2.CaptureVideoFrameResponse: ...
-    @_builtins.property
-    def video_convert(self) -> _video_frame_pb2.VideoConvertResponse: ...
-    @_builtins.property
-    def video_stream_from_participant(self) -> _video_frame_pb2.VideoStreamFromParticipantResponse: ...
-    @_builtins.property
-    def new_audio_stream(self) -> _audio_frame_pb2.NewAudioStreamResponse:
+    @property
+    def new_video_source(self) -> video_frame_pb2.NewVideoSourceResponse: ...
+    @property
+    def capture_video_frame(self) -> video_frame_pb2.CaptureVideoFrameResponse: ...
+    @property
+    def video_convert(self) -> video_frame_pb2.VideoConvertResponse: ...
+    @property
+    def video_stream_from_participant(self) -> video_frame_pb2.VideoStreamFromParticipantResponse: ...
+    @property
+    def new_audio_stream(self) -> audio_frame_pb2.NewAudioStreamResponse:
         """Audio"""
 
-    @_builtins.property
-    def new_audio_source(self) -> _audio_frame_pb2.NewAudioSourceResponse: ...
-    @_builtins.property
-    def capture_audio_frame(self) -> _audio_frame_pb2.CaptureAudioFrameResponse: ...
-    @_builtins.property
-    def clear_audio_buffer(self) -> _audio_frame_pb2.ClearAudioBufferResponse: ...
-    @_builtins.property
-    def new_audio_resampler(self) -> _audio_frame_pb2.NewAudioResamplerResponse: ...
-    @_builtins.property
-    def remix_and_resample(self) -> _audio_frame_pb2.RemixAndResampleResponse: ...
-    @_builtins.property
-    def audio_stream_from_participant(self) -> _audio_frame_pb2.AudioStreamFromParticipantResponse: ...
-    @_builtins.property
-    def e2ee(self) -> _e2ee_pb2.E2eeResponse: ...
-    @_builtins.property
-    def new_sox_resampler(self) -> _audio_frame_pb2.NewSoxResamplerResponse: ...
-    @_builtins.property
-    def push_sox_resampler(self) -> _audio_frame_pb2.PushSoxResamplerResponse: ...
-    @_builtins.property
-    def flush_sox_resampler(self) -> _audio_frame_pb2.FlushSoxResamplerResponse: ...
-    @_builtins.property
-    def send_chat_message(self) -> _room_pb2.SendChatMessageResponse: ...
-    @_builtins.property
-    def perform_rpc(self) -> _rpc_pb2.PerformRpcResponse:
+    @property
+    def new_audio_source(self) -> audio_frame_pb2.NewAudioSourceResponse: ...
+    @property
+    def capture_audio_frame(self) -> audio_frame_pb2.CaptureAudioFrameResponse: ...
+    @property
+    def clear_audio_buffer(self) -> audio_frame_pb2.ClearAudioBufferResponse: ...
+    @property
+    def new_audio_resampler(self) -> audio_frame_pb2.NewAudioResamplerResponse: ...
+    @property
+    def remix_and_resample(self) -> audio_frame_pb2.RemixAndResampleResponse: ...
+    @property
+    def audio_stream_from_participant(self) -> audio_frame_pb2.AudioStreamFromParticipantResponse: ...
+    @property
+    def e2ee(self) -> e2ee_pb2.E2eeResponse: ...
+    @property
+    def new_sox_resampler(self) -> audio_frame_pb2.NewSoxResamplerResponse: ...
+    @property
+    def push_sox_resampler(self) -> audio_frame_pb2.PushSoxResamplerResponse: ...
+    @property
+    def flush_sox_resampler(self) -> audio_frame_pb2.FlushSoxResamplerResponse: ...
+    @property
+    def send_chat_message(self) -> room_pb2.SendChatMessageResponse: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcResponse:
         """RPC"""
 
-    @_builtins.property
-    def register_rpc_method(self) -> _rpc_pb2.RegisterRpcMethodResponse: ...
-    @_builtins.property
-    def unregister_rpc_method(self) -> _rpc_pb2.UnregisterRpcMethodResponse: ...
-    @_builtins.property
-    def rpc_method_invocation_response(self) -> _rpc_pb2.RpcMethodInvocationResponseResponse: ...
-    @_builtins.property
-    def enable_remote_track_publication(self) -> _track_publication_pb2.EnableRemoteTrackPublicationResponse:
+    @property
+    def register_rpc_method(self) -> rpc_pb2.RegisterRpcMethodResponse: ...
+    @property
+    def unregister_rpc_method(self) -> rpc_pb2.UnregisterRpcMethodResponse: ...
+    @property
+    def rpc_method_invocation_response(self) -> rpc_pb2.RpcMethodInvocationResponseResponse: ...
+    @property
+    def enable_remote_track_publication(self) -> track_publication_pb2.EnableRemoteTrackPublicationResponse:
         """Track Publication"""
 
-    @_builtins.property
-    def update_remote_track_publication_dimension(self) -> _track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse: ...
-    @_builtins.property
-    def send_stream_header(self) -> _room_pb2.SendStreamHeaderResponse:
+    @property
+    def update_remote_track_publication_dimension(self) -> track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderResponse:
         """Data Streams"""
 
-    @_builtins.property
-    def send_stream_chunk(self) -> _room_pb2.SendStreamChunkResponse: ...
-    @_builtins.property
-    def send_stream_trailer(self) -> _room_pb2.SendStreamTrailerResponse: ...
-    @_builtins.property
-    def set_data_channel_buffered_amount_low_threshold(self) -> _room_pb2.SetDataChannelBufferedAmountLowThresholdResponse:
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkResponse: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerResponse: ...
+    @property
+    def set_data_channel_buffered_amount_low_threshold(self) -> room_pb2.SetDataChannelBufferedAmountLowThresholdResponse:
         """Data Channel"""
 
-    @_builtins.property
-    def load_audio_filter_plugin(self) -> _audio_frame_pb2.LoadAudioFilterPluginResponse:
+    @property
+    def load_audio_filter_plugin(self) -> audio_frame_pb2.LoadAudioFilterPluginResponse:
         """Audio Filter Plugin"""
 
-    @_builtins.property
-    def new_apm(self) -> _audio_frame_pb2.NewApmResponse: ...
-    @_builtins.property
-    def apm_process_stream(self) -> _audio_frame_pb2.ApmProcessStreamResponse: ...
-    @_builtins.property
-    def apm_process_reverse_stream(self) -> _audio_frame_pb2.ApmProcessReverseStreamResponse: ...
-    @_builtins.property
-    def apm_set_stream_delay(self) -> _audio_frame_pb2.ApmSetStreamDelayResponse: ...
-    @_builtins.property
-    def byte_read_incremental(self) -> _data_stream_pb2.ByteStreamReaderReadIncrementalResponse:
+    @property
+    def new_apm(self) -> audio_frame_pb2.NewApmResponse: ...
+    @property
+    def apm_process_stream(self) -> audio_frame_pb2.ApmProcessStreamResponse: ...
+    @property
+    def apm_process_reverse_stream(self) -> audio_frame_pb2.ApmProcessReverseStreamResponse: ...
+    @property
+    def apm_set_stream_delay(self) -> audio_frame_pb2.ApmSetStreamDelayResponse: ...
+    @property
+    def byte_read_incremental(self) -> data_stream_pb2.ByteStreamReaderReadIncrementalResponse:
         """Data Streams (high level)"""
 
-    @_builtins.property
-    def byte_read_all(self) -> _data_stream_pb2.ByteStreamReaderReadAllResponse: ...
-    @_builtins.property
-    def byte_write_to_file(self) -> _data_stream_pb2.ByteStreamReaderWriteToFileResponse: ...
-    @_builtins.property
-    def text_read_incremental(self) -> _data_stream_pb2.TextStreamReaderReadIncrementalResponse: ...
-    @_builtins.property
-    def text_read_all(self) -> _data_stream_pb2.TextStreamReaderReadAllResponse: ...
-    @_builtins.property
-    def send_file(self) -> _data_stream_pb2.StreamSendFileResponse: ...
-    @_builtins.property
-    def send_text(self) -> _data_stream_pb2.StreamSendTextResponse: ...
-    @_builtins.property
-    def byte_stream_open(self) -> _data_stream_pb2.ByteStreamOpenResponse: ...
-    @_builtins.property
-    def byte_stream_write(self) -> _data_stream_pb2.ByteStreamWriterWriteResponse: ...
-    @_builtins.property
-    def byte_stream_close(self) -> _data_stream_pb2.ByteStreamWriterCloseResponse: ...
-    @_builtins.property
-    def text_stream_open(self) -> _data_stream_pb2.TextStreamOpenResponse: ...
-    @_builtins.property
-    def text_stream_write(self) -> _data_stream_pb2.TextStreamWriterWriteResponse: ...
-    @_builtins.property
-    def text_stream_close(self) -> _data_stream_pb2.TextStreamWriterCloseResponse: ...
-    @_builtins.property
-    def send_bytes(self) -> _data_stream_pb2.StreamSendBytesResponse: ...
-    @_builtins.property
-    def set_remote_track_publication_quality(self) -> _track_publication_pb2.SetRemoteTrackPublicationQualityResponse: ...
+    @property
+    def byte_read_all(self) -> data_stream_pb2.ByteStreamReaderReadAllResponse: ...
+    @property
+    def byte_write_to_file(self) -> data_stream_pb2.ByteStreamReaderWriteToFileResponse: ...
+    @property
+    def text_read_incremental(self) -> data_stream_pb2.TextStreamReaderReadIncrementalResponse: ...
+    @property
+    def text_read_all(self) -> data_stream_pb2.TextStreamReaderReadAllResponse: ...
+    @property
+    def send_file(self) -> data_stream_pb2.StreamSendFileResponse: ...
+    @property
+    def send_text(self) -> data_stream_pb2.StreamSendTextResponse: ...
+    @property
+    def byte_stream_open(self) -> data_stream_pb2.ByteStreamOpenResponse: ...
+    @property
+    def byte_stream_write(self) -> data_stream_pb2.ByteStreamWriterWriteResponse: ...
+    @property
+    def byte_stream_close(self) -> data_stream_pb2.ByteStreamWriterCloseResponse: ...
+    @property
+    def text_stream_open(self) -> data_stream_pb2.TextStreamOpenResponse: ...
+    @property
+    def text_stream_write(self) -> data_stream_pb2.TextStreamWriterWriteResponse: ...
+    @property
+    def text_stream_close(self) -> data_stream_pb2.TextStreamWriterCloseResponse: ...
+    @property
+    def send_bytes(self) -> data_stream_pb2.StreamSendBytesResponse: ...
+    @property
+    def set_remote_track_publication_quality(self) -> track_publication_pb2.SetRemoteTrackPublicationQualityResponse: ...
     def __init__(
         self,
         *,
-        dispose: Global___DisposeResponse | None = ...,
-        connect: _room_pb2.ConnectResponse | None = ...,
-        disconnect: _room_pb2.DisconnectResponse | None = ...,
-        publish_track: _room_pb2.PublishTrackResponse | None = ...,
-        unpublish_track: _room_pb2.UnpublishTrackResponse | None = ...,
-        publish_data: _room_pb2.PublishDataResponse | None = ...,
-        set_subscribed: _room_pb2.SetSubscribedResponse | None = ...,
-        set_local_metadata: _room_pb2.SetLocalMetadataResponse | None = ...,
-        set_local_name: _room_pb2.SetLocalNameResponse | None = ...,
-        set_local_attributes: _room_pb2.SetLocalAttributesResponse | None = ...,
-        get_session_stats: _room_pb2.GetSessionStatsResponse | None = ...,
-        publish_transcription: _room_pb2.PublishTranscriptionResponse | None = ...,
-        publish_sip_dtmf: _room_pb2.PublishSipDtmfResponse | None = ...,
-        create_video_track: _track_pb2.CreateVideoTrackResponse | None = ...,
-        create_audio_track: _track_pb2.CreateAudioTrackResponse | None = ...,
-        local_track_mute: _track_pb2.LocalTrackMuteResponse | None = ...,
-        enable_remote_track: _track_pb2.EnableRemoteTrackResponse | None = ...,
-        get_stats: _track_pb2.GetStatsResponse | None = ...,
-        set_track_subscription_permissions: _track_pb2.SetTrackSubscriptionPermissionsResponse | None = ...,
-        new_video_stream: _video_frame_pb2.NewVideoStreamResponse | None = ...,
-        new_video_source: _video_frame_pb2.NewVideoSourceResponse | None = ...,
-        capture_video_frame: _video_frame_pb2.CaptureVideoFrameResponse | None = ...,
-        video_convert: _video_frame_pb2.VideoConvertResponse | None = ...,
-        video_stream_from_participant: _video_frame_pb2.VideoStreamFromParticipantResponse | None = ...,
-        new_audio_stream: _audio_frame_pb2.NewAudioStreamResponse | None = ...,
-        new_audio_source: _audio_frame_pb2.NewAudioSourceResponse | None = ...,
-        capture_audio_frame: _audio_frame_pb2.CaptureAudioFrameResponse | None = ...,
-        clear_audio_buffer: _audio_frame_pb2.ClearAudioBufferResponse | None = ...,
-        new_audio_resampler: _audio_frame_pb2.NewAudioResamplerResponse | None = ...,
-        remix_and_resample: _audio_frame_pb2.RemixAndResampleResponse | None = ...,
-        audio_stream_from_participant: _audio_frame_pb2.AudioStreamFromParticipantResponse | None = ...,
-        e2ee: _e2ee_pb2.E2eeResponse | None = ...,
-        new_sox_resampler: _audio_frame_pb2.NewSoxResamplerResponse | None = ...,
-        push_sox_resampler: _audio_frame_pb2.PushSoxResamplerResponse | None = ...,
-        flush_sox_resampler: _audio_frame_pb2.FlushSoxResamplerResponse | None = ...,
-        send_chat_message: _room_pb2.SendChatMessageResponse | None = ...,
-        perform_rpc: _rpc_pb2.PerformRpcResponse | None = ...,
-        register_rpc_method: _rpc_pb2.RegisterRpcMethodResponse | None = ...,
-        unregister_rpc_method: _rpc_pb2.UnregisterRpcMethodResponse | None = ...,
-        rpc_method_invocation_response: _rpc_pb2.RpcMethodInvocationResponseResponse | None = ...,
-        enable_remote_track_publication: _track_publication_pb2.EnableRemoteTrackPublicationResponse | None = ...,
-        update_remote_track_publication_dimension: _track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse | None = ...,
-        send_stream_header: _room_pb2.SendStreamHeaderResponse | None = ...,
-        send_stream_chunk: _room_pb2.SendStreamChunkResponse | None = ...,
-        send_stream_trailer: _room_pb2.SendStreamTrailerResponse | None = ...,
-        set_data_channel_buffered_amount_low_threshold: _room_pb2.SetDataChannelBufferedAmountLowThresholdResponse | None = ...,
-        load_audio_filter_plugin: _audio_frame_pb2.LoadAudioFilterPluginResponse | None = ...,
-        new_apm: _audio_frame_pb2.NewApmResponse | None = ...,
-        apm_process_stream: _audio_frame_pb2.ApmProcessStreamResponse | None = ...,
-        apm_process_reverse_stream: _audio_frame_pb2.ApmProcessReverseStreamResponse | None = ...,
-        apm_set_stream_delay: _audio_frame_pb2.ApmSetStreamDelayResponse | None = ...,
-        byte_read_incremental: _data_stream_pb2.ByteStreamReaderReadIncrementalResponse | None = ...,
-        byte_read_all: _data_stream_pb2.ByteStreamReaderReadAllResponse | None = ...,
-        byte_write_to_file: _data_stream_pb2.ByteStreamReaderWriteToFileResponse | None = ...,
-        text_read_incremental: _data_stream_pb2.TextStreamReaderReadIncrementalResponse | None = ...,
-        text_read_all: _data_stream_pb2.TextStreamReaderReadAllResponse | None = ...,
-        send_file: _data_stream_pb2.StreamSendFileResponse | None = ...,
-        send_text: _data_stream_pb2.StreamSendTextResponse | None = ...,
-        byte_stream_open: _data_stream_pb2.ByteStreamOpenResponse | None = ...,
-        byte_stream_write: _data_stream_pb2.ByteStreamWriterWriteResponse | None = ...,
-        byte_stream_close: _data_stream_pb2.ByteStreamWriterCloseResponse | None = ...,
-        text_stream_open: _data_stream_pb2.TextStreamOpenResponse | None = ...,
-        text_stream_write: _data_stream_pb2.TextStreamWriterWriteResponse | None = ...,
-        text_stream_close: _data_stream_pb2.TextStreamWriterCloseResponse | None = ...,
-        send_bytes: _data_stream_pb2.StreamSendBytesResponse | None = ...,
-        set_remote_track_publication_quality: _track_publication_pb2.SetRemoteTrackPublicationQualityResponse | None = ...,
+        dispose: global___DisposeResponse | None = ...,
+        connect: room_pb2.ConnectResponse | None = ...,
+        disconnect: room_pb2.DisconnectResponse | None = ...,
+        publish_track: room_pb2.PublishTrackResponse | None = ...,
+        unpublish_track: room_pb2.UnpublishTrackResponse | None = ...,
+        publish_data: room_pb2.PublishDataResponse | None = ...,
+        set_subscribed: room_pb2.SetSubscribedResponse | None = ...,
+        set_local_metadata: room_pb2.SetLocalMetadataResponse | None = ...,
+        set_local_name: room_pb2.SetLocalNameResponse | None = ...,
+        set_local_attributes: room_pb2.SetLocalAttributesResponse | None = ...,
+        get_session_stats: room_pb2.GetSessionStatsResponse | None = ...,
+        publish_transcription: room_pb2.PublishTranscriptionResponse | None = ...,
+        publish_sip_dtmf: room_pb2.PublishSipDtmfResponse | None = ...,
+        create_video_track: track_pb2.CreateVideoTrackResponse | None = ...,
+        create_audio_track: track_pb2.CreateAudioTrackResponse | None = ...,
+        local_track_mute: track_pb2.LocalTrackMuteResponse | None = ...,
+        enable_remote_track: track_pb2.EnableRemoteTrackResponse | None = ...,
+        get_stats: track_pb2.GetStatsResponse | None = ...,
+        set_track_subscription_permissions: track_pb2.SetTrackSubscriptionPermissionsResponse | None = ...,
+        new_video_stream: video_frame_pb2.NewVideoStreamResponse | None = ...,
+        new_video_source: video_frame_pb2.NewVideoSourceResponse | None = ...,
+        capture_video_frame: video_frame_pb2.CaptureVideoFrameResponse | None = ...,
+        video_convert: video_frame_pb2.VideoConvertResponse | None = ...,
+        video_stream_from_participant: video_frame_pb2.VideoStreamFromParticipantResponse | None = ...,
+        new_audio_stream: audio_frame_pb2.NewAudioStreamResponse | None = ...,
+        new_audio_source: audio_frame_pb2.NewAudioSourceResponse | None = ...,
+        capture_audio_frame: audio_frame_pb2.CaptureAudioFrameResponse | None = ...,
+        clear_audio_buffer: audio_frame_pb2.ClearAudioBufferResponse | None = ...,
+        new_audio_resampler: audio_frame_pb2.NewAudioResamplerResponse | None = ...,
+        remix_and_resample: audio_frame_pb2.RemixAndResampleResponse | None = ...,
+        audio_stream_from_participant: audio_frame_pb2.AudioStreamFromParticipantResponse | None = ...,
+        e2ee: e2ee_pb2.E2eeResponse | None = ...,
+        new_sox_resampler: audio_frame_pb2.NewSoxResamplerResponse | None = ...,
+        push_sox_resampler: audio_frame_pb2.PushSoxResamplerResponse | None = ...,
+        flush_sox_resampler: audio_frame_pb2.FlushSoxResamplerResponse | None = ...,
+        send_chat_message: room_pb2.SendChatMessageResponse | None = ...,
+        perform_rpc: rpc_pb2.PerformRpcResponse | None = ...,
+        register_rpc_method: rpc_pb2.RegisterRpcMethodResponse | None = ...,
+        unregister_rpc_method: rpc_pb2.UnregisterRpcMethodResponse | None = ...,
+        rpc_method_invocation_response: rpc_pb2.RpcMethodInvocationResponseResponse | None = ...,
+        enable_remote_track_publication: track_publication_pb2.EnableRemoteTrackPublicationResponse | None = ...,
+        update_remote_track_publication_dimension: track_publication_pb2.UpdateRemoteTrackPublicationDimensionResponse | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderResponse | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkResponse | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerResponse | None = ...,
+        set_data_channel_buffered_amount_low_threshold: room_pb2.SetDataChannelBufferedAmountLowThresholdResponse | None = ...,
+        load_audio_filter_plugin: audio_frame_pb2.LoadAudioFilterPluginResponse | None = ...,
+        new_apm: audio_frame_pb2.NewApmResponse | None = ...,
+        apm_process_stream: audio_frame_pb2.ApmProcessStreamResponse | None = ...,
+        apm_process_reverse_stream: audio_frame_pb2.ApmProcessReverseStreamResponse | None = ...,
+        apm_set_stream_delay: audio_frame_pb2.ApmSetStreamDelayResponse | None = ...,
+        byte_read_incremental: data_stream_pb2.ByteStreamReaderReadIncrementalResponse | None = ...,
+        byte_read_all: data_stream_pb2.ByteStreamReaderReadAllResponse | None = ...,
+        byte_write_to_file: data_stream_pb2.ByteStreamReaderWriteToFileResponse | None = ...,
+        text_read_incremental: data_stream_pb2.TextStreamReaderReadIncrementalResponse | None = ...,
+        text_read_all: data_stream_pb2.TextStreamReaderReadAllResponse | None = ...,
+        send_file: data_stream_pb2.StreamSendFileResponse | None = ...,
+        send_text: data_stream_pb2.StreamSendTextResponse | None = ...,
+        byte_stream_open: data_stream_pb2.ByteStreamOpenResponse | None = ...,
+        byte_stream_write: data_stream_pb2.ByteStreamWriterWriteResponse | None = ...,
+        byte_stream_close: data_stream_pb2.ByteStreamWriterCloseResponse | None = ...,
+        text_stream_open: data_stream_pb2.TextStreamOpenResponse | None = ...,
+        text_stream_write: data_stream_pb2.TextStreamWriterWriteResponse | None = ...,
+        text_stream_close: data_stream_pb2.TextStreamWriterCloseResponse | None = ...,
+        send_bytes: data_stream_pb2.StreamSendBytesResponse | None = ...,
+        set_remote_track_publication_quality: track_publication_pb2.SetRemoteTrackPublicationQualityResponse | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "audio_stream_from_participant", "e2ee", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_process_reverse_stream", b"apm_process_reverse_stream", "apm_process_stream", b"apm_process_stream", "apm_set_stream_delay", b"apm_set_stream_delay", "audio_stream_from_participant", b"audio_stream_from_participant", "byte_read_all", b"byte_read_all", "byte_read_incremental", b"byte_read_incremental", "byte_stream_close", b"byte_stream_close", "byte_stream_open", b"byte_stream_open", "byte_stream_write", b"byte_stream_write", "byte_write_to_file", b"byte_write_to_file", "capture_audio_frame", b"capture_audio_frame", "capture_video_frame", b"capture_video_frame", "clear_audio_buffer", b"clear_audio_buffer", "connect", b"connect", "create_audio_track", b"create_audio_track", "create_video_track", b"create_video_track", "disconnect", b"disconnect", "dispose", b"dispose", "e2ee", b"e2ee", "enable_remote_track", b"enable_remote_track", "enable_remote_track_publication", b"enable_remote_track_publication", "flush_sox_resampler", b"flush_sox_resampler", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "load_audio_filter_plugin", b"load_audio_filter_plugin", "local_track_mute", b"local_track_mute", "message", b"message", "new_apm", b"new_apm", "new_audio_resampler", b"new_audio_resampler", "new_audio_source", b"new_audio_source", "new_audio_stream", b"new_audio_stream", "new_sox_resampler", b"new_sox_resampler", "new_video_source", b"new_video_source", "new_video_stream", b"new_video_stream", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "push_sox_resampler", b"push_sox_resampler", "register_rpc_method", b"register_rpc_method", "remix_and_resample", b"remix_and_resample", "rpc_method_invocation_response", b"rpc_method_invocation_response", "send_bytes", b"send_bytes", "send_chat_message", b"send_chat_message", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_data_channel_buffered_amount_low_threshold", b"set_data_channel_buffered_amount_low_threshold", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "set_remote_track_publication_quality", b"set_remote_track_publication_quality", "set_subscribed", b"set_subscribed", "set_track_subscription_permissions", b"set_track_subscription_permissions", "text_read_all", b"text_read_all", "text_read_incremental", b"text_read_incremental", "text_stream_close", b"text_stream_close", "text_stream_open", b"text_stream_open", "text_stream_write", b"text_stream_write", "unpublish_track", b"unpublish_track", "unregister_rpc_method", b"unregister_rpc_method", "update_remote_track_publication_dimension", b"update_remote_track_publication_dimension", "video_convert", b"video_convert", "video_stream_from_participant", b"video_stream_from_participant"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["dispose", "connect", "disconnect", "publish_track", "unpublish_track", "publish_data", "set_subscribed", "set_local_metadata", "set_local_name", "set_local_attributes", "get_session_stats", "publish_transcription", "publish_sip_dtmf", "create_video_track", "create_audio_track", "local_track_mute", "enable_remote_track", "get_stats", "set_track_subscription_permissions", "new_video_stream", "new_video_source", "capture_video_frame", "video_convert", "video_stream_from_participant", "new_audio_stream", "new_audio_source", "capture_audio_frame", "clear_audio_buffer", "new_audio_resampler", "remix_and_resample", "audio_stream_from_participant", "e2ee", "new_sox_resampler", "push_sox_resampler", "flush_sox_resampler", "send_chat_message", "perform_rpc", "register_rpc_method", "unregister_rpc_method", "rpc_method_invocation_response", "enable_remote_track_publication", "update_remote_track_publication_dimension", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "set_data_channel_buffered_amount_low_threshold", "load_audio_filter_plugin", "new_apm", "apm_process_stream", "apm_process_reverse_stream", "apm_set_stream_delay", "byte_read_incremental", "byte_read_all", "byte_write_to_file", "text_read_incremental", "text_read_all", "send_file", "send_text", "byte_stream_open", "byte_stream_write", "byte_stream_close", "text_stream_open", "text_stream_write", "text_stream_close", "send_bytes", "set_remote_track_publication_quality"] | None: ...
 
-Global___FfiResponse: _TypeAlias = FfiResponse  # noqa: Y015
+global___FfiResponse = FfiResponse
 
-@_typing.final
-class FfiEvent(_message.Message):
+@typing.final
+class FfiEvent(google.protobuf.message.Message):
     """To minimize complexity, participant events are not included in the protocol.
     It is easily deducible from the room events and it turned out that is is easier to implement
     on the ffi client side.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_EVENT_FIELD_NUMBER: _builtins.int
-    TRACK_EVENT_FIELD_NUMBER: _builtins.int
-    VIDEO_STREAM_EVENT_FIELD_NUMBER: _builtins.int
-    AUDIO_STREAM_EVENT_FIELD_NUMBER: _builtins.int
-    CONNECT_FIELD_NUMBER: _builtins.int
-    DISCONNECT_FIELD_NUMBER: _builtins.int
-    DISPOSE_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    UNPUBLISH_TRACK_FIELD_NUMBER: _builtins.int
-    PUBLISH_DATA_FIELD_NUMBER: _builtins.int
-    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: _builtins.int
-    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_METADATA_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_NAME_FIELD_NUMBER: _builtins.int
-    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    GET_STATS_FIELD_NUMBER: _builtins.int
-    LOGS_FIELD_NUMBER: _builtins.int
-    GET_SESSION_STATS_FIELD_NUMBER: _builtins.int
-    PANIC_FIELD_NUMBER: _builtins.int
-    PUBLISH_SIP_DTMF_FIELD_NUMBER: _builtins.int
-    CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    PERFORM_RPC_FIELD_NUMBER: _builtins.int
-    RPC_METHOD_INVOCATION_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_HEADER_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_CHUNK_FIELD_NUMBER: _builtins.int
-    SEND_STREAM_TRAILER_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_READER_EVENT_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_READER_READ_ALL_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_READER_WRITE_TO_FILE_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_WRITER_WRITE_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_WRITER_CLOSE_FIELD_NUMBER: _builtins.int
-    SEND_FILE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_READER_EVENT_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_READER_READ_ALL_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_OPEN_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_WRITER_WRITE_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_WRITER_CLOSE_FIELD_NUMBER: _builtins.int
-    SEND_TEXT_FIELD_NUMBER: _builtins.int
-    SEND_BYTES_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def room_event(self) -> _room_pb2.RoomEvent: ...
-    @_builtins.property
-    def track_event(self) -> _track_pb2.TrackEvent: ...
-    @_builtins.property
-    def video_stream_event(self) -> _video_frame_pb2.VideoStreamEvent: ...
-    @_builtins.property
-    def audio_stream_event(self) -> _audio_frame_pb2.AudioStreamEvent: ...
-    @_builtins.property
-    def connect(self) -> _room_pb2.ConnectCallback: ...
-    @_builtins.property
-    def disconnect(self) -> _room_pb2.DisconnectCallback: ...
-    @_builtins.property
-    def dispose(self) -> Global___DisposeCallback: ...
-    @_builtins.property
-    def publish_track(self) -> _room_pb2.PublishTrackCallback: ...
-    @_builtins.property
-    def unpublish_track(self) -> _room_pb2.UnpublishTrackCallback: ...
-    @_builtins.property
-    def publish_data(self) -> _room_pb2.PublishDataCallback: ...
-    @_builtins.property
-    def publish_transcription(self) -> _room_pb2.PublishTranscriptionCallback: ...
-    @_builtins.property
-    def capture_audio_frame(self) -> _audio_frame_pb2.CaptureAudioFrameCallback: ...
-    @_builtins.property
-    def set_local_metadata(self) -> _room_pb2.SetLocalMetadataCallback: ...
-    @_builtins.property
-    def set_local_name(self) -> _room_pb2.SetLocalNameCallback: ...
-    @_builtins.property
-    def set_local_attributes(self) -> _room_pb2.SetLocalAttributesCallback: ...
-    @_builtins.property
-    def get_stats(self) -> _track_pb2.GetStatsCallback: ...
-    @_builtins.property
-    def logs(self) -> Global___LogBatch: ...
-    @_builtins.property
-    def get_session_stats(self) -> _room_pb2.GetSessionStatsCallback: ...
-    @_builtins.property
-    def panic(self) -> Global___Panic: ...
-    @_builtins.property
-    def publish_sip_dtmf(self) -> _room_pb2.PublishSipDtmfCallback: ...
-    @_builtins.property
-    def chat_message(self) -> _room_pb2.SendChatMessageCallback: ...
-    @_builtins.property
-    def perform_rpc(self) -> _rpc_pb2.PerformRpcCallback: ...
-    @_builtins.property
-    def rpc_method_invocation(self) -> _rpc_pb2.RpcMethodInvocationEvent: ...
-    @_builtins.property
-    def send_stream_header(self) -> _room_pb2.SendStreamHeaderCallback:
+    ROOM_EVENT_FIELD_NUMBER: builtins.int
+    TRACK_EVENT_FIELD_NUMBER: builtins.int
+    VIDEO_STREAM_EVENT_FIELD_NUMBER: builtins.int
+    AUDIO_STREAM_EVENT_FIELD_NUMBER: builtins.int
+    CONNECT_FIELD_NUMBER: builtins.int
+    DISCONNECT_FIELD_NUMBER: builtins.int
+    DISPOSE_FIELD_NUMBER: builtins.int
+    PUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    UNPUBLISH_TRACK_FIELD_NUMBER: builtins.int
+    PUBLISH_DATA_FIELD_NUMBER: builtins.int
+    PUBLISH_TRANSCRIPTION_FIELD_NUMBER: builtins.int
+    CAPTURE_AUDIO_FRAME_FIELD_NUMBER: builtins.int
+    SET_LOCAL_METADATA_FIELD_NUMBER: builtins.int
+    SET_LOCAL_NAME_FIELD_NUMBER: builtins.int
+    SET_LOCAL_ATTRIBUTES_FIELD_NUMBER: builtins.int
+    GET_STATS_FIELD_NUMBER: builtins.int
+    LOGS_FIELD_NUMBER: builtins.int
+    GET_SESSION_STATS_FIELD_NUMBER: builtins.int
+    PANIC_FIELD_NUMBER: builtins.int
+    PUBLISH_SIP_DTMF_FIELD_NUMBER: builtins.int
+    CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    PERFORM_RPC_FIELD_NUMBER: builtins.int
+    RPC_METHOD_INVOCATION_FIELD_NUMBER: builtins.int
+    SEND_STREAM_HEADER_FIELD_NUMBER: builtins.int
+    SEND_STREAM_CHUNK_FIELD_NUMBER: builtins.int
+    SEND_STREAM_TRAILER_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_READER_EVENT_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_READER_READ_ALL_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_READER_WRITE_TO_FILE_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_WRITER_WRITE_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_WRITER_CLOSE_FIELD_NUMBER: builtins.int
+    SEND_FILE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_READER_EVENT_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_READER_READ_ALL_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_OPEN_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_WRITER_WRITE_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_WRITER_CLOSE_FIELD_NUMBER: builtins.int
+    SEND_TEXT_FIELD_NUMBER: builtins.int
+    SEND_BYTES_FIELD_NUMBER: builtins.int
+    @property
+    def room_event(self) -> room_pb2.RoomEvent: ...
+    @property
+    def track_event(self) -> track_pb2.TrackEvent: ...
+    @property
+    def video_stream_event(self) -> video_frame_pb2.VideoStreamEvent: ...
+    @property
+    def audio_stream_event(self) -> audio_frame_pb2.AudioStreamEvent: ...
+    @property
+    def connect(self) -> room_pb2.ConnectCallback: ...
+    @property
+    def disconnect(self) -> room_pb2.DisconnectCallback: ...
+    @property
+    def dispose(self) -> global___DisposeCallback: ...
+    @property
+    def publish_track(self) -> room_pb2.PublishTrackCallback: ...
+    @property
+    def unpublish_track(self) -> room_pb2.UnpublishTrackCallback: ...
+    @property
+    def publish_data(self) -> room_pb2.PublishDataCallback: ...
+    @property
+    def publish_transcription(self) -> room_pb2.PublishTranscriptionCallback: ...
+    @property
+    def capture_audio_frame(self) -> audio_frame_pb2.CaptureAudioFrameCallback: ...
+    @property
+    def set_local_metadata(self) -> room_pb2.SetLocalMetadataCallback: ...
+    @property
+    def set_local_name(self) -> room_pb2.SetLocalNameCallback: ...
+    @property
+    def set_local_attributes(self) -> room_pb2.SetLocalAttributesCallback: ...
+    @property
+    def get_stats(self) -> track_pb2.GetStatsCallback: ...
+    @property
+    def logs(self) -> global___LogBatch: ...
+    @property
+    def get_session_stats(self) -> room_pb2.GetSessionStatsCallback: ...
+    @property
+    def panic(self) -> global___Panic: ...
+    @property
+    def publish_sip_dtmf(self) -> room_pb2.PublishSipDtmfCallback: ...
+    @property
+    def chat_message(self) -> room_pb2.SendChatMessageCallback: ...
+    @property
+    def perform_rpc(self) -> rpc_pb2.PerformRpcCallback: ...
+    @property
+    def rpc_method_invocation(self) -> rpc_pb2.RpcMethodInvocationEvent: ...
+    @property
+    def send_stream_header(self) -> room_pb2.SendStreamHeaderCallback:
         """Data Streams (low level)"""
 
-    @_builtins.property
-    def send_stream_chunk(self) -> _room_pb2.SendStreamChunkCallback: ...
-    @_builtins.property
-    def send_stream_trailer(self) -> _room_pb2.SendStreamTrailerCallback: ...
-    @_builtins.property
-    def byte_stream_reader_event(self) -> _data_stream_pb2.ByteStreamReaderEvent:
+    @property
+    def send_stream_chunk(self) -> room_pb2.SendStreamChunkCallback: ...
+    @property
+    def send_stream_trailer(self) -> room_pb2.SendStreamTrailerCallback: ...
+    @property
+    def byte_stream_reader_event(self) -> data_stream_pb2.ByteStreamReaderEvent:
         """Data Streams (high level)"""
 
-    @_builtins.property
-    def byte_stream_reader_read_all(self) -> _data_stream_pb2.ByteStreamReaderReadAllCallback: ...
-    @_builtins.property
-    def byte_stream_reader_write_to_file(self) -> _data_stream_pb2.ByteStreamReaderWriteToFileCallback: ...
-    @_builtins.property
-    def byte_stream_open(self) -> _data_stream_pb2.ByteStreamOpenCallback: ...
-    @_builtins.property
-    def byte_stream_writer_write(self) -> _data_stream_pb2.ByteStreamWriterWriteCallback: ...
-    @_builtins.property
-    def byte_stream_writer_close(self) -> _data_stream_pb2.ByteStreamWriterCloseCallback: ...
-    @_builtins.property
-    def send_file(self) -> _data_stream_pb2.StreamSendFileCallback: ...
-    @_builtins.property
-    def text_stream_reader_event(self) -> _data_stream_pb2.TextStreamReaderEvent: ...
-    @_builtins.property
-    def text_stream_reader_read_all(self) -> _data_stream_pb2.TextStreamReaderReadAllCallback: ...
-    @_builtins.property
-    def text_stream_open(self) -> _data_stream_pb2.TextStreamOpenCallback: ...
-    @_builtins.property
-    def text_stream_writer_write(self) -> _data_stream_pb2.TextStreamWriterWriteCallback: ...
-    @_builtins.property
-    def text_stream_writer_close(self) -> _data_stream_pb2.TextStreamWriterCloseCallback: ...
-    @_builtins.property
-    def send_text(self) -> _data_stream_pb2.StreamSendTextCallback: ...
-    @_builtins.property
-    def send_bytes(self) -> _data_stream_pb2.StreamSendBytesCallback: ...
+    @property
+    def byte_stream_reader_read_all(self) -> data_stream_pb2.ByteStreamReaderReadAllCallback: ...
+    @property
+    def byte_stream_reader_write_to_file(self) -> data_stream_pb2.ByteStreamReaderWriteToFileCallback: ...
+    @property
+    def byte_stream_open(self) -> data_stream_pb2.ByteStreamOpenCallback: ...
+    @property
+    def byte_stream_writer_write(self) -> data_stream_pb2.ByteStreamWriterWriteCallback: ...
+    @property
+    def byte_stream_writer_close(self) -> data_stream_pb2.ByteStreamWriterCloseCallback: ...
+    @property
+    def send_file(self) -> data_stream_pb2.StreamSendFileCallback: ...
+    @property
+    def text_stream_reader_event(self) -> data_stream_pb2.TextStreamReaderEvent: ...
+    @property
+    def text_stream_reader_read_all(self) -> data_stream_pb2.TextStreamReaderReadAllCallback: ...
+    @property
+    def text_stream_open(self) -> data_stream_pb2.TextStreamOpenCallback: ...
+    @property
+    def text_stream_writer_write(self) -> data_stream_pb2.TextStreamWriterWriteCallback: ...
+    @property
+    def text_stream_writer_close(self) -> data_stream_pb2.TextStreamWriterCloseCallback: ...
+    @property
+    def send_text(self) -> data_stream_pb2.StreamSendTextCallback: ...
+    @property
+    def send_bytes(self) -> data_stream_pb2.StreamSendBytesCallback: ...
     def __init__(
         self,
         *,
-        room_event: _room_pb2.RoomEvent | None = ...,
-        track_event: _track_pb2.TrackEvent | None = ...,
-        video_stream_event: _video_frame_pb2.VideoStreamEvent | None = ...,
-        audio_stream_event: _audio_frame_pb2.AudioStreamEvent | None = ...,
-        connect: _room_pb2.ConnectCallback | None = ...,
-        disconnect: _room_pb2.DisconnectCallback | None = ...,
-        dispose: Global___DisposeCallback | None = ...,
-        publish_track: _room_pb2.PublishTrackCallback | None = ...,
-        unpublish_track: _room_pb2.UnpublishTrackCallback | None = ...,
-        publish_data: _room_pb2.PublishDataCallback | None = ...,
-        publish_transcription: _room_pb2.PublishTranscriptionCallback | None = ...,
-        capture_audio_frame: _audio_frame_pb2.CaptureAudioFrameCallback | None = ...,
-        set_local_metadata: _room_pb2.SetLocalMetadataCallback | None = ...,
-        set_local_name: _room_pb2.SetLocalNameCallback | None = ...,
-        set_local_attributes: _room_pb2.SetLocalAttributesCallback | None = ...,
-        get_stats: _track_pb2.GetStatsCallback | None = ...,
-        logs: Global___LogBatch | None = ...,
-        get_session_stats: _room_pb2.GetSessionStatsCallback | None = ...,
-        panic: Global___Panic | None = ...,
-        publish_sip_dtmf: _room_pb2.PublishSipDtmfCallback | None = ...,
-        chat_message: _room_pb2.SendChatMessageCallback | None = ...,
-        perform_rpc: _rpc_pb2.PerformRpcCallback | None = ...,
-        rpc_method_invocation: _rpc_pb2.RpcMethodInvocationEvent | None = ...,
-        send_stream_header: _room_pb2.SendStreamHeaderCallback | None = ...,
-        send_stream_chunk: _room_pb2.SendStreamChunkCallback | None = ...,
-        send_stream_trailer: _room_pb2.SendStreamTrailerCallback | None = ...,
-        byte_stream_reader_event: _data_stream_pb2.ByteStreamReaderEvent | None = ...,
-        byte_stream_reader_read_all: _data_stream_pb2.ByteStreamReaderReadAllCallback | None = ...,
-        byte_stream_reader_write_to_file: _data_stream_pb2.ByteStreamReaderWriteToFileCallback | None = ...,
-        byte_stream_open: _data_stream_pb2.ByteStreamOpenCallback | None = ...,
-        byte_stream_writer_write: _data_stream_pb2.ByteStreamWriterWriteCallback | None = ...,
-        byte_stream_writer_close: _data_stream_pb2.ByteStreamWriterCloseCallback | None = ...,
-        send_file: _data_stream_pb2.StreamSendFileCallback | None = ...,
-        text_stream_reader_event: _data_stream_pb2.TextStreamReaderEvent | None = ...,
-        text_stream_reader_read_all: _data_stream_pb2.TextStreamReaderReadAllCallback | None = ...,
-        text_stream_open: _data_stream_pb2.TextStreamOpenCallback | None = ...,
-        text_stream_writer_write: _data_stream_pb2.TextStreamWriterWriteCallback | None = ...,
-        text_stream_writer_close: _data_stream_pb2.TextStreamWriterCloseCallback | None = ...,
-        send_text: _data_stream_pb2.StreamSendTextCallback | None = ...,
-        send_bytes: _data_stream_pb2.StreamSendBytesCallback | None = ...,
+        room_event: room_pb2.RoomEvent | None = ...,
+        track_event: track_pb2.TrackEvent | None = ...,
+        video_stream_event: video_frame_pb2.VideoStreamEvent | None = ...,
+        audio_stream_event: audio_frame_pb2.AudioStreamEvent | None = ...,
+        connect: room_pb2.ConnectCallback | None = ...,
+        disconnect: room_pb2.DisconnectCallback | None = ...,
+        dispose: global___DisposeCallback | None = ...,
+        publish_track: room_pb2.PublishTrackCallback | None = ...,
+        unpublish_track: room_pb2.UnpublishTrackCallback | None = ...,
+        publish_data: room_pb2.PublishDataCallback | None = ...,
+        publish_transcription: room_pb2.PublishTranscriptionCallback | None = ...,
+        capture_audio_frame: audio_frame_pb2.CaptureAudioFrameCallback | None = ...,
+        set_local_metadata: room_pb2.SetLocalMetadataCallback | None = ...,
+        set_local_name: room_pb2.SetLocalNameCallback | None = ...,
+        set_local_attributes: room_pb2.SetLocalAttributesCallback | None = ...,
+        get_stats: track_pb2.GetStatsCallback | None = ...,
+        logs: global___LogBatch | None = ...,
+        get_session_stats: room_pb2.GetSessionStatsCallback | None = ...,
+        panic: global___Panic | None = ...,
+        publish_sip_dtmf: room_pb2.PublishSipDtmfCallback | None = ...,
+        chat_message: room_pb2.SendChatMessageCallback | None = ...,
+        perform_rpc: rpc_pb2.PerformRpcCallback | None = ...,
+        rpc_method_invocation: rpc_pb2.RpcMethodInvocationEvent | None = ...,
+        send_stream_header: room_pb2.SendStreamHeaderCallback | None = ...,
+        send_stream_chunk: room_pb2.SendStreamChunkCallback | None = ...,
+        send_stream_trailer: room_pb2.SendStreamTrailerCallback | None = ...,
+        byte_stream_reader_event: data_stream_pb2.ByteStreamReaderEvent | None = ...,
+        byte_stream_reader_read_all: data_stream_pb2.ByteStreamReaderReadAllCallback | None = ...,
+        byte_stream_reader_write_to_file: data_stream_pb2.ByteStreamReaderWriteToFileCallback | None = ...,
+        byte_stream_open: data_stream_pb2.ByteStreamOpenCallback | None = ...,
+        byte_stream_writer_write: data_stream_pb2.ByteStreamWriterWriteCallback | None = ...,
+        byte_stream_writer_close: data_stream_pb2.ByteStreamWriterCloseCallback | None = ...,
+        send_file: data_stream_pb2.StreamSendFileCallback | None = ...,
+        text_stream_reader_event: data_stream_pb2.TextStreamReaderEvent | None = ...,
+        text_stream_reader_read_all: data_stream_pb2.TextStreamReaderReadAllCallback | None = ...,
+        text_stream_open: data_stream_pb2.TextStreamOpenCallback | None = ...,
+        text_stream_writer_write: data_stream_pb2.TextStreamWriterWriteCallback | None = ...,
+        text_stream_writer_close: data_stream_pb2.TextStreamWriterCloseCallback | None = ...,
+        send_text: data_stream_pb2.StreamSendTextCallback | None = ...,
+        send_bytes: data_stream_pb2.StreamSendBytesCallback | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_stream_event", b"audio_stream_event", "byte_stream_open", b"byte_stream_open", "byte_stream_reader_event", b"byte_stream_reader_event", "byte_stream_reader_read_all", b"byte_stream_reader_read_all", "byte_stream_reader_write_to_file", b"byte_stream_reader_write_to_file", "byte_stream_writer_close", b"byte_stream_writer_close", "byte_stream_writer_write", b"byte_stream_writer_write", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_bytes", b"send_bytes", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "text_stream_open", b"text_stream_open", "text_stream_reader_event", b"text_stream_reader_event", "text_stream_reader_read_all", b"text_stream_reader_read_all", "text_stream_writer_close", b"text_stream_writer_close", "text_stream_writer_write", b"text_stream_writer_write", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_stream_event", b"audio_stream_event", "byte_stream_open", b"byte_stream_open", "byte_stream_reader_event", b"byte_stream_reader_event", "byte_stream_reader_read_all", b"byte_stream_reader_read_all", "byte_stream_reader_write_to_file", b"byte_stream_reader_write_to_file", "byte_stream_writer_close", b"byte_stream_writer_close", "byte_stream_writer_write", b"byte_stream_writer_write", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_bytes", b"send_bytes", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "text_stream_open", b"text_stream_open", "text_stream_reader_event", b"text_stream_reader_event", "text_stream_reader_read_all", b"text_stream_reader_read_all", "text_stream_writer_close", b"text_stream_writer_close", "text_stream_writer_write", b"text_stream_writer_write", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf", "chat_message", "perform_rpc", "rpc_method_invocation", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "byte_stream_reader_event", "byte_stream_reader_read_all", "byte_stream_reader_write_to_file", "byte_stream_open", "byte_stream_writer_write", "byte_stream_writer_close", "send_file", "text_stream_reader_event", "text_stream_reader_read_all", "text_stream_open", "text_stream_writer_write", "text_stream_writer_close", "send_text", "send_bytes"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "byte_stream_open", b"byte_stream_open", "byte_stream_reader_event", b"byte_stream_reader_event", "byte_stream_reader_read_all", b"byte_stream_reader_read_all", "byte_stream_reader_write_to_file", b"byte_stream_reader_write_to_file", "byte_stream_writer_close", b"byte_stream_writer_close", "byte_stream_writer_write", b"byte_stream_writer_write", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_bytes", b"send_bytes", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "text_stream_open", b"text_stream_open", "text_stream_reader_event", b"text_stream_reader_event", "text_stream_reader_read_all", b"text_stream_reader_read_all", "text_stream_writer_close", b"text_stream_writer_close", "text_stream_writer_write", b"text_stream_writer_write", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_stream_event", b"audio_stream_event", "byte_stream_open", b"byte_stream_open", "byte_stream_reader_event", b"byte_stream_reader_event", "byte_stream_reader_read_all", b"byte_stream_reader_read_all", "byte_stream_reader_write_to_file", b"byte_stream_reader_write_to_file", "byte_stream_writer_close", b"byte_stream_writer_close", "byte_stream_writer_write", b"byte_stream_writer_write", "capture_audio_frame", b"capture_audio_frame", "chat_message", b"chat_message", "connect", b"connect", "disconnect", b"disconnect", "dispose", b"dispose", "get_session_stats", b"get_session_stats", "get_stats", b"get_stats", "logs", b"logs", "message", b"message", "panic", b"panic", "perform_rpc", b"perform_rpc", "publish_data", b"publish_data", "publish_sip_dtmf", b"publish_sip_dtmf", "publish_track", b"publish_track", "publish_transcription", b"publish_transcription", "room_event", b"room_event", "rpc_method_invocation", b"rpc_method_invocation", "send_bytes", b"send_bytes", "send_file", b"send_file", "send_stream_chunk", b"send_stream_chunk", "send_stream_header", b"send_stream_header", "send_stream_trailer", b"send_stream_trailer", "send_text", b"send_text", "set_local_attributes", b"set_local_attributes", "set_local_metadata", b"set_local_metadata", "set_local_name", b"set_local_name", "text_stream_open", b"text_stream_open", "text_stream_reader_event", b"text_stream_reader_event", "text_stream_reader_read_all", b"text_stream_reader_read_all", "text_stream_writer_close", b"text_stream_writer_close", "text_stream_writer_write", b"text_stream_writer_write", "track_event", b"track_event", "unpublish_track", b"unpublish_track", "video_stream_event", b"video_stream_event"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["room_event", "track_event", "video_stream_event", "audio_stream_event", "connect", "disconnect", "dispose", "publish_track", "unpublish_track", "publish_data", "publish_transcription", "capture_audio_frame", "set_local_metadata", "set_local_name", "set_local_attributes", "get_stats", "logs", "get_session_stats", "panic", "publish_sip_dtmf", "chat_message", "perform_rpc", "rpc_method_invocation", "send_stream_header", "send_stream_chunk", "send_stream_trailer", "byte_stream_reader_event", "byte_stream_reader_read_all", "byte_stream_reader_write_to_file", "byte_stream_open", "byte_stream_writer_write", "byte_stream_writer_close", "send_file", "text_stream_reader_event", "text_stream_reader_read_all", "text_stream_open", "text_stream_writer_write", "text_stream_writer_close", "send_text", "send_bytes"] | None: ...
 
-Global___FfiEvent: _TypeAlias = FfiEvent  # noqa: Y015
+global___FfiEvent = FfiEvent
 
-@_typing.final
-class DisposeRequest(_message.Message):
+@typing.final
+class DisposeRequest(google.protobuf.message.Message):
     """Stop all rooms synchronously (Do we need async here?).
     e.g: This is used for the Unity Editor after each assemblies reload.
     TODO(theomonnom): Implement a debug mode where we can find all leaked handles?
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_FIELD_NUMBER: _builtins.int
+    ASYNC_FIELD_NUMBER: builtins.int
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async", b"async"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async", b"async"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async", b"async"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async", b"async"]) -> None: ...
 
-Global___DisposeRequest: _TypeAlias = DisposeRequest  # noqa: Y015
+global___DisposeRequest = DisposeRequest
 
-@_typing.final
-class DisposeResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DisposeResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     """None if sync"""
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___DisposeResponse: _TypeAlias = DisposeResponse  # noqa: Y015
+global___DisposeResponse = DisposeResponse
 
-@_typing.final
-class DisposeCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DisposeCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___DisposeCallback: _TypeAlias = DisposeCallback  # noqa: Y015
+global___DisposeCallback = DisposeCallback
 
-@_typing.final
-class LogRecord(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LogRecord(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LEVEL_FIELD_NUMBER: _builtins.int
-    TARGET_FIELD_NUMBER: _builtins.int
-    MODULE_PATH_FIELD_NUMBER: _builtins.int
-    FILE_FIELD_NUMBER: _builtins.int
-    LINE_FIELD_NUMBER: _builtins.int
-    MESSAGE_FIELD_NUMBER: _builtins.int
-    level: Global___LogLevel.ValueType
-    target: _builtins.str
+    LEVEL_FIELD_NUMBER: builtins.int
+    TARGET_FIELD_NUMBER: builtins.int
+    MODULE_PATH_FIELD_NUMBER: builtins.int
+    FILE_FIELD_NUMBER: builtins.int
+    LINE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    level: global___LogLevel.ValueType
+    target: builtins.str
     """e.g "livekit", "libwebrtc", "tokio-tungstenite", etc..."""
-    module_path: _builtins.str
-    file: _builtins.str
-    line: _builtins.int
-    message: _builtins.str
+    module_path: builtins.str
+    file: builtins.str
+    line: builtins.int
+    message: builtins.str
     def __init__(
         self,
         *,
-        level: Global___LogLevel.ValueType | None = ...,
-        target: _builtins.str | None = ...,
-        module_path: _builtins.str | None = ...,
-        file: _builtins.str | None = ...,
-        line: _builtins.int | None = ...,
-        message: _builtins.str | None = ...,
+        level: global___LogLevel.ValueType | None = ...,
+        target: builtins.str | None = ...,
+        module_path: builtins.str | None = ...,
+        file: builtins.str | None = ...,
+        line: builtins.int | None = ...,
+        message: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["file", b"file", "level", b"level", "line", b"line", "message", b"message", "module_path", b"module_path", "target", b"target"]) -> None: ...
 
-Global___LogRecord: _TypeAlias = LogRecord  # noqa: Y015
+global___LogRecord = LogRecord
 
-@_typing.final
-class LogBatch(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LogBatch(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RECORDS_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def records(self) -> _containers.RepeatedCompositeFieldContainer[Global___LogRecord]: ...
+    RECORDS_FIELD_NUMBER: builtins.int
+    @property
+    def records(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___LogRecord]: ...
     def __init__(
         self,
         *,
-        records: _abc.Iterable[Global___LogRecord] | None = ...,
+        records: collections.abc.Iterable[global___LogRecord] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["records", b"records"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def ClearField(self, field_name: typing.Literal["records", b"records"]) -> None: ...
 
-Global___LogBatch: _TypeAlias = LogBatch  # noqa: Y015
+global___LogBatch = LogBatch
 
-@_typing.final
-class Panic(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class Panic(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    MESSAGE_FIELD_NUMBER: _builtins.int
-    message: _builtins.str
+    MESSAGE_FIELD_NUMBER: builtins.int
+    message: builtins.str
     def __init__(
         self,
         *,
-        message: _builtins.str | None = ...,
+        message: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["message", b"message"]) -> None: ...
 
-Global___Panic: _TypeAlias = Panic  # noqa: Y015
+global___Panic = Panic
