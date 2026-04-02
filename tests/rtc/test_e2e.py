@@ -2,7 +2,7 @@
 End-to-end tests for LiveKit RTC library.
 
 These tests verify core functionality of the LiveKit RTC library including:
-- Publishing and subscribing to audio tracks
+- Publishing and subscribing to audio & data tracks
 - Audio stream consumption and energy verification
 - Room lifecycle events (connect, disconnect, track publish/unpublish)
 - Connection state transitions
@@ -20,6 +20,7 @@ Usage:
 
 import asyncio
 import os
+import time
 import uuid
 from typing import Callable, TypeVar
 import numpy as np
@@ -434,3 +435,96 @@ async def test_connection_state_transitions():
     finally:
         if room.isconnected():
             await room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()
+@pytest.mark.skipif(
+    os.getenv("RUN_DATA_TRACK_TESTS") != "1",
+    reason="SFU support requires data tracks support to be enabled via config; remove once this is no longer the case.",
+)
+async def test_data_track():
+    """Test that a published data track delivers frames with correct payloads and timestamps."""
+    FRAME_COUNT = 5
+    PAYLOAD_SIZE = 64
+
+    TRACK_NAME = "test-track"
+    PUBLISHER_IDENTITY = "dt-publisher"
+    SUBSCRIBER_IDENTITY = "dt-subscriber"
+
+    room_name = unique_room_name("test-data-track")
+    url = os.getenv("LIVEKIT_URL")
+
+    publisher_room = rtc.Room()
+    subscriber_room = rtc.Room()
+
+    publisher_token = create_token(PUBLISHER_IDENTITY, room_name)
+    subscriber_token = create_token(SUBSCRIBER_IDENTITY, room_name)
+
+    remote_track_event = asyncio.Event()
+    remote_track = None
+    unpublished_event = asyncio.Event()
+    unpublished_sid = None
+
+    @subscriber_room.on("data_track_published")
+    def on_data_track_published(track: rtc.RemoteDataTrack):
+        nonlocal remote_track
+        remote_track = track
+        remote_track_event.set()
+
+    @subscriber_room.on("data_track_unpublished")
+    def on_data_track_unpublished(sid: str):
+        nonlocal unpublished_sid
+        unpublished_sid = sid
+        unpublished_event.set()
+
+    try:
+        await subscriber_room.connect(url, subscriber_token)
+        await publisher_room.connect(url, publisher_token)
+
+        local_track = await publisher_room.local_participant.publish_data_track(name=TRACK_NAME)
+        assert local_track.info.sid is not None
+        assert local_track.info.name == TRACK_NAME
+        assert local_track.is_published()
+
+        await asyncio.wait_for(remote_track_event.wait(), timeout=10.0)
+        assert remote_track is not None
+        assert remote_track.info.name == TRACK_NAME
+        assert remote_track.publisher_identity == PUBLISHER_IDENTITY
+        assert remote_track.is_published()
+
+        stream = remote_track.subscribe()
+
+        async def push_frames():
+            for i in range(FRAME_COUNT):
+                frame = rtc.DataTrackFrame(
+                    payload=bytes([i] * PAYLOAD_SIZE),
+                    user_timestamp=int(time.time() * 1000),
+                )
+                local_track.try_push(frame)
+                await asyncio.sleep(0.1)
+            await local_track.unpublish()
+
+        async def publish_and_receive():
+            push_task = asyncio.create_task(push_frames())
+            recv_count = 0
+            async for frame in stream:
+                first_byte = frame.payload[0]
+                assert all(b == first_byte for b in frame.payload), "Payload bytes are not uniform"
+                assert len(frame.payload) == PAYLOAD_SIZE
+                assert frame.user_timestamp is not None
+                latency = (int(time.time() * 1000) - frame.user_timestamp) / 1000.0
+                assert latency < 5.0, f"Timestamp latency too high: {latency}"
+                recv_count += 1
+            await push_task
+            return recv_count
+
+        recv_count = await asyncio.wait_for(publish_and_receive(), timeout=10.0)
+        assert recv_count > 0, "No frames were received"
+
+        await asyncio.wait_for(unpublished_event.wait(), timeout=5.0)
+        assert unpublished_sid == local_track.info.sid
+
+    finally:
+        await publisher_room.disconnect()
+        await subscriber_room.disconnect()

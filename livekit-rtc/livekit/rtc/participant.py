@@ -53,6 +53,8 @@ from .data_stream import (
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
 )
+from .data_track import LocalDataTrack
+from ._proto import data_track_pb2 as proto_data_track
 
 
 class PublishTrackError(Exception):
@@ -76,6 +78,11 @@ class PublishDTMFError(Exception):
 
 
 class PublishTranscriptionError(Exception):
+    def __init__(self, message: str) -> None:
+        self.message = message
+
+
+class PublishDataTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
 
@@ -666,6 +673,44 @@ class LocalParticipant(Participant):
         await writer.aclose()
 
         return writer.info
+
+    async def publish_data_track(
+        self,
+        *,
+        name: str,
+    ) -> LocalDataTrack:
+        """Publishes a data track.
+
+        Args:
+            name: The track name used to identify the track to other participants.
+                Must not be empty and must be unique per publisher.
+
+        Returns:
+            The published data track. Use :meth:`LocalDataTrack.try_push` to
+            send data frames on the track.
+
+        Raises:
+            PublishDataTrackError: If there is an error publishing the data track.
+        """
+        proto_opts = proto_data_track.DataTrackOptions(name=name)
+
+        req = proto_ffi.FfiRequest()
+        req.publish_data_track.local_participant_handle = self._ffi_handle.handle
+        req.publish_data_track.options.CopyFrom(proto_opts)
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.publish_data_track.async_id == resp.publish_data_track.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.publish_data_track.HasField("error"):
+            raise PublishDataTrackError(cb.publish_data_track.error.message)
+
+        return LocalDataTrack(cb.publish_data_track.track)
 
     async def publish_track(
         self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()

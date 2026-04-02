@@ -155,12 +155,23 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
     TYPE_FIELD_NUMBER: builtins.int
     FORMAT_FIELD_NUMBER: builtins.int
     NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
     track_handle: builtins.int
     type: global___VideoStreamType.ValueType
     format: global___VideoBufferType.ValueType
     """Get the frame on a specific format"""
     normalize_stride: builtins.bool
     """if true, stride will be set to width/chroma_width"""
+    queue_size_frames: builtins.int
+    """Maximum number of queued WebRTC sink frames on the receive path. Omit this
+    field to use the default bounded queue size of 1 frame. Set it to 0 to
+    request unbounded buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
+    """
     def __init__(
         self,
         *,
@@ -168,9 +179,10 @@ class NewVideoStreamRequest(google.protobuf.message.Message):
         type: global___VideoStreamType.ValueType | None = ...,
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "queue_size_frames", b"queue_size_frames", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "queue_size_frames", b"queue_size_frames", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
 global___NewVideoStreamRequest = NewVideoStreamRequest
 
@@ -202,11 +214,22 @@ class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
     TRACK_SOURCE_FIELD_NUMBER: builtins.int
     FORMAT_FIELD_NUMBER: builtins.int
     NORMALIZE_STRIDE_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
     participant_handle: builtins.int
     type: global___VideoStreamType.ValueType
     track_source: track_pb2.TrackSource.ValueType
     format: global___VideoBufferType.ValueType
     normalize_stride: builtins.bool
+    queue_size_frames: builtins.int
+    """Maximum number of queued WebRTC sink frames on the receive path. Omit this
+    field to use the default bounded queue size of 1 frame. Set it to 0 to
+    request unbounded buffering.
+
+    If your application consumes both audio and video, keep the queue sizing
+    strategy coordinated across both streams. Using a much larger queue, or
+    unbounded buffering, for only one of them can increase end-to-end latency
+    for that stream and cause audio/video drift.
+    """
     def __init__(
         self,
         *,
@@ -215,9 +238,10 @@ class VideoStreamFromParticipantRequest(google.protobuf.message.Message):
         track_source: track_pb2.TrackSource.ValueType | None = ...,
         format: global___VideoBufferType.ValueType | None = ...,
         normalize_stride: builtins.bool | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "track_source", b"track_source", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["format", b"format", "normalize_stride", b"normalize_stride", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "track_source", b"track_source", "type", b"type"]) -> None: ...
 
 global___VideoStreamFromParticipantRequest = VideoStreamFromParticipantRequest
 

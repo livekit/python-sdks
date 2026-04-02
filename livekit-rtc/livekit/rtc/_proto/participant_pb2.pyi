@@ -34,6 +34,25 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _ParticipantState:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _ParticipantStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ParticipantState.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PARTICIPANT_STATE_JOINING: _ParticipantState.ValueType  # 0
+    PARTICIPANT_STATE_JOINED: _ParticipantState.ValueType  # 1
+    PARTICIPANT_STATE_ACTIVE: _ParticipantState.ValueType  # 2
+    PARTICIPANT_STATE_DISCONNECTED: _ParticipantState.ValueType  # 3
+
+class ParticipantState(_ParticipantState, metaclass=_ParticipantStateEnumTypeWrapper): ...
+
+PARTICIPANT_STATE_JOINING: ParticipantState.ValueType  # 0
+PARTICIPANT_STATE_JOINED: ParticipantState.ValueType  # 1
+PARTICIPANT_STATE_ACTIVE: ParticipantState.ValueType  # 2
+PARTICIPANT_STATE_DISCONNECTED: ParticipantState.ValueType  # 3
+global___ParticipantState = ParticipantState
+
 class _ParticipantKind:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -175,18 +194,23 @@ class ParticipantInfo(google.protobuf.message.Message):
     SID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     IDENTITY_FIELD_NUMBER: builtins.int
+    STATE_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
     ATTRIBUTES_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
     DISCONNECT_REASON_FIELD_NUMBER: builtins.int
+    JOINED_AT_FIELD_NUMBER: builtins.int
     KIND_DETAILS_FIELD_NUMBER: builtins.int
     PERMISSION_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
+    state: global___ParticipantState.ValueType
     metadata: builtins.str
     kind: global___ParticipantKind.ValueType
     disconnect_reason: global___DisconnectReason.ValueType
+    joined_at: builtins.int
+    """ms timestamp of when the participant joined the room, maps to joined_at_ms in livekit_models"""
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
@@ -199,15 +223,17 @@ class ParticipantInfo(google.protobuf.message.Message):
         sid: builtins.str | None = ...,
         name: builtins.str | None = ...,
         identity: builtins.str | None = ...,
+        state: global___ParticipantState.ValueType | None = ...,
         metadata: builtins.str | None = ...,
         attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         kind: global___ParticipantKind.ValueType | None = ...,
         disconnect_reason: global___DisconnectReason.ValueType | None = ...,
+        joined_at: builtins.int | None = ...,
         kind_details: collections.abc.Iterable[global___ParticipantKindDetail.ValueType] | None = ...,
         permission: global___ParticipantPermission | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 
