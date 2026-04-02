@@ -72,10 +72,6 @@ class DataTrackFrame:
     user_timestamp: Optional[int] = None
     """The frame's user timestamp, if one is associated."""
 
-    @staticmethod
-    def _timestamp_now() -> int:
-        return int(time.time() * 1000)
-
     def with_user_timestamp_now(self) -> DataTrackFrame:
         """Associates the current Unix timestamp (in milliseconds) with the frame.
 
@@ -84,7 +80,7 @@ class DataTrackFrame:
         """
         return DataTrackFrame(
             payload=self.payload,
-            user_timestamp=self._timestamp_now(),
+            user_timestamp=int(time.time() * 1000),
         )
 
     def duration_since_timestamp(self) -> Optional[float]:
