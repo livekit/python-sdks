@@ -357,7 +357,6 @@ async def capture_loop(
         submit_to_webrtc_started_at = time.perf_counter()
         source.capture_frame(
             video_frame,
-            timestamp_us=monotonic_time_us_now() - started_us,
             frame_metadata=frame_metadata,
         )
         webrtc_capture_finished_at = time.perf_counter()
