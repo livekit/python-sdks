@@ -510,9 +510,7 @@ async def test_data_track():
                 assert len(frame.payload) == PAYLOAD_SIZE
                 assert frame.user_timestamp is not None
                 latency = (int(time.time() * 1000) - frame.user_timestamp) / 1000.0
-                assert latency < 5.0, (
-                    f"Timestamp latency too high: {latency}"
-                )
+                assert latency < 5.0, f"Timestamp latency too high: {latency}"
                 recv_count += 1
             await push_task
             return recv_count
