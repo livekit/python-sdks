@@ -49,6 +49,7 @@ from .data_track import RemoteDataTrack
 EventTypes = Literal[
     "participant_connected",
     "participant_disconnected",
+    "participant_active",
     "local_track_published",
     "local_track_unpublished",
     "local_track_subscribed",
@@ -339,6 +340,8 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `participant` (RemoteParticipant)
             - **"participant_disconnected"**: Called when a participant leaves the room.
                 - Arguments: `participant` (RemoteParticipant)
+            - **"participant_active"**: Called when a remote participant becomes active and is ready to receive data messages.
+                - Arguments: `participant` (RemoteParticipant)
             - **"local_track_published"**: Called when a local track is published.
                 - Arguments: `publication` (LocalTrackPublication), `track` (Track)
             - **"local_track_unpublished"**: Called when a local track is unpublished.
@@ -581,7 +584,7 @@ class Room(EventEmitter[EventTypes]):
             self._text_stream_handlers.pop(topic)
 
     async def disconnect(
-        self, *, reason: DisconnectReason = DisconnectReason.CLIENT_INITIATED
+        self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
@@ -667,6 +670,11 @@ class Room(EventEmitter[EventTypes]):
             rparticipant = self._remote_participants.pop(identity)
             rparticipant._info.disconnect_reason = event.participant_disconnected.disconnect_reason
             self.emit("participant_disconnected", rparticipant)
+        elif which == "participant_active":
+            rp = self._retrieve_remote_participant(event.participant_active.participant_identity)
+            if rp:
+                rp._info.state = proto_participant.PARTICIPANT_STATE_ACTIVE
+                self.emit("participant_active", rp)
         elif which == "local_track_published":
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
