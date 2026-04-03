@@ -19,7 +19,7 @@ limitations under the License.
 import builtins
 import collections.abc
 from . import data_stream_pb2
-import data_track_pb2
+from . import data_track_pb2
 from . import e2ee_pb2
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
