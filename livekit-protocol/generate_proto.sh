@@ -39,6 +39,7 @@ protoc \
     $API_PROTOCOL/livekit_rtc.proto \
     $API_PROTOCOL/agent/livekit_agent_session.proto \
     $API_PROTOCOL/agent/livekit_agent_text.proto \
+    $API_PROTOCOL/agent/livekit_agent_dev.proto \
     $API_PROTOCOL/logger/options.proto \
     $API_PROTOCOL/livekit_connector_whatsapp.proto \
     $API_PROTOCOL/livekit_connector_twilio.proto \
@@ -90,12 +91,14 @@ mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_p
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
 mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_text.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_text.pyi"
+mv "$API_OUT_PYTHON/agent/livekit_agent_dev_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_dev.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_dev_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_dev.pyi"
 
 mkdir -p "$API_OUT_PYTHON/logger_pb"
 mv "$API_OUT_PYTHON/logger/options_pb2.py" "$API_OUT_PYTHON/logger_pb/options.py"
 mv "$API_OUT_PYTHON/logger/options_pb2.pyi" "$API_OUT_PYTHON/logger_pb/options.pyi"
 
-find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|options_pb2))|from . $1|g'
+find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|livekit_agent_dev_pb2\|options_pb2))|from . $1|g'
 
 find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|livekit_(\w+)_pb2|${1}|g'
 
