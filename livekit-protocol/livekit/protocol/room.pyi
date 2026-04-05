@@ -191,7 +191,14 @@ class UpdateRoomMetadataRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class RoomConfiguration(_message.Message):
-    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents")
+    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents", "tags")
+    class TagsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAME_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     DEPARTURE_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
@@ -202,6 +209,7 @@ class RoomConfiguration(_message.Message):
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     SYNC_STREAMS_FIELD_NUMBER: _ClassVar[int]
     AGENTS_FIELD_NUMBER: _ClassVar[int]
+    TAGS_FIELD_NUMBER: _ClassVar[int]
     name: str
     empty_timeout: int
     departure_timeout: int
@@ -212,7 +220,8 @@ class RoomConfiguration(_message.Message):
     max_playout_delay: int
     sync_streams: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
-    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+    tags: _containers.ScalarMap[str, str]
+    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., tags: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ForwardParticipantRequest(_message.Message):
     __slots__ = ("room", "identity", "destination_room")
