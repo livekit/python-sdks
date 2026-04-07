@@ -1,4 +1,4 @@
-from agent import agent_session as _agent_session
+from . import agent_session as _agent_session
 from ..logger_pb import options as _options_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor

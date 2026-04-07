@@ -12,7 +12,7 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-from agent import agent_session as agent_dot__agent__session_
+from . import agent_session as agent_dot__agent__session_
 from ..logger_pb import options as logger_dot_options__pb2
 
 
