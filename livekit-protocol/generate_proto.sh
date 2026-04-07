@@ -18,6 +18,7 @@
 
 set -e
 
+
 API_PROTOCOL=./protocol/protobufs
 API_OUT_PYTHON=./livekit/protocol
 
@@ -37,6 +38,7 @@ protoc \
     $API_PROTOCOL/livekit_analytics.proto \
     $API_PROTOCOL/livekit_rtc.proto \
     $API_PROTOCOL/agent/livekit_agent_session.proto \
+    $API_PROTOCOL/agent/livekit_agent_text.proto \
     $API_PROTOCOL/logger/options.proto \
     $API_PROTOCOL/livekit_connector_whatsapp.proto \
     $API_PROTOCOL/livekit_connector_twilio.proto \
@@ -86,6 +88,8 @@ mv "$API_OUT_PYTHON/livekit_connector_pb2.pyi" "$API_OUT_PYTHON/connector.pyi"
 mkdir -p "$API_OUT_PYTHON/agent_pb"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
+mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_text.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_text.pyi"
 
 mkdir -p "$API_OUT_PYTHON/logger_pb"
 mv "$API_OUT_PYTHON/logger/options_pb2.py" "$API_OUT_PYTHON/logger_pb/options.py"
@@ -100,6 +104,8 @@ find "$API_OUT_PYTHON" -maxdepth 1 -name '*.py' -o -name '*.pyi' | xargs perl -i
 
 # fix logger imports for files in subdirectories (need parent-relative import)
 find "$API_OUT_PYTHON" -mindepth 2 -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from logger import options_pb2 as ([^ ]+)|from ..logger_pb import options as $1|g'
+
+find "$API_OUT_PYTHON"/agent_pb -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from agent import livekit_agent_(\w+)_pb2 as ([^ ]+)|from . import agent_$1 as $2|g'
 
 # fixes - error: ClassVar can only be used for assignments in class body  [misc]
 perl -i -pe 's|^(\w+_FIELD_NUMBER): _ClassVar\[int\]|$1: int|g' "$API_OUT_PYTHON/logger_pb/options.pyi"
