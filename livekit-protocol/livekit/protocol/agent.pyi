@@ -4,8 +4,7 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -58,7 +57,7 @@ class Job(_message.Message):
     agent_name: str
     state: JobState
     enable_recording: bool
-    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: _Optional[bool] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ...) -> None: ...
 
 class JobState(_message.Message):
     __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id")
@@ -172,7 +171,7 @@ class AvailabilityRequest(_message.Message):
     RESUMING_FIELD_NUMBER: _ClassVar[int]
     job: Job
     resuming: bool
-    def __init__(self, job: _Optional[_Union[Job, _Mapping]] = ..., resuming: _Optional[bool] = ...) -> None: ...
+    def __init__(self, job: _Optional[_Union[Job, _Mapping]] = ..., resuming: bool = ...) -> None: ...
 
 class AvailabilityResponse(_message.Message):
     __slots__ = ("job_id", "available", "supports_resume", "terminate", "participant_name", "participant_identity", "participant_metadata", "participant_attributes")
@@ -199,7 +198,7 @@ class AvailabilityResponse(_message.Message):
     participant_identity: str
     participant_metadata: str
     participant_attributes: _containers.ScalarMap[str, str]
-    def __init__(self, job_id: _Optional[str] = ..., available: _Optional[bool] = ..., supports_resume: _Optional[bool] = ..., terminate: _Optional[bool] = ..., participant_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, job_id: _Optional[str] = ..., available: bool = ..., supports_resume: bool = ..., terminate: bool = ..., participant_name: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpdateJobStatus(_message.Message):
     __slots__ = ("job_id", "status", "error")

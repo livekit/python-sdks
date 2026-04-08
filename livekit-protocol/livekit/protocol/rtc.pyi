@@ -4,8 +4,7 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -186,7 +185,7 @@ class AddTrackRequest(_message.Message):
     backup_codec_policy: _models.BackupCodecPolicy
     audio_features: _containers.RepeatedScalarFieldContainer[_models.AudioTrackFeature]
     packet_trailer_features: _containers.RepeatedScalarFieldContainer[_models.PacketTrailerFeature]
-    def __init__(self, cid: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[_models.TrackType, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., muted: _Optional[bool] = ..., disable_dtx: _Optional[bool] = ..., source: _Optional[_Union[_models.TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., simulcast_codecs: _Optional[_Iterable[_Union[SimulcastCodec, _Mapping]]] = ..., sid: _Optional[str] = ..., stereo: _Optional[bool] = ..., disable_red: _Optional[bool] = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ..., stream: _Optional[str] = ..., backup_codec_policy: _Optional[_Union[_models.BackupCodecPolicy, str]] = ..., audio_features: _Optional[_Iterable[_Union[_models.AudioTrackFeature, str]]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[_models.PacketTrailerFeature, str]]] = ...) -> None: ...
+    def __init__(self, cid: _Optional[str] = ..., name: _Optional[str] = ..., type: _Optional[_Union[_models.TrackType, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., muted: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[_models.TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[_models.VideoLayer, _Mapping]]] = ..., simulcast_codecs: _Optional[_Iterable[_Union[SimulcastCodec, _Mapping]]] = ..., sid: _Optional[str] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[_models.Encryption.Type, str]] = ..., stream: _Optional[str] = ..., backup_codec_policy: _Optional[_Union[_models.BackupCodecPolicy, str]] = ..., audio_features: _Optional[_Iterable[_Union[_models.AudioTrackFeature, str]]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[_models.PacketTrailerFeature, str]]] = ...) -> None: ...
 
 class PublishDataTrackRequest(_message.Message):
     __slots__ = ("pub_handle", "name", "encryption")
@@ -246,7 +245,7 @@ class TrickleRequest(_message.Message):
     candidateInit: str
     target: SignalTarget
     final: bool
-    def __init__(self, candidateInit: _Optional[str] = ..., target: _Optional[_Union[SignalTarget, str]] = ..., final: _Optional[bool] = ...) -> None: ...
+    def __init__(self, candidateInit: _Optional[str] = ..., target: _Optional[_Union[SignalTarget, str]] = ..., final: bool = ...) -> None: ...
 
 class MuteTrackRequest(_message.Message):
     __slots__ = ("sid", "muted")
@@ -254,7 +253,7 @@ class MuteTrackRequest(_message.Message):
     MUTED_FIELD_NUMBER: _ClassVar[int]
     sid: str
     muted: bool
-    def __init__(self, sid: _Optional[str] = ..., muted: _Optional[bool] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., muted: bool = ...) -> None: ...
 
 class JoinResponse(_message.Message):
     __slots__ = ("room", "participant", "other_participants", "server_version", "ice_servers", "subscriber_primary", "alternative_url", "client_configuration", "server_region", "ping_timeout", "ping_interval", "server_info", "sif_trailer", "enabled_publish_codecs", "fast_publish")
@@ -288,7 +287,7 @@ class JoinResponse(_message.Message):
     sif_trailer: bytes
     enabled_publish_codecs: _containers.RepeatedCompositeFieldContainer[_models.Codec]
     fast_publish: bool
-    def __init__(self, room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., other_participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ..., server_version: _Optional[str] = ..., ice_servers: _Optional[_Iterable[_Union[ICEServer, _Mapping]]] = ..., subscriber_primary: _Optional[bool] = ..., alternative_url: _Optional[str] = ..., client_configuration: _Optional[_Union[_models.ClientConfiguration, _Mapping]] = ..., server_region: _Optional[str] = ..., ping_timeout: _Optional[int] = ..., ping_interval: _Optional[int] = ..., server_info: _Optional[_Union[_models.ServerInfo, _Mapping]] = ..., sif_trailer: _Optional[bytes] = ..., enabled_publish_codecs: _Optional[_Iterable[_Union[_models.Codec, _Mapping]]] = ..., fast_publish: _Optional[bool] = ...) -> None: ...
+    def __init__(self, room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., other_participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ..., server_version: _Optional[str] = ..., ice_servers: _Optional[_Iterable[_Union[ICEServer, _Mapping]]] = ..., subscriber_primary: bool = ..., alternative_url: _Optional[str] = ..., client_configuration: _Optional[_Union[_models.ClientConfiguration, _Mapping]] = ..., server_region: _Optional[str] = ..., ping_timeout: _Optional[int] = ..., ping_interval: _Optional[int] = ..., server_info: _Optional[_Union[_models.ServerInfo, _Mapping]] = ..., sif_trailer: _Optional[bytes] = ..., enabled_publish_codecs: _Optional[_Iterable[_Union[_models.Codec, _Mapping]]] = ..., fast_publish: bool = ...) -> None: ...
 
 class ReconnectResponse(_message.Message):
     __slots__ = ("ice_servers", "client_configuration", "server_info", "last_message_seq")
@@ -349,7 +348,7 @@ class UpdateSubscription(_message.Message):
     track_sids: _containers.RepeatedScalarFieldContainer[str]
     subscribe: bool
     participant_tracks: _containers.RepeatedCompositeFieldContainer[_models.ParticipantTracks]
-    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., subscribe: _Optional[bool] = ..., participant_tracks: _Optional[_Iterable[_Union[_models.ParticipantTracks, _Mapping]]] = ...) -> None: ...
+    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., subscribe: bool = ..., participant_tracks: _Optional[_Iterable[_Union[_models.ParticipantTracks, _Mapping]]] = ...) -> None: ...
 
 class UpdateDataSubscription(_message.Message):
     __slots__ = ("updates",)
@@ -361,7 +360,7 @@ class UpdateDataSubscription(_message.Message):
         track_sid: str
         subscribe: bool
         options: _models.DataTrackSubscriptionOptions
-        def __init__(self, track_sid: _Optional[str] = ..., subscribe: _Optional[bool] = ..., options: _Optional[_Union[_models.DataTrackSubscriptionOptions, _Mapping]] = ...) -> None: ...
+        def __init__(self, track_sid: _Optional[str] = ..., subscribe: bool = ..., options: _Optional[_Union[_models.DataTrackSubscriptionOptions, _Mapping]] = ...) -> None: ...
     UPDATES_FIELD_NUMBER: _ClassVar[int]
     updates: _containers.RepeatedCompositeFieldContainer[UpdateDataSubscription.Update]
     def __init__(self, updates: _Optional[_Iterable[_Union[UpdateDataSubscription.Update, _Mapping]]] = ...) -> None: ...
@@ -382,7 +381,7 @@ class UpdateTrackSettings(_message.Message):
     height: int
     fps: int
     priority: int
-    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., disabled: _Optional[bool] = ..., quality: _Optional[_Union[_models.VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., fps: _Optional[int] = ..., priority: _Optional[int] = ...) -> None: ...
+    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., disabled: bool = ..., quality: _Optional[_Union[_models.VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., fps: _Optional[int] = ..., priority: _Optional[int] = ...) -> None: ...
 
 class UpdateLocalAudioTrack(_message.Message):
     __slots__ = ("track_sid", "features")
@@ -420,7 +419,7 @@ class LeaveRequest(_message.Message):
     reason: _models.DisconnectReason
     action: LeaveRequest.Action
     regions: RegionSettings
-    def __init__(self, can_reconnect: _Optional[bool] = ..., reason: _Optional[_Union[_models.DisconnectReason, str]] = ..., action: _Optional[_Union[LeaveRequest.Action, str]] = ..., regions: _Optional[_Union[RegionSettings, _Mapping]] = ...) -> None: ...
+    def __init__(self, can_reconnect: bool = ..., reason: _Optional[_Union[_models.DisconnectReason, str]] = ..., action: _Optional[_Union[LeaveRequest.Action, str]] = ..., regions: _Optional[_Union[RegionSettings, _Mapping]] = ...) -> None: ...
 
 class UpdateVideoLayers(_message.Message):
     __slots__ = ("track_sid", "layers")
@@ -509,7 +508,7 @@ class SubscribedQuality(_message.Message):
     ENABLED_FIELD_NUMBER: _ClassVar[int]
     quality: _models.VideoQuality
     enabled: bool
-    def __init__(self, quality: _Optional[_Union[_models.VideoQuality, str]] = ..., enabled: _Optional[bool] = ...) -> None: ...
+    def __init__(self, quality: _Optional[_Union[_models.VideoQuality, str]] = ..., enabled: bool = ...) -> None: ...
 
 class SubscribedCodec(_message.Message):
     __slots__ = ("codec", "qualities")
@@ -547,7 +546,7 @@ class TrackPermission(_message.Message):
     all_tracks: bool
     track_sids: _containers.RepeatedScalarFieldContainer[str]
     participant_identity: str
-    def __init__(self, participant_sid: _Optional[str] = ..., all_tracks: _Optional[bool] = ..., track_sids: _Optional[_Iterable[str]] = ..., participant_identity: _Optional[str] = ...) -> None: ...
+    def __init__(self, participant_sid: _Optional[str] = ..., all_tracks: bool = ..., track_sids: _Optional[_Iterable[str]] = ..., participant_identity: _Optional[str] = ...) -> None: ...
 
 class SubscriptionPermission(_message.Message):
     __slots__ = ("all_participants", "track_permissions")
@@ -555,7 +554,7 @@ class SubscriptionPermission(_message.Message):
     TRACK_PERMISSIONS_FIELD_NUMBER: _ClassVar[int]
     all_participants: bool
     track_permissions: _containers.RepeatedCompositeFieldContainer[TrackPermission]
-    def __init__(self, all_participants: _Optional[bool] = ..., track_permissions: _Optional[_Iterable[_Union[TrackPermission, _Mapping]]] = ...) -> None: ...
+    def __init__(self, all_participants: bool = ..., track_permissions: _Optional[_Iterable[_Union[TrackPermission, _Mapping]]] = ...) -> None: ...
 
 class SubscriptionPermissionUpdate(_message.Message):
     __slots__ = ("participant_sid", "track_sid", "allowed")
@@ -565,7 +564,7 @@ class SubscriptionPermissionUpdate(_message.Message):
     participant_sid: str
     track_sid: str
     allowed: bool
-    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., allowed: _Optional[bool] = ...) -> None: ...
+    def __init__(self, participant_sid: _Optional[str] = ..., track_sid: _Optional[str] = ..., allowed: bool = ...) -> None: ...
 
 class RoomMovedResponse(_message.Message):
     __slots__ = ("room", "token", "participant", "other_participants")
@@ -637,7 +636,7 @@ class SimulateScenario(_message.Message):
     disconnect_signal_on_resume: bool
     disconnect_signal_on_resume_no_messages: bool
     leave_request_full_reconnect: bool
-    def __init__(self, speaker_update: _Optional[int] = ..., node_failure: _Optional[bool] = ..., migration: _Optional[bool] = ..., server_leave: _Optional[bool] = ..., switch_candidate_protocol: _Optional[_Union[CandidateProtocol, str]] = ..., subscriber_bandwidth: _Optional[int] = ..., disconnect_signal_on_resume: _Optional[bool] = ..., disconnect_signal_on_resume_no_messages: _Optional[bool] = ..., leave_request_full_reconnect: _Optional[bool] = ...) -> None: ...
+    def __init__(self, speaker_update: _Optional[int] = ..., node_failure: bool = ..., migration: bool = ..., server_leave: bool = ..., switch_candidate_protocol: _Optional[_Union[CandidateProtocol, str]] = ..., subscriber_bandwidth: _Optional[int] = ..., disconnect_signal_on_resume: bool = ..., disconnect_signal_on_resume_no_messages: bool = ..., leave_request_full_reconnect: bool = ...) -> None: ...
 
 class Ping(_message.Message):
     __slots__ = ("timestamp", "rtt")
@@ -747,7 +746,7 @@ class ConnectionSettings(_message.Message):
     subscriber_allow_pause: bool
     disable_ice_lite: bool
     auto_subscribe_data_track: bool
-    def __init__(self, auto_subscribe: _Optional[bool] = ..., adaptive_stream: _Optional[bool] = ..., subscriber_allow_pause: _Optional[bool] = ..., disable_ice_lite: _Optional[bool] = ..., auto_subscribe_data_track: _Optional[bool] = ...) -> None: ...
+    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., subscriber_allow_pause: bool = ..., disable_ice_lite: bool = ..., auto_subscribe_data_track: bool = ...) -> None: ...
 
 class JoinRequest(_message.Message):
     __slots__ = ("client_info", "connection_settings", "metadata", "participant_attributes", "add_track_requests", "publisher_offer", "reconnect", "reconnect_reason", "participant_sid", "sync_state")
@@ -778,7 +777,7 @@ class JoinRequest(_message.Message):
     reconnect_reason: _models.ReconnectReason
     participant_sid: str
     sync_state: SyncState
-    def __init__(self, client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., connection_settings: _Optional[_Union[ConnectionSettings, _Mapping]] = ..., metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., add_track_requests: _Optional[_Iterable[_Union[AddTrackRequest, _Mapping]]] = ..., publisher_offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., reconnect: _Optional[bool] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., participant_sid: _Optional[str] = ..., sync_state: _Optional[_Union[SyncState, _Mapping]] = ...) -> None: ...
+    def __init__(self, client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., connection_settings: _Optional[_Union[ConnectionSettings, _Mapping]] = ..., metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., add_track_requests: _Optional[_Iterable[_Union[AddTrackRequest, _Mapping]]] = ..., publisher_offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., reconnect: bool = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., participant_sid: _Optional[str] = ..., sync_state: _Optional[_Union[SyncState, _Mapping]] = ...) -> None: ...
 
 class WrappedJoinRequest(_message.Message):
     __slots__ = ("compression", "join_request")
