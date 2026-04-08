@@ -1,0 +1,424 @@
+name: Publish to PyPI
+
+on:
+  # Step 1: Dispatch creates a version bump PR
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish"
+        type: choice
+        required: true
+        options:
+          - livekit
+          - livekit-api
+          - livekit-protocol
+      version:
+        description: "What to publish"
+        type: choice
+        required: true
+        options:
+          - "patch       (1.5.1 → 1.5.2)"
+          - "minor       (1.5.1 → 1.6.0)"
+          - "major       (1.5.1 → 2.0.0)"
+          - "patch-rc    (1.5.1 → 1.5.2.rc1)"
+          - "minor-rc    (1.5.1 → 1.6.0.rc1)"
+          - "major-rc    (1.5.1 → 2.0.0.rc1)"
+          - "next-rc     (.rc1 → .rc2)"
+          - "promote     (1.6.0.rc2 → 1.6.0)"
+      branch:
+        description: "Branch to publish from (default: main)"
+        type: string
+        required: false
+        default: "main"
+
+  # Step 2: Merging the release PR triggers build + publish
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+env:
+  # Map PyPI package names to tag prefixes
+  # livekit -> rtc, livekit-api -> api, livekit-protocol -> protocol
+  TAG_PREFIX_MAP: '{"livekit":"rtc","livekit-api":"api","livekit-protocol":"protocol"}'
+  VERSION_FILE_MAP: '{"livekit":"livekit-rtc/livekit/rtc/version.py","livekit-api":"livekit-api/livekit/api/version.py","livekit-protocol":"livekit-protocol/livekit/protocol/version.py"}'
+
+jobs:
+  # ── Step 1: Create a version bump PR ──────────────────────────
+  bump:
+    name: Create release PR
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          submodules: true
+
+      - name: Guard non-main branches
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+        run: |
+          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
+          if [ "$INPUT_BRANCH" != "main" ]; then
+            case "$key" in
+              *-rc|next-rc) ;; # allowed
+              *) echo "::error::Only RC releases are allowed from non-main branches (got '$key' on '$INPUT_BRANCH')"; exit 1 ;;
+            esac
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install click packaging
+
+      - name: Bump version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
+          pkg="$INPUT_PACKAGE"
+
+          case "$key" in
+            patch|minor|major)
+              python .github/update_versions.py bump --package "$pkg" --bump-type "$key"
+              ;;
+            patch-rc|minor-rc|major-rc)
+              bump="${key%-rc}"
+              python .github/update_versions.py bump --package "$pkg" --bump-type "$bump"
+              python .github/update_versions.py bump --package "$pkg" --pre rc
+              ;;
+            next-rc)
+              python .github/update_versions.py bump --package "$pkg" --pre rc
+              ;;
+            promote)
+              python .github/update_versions.py bump --package "$pkg" --bump-type release
+              ;;
+          esac
+
+      - name: Read new version
+        id: version
+        env:
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          pkg="$INPUT_PACKAGE"
+          version_file=$(echo '${{ env.VERSION_FILE_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
+          version=$(python -c "
+          import re, pathlib
+          m = re.search(r'__version__\s*=\s*[\"'\''](.*?)[\"'\'']', pathlib.Path('${version_file}').read_text())
+          print(m.group(1))
+          ")
+          tag_prefix=$(echo '${{ env.TAG_PREFIX_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag_prefix=$tag_prefix" >> "$GITHUB_OUTPUT"
+          echo "Package: $pkg, New version: $version, Tag: ${tag_prefix}-v${version}"
+
+      - name: Close existing release PRs for this package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
+        run: |
+          prefix="release/${TAG_PREFIX}-v"
+          gh pr list --state open --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"$prefix\")) | .number" | while read -r pr; do
+            echo "Superseding release PR #$pr"
+            gh pr comment "$pr" --body "Superseded by a new release."
+            gh pr close "$pr" --delete-branch || true
+          done
+
+      - name: Create release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          branch="release/${TAG_PREFIX}-v${VERSION}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "${TAG_PREFIX}-v${VERSION}"
+          git push --force origin "$branch"
+
+          gh pr create \
+            --base "$INPUT_BRANCH" \
+            --head "$branch" \
+            --title "${INPUT_PACKAGE} v${VERSION}" \
+            --body "Merging this PR will publish **${INPUT_PACKAGE}** v${VERSION} to PyPI." \
+            --label "release"
+
+  # ── Step 2: Publish on merge ──────────────────────────────────
+  detect:
+    name: Detect package
+    if: |
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.detect.outputs.package }}
+      tag: ${{ steps.detect.outputs.tag }}
+    steps:
+      - name: Parse release branch
+        id: detect
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # branch is like release/rtc-v1.2.0, release/api-v1.1.1, release/protocol-v1.1.5
+          ref="${HEAD_REF#release/}"
+          prefix="${ref%%-v*}"
+
+          case "$prefix" in
+            rtc) package="livekit" ;;
+            api) package="livekit-api" ;;
+            protocol) package="livekit-protocol" ;;
+            *) echo "::error::Unknown release prefix: $prefix"; exit 1 ;;
+          esac
+
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "tag=$ref" >> "$GITHUB_OUTPUT"
+          echo "Releasing $package (tag: $ref)"
+
+  tag:
+    name: Tag release
+    needs: detect
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Create git tag
+        env:
+          TAG: ${{ needs.detect.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+
+  # ── RTC builds (multi-platform) ──────────────────────────────
+  build-rtc:
+    name: Build RTC wheels (${{ matrix.archs }})
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            archs: x86_64
+          - os: namespace-profile-default-arm64
+            archs: aarch64
+          - os: windows-latest
+            archs: AMD64
+          - os: macos-latest
+            archs: x86_64 arm64
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Build wheels
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
+        env:
+          CIBW_ARCHS: ${{ matrix.archs }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-rtc-${{ matrix.os }}
+          path: livekit-rtc/dist/*.whl
+
+  build-rtc-sdist:
+    name: Build RTC sdist
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Build sdist
+        run: |
+          pip3 install build
+          python3 -m build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-rtc-sdist
+          path: livekit-rtc/dist/*.tar.gz
+
+  publish-rtc:
+    name: Publish livekit (RTC)
+    needs: [detect, build-rtc, build-rtc-sdist]
+    if: needs.detect.outputs.package == 'livekit'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dist-rtc-*
+          path: dist
+          merge-multiple: true
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ── API build ────────────────────────────────────────────────
+  build-api:
+    name: Build API
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit-api'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-api
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+
+      - name: Build wheel & sdist
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-api
+          path: |
+            livekit-api/dist/*.whl
+            livekit-api/dist/*.tar.gz
+
+  publish-api:
+    name: Publish livekit-api
+    needs: [detect, build-api]
+    if: needs.detect.outputs.package == 'livekit-api'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-api
+          path: dist/
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ── Protocol build ───────────────────────────────────────────
+  build-protocol:
+    name: Build Protocol
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit-protocol'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-protocol
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@v4
+
+      - name: Build wheel & sdist
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-protocol
+          path: |
+            livekit-protocol/dist/*.whl
+            livekit-protocol/dist/*.tar.gz
+
+  publish-protocol:
+    name: Publish livekit-protocol
+    needs: [detect, build-protocol]
+    if: needs.detect.outputs.package == 'livekit-protocol'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-protocol
+          path: dist/
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ── Docs ─────────────────────────────────────────────────────
+  docs-rtc:
+    name: Build RTC docs
+    needs: [detect, publish-rtc]
+    if: needs.detect.outputs.package == 'livekit'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-rtc
+      package_name: livekit.rtc
+    secrets: inherit
+
+  docs-api:
+    name: Build API docs
+    needs: [detect, publish-api]
+    if: needs.detect.outputs.package == 'livekit-api'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-api
+      package_name: livekit.api
+    secrets: inherit
+
+  docs-protocol:
+    name: Build Protocol docs
+    needs: [detect, publish-protocol]
+    if: needs.detect.outputs.package == 'livekit-protocol'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-protocol
+      package_name: livekit.protocol
+    secrets: inherit
