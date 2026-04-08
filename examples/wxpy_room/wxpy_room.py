@@ -811,7 +811,7 @@ class LoginPanel(wx.Panel):
         codec_label.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
         main_sizer.Add(codec_label, 0, wx.LEFT | wx.RIGHT, 20)
 
-        codecs = ["VP8", "VP9", "AV1", "H264", "H265"]
+        codecs = ["VP8", "VP9", "AV1", "H264"]
         self.codec_choice = wx.Choice(self, choices=codecs, size=(-1, 30))
         self.codec_choice.SetSelection(0)  # default VP8
         main_sizer.Add(self.codec_choice, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 20)
