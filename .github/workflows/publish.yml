@@ -40,12 +40,6 @@ permissions:
   pull-requests: write
   id-token: write
 
-env:
-  # Map PyPI package names to tag prefixes
-  # livekit -> rtc, livekit-api -> api, livekit-protocol -> protocol
-  TAG_PREFIX_MAP: '{"livekit":"rtc","livekit-api":"api","livekit-protocol":"protocol"}'
-  VERSION_FILE_MAP: '{"livekit":"livekit-rtc/livekit/rtc/version.py","livekit-api":"livekit-api/livekit/api/version.py","livekit-protocol":"livekit-protocol/livekit/protocol/version.py"}'
-
 jobs:
   # ── Step 1: Create a version bump PR ──────────────────────────
   bump:
@@ -109,17 +103,10 @@ jobs:
         env:
           INPUT_PACKAGE: ${{ inputs.package }}
         run: |
-          pkg="$INPUT_PACKAGE"
-          version_file=$(echo '${{ env.VERSION_FILE_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
-          version=$(python -c "
-          import re, pathlib
-          m = re.search(r'__version__\s*=\s*[\"'\''](.*?)[\"'\'']', pathlib.Path('${version_file}').read_text())
-          print(m.group(1))
-          ")
-          tag_prefix=$(echo '${{ env.TAG_PREFIX_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
+          eval "$(python .github/update_versions.py --package "$INPUT_PACKAGE" --print-version)"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag_prefix=$tag_prefix" >> "$GITHUB_OUTPUT"
-          echo "Package: $pkg, New version: $version, Tag: ${tag_prefix}-v${version}"
+          echo "Package: $INPUT_PACKAGE, New version: $version, Tag: ${tag_prefix}-v${version}"
 
       - name: Close existing release PRs for this package
         env:

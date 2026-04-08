@@ -9,6 +9,12 @@ PACKAGES = {
     "livekit-protocol": "livekit-protocol/livekit/protocol/version.py",
 }
 
+TAG_PREFIXES = {
+    "livekit": "rtc",
+    "livekit-api": "api",
+    "livekit-protocol": "protocol",
+}
+
 
 def _esc(*codes: int) -> str:
     return "\033[" + ";".join(str(c) for c in codes) + "m"
@@ -117,7 +123,22 @@ def do_prerelease(package: str, prerelease_type: str) -> None:
     default="patch",
     help="Type of version bump.",
 )
-def bump(package: str, pre: str, bump_type: str) -> None:
+@click.option(
+    "--print-version",
+    is_flag=True,
+    default=False,
+    help="Print current version and tag prefix, don't bump.",
+)
+def bump(package: str, pre: str, bump_type: str, print_version: bool) -> None:
+    if print_version:
+        vf = pathlib.Path(PACKAGES[package])
+        version = read_version(vf)
+        tag_prefix = TAG_PREFIXES[package]
+        # Output as key=value for easy parsing
+        print(f"version={version}")
+        print(f"tag_prefix={tag_prefix}")
+        return
+
     if pre == "none":
         do_bump(package, bump_type)
     else:
