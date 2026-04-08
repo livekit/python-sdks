@@ -74,37 +74,37 @@ def update_api_protocol_dependency(new_protocol_version: str) -> None:
         print(f"Updated livekit-api dependency on livekit-protocol to >={new_protocol_version}")
 
 
-def do_bump(bump_type: str) -> None:
-    new_versions = {}
-    for pypi_name, version_path in PACKAGES.items():
-        vf = pathlib.Path(version_path)
-        if vf.exists():
-            cur = read_version(vf)
-            new = bump_version(cur, bump_type)
-            print(f"{pypi_name}: {_esc(31)}{cur}{_esc(0)} -> {_esc(32)}{new}{_esc(0)}")
-            write_new_version(vf, new)
-            new_versions[pypi_name] = new
+def do_bump(package: str, bump_type: str) -> None:
+    version_path = PACKAGES[package]
+    vf = pathlib.Path(version_path)
+    cur = read_version(vf)
+    new = bump_version(cur, bump_type)
+    print(f"{package}: {_esc(31)}{cur}{_esc(0)} -> {_esc(32)}{new}{_esc(0)}")
+    write_new_version(vf, new)
 
-    if "livekit-protocol" in new_versions:
-        update_api_protocol_dependency(new_versions["livekit-protocol"])
+    if package == "livekit-protocol":
+        update_api_protocol_dependency(new)
 
 
-def do_prerelease(prerelease_type: str) -> None:
-    new_versions = {}
-    for pypi_name, version_path in PACKAGES.items():
-        vf = pathlib.Path(version_path)
-        if vf.exists():
-            cur = read_version(vf)
-            new = bump_prerelease(cur, prerelease_type)
-            print(f"{pypi_name}: {_esc(31)}{cur}{_esc(0)} -> {_esc(32)}{new}{_esc(0)}")
-            write_new_version(vf, new)
-            new_versions[pypi_name] = new
+def do_prerelease(package: str, prerelease_type: str) -> None:
+    version_path = PACKAGES[package]
+    vf = pathlib.Path(version_path)
+    cur = read_version(vf)
+    new = bump_prerelease(cur, prerelease_type)
+    print(f"{package}: {_esc(31)}{cur}{_esc(0)} -> {_esc(32)}{new}{_esc(0)}")
+    write_new_version(vf, new)
 
-    if "livekit-protocol" in new_versions:
-        update_api_protocol_dependency(new_versions["livekit-protocol"])
+    if package == "livekit-protocol":
+        update_api_protocol_dependency(new)
 
 
 @click.command("bump")
+@click.option(
+    "--package",
+    type=click.Choice(list(PACKAGES.keys())),
+    required=True,
+    help="Package to bump.",
+)
 @click.option(
     "--pre",
     type=click.Choice(["rc", "none"]),
@@ -117,11 +117,11 @@ def do_prerelease(prerelease_type: str) -> None:
     default="patch",
     help="Type of version bump.",
 )
-def bump(pre: str, bump_type: str) -> None:
+def bump(package: str, pre: str, bump_type: str) -> None:
     if pre == "none":
-        do_bump(bump_type)
+        do_bump(package, bump_type)
     else:
-        do_prerelease(pre)
+        do_prerelease(package, pre)
 
 
 if __name__ == "__main__":

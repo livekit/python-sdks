@@ -4,6 +4,14 @@ on:
   # Step 1: Dispatch creates a version bump PR
   workflow_dispatch:
     inputs:
+      package:
+        description: "Package to publish"
+        type: choice
+        required: true
+        options:
+          - livekit
+          - livekit-api
+          - livekit-protocol
       version:
         description: "What to publish"
         type: choice
@@ -31,6 +39,12 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write
+
+env:
+  # Map PyPI package names to tag prefixes
+  # livekit -> rtc, livekit-api -> api, livekit-protocol -> protocol
+  TAG_PREFIX_MAP: '{"livekit":"rtc","livekit-api":"api","livekit-protocol":"protocol"}'
+  VERSION_FILE_MAP: '{"livekit":"livekit-rtc/livekit/rtc/version.py","livekit-api":"livekit-api/livekit/api/version.py","livekit-protocol":"livekit-protocol/livekit/protocol/version.py"}'
 
 jobs:
   # ── Step 1: Create a version bump PR ──────────────────────────
@@ -63,45 +77,50 @@ jobs:
       - name: Install dependencies
         run: pip install click packaging
 
-      - name: Bump versions
+      - name: Bump version
         run: |
           key=$(echo "${{ inputs.version }}" | awk '{print $1}')
+          pkg="${{ inputs.package }}"
 
           case "$key" in
             patch|minor|major)
-              python .github/update_versions.py bump --bump-type "$key"
+              python .github/update_versions.py bump --package "$pkg" --bump-type "$key"
               ;;
             patch-rc|minor-rc|major-rc)
               bump="${key%-rc}"
-              python .github/update_versions.py bump --bump-type "$bump"
-              python .github/update_versions.py bump --pre rc
+              python .github/update_versions.py bump --package "$pkg" --bump-type "$bump"
+              python .github/update_versions.py bump --package "$pkg" --pre rc
               ;;
             next-rc)
-              python .github/update_versions.py bump --pre rc
+              python .github/update_versions.py bump --package "$pkg" --pre rc
               ;;
             promote)
-              python .github/update_versions.py bump --bump-type release
+              python .github/update_versions.py bump --package "$pkg" --bump-type release
               ;;
           esac
 
       - name: Read new version
         id: version
         run: |
+          pkg="${{ inputs.package }}"
+          version_file=$(echo '${{ env.VERSION_FILE_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
           version=$(python -c "
           import re, pathlib
-          m = re.search(r'__version__\s*=\s*[\"'\''](.*?)[\"'\'']', pathlib.Path('livekit-rtc/livekit/rtc/version.py').read_text())
+          m = re.search(r'__version__\s*=\s*[\"'\''](.*?)[\"'\'']', pathlib.Path('$version_file').read_text())
           print(m.group(1))
           ")
+          tag_prefix=$(echo '${{ env.TAG_PREFIX_MAP }}' | jq -r --arg pkg "$pkg" '.[$pkg]')
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "New version: $version"
+          echo "tag_prefix=$tag_prefix" >> "$GITHUB_OUTPUT"
+          echo "Package: $pkg, New version: $version, Tag: ${tag_prefix}-v${version}"
 
-      - name: Close existing release PRs
+      - name: Close existing release PRs for this package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Close any open PRs from release/* branches
+          prefix="release/${{ steps.version.outputs.tag_prefix }}-v"
           gh pr list --state open --json number,headRefName \
-            --jq '.[] | select(.headRefName | startswith("release/v")) | .number' | while read -r pr; do
+            --jq ".[] | select(.headRefName | startswith(\"$prefix\")) | .number" | while read -r pr; do
             echo "Superseding release PR #$pr"
             gh pr comment "$pr" --body "Superseded by a new release."
             gh pr close "$pr" --delete-branch || true
@@ -112,29 +131,73 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           version="${{ steps.version.outputs.version }}"
-          branch="release/v${version}"
+          tag_prefix="${{ steps.version.outputs.tag_prefix }}"
+          branch="release/${tag_prefix}-v${version}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add -A
-          git commit -m "v${version}"
+          git commit -m "${tag_prefix}-v${version}"
           git push --force origin "$branch"
 
           gh pr create \
             --base "${{ inputs.branch }}" \
             --head "$branch" \
-            --title "v${version}" \
-            --body "Merging this PR will publish all packages as **v${version}** to PyPI." \
+            --title "${{ inputs.package }} v${version}" \
+            --body "Merging this PR will publish **${{ inputs.package }}** v${version} to PyPI." \
             --label "release"
 
   # ── Step 2: Publish on merge ──────────────────────────────────
-  build-rtc:
-    name: Build RTC wheels (${{ matrix.archs }})
+  detect:
+    name: Detect package
     if: |
       github.event_name == 'pull_request'
       && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/v')
+      && startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.detect.outputs.package }}
+      tag: ${{ steps.detect.outputs.tag }}
+    steps:
+      - name: Parse release branch
+        id: detect
+        run: |
+          branch="${{ github.event.pull_request.head.ref }}"
+          # branch is like release/rtc-v1.2.0, release/api-v1.1.1, release/protocol-v1.1.5
+          ref="${branch#release/}"
+          prefix="${ref%%-v*}"
+
+          case "$prefix" in
+            rtc) package="livekit" ;;
+            api) package="livekit-api" ;;
+            protocol) package="livekit-protocol" ;;
+            *) echo "::error::Unknown release prefix: $prefix"; exit 1 ;;
+          esac
+
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "tag=$ref" >> "$GITHUB_OUTPUT"
+          echo "Releasing $package (tag: $ref)"
+
+  tag:
+    name: Tag release
+    needs: detect
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ needs.detect.outputs.tag }}"
+          git push origin "${{ needs.detect.outputs.tag }}"
+
+  # ── RTC builds (multi-platform) ──────────────────────────────
+  build-rtc:
+    name: Build RTC wheels (${{ matrix.archs }})
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -173,10 +236,8 @@ jobs:
 
   build-rtc-sdist:
     name: Build RTC sdist
-    if: |
-      github.event_name == 'pull_request'
-      && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/v')
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -196,12 +257,33 @@ jobs:
           name: dist-rtc-sdist
           path: livekit-rtc/dist/*.tar.gz
 
+  publish-rtc:
+    name: Publish livekit (RTC)
+    needs: [detect, build-rtc, build-rtc-sdist]
+    if: needs.detect.outputs.package == 'livekit'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dist-rtc-*
+          path: dist
+          merge-multiple: true
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ── API build ────────────────────────────────────────────────
   build-api:
     name: Build API
-    if: |
-      github.event_name == 'pull_request'
-      && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/v')
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit-api'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -225,12 +307,32 @@ jobs:
             livekit-api/dist/*.whl
             livekit-api/dist/*.tar.gz
 
+  publish-api:
+    name: Publish livekit-api
+    needs: [detect, build-api]
+    if: needs.detect.outputs.package == 'livekit-api'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-api
+          path: dist/
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  # ── Protocol build ───────────────────────────────────────────
   build-protocol:
     name: Build Protocol
-    if: |
-      github.event_name == 'pull_request'
-      && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/v')
+    needs: detect
+    if: needs.detect.outputs.package == 'livekit-protocol'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -254,69 +356,10 @@ jobs:
             livekit-protocol/dist/*.whl
             livekit-protocol/dist/*.tar.gz
 
-  tag:
-    name: Tag release
-    if: |
-      github.event_name == 'pull_request'
-      && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Create git tag
-        run: |
-          version="${{ github.event.pull_request.head.ref }}"
-          version="${version#release/}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$version"
-          git push origin "$version"
-
-  publish-rtc:
-    name: Publish livekit (RTC)
-    needs: [build-rtc, build-rtc-sdist]
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: dist-rtc-*
-          path: dist
-          merge-multiple: true
-
-      - name: List distributions
-        run: ls -la dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-
-  publish-api:
-    name: Publish livekit-api
-    needs: [build-api]
-    runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-api
-          path: dist/
-
-      - name: List distributions
-        run: ls -la dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-
   publish-protocol:
     name: Publish livekit-protocol
-    needs: [build-protocol]
+    needs: [detect, build-protocol]
+    if: needs.detect.outputs.package == 'livekit-protocol'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -334,20 +377,33 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
-  docs:
-    name: Build docs (${{ matrix.package_name }})
-    needs: [publish-rtc, publish-api, publish-protocol]
-    strategy:
-      matrix:
-        include:
-          - package_dir: livekit-rtc
-            package_name: livekit.rtc
-          - package_dir: livekit-api
-            package_name: livekit.api
-          - package_dir: livekit-protocol
-            package_name: livekit.protocol
+  # ── Docs ─────────────────────────────────────────────────────
+  docs-rtc:
+    name: Build RTC docs
+    needs: [detect, publish-rtc]
+    if: needs.detect.outputs.package == 'livekit'
     uses: ./.github/workflows/build-docs.yml
     with:
-      package_dir: ${{ matrix.package_dir }}
-      package_name: ${{ matrix.package_name }}
+      package_dir: livekit-rtc
+      package_name: livekit.rtc
+    secrets: inherit
+
+  docs-api:
+    name: Build API docs
+    needs: [detect, publish-api]
+    if: needs.detect.outputs.package == 'livekit-api'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-api
+      package_name: livekit.api
+    secrets: inherit
+
+  docs-protocol:
+    name: Build Protocol docs
+    needs: [detect, publish-protocol]
+    if: needs.detect.outputs.package == 'livekit-protocol'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-protocol
+      package_name: livekit.protocol
     secrets: inherit
