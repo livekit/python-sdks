@@ -1,3 +1,5 @@
+import datetime
+
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from . import metrics as _metrics
 from .logger_pb import options as _options_pb2
@@ -5,7 +7,8 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -216,7 +219,7 @@ class ListUpdate(_message.Message):
     add: _containers.RepeatedScalarFieldContainer[str]
     remove: _containers.RepeatedScalarFieldContainer[str]
     clear: bool
-    def __init__(self, set: _Optional[_Iterable[str]] = ..., add: _Optional[_Iterable[str]] = ..., remove: _Optional[_Iterable[str]] = ..., clear: bool = ...) -> None: ...
+    def __init__(self, set: _Optional[_Iterable[str]] = ..., add: _Optional[_Iterable[str]] = ..., remove: _Optional[_Iterable[str]] = ..., clear: _Optional[bool] = ...) -> None: ...
 
 class Room(_message.Message):
     __slots__ = ("sid", "name", "empty_timeout", "departure_timeout", "max_participants", "creation_time", "creation_time_ms", "turn_password", "enabled_codecs", "metadata", "num_participants", "num_publishers", "active_recording", "version")
@@ -248,7 +251,7 @@ class Room(_message.Message):
     num_publishers: int
     active_recording: bool
     version: TimedVersion
-    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., creation_time: _Optional[int] = ..., creation_time_ms: _Optional[int] = ..., turn_password: _Optional[str] = ..., enabled_codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., metadata: _Optional[str] = ..., num_participants: _Optional[int] = ..., num_publishers: _Optional[int] = ..., active_recording: bool = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., creation_time: _Optional[int] = ..., creation_time_ms: _Optional[int] = ..., turn_password: _Optional[str] = ..., enabled_codecs: _Optional[_Iterable[_Union[Codec, _Mapping]]] = ..., metadata: _Optional[str] = ..., num_participants: _Optional[int] = ..., num_publishers: _Optional[int] = ..., active_recording: _Optional[bool] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ...) -> None: ...
 
 class Codec(_message.Message):
     __slots__ = ("mime", "fmtp_line")
@@ -266,7 +269,7 @@ class PlayoutDelay(_message.Message):
     enabled: bool
     min: int
     max: int
-    def __init__(self, enabled: bool = ..., min: _Optional[int] = ..., max: _Optional[int] = ...) -> None: ...
+    def __init__(self, enabled: _Optional[bool] = ..., min: _Optional[int] = ..., max: _Optional[int] = ...) -> None: ...
 
 class ParticipantPermission(_message.Message):
     __slots__ = ("can_subscribe", "can_publish", "can_publish_data", "can_publish_sources", "hidden", "recorder", "can_update_metadata", "agent", "can_subscribe_metrics", "can_manage_agent_session")
@@ -290,7 +293,7 @@ class ParticipantPermission(_message.Message):
     agent: bool
     can_subscribe_metrics: bool
     can_manage_agent_session: bool
-    def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ..., can_manage_agent_session: bool = ...) -> None: ...
+    def __init__(self, can_subscribe: _Optional[bool] = ..., can_publish: _Optional[bool] = ..., can_publish_data: _Optional[bool] = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: _Optional[bool] = ..., recorder: _Optional[bool] = ..., can_update_metadata: _Optional[bool] = ..., agent: _Optional[bool] = ..., can_subscribe_metrics: _Optional[bool] = ..., can_manage_agent_session: _Optional[bool] = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
     __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks", "client_protocol")
@@ -375,7 +378,7 @@ class ParticipantInfo(_message.Message):
     kind_details: _containers.RepeatedScalarFieldContainer[ParticipantInfo.KindDetail]
     data_tracks: _containers.RepeatedCompositeFieldContainer[DataTrackInfo]
     client_protocol: int
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ..., client_protocol: _Optional[int] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: _Optional[bool] = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ..., client_protocol: _Optional[int] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
@@ -449,7 +452,7 @@ class TrackInfo(_message.Message):
     audio_features: _containers.RepeatedScalarFieldContainer[AudioTrackFeature]
     backup_codec_policy: BackupCodecPolicy
     packet_trailer_features: _containers.RepeatedScalarFieldContainer[PacketTrailerFeature]
-    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[PacketTrailerFeature, str]]] = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: _Optional[bool] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: _Optional[bool] = ..., disable_dtx: _Optional[bool] = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: _Optional[bool] = ..., disable_red: _Optional[bool] = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[PacketTrailerFeature, str]]] = ...) -> None: ...
 
 class DataTrackInfo(_message.Message):
     __slots__ = ("pub_handle", "sid", "name", "encryption")
@@ -599,7 +602,7 @@ class SpeakerInfo(_message.Message):
     sid: str
     level: float
     active: bool
-    def __init__(self, sid: _Optional[str] = ..., level: _Optional[float] = ..., active: bool = ...) -> None: ...
+    def __init__(self, sid: _Optional[str] = ..., level: _Optional[float] = ..., active: _Optional[bool] = ...) -> None: ...
 
 class UserPacket(_message.Message):
     __slots__ = ("participant_sid", "participant_identity", "payload", "destination_sids", "destination_identities", "topic", "id", "start_time", "end_time", "nonce")
@@ -657,7 +660,7 @@ class TranscriptionSegment(_message.Message):
     end_time: int
     final: bool
     language: str
-    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: bool = ..., language: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., text: _Optional[str] = ..., start_time: _Optional[int] = ..., end_time: _Optional[int] = ..., final: _Optional[bool] = ..., language: _Optional[str] = ...) -> None: ...
 
 class ChatMessage(_message.Message):
     __slots__ = ("id", "timestamp", "edit_timestamp", "message", "deleted", "generated")
@@ -673,7 +676,7 @@ class ChatMessage(_message.Message):
     message: str
     deleted: bool
     generated: bool
-    def __init__(self, id: _Optional[str] = ..., timestamp: _Optional[int] = ..., edit_timestamp: _Optional[int] = ..., message: _Optional[str] = ..., deleted: bool = ..., generated: bool = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., timestamp: _Optional[int] = ..., edit_timestamp: _Optional[int] = ..., message: _Optional[str] = ..., deleted: _Optional[bool] = ..., generated: _Optional[bool] = ...) -> None: ...
 
 class RpcRequest(_message.Message):
     __slots__ = ("id", "method", "payload", "response_timeout_ms", "version", "compressed_payload")
@@ -859,7 +862,7 @@ class RTPDrift(_message.Message):
     drift_samples: int
     drift_ms: float
     clock_rate: float
-    def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., start_timestamp: _Optional[int] = ..., end_timestamp: _Optional[int] = ..., rtp_clock_ticks: _Optional[int] = ..., drift_samples: _Optional[int] = ..., drift_ms: _Optional[float] = ..., clock_rate: _Optional[float] = ...) -> None: ...
+    def __init__(self, start_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., start_timestamp: _Optional[int] = ..., end_timestamp: _Optional[int] = ..., rtp_clock_ticks: _Optional[int] = ..., drift_samples: _Optional[int] = ..., drift_ms: _Optional[float] = ..., clock_rate: _Optional[float] = ...) -> None: ...
 
 class RTPStats(_message.Message):
     __slots__ = ("start_time", "end_time", "duration", "packets", "packet_rate", "bytes", "header_bytes", "bitrate", "packets_lost", "packet_loss_rate", "packet_loss_percentage", "packets_duplicate", "packet_duplicate_rate", "bytes_duplicate", "header_bytes_duplicate", "bitrate_duplicate", "packets_padding", "packet_padding_rate", "bytes_padding", "header_bytes_padding", "bitrate_padding", "packets_out_of_order", "frames", "frame_rate", "jitter_current", "jitter_max", "gap_histogram", "nacks", "nack_acks", "nack_misses", "nack_repeated", "plis", "last_pli", "firs", "last_fir", "rtt_current", "rtt_max", "key_frames", "last_key_frame", "layer_lock_plis", "last_layer_lock_pli", "packet_drift", "ntp_report_drift", "rebased_report_drift", "received_report_drift")
@@ -960,7 +963,7 @@ class RTPStats(_message.Message):
     ntp_report_drift: RTPDrift
     rebased_report_drift: RTPDrift
     received_report_drift: RTPDrift
-    def __init__(self, start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., ntp_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., received_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
+    def __init__(self, start_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[float] = ..., packets: _Optional[int] = ..., packet_rate: _Optional[float] = ..., bytes: _Optional[int] = ..., header_bytes: _Optional[int] = ..., bitrate: _Optional[float] = ..., packets_lost: _Optional[int] = ..., packet_loss_rate: _Optional[float] = ..., packet_loss_percentage: _Optional[float] = ..., packets_duplicate: _Optional[int] = ..., packet_duplicate_rate: _Optional[float] = ..., bytes_duplicate: _Optional[int] = ..., header_bytes_duplicate: _Optional[int] = ..., bitrate_duplicate: _Optional[float] = ..., packets_padding: _Optional[int] = ..., packet_padding_rate: _Optional[float] = ..., bytes_padding: _Optional[int] = ..., header_bytes_padding: _Optional[int] = ..., bitrate_padding: _Optional[float] = ..., packets_out_of_order: _Optional[int] = ..., frames: _Optional[int] = ..., frame_rate: _Optional[float] = ..., jitter_current: _Optional[float] = ..., jitter_max: _Optional[float] = ..., gap_histogram: _Optional[_Mapping[int, int]] = ..., nacks: _Optional[int] = ..., nack_acks: _Optional[int] = ..., nack_misses: _Optional[int] = ..., nack_repeated: _Optional[int] = ..., plis: _Optional[int] = ..., last_pli: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., firs: _Optional[int] = ..., last_fir: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., rtt_current: _Optional[int] = ..., rtt_max: _Optional[int] = ..., key_frames: _Optional[int] = ..., last_key_frame: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., layer_lock_plis: _Optional[int] = ..., last_layer_lock_pli: _Optional[_Union[datetime.datetime, _timestamp_pb2.Timestamp, _Mapping]] = ..., packet_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., ntp_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., rebased_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ..., received_report_drift: _Optional[_Union[RTPDrift, _Mapping]] = ...) -> None: ...
 
 class RTCPSenderReportState(_message.Message):
     __slots__ = ("rtp_timestamp", "rtp_timestamp_ext", "ntp_timestamp", "at", "at_adjusted", "packets", "octets")
@@ -998,7 +1001,7 @@ class RTPForwarderState(_message.Message):
     rtp_munger: RTPMungerState
     vp8_munger: VP8MungerState
     sender_report_state: _containers.RepeatedCompositeFieldContainer[RTCPSenderReportState]
-    def __init__(self, started: bool = ..., reference_layer_spatial: _Optional[int] = ..., pre_start_time: _Optional[int] = ..., ext_first_timestamp: _Optional[int] = ..., dummy_start_timestamp_offset: _Optional[int] = ..., rtp_munger: _Optional[_Union[RTPMungerState, _Mapping]] = ..., vp8_munger: _Optional[_Union[VP8MungerState, _Mapping]] = ..., sender_report_state: _Optional[_Iterable[_Union[RTCPSenderReportState, _Mapping]]] = ...) -> None: ...
+    def __init__(self, started: _Optional[bool] = ..., reference_layer_spatial: _Optional[int] = ..., pre_start_time: _Optional[int] = ..., ext_first_timestamp: _Optional[int] = ..., dummy_start_timestamp_offset: _Optional[int] = ..., rtp_munger: _Optional[_Union[RTPMungerState, _Mapping]] = ..., vp8_munger: _Optional[_Union[VP8MungerState, _Mapping]] = ..., sender_report_state: _Optional[_Iterable[_Union[RTCPSenderReportState, _Mapping]]] = ...) -> None: ...
 
 class RTPMungerState(_message.Message):
     __slots__ = ("ext_last_sequence_number", "ext_second_last_sequence_number", "ext_last_timestamp", "ext_second_last_timestamp", "last_marker", "second_last_marker")
@@ -1014,7 +1017,7 @@ class RTPMungerState(_message.Message):
     ext_second_last_timestamp: int
     last_marker: bool
     second_last_marker: bool
-    def __init__(self, ext_last_sequence_number: _Optional[int] = ..., ext_second_last_sequence_number: _Optional[int] = ..., ext_last_timestamp: _Optional[int] = ..., ext_second_last_timestamp: _Optional[int] = ..., last_marker: bool = ..., second_last_marker: bool = ...) -> None: ...
+    def __init__(self, ext_last_sequence_number: _Optional[int] = ..., ext_second_last_sequence_number: _Optional[int] = ..., ext_last_timestamp: _Optional[int] = ..., ext_second_last_timestamp: _Optional[int] = ..., last_marker: _Optional[bool] = ..., second_last_marker: _Optional[bool] = ...) -> None: ...
 
 class VP8MungerState(_message.Message):
     __slots__ = ("ext_last_picture_id", "picture_id_used", "last_tl0_pic_idx", "tl0_pic_idx_used", "tid_used", "last_key_idx", "key_idx_used")
@@ -1032,7 +1035,7 @@ class VP8MungerState(_message.Message):
     tid_used: bool
     last_key_idx: int
     key_idx_used: bool
-    def __init__(self, ext_last_picture_id: _Optional[int] = ..., picture_id_used: bool = ..., last_tl0_pic_idx: _Optional[int] = ..., tl0_pic_idx_used: bool = ..., tid_used: bool = ..., last_key_idx: _Optional[int] = ..., key_idx_used: bool = ...) -> None: ...
+    def __init__(self, ext_last_picture_id: _Optional[int] = ..., picture_id_used: _Optional[bool] = ..., last_tl0_pic_idx: _Optional[int] = ..., tl0_pic_idx_used: _Optional[bool] = ..., tid_used: _Optional[bool] = ..., last_key_idx: _Optional[int] = ..., key_idx_used: _Optional[bool] = ...) -> None: ...
 
 class TimedVersion(_message.Message):
     __slots__ = ("unix_micro", "ticks")
@@ -1066,7 +1069,7 @@ class DataStream(_message.Message):
         reply_to_stream_id: str
         attached_stream_ids: _containers.RepeatedScalarFieldContainer[str]
         generated: bool
-        def __init__(self, operation_type: _Optional[_Union[DataStream.OperationType, str]] = ..., version: _Optional[int] = ..., reply_to_stream_id: _Optional[str] = ..., attached_stream_ids: _Optional[_Iterable[str]] = ..., generated: bool = ...) -> None: ...
+        def __init__(self, operation_type: _Optional[_Union[DataStream.OperationType, str]] = ..., version: _Optional[int] = ..., reply_to_stream_id: _Optional[str] = ..., attached_stream_ids: _Optional[_Iterable[str]] = ..., generated: _Optional[bool] = ...) -> None: ...
     class ByteHeader(_message.Message):
         __slots__ = ("name",)
         NAME_FIELD_NUMBER: _ClassVar[int]
@@ -1155,4 +1158,4 @@ class SubscribedAudioCodec(_message.Message):
     ENABLED_FIELD_NUMBER: _ClassVar[int]
     codec: str
     enabled: bool
-    def __init__(self, codec: _Optional[str] = ..., enabled: bool = ...) -> None: ...
+    def __init__(self, codec: _Optional[str] = ..., enabled: _Optional[bool] = ...) -> None: ...
