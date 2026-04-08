@@ -1,29 +1,41 @@
 from . import agent as _agent
 from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class JobRestartPolicy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    JRP_ON_FAILURE: _ClassVar[JobRestartPolicy]
+    JRP_NEVER: _ClassVar[JobRestartPolicy]
+JRP_ON_FAILURE: JobRestartPolicy
+JRP_NEVER: JobRestartPolicy
+
 class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata")
+    __slots__ = ("agent_name", "room", "metadata", "restart_policy")
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     room: str
     metadata: str
-    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
+    restart_policy: JobRestartPolicy
+    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata")
+    __slots__ = ("agent_name", "metadata", "restart_policy")
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     metadata: str
-    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
+    restart_policy: JobRestartPolicy
+    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
     __slots__ = ("dispatch_id", "room")
@@ -48,18 +60,20 @@ class ListAgentDispatchResponse(_message.Message):
     def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state")
+    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy")
     ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     id: str
     agent_name: str
     room: str
     metadata: str
     state: AgentDispatchState
-    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ...) -> None: ...
+    restart_policy: JobRestartPolicy
+    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class AgentDispatchState(_message.Message):
     __slots__ = ("jobs", "created_at", "deleted_at")

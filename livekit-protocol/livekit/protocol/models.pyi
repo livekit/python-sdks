@@ -121,6 +121,7 @@ class AudioTrackFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 class PacketTrailerFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     PTF_USER_TIMESTAMP: _ClassVar[PacketTrailerFeature]
+    PTF_FRAME_ID: _ClassVar[PacketTrailerFeature]
 DEFAULT_AC: AudioCodec
 OPUS: AudioCodec
 AAC: AudioCodec
@@ -189,6 +190,7 @@ TF_NOISE_SUPPRESSION: AudioTrackFeature
 TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature
 TF_PRECONNECT_BUFFER: AudioTrackFeature
 PTF_USER_TIMESTAMP: PacketTrailerFeature
+PTF_FRAME_ID: PacketTrailerFeature
 
 class Pagination(_message.Message):
     __slots__ = ("after_id", "limit")

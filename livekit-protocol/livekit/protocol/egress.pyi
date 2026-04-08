@@ -8,12 +8,36 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class AudioChannel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    AUDIO_CHANNEL_BOTH: _ClassVar[AudioChannel]
+    AUDIO_CHANNEL_LEFT: _ClassVar[AudioChannel]
+    AUDIO_CHANNEL_RIGHT: _ClassVar[AudioChannel]
+
+class EncodingOptionsPreset(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    H264_720P_30: _ClassVar[EncodingOptionsPreset]
+    H264_720P_60: _ClassVar[EncodingOptionsPreset]
+    H264_1080P_30: _ClassVar[EncodingOptionsPreset]
+    H264_1080P_60: _ClassVar[EncodingOptionsPreset]
+    PORTRAIT_H264_720P_30: _ClassVar[EncodingOptionsPreset]
+    PORTRAIT_H264_720P_60: _ClassVar[EncodingOptionsPreset]
+    PORTRAIT_H264_1080P_30: _ClassVar[EncodingOptionsPreset]
+    PORTRAIT_H264_1080P_60: _ClassVar[EncodingOptionsPreset]
+
 class EncodedFileType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     DEFAULT_FILETYPE: _ClassVar[EncodedFileType]
     MP4: _ClassVar[EncodedFileType]
     OGG: _ClassVar[EncodedFileType]
     MP3: _ClassVar[EncodedFileType]
+
+class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    DEFAULT_PROTOCOL: _ClassVar[StreamProtocol]
+    RTMP: _ClassVar[StreamProtocol]
+    SRT: _ClassVar[StreamProtocol]
+    WEBSOCKET: _ClassVar[StreamProtocol]
 
 class SegmentedFileProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -31,28 +55,10 @@ class ImageFileSuffix(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     IMAGE_SUFFIX_TIMESTAMP: _ClassVar[ImageFileSuffix]
     IMAGE_SUFFIX_NONE_OVERWRITE: _ClassVar[ImageFileSuffix]
 
-class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class EgressSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    DEFAULT_PROTOCOL: _ClassVar[StreamProtocol]
-    RTMP: _ClassVar[StreamProtocol]
-    SRT: _ClassVar[StreamProtocol]
-
-class AudioMixing(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = ()
-    DEFAULT_MIXING: _ClassVar[AudioMixing]
-    DUAL_CHANNEL_AGENT: _ClassVar[AudioMixing]
-    DUAL_CHANNEL_ALTERNATE: _ClassVar[AudioMixing]
-
-class EncodingOptionsPreset(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = ()
-    H264_720P_30: _ClassVar[EncodingOptionsPreset]
-    H264_720P_60: _ClassVar[EncodingOptionsPreset]
-    H264_1080P_30: _ClassVar[EncodingOptionsPreset]
-    H264_1080P_60: _ClassVar[EncodingOptionsPreset]
-    PORTRAIT_H264_720P_30: _ClassVar[EncodingOptionsPreset]
-    PORTRAIT_H264_720P_60: _ClassVar[EncodingOptionsPreset]
-    PORTRAIT_H264_1080P_30: _ClassVar[EncodingOptionsPreset]
-    PORTRAIT_H264_1080P_60: _ClassVar[EncodingOptionsPreset]
+    EGRESS_SOURCE_TYPE_WEB: _ClassVar[EgressSourceType]
+    EGRESS_SOURCE_TYPE_SDK: _ClassVar[EgressSourceType]
 
 class EgressStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -64,27 +70,14 @@ class EgressStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     EGRESS_ABORTED: _ClassVar[EgressStatus]
     EGRESS_LIMIT_REACHED: _ClassVar[EgressStatus]
 
-class EgressSourceType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class AudioMixing(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
-    EGRESS_SOURCE_TYPE_WEB: _ClassVar[EgressSourceType]
-    EGRESS_SOURCE_TYPE_SDK: _ClassVar[EgressSourceType]
-DEFAULT_FILETYPE: EncodedFileType
-MP4: EncodedFileType
-OGG: EncodedFileType
-MP3: EncodedFileType
-DEFAULT_SEGMENTED_FILE_PROTOCOL: SegmentedFileProtocol
-HLS_PROTOCOL: SegmentedFileProtocol
-INDEX: SegmentedFileSuffix
-TIMESTAMP: SegmentedFileSuffix
-IMAGE_SUFFIX_INDEX: ImageFileSuffix
-IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix
-IMAGE_SUFFIX_NONE_OVERWRITE: ImageFileSuffix
-DEFAULT_PROTOCOL: StreamProtocol
-RTMP: StreamProtocol
-SRT: StreamProtocol
-DEFAULT_MIXING: AudioMixing
-DUAL_CHANNEL_AGENT: AudioMixing
-DUAL_CHANNEL_ALTERNATE: AudioMixing
+    DEFAULT_MIXING: _ClassVar[AudioMixing]
+    DUAL_CHANNEL_AGENT: _ClassVar[AudioMixing]
+    DUAL_CHANNEL_ALTERNATE: _ClassVar[AudioMixing]
+AUDIO_CHANNEL_BOTH: AudioChannel
+AUDIO_CHANNEL_LEFT: AudioChannel
+AUDIO_CHANNEL_RIGHT: AudioChannel
 H264_720P_30: EncodingOptionsPreset
 H264_720P_60: EncodingOptionsPreset
 H264_1080P_30: EncodingOptionsPreset
@@ -93,6 +86,23 @@ PORTRAIT_H264_720P_30: EncodingOptionsPreset
 PORTRAIT_H264_720P_60: EncodingOptionsPreset
 PORTRAIT_H264_1080P_30: EncodingOptionsPreset
 PORTRAIT_H264_1080P_60: EncodingOptionsPreset
+DEFAULT_FILETYPE: EncodedFileType
+MP4: EncodedFileType
+OGG: EncodedFileType
+MP3: EncodedFileType
+DEFAULT_PROTOCOL: StreamProtocol
+RTMP: StreamProtocol
+SRT: StreamProtocol
+WEBSOCKET: StreamProtocol
+DEFAULT_SEGMENTED_FILE_PROTOCOL: SegmentedFileProtocol
+HLS_PROTOCOL: SegmentedFileProtocol
+INDEX: SegmentedFileSuffix
+TIMESTAMP: SegmentedFileSuffix
+IMAGE_SUFFIX_INDEX: ImageFileSuffix
+IMAGE_SUFFIX_TIMESTAMP: ImageFileSuffix
+IMAGE_SUFFIX_NONE_OVERWRITE: ImageFileSuffix
+EGRESS_SOURCE_TYPE_WEB: EgressSourceType
+EGRESS_SOURCE_TYPE_SDK: EgressSourceType
 EGRESS_STARTING: EgressStatus
 EGRESS_ACTIVE: EgressStatus
 EGRESS_ENDING: EgressStatus
@@ -100,8 +110,540 @@ EGRESS_COMPLETE: EgressStatus
 EGRESS_FAILED: EgressStatus
 EGRESS_ABORTED: EgressStatus
 EGRESS_LIMIT_REACHED: EgressStatus
-EGRESS_SOURCE_TYPE_WEB: EgressSourceType
-EGRESS_SOURCE_TYPE_SDK: EgressSourceType
+DEFAULT_MIXING: AudioMixing
+DUAL_CHANNEL_AGENT: AudioMixing
+DUAL_CHANNEL_ALTERNATE: AudioMixing
+
+class StartEgressRequest(_message.Message):
+    __slots__ = ("room_name", "template", "web", "media", "preset", "advanced", "outputs", "storage", "webhooks")
+    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    WEB_FIELD_NUMBER: _ClassVar[int]
+    MEDIA_FIELD_NUMBER: _ClassVar[int]
+    PRESET_FIELD_NUMBER: _ClassVar[int]
+    ADVANCED_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
+    room_name: str
+    template: TemplateSource
+    web: WebSource
+    media: MediaSource
+    preset: EncodingOptionsPreset
+    advanced: EncodingOptions
+    outputs: _containers.RepeatedCompositeFieldContainer[Output]
+    storage: StorageConfig
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, room_name: _Optional[str] = ..., template: _Optional[_Union[TemplateSource, _Mapping]] = ..., web: _Optional[_Union[WebSource, _Mapping]] = ..., media: _Optional[_Union[MediaSource, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., outputs: _Optional[_Iterable[_Union[Output, _Mapping]]] = ..., storage: _Optional[_Union[StorageConfig, _Mapping]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
+
+class TemplateSource(_message.Message):
+    __slots__ = ("layout", "audio_only", "video_only", "custom_base_url")
+    LAYOUT_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_ONLY_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_ONLY_FIELD_NUMBER: _ClassVar[int]
+    CUSTOM_BASE_URL_FIELD_NUMBER: _ClassVar[int]
+    layout: str
+    audio_only: bool
+    video_only: bool
+    custom_base_url: str
+    def __init__(self, layout: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., custom_base_url: _Optional[str] = ...) -> None: ...
+
+class WebSource(_message.Message):
+    __slots__ = ("url", "audio_only", "video_only", "await_start_signal")
+    URL_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_ONLY_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_ONLY_FIELD_NUMBER: _ClassVar[int]
+    AWAIT_START_SIGNAL_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    audio_only: bool
+    video_only: bool
+    await_start_signal: bool
+    def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ...) -> None: ...
+
+class MediaSource(_message.Message):
+    __slots__ = ("video_track_id", "participant_video", "audio", "data")
+    VIDEO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_VIDEO_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    video_track_id: str
+    participant_video: ParticipantVideo
+    audio: AudioConfig
+    data: DataConfig
+    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ..., data: _Optional[_Union[DataConfig, _Mapping]] = ...) -> None: ...
+
+class ParticipantVideo(_message.Message):
+    __slots__ = ("identity", "prefer_screen_share")
+    IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    PREFER_SCREEN_SHARE_FIELD_NUMBER: _ClassVar[int]
+    identity: str
+    prefer_screen_share: bool
+    def __init__(self, identity: _Optional[str] = ..., prefer_screen_share: bool = ...) -> None: ...
+
+class AudioConfig(_message.Message):
+    __slots__ = ("routes",)
+    ROUTES_FIELD_NUMBER: _ClassVar[int]
+    routes: _containers.RepeatedCompositeFieldContainer[AudioRoute]
+    def __init__(self, routes: _Optional[_Iterable[_Union[AudioRoute, _Mapping]]] = ...) -> None: ...
+
+class AudioRoute(_message.Message):
+    __slots__ = ("track_id", "participant_identity", "participant_kind", "channel")
+    TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_KIND_FIELD_NUMBER: _ClassVar[int]
+    CHANNEL_FIELD_NUMBER: _ClassVar[int]
+    track_id: str
+    participant_identity: str
+    participant_kind: _models.ParticipantInfo.Kind
+    channel: AudioChannel
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
+
+class DataConfig(_message.Message):
+    __slots__ = ("selectors",)
+    SELECTORS_FIELD_NUMBER: _ClassVar[int]
+    selectors: _containers.RepeatedCompositeFieldContainer[DataSelector]
+    def __init__(self, selectors: _Optional[_Iterable[_Union[DataSelector, _Mapping]]] = ...) -> None: ...
+
+class DataSelector(_message.Message):
+    __slots__ = ("track_id", "participant_identity", "topic")
+    TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TOPIC_FIELD_NUMBER: _ClassVar[int]
+    track_id: str
+    participant_identity: str
+    topic: str
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., topic: _Optional[str] = ...) -> None: ...
+
+class EncodingOptions(_message.Message):
+    __slots__ = ("width", "height", "depth", "framerate", "audio_codec", "audio_bitrate", "audio_frequency", "video_codec", "video_bitrate", "key_frame_interval", "audio_quality", "video_quality")
+    WIDTH_FIELD_NUMBER: _ClassVar[int]
+    HEIGHT_FIELD_NUMBER: _ClassVar[int]
+    DEPTH_FIELD_NUMBER: _ClassVar[int]
+    FRAMERATE_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_CODEC_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_BITRATE_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_FREQUENCY_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_CODEC_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_BITRATE_FIELD_NUMBER: _ClassVar[int]
+    KEY_FRAME_INTERVAL_FIELD_NUMBER: _ClassVar[int]
+    AUDIO_QUALITY_FIELD_NUMBER: _ClassVar[int]
+    VIDEO_QUALITY_FIELD_NUMBER: _ClassVar[int]
+    width: int
+    height: int
+    depth: int
+    framerate: int
+    audio_codec: _models.AudioCodec
+    audio_bitrate: int
+    audio_frequency: int
+    video_codec: _models.VideoCodec
+    video_bitrate: int
+    key_frame_interval: float
+    audio_quality: int
+    video_quality: int
+    def __init__(self, width: _Optional[int] = ..., height: _Optional[int] = ..., depth: _Optional[int] = ..., framerate: _Optional[int] = ..., audio_codec: _Optional[_Union[_models.AudioCodec, str]] = ..., audio_bitrate: _Optional[int] = ..., audio_frequency: _Optional[int] = ..., video_codec: _Optional[_Union[_models.VideoCodec, str]] = ..., video_bitrate: _Optional[int] = ..., key_frame_interval: _Optional[float] = ..., audio_quality: _Optional[int] = ..., video_quality: _Optional[int] = ...) -> None: ...
+
+class Output(_message.Message):
+    __slots__ = ("file", "stream", "segments", "images", "storage")
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    STREAM_FIELD_NUMBER: _ClassVar[int]
+    SEGMENTS_FIELD_NUMBER: _ClassVar[int]
+    IMAGES_FIELD_NUMBER: _ClassVar[int]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    file: FileOutput
+    stream: StreamOutput
+    segments: SegmentedFileOutput
+    images: ImageOutput
+    storage: StorageConfig
+    def __init__(self, file: _Optional[_Union[FileOutput, _Mapping]] = ..., stream: _Optional[_Union[StreamOutput, _Mapping]] = ..., segments: _Optional[_Union[SegmentedFileOutput, _Mapping]] = ..., images: _Optional[_Union[ImageOutput, _Mapping]] = ..., storage: _Optional[_Union[StorageConfig, _Mapping]] = ...) -> None: ...
+
+class FileOutput(_message.Message):
+    __slots__ = ("file_type", "filepath", "disable_manifest")
+    FILE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    FILEPATH_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
+    file_type: EncodedFileType
+    filepath: str
+    disable_manifest: bool
+    def __init__(self, file_type: _Optional[_Union[EncodedFileType, str]] = ..., filepath: _Optional[str] = ..., disable_manifest: bool = ...) -> None: ...
+
+class StreamOutput(_message.Message):
+    __slots__ = ("protocol", "urls")
+    PROTOCOL_FIELD_NUMBER: _ClassVar[int]
+    URLS_FIELD_NUMBER: _ClassVar[int]
+    protocol: StreamProtocol
+    urls: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, protocol: _Optional[_Union[StreamProtocol, str]] = ..., urls: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class SegmentedFileOutput(_message.Message):
+    __slots__ = ("protocol", "filename_prefix", "playlist_name", "live_playlist_name", "segment_duration", "filename_suffix", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
+    PROTOCOL_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
+    LIVE_PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
+    SEGMENT_DURATION_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_SUFFIX_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
+    S3_FIELD_NUMBER: _ClassVar[int]
+    GCP_FIELD_NUMBER: _ClassVar[int]
+    AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
+    protocol: SegmentedFileProtocol
+    filename_prefix: str
+    playlist_name: str
+    live_playlist_name: str
+    segment_duration: int
+    filename_suffix: SegmentedFileSuffix
+    disable_manifest: bool
+    s3: S3Upload
+    gcp: GCPUpload
+    azure: AzureBlobUpload
+    aliOSS: AliOSSUpload
+    def __init__(self, protocol: _Optional[_Union[SegmentedFileProtocol, str]] = ..., filename_prefix: _Optional[str] = ..., playlist_name: _Optional[str] = ..., live_playlist_name: _Optional[str] = ..., segment_duration: _Optional[int] = ..., filename_suffix: _Optional[_Union[SegmentedFileSuffix, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
+
+class ImageOutput(_message.Message):
+    __slots__ = ("capture_interval", "width", "height", "filename_prefix", "filename_suffix", "image_codec", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
+    CAPTURE_INTERVAL_FIELD_NUMBER: _ClassVar[int]
+    WIDTH_FIELD_NUMBER: _ClassVar[int]
+    HEIGHT_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_SUFFIX_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_CODEC_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
+    S3_FIELD_NUMBER: _ClassVar[int]
+    GCP_FIELD_NUMBER: _ClassVar[int]
+    AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
+    capture_interval: int
+    width: int
+    height: int
+    filename_prefix: str
+    filename_suffix: ImageFileSuffix
+    image_codec: _models.ImageCodec
+    disable_manifest: bool
+    s3: S3Upload
+    gcp: GCPUpload
+    azure: AzureBlobUpload
+    aliOSS: AliOSSUpload
+    def __init__(self, capture_interval: _Optional[int] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., filename_prefix: _Optional[str] = ..., filename_suffix: _Optional[_Union[ImageFileSuffix, str]] = ..., image_codec: _Optional[_Union[_models.ImageCodec, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
+
+class StorageConfig(_message.Message):
+    __slots__ = ("s3", "gcp", "azure", "aliOSS")
+    S3_FIELD_NUMBER: _ClassVar[int]
+    GCP_FIELD_NUMBER: _ClassVar[int]
+    AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
+    s3: S3Upload
+    gcp: GCPUpload
+    azure: AzureBlobUpload
+    aliOSS: AliOSSUpload
+    def __init__(self, s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
+
+class S3Upload(_message.Message):
+    __slots__ = ("access_key", "secret", "session_token", "assume_role_arn", "assume_role_external_id", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
+    class MetadataEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
+    SECRET_FIELD_NUMBER: _ClassVar[int]
+    SESSION_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    ASSUME_ROLE_ARN_FIELD_NUMBER: _ClassVar[int]
+    ASSUME_ROLE_EXTERNAL_ID_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    ENDPOINT_FIELD_NUMBER: _ClassVar[int]
+    BUCKET_FIELD_NUMBER: _ClassVar[int]
+    FORCE_PATH_STYLE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    TAGGING_FIELD_NUMBER: _ClassVar[int]
+    CONTENT_DISPOSITION_FIELD_NUMBER: _ClassVar[int]
+    PROXY_FIELD_NUMBER: _ClassVar[int]
+    access_key: str
+    secret: str
+    session_token: str
+    assume_role_arn: str
+    assume_role_external_id: str
+    region: str
+    endpoint: str
+    bucket: str
+    force_path_style: bool
+    metadata: _containers.ScalarMap[str, str]
+    tagging: str
+    content_disposition: str
+    proxy: ProxyConfig
+    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., session_token: _Optional[str] = ..., assume_role_arn: _Optional[str] = ..., assume_role_external_id: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
+
+class GCPUpload(_message.Message):
+    __slots__ = ("credentials", "bucket", "proxy")
+    CREDENTIALS_FIELD_NUMBER: _ClassVar[int]
+    BUCKET_FIELD_NUMBER: _ClassVar[int]
+    PROXY_FIELD_NUMBER: _ClassVar[int]
+    credentials: str
+    bucket: str
+    proxy: ProxyConfig
+    def __init__(self, credentials: _Optional[str] = ..., bucket: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
+
+class AzureBlobUpload(_message.Message):
+    __slots__ = ("account_name", "account_key", "container_name")
+    ACCOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
+    ACCOUNT_KEY_FIELD_NUMBER: _ClassVar[int]
+    CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
+    account_name: str
+    account_key: str
+    container_name: str
+    def __init__(self, account_name: _Optional[str] = ..., account_key: _Optional[str] = ..., container_name: _Optional[str] = ...) -> None: ...
+
+class AliOSSUpload(_message.Message):
+    __slots__ = ("access_key", "secret", "region", "endpoint", "bucket")
+    ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
+    SECRET_FIELD_NUMBER: _ClassVar[int]
+    REGION_FIELD_NUMBER: _ClassVar[int]
+    ENDPOINT_FIELD_NUMBER: _ClassVar[int]
+    BUCKET_FIELD_NUMBER: _ClassVar[int]
+    access_key: str
+    secret: str
+    region: str
+    endpoint: str
+    bucket: str
+    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ...) -> None: ...
+
+class ProxyConfig(_message.Message):
+    __slots__ = ("url", "username", "password")
+    URL_FIELD_NUMBER: _ClassVar[int]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    PASSWORD_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    username: str
+    password: str
+    def __init__(self, url: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ...) -> None: ...
+
+class ListEgressRequest(_message.Message):
+    __slots__ = ("room_name", "egress_id", "active")
+    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
+    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
+    ACTIVE_FIELD_NUMBER: _ClassVar[int]
+    room_name: str
+    egress_id: str
+    active: bool
+    def __init__(self, room_name: _Optional[str] = ..., egress_id: _Optional[str] = ..., active: bool = ...) -> None: ...
+
+class ListEgressResponse(_message.Message):
+    __slots__ = ("items",)
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
+    items: _containers.RepeatedCompositeFieldContainer[EgressInfo]
+    def __init__(self, items: _Optional[_Iterable[_Union[EgressInfo, _Mapping]]] = ...) -> None: ...
+
+class UpdateEgressRequest(_message.Message):
+    __slots__ = ("egress_id", "url", "layout", "add_stream_urls", "remove_stream_urls")
+    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    LAYOUT_FIELD_NUMBER: _ClassVar[int]
+    ADD_STREAM_URLS_FIELD_NUMBER: _ClassVar[int]
+    REMOVE_STREAM_URLS_FIELD_NUMBER: _ClassVar[int]
+    egress_id: str
+    url: str
+    layout: str
+    add_stream_urls: _containers.RepeatedScalarFieldContainer[str]
+    remove_stream_urls: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, egress_id: _Optional[str] = ..., url: _Optional[str] = ..., layout: _Optional[str] = ..., add_stream_urls: _Optional[_Iterable[str]] = ..., remove_stream_urls: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class StopEgressRequest(_message.Message):
+    __slots__ = ("egress_id",)
+    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
+    egress_id: str
+    def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
+
+class EgressInfo(_message.Message):
+    __slots__ = ("egress_id", "room_id", "room_name", "source_type", "status", "started_at", "ended_at", "updated_at", "replay", "room_composite", "web", "participant", "track_composite", "track", "stream_results", "file_results", "segment_results", "image_results", "error", "error_code", "details", "manifest_location", "backup_storage_used", "retry_count", "stream", "file", "segments")
+    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_ID_FIELD_NUMBER: _ClassVar[int]
+    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    REPLAY_FIELD_NUMBER: _ClassVar[int]
+    ROOM_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
+    WEB_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
+    TRACK_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
+    TRACK_FIELD_NUMBER: _ClassVar[int]
+    STREAM_RESULTS_FIELD_NUMBER: _ClassVar[int]
+    FILE_RESULTS_FIELD_NUMBER: _ClassVar[int]
+    SEGMENT_RESULTS_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_RESULTS_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    ERROR_CODE_FIELD_NUMBER: _ClassVar[int]
+    DETAILS_FIELD_NUMBER: _ClassVar[int]
+    MANIFEST_LOCATION_FIELD_NUMBER: _ClassVar[int]
+    BACKUP_STORAGE_USED_FIELD_NUMBER: _ClassVar[int]
+    RETRY_COUNT_FIELD_NUMBER: _ClassVar[int]
+    STREAM_FIELD_NUMBER: _ClassVar[int]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    SEGMENTS_FIELD_NUMBER: _ClassVar[int]
+    egress_id: str
+    room_id: str
+    room_name: str
+    source_type: EgressSourceType
+    status: EgressStatus
+    started_at: int
+    ended_at: int
+    updated_at: int
+    replay: ExportReplayRequest
+    room_composite: RoomCompositeEgressRequest
+    web: WebEgressRequest
+    participant: ParticipantEgressRequest
+    track_composite: TrackCompositeEgressRequest
+    track: TrackEgressRequest
+    stream_results: _containers.RepeatedCompositeFieldContainer[StreamInfo]
+    file_results: _containers.RepeatedCompositeFieldContainer[FileInfo]
+    segment_results: _containers.RepeatedCompositeFieldContainer[SegmentsInfo]
+    image_results: _containers.RepeatedCompositeFieldContainer[ImagesInfo]
+    error: str
+    error_code: int
+    details: str
+    manifest_location: str
+    backup_storage_used: bool
+    retry_count: int
+    stream: StreamInfoList
+    file: FileInfo
+    segments: SegmentsInfo
+    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., replay: _Optional[_Union[ExportReplayRequest, _Mapping]] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., details: _Optional[str] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ..., retry_count: _Optional[int] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ...) -> None: ...
+
+class StreamInfo(_message.Message):
+    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries")
+    class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        ACTIVE: _ClassVar[StreamInfo.Status]
+        FINISHED: _ClassVar[StreamInfo.Status]
+        FAILED: _ClassVar[StreamInfo.Status]
+    ACTIVE: StreamInfo.Status
+    FINISHED: StreamInfo.Status
+    FAILED: StreamInfo.Status
+    URL_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    DURATION_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    LAST_RETRY_AT_FIELD_NUMBER: _ClassVar[int]
+    RETRIES_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    started_at: int
+    ended_at: int
+    duration: int
+    status: StreamInfo.Status
+    error: str
+    last_retry_at: int
+    retries: int
+    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ..., last_retry_at: _Optional[int] = ..., retries: _Optional[int] = ...) -> None: ...
+
+class FileInfo(_message.Message):
+    __slots__ = ("filename", "started_at", "ended_at", "duration", "size", "location")
+    FILENAME_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    DURATION_FIELD_NUMBER: _ClassVar[int]
+    SIZE_FIELD_NUMBER: _ClassVar[int]
+    LOCATION_FIELD_NUMBER: _ClassVar[int]
+    filename: str
+    started_at: int
+    ended_at: int
+    duration: int
+    size: int
+    location: str
+    def __init__(self, filename: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., size: _Optional[int] = ..., location: _Optional[str] = ...) -> None: ...
+
+class SegmentsInfo(_message.Message):
+    __slots__ = ("playlist_name", "live_playlist_name", "duration", "size", "playlist_location", "live_playlist_location", "segment_count", "started_at", "ended_at")
+    PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
+    LIVE_PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
+    DURATION_FIELD_NUMBER: _ClassVar[int]
+    SIZE_FIELD_NUMBER: _ClassVar[int]
+    PLAYLIST_LOCATION_FIELD_NUMBER: _ClassVar[int]
+    LIVE_PLAYLIST_LOCATION_FIELD_NUMBER: _ClassVar[int]
+    SEGMENT_COUNT_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    playlist_name: str
+    live_playlist_name: str
+    duration: int
+    size: int
+    playlist_location: str
+    live_playlist_location: str
+    segment_count: int
+    started_at: int
+    ended_at: int
+    def __init__(self, playlist_name: _Optional[str] = ..., live_playlist_name: _Optional[str] = ..., duration: _Optional[int] = ..., size: _Optional[int] = ..., playlist_location: _Optional[str] = ..., live_playlist_location: _Optional[str] = ..., segment_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
+
+class ImagesInfo(_message.Message):
+    __slots__ = ("filename_prefix", "image_count", "started_at", "ended_at")
+    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_COUNT_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
+    filename_prefix: str
+    image_count: int
+    started_at: int
+    ended_at: int
+    def __init__(self, filename_prefix: _Optional[str] = ..., image_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
+
+class AutoParticipantEgress(_message.Message):
+    __slots__ = ("preset", "advanced", "file_outputs", "segment_outputs")
+    PRESET_FIELD_NUMBER: _ClassVar[int]
+    ADVANCED_FIELD_NUMBER: _ClassVar[int]
+    FILE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    preset: EncodingOptionsPreset
+    advanced: EncodingOptions
+    file_outputs: _containers.RepeatedCompositeFieldContainer[EncodedFileOutput]
+    segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
+    def __init__(self, preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ...) -> None: ...
+
+class AutoTrackEgress(_message.Message):
+    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
+    FILEPATH_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
+    S3_FIELD_NUMBER: _ClassVar[int]
+    GCP_FIELD_NUMBER: _ClassVar[int]
+    AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
+    filepath: str
+    disable_manifest: bool
+    s3: S3Upload
+    gcp: GCPUpload
+    azure: AzureBlobUpload
+    aliOSS: AliOSSUpload
+    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
+
+class ExportReplayRequest(_message.Message):
+    __slots__ = ("replay_id", "start_offset_ms", "end_offset_ms", "template", "web", "media", "preset", "advanced", "outputs", "storage", "webhooks")
+    REPLAY_ID_FIELD_NUMBER: _ClassVar[int]
+    START_OFFSET_MS_FIELD_NUMBER: _ClassVar[int]
+    END_OFFSET_MS_FIELD_NUMBER: _ClassVar[int]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    WEB_FIELD_NUMBER: _ClassVar[int]
+    MEDIA_FIELD_NUMBER: _ClassVar[int]
+    PRESET_FIELD_NUMBER: _ClassVar[int]
+    ADVANCED_FIELD_NUMBER: _ClassVar[int]
+    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    WEBHOOKS_FIELD_NUMBER: _ClassVar[int]
+    replay_id: str
+    start_offset_ms: int
+    end_offset_ms: int
+    template: TemplateSource
+    web: WebSource
+    media: MediaSource
+    preset: EncodingOptionsPreset
+    advanced: EncodingOptions
+    outputs: _containers.RepeatedCompositeFieldContainer[Output]
+    storage: StorageConfig
+    webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
+    def __init__(self, replay_id: _Optional[str] = ..., start_offset_ms: _Optional[int] = ..., end_offset_ms: _Optional[int] = ..., template: _Optional[_Union[TemplateSource, _Mapping]] = ..., web: _Optional[_Union[WebSource, _Mapping]] = ..., media: _Optional[_Union[MediaSource, _Mapping]] = ..., preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., outputs: _Optional[_Iterable[_Union[Output, _Mapping]]] = ..., storage: _Optional[_Union[StorageConfig, _Mapping]] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
 class RoomCompositeEgressRequest(_message.Message):
     __slots__ = ("room_name", "layout", "audio_only", "audio_mixing", "video_only", "custom_base_url", "file", "stream", "segments", "preset", "advanced", "file_outputs", "stream_outputs", "segment_outputs", "image_outputs", "webhooks")
@@ -239,6 +781,22 @@ class TrackEgressRequest(_message.Message):
     webhooks: _containers.RepeatedCompositeFieldContainer[_models.WebhookConfig]
     def __init__(self, room_name: _Optional[str] = ..., track_id: _Optional[str] = ..., file: _Optional[_Union[DirectFileOutput, _Mapping]] = ..., websocket_url: _Optional[str] = ..., webhooks: _Optional[_Iterable[_Union[_models.WebhookConfig, _Mapping]]] = ...) -> None: ...
 
+class DirectFileOutput(_message.Message):
+    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
+    FILEPATH_FIELD_NUMBER: _ClassVar[int]
+    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
+    S3_FIELD_NUMBER: _ClassVar[int]
+    GCP_FIELD_NUMBER: _ClassVar[int]
+    AZURE_FIELD_NUMBER: _ClassVar[int]
+    ALIOSS_FIELD_NUMBER: _ClassVar[int]
+    filepath: str
+    disable_manifest: bool
+    s3: S3Upload
+    gcp: GCPUpload
+    azure: AzureBlobUpload
+    aliOSS: AliOSSUpload
+    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
+
 class EncodedFileOutput(_message.Message):
     __slots__ = ("file_type", "filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
     FILE_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -256,191 +814,6 @@ class EncodedFileOutput(_message.Message):
     azure: AzureBlobUpload
     aliOSS: AliOSSUpload
     def __init__(self, file_type: _Optional[_Union[EncodedFileType, str]] = ..., filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
-
-class SegmentedFileOutput(_message.Message):
-    __slots__ = ("protocol", "filename_prefix", "playlist_name", "live_playlist_name", "segment_duration", "filename_suffix", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
-    PROTOCOL_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
-    PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
-    LIVE_PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
-    SEGMENT_DURATION_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_SUFFIX_FIELD_NUMBER: _ClassVar[int]
-    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
-    S3_FIELD_NUMBER: _ClassVar[int]
-    GCP_FIELD_NUMBER: _ClassVar[int]
-    AZURE_FIELD_NUMBER: _ClassVar[int]
-    ALIOSS_FIELD_NUMBER: _ClassVar[int]
-    protocol: SegmentedFileProtocol
-    filename_prefix: str
-    playlist_name: str
-    live_playlist_name: str
-    segment_duration: int
-    filename_suffix: SegmentedFileSuffix
-    disable_manifest: bool
-    s3: S3Upload
-    gcp: GCPUpload
-    azure: AzureBlobUpload
-    aliOSS: AliOSSUpload
-    def __init__(self, protocol: _Optional[_Union[SegmentedFileProtocol, str]] = ..., filename_prefix: _Optional[str] = ..., playlist_name: _Optional[str] = ..., live_playlist_name: _Optional[str] = ..., segment_duration: _Optional[int] = ..., filename_suffix: _Optional[_Union[SegmentedFileSuffix, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
-
-class DirectFileOutput(_message.Message):
-    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
-    FILEPATH_FIELD_NUMBER: _ClassVar[int]
-    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
-    S3_FIELD_NUMBER: _ClassVar[int]
-    GCP_FIELD_NUMBER: _ClassVar[int]
-    AZURE_FIELD_NUMBER: _ClassVar[int]
-    ALIOSS_FIELD_NUMBER: _ClassVar[int]
-    filepath: str
-    disable_manifest: bool
-    s3: S3Upload
-    gcp: GCPUpload
-    azure: AzureBlobUpload
-    aliOSS: AliOSSUpload
-    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
-
-class ImageOutput(_message.Message):
-    __slots__ = ("capture_interval", "width", "height", "filename_prefix", "filename_suffix", "image_codec", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
-    CAPTURE_INTERVAL_FIELD_NUMBER: _ClassVar[int]
-    WIDTH_FIELD_NUMBER: _ClassVar[int]
-    HEIGHT_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_SUFFIX_FIELD_NUMBER: _ClassVar[int]
-    IMAGE_CODEC_FIELD_NUMBER: _ClassVar[int]
-    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
-    S3_FIELD_NUMBER: _ClassVar[int]
-    GCP_FIELD_NUMBER: _ClassVar[int]
-    AZURE_FIELD_NUMBER: _ClassVar[int]
-    ALIOSS_FIELD_NUMBER: _ClassVar[int]
-    capture_interval: int
-    width: int
-    height: int
-    filename_prefix: str
-    filename_suffix: ImageFileSuffix
-    image_codec: _models.ImageCodec
-    disable_manifest: bool
-    s3: S3Upload
-    gcp: GCPUpload
-    azure: AzureBlobUpload
-    aliOSS: AliOSSUpload
-    def __init__(self, capture_interval: _Optional[int] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., filename_prefix: _Optional[str] = ..., filename_suffix: _Optional[_Union[ImageFileSuffix, str]] = ..., image_codec: _Optional[_Union[_models.ImageCodec, str]] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
-
-class S3Upload(_message.Message):
-    __slots__ = ("access_key", "secret", "session_token", "assume_role_arn", "assume_role_external_id", "region", "endpoint", "bucket", "force_path_style", "metadata", "tagging", "content_disposition", "proxy")
-    class MetadataEntry(_message.Message):
-        __slots__ = ("key", "value")
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
-    ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
-    SECRET_FIELD_NUMBER: _ClassVar[int]
-    SESSION_TOKEN_FIELD_NUMBER: _ClassVar[int]
-    ASSUME_ROLE_ARN_FIELD_NUMBER: _ClassVar[int]
-    ASSUME_ROLE_EXTERNAL_ID_FIELD_NUMBER: _ClassVar[int]
-    REGION_FIELD_NUMBER: _ClassVar[int]
-    ENDPOINT_FIELD_NUMBER: _ClassVar[int]
-    BUCKET_FIELD_NUMBER: _ClassVar[int]
-    FORCE_PATH_STYLE_FIELD_NUMBER: _ClassVar[int]
-    METADATA_FIELD_NUMBER: _ClassVar[int]
-    TAGGING_FIELD_NUMBER: _ClassVar[int]
-    CONTENT_DISPOSITION_FIELD_NUMBER: _ClassVar[int]
-    PROXY_FIELD_NUMBER: _ClassVar[int]
-    access_key: str
-    secret: str
-    session_token: str
-    assume_role_arn: str
-    assume_role_external_id: str
-    region: str
-    endpoint: str
-    bucket: str
-    force_path_style: bool
-    metadata: _containers.ScalarMap[str, str]
-    tagging: str
-    content_disposition: str
-    proxy: ProxyConfig
-    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., session_token: _Optional[str] = ..., assume_role_arn: _Optional[str] = ..., assume_role_external_id: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ..., force_path_style: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., tagging: _Optional[str] = ..., content_disposition: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
-
-class GCPUpload(_message.Message):
-    __slots__ = ("credentials", "bucket", "proxy")
-    CREDENTIALS_FIELD_NUMBER: _ClassVar[int]
-    BUCKET_FIELD_NUMBER: _ClassVar[int]
-    PROXY_FIELD_NUMBER: _ClassVar[int]
-    credentials: str
-    bucket: str
-    proxy: ProxyConfig
-    def __init__(self, credentials: _Optional[str] = ..., bucket: _Optional[str] = ..., proxy: _Optional[_Union[ProxyConfig, _Mapping]] = ...) -> None: ...
-
-class AzureBlobUpload(_message.Message):
-    __slots__ = ("account_name", "account_key", "container_name")
-    ACCOUNT_NAME_FIELD_NUMBER: _ClassVar[int]
-    ACCOUNT_KEY_FIELD_NUMBER: _ClassVar[int]
-    CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
-    account_name: str
-    account_key: str
-    container_name: str
-    def __init__(self, account_name: _Optional[str] = ..., account_key: _Optional[str] = ..., container_name: _Optional[str] = ...) -> None: ...
-
-class AliOSSUpload(_message.Message):
-    __slots__ = ("access_key", "secret", "region", "endpoint", "bucket")
-    ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
-    SECRET_FIELD_NUMBER: _ClassVar[int]
-    REGION_FIELD_NUMBER: _ClassVar[int]
-    ENDPOINT_FIELD_NUMBER: _ClassVar[int]
-    BUCKET_FIELD_NUMBER: _ClassVar[int]
-    access_key: str
-    secret: str
-    region: str
-    endpoint: str
-    bucket: str
-    def __init__(self, access_key: _Optional[str] = ..., secret: _Optional[str] = ..., region: _Optional[str] = ..., endpoint: _Optional[str] = ..., bucket: _Optional[str] = ...) -> None: ...
-
-class ProxyConfig(_message.Message):
-    __slots__ = ("url", "username", "password")
-    URL_FIELD_NUMBER: _ClassVar[int]
-    USERNAME_FIELD_NUMBER: _ClassVar[int]
-    PASSWORD_FIELD_NUMBER: _ClassVar[int]
-    url: str
-    username: str
-    password: str
-    def __init__(self, url: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ...) -> None: ...
-
-class StreamOutput(_message.Message):
-    __slots__ = ("protocol", "urls")
-    PROTOCOL_FIELD_NUMBER: _ClassVar[int]
-    URLS_FIELD_NUMBER: _ClassVar[int]
-    protocol: StreamProtocol
-    urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, protocol: _Optional[_Union[StreamProtocol, str]] = ..., urls: _Optional[_Iterable[str]] = ...) -> None: ...
-
-class EncodingOptions(_message.Message):
-    __slots__ = ("width", "height", "depth", "framerate", "audio_codec", "audio_bitrate", "audio_quality", "audio_frequency", "video_codec", "video_bitrate", "video_quality", "key_frame_interval")
-    WIDTH_FIELD_NUMBER: _ClassVar[int]
-    HEIGHT_FIELD_NUMBER: _ClassVar[int]
-    DEPTH_FIELD_NUMBER: _ClassVar[int]
-    FRAMERATE_FIELD_NUMBER: _ClassVar[int]
-    AUDIO_CODEC_FIELD_NUMBER: _ClassVar[int]
-    AUDIO_BITRATE_FIELD_NUMBER: _ClassVar[int]
-    AUDIO_QUALITY_FIELD_NUMBER: _ClassVar[int]
-    AUDIO_FREQUENCY_FIELD_NUMBER: _ClassVar[int]
-    VIDEO_CODEC_FIELD_NUMBER: _ClassVar[int]
-    VIDEO_BITRATE_FIELD_NUMBER: _ClassVar[int]
-    VIDEO_QUALITY_FIELD_NUMBER: _ClassVar[int]
-    KEY_FRAME_INTERVAL_FIELD_NUMBER: _ClassVar[int]
-    width: int
-    height: int
-    depth: int
-    framerate: int
-    audio_codec: _models.AudioCodec
-    audio_bitrate: int
-    audio_quality: int
-    audio_frequency: int
-    video_codec: _models.VideoCodec
-    video_bitrate: int
-    video_quality: int
-    key_frame_interval: float
-    def __init__(self, width: _Optional[int] = ..., height: _Optional[int] = ..., depth: _Optional[int] = ..., framerate: _Optional[int] = ..., audio_codec: _Optional[_Union[_models.AudioCodec, str]] = ..., audio_bitrate: _Optional[int] = ..., audio_quality: _Optional[int] = ..., audio_frequency: _Optional[int] = ..., video_codec: _Optional[_Union[_models.VideoCodec, str]] = ..., video_bitrate: _Optional[int] = ..., video_quality: _Optional[int] = ..., key_frame_interval: _Optional[float] = ...) -> None: ...
 
 class UpdateLayoutRequest(_message.Message):
     __slots__ = ("egress_id", "layout")
@@ -460,192 +833,8 @@ class UpdateStreamRequest(_message.Message):
     remove_output_urls: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, egress_id: _Optional[str] = ..., add_output_urls: _Optional[_Iterable[str]] = ..., remove_output_urls: _Optional[_Iterable[str]] = ...) -> None: ...
 
-class ListEgressRequest(_message.Message):
-    __slots__ = ("room_name", "egress_id", "active")
-    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
-    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    ACTIVE_FIELD_NUMBER: _ClassVar[int]
-    room_name: str
-    egress_id: str
-    active: bool
-    def __init__(self, room_name: _Optional[str] = ..., egress_id: _Optional[str] = ..., active: bool = ...) -> None: ...
-
-class ListEgressResponse(_message.Message):
-    __slots__ = ("items",)
-    ITEMS_FIELD_NUMBER: _ClassVar[int]
-    items: _containers.RepeatedCompositeFieldContainer[EgressInfo]
-    def __init__(self, items: _Optional[_Iterable[_Union[EgressInfo, _Mapping]]] = ...) -> None: ...
-
-class StopEgressRequest(_message.Message):
-    __slots__ = ("egress_id",)
-    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    egress_id: str
-    def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
-
-class EgressInfo(_message.Message):
-    __slots__ = ("egress_id", "room_id", "room_name", "source_type", "status", "started_at", "ended_at", "updated_at", "details", "error", "error_code", "room_composite", "web", "participant", "track_composite", "track", "stream", "file", "segments", "stream_results", "file_results", "segment_results", "image_results", "manifest_location", "backup_storage_used", "retry_count")
-    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    ROOM_ID_FIELD_NUMBER: _ClassVar[int]
-    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
-    SOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
-    STATUS_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
-    UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
-    DETAILS_FIELD_NUMBER: _ClassVar[int]
-    ERROR_FIELD_NUMBER: _ClassVar[int]
-    ERROR_CODE_FIELD_NUMBER: _ClassVar[int]
-    ROOM_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
-    WEB_FIELD_NUMBER: _ClassVar[int]
-    PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
-    TRACK_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
-    TRACK_FIELD_NUMBER: _ClassVar[int]
-    STREAM_FIELD_NUMBER: _ClassVar[int]
-    FILE_FIELD_NUMBER: _ClassVar[int]
-    SEGMENTS_FIELD_NUMBER: _ClassVar[int]
-    STREAM_RESULTS_FIELD_NUMBER: _ClassVar[int]
-    FILE_RESULTS_FIELD_NUMBER: _ClassVar[int]
-    SEGMENT_RESULTS_FIELD_NUMBER: _ClassVar[int]
-    IMAGE_RESULTS_FIELD_NUMBER: _ClassVar[int]
-    MANIFEST_LOCATION_FIELD_NUMBER: _ClassVar[int]
-    BACKUP_STORAGE_USED_FIELD_NUMBER: _ClassVar[int]
-    RETRY_COUNT_FIELD_NUMBER: _ClassVar[int]
-    egress_id: str
-    room_id: str
-    room_name: str
-    source_type: EgressSourceType
-    status: EgressStatus
-    started_at: int
-    ended_at: int
-    updated_at: int
-    details: str
-    error: str
-    error_code: int
-    room_composite: RoomCompositeEgressRequest
-    web: WebEgressRequest
-    participant: ParticipantEgressRequest
-    track_composite: TrackCompositeEgressRequest
-    track: TrackEgressRequest
-    stream: StreamInfoList
-    file: FileInfo
-    segments: SegmentsInfo
-    stream_results: _containers.RepeatedCompositeFieldContainer[StreamInfo]
-    file_results: _containers.RepeatedCompositeFieldContainer[FileInfo]
-    segment_results: _containers.RepeatedCompositeFieldContainer[SegmentsInfo]
-    image_results: _containers.RepeatedCompositeFieldContainer[ImagesInfo]
-    manifest_location: str
-    backup_storage_used: bool
-    retry_count: int
-    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., details: _Optional[str] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ..., retry_count: _Optional[int] = ...) -> None: ...
-
 class StreamInfoList(_message.Message):
     __slots__ = ("info",)
     INFO_FIELD_NUMBER: _ClassVar[int]
     info: _containers.RepeatedCompositeFieldContainer[StreamInfo]
     def __init__(self, info: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ...) -> None: ...
-
-class StreamInfo(_message.Message):
-    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries")
-    class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = ()
-        ACTIVE: _ClassVar[StreamInfo.Status]
-        FINISHED: _ClassVar[StreamInfo.Status]
-        FAILED: _ClassVar[StreamInfo.Status]
-    ACTIVE: StreamInfo.Status
-    FINISHED: StreamInfo.Status
-    FAILED: StreamInfo.Status
-    URL_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
-    DURATION_FIELD_NUMBER: _ClassVar[int]
-    STATUS_FIELD_NUMBER: _ClassVar[int]
-    ERROR_FIELD_NUMBER: _ClassVar[int]
-    LAST_RETRY_AT_FIELD_NUMBER: _ClassVar[int]
-    RETRIES_FIELD_NUMBER: _ClassVar[int]
-    url: str
-    started_at: int
-    ended_at: int
-    duration: int
-    status: StreamInfo.Status
-    error: str
-    last_retry_at: int
-    retries: int
-    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ..., last_retry_at: _Optional[int] = ..., retries: _Optional[int] = ...) -> None: ...
-
-class FileInfo(_message.Message):
-    __slots__ = ("filename", "started_at", "ended_at", "duration", "size", "location")
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
-    DURATION_FIELD_NUMBER: _ClassVar[int]
-    SIZE_FIELD_NUMBER: _ClassVar[int]
-    LOCATION_FIELD_NUMBER: _ClassVar[int]
-    filename: str
-    started_at: int
-    ended_at: int
-    duration: int
-    size: int
-    location: str
-    def __init__(self, filename: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., size: _Optional[int] = ..., location: _Optional[str] = ...) -> None: ...
-
-class SegmentsInfo(_message.Message):
-    __slots__ = ("playlist_name", "live_playlist_name", "duration", "size", "playlist_location", "live_playlist_location", "segment_count", "started_at", "ended_at")
-    PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
-    LIVE_PLAYLIST_NAME_FIELD_NUMBER: _ClassVar[int]
-    DURATION_FIELD_NUMBER: _ClassVar[int]
-    SIZE_FIELD_NUMBER: _ClassVar[int]
-    PLAYLIST_LOCATION_FIELD_NUMBER: _ClassVar[int]
-    LIVE_PLAYLIST_LOCATION_FIELD_NUMBER: _ClassVar[int]
-    SEGMENT_COUNT_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
-    playlist_name: str
-    live_playlist_name: str
-    duration: int
-    size: int
-    playlist_location: str
-    live_playlist_location: str
-    segment_count: int
-    started_at: int
-    ended_at: int
-    def __init__(self, playlist_name: _Optional[str] = ..., live_playlist_name: _Optional[str] = ..., duration: _Optional[int] = ..., size: _Optional[int] = ..., playlist_location: _Optional[str] = ..., live_playlist_location: _Optional[str] = ..., segment_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
-
-class ImagesInfo(_message.Message):
-    __slots__ = ("filename_prefix", "image_count", "started_at", "ended_at")
-    FILENAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
-    IMAGE_COUNT_FIELD_NUMBER: _ClassVar[int]
-    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
-    ENDED_AT_FIELD_NUMBER: _ClassVar[int]
-    filename_prefix: str
-    image_count: int
-    started_at: int
-    ended_at: int
-    def __init__(self, filename_prefix: _Optional[str] = ..., image_count: _Optional[int] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ...) -> None: ...
-
-class AutoParticipantEgress(_message.Message):
-    __slots__ = ("preset", "advanced", "file_outputs", "segment_outputs")
-    PRESET_FIELD_NUMBER: _ClassVar[int]
-    ADVANCED_FIELD_NUMBER: _ClassVar[int]
-    FILE_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    SEGMENT_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
-    preset: EncodingOptionsPreset
-    advanced: EncodingOptions
-    file_outputs: _containers.RepeatedCompositeFieldContainer[EncodedFileOutput]
-    segment_outputs: _containers.RepeatedCompositeFieldContainer[SegmentedFileOutput]
-    def __init__(self, preset: _Optional[_Union[EncodingOptionsPreset, str]] = ..., advanced: _Optional[_Union[EncodingOptions, _Mapping]] = ..., file_outputs: _Optional[_Iterable[_Union[EncodedFileOutput, _Mapping]]] = ..., segment_outputs: _Optional[_Iterable[_Union[SegmentedFileOutput, _Mapping]]] = ...) -> None: ...
-
-class AutoTrackEgress(_message.Message):
-    __slots__ = ("filepath", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
-    FILEPATH_FIELD_NUMBER: _ClassVar[int]
-    DISABLE_MANIFEST_FIELD_NUMBER: _ClassVar[int]
-    S3_FIELD_NUMBER: _ClassVar[int]
-    GCP_FIELD_NUMBER: _ClassVar[int]
-    AZURE_FIELD_NUMBER: _ClassVar[int]
-    ALIOSS_FIELD_NUMBER: _ClassVar[int]
-    filepath: str
-    disable_manifest: bool
-    s3: S3Upload
-    gcp: GCPUpload
-    azure: AzureBlobUpload
-    aliOSS: AliOSSUpload
-    def __init__(self, filepath: _Optional[str] = ..., disable_manifest: bool = ..., s3: _Optional[_Union[S3Upload, _Mapping]] = ..., gcp: _Optional[_Union[GCPUpload, _Mapping]] = ..., azure: _Optional[_Union[AzureBlobUpload, _Mapping]] = ..., aliOSS: _Optional[_Union[AliOSSUpload, _Mapping]] = ...) -> None: ...
