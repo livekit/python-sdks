@@ -1,11 +1,3 @@
-# This workflow will upload a Python Package using Twine when a release is created
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Build Docs
 
 on:
@@ -50,24 +42,31 @@ jobs:
           submodules: recursive
 
       - name: Install Package to Document
-        run: python -m pip install ${{ inputs.package_dir }}/
+        env:
+          PACKAGE_DIR: ${{ inputs.package_dir }}
+        run: python -m pip install "$PACKAGE_DIR/"
 
       - name: Download ffi
+        env:
+          PACKAGE_NAME: ${{ inputs.package_name }}
         run: |
-          if [[ '${{ inputs.package_name }}' = 'livekit.rtc' ]]; then
+          if [[ "$PACKAGE_NAME" = 'livekit.rtc' ]]; then
             pip install requests
-            python livekit-rtc/rust-sdks/download_ffi.py --output $(python -m site --user-site)/livekit/rtc/resources
+            python livekit-rtc/rust-sdks/download_ffi.py --output "$(python -m site --user-site)/livekit/rtc/resources"
           fi
 
       - name: Install pdoc
         run: pip install --upgrade pdoc
 
       - name: Build Docs
-        run: python -m pdoc ${{ inputs.package_name }} --docformat=google --output-dir docs
+        env:
+          PACKAGE_NAME: ${{ inputs.package_name }}
+        run: python -m pdoc "$PACKAGE_NAME" --docformat=google --output-dir docs
 
       - name: S3 Upload
-        run: aws s3 cp docs/ s3://livekit-docs/${{ inputs.package_dir }} --recursive
         env:
+          PACKAGE_DIR: ${{ inputs.package_dir }}
           AWS_ACCESS_KEY_ID: ${{ secrets.DOCS_DEPLOY_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DOCS_DEPLOY_AWS_API_SECRET }}
           AWS_DEFAULT_REGION: "us-east-1"
+        run: aws s3 cp docs/ "s3://livekit-docs/$PACKAGE_DIR" --recursive
