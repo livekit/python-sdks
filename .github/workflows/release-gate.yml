@@ -14,14 +14,15 @@ permissions:
 jobs:
   release-gate:
     name: Release gate
-    if: startsWith(github.event.pull_request.head.ref, 'release/v')
+    if: startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     steps:
       - name: Verify PR was created by GitHub Actions
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          author="${{ github.event.pull_request.user.login }}"
-          if [ "$author" != "github-actions[bot]" ]; then
-            echo "::error::Release PRs must be created by the publish workflow, not by '$author'"
+          if [ "$PR_AUTHOR" != "github-actions[bot]" ]; then
+            echo "::error::Release PRs must be created by the publish workflow, not by '$PR_AUTHOR'"
             exit 1
           fi
 
@@ -30,7 +31,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           approvals=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
-            --jq '[.[] | select(.state == "APPROVED")] | length')
+            --jq '[.[] | select(.state == "APPROVED") | .user.login] | unique | length')
           echo "Approvals: $approvals"
           if [ "$approvals" -lt 2 ]; then
             echo "::error::Release PRs require at least 2 approvals (got $approvals)"
