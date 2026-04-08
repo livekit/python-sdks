@@ -1,6 +1,5 @@
 import pathlib
 import re
-import sys
 import click
 from packaging.version import Version
 
