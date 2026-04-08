@@ -362,12 +362,14 @@ class RoomManager:
         logger.info("Track unsubscribed: %s from %s", track.sid, participant.identity)
         identity = self._track_to_participant.pop(track.sid, None)
         if identity:
-            stream = self._video_streams.pop(identity, None)
-            if stream:
-                asyncio.ensure_future(stream.aclose())
-            stream = self._audio_streams.pop(identity, None)
-            if stream:
-                asyncio.ensure_future(stream.aclose())
+            if track.kind == rtc.TrackKind.KIND_VIDEO:
+                stream = self._video_streams.pop(identity, None)
+                if stream:
+                    asyncio.ensure_future(stream.aclose())
+            elif track.kind == rtc.TrackKind.KIND_AUDIO:
+                stream = self._audio_streams.pop(identity, None)
+                if stream:
+                    asyncio.ensure_future(stream.aclose())
 
     def _on_local_track_published(self, publication, track):
         logger.info("Local track published: %s (kind=%s)", publication.sid, track.kind)
