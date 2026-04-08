@@ -143,7 +143,7 @@ jobs:
             --head "$branch" \
             --title "${INPUT_PACKAGE} v${VERSION}" \
             --body "Merging this PR will publish **${INPUT_PACKAGE}** v${VERSION} to PyPI." \
-            --label "release"
+
 
   # ── Step 2: Publish on merge ──────────────────────────────────
   detect:
