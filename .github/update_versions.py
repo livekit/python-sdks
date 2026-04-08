@@ -98,7 +98,7 @@ def do_prerelease(package: str, prerelease_type: str) -> None:
         update_api_protocol_dependency(new)
 
 
-@click.command("bump")
+@click.command()
 @click.option(
     "--package",
     type=click.Choice(list(PACKAGES.keys())),

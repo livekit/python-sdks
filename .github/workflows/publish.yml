@@ -89,18 +89,18 @@ jobs:
 
           case "$key" in
             patch|minor|major)
-              python .github/update_versions.py bump --package "$pkg" --bump-type "$key"
+              python .github/update_versions.py --package "$pkg" --bump-type "$key"
               ;;
             patch-rc|minor-rc|major-rc)
               bump="${key%-rc}"
-              python .github/update_versions.py bump --package "$pkg" --bump-type "$bump"
-              python .github/update_versions.py bump --package "$pkg" --pre rc
+              python .github/update_versions.py --package "$pkg" --bump-type "$bump"
+              python .github/update_versions.py --package "$pkg" --pre rc
               ;;
             next-rc)
-              python .github/update_versions.py bump --package "$pkg" --pre rc
+              python .github/update_versions.py --package "$pkg" --pre rc
               ;;
             promote)
-              python .github/update_versions.py bump --package "$pkg" --bump-type release
+              python .github/update_versions.py --package "$pkg" --bump-type release
               ;;
           esac
 
