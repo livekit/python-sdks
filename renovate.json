@@ -10,7 +10,8 @@
     },
     {
       "matchManagers": ["pip_requirements", "pip_setup", "pep621"],
-      "groupName": "python deps"
+      "groupName": "python deps",
+      "schedule": ["before 9am on monday"]
     }
   ]
 }
