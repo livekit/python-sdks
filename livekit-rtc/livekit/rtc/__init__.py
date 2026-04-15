@@ -19,7 +19,7 @@ See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for 
 """
 
 from ._proto import stats_pb2 as stats
-from ._proto.e2ee_pb2 import EncryptionState, EncryptionType
+from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
 from ._proto.participant_pb2 import ParticipantKind, ParticipantState, DisconnectReason
 from ._proto.room_pb2 import (
     ConnectionQuality,
@@ -129,6 +129,7 @@ __all__ = [
     "IceServer",
     "EncryptionType",
     "EncryptionState",
+    "KeyDerivationFunction",
     "StreamState",
     "TrackKind",
     "TrackSource",
