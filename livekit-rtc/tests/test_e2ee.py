@@ -14,8 +14,6 @@
 
 """Unit tests for E2EE functionality."""
 
-import pytest
-
 
 class TestKeyProviderOptions:
     """Tests for KeyProviderOptions dataclass."""
