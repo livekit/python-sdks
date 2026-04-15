@@ -16,41 +16,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections import abc as _abc
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-import builtins as _builtins
-from . import data_stream_pb2 as _data_stream_pb2
-from . import data_track_pb2 as _data_track_pb2
-from . import e2ee_pb2 as _e2ee_pb2
-from . import handle_pb2 as _handle_pb2
-from . import participant_pb2 as _participant_pb2
-from . import stats_pb2 as _stats_pb2
+import builtins
+import collections.abc
+from . import data_stream_pb2
+from . import data_track_pb2
+from . import e2ee_pb2
+import google.protobuf.descriptor
+import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
+import google.protobuf.message
+from . import handle_pb2
+from . import participant_pb2
+from . import stats_pb2
 import sys
-from . import track_pb2 as _track_pb2
-import typing as _typing
-from . import video_frame_pb2 as _video_frame_pb2
+from . import track_pb2
+import typing
+from . import video_frame_pb2
 
 if sys.version_info >= (3, 10):
-    from typing import TypeAlias as _TypeAlias
+    import typing as typing_extensions
 else:
-    from typing_extensions import TypeAlias as _TypeAlias
+    import typing_extensions
 
-if sys.version_info >= (3, 13):
-    from warnings import deprecated as _deprecated
-else:
-    from typing_extensions import deprecated as _deprecated
-
-DESCRIPTOR: _descriptor.FileDescriptor
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class _IceTransportType:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _IceTransportTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceTransportType.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _IceTransportTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceTransportType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     TRANSPORT_RELAY: _IceTransportType.ValueType  # 0
     TRANSPORT_NOHOST: _IceTransportType.ValueType  # 1
     TRANSPORT_ALL: _IceTransportType.ValueType  # 2
@@ -60,14 +55,14 @@ class IceTransportType(_IceTransportType, metaclass=_IceTransportTypeEnumTypeWra
 TRANSPORT_RELAY: IceTransportType.ValueType  # 0
 TRANSPORT_NOHOST: IceTransportType.ValueType  # 1
 TRANSPORT_ALL: IceTransportType.ValueType  # 2
-Global___IceTransportType: _TypeAlias = IceTransportType  # noqa: Y015
+global___IceTransportType = IceTransportType
 
 class _ContinualGatheringPolicy:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _ContinualGatheringPolicyEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_ContinualGatheringPolicy.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _ContinualGatheringPolicyEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ContinualGatheringPolicy.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     GATHER_ONCE: _ContinualGatheringPolicy.ValueType  # 0
     GATHER_CONTINUALLY: _ContinualGatheringPolicy.ValueType  # 1
 
@@ -75,14 +70,14 @@ class ContinualGatheringPolicy(_ContinualGatheringPolicy, metaclass=_ContinualGa
 
 GATHER_ONCE: ContinualGatheringPolicy.ValueType  # 0
 GATHER_CONTINUALLY: ContinualGatheringPolicy.ValueType  # 1
-Global___ContinualGatheringPolicy: _TypeAlias = ContinualGatheringPolicy  # noqa: Y015
+global___ContinualGatheringPolicy = ContinualGatheringPolicy
 
 class _ConnectionQuality:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _ConnectionQualityEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_ConnectionQuality.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _ConnectionQualityEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ConnectionQuality.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     QUALITY_POOR: _ConnectionQuality.ValueType  # 0
     QUALITY_GOOD: _ConnectionQuality.ValueType  # 1
     QUALITY_EXCELLENT: _ConnectionQuality.ValueType  # 2
@@ -97,14 +92,14 @@ QUALITY_POOR: ConnectionQuality.ValueType  # 0
 QUALITY_GOOD: ConnectionQuality.ValueType  # 1
 QUALITY_EXCELLENT: ConnectionQuality.ValueType  # 2
 QUALITY_LOST: ConnectionQuality.ValueType  # 3
-Global___ConnectionQuality: _TypeAlias = ConnectionQuality  # noqa: Y015
+global___ConnectionQuality = ConnectionQuality
 
 class _ConnectionState:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _ConnectionStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_ConnectionState.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _ConnectionStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ConnectionState.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     CONN_DISCONNECTED: _ConnectionState.ValueType  # 0
     CONN_CONNECTED: _ConnectionState.ValueType  # 1
     CONN_RECONNECTING: _ConnectionState.ValueType  # 2
@@ -114,14 +109,14 @@ class ConnectionState(_ConnectionState, metaclass=_ConnectionStateEnumTypeWrappe
 CONN_DISCONNECTED: ConnectionState.ValueType  # 0
 CONN_CONNECTED: ConnectionState.ValueType  # 1
 CONN_RECONNECTING: ConnectionState.ValueType  # 2
-Global___ConnectionState: _TypeAlias = ConnectionState  # noqa: Y015
+global___ConnectionState = ConnectionState
 
 class _DataPacketKind:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _DataPacketKindEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_DataPacketKind.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _DataPacketKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataPacketKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     KIND_LOSSY: _DataPacketKind.ValueType  # 0
     KIND_RELIABLE: _DataPacketKind.ValueType  # 1
 
@@ -129,70 +124,66 @@ class DataPacketKind(_DataPacketKind, metaclass=_DataPacketKindEnumTypeWrapper):
 
 KIND_LOSSY: DataPacketKind.ValueType  # 0
 KIND_RELIABLE: DataPacketKind.ValueType  # 1
-Global___DataPacketKind: _TypeAlias = DataPacketKind  # noqa: Y015
+global___DataPacketKind = DataPacketKind
 
-@_typing.final
-class ConnectRequest(_message.Message):
+@typing.final
+class ConnectRequest(google.protobuf.message.Message):
     """Connect to a new LiveKit room"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    URL_FIELD_NUMBER: _builtins.int
-    TOKEN_FIELD_NUMBER: _builtins.int
-    OPTIONS_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    url: _builtins.str
-    token: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def options(self) -> Global___RoomOptions: ...
+    URL_FIELD_NUMBER: builtins.int
+    TOKEN_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    url: builtins.str
+    token: builtins.str
+    request_async_id: builtins.int
+    @property
+    def options(self) -> global___RoomOptions: ...
     def __init__(
         self,
         *,
-        url: _builtins.str | None = ...,
-        token: _builtins.str | None = ...,
-        options: Global___RoomOptions | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        url: builtins.str | None = ...,
+        token: builtins.str | None = ...,
+        options: global___RoomOptions | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> None: ...
 
-Global___ConnectRequest: _TypeAlias = ConnectRequest  # noqa: Y015
+global___ConnectRequest = ConnectRequest
 
-@_typing.final
-class ConnectResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ConnectResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___ConnectResponse: _TypeAlias = ConnectResponse  # noqa: Y015
+global___ConnectResponse = ConnectResponse
 
-@_typing.final
-class ConnectCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ConnectCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @_typing.final
-    class ParticipantWithTracks(_message.Message):
-        DESCRIPTOR: _descriptor.Descriptor
+    @typing.final
+    class ParticipantWithTracks(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        PARTICIPANT_FIELD_NUMBER: _builtins.int
-        PUBLICATIONS_FIELD_NUMBER: _builtins.int
-        @_builtins.property
-        def participant(self) -> _participant_pb2.OwnedParticipant: ...
-        @_builtins.property
-        def publications(self) -> _containers.RepeatedCompositeFieldContainer[_track_pb2.OwnedTrackPublication]:
+        PARTICIPANT_FIELD_NUMBER: builtins.int
+        PUBLICATIONS_FIELD_NUMBER: builtins.int
+        @property
+        def participant(self) -> participant_pb2.OwnedParticipant: ...
+        @property
+        def publications(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[track_pb2.OwnedTrackPublication]:
             """TrackInfo are not needed here, if we're subscribed to a track, the FfiServer will send
             a TrackSubscribed event
             """
@@ -200,2249 +191,2068 @@ class ConnectCallback(_message.Message):
         def __init__(
             self,
             *,
-            participant: _participant_pb2.OwnedParticipant | None = ...,
-            publications: _abc.Iterable[_track_pb2.OwnedTrackPublication] | None = ...,
+            participant: participant_pb2.OwnedParticipant | None = ...,
+            publications: collections.abc.Iterable[track_pb2.OwnedTrackPublication] | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["participant", b"participant"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["participant", b"participant", "publications", b"publications"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["participant", b"participant"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["participant", b"participant", "publications", b"publications"]) -> None: ...
 
-    @_typing.final
-    class Result(_message.Message):
-        DESCRIPTOR: _descriptor.Descriptor
+    @typing.final
+    class Result(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        ROOM_FIELD_NUMBER: _builtins.int
-        LOCAL_PARTICIPANT_FIELD_NUMBER: _builtins.int
-        PARTICIPANTS_FIELD_NUMBER: _builtins.int
-        @_builtins.property
-        def room(self) -> Global___OwnedRoom: ...
-        @_builtins.property
-        def local_participant(self) -> _participant_pb2.OwnedParticipant: ...
-        @_builtins.property
-        def participants(self) -> _containers.RepeatedCompositeFieldContainer[Global___ConnectCallback.ParticipantWithTracks]: ...
+        ROOM_FIELD_NUMBER: builtins.int
+        LOCAL_PARTICIPANT_FIELD_NUMBER: builtins.int
+        PARTICIPANTS_FIELD_NUMBER: builtins.int
+        @property
+        def room(self) -> global___OwnedRoom: ...
+        @property
+        def local_participant(self) -> participant_pb2.OwnedParticipant: ...
+        @property
+        def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConnectCallback.ParticipantWithTracks]: ...
         def __init__(
             self,
             *,
-            room: Global___OwnedRoom | None = ...,
-            local_participant: _participant_pb2.OwnedParticipant | None = ...,
-            participants: _abc.Iterable[Global___ConnectCallback.ParticipantWithTracks] | None = ...,
+            room: global___OwnedRoom | None = ...,
+            local_participant: participant_pb2.OwnedParticipant | None = ...,
+            participants: collections.abc.Iterable[global___ConnectCallback.ParticipantWithTracks] | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant", b"local_participant", "room", b"room"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant", b"local_participant", "participants", b"participants", "room", b"room"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["local_participant", b"local_participant", "room", b"room"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["local_participant", b"local_participant", "participants", b"participants", "room", b"room"]) -> None: ...
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    RESULT_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def result(self) -> Global___ConnectCallback.Result: ...
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    RESULT_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def result(self) -> global___ConnectCallback.Result: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
-        result: Global___ConnectCallback.Result | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        result: global___ConnectCallback.Result | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["error", "result"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "result"] | None: ...
 
-Global___ConnectCallback: _TypeAlias = ConnectCallback  # noqa: Y015
+global___ConnectCallback = ConnectCallback
 
-@_typing.final
-class DisconnectRequest(_message.Message):
+@typing.final
+class DisconnectRequest(google.protobuf.message.Message):
     """Disconnect from the a room"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    REASON_FIELD_NUMBER: _builtins.int
-    room_handle: _builtins.int
-    request_async_id: _builtins.int
-    reason: _participant_pb2.DisconnectReason.ValueType
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    REASON_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    request_async_id: builtins.int
+    reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
-        room_handle: _builtins.int | None = ...,
-        request_async_id: _builtins.int | None = ...,
-        reason: _participant_pb2.DisconnectReason.ValueType | None = ...,
+        room_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
+        reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> None: ...
 
-Global___DisconnectRequest: _TypeAlias = DisconnectRequest  # noqa: Y015
+global___DisconnectRequest = DisconnectRequest
 
-@_typing.final
-class DisconnectResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DisconnectResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___DisconnectResponse: _TypeAlias = DisconnectResponse  # noqa: Y015
+global___DisconnectResponse = DisconnectResponse
 
-@_typing.final
-class DisconnectCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DisconnectCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___DisconnectCallback: _TypeAlias = DisconnectCallback  # noqa: Y015
+global___DisconnectCallback = DisconnectCallback
 
-@_typing.final
-class PublishTrackRequest(_message.Message):
+@typing.final
+class PublishTrackRequest(google.protobuf.message.Message):
     """Publish a track to the room"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
-    OPTIONS_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    track_handle: _builtins.int
-    request_async_id: _builtins.int
-    @_builtins.property
-    def options(self) -> Global___TrackPublishOptions: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    track_handle: builtins.int
+    request_async_id: builtins.int
+    @property
+    def options(self) -> global___TrackPublishOptions: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        track_handle: _builtins.int | None = ...,
-        options: Global___TrackPublishOptions | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        track_handle: builtins.int | None = ...,
+        options: global___TrackPublishOptions | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id", "track_handle", b"track_handle"]) -> None: ...
 
-Global___PublishTrackRequest: _TypeAlias = PublishTrackRequest  # noqa: Y015
+global___PublishTrackRequest = PublishTrackRequest
 
-@_typing.final
-class PublishTrackResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___PublishTrackResponse: _TypeAlias = PublishTrackResponse  # noqa: Y015
+global___PublishTrackResponse = PublishTrackResponse
 
-@_typing.final
-class PublishTrackCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishTrackCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    PUBLICATION_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def publication(self) -> _track_pb2.OwnedTrackPublication: ...
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    PUBLICATION_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def publication(self) -> track_pb2.OwnedTrackPublication: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
-        publication: _track_pb2.OwnedTrackPublication | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        publication: track_pb2.OwnedTrackPublication | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["error", "publication"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "publication", b"publication"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "publication"] | None: ...
 
-Global___PublishTrackCallback: _TypeAlias = PublishTrackCallback  # noqa: Y015
+global___PublishTrackCallback = PublishTrackCallback
 
-@_typing.final
-class UnpublishTrackRequest(_message.Message):
+@typing.final
+class UnpublishTrackRequest(google.protobuf.message.Message):
     """Unpublish a track from the room"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    STOP_ON_UNPUBLISH_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    track_sid: _builtins.str
-    stop_on_unpublish: _builtins.bool
-    request_async_id: _builtins.int
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    STOP_ON_UNPUBLISH_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    track_sid: builtins.str
+    stop_on_unpublish: builtins.bool
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        track_sid: _builtins.str | None = ...,
-        stop_on_unpublish: _builtins.bool | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        track_sid: builtins.str | None = ...,
+        stop_on_unpublish: builtins.bool | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "stop_on_unpublish", b"stop_on_unpublish", "track_sid", b"track_sid"]) -> None: ...
 
-Global___UnpublishTrackRequest: _TypeAlias = UnpublishTrackRequest  # noqa: Y015
+global___UnpublishTrackRequest = UnpublishTrackRequest
 
-@_typing.final
-class UnpublishTrackResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class UnpublishTrackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___UnpublishTrackResponse: _TypeAlias = UnpublishTrackResponse  # noqa: Y015
+global___UnpublishTrackResponse = UnpublishTrackResponse
 
-@_typing.final
-class UnpublishTrackCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class UnpublishTrackCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___UnpublishTrackCallback: _TypeAlias = UnpublishTrackCallback  # noqa: Y015
+global___UnpublishTrackCallback = UnpublishTrackCallback
 
-@_typing.final
-class PublishDataRequest(_message.Message):
+@typing.final
+class PublishDataRequest(google.protobuf.message.Message):
     """Publish data to other participants"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    DATA_LEN_FIELD_NUMBER: _builtins.int
-    RELIABLE_FIELD_NUMBER: _builtins.int
-    DESTINATION_SIDS_FIELD_NUMBER: _builtins.int
-    TOPIC_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    data_ptr: _builtins.int
-    data_len: _builtins.int
-    reliable: _builtins.bool
-    topic: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    @_deprecated("""This field has been marked as deprecated using proto field options.""")
-    def destination_sids(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    DATA_LEN_FIELD_NUMBER: builtins.int
+    RELIABLE_FIELD_NUMBER: builtins.int
+    DESTINATION_SIDS_FIELD_NUMBER: builtins.int
+    TOPIC_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    data_ptr: builtins.int
+    data_len: builtins.int
+    reliable: builtins.bool
+    topic: builtins.str
+    request_async_id: builtins.int
+    @property
+    def destination_sids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        data_ptr: _builtins.int | None = ...,
-        data_len: _builtins.int | None = ...,
-        reliable: _builtins.bool | None = ...,
-        destination_sids: _abc.Iterable[_builtins.str] | None = ...,
-        topic: _builtins.str | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        data_len: builtins.int | None = ...,
+        reliable: builtins.bool | None = ...,
+        destination_sids: collections.abc.Iterable[builtins.str] | None = ...,
+        topic: builtins.str | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "request_async_id", b"request_async_id", "topic", b"topic"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "request_async_id", b"request_async_id", "topic", b"topic"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "request_async_id", b"request_async_id", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr", "destination_identities", b"destination_identities", "destination_sids", b"destination_sids", "local_participant_handle", b"local_participant_handle", "reliable", b"reliable", "request_async_id", b"request_async_id", "topic", b"topic"]) -> None: ...
 
-Global___PublishDataRequest: _TypeAlias = PublishDataRequest  # noqa: Y015
+global___PublishDataRequest = PublishDataRequest
 
-@_typing.final
-class PublishDataResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishDataResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___PublishDataResponse: _TypeAlias = PublishDataResponse  # noqa: Y015
+global___PublishDataResponse = PublishDataResponse
 
-@_typing.final
-class PublishDataCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishDataCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___PublishDataCallback: _TypeAlias = PublishDataCallback  # noqa: Y015
+global___PublishDataCallback = PublishDataCallback
 
-@_typing.final
-class PublishTranscriptionRequest(_message.Message):
+@typing.final
+class PublishTranscriptionRequest(google.protobuf.message.Message):
     """Publish transcription messages to room"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_ID_FIELD_NUMBER: _builtins.int
-    SEGMENTS_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    participant_identity: _builtins.str
-    track_id: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def segments(self) -> _containers.RepeatedCompositeFieldContainer[Global___TranscriptionSegment]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_ID_FIELD_NUMBER: builtins.int
+    SEGMENTS_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    participant_identity: builtins.str
+    track_id: builtins.str
+    request_async_id: builtins.int
+    @property
+    def segments(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___TranscriptionSegment]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        participant_identity: _builtins.str | None = ...,
-        track_id: _builtins.str | None = ...,
-        segments: _abc.Iterable[Global___TranscriptionSegment] | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_id: builtins.str | None = ...,
+        segments: collections.abc.Iterable[global___TranscriptionSegment] | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "track_id", b"track_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "segments", b"segments", "track_id", b"track_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "track_id", b"track_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "segments", b"segments", "track_id", b"track_id"]) -> None: ...
 
-Global___PublishTranscriptionRequest: _TypeAlias = PublishTranscriptionRequest  # noqa: Y015
+global___PublishTranscriptionRequest = PublishTranscriptionRequest
 
-@_typing.final
-class PublishTranscriptionResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishTranscriptionResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___PublishTranscriptionResponse: _TypeAlias = PublishTranscriptionResponse  # noqa: Y015
+global___PublishTranscriptionResponse = PublishTranscriptionResponse
 
-@_typing.final
-class PublishTranscriptionCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishTranscriptionCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___PublishTranscriptionCallback: _TypeAlias = PublishTranscriptionCallback  # noqa: Y015
+global___PublishTranscriptionCallback = PublishTranscriptionCallback
 
-@_typing.final
-class PublishSipDtmfRequest(_message.Message):
+@typing.final
+class PublishSipDtmfRequest(google.protobuf.message.Message):
     """Publish Sip DTMF messages to other participants"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    CODE_FIELD_NUMBER: _builtins.int
-    DIGIT_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    code: _builtins.int
-    digit: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    CODE_FIELD_NUMBER: builtins.int
+    DIGIT_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    code: builtins.int
+    digit: builtins.str
+    request_async_id: builtins.int
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        code: _builtins.int | None = ...,
-        digit: _builtins.str | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        code: builtins.int | None = ...,
+        digit: builtins.str | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "digit", b"digit", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "destination_identities", b"destination_identities", "digit", b"digit", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "digit", b"digit", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "destination_identities", b"destination_identities", "digit", b"digit", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]) -> None: ...
 
-Global___PublishSipDtmfRequest: _TypeAlias = PublishSipDtmfRequest  # noqa: Y015
+global___PublishSipDtmfRequest = PublishSipDtmfRequest
 
-@_typing.final
-class PublishSipDtmfResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishSipDtmfResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___PublishSipDtmfResponse: _TypeAlias = PublishSipDtmfResponse  # noqa: Y015
+global___PublishSipDtmfResponse = PublishSipDtmfResponse
 
-@_typing.final
-class PublishSipDtmfCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PublishSipDtmfCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___PublishSipDtmfCallback: _TypeAlias = PublishSipDtmfCallback  # noqa: Y015
+global___PublishSipDtmfCallback = PublishSipDtmfCallback
 
-@_typing.final
-class SetLocalMetadataRequest(_message.Message):
+@typing.final
+class SetLocalMetadataRequest(google.protobuf.message.Message):
     """Change the local participant's metadata"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    METADATA_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    metadata: _builtins.str
-    request_async_id: _builtins.int
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    metadata: builtins.str
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        metadata: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        metadata: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "metadata", b"metadata", "request_async_id", b"request_async_id"]) -> None: ...
 
-Global___SetLocalMetadataRequest: _TypeAlias = SetLocalMetadataRequest  # noqa: Y015
+global___SetLocalMetadataRequest = SetLocalMetadataRequest
 
-@_typing.final
-class SetLocalMetadataResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalMetadataResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SetLocalMetadataResponse: _TypeAlias = SetLocalMetadataResponse  # noqa: Y015
+global___SetLocalMetadataResponse = SetLocalMetadataResponse
 
-@_typing.final
-class SetLocalMetadataCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalMetadataCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SetLocalMetadataCallback: _TypeAlias = SetLocalMetadataCallback  # noqa: Y015
+global___SetLocalMetadataCallback = SetLocalMetadataCallback
 
-@_typing.final
-class SendChatMessageRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendChatMessageRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    MESSAGE_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    message: _builtins.str
-    sender_identity: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    message: builtins.str
+    sender_identity: builtins.str
+    request_async_id: builtins.int
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        message: _builtins.str | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        sender_identity: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        message: builtins.str | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "message", b"message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "message", b"message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "message", b"message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "message", b"message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> None: ...
 
-Global___SendChatMessageRequest: _TypeAlias = SendChatMessageRequest  # noqa: Y015
+global___SendChatMessageRequest = SendChatMessageRequest
 
-@_typing.final
-class EditChatMessageRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class EditChatMessageRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    EDIT_TEXT_FIELD_NUMBER: _builtins.int
-    ORIGINAL_MESSAGE_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    edit_text: _builtins.str
-    sender_identity: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def original_message(self) -> Global___ChatMessage: ...
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    EDIT_TEXT_FIELD_NUMBER: builtins.int
+    ORIGINAL_MESSAGE_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    edit_text: builtins.str
+    sender_identity: builtins.str
+    request_async_id: builtins.int
+    @property
+    def original_message(self) -> global___ChatMessage: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        edit_text: _builtins.str | None = ...,
-        original_message: Global___ChatMessage | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        sender_identity: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        edit_text: builtins.str | None = ...,
+        original_message: global___ChatMessage | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["destination_identities", b"destination_identities", "edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "edit_text", b"edit_text", "local_participant_handle", b"local_participant_handle", "original_message", b"original_message", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> None: ...
 
-Global___EditChatMessageRequest: _TypeAlias = EditChatMessageRequest  # noqa: Y015
+global___EditChatMessageRequest = EditChatMessageRequest
 
-@_typing.final
-class SendChatMessageResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendChatMessageResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SendChatMessageResponse: _TypeAlias = SendChatMessageResponse  # noqa: Y015
+global___SendChatMessageResponse = SendChatMessageResponse
 
-@_typing.final
-class SendChatMessageCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendChatMessageCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def chat_message(self) -> Global___ChatMessage: ...
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def chat_message(self) -> global___ChatMessage: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
-        chat_message: Global___ChatMessage | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        chat_message: global___ChatMessage | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["error", "chat_message"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "chat_message", b"chat_message", "error", b"error", "message", b"message"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "chat_message"] | None: ...
 
-Global___SendChatMessageCallback: _TypeAlias = SendChatMessageCallback  # noqa: Y015
+global___SendChatMessageCallback = SendChatMessageCallback
 
-@_typing.final
-class SetLocalAttributesRequest(_message.Message):
+@typing.final
+class SetLocalAttributesRequest(google.protobuf.message.Message):
     """Change the local participant's attributes"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    request_async_id: _builtins.int
-    @_builtins.property
-    def attributes(self) -> _containers.RepeatedCompositeFieldContainer[Global___AttributesEntry]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    request_async_id: builtins.int
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        attributes: _abc.Iterable[Global___AttributesEntry] | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["attributes", b"attributes", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id"]) -> None: ...
 
-Global___SetLocalAttributesRequest: _TypeAlias = SetLocalAttributesRequest  # noqa: Y015
+global___SetLocalAttributesRequest = SetLocalAttributesRequest
 
-@_typing.final
-class AttributesEntry(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AttributesEntry(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    KEY_FIELD_NUMBER: _builtins.int
-    VALUE_FIELD_NUMBER: _builtins.int
-    key: _builtins.str
-    value: _builtins.str
+    KEY_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    key: builtins.str
+    value: builtins.str
     def __init__(
         self,
         *,
-        key: _builtins.str | None = ...,
-        value: _builtins.str | None = ...,
+        key: builtins.str | None = ...,
+        value: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
 
-Global___AttributesEntry: _TypeAlias = AttributesEntry  # noqa: Y015
+global___AttributesEntry = AttributesEntry
 
-@_typing.final
-class SetLocalAttributesResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalAttributesResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SetLocalAttributesResponse: _TypeAlias = SetLocalAttributesResponse  # noqa: Y015
+global___SetLocalAttributesResponse = SetLocalAttributesResponse
 
-@_typing.final
-class SetLocalAttributesCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalAttributesCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SetLocalAttributesCallback: _TypeAlias = SetLocalAttributesCallback  # noqa: Y015
+global___SetLocalAttributesCallback = SetLocalAttributesCallback
 
-@_typing.final
-class SetLocalNameRequest(_message.Message):
+@typing.final
+class SetLocalNameRequest(google.protobuf.message.Message):
     """Change the local participant's name"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    name: _builtins.str
-    request_async_id: _builtins.int
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    name: builtins.str
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        name: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name", "request_async_id", b"request_async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "name", b"name", "request_async_id", b"request_async_id"]) -> None: ...
 
-Global___SetLocalNameRequest: _TypeAlias = SetLocalNameRequest  # noqa: Y015
+global___SetLocalNameRequest = SetLocalNameRequest
 
-@_typing.final
-class SetLocalNameResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalNameResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SetLocalNameResponse: _TypeAlias = SetLocalNameResponse  # noqa: Y015
+global___SetLocalNameResponse = SetLocalNameResponse
 
-@_typing.final
-class SetLocalNameCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetLocalNameCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SetLocalNameCallback: _TypeAlias = SetLocalNameCallback  # noqa: Y015
+global___SetLocalNameCallback = SetLocalNameCallback
 
-@_typing.final
-class SetSubscribedRequest(_message.Message):
+@typing.final
+class SetSubscribedRequest(google.protobuf.message.Message):
     """Change the "desire" to subs2ribe to a track"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SUBSCRIBE_FIELD_NUMBER: _builtins.int
-    PUBLICATION_HANDLE_FIELD_NUMBER: _builtins.int
-    subscribe: _builtins.bool
-    publication_handle: _builtins.int
+    SUBSCRIBE_FIELD_NUMBER: builtins.int
+    PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
+    subscribe: builtins.bool
+    publication_handle: builtins.int
     def __init__(
         self,
         *,
-        subscribe: _builtins.bool | None = ...,
-        publication_handle: _builtins.int | None = ...,
+        subscribe: builtins.bool | None = ...,
+        publication_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["publication_handle", b"publication_handle", "subscribe", b"subscribe"]) -> None: ...
 
-Global___SetSubscribedRequest: _TypeAlias = SetSubscribedRequest  # noqa: Y015
+global___SetSubscribedRequest = SetSubscribedRequest
 
-@_typing.final
-class SetSubscribedResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetSubscribedResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___SetSubscribedResponse: _TypeAlias = SetSubscribedResponse  # noqa: Y015
+global___SetSubscribedResponse = SetSubscribedResponse
 
-@_typing.final
-class GetSessionStatsRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetSessionStatsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    room_handle: _builtins.int
-    request_async_id: _builtins.int
-    def __init__(
-        self,
-        *,
-        room_handle: _builtins.int | None = ...,
-        request_async_id: _builtins.int | None = ...,
-    ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-
-Global___GetSessionStatsRequest: _TypeAlias = GetSessionStatsRequest  # noqa: Y015
-
-@_typing.final
-class GetSessionStatsResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    request_async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        room_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle"]) -> None: ...
 
-Global___GetSessionStatsResponse: _TypeAlias = GetSessionStatsResponse  # noqa: Y015
+global___GetSessionStatsRequest = GetSessionStatsRequest
 
-@_typing.final
-class GetSessionStatsCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetSessionStatsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    @_typing.final
-    class Result(_message.Message):
-        DESCRIPTOR: _descriptor.Descriptor
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-        PUBLISHER_STATS_FIELD_NUMBER: _builtins.int
-        SUBSCRIBER_STATS_FIELD_NUMBER: _builtins.int
-        @_builtins.property
-        def publisher_stats(self) -> _containers.RepeatedCompositeFieldContainer[_stats_pb2.RtcStats]: ...
-        @_builtins.property
-        def subscriber_stats(self) -> _containers.RepeatedCompositeFieldContainer[_stats_pb2.RtcStats]: ...
+global___GetSessionStatsResponse = GetSessionStatsResponse
+
+@typing.final
+class GetSessionStatsCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    @typing.final
+    class Result(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        PUBLISHER_STATS_FIELD_NUMBER: builtins.int
+        SUBSCRIBER_STATS_FIELD_NUMBER: builtins.int
+        @property
+        def publisher_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
+        @property
+        def subscriber_stats(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[stats_pb2.RtcStats]: ...
         def __init__(
             self,
             *,
-            publisher_stats: _abc.Iterable[_stats_pb2.RtcStats] | None = ...,
-            subscriber_stats: _abc.Iterable[_stats_pb2.RtcStats] | None = ...,
+            publisher_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
+            subscriber_stats: collections.abc.Iterable[stats_pb2.RtcStats] | None = ...,
         ) -> None: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["publisher_stats", b"publisher_stats", "subscriber_stats", b"subscriber_stats"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def ClearField(self, field_name: typing.Literal["publisher_stats", b"publisher_stats", "subscriber_stats", b"subscriber_stats"]) -> None: ...
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    RESULT_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def result(self) -> Global___GetSessionStatsCallback.Result: ...
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    RESULT_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def result(self) -> global___GetSessionStatsCallback.Result: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
-        result: Global___GetSessionStatsCallback.Result | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        result: global___GetSessionStatsCallback.Result | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["error", "result"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "message", b"message", "result", b"result"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "result"] | None: ...
 
-Global___GetSessionStatsCallback: _TypeAlias = GetSessionStatsCallback  # noqa: Y015
+global___GetSessionStatsCallback = GetSessionStatsCallback
 
-@_typing.final
-class VideoEncoding(_message.Message):
+@typing.final
+class VideoEncoding(google.protobuf.message.Message):
     """
     Options
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    MAX_BITRATE_FIELD_NUMBER: _builtins.int
-    MAX_FRAMERATE_FIELD_NUMBER: _builtins.int
-    max_bitrate: _builtins.int
-    max_framerate: _builtins.float
+    MAX_BITRATE_FIELD_NUMBER: builtins.int
+    MAX_FRAMERATE_FIELD_NUMBER: builtins.int
+    max_bitrate: builtins.int
+    max_framerate: builtins.float
     def __init__(
         self,
         *,
-        max_bitrate: _builtins.int | None = ...,
-        max_framerate: _builtins.float | None = ...,
+        max_bitrate: builtins.int | None = ...,
+        max_framerate: builtins.float | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate", "max_framerate", b"max_framerate"]) -> None: ...
 
-Global___VideoEncoding: _TypeAlias = VideoEncoding  # noqa: Y015
+global___VideoEncoding = VideoEncoding
 
-@_typing.final
-class AudioEncoding(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioEncoding(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    MAX_BITRATE_FIELD_NUMBER: _builtins.int
-    max_bitrate: _builtins.int
+    MAX_BITRATE_FIELD_NUMBER: builtins.int
+    max_bitrate: builtins.int
     def __init__(
         self,
         *,
-        max_bitrate: _builtins.int | None = ...,
+        max_bitrate: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["max_bitrate", b"max_bitrate"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["max_bitrate", b"max_bitrate"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["max_bitrate", b"max_bitrate"]) -> None: ...
 
-Global___AudioEncoding: _TypeAlias = AudioEncoding  # noqa: Y015
+global___AudioEncoding = AudioEncoding
 
-@_typing.final
-class TrackPublishOptions(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackPublishOptions(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    VIDEO_ENCODING_FIELD_NUMBER: _builtins.int
-    AUDIO_ENCODING_FIELD_NUMBER: _builtins.int
-    VIDEO_CODEC_FIELD_NUMBER: _builtins.int
-    DTX_FIELD_NUMBER: _builtins.int
-    RED_FIELD_NUMBER: _builtins.int
-    SIMULCAST_FIELD_NUMBER: _builtins.int
-    SOURCE_FIELD_NUMBER: _builtins.int
-    STREAM_FIELD_NUMBER: _builtins.int
-    PRECONNECT_BUFFER_FIELD_NUMBER: _builtins.int
-    video_codec: _video_frame_pb2.VideoCodec.ValueType
-    dtx: _builtins.bool
-    red: _builtins.bool
-    simulcast: _builtins.bool
-    source: _track_pb2.TrackSource.ValueType
-    stream: _builtins.str
-    preconnect_buffer: _builtins.bool
-    @_builtins.property
-    def video_encoding(self) -> Global___VideoEncoding:
+    VIDEO_ENCODING_FIELD_NUMBER: builtins.int
+    AUDIO_ENCODING_FIELD_NUMBER: builtins.int
+    VIDEO_CODEC_FIELD_NUMBER: builtins.int
+    DTX_FIELD_NUMBER: builtins.int
+    RED_FIELD_NUMBER: builtins.int
+    SIMULCAST_FIELD_NUMBER: builtins.int
+    SOURCE_FIELD_NUMBER: builtins.int
+    STREAM_FIELD_NUMBER: builtins.int
+    PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
+    video_codec: video_frame_pb2.VideoCodec.ValueType
+    dtx: builtins.bool
+    red: builtins.bool
+    simulcast: builtins.bool
+    source: track_pb2.TrackSource.ValueType
+    stream: builtins.str
+    preconnect_buffer: builtins.bool
+    @property
+    def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
 
-    @_builtins.property
-    def audio_encoding(self) -> Global___AudioEncoding: ...
+    @property
+    def audio_encoding(self) -> global___AudioEncoding: ...
     def __init__(
         self,
         *,
-        video_encoding: Global___VideoEncoding | None = ...,
-        audio_encoding: Global___AudioEncoding | None = ...,
-        video_codec: _video_frame_pb2.VideoCodec.ValueType | None = ...,
-        dtx: _builtins.bool | None = ...,
-        red: _builtins.bool | None = ...,
-        simulcast: _builtins.bool | None = ...,
-        source: _track_pb2.TrackSource.ValueType | None = ...,
-        stream: _builtins.str | None = ...,
-        preconnect_buffer: _builtins.bool | None = ...,
+        video_encoding: global___VideoEncoding | None = ...,
+        audio_encoding: global___AudioEncoding | None = ...,
+        video_codec: video_frame_pb2.VideoCodec.ValueType | None = ...,
+        dtx: builtins.bool | None = ...,
+        red: builtins.bool | None = ...,
+        simulcast: builtins.bool | None = ...,
+        source: track_pb2.TrackSource.ValueType | None = ...,
+        stream: builtins.str | None = ...,
+        preconnect_buffer: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
 
-Global___TrackPublishOptions: _TypeAlias = TrackPublishOptions  # noqa: Y015
+global___TrackPublishOptions = TrackPublishOptions
 
-@_typing.final
-class IceServer(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class IceServer(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    URLS_FIELD_NUMBER: _builtins.int
-    USERNAME_FIELD_NUMBER: _builtins.int
-    PASSWORD_FIELD_NUMBER: _builtins.int
-    username: _builtins.str
-    password: _builtins.str
-    @_builtins.property
-    def urls(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    URLS_FIELD_NUMBER: builtins.int
+    USERNAME_FIELD_NUMBER: builtins.int
+    PASSWORD_FIELD_NUMBER: builtins.int
+    username: builtins.str
+    password: builtins.str
+    @property
+    def urls(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        urls: _abc.Iterable[_builtins.str] | None = ...,
-        username: _builtins.str | None = ...,
-        password: _builtins.str | None = ...,
+        urls: collections.abc.Iterable[builtins.str] | None = ...,
+        username: builtins.str | None = ...,
+        password: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["password", b"password", "username", b"username"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["password", b"password", "urls", b"urls", "username", b"username"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["password", b"password", "username", b"username"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["password", b"password", "urls", b"urls", "username", b"username"]) -> None: ...
 
-Global___IceServer: _TypeAlias = IceServer  # noqa: Y015
+global___IceServer = IceServer
 
-@_typing.final
-class RtcConfig(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RtcConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ICE_TRANSPORT_TYPE_FIELD_NUMBER: _builtins.int
-    CONTINUAL_GATHERING_POLICY_FIELD_NUMBER: _builtins.int
-    ICE_SERVERS_FIELD_NUMBER: _builtins.int
-    ice_transport_type: Global___IceTransportType.ValueType
-    continual_gathering_policy: Global___ContinualGatheringPolicy.ValueType
-    @_builtins.property
-    def ice_servers(self) -> _containers.RepeatedCompositeFieldContainer[Global___IceServer]:
+    ICE_TRANSPORT_TYPE_FIELD_NUMBER: builtins.int
+    CONTINUAL_GATHERING_POLICY_FIELD_NUMBER: builtins.int
+    ICE_SERVERS_FIELD_NUMBER: builtins.int
+    ice_transport_type: global___IceTransportType.ValueType
+    continual_gathering_policy: global___ContinualGatheringPolicy.ValueType
+    @property
+    def ice_servers(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___IceServer]:
         """empty fallback to default"""
 
     def __init__(
         self,
         *,
-        ice_transport_type: Global___IceTransportType.ValueType | None = ...,
-        continual_gathering_policy: Global___ContinualGatheringPolicy.ValueType | None = ...,
-        ice_servers: _abc.Iterable[Global___IceServer] | None = ...,
+        ice_transport_type: global___IceTransportType.ValueType | None = ...,
+        continual_gathering_policy: global___ContinualGatheringPolicy.ValueType | None = ...,
+        ice_servers: collections.abc.Iterable[global___IceServer] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_transport_type", b"ice_transport_type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_servers", b"ice_servers", "ice_transport_type", b"ice_transport_type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_transport_type", b"ice_transport_type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["continual_gathering_policy", b"continual_gathering_policy", "ice_servers", b"ice_servers", "ice_transport_type", b"ice_transport_type"]) -> None: ...
 
-Global___RtcConfig: _TypeAlias = RtcConfig  # noqa: Y015
+global___RtcConfig = RtcConfig
 
-@_typing.final
-class RoomOptions(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RoomOptions(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    AUTO_SUBSCRIBE_FIELD_NUMBER: _builtins.int
-    ADAPTIVE_STREAM_FIELD_NUMBER: _builtins.int
-    DYNACAST_FIELD_NUMBER: _builtins.int
-    E2EE_FIELD_NUMBER: _builtins.int
-    RTC_CONFIG_FIELD_NUMBER: _builtins.int
-    JOIN_RETRIES_FIELD_NUMBER: _builtins.int
-    ENCRYPTION_FIELD_NUMBER: _builtins.int
-    SINGLE_PEER_CONNECTION_FIELD_NUMBER: _builtins.int
-    CONNECT_TIMEOUT_MS_FIELD_NUMBER: _builtins.int
-    auto_subscribe: _builtins.bool
-    adaptive_stream: _builtins.bool
-    dynacast: _builtins.bool
-    join_retries: _builtins.int
-    single_peer_connection: _builtins.bool
+    AUTO_SUBSCRIBE_FIELD_NUMBER: builtins.int
+    ADAPTIVE_STREAM_FIELD_NUMBER: builtins.int
+    DYNACAST_FIELD_NUMBER: builtins.int
+    E2EE_FIELD_NUMBER: builtins.int
+    RTC_CONFIG_FIELD_NUMBER: builtins.int
+    JOIN_RETRIES_FIELD_NUMBER: builtins.int
+    ENCRYPTION_FIELD_NUMBER: builtins.int
+    SINGLE_PEER_CONNECTION_FIELD_NUMBER: builtins.int
+    CONNECT_TIMEOUT_MS_FIELD_NUMBER: builtins.int
+    auto_subscribe: builtins.bool
+    adaptive_stream: builtins.bool
+    dynacast: builtins.bool
+    join_retries: builtins.int
+    single_peer_connection: builtins.bool
     """use single peer connection for both publish/subscribe (default: false)"""
-    connect_timeout_ms: _builtins.int
+    connect_timeout_ms: builtins.int
     """timeout in milliseconds for each signal connection attempt (default: 5000)"""
-    @_builtins.property
-    @_deprecated("""This field has been marked as deprecated using proto field options.""")
-    def e2ee(self) -> _e2ee_pb2.E2eeOptions: ...
-    @_builtins.property
-    def rtc_config(self) -> Global___RtcConfig:
+    @property
+    def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
+    @property
+    def rtc_config(self) -> global___RtcConfig:
         """allow to setup a custom RtcConfiguration"""
 
-    @_builtins.property
-    def encryption(self) -> _e2ee_pb2.E2eeOptions: ...
+    @property
+    def encryption(self) -> e2ee_pb2.E2eeOptions: ...
     def __init__(
         self,
         *,
-        auto_subscribe: _builtins.bool | None = ...,
-        adaptive_stream: _builtins.bool | None = ...,
-        dynacast: _builtins.bool | None = ...,
-        e2ee: _e2ee_pb2.E2eeOptions | None = ...,
-        rtc_config: Global___RtcConfig | None = ...,
-        join_retries: _builtins.int | None = ...,
-        encryption: _e2ee_pb2.E2eeOptions | None = ...,
-        single_peer_connection: _builtins.bool | None = ...,
-        connect_timeout_ms: _builtins.int | None = ...,
+        auto_subscribe: builtins.bool | None = ...,
+        adaptive_stream: builtins.bool | None = ...,
+        dynacast: builtins.bool | None = ...,
+        e2ee: e2ee_pb2.E2eeOptions | None = ...,
+        rtc_config: global___RtcConfig | None = ...,
+        join_retries: builtins.int | None = ...,
+        encryption: e2ee_pb2.E2eeOptions | None = ...,
+        single_peer_connection: builtins.bool | None = ...,
+        connect_timeout_ms: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
 
-Global___RoomOptions: _TypeAlias = RoomOptions  # noqa: Y015
+global___RoomOptions = RoomOptions
 
-@_typing.final
-class TranscriptionSegment(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TranscriptionSegment(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ID_FIELD_NUMBER: _builtins.int
-    TEXT_FIELD_NUMBER: _builtins.int
-    START_TIME_FIELD_NUMBER: _builtins.int
-    END_TIME_FIELD_NUMBER: _builtins.int
-    FINAL_FIELD_NUMBER: _builtins.int
-    LANGUAGE_FIELD_NUMBER: _builtins.int
-    id: _builtins.str
-    text: _builtins.str
-    start_time: _builtins.int
-    end_time: _builtins.int
-    final: _builtins.bool
-    language: _builtins.str
+    ID_FIELD_NUMBER: builtins.int
+    TEXT_FIELD_NUMBER: builtins.int
+    START_TIME_FIELD_NUMBER: builtins.int
+    END_TIME_FIELD_NUMBER: builtins.int
+    FINAL_FIELD_NUMBER: builtins.int
+    LANGUAGE_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    text: builtins.str
+    start_time: builtins.int
+    end_time: builtins.int
+    final: builtins.bool
+    language: builtins.str
     def __init__(
         self,
         *,
-        id: _builtins.str | None = ...,
-        text: _builtins.str | None = ...,
-        start_time: _builtins.int | None = ...,
-        end_time: _builtins.int | None = ...,
-        final: _builtins.bool | None = ...,
-        language: _builtins.str | None = ...,
+        id: builtins.str | None = ...,
+        text: builtins.str | None = ...,
+        start_time: builtins.int | None = ...,
+        end_time: builtins.int | None = ...,
+        final: builtins.bool | None = ...,
+        language: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["end_time", b"end_time", "final", b"final", "id", b"id", "language", b"language", "start_time", b"start_time", "text", b"text"]) -> None: ...
 
-Global___TranscriptionSegment: _TypeAlias = TranscriptionSegment  # noqa: Y015
+global___TranscriptionSegment = TranscriptionSegment
 
-@_typing.final
-class BufferInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class BufferInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    DATA_LEN_FIELD_NUMBER: _builtins.int
-    data_ptr: _builtins.int
-    data_len: _builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    DATA_LEN_FIELD_NUMBER: builtins.int
+    data_ptr: builtins.int
+    data_len: builtins.int
     def __init__(
         self,
         *,
-        data_ptr: _builtins.int | None = ...,
-        data_len: _builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        data_len: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> None: ...
 
-Global___BufferInfo: _TypeAlias = BufferInfo  # noqa: Y015
+global___BufferInfo = BufferInfo
 
-@_typing.final
-class OwnedBuffer(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedBuffer(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    DATA_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def data(self) -> Global___BufferInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    DATA_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def data(self) -> global___BufferInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        data: Global___BufferInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        data: global___BufferInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data", b"data", "handle", b"handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data", b"data", "handle", b"handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["data", b"data", "handle", b"handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data", b"data", "handle", b"handle"]) -> None: ...
 
-Global___OwnedBuffer: _TypeAlias = OwnedBuffer  # noqa: Y015
+global___OwnedBuffer = OwnedBuffer
 
-@_typing.final
-class RoomEvent(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RoomEvent(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ROOM_HANDLE_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_CONNECTED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_DISCONNECTED_FIELD_NUMBER: _builtins.int
-    LOCAL_TRACK_PUBLISHED_FIELD_NUMBER: _builtins.int
-    LOCAL_TRACK_UNPUBLISHED_FIELD_NUMBER: _builtins.int
-    LOCAL_TRACK_SUBSCRIBED_FIELD_NUMBER: _builtins.int
-    TRACK_PUBLISHED_FIELD_NUMBER: _builtins.int
-    TRACK_UNPUBLISHED_FIELD_NUMBER: _builtins.int
-    TRACK_SUBSCRIBED_FIELD_NUMBER: _builtins.int
-    TRACK_UNSUBSCRIBED_FIELD_NUMBER: _builtins.int
-    TRACK_SUBSCRIPTION_FAILED_FIELD_NUMBER: _builtins.int
-    TRACK_MUTED_FIELD_NUMBER: _builtins.int
-    TRACK_UNMUTED_FIELD_NUMBER: _builtins.int
-    ACTIVE_SPEAKERS_CHANGED_FIELD_NUMBER: _builtins.int
-    ROOM_METADATA_CHANGED_FIELD_NUMBER: _builtins.int
-    ROOM_SID_CHANGED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_METADATA_CHANGED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_NAME_CHANGED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_ATTRIBUTES_CHANGED_FIELD_NUMBER: _builtins.int
-    CONNECTION_QUALITY_CHANGED_FIELD_NUMBER: _builtins.int
-    CONNECTION_STATE_CHANGED_FIELD_NUMBER: _builtins.int
-    DISCONNECTED_FIELD_NUMBER: _builtins.int
-    RECONNECTING_FIELD_NUMBER: _builtins.int
-    RECONNECTED_FIELD_NUMBER: _builtins.int
-    E2EE_STATE_CHANGED_FIELD_NUMBER: _builtins.int
-    EOS_FIELD_NUMBER: _builtins.int
-    DATA_PACKET_RECEIVED_FIELD_NUMBER: _builtins.int
-    TRANSCRIPTION_RECEIVED_FIELD_NUMBER: _builtins.int
-    CHAT_MESSAGE_FIELD_NUMBER: _builtins.int
-    STREAM_HEADER_RECEIVED_FIELD_NUMBER: _builtins.int
-    STREAM_CHUNK_RECEIVED_FIELD_NUMBER: _builtins.int
-    STREAM_TRAILER_RECEIVED_FIELD_NUMBER: _builtins.int
-    DATA_CHANNEL_LOW_THRESHOLD_CHANGED_FIELD_NUMBER: _builtins.int
-    BYTE_STREAM_OPENED_FIELD_NUMBER: _builtins.int
-    TEXT_STREAM_OPENED_FIELD_NUMBER: _builtins.int
-    ROOM_UPDATED_FIELD_NUMBER: _builtins.int
-    MOVED_FIELD_NUMBER: _builtins.int
-    PARTICIPANTS_UPDATED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_ENCRYPTION_STATUS_CHANGED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_PERMISSION_CHANGED_FIELD_NUMBER: _builtins.int
-    TOKEN_REFRESHED_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_ACTIVE_FIELD_NUMBER: _builtins.int
-    DATA_TRACK_PUBLISHED_FIELD_NUMBER: _builtins.int
-    DATA_TRACK_UNPUBLISHED_FIELD_NUMBER: _builtins.int
-    room_handle: _builtins.int
-    @_builtins.property
-    def participant_connected(self) -> Global___ParticipantConnected: ...
-    @_builtins.property
-    def participant_disconnected(self) -> Global___ParticipantDisconnected: ...
-    @_builtins.property
-    def local_track_published(self) -> Global___LocalTrackPublished: ...
-    @_builtins.property
-    def local_track_unpublished(self) -> Global___LocalTrackUnpublished: ...
-    @_builtins.property
-    def local_track_subscribed(self) -> Global___LocalTrackSubscribed: ...
-    @_builtins.property
-    def track_published(self) -> Global___TrackPublished: ...
-    @_builtins.property
-    def track_unpublished(self) -> Global___TrackUnpublished: ...
-    @_builtins.property
-    def track_subscribed(self) -> Global___TrackSubscribed: ...
-    @_builtins.property
-    def track_unsubscribed(self) -> Global___TrackUnsubscribed: ...
-    @_builtins.property
-    def track_subscription_failed(self) -> Global___TrackSubscriptionFailed: ...
-    @_builtins.property
-    def track_muted(self) -> Global___TrackMuted: ...
-    @_builtins.property
-    def track_unmuted(self) -> Global___TrackUnmuted: ...
-    @_builtins.property
-    def active_speakers_changed(self) -> Global___ActiveSpeakersChanged: ...
-    @_builtins.property
-    def room_metadata_changed(self) -> Global___RoomMetadataChanged: ...
-    @_builtins.property
-    def room_sid_changed(self) -> Global___RoomSidChanged: ...
-    @_builtins.property
-    def participant_metadata_changed(self) -> Global___ParticipantMetadataChanged: ...
-    @_builtins.property
-    def participant_name_changed(self) -> Global___ParticipantNameChanged: ...
-    @_builtins.property
-    def participant_attributes_changed(self) -> Global___ParticipantAttributesChanged: ...
-    @_builtins.property
-    def connection_quality_changed(self) -> Global___ConnectionQualityChanged: ...
-    @_builtins.property
-    def connection_state_changed(self) -> Global___ConnectionStateChanged: ...
-    @_builtins.property
-    def disconnected(self) -> Global___Disconnected:
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    PARTICIPANT_CONNECTED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_DISCONNECTED_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_PUBLISHED_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_UNPUBLISHED_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_SUBSCRIBED_FIELD_NUMBER: builtins.int
+    TRACK_PUBLISHED_FIELD_NUMBER: builtins.int
+    TRACK_UNPUBLISHED_FIELD_NUMBER: builtins.int
+    TRACK_SUBSCRIBED_FIELD_NUMBER: builtins.int
+    TRACK_UNSUBSCRIBED_FIELD_NUMBER: builtins.int
+    TRACK_SUBSCRIPTION_FAILED_FIELD_NUMBER: builtins.int
+    TRACK_MUTED_FIELD_NUMBER: builtins.int
+    TRACK_UNMUTED_FIELD_NUMBER: builtins.int
+    ACTIVE_SPEAKERS_CHANGED_FIELD_NUMBER: builtins.int
+    ROOM_METADATA_CHANGED_FIELD_NUMBER: builtins.int
+    ROOM_SID_CHANGED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_METADATA_CHANGED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_NAME_CHANGED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_ATTRIBUTES_CHANGED_FIELD_NUMBER: builtins.int
+    CONNECTION_QUALITY_CHANGED_FIELD_NUMBER: builtins.int
+    CONNECTION_STATE_CHANGED_FIELD_NUMBER: builtins.int
+    DISCONNECTED_FIELD_NUMBER: builtins.int
+    RECONNECTING_FIELD_NUMBER: builtins.int
+    RECONNECTED_FIELD_NUMBER: builtins.int
+    E2EE_STATE_CHANGED_FIELD_NUMBER: builtins.int
+    EOS_FIELD_NUMBER: builtins.int
+    DATA_PACKET_RECEIVED_FIELD_NUMBER: builtins.int
+    TRANSCRIPTION_RECEIVED_FIELD_NUMBER: builtins.int
+    CHAT_MESSAGE_FIELD_NUMBER: builtins.int
+    STREAM_HEADER_RECEIVED_FIELD_NUMBER: builtins.int
+    STREAM_CHUNK_RECEIVED_FIELD_NUMBER: builtins.int
+    STREAM_TRAILER_RECEIVED_FIELD_NUMBER: builtins.int
+    DATA_CHANNEL_LOW_THRESHOLD_CHANGED_FIELD_NUMBER: builtins.int
+    BYTE_STREAM_OPENED_FIELD_NUMBER: builtins.int
+    TEXT_STREAM_OPENED_FIELD_NUMBER: builtins.int
+    ROOM_UPDATED_FIELD_NUMBER: builtins.int
+    MOVED_FIELD_NUMBER: builtins.int
+    PARTICIPANTS_UPDATED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_ENCRYPTION_STATUS_CHANGED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_PERMISSION_CHANGED_FIELD_NUMBER: builtins.int
+    TOKEN_REFRESHED_FIELD_NUMBER: builtins.int
+    PARTICIPANT_ACTIVE_FIELD_NUMBER: builtins.int
+    DATA_TRACK_PUBLISHED_FIELD_NUMBER: builtins.int
+    DATA_TRACK_UNPUBLISHED_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    @property
+    def participant_connected(self) -> global___ParticipantConnected: ...
+    @property
+    def participant_disconnected(self) -> global___ParticipantDisconnected: ...
+    @property
+    def local_track_published(self) -> global___LocalTrackPublished: ...
+    @property
+    def local_track_unpublished(self) -> global___LocalTrackUnpublished: ...
+    @property
+    def local_track_subscribed(self) -> global___LocalTrackSubscribed: ...
+    @property
+    def track_published(self) -> global___TrackPublished: ...
+    @property
+    def track_unpublished(self) -> global___TrackUnpublished: ...
+    @property
+    def track_subscribed(self) -> global___TrackSubscribed: ...
+    @property
+    def track_unsubscribed(self) -> global___TrackUnsubscribed: ...
+    @property
+    def track_subscription_failed(self) -> global___TrackSubscriptionFailed: ...
+    @property
+    def track_muted(self) -> global___TrackMuted: ...
+    @property
+    def track_unmuted(self) -> global___TrackUnmuted: ...
+    @property
+    def active_speakers_changed(self) -> global___ActiveSpeakersChanged: ...
+    @property
+    def room_metadata_changed(self) -> global___RoomMetadataChanged: ...
+    @property
+    def room_sid_changed(self) -> global___RoomSidChanged: ...
+    @property
+    def participant_metadata_changed(self) -> global___ParticipantMetadataChanged: ...
+    @property
+    def participant_name_changed(self) -> global___ParticipantNameChanged: ...
+    @property
+    def participant_attributes_changed(self) -> global___ParticipantAttributesChanged: ...
+    @property
+    def connection_quality_changed(self) -> global___ConnectionQualityChanged: ...
+    @property
+    def connection_state_changed(self) -> global___ConnectionStateChanged: ...
+    @property
+    def disconnected(self) -> global___Disconnected:
         """Connected connected = 21;"""
 
-    @_builtins.property
-    def reconnecting(self) -> Global___Reconnecting: ...
-    @_builtins.property
-    def reconnected(self) -> Global___Reconnected: ...
-    @_builtins.property
-    def e2ee_state_changed(self) -> Global___E2eeStateChanged: ...
-    @_builtins.property
-    def eos(self) -> Global___RoomEOS:
+    @property
+    def reconnecting(self) -> global___Reconnecting: ...
+    @property
+    def reconnected(self) -> global___Reconnected: ...
+    @property
+    def e2ee_state_changed(self) -> global___E2eeStateChanged: ...
+    @property
+    def eos(self) -> global___RoomEOS:
         """The stream of room events has ended"""
 
-    @_builtins.property
-    def data_packet_received(self) -> Global___DataPacketReceived: ...
-    @_builtins.property
-    def transcription_received(self) -> Global___TranscriptionReceived: ...
-    @_builtins.property
-    def chat_message(self) -> Global___ChatMessageReceived: ...
-    @_builtins.property
-    def stream_header_received(self) -> Global___DataStreamHeaderReceived:
+    @property
+    def data_packet_received(self) -> global___DataPacketReceived: ...
+    @property
+    def transcription_received(self) -> global___TranscriptionReceived: ...
+    @property
+    def chat_message(self) -> global___ChatMessageReceived: ...
+    @property
+    def stream_header_received(self) -> global___DataStreamHeaderReceived:
         """Data stream (low level)"""
 
-    @_builtins.property
-    def stream_chunk_received(self) -> Global___DataStreamChunkReceived: ...
-    @_builtins.property
-    def stream_trailer_received(self) -> Global___DataStreamTrailerReceived: ...
-    @_builtins.property
-    def data_channel_low_threshold_changed(self) -> Global___DataChannelBufferedAmountLowThresholdChanged: ...
-    @_builtins.property
-    def byte_stream_opened(self) -> Global___ByteStreamOpened:
+    @property
+    def stream_chunk_received(self) -> global___DataStreamChunkReceived: ...
+    @property
+    def stream_trailer_received(self) -> global___DataStreamTrailerReceived: ...
+    @property
+    def data_channel_low_threshold_changed(self) -> global___DataChannelBufferedAmountLowThresholdChanged: ...
+    @property
+    def byte_stream_opened(self) -> global___ByteStreamOpened:
         """Data stream (high level)"""
 
-    @_builtins.property
-    def text_stream_opened(self) -> Global___TextStreamOpened: ...
-    @_builtins.property
-    def room_updated(self) -> Global___RoomInfo:
+    @property
+    def text_stream_opened(self) -> global___TextStreamOpened: ...
+    @property
+    def room_updated(self) -> global___RoomInfo:
         """Room info updated"""
 
-    @_builtins.property
-    def moved(self) -> Global___RoomInfo:
+    @property
+    def moved(self) -> global___RoomInfo:
         """Participant moved to new room"""
 
-    @_builtins.property
-    def participants_updated(self) -> Global___ParticipantsUpdated:
+    @property
+    def participants_updated(self) -> global___ParticipantsUpdated:
         """carry over all participant info updates, including sid"""
 
-    @_builtins.property
-    def participant_encryption_status_changed(self) -> Global___ParticipantEncryptionStatusChanged: ...
-    @_builtins.property
-    def participant_permission_changed(self) -> Global___ParticipantPermissionChanged: ...
-    @_builtins.property
-    def token_refreshed(self) -> Global___TokenRefreshed: ...
-    @_builtins.property
-    def participant_active(self) -> Global___ParticipantActive: ...
-    @_builtins.property
-    def data_track_published(self) -> Global___DataTrackPublished: ...
-    @_builtins.property
-    def data_track_unpublished(self) -> Global___DataTrackUnpublished: ...
+    @property
+    def participant_encryption_status_changed(self) -> global___ParticipantEncryptionStatusChanged: ...
+    @property
+    def participant_permission_changed(self) -> global___ParticipantPermissionChanged: ...
+    @property
+    def token_refreshed(self) -> global___TokenRefreshed: ...
+    @property
+    def participant_active(self) -> global___ParticipantActive: ...
+    @property
+    def data_track_published(self) -> global___DataTrackPublished: ...
+    @property
+    def data_track_unpublished(self) -> global___DataTrackUnpublished: ...
     def __init__(
         self,
         *,
-        room_handle: _builtins.int | None = ...,
-        participant_connected: Global___ParticipantConnected | None = ...,
-        participant_disconnected: Global___ParticipantDisconnected | None = ...,
-        local_track_published: Global___LocalTrackPublished | None = ...,
-        local_track_unpublished: Global___LocalTrackUnpublished | None = ...,
-        local_track_subscribed: Global___LocalTrackSubscribed | None = ...,
-        track_published: Global___TrackPublished | None = ...,
-        track_unpublished: Global___TrackUnpublished | None = ...,
-        track_subscribed: Global___TrackSubscribed | None = ...,
-        track_unsubscribed: Global___TrackUnsubscribed | None = ...,
-        track_subscription_failed: Global___TrackSubscriptionFailed | None = ...,
-        track_muted: Global___TrackMuted | None = ...,
-        track_unmuted: Global___TrackUnmuted | None = ...,
-        active_speakers_changed: Global___ActiveSpeakersChanged | None = ...,
-        room_metadata_changed: Global___RoomMetadataChanged | None = ...,
-        room_sid_changed: Global___RoomSidChanged | None = ...,
-        participant_metadata_changed: Global___ParticipantMetadataChanged | None = ...,
-        participant_name_changed: Global___ParticipantNameChanged | None = ...,
-        participant_attributes_changed: Global___ParticipantAttributesChanged | None = ...,
-        connection_quality_changed: Global___ConnectionQualityChanged | None = ...,
-        connection_state_changed: Global___ConnectionStateChanged | None = ...,
-        disconnected: Global___Disconnected | None = ...,
-        reconnecting: Global___Reconnecting | None = ...,
-        reconnected: Global___Reconnected | None = ...,
-        e2ee_state_changed: Global___E2eeStateChanged | None = ...,
-        eos: Global___RoomEOS | None = ...,
-        data_packet_received: Global___DataPacketReceived | None = ...,
-        transcription_received: Global___TranscriptionReceived | None = ...,
-        chat_message: Global___ChatMessageReceived | None = ...,
-        stream_header_received: Global___DataStreamHeaderReceived | None = ...,
-        stream_chunk_received: Global___DataStreamChunkReceived | None = ...,
-        stream_trailer_received: Global___DataStreamTrailerReceived | None = ...,
-        data_channel_low_threshold_changed: Global___DataChannelBufferedAmountLowThresholdChanged | None = ...,
-        byte_stream_opened: Global___ByteStreamOpened | None = ...,
-        text_stream_opened: Global___TextStreamOpened | None = ...,
-        room_updated: Global___RoomInfo | None = ...,
-        moved: Global___RoomInfo | None = ...,
-        participants_updated: Global___ParticipantsUpdated | None = ...,
-        participant_encryption_status_changed: Global___ParticipantEncryptionStatusChanged | None = ...,
-        participant_permission_changed: Global___ParticipantPermissionChanged | None = ...,
-        token_refreshed: Global___TokenRefreshed | None = ...,
-        participant_active: Global___ParticipantActive | None = ...,
-        data_track_published: Global___DataTrackPublished | None = ...,
-        data_track_unpublished: Global___DataTrackUnpublished | None = ...,
+        room_handle: builtins.int | None = ...,
+        participant_connected: global___ParticipantConnected | None = ...,
+        participant_disconnected: global___ParticipantDisconnected | None = ...,
+        local_track_published: global___LocalTrackPublished | None = ...,
+        local_track_unpublished: global___LocalTrackUnpublished | None = ...,
+        local_track_subscribed: global___LocalTrackSubscribed | None = ...,
+        track_published: global___TrackPublished | None = ...,
+        track_unpublished: global___TrackUnpublished | None = ...,
+        track_subscribed: global___TrackSubscribed | None = ...,
+        track_unsubscribed: global___TrackUnsubscribed | None = ...,
+        track_subscription_failed: global___TrackSubscriptionFailed | None = ...,
+        track_muted: global___TrackMuted | None = ...,
+        track_unmuted: global___TrackUnmuted | None = ...,
+        active_speakers_changed: global___ActiveSpeakersChanged | None = ...,
+        room_metadata_changed: global___RoomMetadataChanged | None = ...,
+        room_sid_changed: global___RoomSidChanged | None = ...,
+        participant_metadata_changed: global___ParticipantMetadataChanged | None = ...,
+        participant_name_changed: global___ParticipantNameChanged | None = ...,
+        participant_attributes_changed: global___ParticipantAttributesChanged | None = ...,
+        connection_quality_changed: global___ConnectionQualityChanged | None = ...,
+        connection_state_changed: global___ConnectionStateChanged | None = ...,
+        disconnected: global___Disconnected | None = ...,
+        reconnecting: global___Reconnecting | None = ...,
+        reconnected: global___Reconnected | None = ...,
+        e2ee_state_changed: global___E2eeStateChanged | None = ...,
+        eos: global___RoomEOS | None = ...,
+        data_packet_received: global___DataPacketReceived | None = ...,
+        transcription_received: global___TranscriptionReceived | None = ...,
+        chat_message: global___ChatMessageReceived | None = ...,
+        stream_header_received: global___DataStreamHeaderReceived | None = ...,
+        stream_chunk_received: global___DataStreamChunkReceived | None = ...,
+        stream_trailer_received: global___DataStreamTrailerReceived | None = ...,
+        data_channel_low_threshold_changed: global___DataChannelBufferedAmountLowThresholdChanged | None = ...,
+        byte_stream_opened: global___ByteStreamOpened | None = ...,
+        text_stream_opened: global___TextStreamOpened | None = ...,
+        room_updated: global___RoomInfo | None = ...,
+        moved: global___RoomInfo | None = ...,
+        participants_updated: global___ParticipantsUpdated | None = ...,
+        participant_encryption_status_changed: global___ParticipantEncryptionStatusChanged | None = ...,
+        participant_permission_changed: global___ParticipantPermissionChanged | None = ...,
+        token_refreshed: global___TokenRefreshed | None = ...,
+        participant_active: global___ParticipantActive | None = ...,
+        data_track_published: global___DataTrackPublished | None = ...,
+        data_track_unpublished: global___DataTrackUnpublished | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed", "byte_stream_opened", "text_stream_opened", "room_updated", "moved", "participants_updated", "participant_encryption_status_changed", "participant_permission_changed", "token_refreshed", "participant_active", "data_track_published", "data_track_unpublished"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed", "byte_stream_opened", "text_stream_opened", "room_updated", "moved", "participants_updated", "participant_encryption_status_changed", "participant_permission_changed", "token_refreshed", "participant_active", "data_track_published", "data_track_unpublished"] | None: ...
 
-Global___RoomEvent: _TypeAlias = RoomEvent  # noqa: Y015
+global___RoomEvent = RoomEvent
 
-@_typing.final
-class RoomInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RoomInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SID_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    METADATA_FIELD_NUMBER: _builtins.int
-    LOSSY_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: _builtins.int
-    RELIABLE_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: _builtins.int
-    EMPTY_TIMEOUT_FIELD_NUMBER: _builtins.int
-    DEPARTURE_TIMEOUT_FIELD_NUMBER: _builtins.int
-    MAX_PARTICIPANTS_FIELD_NUMBER: _builtins.int
-    CREATION_TIME_FIELD_NUMBER: _builtins.int
-    NUM_PARTICIPANTS_FIELD_NUMBER: _builtins.int
-    NUM_PUBLISHERS_FIELD_NUMBER: _builtins.int
-    ACTIVE_RECORDING_FIELD_NUMBER: _builtins.int
-    sid: _builtins.str
-    name: _builtins.str
-    metadata: _builtins.str
-    lossy_dc_buffered_amount_low_threshold: _builtins.int
-    reliable_dc_buffered_amount_low_threshold: _builtins.int
-    empty_timeout: _builtins.int
-    departure_timeout: _builtins.int
-    max_participants: _builtins.int
-    creation_time: _builtins.int
-    num_participants: _builtins.int
-    num_publishers: _builtins.int
-    active_recording: _builtins.bool
+    SID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
+    LOSSY_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    RELIABLE_DC_BUFFERED_AMOUNT_LOW_THRESHOLD_FIELD_NUMBER: builtins.int
+    EMPTY_TIMEOUT_FIELD_NUMBER: builtins.int
+    DEPARTURE_TIMEOUT_FIELD_NUMBER: builtins.int
+    MAX_PARTICIPANTS_FIELD_NUMBER: builtins.int
+    CREATION_TIME_FIELD_NUMBER: builtins.int
+    NUM_PARTICIPANTS_FIELD_NUMBER: builtins.int
+    NUM_PUBLISHERS_FIELD_NUMBER: builtins.int
+    ACTIVE_RECORDING_FIELD_NUMBER: builtins.int
+    sid: builtins.str
+    name: builtins.str
+    metadata: builtins.str
+    lossy_dc_buffered_amount_low_threshold: builtins.int
+    reliable_dc_buffered_amount_low_threshold: builtins.int
+    empty_timeout: builtins.int
+    departure_timeout: builtins.int
+    max_participants: builtins.int
+    creation_time: builtins.int
+    num_participants: builtins.int
+    num_publishers: builtins.int
+    active_recording: builtins.bool
     def __init__(
         self,
         *,
-        sid: _builtins.str | None = ...,
-        name: _builtins.str | None = ...,
-        metadata: _builtins.str | None = ...,
-        lossy_dc_buffered_amount_low_threshold: _builtins.int | None = ...,
-        reliable_dc_buffered_amount_low_threshold: _builtins.int | None = ...,
-        empty_timeout: _builtins.int | None = ...,
-        departure_timeout: _builtins.int | None = ...,
-        max_participants: _builtins.int | None = ...,
-        creation_time: _builtins.int | None = ...,
-        num_participants: _builtins.int | None = ...,
-        num_publishers: _builtins.int | None = ...,
-        active_recording: _builtins.bool | None = ...,
+        sid: builtins.str | None = ...,
+        name: builtins.str | None = ...,
+        metadata: builtins.str | None = ...,
+        lossy_dc_buffered_amount_low_threshold: builtins.int | None = ...,
+        reliable_dc_buffered_amount_low_threshold: builtins.int | None = ...,
+        empty_timeout: builtins.int | None = ...,
+        departure_timeout: builtins.int | None = ...,
+        max_participants: builtins.int | None = ...,
+        creation_time: builtins.int | None = ...,
+        num_participants: builtins.int | None = ...,
+        num_publishers: builtins.int | None = ...,
+        active_recording: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "departure_timeout", b"departure_timeout", "empty_timeout", b"empty_timeout", "lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "departure_timeout", b"departure_timeout", "empty_timeout", b"empty_timeout", "lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "departure_timeout", b"departure_timeout", "empty_timeout", b"empty_timeout", "lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_recording", b"active_recording", "creation_time", b"creation_time", "departure_timeout", b"departure_timeout", "empty_timeout", b"empty_timeout", "lossy_dc_buffered_amount_low_threshold", b"lossy_dc_buffered_amount_low_threshold", "max_participants", b"max_participants", "metadata", b"metadata", "name", b"name", "num_participants", b"num_participants", "num_publishers", b"num_publishers", "reliable_dc_buffered_amount_low_threshold", b"reliable_dc_buffered_amount_low_threshold", "sid", b"sid"]) -> None: ...
 
-Global___RoomInfo: _TypeAlias = RoomInfo  # noqa: Y015
+global___RoomInfo = RoomInfo
 
-@_typing.final
-class OwnedRoom(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedRoom(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___RoomInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___RoomInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___RoomInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___RoomInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedRoom: _TypeAlias = OwnedRoom  # noqa: Y015
+global___OwnedRoom = OwnedRoom
 
-@_typing.final
-class ParticipantsUpdated(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantsUpdated(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANTS_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def participants(self) -> _containers.RepeatedCompositeFieldContainer[_participant_pb2.ParticipantInfo]: ...
+    PARTICIPANTS_FIELD_NUMBER: builtins.int
+    @property
+    def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[participant_pb2.ParticipantInfo]: ...
     def __init__(
         self,
         *,
-        participants: _abc.Iterable[_participant_pb2.ParticipantInfo] | None = ...,
+        participants: collections.abc.Iterable[participant_pb2.ParticipantInfo] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participants", b"participants"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def ClearField(self, field_name: typing.Literal["participants", b"participants"]) -> None: ...
 
-Global___ParticipantsUpdated: _TypeAlias = ParticipantsUpdated  # noqa: Y015
+global___ParticipantsUpdated = ParticipantsUpdated
 
-@_typing.final
-class ParticipantConnected(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantConnected(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def info(self) -> _participant_pb2.OwnedParticipant: ...
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def info(self) -> participant_pb2.OwnedParticipant: ...
     def __init__(
         self,
         *,
-        info: _participant_pb2.OwnedParticipant | None = ...,
+        info: participant_pb2.OwnedParticipant | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["info", b"info"]) -> None: ...
 
-Global___ParticipantConnected: _TypeAlias = ParticipantConnected  # noqa: Y015
+global___ParticipantConnected = ParticipantConnected
 
-@_typing.final
-class ParticipantActive(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantActive(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantActive: _TypeAlias = ParticipantActive  # noqa: Y015
+global___ParticipantActive = ParticipantActive
 
-@_typing.final
-class ParticipantDisconnected(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantDisconnected(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    DISCONNECT_REASON_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    disconnect_reason: _participant_pb2.DisconnectReason.ValueType
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    DISCONNECT_REASON_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    disconnect_reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        disconnect_reason: _participant_pb2.DisconnectReason.ValueType | None = ...,
+        participant_identity: builtins.str | None = ...,
+        disconnect_reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantDisconnected: _TypeAlias = ParticipantDisconnected  # noqa: Y015
+global___ParticipantDisconnected = ParticipantDisconnected
 
-@_typing.final
-class LocalTrackPublished(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LocalTrackPublished(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    track_sid: _builtins.str
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    track_sid: builtins.str
     """The TrackPublicationInfo comes from the PublishTrack response
     and the FfiClient musts wait for it before firing this event
     """
     def __init__(
         self,
         *,
-        track_sid: _builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> None: ...
 
-Global___LocalTrackPublished: _TypeAlias = LocalTrackPublished  # noqa: Y015
+global___LocalTrackPublished = LocalTrackPublished
 
-@_typing.final
-class LocalTrackUnpublished(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LocalTrackUnpublished(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PUBLICATION_SID_FIELD_NUMBER: _builtins.int
-    publication_sid: _builtins.str
+    PUBLICATION_SID_FIELD_NUMBER: builtins.int
+    publication_sid: builtins.str
     def __init__(
         self,
         *,
-        publication_sid: _builtins.str | None = ...,
+        publication_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["publication_sid", b"publication_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["publication_sid", b"publication_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["publication_sid", b"publication_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["publication_sid", b"publication_sid"]) -> None: ...
 
-Global___LocalTrackUnpublished: _TypeAlias = LocalTrackUnpublished  # noqa: Y015
+global___LocalTrackUnpublished = LocalTrackUnpublished
 
-@_typing.final
-class LocalTrackSubscribed(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LocalTrackSubscribed(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    track_sid: _builtins.str
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    track_sid: builtins.str
     def __init__(
         self,
         *,
-        track_sid: _builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track_sid", b"track_sid"]) -> None: ...
 
-Global___LocalTrackSubscribed: _TypeAlias = LocalTrackSubscribed  # noqa: Y015
+global___LocalTrackSubscribed = LocalTrackSubscribed
 
-@_typing.final
-class TrackPublished(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackPublished(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    PUBLICATION_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def publication(self) -> _track_pb2.OwnedTrackPublication: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    PUBLICATION_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def publication(self) -> track_pb2.OwnedTrackPublication: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        publication: _track_pb2.OwnedTrackPublication | None = ...,
+        participant_identity: builtins.str | None = ...,
+        publication: track_pb2.OwnedTrackPublication | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication", b"publication"]) -> None: ...
 
-Global___TrackPublished: _TypeAlias = TrackPublished  # noqa: Y015
+global___TrackPublished = TrackPublished
 
-@_typing.final
-class TrackUnpublished(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackUnpublished(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    PUBLICATION_SID_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    publication_sid: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    PUBLICATION_SID_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    publication_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        publication_sid: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        publication_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "publication_sid", b"publication_sid"]) -> None: ...
 
-Global___TrackUnpublished: _TypeAlias = TrackUnpublished  # noqa: Y015
+global___TrackUnpublished = TrackUnpublished
 
-@_typing.final
-class TrackSubscribed(_message.Message):
+@typing.final
+class TrackSubscribed(google.protobuf.message.Message):
     """Publication isn't needed for subscription events on the FFI
     The FFI will retrieve the publication using the Track sid
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def track(self) -> _track_pb2.OwnedTrack: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def track(self) -> track_pb2.OwnedTrack: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track: _track_pb2.OwnedTrack | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track: track_pb2.OwnedTrack | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track", b"track"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track", b"track"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track", b"track"]) -> None: ...
 
-Global___TrackSubscribed: _TypeAlias = TrackSubscribed  # noqa: Y015
+global___TrackSubscribed = TrackSubscribed
 
-@_typing.final
-class TrackUnsubscribed(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackUnsubscribed(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
     """The FFI language can dispose/remove the VideoSink here"""
-    track_sid: _builtins.str
+    track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track_sid: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-Global___TrackUnsubscribed: _TypeAlias = TrackUnsubscribed  # noqa: Y015
+global___TrackUnsubscribed = TrackUnsubscribed
 
-@_typing.final
-class TrackSubscriptionFailed(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackSubscriptionFailed(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    track_sid: _builtins.str
-    error: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
+    error: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track_sid: _builtins.str | None = ...,
-        error: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-Global___TrackSubscriptionFailed: _TypeAlias = TrackSubscriptionFailed  # noqa: Y015
+global___TrackSubscriptionFailed = TrackSubscriptionFailed
 
-@_typing.final
-class TrackMuted(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackMuted(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    track_sid: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track_sid: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-Global___TrackMuted: _TypeAlias = TrackMuted  # noqa: Y015
+global___TrackMuted = TrackMuted
 
-@_typing.final
-class TrackUnmuted(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TrackUnmuted(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    track_sid: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track_sid: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> None: ...
 
-Global___TrackUnmuted: _TypeAlias = TrackUnmuted  # noqa: Y015
+global___TrackUnmuted = TrackUnmuted
 
-@_typing.final
-class E2eeStateChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class E2eeStateChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    STATE_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    STATE_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
     """Using sid instead of identity for ffi communication"""
-    state: _e2ee_pb2.EncryptionState.ValueType
+    state: e2ee_pb2.EncryptionState.ValueType
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        state: _e2ee_pb2.EncryptionState.ValueType | None = ...,
+        participant_identity: builtins.str | None = ...,
+        state: e2ee_pb2.EncryptionState.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "state", b"state"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "state", b"state"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "state", b"state"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "state", b"state"]) -> None: ...
 
-Global___E2eeStateChanged: _TypeAlias = E2eeStateChanged  # noqa: Y015
+global___E2eeStateChanged = E2eeStateChanged
 
-@_typing.final
-class ActiveSpeakersChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ActiveSpeakersChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITIES_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def participant_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    PARTICIPANT_IDENTITIES_FIELD_NUMBER: builtins.int
+    @property
+    def participant_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        participant_identities: _abc.Iterable[_builtins.str] | None = ...,
+        participant_identities: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identities", b"participant_identities"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def ClearField(self, field_name: typing.Literal["participant_identities", b"participant_identities"]) -> None: ...
 
-Global___ActiveSpeakersChanged: _TypeAlias = ActiveSpeakersChanged  # noqa: Y015
+global___ActiveSpeakersChanged = ActiveSpeakersChanged
 
-@_typing.final
-class RoomMetadataChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RoomMetadataChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    METADATA_FIELD_NUMBER: _builtins.int
-    metadata: _builtins.str
+    METADATA_FIELD_NUMBER: builtins.int
+    metadata: builtins.str
     def __init__(
         self,
         *,
-        metadata: _builtins.str | None = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["metadata", b"metadata"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["metadata", b"metadata"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["metadata", b"metadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["metadata", b"metadata"]) -> None: ...
 
-Global___RoomMetadataChanged: _TypeAlias = RoomMetadataChanged  # noqa: Y015
+global___RoomMetadataChanged = RoomMetadataChanged
 
-@_typing.final
-class RoomSidChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RoomSidChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SID_FIELD_NUMBER: _builtins.int
-    sid: _builtins.str
+    SID_FIELD_NUMBER: builtins.int
+    sid: builtins.str
     def __init__(
         self,
         *,
-        sid: _builtins.str | None = ...,
+        sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["sid", b"sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["sid", b"sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["sid", b"sid"]) -> None: ...
 
-Global___RoomSidChanged: _TypeAlias = RoomSidChanged  # noqa: Y015
+global___RoomSidChanged = RoomSidChanged
 
-@_typing.final
-class ParticipantMetadataChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantMetadataChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    METADATA_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    metadata: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    metadata: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        metadata: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        metadata: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["metadata", b"metadata", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantMetadataChanged: _TypeAlias = ParticipantMetadataChanged  # noqa: Y015
+global___ParticipantMetadataChanged = ParticipantMetadataChanged
 
-@_typing.final
-class ParticipantAttributesChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantAttributesChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    CHANGED_ATTRIBUTES_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def attributes(self) -> _containers.RepeatedCompositeFieldContainer[Global___AttributesEntry]: ...
-    @_builtins.property
-    def changed_attributes(self) -> _containers.RepeatedCompositeFieldContainer[Global___AttributesEntry]: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
+    CHANGED_ATTRIBUTES_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
+    @property
+    def changed_attributes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AttributesEntry]: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        attributes: _abc.Iterable[Global___AttributesEntry] | None = ...,
-        changed_attributes: _abc.Iterable[Global___AttributesEntry] | None = ...,
+        participant_identity: builtins.str | None = ...,
+        attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
+        changed_attributes: collections.abc.Iterable[global___AttributesEntry] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["attributes", b"attributes", "changed_attributes", b"changed_attributes", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "changed_attributes", b"changed_attributes", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantAttributesChanged: _TypeAlias = ParticipantAttributesChanged  # noqa: Y015
+global___ParticipantAttributesChanged = ParticipantAttributesChanged
 
-@_typing.final
-class ParticipantEncryptionStatusChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantEncryptionStatusChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    IS_ENCRYPTED_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    is_encrypted: _builtins.bool
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    IS_ENCRYPTED_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    is_encrypted: builtins.bool
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        is_encrypted: _builtins.bool | None = ...,
+        participant_identity: builtins.str | None = ...,
+        is_encrypted: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["is_encrypted", b"is_encrypted", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["is_encrypted", b"is_encrypted", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["is_encrypted", b"is_encrypted", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["is_encrypted", b"is_encrypted", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantEncryptionStatusChanged: _TypeAlias = ParticipantEncryptionStatusChanged  # noqa: Y015
+global___ParticipantEncryptionStatusChanged = ParticipantEncryptionStatusChanged
 
-@_typing.final
-class ParticipantNameChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantNameChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    name: _builtins.str
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    name: builtins.str
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        name: _builtins.str | None = ...,
+        participant_identity: builtins.str | None = ...,
+        name: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ParticipantNameChanged: _TypeAlias = ParticipantNameChanged  # noqa: Y015
+global___ParticipantNameChanged = ParticipantNameChanged
 
-@_typing.final
-class ParticipantPermissionChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ParticipantPermissionChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    PERMISSION_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def permission(self) -> _participant_pb2.ParticipantPermission: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    PERMISSION_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def permission(self) -> participant_pb2.ParticipantPermission: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        permission: _participant_pb2.ParticipantPermission | None = ...,
+        participant_identity: builtins.str | None = ...,
+        permission: participant_pb2.ParticipantPermission | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "permission", b"permission"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "permission", b"permission"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "permission", b"permission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "permission", b"permission"]) -> None: ...
 
-Global___ParticipantPermissionChanged: _TypeAlias = ParticipantPermissionChanged  # noqa: Y015
+global___ParticipantPermissionChanged = ParticipantPermissionChanged
 
-@_typing.final
-class ConnectionQualityChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ConnectionQualityChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    QUALITY_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    quality: Global___ConnectionQuality.ValueType
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    QUALITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    quality: global___ConnectionQuality.ValueType
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        quality: Global___ConnectionQuality.ValueType | None = ...,
+        participant_identity: builtins.str | None = ...,
+        quality: global___ConnectionQuality.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "quality", b"quality"]) -> None: ...
 
-Global___ConnectionQualityChanged: _TypeAlias = ConnectionQualityChanged  # noqa: Y015
+global___ConnectionQualityChanged = ConnectionQualityChanged
 
-@_typing.final
-class UserPacket(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class UserPacket(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    DATA_FIELD_NUMBER: _builtins.int
-    TOPIC_FIELD_NUMBER: _builtins.int
-    topic: _builtins.str
-    @_builtins.property
-    def data(self) -> Global___OwnedBuffer: ...
+    DATA_FIELD_NUMBER: builtins.int
+    TOPIC_FIELD_NUMBER: builtins.int
+    topic: builtins.str
+    @property
+    def data(self) -> global___OwnedBuffer: ...
     def __init__(
         self,
         *,
-        data: Global___OwnedBuffer | None = ...,
-        topic: _builtins.str | None = ...,
+        data: global___OwnedBuffer | None = ...,
+        topic: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data", b"data", "topic", b"topic"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data", b"data", "topic", b"topic"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["data", b"data", "topic", b"topic"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data", b"data", "topic", b"topic"]) -> None: ...
 
-Global___UserPacket: _TypeAlias = UserPacket  # noqa: Y015
+global___UserPacket = UserPacket
 
-@_typing.final
-class ChatMessage(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ChatMessage(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ID_FIELD_NUMBER: _builtins.int
-    TIMESTAMP_FIELD_NUMBER: _builtins.int
-    MESSAGE_FIELD_NUMBER: _builtins.int
-    EDIT_TIMESTAMP_FIELD_NUMBER: _builtins.int
-    DELETED_FIELD_NUMBER: _builtins.int
-    GENERATED_FIELD_NUMBER: _builtins.int
-    id: _builtins.str
-    timestamp: _builtins.int
-    message: _builtins.str
-    edit_timestamp: _builtins.int
-    deleted: _builtins.bool
-    generated: _builtins.bool
+    ID_FIELD_NUMBER: builtins.int
+    TIMESTAMP_FIELD_NUMBER: builtins.int
+    MESSAGE_FIELD_NUMBER: builtins.int
+    EDIT_TIMESTAMP_FIELD_NUMBER: builtins.int
+    DELETED_FIELD_NUMBER: builtins.int
+    GENERATED_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    timestamp: builtins.int
+    message: builtins.str
+    edit_timestamp: builtins.int
+    deleted: builtins.bool
+    generated: builtins.bool
     def __init__(
         self,
         *,
-        id: _builtins.str | None = ...,
-        timestamp: _builtins.int | None = ...,
-        message: _builtins.str | None = ...,
-        edit_timestamp: _builtins.int | None = ...,
-        deleted: _builtins.bool | None = ...,
-        generated: _builtins.bool | None = ...,
+        id: builtins.str | None = ...,
+        timestamp: builtins.int | None = ...,
+        message: builtins.str | None = ...,
+        edit_timestamp: builtins.int | None = ...,
+        deleted: builtins.bool | None = ...,
+        generated: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["deleted", b"deleted", "edit_timestamp", b"edit_timestamp", "generated", b"generated", "id", b"id", "message", b"message", "timestamp", b"timestamp"]) -> None: ...
 
-Global___ChatMessage: _TypeAlias = ChatMessage  # noqa: Y015
+global___ChatMessage = ChatMessage
 
-@_typing.final
-class ChatMessageReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ChatMessageReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    MESSAGE_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def message(self) -> Global___ChatMessage: ...
+    MESSAGE_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def message(self) -> global___ChatMessage: ...
     def __init__(
         self,
         *,
-        message: Global___ChatMessage | None = ...,
-        participant_identity: _builtins.str | None = ...,
+        message: global___ChatMessage | None = ...,
+        participant_identity: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["message", b"message", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["message", b"message", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["message", b"message", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["message", b"message", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___ChatMessageReceived: _TypeAlias = ChatMessageReceived  # noqa: Y015
+global___ChatMessageReceived = ChatMessageReceived
 
-@_typing.final
-class SipDTMF(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SipDTMF(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    CODE_FIELD_NUMBER: _builtins.int
-    DIGIT_FIELD_NUMBER: _builtins.int
-    code: _builtins.int
-    digit: _builtins.str
+    CODE_FIELD_NUMBER: builtins.int
+    DIGIT_FIELD_NUMBER: builtins.int
+    code: builtins.int
+    digit: builtins.str
     def __init__(
         self,
         *,
-        code: _builtins.int | None = ...,
-        digit: _builtins.str | None = ...,
+        code: builtins.int | None = ...,
+        digit: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "digit", b"digit"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "digit", b"digit"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["code", b"code", "digit", b"digit"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["code", b"code", "digit", b"digit"]) -> None: ...
 
-Global___SipDTMF: _TypeAlias = SipDTMF  # noqa: Y015
+global___SipDTMF = SipDTMF
 
-@_typing.final
-class DataPacketReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DataPacketReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    KIND_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    USER_FIELD_NUMBER: _builtins.int
-    SIP_DTMF_FIELD_NUMBER: _builtins.int
-    kind: Global___DataPacketKind.ValueType
-    participant_identity: _builtins.str
+    KIND_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    USER_FIELD_NUMBER: builtins.int
+    SIP_DTMF_FIELD_NUMBER: builtins.int
+    kind: global___DataPacketKind.ValueType
+    participant_identity: builtins.str
     """Can be empty if the data is sent a server SDK"""
-    @_builtins.property
-    def user(self) -> Global___UserPacket: ...
-    @_builtins.property
-    def sip_dtmf(self) -> Global___SipDTMF: ...
+    @property
+    def user(self) -> global___UserPacket: ...
+    @property
+    def sip_dtmf(self) -> global___SipDTMF: ...
     def __init__(
         self,
         *,
-        kind: Global___DataPacketKind.ValueType | None = ...,
-        participant_identity: _builtins.str | None = ...,
-        user: Global___UserPacket | None = ...,
-        sip_dtmf: Global___SipDTMF | None = ...,
+        kind: global___DataPacketKind.ValueType | None = ...,
+        participant_identity: builtins.str | None = ...,
+        user: global___UserPacket | None = ...,
+        sip_dtmf: global___SipDTMF | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_value: _TypeAlias = _typing.Literal["user", "sip_dtmf"]  # noqa: Y015
-    _WhichOneofArgType_value: _TypeAlias = _typing.Literal["value", b"value"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_value) -> _WhichOneofReturnType_value | None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "participant_identity", b"participant_identity", "sip_dtmf", b"sip_dtmf", "user", b"user", "value", b"value"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["value", b"value"]) -> typing.Literal["user", "sip_dtmf"] | None: ...
 
-Global___DataPacketReceived: _TypeAlias = DataPacketReceived  # noqa: Y015
+global___DataPacketReceived = DataPacketReceived
 
-@_typing.final
-class TranscriptionReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class TranscriptionReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRACK_SID_FIELD_NUMBER: _builtins.int
-    SEGMENTS_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    track_sid: _builtins.str
-    @_builtins.property
-    def segments(self) -> _containers.RepeatedCompositeFieldContainer[Global___TranscriptionSegment]: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRACK_SID_FIELD_NUMBER: builtins.int
+    SEGMENTS_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    track_sid: builtins.str
+    @property
+    def segments(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___TranscriptionSegment]: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        track_sid: _builtins.str | None = ...,
-        segments: _abc.Iterable[Global___TranscriptionSegment] | None = ...,
+        participant_identity: builtins.str | None = ...,
+        track_sid: builtins.str | None = ...,
+        segments: collections.abc.Iterable[global___TranscriptionSegment] | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "segments", b"segments", "track_sid", b"track_sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "track_sid", b"track_sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "segments", b"segments", "track_sid", b"track_sid"]) -> None: ...
 
-Global___TranscriptionReceived: _TypeAlias = TranscriptionReceived  # noqa: Y015
+global___TranscriptionReceived = TranscriptionReceived
 
-@_typing.final
-class ConnectionStateChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ConnectionStateChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    STATE_FIELD_NUMBER: _builtins.int
-    state: Global___ConnectionState.ValueType
+    STATE_FIELD_NUMBER: builtins.int
+    state: global___ConnectionState.ValueType
     def __init__(
         self,
         *,
-        state: Global___ConnectionState.ValueType | None = ...,
+        state: global___ConnectionState.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["state", b"state"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["state", b"state"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["state", b"state"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["state", b"state"]) -> None: ...
 
-Global___ConnectionStateChanged: _TypeAlias = ConnectionStateChanged  # noqa: Y015
+global___ConnectionStateChanged = ConnectionStateChanged
 
-@_typing.final
-class Connected(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class Connected(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___Connected: _TypeAlias = Connected  # noqa: Y015
+global___Connected = Connected
 
-@_typing.final
-class Disconnected(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class Disconnected(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    REASON_FIELD_NUMBER: _builtins.int
-    reason: _participant_pb2.DisconnectReason.ValueType
-    def __init__(
-        self,
-        *,
-        reason: _participant_pb2.DisconnectReason.ValueType | None = ...,
-    ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["reason", b"reason"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["reason", b"reason"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-
-Global___Disconnected: _TypeAlias = Disconnected  # noqa: Y015
-
-@_typing.final
-class Reconnecting(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    def __init__(
-        self,
-    ) -> None: ...
-
-Global___Reconnecting: _TypeAlias = Reconnecting  # noqa: Y015
-
-@_typing.final
-class Reconnected(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    def __init__(
-        self,
-    ) -> None: ...
-
-Global___Reconnected: _TypeAlias = Reconnected  # noqa: Y015
-
-@_typing.final
-class TokenRefreshed(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    TOKEN_FIELD_NUMBER: _builtins.int
-    token: _builtins.str
+    REASON_FIELD_NUMBER: builtins.int
+    reason: participant_pb2.DisconnectReason.ValueType
     def __init__(
         self,
         *,
-        token: _builtins.str | None = ...,
+        reason: participant_pb2.DisconnectReason.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["token", b"token"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["token", b"token"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["reason", b"reason"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["reason", b"reason"]) -> None: ...
 
-Global___TokenRefreshed: _TypeAlias = TokenRefreshed  # noqa: Y015
+global___Disconnected = Disconnected
 
-@_typing.final
-class RoomEOS(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class Reconnecting(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___RoomEOS: _TypeAlias = RoomEOS  # noqa: Y015
+global___Reconnecting = Reconnecting
 
-@_typing.final
-class DataStream(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class Reconnected(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___Reconnected = Reconnected
+
+@typing.final
+class TokenRefreshed(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TOKEN_FIELD_NUMBER: builtins.int
+    token: builtins.str
+    def __init__(
+        self,
+        *,
+        token: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["token", b"token"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["token", b"token"]) -> None: ...
+
+global___TokenRefreshed = TokenRefreshed
+
+@typing.final
+class RoomEOS(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___RoomEOS = RoomEOS
+
+@typing.final
+class DataStream(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     class _OperationType:
-        ValueType = _typing.NewType("ValueType", _builtins.int)
-        V: _TypeAlias = ValueType  # noqa: Y015
+        ValueType = typing.NewType("ValueType", builtins.int)
+        V: typing_extensions.TypeAlias = ValueType
 
-    class _OperationTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[DataStream._OperationType.ValueType], _builtins.type):
-        DESCRIPTOR: _descriptor.EnumDescriptor
+    class _OperationTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataStream._OperationType.ValueType], builtins.type):
+        DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         CREATE: DataStream._OperationType.ValueType  # 0
         UPDATE: DataStream._OperationType.ValueType  # 1
         DELETE: DataStream._OperationType.ValueType  # 2
@@ -2456,629 +2266,577 @@ class DataStream(_message.Message):
     DELETE: DataStream.OperationType.ValueType  # 2
     REACTION: DataStream.OperationType.ValueType  # 3
 
-    @_typing.final
-    class TextHeader(_message.Message):
+    @typing.final
+    class TextHeader(google.protobuf.message.Message):
         """header properties specific to text streams"""
 
-        DESCRIPTOR: _descriptor.Descriptor
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        OPERATION_TYPE_FIELD_NUMBER: _builtins.int
-        VERSION_FIELD_NUMBER: _builtins.int
-        REPLY_TO_STREAM_ID_FIELD_NUMBER: _builtins.int
-        ATTACHED_STREAM_IDS_FIELD_NUMBER: _builtins.int
-        GENERATED_FIELD_NUMBER: _builtins.int
-        operation_type: Global___DataStream.OperationType.ValueType
-        version: _builtins.int
+        OPERATION_TYPE_FIELD_NUMBER: builtins.int
+        VERSION_FIELD_NUMBER: builtins.int
+        REPLY_TO_STREAM_ID_FIELD_NUMBER: builtins.int
+        ATTACHED_STREAM_IDS_FIELD_NUMBER: builtins.int
+        GENERATED_FIELD_NUMBER: builtins.int
+        operation_type: global___DataStream.OperationType.ValueType
+        version: builtins.int
         """Optional: Version for updates/edits"""
-        reply_to_stream_id: _builtins.str
+        reply_to_stream_id: builtins.str
         """Optional: Reply to specific message"""
-        generated: _builtins.bool
+        generated: builtins.bool
         """true if the text has been generated by an agent from a participant's audio transcription"""
-        @_builtins.property
-        def attached_stream_ids(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]:
+        @property
+        def attached_stream_ids(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
             """file attachments for text streams"""
 
         def __init__(
             self,
             *,
-            operation_type: Global___DataStream.OperationType.ValueType | None = ...,
-            version: _builtins.int | None = ...,
-            reply_to_stream_id: _builtins.str | None = ...,
-            attached_stream_ids: _abc.Iterable[_builtins.str] | None = ...,
-            generated: _builtins.bool | None = ...,
+            operation_type: global___DataStream.OperationType.ValueType | None = ...,
+            version: builtins.int | None = ...,
+            reply_to_stream_id: builtins.str | None = ...,
+            attached_stream_ids: collections.abc.Iterable[builtins.str] | None = ...,
+            generated: builtins.bool | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["generated", b"generated", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "version", b"version"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["attached_stream_ids", b"attached_stream_ids", "generated", b"generated", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "version", b"version"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["generated", b"generated", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "version", b"version"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "generated", b"generated", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "version", b"version"]) -> None: ...
 
-    @_typing.final
-    class ByteHeader(_message.Message):
+    @typing.final
+    class ByteHeader(google.protobuf.message.Message):
         """header properties specific to byte or file streams"""
 
-        DESCRIPTOR: _descriptor.Descriptor
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        NAME_FIELD_NUMBER: _builtins.int
-        name: _builtins.str
+        NAME_FIELD_NUMBER: builtins.int
+        name: builtins.str
         def __init__(
             self,
             *,
-            name: _builtins.str | None = ...,
+            name: builtins.str | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["name", b"name"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["name", b"name"]) -> None: ...
 
-    @_typing.final
-    class Header(_message.Message):
+    @typing.final
+    class Header(google.protobuf.message.Message):
         """main DataStream.Header that contains a oneof for specific headers"""
 
-        DESCRIPTOR: _descriptor.Descriptor
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        @_typing.final
-        class AttributesEntry(_message.Message):
-            DESCRIPTOR: _descriptor.Descriptor
+        @typing.final
+        class AttributesEntry(google.protobuf.message.Message):
+            DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-            KEY_FIELD_NUMBER: _builtins.int
-            VALUE_FIELD_NUMBER: _builtins.int
-            key: _builtins.str
-            value: _builtins.str
+            KEY_FIELD_NUMBER: builtins.int
+            VALUE_FIELD_NUMBER: builtins.int
+            key: builtins.str
+            value: builtins.str
             def __init__(
                 self,
                 *,
-                key: _builtins.str | None = ...,
-                value: _builtins.str | None = ...,
+                key: builtins.str | None = ...,
+                value: builtins.str | None = ...,
             ) -> None: ...
-            _HasFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-            def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-            _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-            def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+            def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+            def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
 
-        STREAM_ID_FIELD_NUMBER: _builtins.int
-        TIMESTAMP_FIELD_NUMBER: _builtins.int
-        MIME_TYPE_FIELD_NUMBER: _builtins.int
-        TOPIC_FIELD_NUMBER: _builtins.int
-        TOTAL_LENGTH_FIELD_NUMBER: _builtins.int
-        ATTRIBUTES_FIELD_NUMBER: _builtins.int
-        TEXT_HEADER_FIELD_NUMBER: _builtins.int
-        BYTE_HEADER_FIELD_NUMBER: _builtins.int
-        stream_id: _builtins.str
+        STREAM_ID_FIELD_NUMBER: builtins.int
+        TIMESTAMP_FIELD_NUMBER: builtins.int
+        MIME_TYPE_FIELD_NUMBER: builtins.int
+        TOPIC_FIELD_NUMBER: builtins.int
+        TOTAL_LENGTH_FIELD_NUMBER: builtins.int
+        ATTRIBUTES_FIELD_NUMBER: builtins.int
+        TEXT_HEADER_FIELD_NUMBER: builtins.int
+        BYTE_HEADER_FIELD_NUMBER: builtins.int
+        stream_id: builtins.str
         """unique identifier for this data stream"""
-        timestamp: _builtins.int
+        timestamp: builtins.int
         """using int64 for Unix timestamp"""
-        mime_type: _builtins.str
-        topic: _builtins.str
-        total_length: _builtins.int
+        mime_type: builtins.str
+        topic: builtins.str
+        total_length: builtins.int
         """only populated for finite streams, if it's a stream of unknown size this stays empty"""
-        @_builtins.property
-        def attributes(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]:
+        @property
+        def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
             """user defined attributes map that can carry additional info"""
 
-        @_builtins.property
-        def text_header(self) -> Global___DataStream.TextHeader: ...
-        @_builtins.property
-        def byte_header(self) -> Global___DataStream.ByteHeader: ...
+        @property
+        def text_header(self) -> global___DataStream.TextHeader: ...
+        @property
+        def byte_header(self) -> global___DataStream.ByteHeader: ...
         def __init__(
             self,
             *,
-            stream_id: _builtins.str | None = ...,
-            timestamp: _builtins.int | None = ...,
-            mime_type: _builtins.str | None = ...,
-            topic: _builtins.str | None = ...,
-            total_length: _builtins.int | None = ...,
-            attributes: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
-            text_header: Global___DataStream.TextHeader | None = ...,
-            byte_header: Global___DataStream.ByteHeader | None = ...,
+            stream_id: builtins.str | None = ...,
+            timestamp: builtins.int | None = ...,
+            mime_type: builtins.str | None = ...,
+            topic: builtins.str | None = ...,
+            total_length: builtins.int | None = ...,
+            attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+            text_header: global___DataStream.TextHeader | None = ...,
+            byte_header: global___DataStream.ByteHeader | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["attributes", b"attributes", "byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-        _WhichOneofReturnType_content_header: _TypeAlias = _typing.Literal["text_header", "byte_header"]  # noqa: Y015
-        _WhichOneofArgType_content_header: _TypeAlias = _typing.Literal["content_header", b"content_header"]  # noqa: Y015
-        def WhichOneof(self, oneof_group: _WhichOneofArgType_content_header) -> _WhichOneofReturnType_content_header | None: ...
+        def HasField(self, field_name: typing.Literal["byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "byte_header", b"byte_header", "content_header", b"content_header", "mime_type", b"mime_type", "stream_id", b"stream_id", "text_header", b"text_header", "timestamp", b"timestamp", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
+        def WhichOneof(self, oneof_group: typing.Literal["content_header", b"content_header"]) -> typing.Literal["text_header", "byte_header"] | None: ...
 
-    @_typing.final
-    class Chunk(_message.Message):
-        DESCRIPTOR: _descriptor.Descriptor
+    @typing.final
+    class Chunk(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        STREAM_ID_FIELD_NUMBER: _builtins.int
-        CHUNK_INDEX_FIELD_NUMBER: _builtins.int
-        CONTENT_FIELD_NUMBER: _builtins.int
-        VERSION_FIELD_NUMBER: _builtins.int
-        IV_FIELD_NUMBER: _builtins.int
-        stream_id: _builtins.str
+        STREAM_ID_FIELD_NUMBER: builtins.int
+        CHUNK_INDEX_FIELD_NUMBER: builtins.int
+        CONTENT_FIELD_NUMBER: builtins.int
+        VERSION_FIELD_NUMBER: builtins.int
+        IV_FIELD_NUMBER: builtins.int
+        stream_id: builtins.str
         """unique identifier for this data stream to map it to the correct header"""
-        chunk_index: _builtins.int
-        content: _builtins.bytes
+        chunk_index: builtins.int
+        content: builtins.bytes
         """content as binary (bytes)"""
-        version: _builtins.int
+        version: builtins.int
         """a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced"""
-        iv: _builtins.bytes
+        iv: builtins.bytes
         """optional, initialization vector for AES-GCM encryption"""
         def __init__(
             self,
             *,
-            stream_id: _builtins.str | None = ...,
-            chunk_index: _builtins.int | None = ...,
-            content: _builtins.bytes | None = ...,
-            version: _builtins.int | None = ...,
-            iv: _builtins.bytes | None = ...,
+            stream_id: builtins.str | None = ...,
+            chunk_index: builtins.int | None = ...,
+            content: builtins.bytes | None = ...,
+            version: builtins.int | None = ...,
+            iv: builtins.bytes | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["chunk_index", b"chunk_index", "content", b"content", "iv", b"iv", "stream_id", b"stream_id", "version", b"version"]) -> None: ...
 
-    @_typing.final
-    class Trailer(_message.Message):
-        DESCRIPTOR: _descriptor.Descriptor
+    @typing.final
+    class Trailer(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-        @_typing.final
-        class AttributesEntry(_message.Message):
-            DESCRIPTOR: _descriptor.Descriptor
+        @typing.final
+        class AttributesEntry(google.protobuf.message.Message):
+            DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-            KEY_FIELD_NUMBER: _builtins.int
-            VALUE_FIELD_NUMBER: _builtins.int
-            key: _builtins.str
-            value: _builtins.str
+            KEY_FIELD_NUMBER: builtins.int
+            VALUE_FIELD_NUMBER: builtins.int
+            key: builtins.str
+            value: builtins.str
             def __init__(
                 self,
                 *,
-                key: _builtins.str | None = ...,
-                value: _builtins.str | None = ...,
+                key: builtins.str | None = ...,
+                value: builtins.str | None = ...,
             ) -> None: ...
-            _HasFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-            def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-            _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
-            def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+            def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+            def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
 
-        STREAM_ID_FIELD_NUMBER: _builtins.int
-        REASON_FIELD_NUMBER: _builtins.int
-        ATTRIBUTES_FIELD_NUMBER: _builtins.int
-        stream_id: _builtins.str
+        STREAM_ID_FIELD_NUMBER: builtins.int
+        REASON_FIELD_NUMBER: builtins.int
+        ATTRIBUTES_FIELD_NUMBER: builtins.int
+        stream_id: builtins.str
         """unique identifier for this data stream"""
-        reason: _builtins.str
+        reason: builtins.str
         """reason why the stream was closed (could contain "error" / "interrupted" / empty for expected end)"""
-        @_builtins.property
-        def attributes(self) -> _containers.ScalarMap[_builtins.str, _builtins.str]:
+        @property
+        def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
             """finalizing updates for the stream, can also include additional insights for errors or endTime for transcription"""
 
         def __init__(
             self,
             *,
-            stream_id: _builtins.str | None = ...,
-            reason: _builtins.str | None = ...,
-            attributes: _abc.Mapping[_builtins.str, _builtins.str] | None = ...,
+            stream_id: builtins.str | None = ...,
+            reason: builtins.str | None = ...,
+            attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
         ) -> None: ...
-        _HasFieldArgType: _TypeAlias = _typing.Literal["reason", b"reason", "stream_id", b"stream_id"]  # noqa: Y015
-        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-        _ClearFieldArgType: _TypeAlias = _typing.Literal["attributes", b"attributes", "reason", b"reason", "stream_id", b"stream_id"]  # noqa: Y015
-        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+        def HasField(self, field_name: typing.Literal["reason", b"reason", "stream_id", b"stream_id"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "reason", b"reason", "stream_id", b"stream_id"]) -> None: ...
 
     def __init__(
         self,
     ) -> None: ...
 
-Global___DataStream: _TypeAlias = DataStream  # noqa: Y015
+global___DataStream = DataStream
 
-@_typing.final
-class DataStreamHeaderReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DataStreamHeaderReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    HEADER_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def header(self) -> Global___DataStream.Header: ...
-    def __init__(
-        self,
-        *,
-        participant_identity: _builtins.str | None = ...,
-        header: Global___DataStream.Header | None = ...,
-    ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["header", b"header", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["header", b"header", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-
-Global___DataStreamHeaderReceived: _TypeAlias = DataStreamHeaderReceived  # noqa: Y015
-
-@_typing.final
-class DataStreamChunkReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    CHUNK_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def chunk(self) -> Global___DataStream.Chunk: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    HEADER_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def header(self) -> global___DataStream.Header: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        chunk: Global___DataStream.Chunk | None = ...,
+        participant_identity: builtins.str | None = ...,
+        header: global___DataStream.Header | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["header", b"header", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["header", b"header", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___DataStreamChunkReceived: _TypeAlias = DataStreamChunkReceived  # noqa: Y015
+global___DataStreamHeaderReceived = DataStreamHeaderReceived
 
-@_typing.final
-class DataStreamTrailerReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DataStreamChunkReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    TRAILER_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def trailer(self) -> Global___DataStream.Trailer: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    CHUNK_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def chunk(self) -> global___DataStream.Chunk: ...
     def __init__(
         self,
         *,
-        participant_identity: _builtins.str | None = ...,
-        trailer: Global___DataStream.Trailer | None = ...,
+        participant_identity: builtins.str | None = ...,
+        chunk: global___DataStream.Chunk | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["chunk", b"chunk", "participant_identity", b"participant_identity"]) -> None: ...
 
-Global___DataStreamTrailerReceived: _TypeAlias = DataStreamTrailerReceived  # noqa: Y015
+global___DataStreamChunkReceived = DataStreamChunkReceived
 
-@_typing.final
-class SendStreamHeaderRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class DataStreamTrailerReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    HEADER_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    sender_identity: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def header(self) -> Global___DataStream.Header: ...
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    TRAILER_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def trailer(self) -> global___DataStream.Trailer: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        header: Global___DataStream.Header | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        sender_identity: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        participant_identity: builtins.str | None = ...,
+        trailer: global___DataStream.Trailer | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["header", b"header", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["destination_identities", b"destination_identities", "header", b"header", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "trailer", b"trailer"]) -> None: ...
 
-Global___SendStreamHeaderRequest: _TypeAlias = SendStreamHeaderRequest  # noqa: Y015
+global___DataStreamTrailerReceived = DataStreamTrailerReceived
 
-@_typing.final
-class SendStreamChunkRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamHeaderRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    CHUNK_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    sender_identity: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def chunk(self) -> Global___DataStream.Chunk: ...
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    HEADER_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    sender_identity: builtins.str
+    request_async_id: builtins.int
+    @property
+    def header(self) -> global___DataStream.Header: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        chunk: Global___DataStream.Chunk | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        sender_identity: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        header: global___DataStream.Header | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["chunk", b"chunk", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["chunk", b"chunk", "destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["header", b"header", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "header", b"header", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> None: ...
 
-Global___SendStreamChunkRequest: _TypeAlias = SendStreamChunkRequest  # noqa: Y015
+global___SendStreamHeaderRequest = SendStreamHeaderRequest
 
-@_typing.final
-class SendStreamTrailerRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamChunkRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    TRAILER_FIELD_NUMBER: _builtins.int
-    DESTINATION_IDENTITIES_FIELD_NUMBER: _builtins.int
-    SENDER_IDENTITY_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    sender_identity: _builtins.str
-    request_async_id: _builtins.int
-    @_builtins.property
-    def trailer(self) -> Global___DataStream.Trailer: ...
-    @_builtins.property
-    def destination_identities(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    CHUNK_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    sender_identity: builtins.str
+    request_async_id: builtins.int
+    @property
+    def chunk(self) -> global___DataStream.Chunk: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        trailer: Global___DataStream.Trailer | None = ...,
-        destination_identities: _abc.Iterable[_builtins.str] | None = ...,
-        sender_identity: _builtins.str | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        chunk: global___DataStream.Chunk | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity", "trailer", b"trailer"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity", "trailer", b"trailer"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["chunk", b"chunk", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["chunk", b"chunk", "destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity"]) -> None: ...
 
-Global___SendStreamTrailerRequest: _TypeAlias = SendStreamTrailerRequest  # noqa: Y015
+global___SendStreamChunkRequest = SendStreamChunkRequest
 
-@_typing.final
-class SendStreamHeaderResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamTrailerRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TRAILER_FIELD_NUMBER: builtins.int
+    DESTINATION_IDENTITIES_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    sender_identity: builtins.str
+    request_async_id: builtins.int
+    @property
+    def trailer(self) -> global___DataStream.Trailer: ...
+    @property
+    def destination_identities(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        trailer: global___DataStream.Trailer | None = ...,
+        destination_identities: collections.abc.Iterable[builtins.str] | None = ...,
+        sender_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity", "trailer", b"trailer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identities", b"destination_identities", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "sender_identity", b"sender_identity", "trailer", b"trailer"]) -> None: ...
 
-Global___SendStreamHeaderResponse: _TypeAlias = SendStreamHeaderResponse  # noqa: Y015
+global___SendStreamTrailerRequest = SendStreamTrailerRequest
 
-@_typing.final
-class SendStreamChunkResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamHeaderResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SendStreamChunkResponse: _TypeAlias = SendStreamChunkResponse  # noqa: Y015
+global___SendStreamHeaderResponse = SendStreamHeaderResponse
 
-@_typing.final
-class SendStreamTrailerResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamChunkResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SendStreamTrailerResponse: _TypeAlias = SendStreamTrailerResponse  # noqa: Y015
+global___SendStreamChunkResponse = SendStreamChunkResponse
 
-@_typing.final
-class SendStreamHeaderCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamTrailerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___SendStreamHeaderCallback: _TypeAlias = SendStreamHeaderCallback  # noqa: Y015
+global___SendStreamTrailerResponse = SendStreamTrailerResponse
 
-@_typing.final
-class SendStreamChunkCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamHeaderCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SendStreamChunkCallback: _TypeAlias = SendStreamChunkCallback  # noqa: Y015
+global___SendStreamHeaderCallback = SendStreamHeaderCallback
 
-@_typing.final
-class SendStreamTrailerCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamChunkCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SendStreamTrailerCallback: _TypeAlias = SendStreamTrailerCallback  # noqa: Y015
+global___SendStreamChunkCallback = SendStreamChunkCallback
 
-@_typing.final
-class SetDataChannelBufferedAmountLowThresholdRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SendStreamTrailerCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    THRESHOLD_FIELD_NUMBER: _builtins.int
-    KIND_FIELD_NUMBER: _builtins.int
-    local_participant_handle: _builtins.int
-    threshold: _builtins.int
-    kind: Global___DataPacketKind.ValueType
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        local_participant_handle: _builtins.int | None = ...,
-        threshold: _builtins.int | None = ...,
-        kind: Global___DataPacketKind.ValueType | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___SetDataChannelBufferedAmountLowThresholdRequest: _TypeAlias = SetDataChannelBufferedAmountLowThresholdRequest  # noqa: Y015
+global___SendStreamTrailerCallback = SendStreamTrailerCallback
 
-@_typing.final
-class SetDataChannelBufferedAmountLowThresholdResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetDataChannelBufferedAmountLowThresholdRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    def __init__(
-        self,
-    ) -> None: ...
-
-Global___SetDataChannelBufferedAmountLowThresholdResponse: _TypeAlias = SetDataChannelBufferedAmountLowThresholdResponse  # noqa: Y015
-
-@_typing.final
-class DataChannelBufferedAmountLowThresholdChanged(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
-
-    KIND_FIELD_NUMBER: _builtins.int
-    THRESHOLD_FIELD_NUMBER: _builtins.int
-    kind: Global___DataPacketKind.ValueType
-    threshold: _builtins.int
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    THRESHOLD_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    threshold: builtins.int
+    kind: global___DataPacketKind.ValueType
     def __init__(
         self,
         *,
-        kind: Global___DataPacketKind.ValueType | None = ...,
-        threshold: _builtins.int | None = ...,
+        local_participant_handle: builtins.int | None = ...,
+        threshold: builtins.int | None = ...,
+        kind: global___DataPacketKind.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "threshold", b"threshold"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "threshold", b"threshold"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "local_participant_handle", b"local_participant_handle", "threshold", b"threshold"]) -> None: ...
 
-Global___DataChannelBufferedAmountLowThresholdChanged: _TypeAlias = DataChannelBufferedAmountLowThresholdChanged  # noqa: Y015
+global___SetDataChannelBufferedAmountLowThresholdRequest = SetDataChannelBufferedAmountLowThresholdRequest
 
-@_typing.final
-class ByteStreamOpened(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetDataChannelBufferedAmountLowThresholdResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    READER_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def reader(self) -> _data_stream_pb2.OwnedByteStreamReader: ...
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___SetDataChannelBufferedAmountLowThresholdResponse = SetDataChannelBufferedAmountLowThresholdResponse
+
+@typing.final
+class DataChannelBufferedAmountLowThresholdChanged(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    KIND_FIELD_NUMBER: builtins.int
+    THRESHOLD_FIELD_NUMBER: builtins.int
+    kind: global___DataPacketKind.ValueType
+    threshold: builtins.int
     def __init__(
         self,
         *,
-        reader: _data_stream_pb2.OwnedByteStreamReader | None = ...,
-        participant_identity: _builtins.str | None = ...,
+        kind: global___DataPacketKind.ValueType | None = ...,
+        threshold: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["kind", b"kind", "threshold", b"threshold"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["kind", b"kind", "threshold", b"threshold"]) -> None: ...
 
-Global___ByteStreamOpened: _TypeAlias = ByteStreamOpened  # noqa: Y015
+global___DataChannelBufferedAmountLowThresholdChanged = DataChannelBufferedAmountLowThresholdChanged
 
-@_typing.final
-class TextStreamOpened(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ByteStreamOpened(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    READER_FIELD_NUMBER: _builtins.int
-    PARTICIPANT_IDENTITY_FIELD_NUMBER: _builtins.int
-    participant_identity: _builtins.str
-    @_builtins.property
-    def reader(self) -> _data_stream_pb2.OwnedTextStreamReader: ...
+    READER_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def reader(self) -> data_stream_pb2.OwnedByteStreamReader: ...
     def __init__(
         self,
         *,
-        reader: _data_stream_pb2.OwnedTextStreamReader | None = ...,
-        participant_identity: _builtins.str | None = ...,
+        reader: data_stream_pb2.OwnedByteStreamReader | None = ...,
+        participant_identity: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> None: ...
 
-Global___TextStreamOpened: _TypeAlias = TextStreamOpened  # noqa: Y015
+global___ByteStreamOpened = ByteStreamOpened
 
-@_typing.final
-class DataTrackPublished(_message.Message):
+@typing.final
+class TextStreamOpened(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    READER_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    participant_identity: builtins.str
+    @property
+    def reader(self) -> data_stream_pb2.OwnedTextStreamReader: ...
+    def __init__(
+        self,
+        *,
+        reader: data_stream_pb2.OwnedTextStreamReader | None = ...,
+        participant_identity: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["participant_identity", b"participant_identity", "reader", b"reader"]) -> None: ...
+
+global___TextStreamOpened = TextStreamOpened
+
+@typing.final
+class DataTrackPublished(google.protobuf.message.Message):
     """A remote participant published a data track."""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def track(self) -> _data_track_pb2.OwnedRemoteDataTrack: ...
+    TRACK_FIELD_NUMBER: builtins.int
+    @property
+    def track(self) -> data_track_pb2.OwnedRemoteDataTrack: ...
     def __init__(
         self,
         *,
-        track: _data_track_pb2.OwnedRemoteDataTrack | None = ...,
+        track: data_track_pb2.OwnedRemoteDataTrack | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["track", b"track"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["track", b"track"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["track", b"track"]) -> None: ...
 
-Global___DataTrackPublished: _TypeAlias = DataTrackPublished  # noqa: Y015
+global___DataTrackPublished = DataTrackPublished
 
-@_typing.final
-class DataTrackUnpublished(_message.Message):
+@typing.final
+class DataTrackUnpublished(google.protobuf.message.Message):
     """A remote participant unpublished a data track."""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SID_FIELD_NUMBER: _builtins.int
-    sid: _builtins.str
+    SID_FIELD_NUMBER: builtins.int
+    sid: builtins.str
     """SID of the track that was unpublished."""
     def __init__(
         self,
         *,
-        sid: _builtins.str | None = ...,
+        sid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["sid", b"sid"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["sid", b"sid"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def HasField(self, field_name: typing.Literal["sid", b"sid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["sid", b"sid"]) -> None: ...
 
-Global___DataTrackUnpublished: _TypeAlias = DataTrackUnpublished  # noqa: Y015
+global___DataTrackUnpublished = DataTrackUnpublished
