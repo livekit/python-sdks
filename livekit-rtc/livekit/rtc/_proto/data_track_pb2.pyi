@@ -16,27 +16,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import builtins
-import google.protobuf.descriptor
-import google.protobuf.internal.enum_type_wrapper
-import google.protobuf.message
-from . import handle_pb2
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+import builtins as _builtins
+from . import handle_pb2 as _handle_pb2
 import sys
-import typing
+import typing as _typing
 
 if sys.version_info >= (3, 10):
-    import typing as typing_extensions
+    from typing import TypeAlias as _TypeAlias
 else:
-    import typing_extensions
+    from typing_extensions import TypeAlias as _TypeAlias
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+DESCRIPTOR: _descriptor.FileDescriptor
 
 class _DataTrackErrorCode:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _DataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataTrackErrorCode.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _DataTrackErrorCodeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_DataTrackErrorCode.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     DATA_TRACK_ERROR_CODE_UNKNOWN: _DataTrackErrorCode.ValueType  # 0
     DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _DataTrackErrorCode.ValueType  # 1
     DATA_TRACK_ERROR_CODE_DUPLICATE_TRACK_NAME: _DataTrackErrorCode.ValueType  # 2
@@ -58,14 +58,14 @@ DATA_TRACK_ERROR_CODE_SUBSCRIPTION_CLOSED: DataTrackErrorCode.ValueType  # 5
 DATA_TRACK_ERROR_CODE_CANCELLED: DataTrackErrorCode.ValueType  # 6
 DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: DataTrackErrorCode.ValueType  # 7
 DATA_TRACK_ERROR_CODE_INTERNAL: DataTrackErrorCode.ValueType  # 8
-global___DataTrackErrorCode = DataTrackErrorCode
+Global___DataTrackErrorCode: _TypeAlias = DataTrackErrorCode  # noqa: Y015
 
 class _PublishDataTrackErrorCode:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _PublishDataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PublishDataTrackErrorCode.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _PublishDataTrackErrorCodeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_PublishDataTrackErrorCode.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     PUBLISH_DATA_TRACK_ERROR_CODE_UNKNOWN: _PublishDataTrackErrorCode.ValueType  # 0
     PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _PublishDataTrackErrorCode.ValueType  # 1
     PUBLISH_DATA_TRACK_ERROR_CODE_DUPLICATE_NAME: _PublishDataTrackErrorCode.ValueType  # 2
@@ -89,14 +89,14 @@ PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_NAME: PublishDataTrackErrorCode.ValueType 
 PUBLISH_DATA_TRACK_ERROR_CODE_LIMIT_REACHED: PublishDataTrackErrorCode.ValueType  # 7
 PUBLISH_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: PublishDataTrackErrorCode.ValueType  # 8
 PUBLISH_DATA_TRACK_ERROR_CODE_INTERNAL: PublishDataTrackErrorCode.ValueType  # 9
-global___PublishDataTrackErrorCode = PublishDataTrackErrorCode
+Global___PublishDataTrackErrorCode: _TypeAlias = PublishDataTrackErrorCode  # noqa: Y015
 
 class _LocalDataTrackTryPushErrorCode:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _LocalDataTrackTryPushErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_LocalDataTrackTryPushErrorCode.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _LocalDataTrackTryPushErrorCodeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_LocalDataTrackTryPushErrorCode.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_UNKNOWN: _LocalDataTrackTryPushErrorCode.ValueType  # 0
     LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INVALID_HANDLE: _LocalDataTrackTryPushErrorCode.ValueType  # 1
     LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_TRACK_UNPUBLISHED: _LocalDataTrackTryPushErrorCode.ValueType  # 2
@@ -110,14 +110,14 @@ LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INVALID_HANDLE: LocalDataTrackTryPushErrorC
 LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_TRACK_UNPUBLISHED: LocalDataTrackTryPushErrorCode.ValueType  # 2
 LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_QUEUE_FULL: LocalDataTrackTryPushErrorCode.ValueType  # 3
 LOCAL_DATA_TRACK_TRY_PUSH_ERROR_CODE_INTERNAL: LocalDataTrackTryPushErrorCode.ValueType  # 4
-global___LocalDataTrackTryPushErrorCode = LocalDataTrackTryPushErrorCode
+Global___LocalDataTrackTryPushErrorCode: _TypeAlias = LocalDataTrackTryPushErrorCode  # noqa: Y015
 
 class _SubscribeDataTrackErrorCode:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _SubscribeDataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SubscribeDataTrackErrorCode.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _SubscribeDataTrackErrorCodeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_SubscribeDataTrackErrorCode.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNKNOWN: _SubscribeDataTrackErrorCode.ValueType  # 0
     SUBSCRIBE_DATA_TRACK_ERROR_CODE_INVALID_HANDLE: _SubscribeDataTrackErrorCode.ValueType  # 1
     SUBSCRIBE_DATA_TRACK_ERROR_CODE_UNPUBLISHED: _SubscribeDataTrackErrorCode.ValueType  # 2
@@ -135,146 +135,158 @@ SUBSCRIBE_DATA_TRACK_ERROR_CODE_TIMEOUT: SubscribeDataTrackErrorCode.ValueType  
 SUBSCRIBE_DATA_TRACK_ERROR_CODE_DISCONNECTED: SubscribeDataTrackErrorCode.ValueType  # 4
 SUBSCRIBE_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: SubscribeDataTrackErrorCode.ValueType  # 5
 SUBSCRIBE_DATA_TRACK_ERROR_CODE_INTERNAL: SubscribeDataTrackErrorCode.ValueType  # 6
-global___SubscribeDataTrackErrorCode = SubscribeDataTrackErrorCode
+Global___SubscribeDataTrackErrorCode: _TypeAlias = SubscribeDataTrackErrorCode  # noqa: Y015
 
-@typing.final
-class DataTrackInfo(google.protobuf.message.Message):
+@_typing.final
+class DataTrackInfo(_message.Message):
     """MARK: - Common
 
     Information about a published data track.
     """
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    NAME_FIELD_NUMBER: builtins.int
-    SID_FIELD_NUMBER: builtins.int
-    USES_E2EE_FIELD_NUMBER: builtins.int
-    name: builtins.str
+    NAME_FIELD_NUMBER: _builtins.int
+    SID_FIELD_NUMBER: _builtins.int
+    USES_E2EE_FIELD_NUMBER: _builtins.int
+    name: _builtins.str
     """Name of the track assigned by the publisher."""
-    sid: builtins.str
+    sid: _builtins.str
     """SFU-assigned track identifier."""
-    uses_e2ee: builtins.bool
+    uses_e2ee: _builtins.bool
     """Whether or not frames sent on the track use end-to-end encryption."""
     def __init__(
         self,
         *,
-        name: builtins.str | None = ...,
-        sid: builtins.str | None = ...,
-        uses_e2ee: builtins.bool | None = ...,
+        name: _builtins.str | None = ...,
+        sid: _builtins.str | None = ...,
+        uses_e2ee: _builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackInfo = DataTrackInfo
+Global___DataTrackInfo: _TypeAlias = DataTrackInfo  # noqa: Y015
 
-@typing.final
-class DataTrackFrame(google.protobuf.message.Message):
+@_typing.final
+class DataTrackFrame(_message.Message):
     """A frame published on a data track."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    PAYLOAD_FIELD_NUMBER: builtins.int
-    USER_TIMESTAMP_FIELD_NUMBER: builtins.int
-    payload: builtins.bytes
-    user_timestamp: builtins.int
+    PAYLOAD_FIELD_NUMBER: _builtins.int
+    USER_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    payload: _builtins.bytes
+    user_timestamp: _builtins.int
     def __init__(
         self,
         *,
-        payload: builtins.bytes | None = ...,
-        user_timestamp: builtins.int | None = ...,
+        payload: _builtins.bytes | None = ...,
+        user_timestamp: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["payload", b"payload", "user_timestamp", b"user_timestamp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["payload", b"payload", "user_timestamp", b"user_timestamp"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["payload", b"payload", "user_timestamp", b"user_timestamp"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["payload", b"payload", "user_timestamp", b"user_timestamp"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackFrame = DataTrackFrame
+Global___DataTrackFrame: _TypeAlias = DataTrackFrame  # noqa: Y015
 
-@typing.final
-class DataTrackError(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class DataTrackError(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    CODE_FIELD_NUMBER: builtins.int
-    MESSAGE_FIELD_NUMBER: builtins.int
-    code: global___DataTrackErrorCode.ValueType
-    message: builtins.str
+    CODE_FIELD_NUMBER: _builtins.int
+    MESSAGE_FIELD_NUMBER: _builtins.int
+    code: Global___DataTrackErrorCode.ValueType
+    message: _builtins.str
     def __init__(
         self,
         *,
-        code: global___DataTrackErrorCode.ValueType | None = ...,
-        message: builtins.str | None = ...,
+        code: Global___DataTrackErrorCode.ValueType | None = ...,
+        message: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackError = DataTrackError
+Global___DataTrackError: _TypeAlias = DataTrackError  # noqa: Y015
 
-@typing.final
-class PublishDataTrackError(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class PublishDataTrackError(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    CODE_FIELD_NUMBER: builtins.int
-    MESSAGE_FIELD_NUMBER: builtins.int
-    code: global___PublishDataTrackErrorCode.ValueType
-    message: builtins.str
+    CODE_FIELD_NUMBER: _builtins.int
+    MESSAGE_FIELD_NUMBER: _builtins.int
+    code: Global___PublishDataTrackErrorCode.ValueType
+    message: _builtins.str
     def __init__(
         self,
         *,
-        code: global___PublishDataTrackErrorCode.ValueType | None = ...,
-        message: builtins.str | None = ...,
+        code: Global___PublishDataTrackErrorCode.ValueType | None = ...,
+        message: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___PublishDataTrackError = PublishDataTrackError
+Global___PublishDataTrackError: _TypeAlias = PublishDataTrackError  # noqa: Y015
 
-@typing.final
-class LocalDataTrackTryPushError(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class LocalDataTrackTryPushError(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    CODE_FIELD_NUMBER: builtins.int
-    MESSAGE_FIELD_NUMBER: builtins.int
-    code: global___LocalDataTrackTryPushErrorCode.ValueType
-    message: builtins.str
+    CODE_FIELD_NUMBER: _builtins.int
+    MESSAGE_FIELD_NUMBER: _builtins.int
+    code: Global___LocalDataTrackTryPushErrorCode.ValueType
+    message: _builtins.str
     def __init__(
         self,
         *,
-        code: global___LocalDataTrackTryPushErrorCode.ValueType | None = ...,
-        message: builtins.str | None = ...,
+        code: Global___LocalDataTrackTryPushErrorCode.ValueType | None = ...,
+        message: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackTryPushError = LocalDataTrackTryPushError
+Global___LocalDataTrackTryPushError: _TypeAlias = LocalDataTrackTryPushError  # noqa: Y015
 
-@typing.final
-class SubscribeDataTrackError(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class SubscribeDataTrackError(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    CODE_FIELD_NUMBER: builtins.int
-    MESSAGE_FIELD_NUMBER: builtins.int
-    code: global___SubscribeDataTrackErrorCode.ValueType
-    message: builtins.str
+    CODE_FIELD_NUMBER: _builtins.int
+    MESSAGE_FIELD_NUMBER: _builtins.int
+    code: Global___SubscribeDataTrackErrorCode.ValueType
+    message: _builtins.str
     def __init__(
         self,
         *,
-        code: global___SubscribeDataTrackErrorCode.ValueType | None = ...,
-        message: builtins.str | None = ...,
+        code: Global___SubscribeDataTrackErrorCode.ValueType | None = ...,
+        message: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["code", b"code", "message", b"message"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["code", b"code", "message", b"message"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___SubscribeDataTrackError = SubscribeDataTrackError
+Global___SubscribeDataTrackError: _TypeAlias = SubscribeDataTrackError  # noqa: Y015
 
-@typing.final
-class DataTrackOptions(google.protobuf.message.Message):
+@_typing.final
+class DataTrackOptions(_message.Message):
     """MARK: - Local
 
     Options for publishing a data track.
     """
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    NAME_FIELD_NUMBER: builtins.int
-    name: builtins.str
+    NAME_FIELD_NUMBER: _builtins.int
+    name: _builtins.str
     """Track name used to identify the track to other participants.
 
     Must not be empty and must be unique per publisher.
@@ -282,344 +294,380 @@ class DataTrackOptions(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        name: builtins.str | None = ...,
+        name: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["name", b"name"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["name", b"name"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["name", b"name"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackOptions = DataTrackOptions
+Global___DataTrackOptions: _TypeAlias = DataTrackOptions  # noqa: Y015
 
-@typing.final
-class PublishDataTrackRequest(google.protobuf.message.Message):
+@_typing.final
+class PublishDataTrackRequest(_message.Message):
     """Publish a data track"""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
-    OPTIONS_FIELD_NUMBER: builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
-    local_participant_handle: builtins.int
-    request_async_id: builtins.int
-    @property
-    def options(self) -> global___DataTrackOptions: ...
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
+    OPTIONS_FIELD_NUMBER: _builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
+    local_participant_handle: _builtins.int
+    request_async_id: _builtins.int
+    @_builtins.property
+    def options(self) -> Global___DataTrackOptions: ...
     def __init__(
         self,
         *,
-        local_participant_handle: builtins.int | None = ...,
-        options: global___DataTrackOptions | None = ...,
-        request_async_id: builtins.int | None = ...,
+        local_participant_handle: _builtins.int | None = ...,
+        options: Global___DataTrackOptions | None = ...,
+        request_async_id: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_participant_handle", b"local_participant_handle", "options", b"options", "request_async_id", b"request_async_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___PublishDataTrackRequest = PublishDataTrackRequest
+Global___PublishDataTrackRequest: _TypeAlias = PublishDataTrackRequest  # noqa: Y015
 
-@typing.final
-class PublishDataTrackResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class PublishDataTrackResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
+    ASYNC_ID_FIELD_NUMBER: _builtins.int
+    async_id: _builtins.int
     def __init__(
         self,
         *,
-        async_id: builtins.int | None = ...,
+        async_id: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___PublishDataTrackResponse = PublishDataTrackResponse
+Global___PublishDataTrackResponse: _TypeAlias = PublishDataTrackResponse  # noqa: Y015
 
-@typing.final
-class PublishDataTrackCallback(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class PublishDataTrackCallback(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: builtins.int
-    TRACK_FIELD_NUMBER: builtins.int
-    ERROR_FIELD_NUMBER: builtins.int
-    async_id: builtins.int
-    @property
-    def track(self) -> global___OwnedLocalDataTrack: ...
-    @property
-    def error(self) -> global___PublishDataTrackError: ...
+    ASYNC_ID_FIELD_NUMBER: _builtins.int
+    TRACK_FIELD_NUMBER: _builtins.int
+    ERROR_FIELD_NUMBER: _builtins.int
+    async_id: _builtins.int
+    @_builtins.property
+    def track(self) -> Global___OwnedLocalDataTrack: ...
+    @_builtins.property
+    def error(self) -> Global___PublishDataTrackError: ...
     def __init__(
         self,
         *,
-        async_id: builtins.int | None = ...,
-        track: global___OwnedLocalDataTrack | None = ...,
-        error: global___PublishDataTrackError | None = ...,
+        async_id: _builtins.int | None = ...,
+        track: Global___OwnedLocalDataTrack | None = ...,
+        error: Global___PublishDataTrackError | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["result", b"result"]) -> typing.Literal["track", "error"] | None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error", "result", b"result", "track", b"track"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    _WhichOneofReturnType_result: _TypeAlias = _typing.Literal["track", "error"]  # noqa: Y015
+    _WhichOneofArgType_result: _TypeAlias = _typing.Literal["result", b"result"]  # noqa: Y015
+    def WhichOneof(self, oneof_group: _WhichOneofArgType_result) -> _WhichOneofReturnType_result | None: ...
 
-global___PublishDataTrackCallback = PublishDataTrackCallback
+Global___PublishDataTrackCallback: _TypeAlias = PublishDataTrackCallback  # noqa: Y015
 
-@typing.final
-class OwnedLocalDataTrack(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class OwnedLocalDataTrack(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: builtins.int
-    INFO_FIELD_NUMBER: builtins.int
-    @property
-    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
-    @property
-    def info(self) -> global___DataTrackInfo: ...
+    HANDLE_FIELD_NUMBER: _builtins.int
+    INFO_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
+    @_builtins.property
+    def info(self) -> Global___DataTrackInfo: ...
     def __init__(
         self,
         *,
-        handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___DataTrackInfo | None = ...,
+        handle: _handle_pb2.FfiOwnedHandle | None = ...,
+        info: Global___DataTrackInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___OwnedLocalDataTrack = OwnedLocalDataTrack
+Global___OwnedLocalDataTrack: _TypeAlias = OwnedLocalDataTrack  # noqa: Y015
 
-@typing.final
-class LocalDataTrackTryPushRequest(google.protobuf.message.Message):
+@_typing.final
+class LocalDataTrackTryPushRequest(_message.Message):
     """Try pushing a frame to subscribers of the track."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: builtins.int
-    FRAME_FIELD_NUMBER: builtins.int
-    track_handle: builtins.int
-    @property
-    def frame(self) -> global___DataTrackFrame: ...
+    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
+    FRAME_FIELD_NUMBER: _builtins.int
+    track_handle: _builtins.int
+    @_builtins.property
+    def frame(self) -> Global___DataTrackFrame: ...
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
-        frame: global___DataTrackFrame | None = ...,
+        track_handle: _builtins.int | None = ...,
+        frame: Global___DataTrackFrame | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frame", b"frame", "track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frame", b"frame", "track_handle", b"track_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame", "track_handle", b"track_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame", "track_handle", b"track_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackTryPushRequest = LocalDataTrackTryPushRequest
+Global___LocalDataTrackTryPushRequest: _TypeAlias = LocalDataTrackTryPushRequest  # noqa: Y015
 
-@typing.final
-class LocalDataTrackTryPushResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class LocalDataTrackTryPushResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: builtins.int
-    @property
-    def error(self) -> global___LocalDataTrackTryPushError: ...
+    ERROR_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def error(self) -> Global___LocalDataTrackTryPushError: ...
     def __init__(
         self,
         *,
-        error: global___LocalDataTrackTryPushError | None = ...,
+        error: Global___LocalDataTrackTryPushError | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackTryPushResponse = LocalDataTrackTryPushResponse
+Global___LocalDataTrackTryPushResponse: _TypeAlias = LocalDataTrackTryPushResponse  # noqa: Y015
 
-@typing.final
-class LocalDataTrackIsPublishedRequest(google.protobuf.message.Message):
+@_typing.final
+class LocalDataTrackIsPublishedRequest(_message.Message):
     """Checks if the track is still published."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: builtins.int
-    track_handle: builtins.int
+    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
+    track_handle: _builtins.int
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
+        track_handle: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackIsPublishedRequest = LocalDataTrackIsPublishedRequest
+Global___LocalDataTrackIsPublishedRequest: _TypeAlias = LocalDataTrackIsPublishedRequest  # noqa: Y015
 
-@typing.final
-class LocalDataTrackIsPublishedResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class LocalDataTrackIsPublishedResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    IS_PUBLISHED_FIELD_NUMBER: builtins.int
-    is_published: builtins.bool
+    IS_PUBLISHED_FIELD_NUMBER: _builtins.int
+    is_published: _builtins.bool
     def __init__(
         self,
         *,
-        is_published: builtins.bool | None = ...,
+        is_published: _builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["is_published", b"is_published"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["is_published", b"is_published"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["is_published", b"is_published"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["is_published", b"is_published"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackIsPublishedResponse = LocalDataTrackIsPublishedResponse
+Global___LocalDataTrackIsPublishedResponse: _TypeAlias = LocalDataTrackIsPublishedResponse  # noqa: Y015
 
-@typing.final
-class LocalDataTrackUnpublishRequest(google.protobuf.message.Message):
+@_typing.final
+class LocalDataTrackUnpublishRequest(_message.Message):
     """Unpublishes the track."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: builtins.int
-    track_handle: builtins.int
+    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
+    track_handle: _builtins.int
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
+        track_handle: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___LocalDataTrackUnpublishRequest = LocalDataTrackUnpublishRequest
+Global___LocalDataTrackUnpublishRequest: _TypeAlias = LocalDataTrackUnpublishRequest  # noqa: Y015
 
-@typing.final
-class LocalDataTrackUnpublishResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class LocalDataTrackUnpublishResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___LocalDataTrackUnpublishResponse = LocalDataTrackUnpublishResponse
+Global___LocalDataTrackUnpublishResponse: _TypeAlias = LocalDataTrackUnpublishResponse  # noqa: Y015
 
-@typing.final
-class OwnedRemoteDataTrack(google.protobuf.message.Message):
+@_typing.final
+class OwnedRemoteDataTrack(_message.Message):
     """MARK: - Remote"""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: builtins.int
-    INFO_FIELD_NUMBER: builtins.int
-    PUBLISHER_IDENTITY_FIELD_NUMBER: builtins.int
-    publisher_identity: builtins.str
+    HANDLE_FIELD_NUMBER: _builtins.int
+    INFO_FIELD_NUMBER: _builtins.int
+    PUBLISHER_IDENTITY_FIELD_NUMBER: _builtins.int
+    publisher_identity: _builtins.str
     """Identity of the remote participant who published the track."""
-    @property
-    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
-    @property
-    def info(self) -> global___DataTrackInfo: ...
+    @_builtins.property
+    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
+    @_builtins.property
+    def info(self) -> Global___DataTrackInfo: ...
     def __init__(
         self,
         *,
-        handle: handle_pb2.FfiOwnedHandle | None = ...,
-        info: global___DataTrackInfo | None = ...,
-        publisher_identity: builtins.str | None = ...,
+        handle: _handle_pb2.FfiOwnedHandle | None = ...,
+        info: Global___DataTrackInfo | None = ...,
+        publisher_identity: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info", "publisher_identity", b"publisher_identity"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info", "publisher_identity", b"publisher_identity"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info", "publisher_identity", b"publisher_identity"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info", "publisher_identity", b"publisher_identity"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___OwnedRemoteDataTrack = OwnedRemoteDataTrack
+Global___OwnedRemoteDataTrack: _TypeAlias = OwnedRemoteDataTrack  # noqa: Y015
 
-@typing.final
-class OwnedDataTrackStream(google.protobuf.message.Message):
+@_typing.final
+class OwnedDataTrackStream(_message.Message):
     """Handle to an active data track subscription.
 
     Dropping the handle will unsubscribe from the track.
     """
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: builtins.int
-    @property
-    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    HANDLE_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
     def __init__(
         self,
         *,
-        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        handle: _handle_pb2.FfiOwnedHandle | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["handle", b"handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["handle", b"handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___OwnedDataTrackStream = OwnedDataTrackStream
+Global___OwnedDataTrackStream: _TypeAlias = OwnedDataTrackStream  # noqa: Y015
 
-@typing.final
-class DataTrackSubscribeOptions(google.protobuf.message.Message):
+@_typing.final
+class DataTrackSubscribeOptions(_message.Message):
     """Reserved for future subscription options."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    BUFFER_SIZE_FIELD_NUMBER: builtins.int
-    buffer_size: builtins.int
+    BUFFER_SIZE_FIELD_NUMBER: _builtins.int
+    buffer_size: _builtins.int
     """Maximum number of frames to buffer internally."""
     def __init__(
         self,
         *,
-        buffer_size: builtins.int | None = ...,
+        buffer_size: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer_size", b"buffer_size"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer_size", b"buffer_size"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer_size", b"buffer_size"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer_size", b"buffer_size"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackSubscribeOptions = DataTrackSubscribeOptions
+Global___DataTrackSubscribeOptions: _TypeAlias = DataTrackSubscribeOptions  # noqa: Y015
 
-@typing.final
-class RemoteDataTrackIsPublishedRequest(google.protobuf.message.Message):
+@_typing.final
+class RemoteDataTrackIsPublishedRequest(_message.Message):
     """Checks if the track is still published."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: builtins.int
-    track_handle: builtins.int
+    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
+    track_handle: _builtins.int
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
+        track_handle: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["track_handle", b"track_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["track_handle", b"track_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RemoteDataTrackIsPublishedRequest = RemoteDataTrackIsPublishedRequest
+Global___RemoteDataTrackIsPublishedRequest: _TypeAlias = RemoteDataTrackIsPublishedRequest  # noqa: Y015
 
-@typing.final
-class RemoteDataTrackIsPublishedResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RemoteDataTrackIsPublishedResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    IS_PUBLISHED_FIELD_NUMBER: builtins.int
-    is_published: builtins.bool
+    IS_PUBLISHED_FIELD_NUMBER: _builtins.int
+    is_published: _builtins.bool
     def __init__(
         self,
         *,
-        is_published: builtins.bool | None = ...,
+        is_published: _builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["is_published", b"is_published"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["is_published", b"is_published"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["is_published", b"is_published"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["is_published", b"is_published"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RemoteDataTrackIsPublishedResponse = RemoteDataTrackIsPublishedResponse
+Global___RemoteDataTrackIsPublishedResponse: _TypeAlias = RemoteDataTrackIsPublishedResponse  # noqa: Y015
 
-@typing.final
-class SubscribeDataTrackRequest(google.protobuf.message.Message):
+@_typing.final
+class SubscribeDataTrackRequest(_message.Message):
     """Subscribe to a data track."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: builtins.int
-    OPTIONS_FIELD_NUMBER: builtins.int
-    track_handle: builtins.int
-    @property
-    def options(self) -> global___DataTrackSubscribeOptions: ...
+    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
+    OPTIONS_FIELD_NUMBER: _builtins.int
+    track_handle: _builtins.int
+    @_builtins.property
+    def options(self) -> Global___DataTrackSubscribeOptions: ...
     def __init__(
         self,
         *,
-        track_handle: builtins.int | None = ...,
-        options: global___DataTrackSubscribeOptions | None = ...,
+        track_handle: _builtins.int | None = ...,
+        options: Global___DataTrackSubscribeOptions | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["options", b"options", "track_handle", b"track_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["options", b"options", "track_handle", b"track_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___SubscribeDataTrackRequest = SubscribeDataTrackRequest
+Global___SubscribeDataTrackRequest: _TypeAlias = SubscribeDataTrackRequest  # noqa: Y015
 
-@typing.final
-class SubscribeDataTrackResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class SubscribeDataTrackResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    STREAM_FIELD_NUMBER: builtins.int
-    @property
-    def stream(self) -> global___OwnedDataTrackStream: ...
+    STREAM_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def stream(self) -> Global___OwnedDataTrackStream: ...
     def __init__(
         self,
         *,
-        stream: global___OwnedDataTrackStream | None = ...,
+        stream: Global___OwnedDataTrackStream | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___SubscribeDataTrackResponse = SubscribeDataTrackResponse
+Global___SubscribeDataTrackResponse: _TypeAlias = SubscribeDataTrackResponse  # noqa: Y015
 
-@typing.final
-class DataTrackStreamReadRequest(google.protobuf.message.Message):
+@_typing.final
+class DataTrackStreamReadRequest(_message.Message):
     """Signal readiness to handle the next frame.
 
     This allows the client to put backpressure on the internal receive buffer.
@@ -627,93 +675,103 @@ class DataTrackStreamReadRequest(google.protobuf.message.Message):
     once one is available.
     """
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    STREAM_HANDLE_FIELD_NUMBER: builtins.int
-    stream_handle: builtins.int
+    STREAM_HANDLE_FIELD_NUMBER: _builtins.int
+    stream_handle: _builtins.int
     def __init__(
         self,
         *,
-        stream_handle: builtins.int | None = ...,
+        stream_handle: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["stream_handle", b"stream_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["stream_handle", b"stream_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["stream_handle", b"stream_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["stream_handle", b"stream_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackStreamReadRequest = DataTrackStreamReadRequest
+Global___DataTrackStreamReadRequest: _TypeAlias = DataTrackStreamReadRequest  # noqa: Y015
 
-@typing.final
-class DataTrackStreamReadResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class DataTrackStreamReadResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___DataTrackStreamReadResponse = DataTrackStreamReadResponse
+Global___DataTrackStreamReadResponse: _TypeAlias = DataTrackStreamReadResponse  # noqa: Y015
 
-@typing.final
-class DataTrackStreamEvent(google.protobuf.message.Message):
+@_typing.final
+class DataTrackStreamEvent(_message.Message):
     """Event emitted on an active stream."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    STREAM_HANDLE_FIELD_NUMBER: builtins.int
-    FRAME_RECEIVED_FIELD_NUMBER: builtins.int
-    EOS_FIELD_NUMBER: builtins.int
-    stream_handle: builtins.int
-    @property
-    def frame_received(self) -> global___DataTrackStreamFrameReceived: ...
-    @property
-    def eos(self) -> global___DataTrackStreamEOS: ...
+    STREAM_HANDLE_FIELD_NUMBER: _builtins.int
+    FRAME_RECEIVED_FIELD_NUMBER: _builtins.int
+    EOS_FIELD_NUMBER: _builtins.int
+    stream_handle: _builtins.int
+    @_builtins.property
+    def frame_received(self) -> Global___DataTrackStreamFrameReceived: ...
+    @_builtins.property
+    def eos(self) -> Global___DataTrackStreamEOS: ...
     def __init__(
         self,
         *,
-        stream_handle: builtins.int | None = ...,
-        frame_received: global___DataTrackStreamFrameReceived | None = ...,
-        eos: global___DataTrackStreamEOS | None = ...,
+        stream_handle: _builtins.int | None = ...,
+        frame_received: Global___DataTrackStreamFrameReceived | None = ...,
+        eos: Global___DataTrackStreamEOS | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["detail", b"detail"]) -> typing.Literal["frame_received", "eos"] | None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["detail", b"detail", "eos", b"eos", "frame_received", b"frame_received", "stream_handle", b"stream_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    _WhichOneofReturnType_detail: _TypeAlias = _typing.Literal["frame_received", "eos"]  # noqa: Y015
+    _WhichOneofArgType_detail: _TypeAlias = _typing.Literal["detail", b"detail"]  # noqa: Y015
+    def WhichOneof(self, oneof_group: _WhichOneofArgType_detail) -> _WhichOneofReturnType_detail | None: ...
 
-global___DataTrackStreamEvent = DataTrackStreamEvent
+Global___DataTrackStreamEvent: _TypeAlias = DataTrackStreamEvent  # noqa: Y015
 
-@typing.final
-class DataTrackStreamFrameReceived(google.protobuf.message.Message):
+@_typing.final
+class DataTrackStreamFrameReceived(_message.Message):
     """A frame was received."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    FRAME_FIELD_NUMBER: builtins.int
-    @property
-    def frame(self) -> global___DataTrackFrame: ...
+    FRAME_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def frame(self) -> Global___DataTrackFrame: ...
     def __init__(
         self,
         *,
-        frame: global___DataTrackFrame | None = ...,
+        frame: Global___DataTrackFrame | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frame", b"frame"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frame", b"frame"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackStreamFrameReceived = DataTrackStreamFrameReceived
+Global___DataTrackStreamFrameReceived: _TypeAlias = DataTrackStreamFrameReceived  # noqa: Y015
 
-@typing.final
-class DataTrackStreamEOS(google.protobuf.message.Message):
+@_typing.final
+class DataTrackStreamEOS(_message.Message):
     """Stream has ended."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: builtins.int
-    error: builtins.str
+    ERROR_FIELD_NUMBER: _builtins.int
+    error: _builtins.str
     """If the track could not be subscribed to, a message describing the error.
     Absent if the stream ended normally.
     """
     def __init__(
         self,
         *,
-        error: builtins.str | None = ...,
+        error: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataTrackStreamEOS = DataTrackStreamEOS
+Global___DataTrackStreamEOS: _TypeAlias = DataTrackStreamEOS  # noqa: Y015
