@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""End-to-end audio and video publish/subscribe tests."""
+"""End-to-end audio publish/subscribe tests."""
 
 import asyncio
 import ctypes
@@ -34,19 +34,6 @@ NUM_CHANNELS = 1
 TONE_DURATION_SEC = 1.0
 FREQUENCIES_HZ = [100, 300, 500, 700, 1000]
 AMPLITUDE = 0.5
-
-VIDEO_WIDTH = 640
-VIDEO_HEIGHT = 480
-VIDEO_FPS = 15
-VIDEO_COLOR_DURATION_SEC = 1.0
-# (name, RGB tuple) — order matters; the subscriber must see them in this sequence.
-VIDEO_COLOR_SEQUENCE: list[tuple[str, tuple[int, int, int]]] = [
-    ("red", (255, 0, 0)),
-    ("green", (0, 255, 0)),
-    ("blue", (0, 0, 255)),
-    ("white", (255, 255, 255)),
-    ("black", (0, 0, 0)),
-]
 
 
 def skip_if_no_credentials():
