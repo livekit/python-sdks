@@ -121,7 +121,9 @@ def _band_energies(
     freqs, magnitudes = _fft_spectrum(frame)
     power = magnitudes**2
     return {
-        center: float(np.sum(power[(freqs >= center - bandwidth_hz) & (freqs <= center + bandwidth_hz)]))
+        center: float(
+            np.sum(power[(freqs >= center - bandwidth_hz) & (freqs <= center + bandwidth_hz)])
+        )
         for center in centers
     }
 
@@ -195,18 +197,12 @@ class TestAudioStreamPublishSubscribe:
                 buffers: list[np.ndarray] = []
                 total = 0
                 async for event in audio_stream:
-                    chunk = np.frombuffer(
-                        bytes(event.frame.data.cast("B")), dtype=np.int16
-                    )
+                    chunk = np.frombuffer(bytes(event.frame.data.cast("B")), dtype=np.int16)
                     buffers.append(chunk)
                     total += len(chunk)
                     if total >= collect_samples_target:
                         break
-                return (
-                    np.concatenate(buffers)
-                    if buffers
-                    else np.array([], dtype=np.int16)
-                )
+                return np.concatenate(buffers) if buffers else np.array([], dtype=np.int16)
 
             publish_task = asyncio.create_task(publish_tones())
             received = await asyncio.wait_for(collect_samples(), timeout=20.0)

@@ -67,9 +67,8 @@ def create_token(identity: str, room_name: str) -> str:
 def unique_room_name(base: str) -> str:
     return f"{base}-{uuid.uuid4().hex[:8]}"
 
-def _solid_color_rgba_frame(
-    width: int, height: int, rgb: tuple[int, int, int]
-) -> rtc.VideoFrame:
+
+def _solid_color_rgba_frame(width: int, height: int, rgb: tuple[int, int, int]) -> rtc.VideoFrame:
     """Build a solid-color 640x480 RGBA `VideoFrame` for the given RGB triple."""
     pixels = np.empty((height, width, 4), dtype=np.uint8)
     pixels[:, :, 0] = rgb[0]
@@ -169,9 +168,7 @@ class TestVideoStreamPublishSubscribe:
             assert subscribed_track is not None
 
             # Request RGBA frames from the SFU so we don't have to convert per frame.
-            video_stream = rtc.VideoStream(
-                subscribed_track, format=rtc.VideoBufferType.RGBA
-            )
+            video_stream = rtc.VideoStream(subscribed_track, format=rtc.VideoBufferType.RGBA)
 
             received_frames: list[np.ndarray] = []
             stop_collecting = asyncio.Event()
@@ -197,9 +194,11 @@ class TestVideoStreamPublishSubscribe:
                     vf = event.frame
                     if vf.type != rtc.VideoBufferType.RGBA:
                         vf = vf.convert(rtc.VideoBufferType.RGBA)
-                    arr = np.frombuffer(
-                        bytes(vf.data.cast("B")), dtype=np.uint8
-                    ).reshape(vf.height, vf.width, 4).copy()
+                    arr = (
+                        np.frombuffer(bytes(vf.data.cast("B")), dtype=np.uint8)
+                        .reshape(vf.height, vf.width, 4)
+                        .copy()
+                    )
                     received_frames.append(arr)
                     if stop_collecting.is_set():
                         break
@@ -228,8 +227,7 @@ class TestVideoStreamPublishSubscribe:
 
             # Classify each received frame against the 5-color palette.
             classified = [
-                _classify_frame_color(f, VIDEO_COLOR_SEQUENCE)[0]
-                for f in received_frames
+                _classify_frame_color(f, VIDEO_COLOR_SEQUENCE)[0] for f in received_frames
             ]
 
             # Reduce to stable runs: ignore single-frame transitions at color boundaries.
@@ -271,8 +269,7 @@ class TestVideoStreamPublishSubscribe:
             expected_names = {name for name, _ in VIDEO_COLOR_SEQUENCE}
             missing = expected_names - saved.keys()
             assert not missing, (
-                f"Did not capture a frame for colors: {missing}. "
-                f"Classified stream: {classified}"
+                f"Did not capture a frame for colors: {missing}. Classified stream: {classified}"
             )
         finally:
             await publisher_room.disconnect()
