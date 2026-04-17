@@ -18,8 +18,6 @@ import asyncio
 import ctypes
 import math
 import os
-import shutil
-import subprocess
 import uuid
 import wave
 from pathlib import Path
