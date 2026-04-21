@@ -174,6 +174,7 @@ class TestVideoStreamPublishSubscribe:
             stop_collecting = asyncio.Event()
 
             async def publish_colors() -> None:
+                await track_subscribed_event.wait()
                 frame_interval = 1.0 / VIDEO_FPS
                 frames_per_color = int(VIDEO_FPS * VIDEO_COLOR_DURATION_SEC)
                 loop = asyncio.get_event_loop()

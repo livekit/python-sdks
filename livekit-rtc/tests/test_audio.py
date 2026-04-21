@@ -182,6 +182,7 @@ class TestAudioStreamPublishSubscribe:
             collect_samples_target = target_samples + int(SAMPLE_RATE * 1.0)
 
             async def publish_tones() -> None:
+                await track_subscribed_event.wait()
                 for freq in FREQUENCIES_HZ:
                     frame = _generate_sine_wave(
                         freq,
