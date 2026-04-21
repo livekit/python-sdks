@@ -62,6 +62,22 @@ class MetricsReport(_message.Message):
     e2e_latency: float
     def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ...) -> None: ...
 
+class TimedString(_message.Message):
+    __slots__ = ("text", "start_time", "end_time", "confidence", "start_time_offset", "speaker_id")
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
+    CONFIDENCE_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_OFFSET_FIELD_NUMBER: _ClassVar[int]
+    SPEAKER_ID_FIELD_NUMBER: _ClassVar[int]
+    text: str
+    start_time: float
+    end_time: float
+    confidence: float
+    start_time_offset: float
+    speaker_id: str
+    def __init__(self, text: _Optional[str] = ..., start_time: _Optional[float] = ..., end_time: _Optional[float] = ..., confidence: _Optional[float] = ..., start_time_offset: _Optional[float] = ..., speaker_id: _Optional[str] = ...) -> None: ...
+
 class ChatMessage(_message.Message):
     __slots__ = ("id", "role", "content", "interrupted", "transcript_confidence", "extra", "metrics", "created_at")
     class ChatContent(_message.Message):
