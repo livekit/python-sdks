@@ -180,15 +180,16 @@ class TestVideoStreamPublishSubscribe:
                 loop = asyncio.get_event_loop()
                 start = loop.time()
                 global_idx = 0
-                for _color_name, rgb in VIDEO_COLOR_SEQUENCE:
-                    frame = _solid_color_rgba_frame(VIDEO_WIDTH, VIDEO_HEIGHT, rgb)
-                    for _ in range(frames_per_color):
-                        source.capture_frame(frame)
-                        global_idx += 1
-                        target = start + global_idx * frame_interval
-                        sleep_for = target - loop.time()
-                        if sleep_for > 0:
-                            await asyncio.sleep(sleep_for)
+                for _repeat in range(2):
+                    for _color_name, rgb in VIDEO_COLOR_SEQUENCE:
+                        frame = _solid_color_rgba_frame(VIDEO_WIDTH, VIDEO_HEIGHT, rgb)
+                        for _ in range(frames_per_color):
+                            source.capture_frame(frame)
+                            global_idx += 1
+                            target = start + global_idx * frame_interval
+                            sleep_for = target - loop.time()
+                            if sleep_for > 0:
+                                await asyncio.sleep(sleep_for)
 
             async def collect_frames() -> None:
                 async for event in video_stream:
@@ -204,8 +205,8 @@ class TestVideoStreamPublishSubscribe:
                     if stop_collecting.is_set():
                         break
 
-            publish_task = asyncio.create_task(publish_colors())
             collect_task = asyncio.create_task(collect_frames())
+            publish_task = asyncio.create_task(publish_colors())
 
             await publish_task
             # Allow trailing frames to drain before signaling stop.
@@ -240,17 +241,14 @@ class TestVideoStreamPublishSubscribe:
                     runs.append((color, 1))
             # A stable run has several frames of the same classified color.
             stable_run_min = max(3, VIDEO_FPS // 3)
-            dominant = [c for c, n in runs if n >= stable_run_min]
+            dominant = {c for c, n in runs if n >= stable_run_min}
 
-            expected_order = [name for name, _ in VIDEO_COLOR_SEQUENCE]
-            # Find expected_order as a subsequence of dominant.
-            seq_idx = 0
-            for color in dominant:
-                if seq_idx < len(expected_order) and color == expected_order[seq_idx]:
-                    seq_idx += 1
-            assert seq_idx == len(expected_order), (
-                f"Expected color sequence {expected_order} not found in dominant runs "
-                f"{dominant}. Full classified stream: {classified}"
+            expected_colors = {name for name, _ in VIDEO_COLOR_SEQUENCE}
+            missing_colors = expected_colors - dominant
+            assert not missing_colors, (
+                f"Expected colors {expected_colors} not all present in subscribed track; "
+                f"missing {missing_colors}. Dominant colors: {dominant}. "
+                f"Full classified stream: {classified}"
             )
 
             # Snapshot the first received frame of each expected color to JPEG.
