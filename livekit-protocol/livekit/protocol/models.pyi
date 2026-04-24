@@ -752,7 +752,7 @@ class ServerInfo(_message.Message):
     def __init__(self, edition: _Optional[_Union[ServerInfo.Edition, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., region: _Optional[str] = ..., node_id: _Optional[str] = ..., debug_info: _Optional[str] = ..., agent_protocol: _Optional[int] = ...) -> None: ...
 
 class ClientInfo(_message.Message):
-    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network", "other_sdks", "client_protocol")
+    __slots__ = ("sdk", "version", "protocol", "os", "os_version", "device_model", "browser", "browser_version", "address", "network", "other_sdks", "client_protocol", "capabilities")
     class SDK(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         UNKNOWN: _ClassVar[ClientInfo.SDK]
@@ -785,6 +785,12 @@ class ClientInfo(_message.Message):
     NODE: ClientInfo.SDK
     UNREAL: ClientInfo.SDK
     ESP32: ClientInfo.SDK
+    class Capability(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        CAP_UNUSED: _ClassVar[ClientInfo.Capability]
+        CAP_PACKET_TRAILER: _ClassVar[ClientInfo.Capability]
+    CAP_UNUSED: ClientInfo.Capability
+    CAP_PACKET_TRAILER: ClientInfo.Capability
     SDK_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
@@ -797,6 +803,7 @@ class ClientInfo(_message.Message):
     NETWORK_FIELD_NUMBER: _ClassVar[int]
     OTHER_SDKS_FIELD_NUMBER: _ClassVar[int]
     CLIENT_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
+    CAPABILITIES_FIELD_NUMBER: _ClassVar[int]
     sdk: ClientInfo.SDK
     version: str
     protocol: int
@@ -809,7 +816,8 @@ class ClientInfo(_message.Message):
     network: str
     other_sdks: str
     client_protocol: int
-    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ..., other_sdks: _Optional[str] = ..., client_protocol: _Optional[int] = ...) -> None: ...
+    capabilities: _containers.RepeatedScalarFieldContainer[ClientInfo.Capability]
+    def __init__(self, sdk: _Optional[_Union[ClientInfo.SDK, str]] = ..., version: _Optional[str] = ..., protocol: _Optional[int] = ..., os: _Optional[str] = ..., os_version: _Optional[str] = ..., device_model: _Optional[str] = ..., browser: _Optional[str] = ..., browser_version: _Optional[str] = ..., address: _Optional[str] = ..., network: _Optional[str] = ..., other_sdks: _Optional[str] = ..., client_protocol: _Optional[int] = ..., capabilities: _Optional[_Iterable[_Union[ClientInfo.Capability, str]]] = ...) -> None: ...
 
 class ClientConfiguration(_message.Message):
     __slots__ = ("video", "screen", "resume_connection", "disabled_codecs", "force_relay")
