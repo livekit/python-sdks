@@ -320,12 +320,15 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
     BUFFER_FIELD_NUMBER: builtins.int
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
     source_handle: builtins.int
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
     @property
     def buffer(self) -> global___VideoBufferInfo: ...
+    @property
+    def metadata(self) -> global___FrameMetadata: ...
     def __init__(
         self,
         *,
@@ -333,9 +336,10 @@ class CaptureVideoFrameRequest(google.protobuf.message.Message):
         buffer: global___VideoBufferInfo | None = ...,
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
+        metadata: global___FrameMetadata | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___CaptureVideoFrameRequest = CaptureVideoFrameRequest
 
@@ -494,6 +498,25 @@ class OwnedVideoBuffer(google.protobuf.message.Message):
 global___OwnedVideoBuffer = OwnedVideoBuffer
 
 @typing.final
+class FrameMetadata(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USER_TIMESTAMP_FIELD_NUMBER: builtins.int
+    FRAME_ID_FIELD_NUMBER: builtins.int
+    user_timestamp: builtins.int
+    frame_id: builtins.int
+    def __init__(
+        self,
+        *,
+        user_timestamp: builtins.int | None = ...,
+        frame_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]) -> None: ...
+
+global___FrameMetadata = FrameMetadata
+
+@typing.final
 class VideoStreamInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -562,20 +585,24 @@ class VideoFrameReceived(google.protobuf.message.Message):
     BUFFER_FIELD_NUMBER: builtins.int
     TIMESTAMP_US_FIELD_NUMBER: builtins.int
     ROTATION_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
     timestamp_us: builtins.int
     """In microseconds"""
     rotation: global___VideoRotation.ValueType
     @property
     def buffer(self) -> global___OwnedVideoBuffer: ...
+    @property
+    def metadata(self) -> global___FrameMetadata: ...
     def __init__(
         self,
         *,
         buffer: global___OwnedVideoBuffer | None = ...,
         timestamp_us: builtins.int | None = ...,
         rotation: global___VideoRotation.ValueType | None = ...,
+        metadata: global___FrameMetadata | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]) -> None: ...
 
 global___VideoFrameReceived = VideoFrameReceived
 

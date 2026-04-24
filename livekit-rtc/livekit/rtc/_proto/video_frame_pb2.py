@@ -16,7 +16,7 @@ from . import handle_pb2 as handle__pb2
 from . import track_pb2 as track__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11video_frame.proto\x12\rlivekit.proto\x1a\x0chandle.proto\x1a\x0btrack.proto\"\xc0\x01\n\x15NewVideoStreamRequest\x12\x14\n\x0ctrack_handle\x18\x01 \x02(\x04\x12,\n\x04type\x18\x02 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\x12.\n\x06\x66ormat\x18\x03 \x01(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\x18\n\x10normalize_stride\x18\x04 \x01(\x08\x12\x19\n\x11queue_size_frames\x18\x05 \x01(\r\"I\n\x16NewVideoStreamResponse\x12/\n\x06stream\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoStream\"\x84\x02\n!VideoStreamFromParticipantRequest\x12\x1a\n\x12participant_handle\x18\x01 \x02(\x04\x12,\n\x04type\x18\x02 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\x12\x30\n\x0ctrack_source\x18\x03 \x02(\x0e\x32\x1a.livekit.proto.TrackSource\x12.\n\x06\x66ormat\x18\x04 \x01(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\x18\n\x10normalize_stride\x18\x05 \x01(\x08\x12\x19\n\x11queue_size_frames\x18\x06 \x01(\r\"U\n\"VideoStreamFromParticipantResponse\x12/\n\x06stream\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoStream\"\x96\x01\n\x15NewVideoSourceRequest\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoSourceType\x12\x38\n\nresolution\x18\x02 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\ris_screencast\x18\x03 \x01(\x08\"I\n\x16NewVideoSourceResponse\x12/\n\x06source\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoSource\"\xa7\x01\n\x18\x43\x61ptureVideoFrameRequest\x12\x15\n\rsource_handle\x18\x01 \x02(\x04\x12.\n\x06\x62uffer\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\x12\x14\n\x0ctimestamp_us\x18\x03 \x02(\x03\x12.\n\x08rotation\x18\x04 \x02(\x0e\x32\x1c.livekit.proto.VideoRotation\"\x1b\n\x19\x43\x61ptureVideoFrameResponse\"\x87\x01\n\x13VideoConvertRequest\x12\x0e\n\x06\x66lip_y\x18\x01 \x01(\x08\x12.\n\x06\x62uffer\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\x12\x30\n\x08\x64st_type\x18\x03 \x02(\x0e\x32\x1e.livekit.proto.VideoBufferType\"e\n\x14VideoConvertResponse\x12\x0f\n\x05\x65rror\x18\x01 \x01(\tH\x00\x12\x31\n\x06\x62uffer\x18\x02 \x01(\x0b\x32\x1f.livekit.proto.OwnedVideoBufferH\x00\x42\t\n\x07message\"D\n\x0fVideoResolution\x12\r\n\x05width\x18\x01 \x02(\r\x12\x0e\n\x06height\x18\x02 \x02(\r\x12\x12\n\nframe_rate\x18\x03 \x02(\x01\"\x83\x02\n\x0fVideoBufferInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\r\n\x05width\x18\x02 \x02(\r\x12\x0e\n\x06height\x18\x03 \x02(\r\x12\x10\n\x08\x64\x61ta_ptr\x18\x04 \x02(\x04\x12\x0e\n\x06stride\x18\x06 \x01(\r\x12@\n\ncomponents\x18\x07 \x03(\x0b\x32,.livekit.proto.VideoBufferInfo.ComponentInfo\x1a?\n\rComponentInfo\x12\x10\n\x08\x64\x61ta_ptr\x18\x01 \x02(\x04\x12\x0e\n\x06stride\x18\x02 \x02(\r\x12\x0c\n\x04size\x18\x03 \x02(\r\"o\n\x10OwnedVideoBuffer\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\"?\n\x0fVideoStreamInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\"o\n\x10OwnedVideoStream\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoStreamInfo\"\x9f\x01\n\x10VideoStreamEvent\x12\x15\n\rstream_handle\x18\x01 \x02(\x04\x12;\n\x0e\x66rame_received\x18\x02 \x01(\x0b\x32!.livekit.proto.VideoFrameReceivedH\x00\x12,\n\x03\x65os\x18\x03 \x01(\x0b\x32\x1d.livekit.proto.VideoStreamEOSH\x00\x42\t\n\x07message\"\x8b\x01\n\x12VideoFrameReceived\x12/\n\x06\x62uffer\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoBuffer\x12\x14\n\x0ctimestamp_us\x18\x02 \x02(\x03\x12.\n\x08rotation\x18\x03 \x02(\x0e\x32\x1c.livekit.proto.VideoRotation\"\x10\n\x0eVideoStreamEOS\"6\n\x15VideoSourceResolution\x12\r\n\x05width\x18\x01 \x02(\r\x12\x0e\n\x06height\x18\x02 \x02(\r\"?\n\x0fVideoSourceInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoSourceType\"o\n\x10OwnedVideoSource\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoSourceInfo*;\n\nVideoCodec\x12\x07\n\x03VP8\x10\x00\x12\x08\n\x04H264\x10\x01\x12\x07\n\x03\x41V1\x10\x02\x12\x07\n\x03VP9\x10\x03\x12\x08\n\x04H265\x10\x04*l\n\rVideoRotation\x12\x14\n\x10VIDEO_ROTATION_0\x10\x00\x12\x15\n\x11VIDEO_ROTATION_90\x10\x01\x12\x16\n\x12VIDEO_ROTATION_180\x10\x02\x12\x16\n\x12VIDEO_ROTATION_270\x10\x03*\x81\x01\n\x0fVideoBufferType\x12\x08\n\x04RGBA\x10\x00\x12\x08\n\x04\x41\x42GR\x10\x01\x12\x08\n\x04\x41RGB\x10\x02\x12\x08\n\x04\x42GRA\x10\x03\x12\t\n\x05RGB24\x10\x04\x12\x08\n\x04I420\x10\x05\x12\t\n\x05I420A\x10\x06\x12\x08\n\x04I422\x10\x07\x12\x08\n\x04I444\x10\x08\x12\x08\n\x04I010\x10\t\x12\x08\n\x04NV12\x10\n*Y\n\x0fVideoStreamType\x12\x17\n\x13VIDEO_STREAM_NATIVE\x10\x00\x12\x16\n\x12VIDEO_STREAM_WEBGL\x10\x01\x12\x15\n\x11VIDEO_STREAM_HTML\x10\x02**\n\x0fVideoSourceType\x12\x17\n\x13VIDEO_SOURCE_NATIVE\x10\x00\x42\x10\xaa\x02\rLiveKit.Proto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11video_frame.proto\x12\rlivekit.proto\x1a\x0chandle.proto\x1a\x0btrack.proto\"\xc0\x01\n\x15NewVideoStreamRequest\x12\x14\n\x0ctrack_handle\x18\x01 \x02(\x04\x12,\n\x04type\x18\x02 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\x12.\n\x06\x66ormat\x18\x03 \x01(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\x18\n\x10normalize_stride\x18\x04 \x01(\x08\x12\x19\n\x11queue_size_frames\x18\x05 \x01(\r\"I\n\x16NewVideoStreamResponse\x12/\n\x06stream\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoStream\"\x84\x02\n!VideoStreamFromParticipantRequest\x12\x1a\n\x12participant_handle\x18\x01 \x02(\x04\x12,\n\x04type\x18\x02 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\x12\x30\n\x0ctrack_source\x18\x03 \x02(\x0e\x32\x1a.livekit.proto.TrackSource\x12.\n\x06\x66ormat\x18\x04 \x01(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\x18\n\x10normalize_stride\x18\x05 \x01(\x08\x12\x19\n\x11queue_size_frames\x18\x06 \x01(\r\"U\n\"VideoStreamFromParticipantResponse\x12/\n\x06stream\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoStream\"\x96\x01\n\x15NewVideoSourceRequest\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoSourceType\x12\x38\n\nresolution\x18\x02 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\ris_screencast\x18\x03 \x01(\x08\"I\n\x16NewVideoSourceResponse\x12/\n\x06source\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoSource\"\xd7\x01\n\x18\x43\x61ptureVideoFrameRequest\x12\x15\n\rsource_handle\x18\x01 \x02(\x04\x12.\n\x06\x62uffer\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\x12\x14\n\x0ctimestamp_us\x18\x03 \x02(\x03\x12.\n\x08rotation\x18\x04 \x02(\x0e\x32\x1c.livekit.proto.VideoRotation\x12.\n\x08metadata\x18\x05 \x01(\x0b\x32\x1c.livekit.proto.FrameMetadata\"\x1b\n\x19\x43\x61ptureVideoFrameResponse\"\x87\x01\n\x13VideoConvertRequest\x12\x0e\n\x06\x66lip_y\x18\x01 \x01(\x08\x12.\n\x06\x62uffer\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\x12\x30\n\x08\x64st_type\x18\x03 \x02(\x0e\x32\x1e.livekit.proto.VideoBufferType\"e\n\x14VideoConvertResponse\x12\x0f\n\x05\x65rror\x18\x01 \x01(\tH\x00\x12\x31\n\x06\x62uffer\x18\x02 \x01(\x0b\x32\x1f.livekit.proto.OwnedVideoBufferH\x00\x42\t\n\x07message\"D\n\x0fVideoResolution\x12\r\n\x05width\x18\x01 \x02(\r\x12\x0e\n\x06height\x18\x02 \x02(\r\x12\x12\n\nframe_rate\x18\x03 \x02(\x01\"\x83\x02\n\x0fVideoBufferInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoBufferType\x12\r\n\x05width\x18\x02 \x02(\r\x12\x0e\n\x06height\x18\x03 \x02(\r\x12\x10\n\x08\x64\x61ta_ptr\x18\x04 \x02(\x04\x12\x0e\n\x06stride\x18\x06 \x01(\r\x12@\n\ncomponents\x18\x07 \x03(\x0b\x32,.livekit.proto.VideoBufferInfo.ComponentInfo\x1a?\n\rComponentInfo\x12\x10\n\x08\x64\x61ta_ptr\x18\x01 \x02(\x04\x12\x0e\n\x06stride\x18\x02 \x02(\r\x12\x0c\n\x04size\x18\x03 \x02(\r\"o\n\x10OwnedVideoBuffer\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoBufferInfo\"9\n\rFrameMetadata\x12\x16\n\x0euser_timestamp\x18\x01 \x01(\x04\x12\x10\n\x08\x66rame_id\x18\x02 \x01(\r\"?\n\x0fVideoStreamInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoStreamType\"o\n\x10OwnedVideoStream\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoStreamInfo\"\x9f\x01\n\x10VideoStreamEvent\x12\x15\n\rstream_handle\x18\x01 \x02(\x04\x12;\n\x0e\x66rame_received\x18\x02 \x01(\x0b\x32!.livekit.proto.VideoFrameReceivedH\x00\x12,\n\x03\x65os\x18\x03 \x01(\x0b\x32\x1d.livekit.proto.VideoStreamEOSH\x00\x42\t\n\x07message\"\xbb\x01\n\x12VideoFrameReceived\x12/\n\x06\x62uffer\x18\x01 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoBuffer\x12\x14\n\x0ctimestamp_us\x18\x02 \x02(\x03\x12.\n\x08rotation\x18\x03 \x02(\x0e\x32\x1c.livekit.proto.VideoRotation\x12.\n\x08metadata\x18\x04 \x01(\x0b\x32\x1c.livekit.proto.FrameMetadata\"\x10\n\x0eVideoStreamEOS\"6\n\x15VideoSourceResolution\x12\r\n\x05width\x18\x01 \x02(\r\x12\x0e\n\x06height\x18\x02 \x02(\r\"?\n\x0fVideoSourceInfo\x12,\n\x04type\x18\x01 \x02(\x0e\x32\x1e.livekit.proto.VideoSourceType\"o\n\x10OwnedVideoSource\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12,\n\x04info\x18\x02 \x02(\x0b\x32\x1e.livekit.proto.VideoSourceInfo*;\n\nVideoCodec\x12\x07\n\x03VP8\x10\x00\x12\x08\n\x04H264\x10\x01\x12\x07\n\x03\x41V1\x10\x02\x12\x07\n\x03VP9\x10\x03\x12\x08\n\x04H265\x10\x04*l\n\rVideoRotation\x12\x14\n\x10VIDEO_ROTATION_0\x10\x00\x12\x15\n\x11VIDEO_ROTATION_90\x10\x01\x12\x16\n\x12VIDEO_ROTATION_180\x10\x02\x12\x16\n\x12VIDEO_ROTATION_270\x10\x03*\x81\x01\n\x0fVideoBufferType\x12\x08\n\x04RGBA\x10\x00\x12\x08\n\x04\x41\x42GR\x10\x01\x12\x08\n\x04\x41RGB\x10\x02\x12\x08\n\x04\x42GRA\x10\x03\x12\t\n\x05RGB24\x10\x04\x12\x08\n\x04I420\x10\x05\x12\t\n\x05I420A\x10\x06\x12\x08\n\x04I422\x10\x07\x12\x08\n\x04I444\x10\x08\x12\x08\n\x04I010\x10\t\x12\x08\n\x04NV12\x10\n*Y\n\x0fVideoStreamType\x12\x17\n\x13VIDEO_STREAM_NATIVE\x10\x00\x12\x16\n\x12VIDEO_STREAM_WEBGL\x10\x01\x12\x15\n\x11VIDEO_STREAM_HTML\x10\x02**\n\x0fVideoSourceType\x12\x17\n\x13VIDEO_SOURCE_NATIVE\x10\x00\x42\x10\xaa\x02\rLiveKit.Proto')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,16 +24,16 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'video_frame_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_VIDEOCODEC']._serialized_start=2530
-  _globals['_VIDEOCODEC']._serialized_end=2589
-  _globals['_VIDEOROTATION']._serialized_start=2591
-  _globals['_VIDEOROTATION']._serialized_end=2699
-  _globals['_VIDEOBUFFERTYPE']._serialized_start=2702
-  _globals['_VIDEOBUFFERTYPE']._serialized_end=2831
-  _globals['_VIDEOSTREAMTYPE']._serialized_start=2833
-  _globals['_VIDEOSTREAMTYPE']._serialized_end=2922
-  _globals['_VIDEOSOURCETYPE']._serialized_start=2924
-  _globals['_VIDEOSOURCETYPE']._serialized_end=2966
+  _globals['_VIDEOCODEC']._serialized_start=2685
+  _globals['_VIDEOCODEC']._serialized_end=2744
+  _globals['_VIDEOROTATION']._serialized_start=2746
+  _globals['_VIDEOROTATION']._serialized_end=2854
+  _globals['_VIDEOBUFFERTYPE']._serialized_start=2857
+  _globals['_VIDEOBUFFERTYPE']._serialized_end=2986
+  _globals['_VIDEOSTREAMTYPE']._serialized_start=2988
+  _globals['_VIDEOSTREAMTYPE']._serialized_end=3077
+  _globals['_VIDEOSOURCETYPE']._serialized_start=3079
+  _globals['_VIDEOSOURCETYPE']._serialized_end=3121
   _globals['_NEWVIDEOSTREAMREQUEST']._serialized_start=64
   _globals['_NEWVIDEOSTREAMREQUEST']._serialized_end=256
   _globals['_NEWVIDEOSTREAMRESPONSE']._serialized_start=258
@@ -47,35 +47,37 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_NEWVIDEOSOURCERESPONSE']._serialized_start=836
   _globals['_NEWVIDEOSOURCERESPONSE']._serialized_end=909
   _globals['_CAPTUREVIDEOFRAMEREQUEST']._serialized_start=912
-  _globals['_CAPTUREVIDEOFRAMEREQUEST']._serialized_end=1079
-  _globals['_CAPTUREVIDEOFRAMERESPONSE']._serialized_start=1081
-  _globals['_CAPTUREVIDEOFRAMERESPONSE']._serialized_end=1108
-  _globals['_VIDEOCONVERTREQUEST']._serialized_start=1111
-  _globals['_VIDEOCONVERTREQUEST']._serialized_end=1246
-  _globals['_VIDEOCONVERTRESPONSE']._serialized_start=1248
-  _globals['_VIDEOCONVERTRESPONSE']._serialized_end=1349
-  _globals['_VIDEORESOLUTION']._serialized_start=1351
-  _globals['_VIDEORESOLUTION']._serialized_end=1419
-  _globals['_VIDEOBUFFERINFO']._serialized_start=1422
-  _globals['_VIDEOBUFFERINFO']._serialized_end=1681
-  _globals['_VIDEOBUFFERINFO_COMPONENTINFO']._serialized_start=1618
-  _globals['_VIDEOBUFFERINFO_COMPONENTINFO']._serialized_end=1681
-  _globals['_OWNEDVIDEOBUFFER']._serialized_start=1683
-  _globals['_OWNEDVIDEOBUFFER']._serialized_end=1794
-  _globals['_VIDEOSTREAMINFO']._serialized_start=1796
-  _globals['_VIDEOSTREAMINFO']._serialized_end=1859
-  _globals['_OWNEDVIDEOSTREAM']._serialized_start=1861
-  _globals['_OWNEDVIDEOSTREAM']._serialized_end=1972
-  _globals['_VIDEOSTREAMEVENT']._serialized_start=1975
-  _globals['_VIDEOSTREAMEVENT']._serialized_end=2134
-  _globals['_VIDEOFRAMERECEIVED']._serialized_start=2137
-  _globals['_VIDEOFRAMERECEIVED']._serialized_end=2276
-  _globals['_VIDEOSTREAMEOS']._serialized_start=2278
-  _globals['_VIDEOSTREAMEOS']._serialized_end=2294
-  _globals['_VIDEOSOURCERESOLUTION']._serialized_start=2296
-  _globals['_VIDEOSOURCERESOLUTION']._serialized_end=2350
-  _globals['_VIDEOSOURCEINFO']._serialized_start=2352
-  _globals['_VIDEOSOURCEINFO']._serialized_end=2415
-  _globals['_OWNEDVIDEOSOURCE']._serialized_start=2417
-  _globals['_OWNEDVIDEOSOURCE']._serialized_end=2528
+  _globals['_CAPTUREVIDEOFRAMEREQUEST']._serialized_end=1127
+  _globals['_CAPTUREVIDEOFRAMERESPONSE']._serialized_start=1129
+  _globals['_CAPTUREVIDEOFRAMERESPONSE']._serialized_end=1156
+  _globals['_VIDEOCONVERTREQUEST']._serialized_start=1159
+  _globals['_VIDEOCONVERTREQUEST']._serialized_end=1294
+  _globals['_VIDEOCONVERTRESPONSE']._serialized_start=1296
+  _globals['_VIDEOCONVERTRESPONSE']._serialized_end=1397
+  _globals['_VIDEORESOLUTION']._serialized_start=1399
+  _globals['_VIDEORESOLUTION']._serialized_end=1467
+  _globals['_VIDEOBUFFERINFO']._serialized_start=1470
+  _globals['_VIDEOBUFFERINFO']._serialized_end=1729
+  _globals['_VIDEOBUFFERINFO_COMPONENTINFO']._serialized_start=1666
+  _globals['_VIDEOBUFFERINFO_COMPONENTINFO']._serialized_end=1729
+  _globals['_OWNEDVIDEOBUFFER']._serialized_start=1731
+  _globals['_OWNEDVIDEOBUFFER']._serialized_end=1842
+  _globals['_FRAMEMETADATA']._serialized_start=1844
+  _globals['_FRAMEMETADATA']._serialized_end=1901
+  _globals['_VIDEOSTREAMINFO']._serialized_start=1903
+  _globals['_VIDEOSTREAMINFO']._serialized_end=1966
+  _globals['_OWNEDVIDEOSTREAM']._serialized_start=1968
+  _globals['_OWNEDVIDEOSTREAM']._serialized_end=2079
+  _globals['_VIDEOSTREAMEVENT']._serialized_start=2082
+  _globals['_VIDEOSTREAMEVENT']._serialized_end=2241
+  _globals['_VIDEOFRAMERECEIVED']._serialized_start=2244
+  _globals['_VIDEOFRAMERECEIVED']._serialized_end=2431
+  _globals['_VIDEOSTREAMEOS']._serialized_start=2433
+  _globals['_VIDEOSTREAMEOS']._serialized_end=2449
+  _globals['_VIDEOSOURCERESOLUTION']._serialized_start=2451
+  _globals['_VIDEOSOURCERESOLUTION']._serialized_end=2505
+  _globals['_VIDEOSOURCEINFO']._serialized_start=2507
+  _globals['_VIDEOSOURCEINFO']._serialized_end=2570
+  _globals['_OWNEDVIDEOSOURCE']._serialized_start=2572
+  _globals['_OWNEDVIDEOSOURCE']._serialized_end=2683
 # @@protoc_insertion_point(module_scope)
