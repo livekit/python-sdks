@@ -38,6 +38,7 @@ protoc \
     $API_PROTOCOL/livekit_analytics.proto \
     $API_PROTOCOL/livekit_rtc.proto \
     $API_PROTOCOL/agent/livekit_agent_session.proto \
+    $API_PROTOCOL/agent/livekit_agent_inference.proto \
     $API_PROTOCOL/agent/livekit_agent_text.proto \
     $API_PROTOCOL/agent/livekit_agent_dev.proto \
     $API_PROTOCOL/logger/options.proto \
@@ -87,6 +88,8 @@ mv "$API_OUT_PYTHON/livekit_connector_pb2.py" "$API_OUT_PYTHON/connector.py"
 mv "$API_OUT_PYTHON/livekit_connector_pb2.pyi" "$API_OUT_PYTHON/connector.pyi"
 
 mkdir -p "$API_OUT_PYTHON/agent_pb"
+mv "$API_OUT_PYTHON/agent/livekit_agent_inference_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_inference.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_inference_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_inference.pyi"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
 mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_text.py"
