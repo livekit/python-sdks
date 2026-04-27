@@ -123,7 +123,7 @@ async def _await_event(fut: asyncio.Future, timeout: float = WAIT_TIMEOUT) -> No
         raise AssertionError("timed out waiting for event") from e
 
 
-async def _publish_camera(
+async def _publish_video(
     room: rtc.Room, track_name: str
 ) -> rtc.LocalTrackPublication:
     source = rtc.VideoSource(320, 240)
@@ -132,7 +132,7 @@ async def _publish_camera(
     return await room.local_participant.publish_track(track, options)
 
 
-async def _publish_mic(room: rtc.Room, track_name: str) -> rtc.LocalTrackPublication:
+async def _publish_audio(room: rtc.Room, track_name: str) -> rtc.LocalTrackPublication:
     source = rtc.AudioSource(48000, 1)
     track = rtc.LocalAudioTrack.create_audio_track(track_name, source)
     options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
@@ -200,7 +200,7 @@ async def test_connection_basics() -> None:
 
     # publish camera from p3, expect p4 to see track_published
     video_published = _expect_event(p4, "track_published")
-    video_pub = await _publish_camera(p3, "p3-camera")
+    video_pub = await _publish_video(p3, "p3-camera")
     await _await_event(video_published)
     await _ensure_track_subscribed(p4, video_pub.sid)
 
@@ -210,7 +210,7 @@ async def test_connection_basics() -> None:
         "track_published",
         predicate=lambda pub, _p: pub.sid != video_pub.sid,
     )
-    audio_pub = await _publish_mic(p3, "p3-mic")
+    audio_pub = await _publish_audio(p3, "p3-mic")
     await _await_event(audio_published)
     await _ensure_track_subscribed(p4, audio_pub.sid)
 
