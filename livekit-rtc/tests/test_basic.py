@@ -1,4 +1,4 @@
-"""End-to-end translation of the Flutter `BasicsTest` scenario.
+"""End-to-end Test for basic scenarios.
 
 The test exercises connect/disconnect lifecycle, participant
 visibility, reconnection, and track publish/subscribe between four rooms.
@@ -47,6 +47,7 @@ def create_token(identity: str, room_name: str) -> str:
         .to_jwt()
     )
 
+
 def unique_room_name(base: str) -> str:
     return f"{base}-{uuid.uuid4().hex[:8]}"
 
@@ -77,9 +78,7 @@ async def _connect(room: rtc.Room, identity: str, room_name: str) -> str:
 
 async def _ensure_all_connected(rooms: list[rtc.Room]) -> None:
     await _wait_until(
-        lambda: all(
-            r.connection_state == rtc.ConnectionState.CONN_CONNECTED for r in rooms
-        ),
+        lambda: all(r.connection_state == rtc.ConnectionState.CONN_CONNECTED for r in rooms),
         message="not all rooms reached CONN_CONNECTED",
     )
 
@@ -123,9 +122,7 @@ async def _await_event(fut: asyncio.Future, timeout: float = WAIT_TIMEOUT) -> No
         raise AssertionError("timed out waiting for event") from e
 
 
-async def _publish_video(
-    room: rtc.Room, track_name: str
-) -> rtc.LocalTrackPublication:
+async def _publish_video(room: rtc.Room, track_name: str) -> rtc.LocalTrackPublication:
     source = rtc.VideoSource(320, 240)
     track = rtc.LocalVideoTrack.create_video_track(track_name, source)
     options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_CAMERA)
