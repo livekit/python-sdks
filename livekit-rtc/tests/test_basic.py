@@ -19,6 +19,7 @@ from typing import Callable, Optional
 import pytest
 
 from livekit import api, rtc
+from livekit.rtc.room import EventTypes
 
 
 WAIT_TIMEOUT = 20.0
@@ -98,7 +99,9 @@ async def _ensure_track_subscribed(room: rtc.Room, track_sid: str) -> None:
 
 
 def _expect_event(
-    room: rtc.Room, event: str, predicate: Optional[Callable[..., bool]] = None
+    room: rtc.Room,
+    event: EventTypes,
+    predicate: Optional[Callable[..., bool]] = None,
 ) -> asyncio.Future:
     """Returns a future that resolves when `event` (optionally matching
     `predicate`) is fired on `room`."""
