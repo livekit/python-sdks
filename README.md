@@ -139,6 +139,17 @@ async def main():
             print(f"\ttrack id: {publication}")
 ```
 
+### Debug participant
+
+Use [`debug_participant.py`](debug_participant.py) to connect to a room from the
+command line and log participant and data track events.
+
+Run it with:
+
+```shell
+$ python debug_participant.py --url "$LIVEKIT_URL" --token "$LIVEKIT_TOKEN"
+```
+
 ### RPC
 
 Perform your own predefined method calls from one participant to another.
