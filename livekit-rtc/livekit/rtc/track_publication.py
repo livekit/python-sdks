@@ -123,9 +123,7 @@ class RemoteTrackPublication(TrackPublication):
         This is a no-op (the SDK logs a warning) if the publication is not
         simulcasted."""
         req = proto_ffi.FfiRequest()
-        req.set_remote_track_publication_quality.track_publication_handle = (
-            self._ffi_handle.handle
-        )
+        req.set_remote_track_publication_quality.track_publication_handle = self._ffi_handle.handle
         req.set_remote_track_publication_quality.quality = quality
         FfiClient.instance.request(req)
 

@@ -210,9 +210,7 @@ async def _wait_for_layer(
                 return last
         else:
             matches = 0
-    raise AssertionError(
-        f"timed out waiting for ~{expected_w}x{expected_h}, last seen={last}"
-    )
+    raise AssertionError(f"timed out waiting for ~{expected_w}x{expected_h}, last seen={last}")
 
 
 @skip_if_no_credentials()
@@ -283,9 +281,7 @@ async def test_simulcast_quality_layers(
             remote_pub.set_video_quality(quality)
             ew, eh = LAYER_DIMENSIONS[layer]
             actual = await _wait_for_layer(stream, ew, eh, timeout=20.0)
-            print(
-                f"[{codec_name}] layer={layer} expected~{ew}x{eh} got={actual[0]}x{actual[1]}"
-            )
+            print(f"[{codec_name}] layer={layer} expected~{ew}x{eh} got={actual[0]}x{actual[1]}")
     finally:
         stop.set()
         try:
