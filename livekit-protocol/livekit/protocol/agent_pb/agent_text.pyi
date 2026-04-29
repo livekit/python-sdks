@@ -3,7 +3,8 @@ from ..logger_pb import options as _options_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -19,7 +20,7 @@ TEXT_HANDLER_ERROR: TextMessageErrorCode
 PROCESS_CLOSED: TextMessageErrorCode
 
 class TextMessageRequest(_message.Message):
-    __slots__ = ("text", "message_id", "session_id", "agent_name", "metadata", "session_state")
+    __slots__ = ()
     TEXT_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
     SESSION_ID_FIELD_NUMBER: _ClassVar[int]
@@ -35,7 +36,7 @@ class TextMessageRequest(_message.Message):
     def __init__(self, text: _Optional[str] = ..., message_id: _Optional[str] = ..., session_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., session_state: _Optional[_Union[AgentSessionState, _Mapping]] = ...) -> None: ...
 
 class TextMessageResponse(_message.Message):
-    __slots__ = ("message_id", "session_id", "message", "function_call", "function_call_output", "agent_handoff", "complete")
+    __slots__ = ()
     MESSAGE_ID_FIELD_NUMBER: _ClassVar[int]
     SESSION_ID_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
@@ -53,7 +54,7 @@ class TextMessageResponse(_message.Message):
     def __init__(self, message_id: _Optional[str] = ..., session_id: _Optional[str] = ..., message: _Optional[_Union[_agent_session.ChatMessage, _Mapping]] = ..., function_call: _Optional[_Union[_agent_session.FunctionCall, _Mapping]] = ..., function_call_output: _Optional[_Union[_agent_session.FunctionCallOutput, _Mapping]] = ..., agent_handoff: _Optional[_Union[_agent_session.AgentHandoff, _Mapping]] = ..., complete: _Optional[_Union[TextMessageComplete, _Mapping]] = ...) -> None: ...
 
 class TextMessageComplete(_message.Message):
-    __slots__ = ("session_state", "error")
+    __slots__ = ()
     SESSION_STATE_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     session_state: AgentSessionState
@@ -61,7 +62,7 @@ class TextMessageComplete(_message.Message):
     def __init__(self, session_state: _Optional[_Union[AgentSessionState, _Mapping]] = ..., error: _Optional[_Union[TextMessageError, _Mapping]] = ...) -> None: ...
 
 class AgentSessionState(_message.Message):
-    __slots__ = ("version", "snapshot", "delta")
+    __slots__ = ()
     VERSION_FIELD_NUMBER: _ClassVar[int]
     SNAPSHOT_FIELD_NUMBER: _ClassVar[int]
     DELTA_FIELD_NUMBER: _ClassVar[int]
@@ -71,7 +72,7 @@ class AgentSessionState(_message.Message):
     def __init__(self, version: _Optional[int] = ..., snapshot: _Optional[bytes] = ..., delta: _Optional[bytes] = ...) -> None: ...
 
 class TextMessageError(_message.Message):
-    __slots__ = ("message", "code")
+    __slots__ = ()
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     CODE_FIELD_NUMBER: _ClassVar[int]
     message: str

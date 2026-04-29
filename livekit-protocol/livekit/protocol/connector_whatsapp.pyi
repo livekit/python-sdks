@@ -1,3 +1,5 @@
+import datetime
+
 from google.protobuf import duration_pb2 as _duration_pb2
 from . import agent_dispatch as _agent_dispatch
 from . import rtc as _rtc
@@ -6,7 +8,8 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -18,9 +21,9 @@ WHATSAPP_CALL_DIRECTION_INBOUND: WhatsAppCallDirection
 WHATSAPP_CALL_DIRECTION_OUTBOUND: WhatsAppCallDirection
 
 class DialWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_phone_number_id", "whatsapp_to_phone_number", "whatsapp_api_key", "whatsapp_cloud_api_version", "whatsapp_biz_opaque_callback_data", "room_name", "agents", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "destination_country", "ringing_timeout")
+    __slots__ = ()
     class ParticipantAttributesEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -52,10 +55,10 @@ class DialWhatsAppCallRequest(_message.Message):
     participant_attributes: _containers.ScalarMap[str, str]
     destination_country: str
     ringing_timeout: _duration_pb2.Duration
-    def __init__(self, whatsapp_phone_number_id: _Optional[str] = ..., whatsapp_to_phone_number: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ..., whatsapp_cloud_api_version: _Optional[str] = ..., whatsapp_biz_opaque_callback_data: _Optional[str] = ..., room_name: _Optional[str] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., destination_country: _Optional[str] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, whatsapp_phone_number_id: _Optional[str] = ..., whatsapp_to_phone_number: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ..., whatsapp_cloud_api_version: _Optional[str] = ..., whatsapp_biz_opaque_callback_data: _Optional[str] = ..., room_name: _Optional[str] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., destination_country: _Optional[str] = ..., ringing_timeout: _Optional[_Union[datetime.timedelta, _duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class DialWhatsAppCallResponse(_message.Message):
-    __slots__ = ("whatsapp_call_id", "room_name")
+    __slots__ = ()
     WHATSAPP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     whatsapp_call_id: str
@@ -63,7 +66,7 @@ class DialWhatsAppCallResponse(_message.Message):
     def __init__(self, whatsapp_call_id: _Optional[str] = ..., room_name: _Optional[str] = ...) -> None: ...
 
 class DisconnectWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_call_id", "whatsapp_api_key", "disconnect_reason")
+    __slots__ = ()
     class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         BUSINESS_INITIATED: _ClassVar[DisconnectWhatsAppCallRequest.DisconnectReason]
@@ -83,7 +86,7 @@ class DisconnectWhatsAppCallResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ConnectWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_call_id", "sdp")
+    __slots__ = ()
     WHATSAPP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     SDP_FIELD_NUMBER: _ClassVar[int]
     whatsapp_call_id: str
@@ -95,9 +98,9 @@ class ConnectWhatsAppCallResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class AcceptWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_phone_number_id", "whatsapp_api_key", "whatsapp_cloud_api_version", "whatsapp_call_id", "whatsapp_biz_opaque_callback_data", "sdp", "room_name", "agents", "participant_identity", "participant_name", "participant_metadata", "participant_attributes", "destination_country", "ringing_timeout", "wait_until_answered")
+    __slots__ = ()
     class ParticipantAttributesEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -133,16 +136,16 @@ class AcceptWhatsAppCallRequest(_message.Message):
     destination_country: str
     ringing_timeout: _duration_pb2.Duration
     wait_until_answered: bool
-    def __init__(self, whatsapp_phone_number_id: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ..., whatsapp_cloud_api_version: _Optional[str] = ..., whatsapp_call_id: _Optional[str] = ..., whatsapp_biz_opaque_callback_data: _Optional[str] = ..., sdp: _Optional[_Union[_rtc.SessionDescription, _Mapping]] = ..., room_name: _Optional[str] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., destination_country: _Optional[str] = ..., ringing_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., wait_until_answered: bool = ...) -> None: ...
+    def __init__(self, whatsapp_phone_number_id: _Optional[str] = ..., whatsapp_api_key: _Optional[str] = ..., whatsapp_cloud_api_version: _Optional[str] = ..., whatsapp_call_id: _Optional[str] = ..., whatsapp_biz_opaque_callback_data: _Optional[str] = ..., sdp: _Optional[_Union[_rtc.SessionDescription, _Mapping]] = ..., room_name: _Optional[str] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., participant_identity: _Optional[str] = ..., participant_name: _Optional[str] = ..., participant_metadata: _Optional[str] = ..., participant_attributes: _Optional[_Mapping[str, str]] = ..., destination_country: _Optional[str] = ..., ringing_timeout: _Optional[_Union[datetime.timedelta, _duration_pb2.Duration, _Mapping]] = ..., wait_until_answered: _Optional[bool] = ...) -> None: ...
 
 class AcceptWhatsAppCallResponse(_message.Message):
-    __slots__ = ("room_name",)
+    __slots__ = ()
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     def __init__(self, room_name: _Optional[str] = ...) -> None: ...
 
 class WhatsAppCall(_message.Message):
-    __slots__ = ("whatsapp_call_id", "direction")
+    __slots__ = ()
     WHATSAPP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     DIRECTION_FIELD_NUMBER: _ClassVar[int]
     whatsapp_call_id: str

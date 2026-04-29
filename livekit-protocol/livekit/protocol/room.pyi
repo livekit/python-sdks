@@ -5,14 +5,15 @@ from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateRoomRequest(_message.Message):
-    __slots__ = ("name", "room_preset", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "tags", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "replay_enabled", "agents")
+    __slots__ = ()
     class TagsEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -46,10 +47,10 @@ class CreateRoomRequest(_message.Message):
     sync_streams: bool
     replay_enabled: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
-    def __init__(self, name: _Optional[str] = ..., room_preset: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., tags: _Optional[_Mapping[str, str]] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., replay_enabled: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., room_preset: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., tags: _Optional[_Mapping[str, str]] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: _Optional[bool] = ..., replay_enabled: _Optional[bool] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class RoomEgress(_message.Message):
-    __slots__ = ("room", "participant", "tracks")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
     TRACKS_FIELD_NUMBER: _ClassVar[int]
@@ -59,25 +60,25 @@ class RoomEgress(_message.Message):
     def __init__(self, room: _Optional[_Union[_egress.RoomCompositeEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[_egress.AutoParticipantEgress, _Mapping]] = ..., tracks: _Optional[_Union[_egress.AutoTrackEgress, _Mapping]] = ...) -> None: ...
 
 class RoomAgent(_message.Message):
-    __slots__ = ("dispatches",)
+    __slots__ = ()
     DISPATCHES_FIELD_NUMBER: _ClassVar[int]
     dispatches: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
     def __init__(self, dispatches: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class ListRoomsRequest(_message.Message):
-    __slots__ = ("names",)
+    __slots__ = ()
     NAMES_FIELD_NUMBER: _ClassVar[int]
     names: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, names: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ListRoomsResponse(_message.Message):
-    __slots__ = ("rooms",)
+    __slots__ = ()
     ROOMS_FIELD_NUMBER: _ClassVar[int]
     rooms: _containers.RepeatedCompositeFieldContainer[_models.Room]
     def __init__(self, rooms: _Optional[_Iterable[_Union[_models.Room, _Mapping]]] = ...) -> None: ...
 
 class DeleteRoomRequest(_message.Message):
-    __slots__ = ("room",)
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     room: str
     def __init__(self, room: _Optional[str] = ...) -> None: ...
@@ -87,19 +88,19 @@ class DeleteRoomResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ListParticipantsRequest(_message.Message):
-    __slots__ = ("room",)
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     room: str
     def __init__(self, room: _Optional[str] = ...) -> None: ...
 
 class ListParticipantsResponse(_message.Message):
-    __slots__ = ("participants",)
+    __slots__ = ()
     PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     participants: _containers.RepeatedCompositeFieldContainer[_models.ParticipantInfo]
     def __init__(self, participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ...) -> None: ...
 
 class RoomParticipantIdentity(_message.Message):
-    __slots__ = ("room", "identity")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     room: str
@@ -111,7 +112,7 @@ class RemoveParticipantResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class MuteRoomTrackRequest(_message.Message):
-    __slots__ = ("room", "identity", "track_sid", "muted")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     TRACK_SID_FIELD_NUMBER: _ClassVar[int]
@@ -120,18 +121,18 @@ class MuteRoomTrackRequest(_message.Message):
     identity: str
     track_sid: str
     muted: bool
-    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., track_sid: _Optional[str] = ..., muted: bool = ...) -> None: ...
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., track_sid: _Optional[str] = ..., muted: _Optional[bool] = ...) -> None: ...
 
 class MuteRoomTrackResponse(_message.Message):
-    __slots__ = ("track",)
+    __slots__ = ()
     TRACK_FIELD_NUMBER: _ClassVar[int]
     track: _models.TrackInfo
     def __init__(self, track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ...) -> None: ...
 
 class UpdateParticipantRequest(_message.Message):
-    __slots__ = ("room", "identity", "metadata", "permission", "name", "attributes")
+    __slots__ = ()
     class AttributesEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -152,7 +153,7 @@ class UpdateParticipantRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., metadata: _Optional[str] = ..., permission: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ..., name: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class UpdateSubscriptionsRequest(_message.Message):
-    __slots__ = ("room", "identity", "track_sids", "subscribe", "participant_tracks")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     TRACK_SIDS_FIELD_NUMBER: _ClassVar[int]
@@ -163,14 +164,14 @@ class UpdateSubscriptionsRequest(_message.Message):
     track_sids: _containers.RepeatedScalarFieldContainer[str]
     subscribe: bool
     participant_tracks: _containers.RepeatedCompositeFieldContainer[_models.ParticipantTracks]
-    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., track_sids: _Optional[_Iterable[str]] = ..., subscribe: bool = ..., participant_tracks: _Optional[_Iterable[_Union[_models.ParticipantTracks, _Mapping]]] = ...) -> None: ...
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., track_sids: _Optional[_Iterable[str]] = ..., subscribe: _Optional[bool] = ..., participant_tracks: _Optional[_Iterable[_Union[_models.ParticipantTracks, _Mapping]]] = ...) -> None: ...
 
 class UpdateSubscriptionsResponse(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
 
 class SendDataRequest(_message.Message):
-    __slots__ = ("room", "data", "kind", "destination_sids", "destination_identities", "topic", "nonce")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
     KIND_FIELD_NUMBER: _ClassVar[int]
@@ -192,7 +193,7 @@ class SendDataResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class UpdateRoomMetadataRequest(_message.Message):
-    __slots__ = ("room", "metadata")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     room: str
@@ -200,9 +201,9 @@ class UpdateRoomMetadataRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., metadata: _Optional[str] = ...) -> None: ...
 
 class RoomConfiguration(_message.Message):
-    __slots__ = ("name", "empty_timeout", "departure_timeout", "max_participants", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "agents", "tags")
+    __slots__ = ()
     class TagsEntry(_message.Message):
-        __slots__ = ("key", "value")
+        __slots__ = ()
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
@@ -230,10 +231,10 @@ class RoomConfiguration(_message.Message):
     sync_streams: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
     tags: _containers.ScalarMap[str, str]
-    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., tags: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: _Optional[bool] = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ..., tags: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ForwardParticipantRequest(_message.Message):
-    __slots__ = ("room", "identity", "destination_room")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_ROOM_FIELD_NUMBER: _ClassVar[int]
@@ -247,7 +248,7 @@ class ForwardParticipantResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class MoveParticipantRequest(_message.Message):
-    __slots__ = ("room", "identity", "destination_room")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_ROOM_FIELD_NUMBER: _ClassVar[int]
@@ -261,7 +262,7 @@ class MoveParticipantResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class PerformRpcRequest(_message.Message):
-    __slots__ = ("room", "destination_identity", "method", "payload", "response_timeout_ms")
+    __slots__ = ()
     ROOM_FIELD_NUMBER: _ClassVar[int]
     DESTINATION_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     METHOD_FIELD_NUMBER: _ClassVar[int]
@@ -275,7 +276,7 @@ class PerformRpcRequest(_message.Message):
     def __init__(self, room: _Optional[str] = ..., destination_identity: _Optional[str] = ..., method: _Optional[str] = ..., payload: _Optional[str] = ..., response_timeout_ms: _Optional[int] = ...) -> None: ...
 
 class PerformRpcResponse(_message.Message):
-    __slots__ = ("payload",)
+    __slots__ = ()
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
     payload: str
     def __init__(self, payload: _Optional[str] = ...) -> None: ...

@@ -4,7 +4,8 @@ from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -16,7 +17,7 @@ JRP_ON_FAILURE: JobRestartPolicy
 JRP_NEVER: JobRestartPolicy
 
 class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata", "restart_policy")
+    __slots__ = ()
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
@@ -28,7 +29,7 @@ class CreateAgentDispatchRequest(_message.Message):
     def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata", "restart_policy")
+    __slots__ = ()
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
@@ -38,7 +39,7 @@ class RoomAgentDispatch(_message.Message):
     def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
-    __slots__ = ("dispatch_id", "room")
+    __slots__ = ()
     DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     dispatch_id: str
@@ -46,7 +47,7 @@ class DeleteAgentDispatchRequest(_message.Message):
     def __init__(self, dispatch_id: _Optional[str] = ..., room: _Optional[str] = ...) -> None: ...
 
 class ListAgentDispatchRequest(_message.Message):
-    __slots__ = ("dispatch_id", "room")
+    __slots__ = ()
     DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     dispatch_id: str
@@ -54,13 +55,13 @@ class ListAgentDispatchRequest(_message.Message):
     def __init__(self, dispatch_id: _Optional[str] = ..., room: _Optional[str] = ...) -> None: ...
 
 class ListAgentDispatchResponse(_message.Message):
-    __slots__ = ("agent_dispatches",)
+    __slots__ = ()
     AGENT_DISPATCHES_FIELD_NUMBER: _ClassVar[int]
     agent_dispatches: _containers.RepeatedCompositeFieldContainer[AgentDispatch]
     def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy")
+    __slots__ = ()
     ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
@@ -76,7 +77,7 @@ class AgentDispatch(_message.Message):
     def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
 
 class AgentDispatchState(_message.Message):
-    __slots__ = ("jobs", "created_at", "deleted_at")
+    __slots__ = ()
     JOBS_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     DELETED_AT_FIELD_NUMBER: _ClassVar[int]
