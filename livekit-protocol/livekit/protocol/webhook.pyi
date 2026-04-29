@@ -3,13 +3,12 @@ from . import egress as _egress
 from . import ingress as _ingress
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WebhookEvent(_message.Message):
-    __slots__ = ()
+    __slots__ = ("event", "room", "participant", "egress_info", "ingress_info", "track", "id", "created_at", "num_dropped")
     EVENT_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_FIELD_NUMBER: _ClassVar[int]
