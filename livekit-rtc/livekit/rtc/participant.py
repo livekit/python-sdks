@@ -128,6 +128,11 @@ class Participant(ABC):
         return self._info.kind
 
     @property
+    def kind_details(self) -> list[proto_participant.ParticipantKindDetail.ValueType]:
+        """Additional details refining the participant's kind (e.g., cloud agent, forwarded, whatsapp/twilio connector, rtsp bridge)."""
+        return list(self._info.kind_details)
+
+    @property
     def state(self) -> proto_participant.ParticipantState.ValueType:
         """Participant's connection state (joining, joined, active, disconnected)."""
         return self._info.state
