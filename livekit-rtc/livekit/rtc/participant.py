@@ -20,7 +20,7 @@ import datetime
 import os
 import mimetypes
 import aiofiles
-from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
+from typing import TYPE_CHECKING, List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -36,7 +36,7 @@ from ._proto.track_pb2 import (
     ParticipantTrackPermission,
 )
 from ._utils import BroadcastQueue
-from .track import LocalTrack
+from .track import LocalAudioTrack, LocalTrack
 from .track_publication import (
     LocalTrackPublication,
     RemoteTrackPublication,
@@ -56,6 +56,9 @@ from .data_stream import (
 )
 from .data_track import LocalDataTrack
 from ._proto import data_track_pb2 as proto_data_track
+
+if TYPE_CHECKING:
+    from .room import Room
 
 
 class PublishTrackError(Exception):
@@ -189,6 +192,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
         self._rpc_handlers: Dict[str, RpcHandler] = {}
+        self._room: Room | None = None
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -728,7 +732,11 @@ class LocalParticipant(Participant):
         return LocalDataTrack(cb.publish_data_track.track)
 
     async def publish_track(
-        self, track: LocalTrack, options: TrackPublishOptions = TrackPublishOptions()
+        self,
+        track: LocalTrack,
+        options: TrackPublishOptions = TrackPublishOptions(),
+        *,
+        preconnect_buffer_auto_send_to: str | None = None,
     ) -> LocalTrackPublication:
         """
         Publish a local track to the room.
@@ -736,6 +744,8 @@ class LocalParticipant(Participant):
         Args:
             track (LocalTrack): The track to publish.
             options (TrackPublishOptions, optional): Options for publishing the track.
+            preconnect_buffer_auto_send_to (str, optional): If set, automatically sends the
+                preconnect buffer when a participant with this identity becomes active.
 
         Returns:
             LocalTrackPublication: The publication of the published track.
@@ -763,10 +773,47 @@ class LocalParticipant(Participant):
             track._info.sid = track_publication.sid
             self._track_publications[track_publication.sid] = track_publication
 
+            if isinstance(track, LocalAudioTrack):
+                track._participant = self
+                track._publication_sid = track_publication.sid
+
+                if preconnect_buffer_auto_send_to:
+                    if track.has_preconnect_buffer:
+                        self._setup_preconnect_auto_send(
+                            track, preconnect_buffer_auto_send_to
+                        )
+                    else:
+                        logger.warning(
+                            "preconnect_buffer_auto_send_to set but no preconnect buffer "
+                            "is active — call track.start_preconnect_buffer() first"
+                        )
+
             queue.task_done()
             return track_publication
         finally:
             self._room_queue.unsubscribe(queue)
+
+    def _setup_preconnect_auto_send(
+        self, track: LocalAudioTrack, target_identity: str
+    ) -> None:
+        room = self._room
+        if room is None:
+            return
+
+        async def _on_participant_active(participant: RemoteParticipant) -> None:
+            if participant.identity != target_identity:
+                return
+            if not track.has_preconnect_buffer:
+                return
+            room.off("participant_active", _on_participant_active)
+            try:
+                await track.send_preconnect_buffer(
+                    destination_identity=participant.identity
+                )
+            except Exception:
+                logger.exception("failed to auto-send preconnect buffer")
+
+        room.on("participant_active", _on_participant_active)
 
     async def unpublish_track(self, track_sid: str) -> None:
         """
