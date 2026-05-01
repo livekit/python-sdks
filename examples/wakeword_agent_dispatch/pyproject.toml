@@ -5,7 +5,7 @@ description = "Wake word-triggered LiveKit agent dispatch with pre-connect audio
 requires-python = ">=3.11"
 dependencies = [
     "livekit",
-    "livekit-agents>=1.3.0",
+    "livekit-agents[xai]>=1.3.0",
     "livekit-api",
     "livekit-protocol",
     "livekit-wakeword>=0.1.1",

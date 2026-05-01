@@ -15,8 +15,18 @@ from livekit.agents import (
     function_tool,
     room_io,
 )
+from livekit.plugins import xai
 
 logger = logging.getLogger("wakeword-agent")
+
+
+def _xai_realtime_model() -> xai.realtime.RealtimeModel:
+    """Grok Voice Agent API (OpenAI Realtime–compatible) end-to-end voice model."""
+    voice = os.getenv("LIVEKIT_AGENT_XAI_VOICE", "Ara")
+    model = os.getenv("LIVEKIT_AGENT_XAI_MODEL", "").strip()
+    if model:
+        return xai.realtime.RealtimeModel(model=model, voice=voice)
+    return xai.realtime.RealtimeModel(voice=voice)
 
 
 class BasicAssistant(Agent):
@@ -28,9 +38,7 @@ class BasicAssistant(Agent):
                 "'bye livekit' or otherwise clearly asks to end the conversation, call "
                 "the end_session tool immediately."
             ),
-            stt="deepgram/nova-3",
-            llm="openai/gpt-4o-mini",
-            tts="cartesia/sonic-2",
+            llm=_xai_realtime_model(),
         )
 
     @function_tool(name="end_session")
