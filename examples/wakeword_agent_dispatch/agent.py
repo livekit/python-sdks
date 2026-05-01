@@ -28,9 +28,9 @@ class BasicAssistant(Agent):
                 "'bye livekit' or otherwise clearly asks to end the conversation, call "
                 "the end_session tool immediately."
             ),
-            stt=os.getenv("LIVEKIT_AGENT_STT_MODEL", "deepgram/nova-3"),
-            llm=os.getenv("LIVEKIT_AGENT_LLM_MODEL", "openai/gpt-4o-mini"),
-            tts=os.getenv("LIVEKIT_AGENT_TTS_MODEL", "cartesia/sonic-2"),
+            stt="deepgram/nova-3",
+            llm="openai/gpt-4o-mini",
+            tts="cartesia/sonic-2",
         )
 
     @function_tool(name="end_session")
@@ -49,7 +49,6 @@ class BasicAssistant(Agent):
 async def entrypoint(ctx: JobContext) -> None:
     session = AgentSession()
     closed = asyncio.get_running_loop().create_future()
-    join_delay = float(os.getenv("LIVEKIT_AGENT_JOIN_DELAY_SECONDS", "2.0"))
     pre_connect_audio_timeout = float(
         os.getenv("LIVEKIT_AGENT_PRECONNECT_AUDIO_TIMEOUT_SECONDS", "10.0")
     )
@@ -70,10 +69,6 @@ async def entrypoint(ctx: JobContext) -> None:
     @session.on("conversation_item_added")
     def _on_conversation_item_added(ev) -> None:
         logger.info("conversation item added: %s", ev.item)
-
-    if join_delay > 0:
-        logger.info("delaying agent room join by %.1f seconds", join_delay)
-        await asyncio.sleep(join_delay)
 
     await session.start(
         agent=BasicAssistant(),
