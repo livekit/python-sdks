@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import logging
 import os
+import signal
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
@@ -246,6 +247,28 @@ def _drain_audio_queue(audio_queue: asyncio.Queue[MicChunk]) -> int:
             return drained
 
 
+async def _wait_mic_chunk_or_shutdown(
+    audio_queue: asyncio.Queue[MicChunk],
+    shutdown: asyncio.Event,
+) -> MicChunk | None:
+    """Return the next mic chunk, or None when shutdown was requested."""
+    if shutdown.is_set():
+        return None
+    get_chunk = asyncio.create_task(audio_queue.get())
+    wait_shutdown = asyncio.create_task(shutdown.wait())
+    done, pending = await asyncio.wait(
+        {get_chunk, wait_shutdown},
+        return_when=asyncio.FIRST_COMPLETED,
+    )
+    for task in pending:
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
+    if wait_shutdown in done:
+        return None
+    return get_chunk.result()
+
+
 def _reset_wakeword_model(model: Any) -> None:
     reset = getattr(model, "reset", None)
     if callable(reset):
@@ -284,6 +307,7 @@ async def _run_audio_loop(
     room: rtc.Room,
     lkapi: api.LiveKitAPI,
     config: Config,
+    shutdown: asyncio.Event,
 ) -> None:
     preroll = PrerollBuffer(config.wakeword_preroll_seconds)
     wakeword_window = WakeWordAudioWindow(WAKEWORD_WINDOW_SAMPLES)
@@ -370,7 +394,10 @@ async def _run_audio_loop(
 
     try:
         while True:
-            chunk = await audio_queue.get()
+            chunk = await _wait_mic_chunk_or_shutdown(audio_queue, shutdown)
+            if chunk is None:
+                logger.info("audio loop stopping (shutdown requested)")
+                break
 
             if state.mode == ClientMode.IDLE:
                 preroll.append(chunk)
@@ -428,6 +455,8 @@ async def main() -> None:
         raise RuntimeError(f"wake word model not found: {config.wakeword_model}")
 
     from livekit.wakeword import WakeWordModel
+
+    shutdown_event = asyncio.Event()
 
     model = WakeWordModel(models=[str(config.wakeword_model)])
     room = rtc.Room()
@@ -533,9 +562,25 @@ async def main() -> None:
         .to_jwt()
     )
 
+    loop = asyncio.get_running_loop()
+    signal_handlers_registered = False
+
+    def _request_shutdown() -> None:
+        if not shutdown_event.is_set():
+            logger.info("shutdown requested; stopping wake word client…")
+        shutdown_event.set()
+
     try:
         await room.connect(config.url, token)
         logger.info("connected to room %s", room.name)
+
+        try:
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.add_signal_handler(sig, _request_shutdown)
+            signal_handlers_registered = True
+        except (NotImplementedError, RuntimeError):
+            # Some platforms (e.g. Windows) may not support signal handlers on the event loop.
+            pass
 
         track = rtc.LocalAudioTrack.create_audio_track("wakeword-mic", mic.source)
 
@@ -556,15 +601,26 @@ async def main() -> None:
             room,
             lkapi,
             config,
+            shutdown_event,
         )
     finally:
+        if signal_handlers_registered:
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                with contextlib.suppress(Exception):
+                    loop.remove_signal_handler(sig)
+
         for task in list(background_tasks):
             task.cancel()
         for task in list(background_tasks):
             with contextlib.suppress(asyncio.CancelledError):
                 await task
-        await mic.aclose()
-        await player.aclose()
+
+        # Close playback before capture so PortAudio + AEC reverse path tear down cleanly.
+        with contextlib.suppress(Exception):
+            await player.aclose()
+        with contextlib.suppress(Exception):
+            await mic.aclose()
+
         room.unregister_text_stream_handler("lk.transcription")
         await lkapi.aclose()
         await room.disconnect()
