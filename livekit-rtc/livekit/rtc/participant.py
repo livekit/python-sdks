@@ -753,7 +753,7 @@ class LocalParticipant(Participant):
         req.publish_track.local_participant_handle = self._ffi_handle.handle
         req.publish_track.options.CopyFrom(options)
 
-        queue = self._room_queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
@@ -771,7 +771,7 @@ class LocalParticipant(Participant):
             queue.task_done()
             return track_publication
         finally:
-            self._room_queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
     async def unpublish_track(self, track_sid: str) -> None:
         """
@@ -788,7 +788,7 @@ class LocalParticipant(Participant):
         req.unpublish_track.track_sid = track_sid
         req.unpublish_track.stop_on_unpublish = True
 
-        queue = self._room_queue.subscribe()
+        queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
@@ -802,7 +802,7 @@ class LocalParticipant(Participant):
             publication._track = None
             queue.task_done()
         finally:
-            self._room_queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(queue)
 
     def __repr__(self) -> str:
         return f"rtc.LocalParticipant(sid={self.sid}, identity={self.identity}, name={self.name})"
