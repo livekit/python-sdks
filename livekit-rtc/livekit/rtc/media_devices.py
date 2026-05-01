@@ -493,6 +493,21 @@ class MediaDevices:
         # Queue from callback to async task
         q: asyncio.Queue[AudioFrame] = asyncio.Queue(maxsize=queue_capacity)
 
+        def _enqueue_frame(frame: AudioFrame) -> None:
+            try:
+                q.put_nowait(frame)
+            except asyncio.QueueFull:
+                # Capture must never surface QueueFull on the event loop thread.
+                # Drop the oldest frame so the published mic stays close to realtime.
+                try:
+                    q.get_nowait()
+                except asyncio.QueueEmpty:
+                    return
+                try:
+                    q.put_nowait(frame)
+                except asyncio.QueueFull:
+                    pass
+
         def _input_callback(
             indata: np.ndarray, frame_count: int, time_info: Any, status: Any
         ) -> None:
@@ -532,9 +547,7 @@ class MediaDevices:
                         # Continue even if APM processing fails
                         pass
                 try:
-                    # Non-blocking: drop if full
-                    if not q.full():
-                        loop.call_soon_threadsafe(q.put_nowait, frame)
+                    loop.call_soon_threadsafe(_enqueue_frame, frame)
                 except Exception:
                     pass
 

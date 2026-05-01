@@ -800,18 +800,37 @@ class LocalParticipant(Participant):
         if room is None:
             return
 
-        async def _on_participant_active(participant: RemoteParticipant) -> None:
+        def _send_buffer(participant: RemoteParticipant) -> None:
+            if not track.has_preconnect_buffer:
+                return
+
+            task = asyncio.create_task(
+                track.send_preconnect_buffer(destination_identity=participant.identity)
+            )
+
+            def _on_done(task: asyncio.Task[None]) -> None:
+                try:
+                    task.result()
+                except Exception:
+                    logger.exception("failed to auto-send preconnect buffer")
+
+            task.add_done_callback(_on_done)
+
+        def _on_participant_active(participant: RemoteParticipant) -> None:
             if participant.identity != target_identity:
                 return
             if not track.has_preconnect_buffer:
                 return
             room.off("participant_active", _on_participant_active)
-            try:
-                await track.send_preconnect_buffer(
-                    destination_identity=participant.identity
-                )
-            except Exception:
-                logger.exception("failed to auto-send preconnect buffer")
+            _send_buffer(participant)
+
+        participant = room.remote_participants.get(target_identity)
+        if (
+            participant is not None
+            and participant.state == proto_participant.PARTICIPANT_STATE_ACTIVE
+        ):
+            _send_buffer(participant)
+            return
 
         room.on("participant_active", _on_participant_active)
 
