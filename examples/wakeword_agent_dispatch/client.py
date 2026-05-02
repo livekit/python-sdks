@@ -43,6 +43,8 @@ class Config:
     preconnect_debug_wav: Path | None
     agent_metadata: str
     agent_wait_timeout: float
+    audio_input_device: int | None
+    audio_output_device: int | None
 
     @staticmethod
     def from_env() -> "Config":
@@ -78,7 +80,43 @@ class Config:
             ),
             agent_metadata=os.getenv("LIVEKIT_AGENT_METADATA", ""),
             agent_wait_timeout=float(os.getenv("LIVEKIT_AGENT_WAIT_TIMEOUT", "30.0")),
+            audio_input_device=Config._optional_int_from_env(
+                "LIVEKIT_AUDIO_INPUT_DEVICE"
+            ),
+            audio_output_device=Config._optional_int_from_env(
+                "LIVEKIT_AUDIO_OUTPUT_DEVICE"
+            ),
         )
+
+    @staticmethod
+    def _optional_int_from_env(name: str) -> int | None:
+        raw = os.getenv(name)
+        if raw is None or not raw.strip():
+            return None
+
+        try:
+            return int(raw)
+        except ValueError:
+            raise RuntimeError(f"{name} must be an integer device index") from None
+
+
+def _describe_audio_device(device_index: int | None, kind: str) -> str:
+    import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
+
+    selected_index = device_index
+    if selected_index is None:
+        default_device = sd.default.device
+        if isinstance(default_device, (list, tuple)):
+            selected_index = default_device[0 if kind == "input" else 1]
+
+    if selected_index is None:
+        return "system default"
+
+    try:
+        device = sd.query_devices(selected_index)
+        return f"{selected_index} ({device['name']})"
+    except Exception:
+        return str(selected_index)
 
 
 @dataclass(frozen=True)
@@ -573,8 +611,6 @@ async def main() -> None:
     shutdown_event = asyncio.Event()
 
     model = WakeWordModel(models=[str(config.wakeword_model)])
-    room = rtc.Room()
-    lkapi = api.LiveKitAPI(config.url, config.api_key, config.api_secret)
     audio_queue: asyncio.Queue[MicChunk] = asyncio.Queue(maxsize=100)
     devices = rtc.MediaDevices(
         input_sample_rate=SAMPLE_RATE,
@@ -582,8 +618,18 @@ async def main() -> None:
         num_channels=NUM_CHANNELS,
         blocksize=OUTPUT_FRAME_SAMPLES,
     )
-    mic = devices.open_input(enable_aec=True)
-    player = devices.open_output()
+    logger.info(
+        "using audio devices input=%s output=%s",
+        _describe_audio_device(config.audio_input_device, "input"),
+        _describe_audio_device(config.audio_output_device, "output"),
+    )
+    mic = devices.open_input(
+        enable_aec=True,
+        input_device=config.audio_input_device,
+    )
+    player = devices.open_output(output_device=config.audio_output_device)
+    room = rtc.Room()
+    lkapi = api.LiveKitAPI(config.url, config.api_key, config.api_secret)
     background_tasks: set[asyncio.Task[None]] = set()
 
     def _create_background_task(coro) -> None:
