@@ -144,7 +144,11 @@ def _select_audio_device(
         for device in listing:
             if device["index"] == requested_index:
                 return requested_index, device["name"]
-        raise RuntimeError(f"{kind} device index {requested_index} not found")
+        logger.warning(
+            "%s device index %s not found; trying WM8960 or system default",
+            kind,
+            requested_index,
+        )
 
     for device in listing:
         if DEFAULT_WM8960_DEVICE_NAME in device["name"].lower():
