@@ -6,6 +6,7 @@ import datetime
 import logging
 import os
 import signal
+import subprocess
 import wave
 from collections import deque
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ WAKEWORD_WINDOW_SAMPLES = 2 * WAKEWORD_SAMPLE_RATE
 OUTPUT_SAMPLE_RATE = 48_000
 OUTPUT_FRAME_SAMPLES = 480  # 10 ms at 48 kHz
 PRE_CONNECT_AUDIO_BUFFER_TOPIC = "lk.agent.pre-connect-audio-buffer"
+DEFAULT_WM8960_DEVICE_NAME = "wm8960"
 
 logger = logging.getLogger("wakeword-agent-dispatch")
 
@@ -100,23 +102,89 @@ class Config:
             raise RuntimeError(f"{name} must be an integer device index") from None
 
 
-def _describe_audio_device(device_index: int | None, kind: str) -> str:
-    import sounddevice as sd  # type: ignore[import-not-found, import-untyped]
-
-    selected_index = device_index
-    if selected_index is None:
-        default_device = sd.default.device
-        if isinstance(default_device, (list, tuple)):
-            selected_index = default_device[0 if kind == "input" else 1]
-
-    if selected_index is None:
-        return "system default"
-
+def _find_wm8960_card() -> int | None:
     try:
-        device = sd.query_devices(selected_index)
-        return f"{selected_index} ({device['name']})"
+        with open("/proc/asound/cards") as cards:
+            for line in cards:
+                if DEFAULT_WM8960_DEVICE_NAME in line.lower():
+                    return int(line.strip().split()[0])
     except Exception:
-        return str(selected_index)
+        return None
+
+    return None
+
+
+def _setup_wm8960_mixer() -> None:
+    card_index = _find_wm8960_card()
+    if card_index is None:
+        logger.info("WM8960 ALSA card not found; skipping mixer setup")
+        return
+
+    logger.info("configuring WM8960 mixer on ALSA card %s", card_index)
+    commands = [
+        ["amixer", "-c", str(card_index), "sset", "Left Output Mixer PCM", "on"],
+        ["amixer", "-c", str(card_index), "sset", "Right Output Mixer PCM", "on"],
+        ["amixer", "-c", str(card_index), "sset", "Speaker", "121"],
+        ["amixer", "-c", str(card_index), "sset", "Playback", "230"],
+        ["amixer", "-c", str(card_index), "sset", "Left Input Mixer Boost", "on"],
+        ["amixer", "-c", str(card_index), "sset", "Right Input Mixer Boost", "on"],
+        ["amixer", "-c", str(card_index), "sset", "Capture", "45"],
+        ["amixer", "-c", str(card_index), "sset", "ADC PCM", "195"],
+        ["amixer", "-c", str(card_index), "sset", "Left Input Boost Mixer LINPUT1", "2"],
+        ["amixer", "-c", str(card_index), "sset", "Right Input Boost Mixer RINPUT1", "2"],
+    ]
+
+    for command in commands:
+        try:
+            subprocess.run(command, capture_output=True, timeout=5, check=False)
+        except FileNotFoundError:
+            logger.warning("amixer not found; skipping WM8960 mixer setup")
+            return
+        except Exception:
+            logger.exception("failed to run WM8960 mixer command: %s", command)
+
+
+def _device_name_for_index(devices: rtc.MediaDevices, kind: str, index: int | None) -> str:
+    listing = (
+        devices.list_input_devices()
+        if kind == "input"
+        else devices.list_output_devices()
+    )
+    for device in listing:
+        if device["index"] == index:
+            return device["name"]
+
+    return "system default" if index is None else f"device {index}"
+
+
+def _select_audio_device(
+    devices: rtc.MediaDevices,
+    kind: str,
+    requested_index: int | None,
+) -> tuple[int | None, str]:
+    listing = (
+        devices.list_input_devices()
+        if kind == "input"
+        else devices.list_output_devices()
+    )
+    default_index = (
+        devices.default_input_device()
+        if kind == "input"
+        else devices.default_output_device()
+    )
+
+    if requested_index is not None:
+        for device in listing:
+            if device["index"] == requested_index:
+                return requested_index, device["name"]
+        raise RuntimeError(f"{kind} device index {requested_index} not found")
+
+    for device in listing:
+        if DEFAULT_WM8960_DEVICE_NAME in device["name"].lower():
+            return device["index"], device["name"]
+
+    logger.warning("WM8960 %s device not found; using system default", kind)
+    return default_index, _device_name_for_index(devices, kind, default_index)
 
 
 @dataclass(frozen=True)
@@ -612,22 +680,35 @@ async def main() -> None:
 
     model = WakeWordModel(models=[str(config.wakeword_model)])
     audio_queue: asyncio.Queue[MicChunk] = asyncio.Queue(maxsize=100)
+    _setup_wm8960_mixer()
     devices = rtc.MediaDevices(
         input_sample_rate=SAMPLE_RATE,
         output_sample_rate=OUTPUT_SAMPLE_RATE,
         num_channels=NUM_CHANNELS,
         blocksize=OUTPUT_FRAME_SAMPLES,
     )
+    input_device, input_device_name = _select_audio_device(
+        devices,
+        "input",
+        config.audio_input_device,
+    )
+    output_device, output_device_name = _select_audio_device(
+        devices,
+        "output",
+        config.audio_output_device,
+    )
     logger.info(
-        "using audio devices input=%s output=%s",
-        _describe_audio_device(config.audio_input_device, "input"),
-        _describe_audio_device(config.audio_output_device, "output"),
+        "using audio devices input=[%s] %s output=[%s] %s",
+        input_device,
+        input_device_name,
+        output_device,
+        output_device_name,
     )
     mic = devices.open_input(
         enable_aec=True,
-        input_device=config.audio_input_device,
+        input_device=input_device,
     )
-    player = devices.open_output(output_device=config.audio_output_device)
+    player = devices.open_output(output_device=output_device)
     room = rtc.Room()
     lkapi = api.LiveKitAPI(config.url, config.api_key, config.api_secret)
     background_tasks: set[asyncio.Task[None]] = set()
