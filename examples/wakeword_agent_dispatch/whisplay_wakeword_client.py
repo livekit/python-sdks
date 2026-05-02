@@ -7,6 +7,7 @@ import logging
 import os
 import signal
 import subprocess
+import time
 import wave
 from collections import deque
 from dataclasses import dataclass
@@ -25,6 +26,9 @@ WAKEWORD_WINDOW_SAMPLES = 2 * WAKEWORD_SAMPLE_RATE
 OUTPUT_FRAME_SAMPLES = 480  # 10 ms at 48 kHz
 PRE_CONNECT_AUDIO_BUFFER_TOPIC = "lk.agent.pre-connect-audio-buffer"
 DEFAULT_WM8960_DEVICE_NAME = "wm8960"
+MIC_VU_INTERVAL_SECONDS = 0.5
+MIC_VU_BAR_WIDTH = 24
+MIC_VU_FLOOR_DBFS = -60.0
 
 logger = logging.getLogger("whisplay-wakeword-client")
 
@@ -211,6 +215,61 @@ def _create_token(config: Config) -> str:
 class MicChunk:
     data: bytes
     samples_per_channel: int
+
+
+class MicVuMeter:
+    def __init__(self) -> None:
+        self._sum_squares = 0.0
+        self._sample_count = 0
+        self._peak = 0.0
+        self._next_log_at = time.monotonic() + MIC_VU_INTERVAL_SECONDS
+
+    def add(self, chunk: MicChunk) -> None:
+        samples = np.frombuffer(chunk.data, dtype=np.int16).astype(np.float32)
+        if samples.size == 0:
+            return
+
+        self._sum_squares += float(np.dot(samples, samples))
+        self._sample_count += int(samples.size)
+        self._peak = max(self._peak, float(np.max(np.abs(samples))))
+
+        now = time.monotonic()
+        if now < self._next_log_at:
+            return
+
+        self._log_level()
+        self._sum_squares = 0.0
+        self._sample_count = 0
+        self._peak = 0.0
+        self._next_log_at = now + MIC_VU_INTERVAL_SECONDS
+
+    def _log_level(self) -> None:
+        if self._sample_count == 0:
+            return
+
+        rms = float(np.sqrt(self._sum_squares / self._sample_count))
+        rms_dbfs = _amplitude_to_dbfs(rms)
+        peak_dbfs = _amplitude_to_dbfs(self._peak)
+        fill = _dbfs_to_bar_fill(rms_dbfs)
+        bar = "#" * fill + "-" * (MIC_VU_BAR_WIDTH - fill)
+        logger.info(
+            "mic VU [%s] rms=%5.1f dBFS peak=%5.1f dBFS",
+            bar,
+            rms_dbfs,
+            peak_dbfs,
+        )
+
+
+def _amplitude_to_dbfs(amplitude: float) -> float:
+    if amplitude <= 0:
+        return MIC_VU_FLOOR_DBFS
+
+    return float(max(MIC_VU_FLOOR_DBFS, 20.0 * np.log10(amplitude / 32768.0)))
+
+
+def _dbfs_to_bar_fill(dbfs: float) -> int:
+    normalized = (dbfs - MIC_VU_FLOOR_DBFS) / abs(MIC_VU_FLOOR_DBFS)
+    return round(max(0.0, min(1.0, normalized)) * MIC_VU_BAR_WIDTH)
 
 
 class PreconnectAudioBuffer:
@@ -549,6 +608,7 @@ async def _run_audio_loop(
     preconnect_buffer = PreconnectAudioBuffer(config.wakeword_preroll_seconds)
     wakeword_window = WakeWordAudioWindow(WAKEWORD_WINDOW_SAMPLES)
     wakeword_resampler = rtc.AudioResampler(SAMPLE_RATE, WAKEWORD_SAMPLE_RATE)
+    mic_vu_meter = MicVuMeter()
     state = ClientState()
 
     def _reset_to_idle(reason: str, *, cancel_dispatch: bool = True) -> None:
@@ -635,6 +695,8 @@ async def _run_audio_loop(
             if chunk is None:
                 logger.info("audio loop stopping (shutdown requested)")
                 break
+
+            mic_vu_meter.add(chunk)
 
             if state.mode in (ClientMode.IDLE, ClientMode.DISPATCHING):
                 preconnect_buffer.append(chunk)
