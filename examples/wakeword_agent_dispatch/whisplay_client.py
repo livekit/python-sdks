@@ -91,8 +91,10 @@ def _setup_wm8960_mixer() -> None:
     commands = [
         ["amixer", "-c", str(card_index), "sset", "Left Output Mixer PCM", "on"],
         ["amixer", "-c", str(card_index), "sset", "Right Output Mixer PCM", "on"],
-        ["amixer", "-c", str(card_index), "sset", "Speaker", "121"],
-        ["amixer", "-c", str(card_index), "sset", "Playback", "230"],
+        ["amixer", "-c", str(card_index), "sset", "Speaker", "127"],
+        ["amixer", "-c", str(card_index), "sset", "Speaker DC", "5"],
+        ["amixer", "-c", str(card_index), "sset", "Speaker AC", "5"],
+        ["amixer", "-c", str(card_index), "sset", "Playback", "255"],
         ["amixer", "-c", str(card_index), "sset", "Left Input Mixer Boost", "on"],
         ["amixer", "-c", str(card_index), "sset", "Right Input Mixer Boost", "on"],
         ["amixer", "-c", str(card_index), "sset", "Capture", "45"],
