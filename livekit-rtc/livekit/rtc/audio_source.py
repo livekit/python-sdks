@@ -16,11 +16,15 @@ from __future__ import annotations
 
 import time
 import asyncio
+from typing import TYPE_CHECKING
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
 from ._proto import ffi_pb2 as proto_ffi
 from .audio_frame import AudioFrame
+
+if TYPE_CHECKING:
+    from .audio_ring_buffer import AudioRingBuffer
 
 
 class AudioSource:
@@ -69,6 +73,7 @@ class AudioSource:
         self._q_size = 0.0
         self._join_handle: asyncio.TimerHandle | None = None
         self._join_fut: asyncio.Future[None] | None = None
+        self._preconnect_buffer: AudioRingBuffer | None = None
 
     @property
     def sample_rate(self) -> int:
@@ -119,6 +124,9 @@ class AudioSource:
         if frame.samples_per_channel == 0 or self._ffi_handle.disposed:
             return
 
+        if self._preconnect_buffer is not None:
+            self._preconnect_buffer.push(frame)
+
         now = time.monotonic()
         elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
         self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
@@ -161,6 +169,9 @@ class AudioSource:
             return
 
         await asyncio.shield(self._join_fut)
+
+    def _set_preconnect_buffer(self, buf: AudioRingBuffer | None) -> None:
+        self._preconnect_buffer = buf
 
     def _release_waiter(self) -> None:
         if self._join_fut is None:

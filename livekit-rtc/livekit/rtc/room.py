@@ -537,6 +537,7 @@ class Room(EventEmitter[EventTypes]):
         self._local_participant = LocalParticipant(
             self._room_queue, cb.connect.result.local_participant
         )
+        self._local_participant._room = self
 
         for pt in cb.connect.result.participants:
             rp = self._create_remote_participant(pt.participant)

@@ -1,0 +1,19 @@
+[project]
+name = "wakeword-agent-dispatch-example"
+version = "0.1.0"
+description = "Wake word-triggered LiveKit agent dispatch with pre-connect audio buffering"
+requires-python = ">=3.11"
+dependencies = [
+    "livekit",
+    "livekit-agents[xai]>=1.3.0",
+    "livekit-api",
+    "livekit-protocol",
+    "livekit-wakeword>=0.1.1",
+    "python-dotenv>=1.0.0",
+    "sounddevice>=0.4.6",
+]
+
+[tool.uv.sources]
+livekit = { path = "../../livekit-rtc", editable = true }
+livekit-api = { path = "../../livekit-api", editable = true }
+livekit-protocol = { path = "../../livekit-protocol", editable = true }

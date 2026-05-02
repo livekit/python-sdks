@@ -44,6 +44,7 @@ from ._proto.track_pb2 import (
 )
 from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
+from .audio_ring_buffer import AudioRingBuffer
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream, NoiseCancellationOptions
 from .audio_filter import AudioFilter
@@ -143,6 +144,7 @@ __all__ = [
     "VideoRotation",
     "stats",
     "AudioFrame",
+    "AudioRingBuffer",
     "AudioSource",
     "AudioStream",
     "NoiseCancellationOptions",
