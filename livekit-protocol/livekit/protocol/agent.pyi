@@ -36,7 +36,7 @@ JS_SUCCESS: JobStatus
 JS_FAILED: JobStatus
 
 class Job(_message.Message):
-    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording")
+    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording", "environment")
     ID_FIELD_NUMBER: _ClassVar[int]
     DISPATCH_ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -47,6 +47,7 @@ class Job(_message.Message):
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     ENABLE_RECORDING_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
     id: str
     dispatch_id: str
     type: JobType
@@ -57,7 +58,8 @@ class Job(_message.Message):
     agent_name: str
     state: JobState
     enable_recording: bool
-    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ...) -> None: ...
+    environment: str
+    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ..., environment: _Optional[str] = ...) -> None: ...
 
 class JobState(_message.Message):
     __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id")
@@ -136,20 +138,22 @@ class WorkerPong(_message.Message):
     def __init__(self, last_timestamp: _Optional[int] = ..., timestamp: _Optional[int] = ...) -> None: ...
 
 class RegisterWorkerRequest(_message.Message):
-    __slots__ = ("type", "agent_name", "version", "ping_interval", "namespace", "allowed_permissions")
+    __slots__ = ("type", "agent_name", "version", "ping_interval", "namespace", "allowed_permissions", "environment")
     TYPE_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PING_INTERVAL_FIELD_NUMBER: _ClassVar[int]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     ALLOWED_PERMISSIONS_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
     type: JobType
     agent_name: str
     version: str
     ping_interval: int
     namespace: str
     allowed_permissions: _models.ParticipantPermission
-    def __init__(self, type: _Optional[_Union[JobType, str]] = ..., agent_name: _Optional[str] = ..., version: _Optional[str] = ..., ping_interval: _Optional[int] = ..., namespace: _Optional[str] = ..., allowed_permissions: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ...) -> None: ...
+    environment: str
+    def __init__(self, type: _Optional[_Union[JobType, str]] = ..., agent_name: _Optional[str] = ..., version: _Optional[str] = ..., ping_interval: _Optional[int] = ..., namespace: _Optional[str] = ..., allowed_permissions: _Optional[_Union[_models.ParticipantPermission, _Mapping]] = ..., environment: _Optional[str] = ...) -> None: ...
 
 class RegisterWorkerResponse(_message.Message):
     __slots__ = ("worker_id", "server_info")
