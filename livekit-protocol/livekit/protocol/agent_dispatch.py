@@ -16,7 +16,7 @@ from . import agent as _agent_
 from .logger_pb import options as logger_dot_options__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1clivekit_agent_dispatch.proto\x12\x07livekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\x88\x01\n\x1a\x43reateAgentDispatchRequest\x12\x12\n\nagent_name\x18\x01 \x01(\t\x12\x0c\n\x04room\x18\x02 \x01(\t\x12\x15\n\x08metadata\x18\x03 \x01(\tB\x03\xa8P\x01\x12\x31\n\x0erestart_policy\x18\x04 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\"q\n\x11RoomAgentDispatch\x12\x12\n\nagent_name\x18\x01 \x01(\t\x12\x15\n\x08metadata\x18\x02 \x01(\tB\x03\xa8P\x01\x12\x31\n\x0erestart_policy\x18\x03 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\"N\n\x1a\x44\x65leteAgentDispatchRequest\x12\"\n\x0b\x64ispatch_id\x18\x01 \x01(\tB\r\xbaP\ndispatchID\x12\x0c\n\x04room\x18\x02 \x01(\t\"L\n\x18ListAgentDispatchRequest\x12\"\n\x0b\x64ispatch_id\x18\x01 \x01(\tB\r\xbaP\ndispatchID\x12\x0c\n\x04room\x18\x02 \x01(\t\"M\n\x19ListAgentDispatchResponse\x12\x30\n\x10\x61gent_dispatches\x18\x01 \x03(\x0b\x32\x16.livekit.AgentDispatch\"\xb3\x01\n\rAgentDispatch\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nagent_name\x18\x02 \x01(\t\x12\x0c\n\x04room\x18\x03 \x01(\t\x12\x15\n\x08metadata\x18\x04 \x01(\tB\x03\xa8P\x01\x12*\n\x05state\x18\x05 \x01(\x0b\x32\x1b.livekit.AgentDispatchState\x12\x31\n\x0erestart_policy\x18\x06 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\"X\n\x12\x41gentDispatchState\x12\x1a\n\x04jobs\x18\x01 \x03(\x0b\x32\x0c.livekit.Job\x12\x12\n\ncreated_at\x18\x02 \x01(\x03\x12\x12\n\ndeleted_at\x18\x03 \x01(\x03*5\n\x10JobRestartPolicy\x12\x12\n\x0eJRP_ON_FAILURE\x10\x00\x12\r\n\tJRP_NEVER\x10\x01\x32\x8b\x02\n\x14\x41gentDispatchService\x12M\n\x0e\x43reateDispatch\x12#.livekit.CreateAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12M\n\x0e\x44\x65leteDispatch\x12#.livekit.DeleteAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12U\n\x0cListDispatch\x12!.livekit.ListAgentDispatchRequest\x1a\".livekit.ListAgentDispatchResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1clivekit_agent_dispatch.proto\x12\x07livekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\x9d\x01\n\x1a\x43reateAgentDispatchRequest\x12\x12\n\nagent_name\x18\x01 \x01(\t\x12\x0c\n\x04room\x18\x02 \x01(\t\x12\x15\n\x08metadata\x18\x03 \x01(\tB\x03\xa8P\x01\x12\x31\n\x0erestart_policy\x18\x04 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\x12\x13\n\x0b\x65nvironment\x18\x05 \x01(\t\"\x86\x01\n\x11RoomAgentDispatch\x12\x12\n\nagent_name\x18\x01 \x01(\t\x12\x15\n\x08metadata\x18\x02 \x01(\tB\x03\xa8P\x01\x12\x31\n\x0erestart_policy\x18\x03 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\x12\x13\n\x0b\x65nvironment\x18\x04 \x01(\t\"N\n\x1a\x44\x65leteAgentDispatchRequest\x12\"\n\x0b\x64ispatch_id\x18\x01 \x01(\tB\r\xbaP\ndispatchID\x12\x0c\n\x04room\x18\x02 \x01(\t\"L\n\x18ListAgentDispatchRequest\x12\"\n\x0b\x64ispatch_id\x18\x01 \x01(\tB\r\xbaP\ndispatchID\x12\x0c\n\x04room\x18\x02 \x01(\t\"M\n\x19ListAgentDispatchResponse\x12\x30\n\x10\x61gent_dispatches\x18\x01 \x03(\x0b\x32\x16.livekit.AgentDispatch\"\xc8\x01\n\rAgentDispatch\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nagent_name\x18\x02 \x01(\t\x12\x0c\n\x04room\x18\x03 \x01(\t\x12\x15\n\x08metadata\x18\x04 \x01(\tB\x03\xa8P\x01\x12*\n\x05state\x18\x05 \x01(\x0b\x32\x1b.livekit.AgentDispatchState\x12\x31\n\x0erestart_policy\x18\x06 \x01(\x0e\x32\x19.livekit.JobRestartPolicy\x12\x13\n\x0b\x65nvironment\x18\x07 \x01(\t\"X\n\x12\x41gentDispatchState\x12\x1a\n\x04jobs\x18\x01 \x03(\x0b\x32\x0c.livekit.Job\x12\x12\n\ncreated_at\x18\x02 \x01(\x03\x12\x12\n\ndeleted_at\x18\x03 \x01(\x03*5\n\x10JobRestartPolicy\x12\x12\n\x0eJRP_ON_FAILURE\x10\x00\x12\r\n\tJRP_NEVER\x10\x01\x32\x8b\x02\n\x14\x41gentDispatchService\x12M\n\x0e\x43reateDispatch\x12#.livekit.CreateAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12M\n\x0e\x44\x65leteDispatch\x12#.livekit.DeleteAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12U\n\x0cListDispatch\x12!.livekit.ListAgentDispatchRequest\x1a\".livekit.ListAgentDispatchResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,22 +34,22 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_LISTAGENTDISPATCHREQUEST'].fields_by_name['dispatch_id']._serialized_options = b'\272P\ndispatchID'
   _globals['_AGENTDISPATCH'].fields_by_name['metadata']._options = None
   _globals['_AGENTDISPATCH'].fields_by_name['metadata']._serialized_options = b'\250P\001'
-  _globals['_JOBRESTARTPOLICY']._serialized_start=847
-  _globals['_JOBRESTARTPOLICY']._serialized_end=900
+  _globals['_JOBRESTARTPOLICY']._serialized_start=911
+  _globals['_JOBRESTARTPOLICY']._serialized_end=964
   _globals['_CREATEAGENTDISPATCHREQUEST']._serialized_start=85
-  _globals['_CREATEAGENTDISPATCHREQUEST']._serialized_end=221
-  _globals['_ROOMAGENTDISPATCH']._serialized_start=223
-  _globals['_ROOMAGENTDISPATCH']._serialized_end=336
-  _globals['_DELETEAGENTDISPATCHREQUEST']._serialized_start=338
-  _globals['_DELETEAGENTDISPATCHREQUEST']._serialized_end=416
-  _globals['_LISTAGENTDISPATCHREQUEST']._serialized_start=418
-  _globals['_LISTAGENTDISPATCHREQUEST']._serialized_end=494
-  _globals['_LISTAGENTDISPATCHRESPONSE']._serialized_start=496
-  _globals['_LISTAGENTDISPATCHRESPONSE']._serialized_end=573
-  _globals['_AGENTDISPATCH']._serialized_start=576
-  _globals['_AGENTDISPATCH']._serialized_end=755
-  _globals['_AGENTDISPATCHSTATE']._serialized_start=757
-  _globals['_AGENTDISPATCHSTATE']._serialized_end=845
-  _globals['_AGENTDISPATCHSERVICE']._serialized_start=903
-  _globals['_AGENTDISPATCHSERVICE']._serialized_end=1170
+  _globals['_CREATEAGENTDISPATCHREQUEST']._serialized_end=242
+  _globals['_ROOMAGENTDISPATCH']._serialized_start=245
+  _globals['_ROOMAGENTDISPATCH']._serialized_end=379
+  _globals['_DELETEAGENTDISPATCHREQUEST']._serialized_start=381
+  _globals['_DELETEAGENTDISPATCHREQUEST']._serialized_end=459
+  _globals['_LISTAGENTDISPATCHREQUEST']._serialized_start=461
+  _globals['_LISTAGENTDISPATCHREQUEST']._serialized_end=537
+  _globals['_LISTAGENTDISPATCHRESPONSE']._serialized_start=539
+  _globals['_LISTAGENTDISPATCHRESPONSE']._serialized_end=616
+  _globals['_AGENTDISPATCH']._serialized_start=619
+  _globals['_AGENTDISPATCH']._serialized_end=819
+  _globals['_AGENTDISPATCHSTATE']._serialized_start=821
+  _globals['_AGENTDISPATCHSTATE']._serialized_end=909
+  _globals['_AGENTDISPATCHSERVICE']._serialized_start=967
+  _globals['_AGENTDISPATCHSERVICE']._serialized_end=1234
 # @@protoc_insertion_point(module_scope)
