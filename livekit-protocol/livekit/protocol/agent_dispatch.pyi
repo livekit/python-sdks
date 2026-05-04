@@ -16,26 +16,30 @@ JRP_ON_FAILURE: JobRestartPolicy
 JRP_NEVER: JobRestartPolicy
 
 class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata", "restart_policy")
+    __slots__ = ("agent_name", "room", "metadata", "restart_policy", "environment")
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     room: str
     metadata: str
     restart_policy: JobRestartPolicy
-    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
+    environment: str
+    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., environment: _Optional[str] = ...) -> None: ...
 
 class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata", "restart_policy")
+    __slots__ = ("agent_name", "metadata", "restart_policy", "environment")
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     metadata: str
     restart_policy: JobRestartPolicy
-    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
+    environment: str
+    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., environment: _Optional[str] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
     __slots__ = ("dispatch_id", "room")
@@ -60,20 +64,22 @@ class ListAgentDispatchResponse(_message.Message):
     def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy")
+    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy", "environment")
     ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
     id: str
     agent_name: str
     room: str
     metadata: str
     state: AgentDispatchState
     restart_policy: JobRestartPolicy
-    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ...) -> None: ...
+    environment: str
+    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., environment: _Optional[str] = ...) -> None: ...
 
 class AgentDispatchState(_message.Message):
     __slots__ = ("jobs", "created_at", "deleted_at")
