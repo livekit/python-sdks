@@ -24,8 +24,42 @@ ParticipantEvent, EVT_PARTICIPANT = wx.lib.newevent.NewEvent()
 AudioBandsEvent, EVT_AUDIO_BANDS = wx.lib.newevent.NewEvent()
 # Custom event for incoming chat messages
 ChatMessageEvent, EVT_CHAT_MESSAGE = wx.lib.newevent.NewEvent()
+# Custom event for video codec/stats updates
+VideoCodecEvent, EVT_VIDEO_CODEC = wx.lib.newevent.NewEvent()
 
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "wxpy_room_cfg.ini")
+
+def _extract_video_codec(stats):
+    """Return (mime_type, implementation) for the active video codec, or (None, None).
+
+    `implementation` is `encoder_implementation` for outbound (local) tracks and
+    `decoder_implementation` for inbound (remote) tracks — e.g. "libvpx", "ExternalDecoder (VideoToolbox)".
+    """
+    codec_id_to_mime = {}
+    video_codec_id = None
+    implementation = None
+    for s in stats:
+        which = s.WhichOneof("stats")
+        if which == "codec":
+            codec_id_to_mime[s.codec.rtc.id] = s.codec.codec.mime_type
+        elif which == "inbound_rtp" and s.inbound_rtp.stream.kind == "video":
+            video_codec_id = s.inbound_rtp.stream.codec_id
+            if s.inbound_rtp.inbound.decoder_implementation:
+                implementation = s.inbound_rtp.inbound.decoder_implementation
+        elif which == "outbound_rtp" and s.outbound_rtp.stream.kind == "video":
+            video_codec_id = s.outbound_rtp.stream.codec_id
+            if s.outbound_rtp.outbound.encoder_implementation:
+                implementation = s.outbound_rtp.outbound.encoder_implementation
+    mime = None
+    if video_codec_id and video_codec_id in codec_id_to_mime:
+        mime = codec_id_to_mime[video_codec_id]
+    else:
+        for m in codec_id_to_mime.values():
+            if m.lower().startswith("video/"):
+                mime = m
+                break
+    return mime, implementation
+
 
 CODEC_MAP = {
     "VP8": rtc.VideoCodec.VP8,
@@ -97,6 +131,7 @@ class RoomManager:
         self._video_streams = {}  # participant_identity -> VideoStream
         self._audio_streams = {}  # participant_identity -> AudioStream
         self._track_to_participant = {}  # track_sid -> participant_identity
+        self._stats_tasks = {}  # participant_identity -> asyncio.Task (video codec poller)
         self._disconnecting = False  # True when _async_disconnect is in progress
         self._test_video_task = None  # asyncio.Task for test video publishing
         self._test_video_track = None  # LocalVideoTrack
@@ -325,6 +360,9 @@ class RoomManager:
             for stream in list(self._audio_streams.values()):
                 await stream.aclose()
             self._audio_streams.clear()
+            for task in list(self._stats_tasks.values()):
+                task.cancel()
+            self._stats_tasks.clear()
             self._track_to_participant.clear()
             await self.room.disconnect()
         except Exception:
@@ -348,6 +386,7 @@ class RoomManager:
             self._track_to_participant[track.sid] = identity
             if self.loop:
                 asyncio.ensure_future(self._receive_video(identity, stream))
+                self._start_codec_poll(identity, track)
         elif track.kind == rtc.TrackKind.KIND_AUDIO:
             old_stream = self._audio_streams.pop(identity, None)
             if old_stream:
@@ -366,6 +405,7 @@ class RoomManager:
                 stream = self._video_streams.pop(identity, None)
                 if stream:
                     asyncio.ensure_future(stream.aclose())
+                self._stop_codec_poll(identity)
             elif track.kind == rtc.TrackKind.KIND_AUDIO:
                 stream = self._audio_streams.pop(identity, None)
                 if stream:
@@ -384,6 +424,7 @@ class RoomManager:
             self._post_participants()
             if self.loop:
                 asyncio.ensure_future(self._receive_video(identity, stream))
+                self._start_codec_poll(identity, track)
 
     def _on_local_track_unpublished(self, publication):
         logger.info("Local track unpublished: %s", publication.sid)
@@ -393,6 +434,7 @@ class RoomManager:
         stream = self._video_streams.pop(identity, None)
         if stream:
             asyncio.ensure_future(stream.aclose())
+        self._stop_codec_poll(identity)
         self._post_participants()
 
     def _on_participant_connected(self, participant):
@@ -408,6 +450,7 @@ class RoomManager:
         stream = self._audio_streams.pop(identity, None)
         if stream:
             asyncio.ensure_future(stream.aclose())
+        self._stop_codec_poll(identity)
         self._track_to_participant = {
             k: v for k, v in self._track_to_participant.items() if v != identity
         }
@@ -425,6 +468,9 @@ class RoomManager:
         for stream in list(self._audio_streams.values()):
             asyncio.ensure_future(stream.aclose())
         self._audio_streams.clear()
+        for task in list(self._stats_tasks.values()):
+            task.cancel()
+        self._stats_tasks.clear()
         self._track_to_participant.clear()
         self._post_state("disconnected", str(reason))
         if self.loop and self.loop.is_running():
@@ -506,6 +552,37 @@ class RoomManager:
         finally:
             logger.info("Stopped receiving audio for %s (total frames: %d)", identity, frame_count)
 
+    def _start_codec_poll(self, identity, track):
+        self._stop_codec_poll(identity)
+        self._stats_tasks[identity] = asyncio.ensure_future(
+            self._poll_video_codec(identity, track)
+        )
+
+    def _stop_codec_poll(self, identity):
+        task = self._stats_tasks.pop(identity, None)
+        if task and not task.done():
+            task.cancel()
+
+    async def _poll_video_codec(self, identity, track):
+        last = (None, None)
+        try:
+            # Brief delay so the first stats sample has data
+            await asyncio.sleep(1.0)
+            while True:
+                try:
+                    stats = await track.get_stats()
+                    codec, impl = _extract_video_codec(stats)
+                except Exception as e:
+                    logger.debug("get_stats failed for %s: %s", identity, e)
+                    codec, impl = None, None
+                if codec and (codec, impl) != last:
+                    last = (codec, impl)
+                    evt = VideoCodecEvent(identity=identity, codec=codec, implementation=impl or "")
+                    wx.PostEvent(self.wx_target, evt)
+                await asyncio.sleep(2.0)
+        except asyncio.CancelledError:
+            pass
+
     def _post_state(self, state, message="", **kwargs):
         evt = RoomStateEvent(state=state, message=message, **kwargs)
         wx.PostEvent(self.wx_target, evt)
@@ -532,6 +609,8 @@ class VideoPanel(wx.Panel):
         self.label = label
         self.video_width = 0
         self.video_height = 0
+        self.video_codec = ""
+        self.video_codec_impl = ""
         self.audio_bands = [0.0] * 5  # 5 frequency band levels (0..1)
         self.bitmap = None
         self.bg_color = bg_color or wx.Colour(30, 30, 30)
@@ -578,6 +657,11 @@ class VideoPanel(wx.Panel):
             overlay_text = self.label
             if self.video_width > 0 and self.video_height > 0:
                 overlay_text += f" {self.video_width}x{self.video_height}"
+            if self.video_codec:
+                if self.video_codec_impl:
+                    overlay_text += f" [{self.video_codec} / {self.video_codec_impl}]"
+                else:
+                    overlay_text += f" [{self.video_codec}]"
             dc.SetTextForeground(wx.WHITE)
             dc.SetFont(wx.Font(10, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
             tw, th = dc.GetTextExtent(overlay_text)
@@ -628,6 +712,16 @@ class VideoPanel(wx.Panel):
         self.bitmap = wx.Bitmap(img)
         self.Refresh()
 
+    def update_video_codec(self, codec, implementation=""):
+        """Set the codec mime_type (e.g. 'video/VP8') and implementation shown in the overlay."""
+        # Strip the 'video/' prefix for a tighter overlay label.
+        if codec and codec.lower().startswith("video/"):
+            codec = codec.split("/", 1)[1]
+        if codec != self.video_codec or implementation != self.video_codec_impl:
+            self.video_codec = codec
+            self.video_codec_impl = implementation
+            self.Refresh()
+
     def update_audio_bands(self, bands):
         """Update the 5-band audio spectrum levels (list of floats 0..1).
         Does not trigger a repaint — the next video frame refresh will draw them.
@@ -677,6 +771,12 @@ class VideoGridPanel(wx.Panel):
         panel = self.video_panels.get(identity)
         if panel:
             panel.update_audio_bands(bands)
+
+    def update_video_codec(self, identity, codec, implementation=""):
+        """Update a participant's video panel codec overlay."""
+        panel = self.video_panels.get(identity)
+        if panel:
+            panel.update_video_codec(codec, implementation)
 
     def update_video(self, identity, bitmap, label=None):
         panel = self.video_panels.get(identity)
@@ -1007,6 +1107,7 @@ class MainFrame(wx.Frame):
         self.Bind(EVT_PARTICIPANT, self.on_participant_update)
         self.Bind(EVT_AUDIO_BANDS, self.on_audio_bands)
         self.Bind(EVT_CHAT_MESSAGE, self.on_chat_message)
+        self.Bind(EVT_VIDEO_CODEC, self.on_video_codec)
 
         self.Centre()
 
@@ -1074,6 +1175,10 @@ class MainFrame(wx.Frame):
     def on_audio_bands(self, event):
         """Handle audio spectrum bands from async thread."""
         self.video_grid.update_audio_bands(event.identity, event.bands)
+
+    def on_video_codec(self, event):
+        """Handle video codec updates from async thread."""
+        self.video_grid.update_video_codec(event.identity, event.codec, event.implementation)
 
     def on_chat_message(self, event):
         self.right_panel.append_chat(event.sender, event.message)
