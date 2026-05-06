@@ -276,18 +276,17 @@ You may throw errors of the type `RpcError` with a string `message` in an RPC me
 
 ## Hardware video codec support
 
-The underlying Rust SDK ships with platform-specific hardware-accelerated encoders/decoders, which are enabled automatically when the requested codec and OS match.
+The underlying Rust SDK ships with platform-specific hardware-accelerated encoders/decoders, These are used automatically when available and compatible with the runtime environment (OS, drivers, GPU, and codec).
 
 | Platform                       | Codec(s)   | Encoder | Decoder | Backend                                |
 | ------------------------------ | ---------- | ------- | ------- | -------------------------------------- |
 | macOS                          | H264, H265 | ✓       | ✓       | VideoToolbox                           |
 | Linux (AMD GPU)                | H264       | ✓       |         | VAAPI                                  |
 | Linux x64 (NVIDIA GPU)         | H264, H265 | ✓       | ✓       | NVENC / NVDEC (NVIDIA Video Codec SDK) |
-| Linux ARM (NVIDIA Jetson)      | H264, H265 | ?       | ?       | NVENC / NVDEC (to be confirmed)        |
 
-Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are used as a fallback on platforms or codecs not listed above.
+Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are used as a fallback when hardware acceleration is not available.
 
-> **Note:** NVIDIA data-center / AI-inference GPUs such as the **H100, H200, A100** physically omit the NVENC/NVDEC engines — running on these cards will silently fall back to the software encoder/decoder regardless of the table above.
+> **Note:** Availability depends on the specific machine configuration, including GPU model, driver support, and runtime environment.
 
 ## Examples
 
