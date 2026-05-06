@@ -62,6 +62,22 @@ class MetricsReport(_message.Message):
     e2e_latency: float
     def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ...) -> None: ...
 
+class TimedString(_message.Message):
+    __slots__ = ("text", "start_time", "end_time", "confidence", "start_time_offset", "speaker_id")
+    TEXT_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
+    CONFIDENCE_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_OFFSET_FIELD_NUMBER: _ClassVar[int]
+    SPEAKER_ID_FIELD_NUMBER: _ClassVar[int]
+    text: str
+    start_time: float
+    end_time: float
+    confidence: float
+    start_time_offset: float
+    speaker_id: str
+    def __init__(self, text: _Optional[str] = ..., start_time: _Optional[float] = ..., end_time: _Optional[float] = ..., confidence: _Optional[float] = ..., start_time_offset: _Optional[float] = ..., speaker_id: _Optional[str] = ...) -> None: ...
+
 class ChatMessage(_message.Message):
     __slots__ = ("id", "role", "content", "interrupted", "transcript_confidence", "extra", "metrics", "created_at")
     class ChatContent(_message.Message):
@@ -338,7 +354,7 @@ class AgentSessionEvent(_message.Message):
     def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ...) -> None: ...
 
 class SessionRequest(_message.Message):
-    __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage")
+    __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
     class Ping(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
@@ -362,6 +378,9 @@ class SessionRequest(_message.Message):
     class GetSessionUsage(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
+    class GetFrameworkInfo(_message.Message):
+        __slots__ = ()
+        def __init__(self) -> None: ...
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     PING_FIELD_NUMBER: _ClassVar[int]
     GET_CHAT_HISTORY_FIELD_NUMBER: _ClassVar[int]
@@ -370,6 +389,7 @@ class SessionRequest(_message.Message):
     GET_SESSION_STATE_FIELD_NUMBER: _ClassVar[int]
     GET_RTC_STATS_FIELD_NUMBER: _ClassVar[int]
     GET_SESSION_USAGE_FIELD_NUMBER: _ClassVar[int]
+    GET_FRAMEWORK_INFO_FIELD_NUMBER: _ClassVar[int]
     request_id: str
     ping: SessionRequest.Ping
     get_chat_history: SessionRequest.GetChatHistory
@@ -378,10 +398,11 @@ class SessionRequest(_message.Message):
     get_session_state: SessionRequest.GetSessionState
     get_rtc_stats: SessionRequest.GetRTCStats
     get_session_usage: SessionRequest.GetSessionUsage
-    def __init__(self, request_id: _Optional[str] = ..., ping: _Optional[_Union[SessionRequest.Ping, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionRequest.GetChatHistory, _Mapping]] = ..., run_input: _Optional[_Union[SessionRequest.RunInput, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionRequest.GetAgentInfo, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionRequest.GetSessionState, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionRequest.GetRTCStats, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionRequest.GetSessionUsage, _Mapping]] = ...) -> None: ...
+    get_framework_info: SessionRequest.GetFrameworkInfo
+    def __init__(self, request_id: _Optional[str] = ..., ping: _Optional[_Union[SessionRequest.Ping, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionRequest.GetChatHistory, _Mapping]] = ..., run_input: _Optional[_Union[SessionRequest.RunInput, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionRequest.GetAgentInfo, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionRequest.GetSessionState, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionRequest.GetRTCStats, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionRequest.GetSessionUsage, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionRequest.GetFrameworkInfo, _Mapping]] = ...) -> None: ...
 
 class SessionResponse(_message.Message):
-    __slots__ = ("request_id", "error", "pong", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage")
+    __slots__ = ("request_id", "error", "pong", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
     class Pong(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
@@ -440,6 +461,13 @@ class SessionResponse(_message.Message):
         usage: AgentSessionUsage
         created_at: _timestamp_pb2.Timestamp
         def __init__(self, usage: _Optional[_Union[AgentSessionUsage, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    class GetFrameworkInfoResponse(_message.Message):
+        __slots__ = ("sdk", "sdk_version")
+        SDK_FIELD_NUMBER: _ClassVar[int]
+        SDK_VERSION_FIELD_NUMBER: _ClassVar[int]
+        sdk: str
+        sdk_version: str
+        def __init__(self, sdk: _Optional[str] = ..., sdk_version: _Optional[str] = ...) -> None: ...
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     PONG_FIELD_NUMBER: _ClassVar[int]
@@ -449,6 +477,7 @@ class SessionResponse(_message.Message):
     GET_SESSION_STATE_FIELD_NUMBER: _ClassVar[int]
     GET_RTC_STATS_FIELD_NUMBER: _ClassVar[int]
     GET_SESSION_USAGE_FIELD_NUMBER: _ClassVar[int]
+    GET_FRAMEWORK_INFO_FIELD_NUMBER: _ClassVar[int]
     request_id: str
     error: str
     pong: SessionResponse.Pong
@@ -458,7 +487,8 @@ class SessionResponse(_message.Message):
     get_session_state: SessionResponse.GetSessionStateResponse
     get_rtc_stats: SessionResponse.GetRTCStatsResponse
     get_session_usage: SessionResponse.GetSessionUsageResponse
-    def __init__(self, request_id: _Optional[str] = ..., error: _Optional[str] = ..., pong: _Optional[_Union[SessionResponse.Pong, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionResponse.GetChatHistoryResponse, _Mapping]] = ..., run_input: _Optional[_Union[SessionResponse.RunInputResponse, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionResponse.GetAgentInfoResponse, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionResponse.GetSessionStateResponse, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionResponse.GetRTCStatsResponse, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionResponse.GetSessionUsageResponse, _Mapping]] = ...) -> None: ...
+    get_framework_info: SessionResponse.GetFrameworkInfoResponse
+    def __init__(self, request_id: _Optional[str] = ..., error: _Optional[str] = ..., pong: _Optional[_Union[SessionResponse.Pong, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionResponse.GetChatHistoryResponse, _Mapping]] = ..., run_input: _Optional[_Union[SessionResponse.RunInputResponse, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionResponse.GetAgentInfoResponse, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionResponse.GetSessionStateResponse, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionResponse.GetRTCStatsResponse, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionResponse.GetSessionUsageResponse, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionResponse.GetFrameworkInfoResponse, _Mapping]] = ...) -> None: ...
 
 class AgentSessionMessage(_message.Message):
     __slots__ = ("audio_input", "audio_output", "event", "request", "response", "audio_playback_flush", "audio_playback_clear", "audio_playback_finished")

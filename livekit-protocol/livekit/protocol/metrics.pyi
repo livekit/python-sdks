@@ -114,7 +114,7 @@ class EventMetric(_message.Message):
     def __init__(self, label: _Optional[int] = ..., participant_identity: _Optional[int] = ..., track_sid: _Optional[int] = ..., start_timestamp_ms: _Optional[int] = ..., end_timestamp_ms: _Optional[int] = ..., normalized_start_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., normalized_end_timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[str] = ..., rid: _Optional[int] = ...) -> None: ...
 
 class MetricsRecordingHeader(_message.Message):
-    __slots__ = ("room_id", "duration", "start_time", "room_tags")
+    __slots__ = ("room_id", "duration", "start_time", "room_tags", "room_name", "room_start_time")
     class RoomTagsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -126,8 +126,12 @@ class MetricsRecordingHeader(_message.Message):
     DURATION_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     ROOM_TAGS_FIELD_NUMBER: _ClassVar[int]
+    ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
+    ROOM_START_TIME_FIELD_NUMBER: _ClassVar[int]
     room_id: str
     duration: int
     start_time: _timestamp_pb2.Timestamp
     room_tags: _containers.ScalarMap[str, str]
-    def __init__(self, room_id: _Optional[str] = ..., duration: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_tags: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    room_name: str
+    room_start_time: _timestamp_pb2.Timestamp
+    def __init__(self, room_id: _Optional[str] = ..., duration: _Optional[int] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_tags: _Optional[_Mapping[str, str]] = ..., room_name: _Optional[str] = ..., room_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
