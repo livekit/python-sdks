@@ -33,6 +33,7 @@ from ._proto.room_pb2 import (
     DataPacketKind,
     IceServer,
     IceTransportType,
+    SimulateScenarioKind,
     TrackPublishOptions,
     VideoEncoding,
 )
@@ -65,7 +66,6 @@ from .room import (
     Room,
     RoomOptions,
     RtcConfiguration,
-    SimulateScenario,
     SipDTMF,
     RtcStats,
 )
@@ -160,7 +160,7 @@ __all__ = [
     "Room",
     "RoomOptions",
     "RtcConfiguration",
-    "SimulateScenario",
+    "SimulateScenarioKind",
     "SipDTMF",
     "RtcStats",
     "DataPacket",

@@ -16,7 +16,6 @@ from __future__ import annotations
 import datetime
 import asyncio
 import ctypes
-import enum
 import logging
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast, Mapping
@@ -29,7 +28,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
 from ._proto.participant_pb2 import DisconnectReason
-from ._proto.room_pb2 import ConnectionState
+from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
@@ -596,11 +595,11 @@ class Room(EventEmitter[EventTypes]):
         if self._text_stream_handlers.get(topic):
             self._text_stream_handlers.pop(topic)
 
-    async def simulate_scenario(self, scenario: "SimulateScenario") -> None:
+    async def simulate_scenario(self, scenario: SimulateScenarioKind.ValueType) -> None:
         """Trigger a reconnection / chaos scenario for testing.
 
-        See `SimulateScenario` for the available variants. Most useful in
-        tests to deterministically force a Resume (signal-only reconnect
+        See `SimulateScenarioKind` for the available variants. Most useful
+        in tests to deterministically force a Resume (signal-only reconnect
         that preserves the PeerConnection and existing publications) or a
         full reconnect (the SDK rebuilds the RtcSession and re-publishes
         existing local tracks).
@@ -612,7 +611,7 @@ class Room(EventEmitter[EventTypes]):
 
         req = proto_ffi.FfiRequest()
         req.simulate_scenario.room_handle = self._ffi_handle.handle
-        req.simulate_scenario.scenario = scenario.value
+        req.simulate_scenario.scenario = scenario
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -1082,23 +1081,3 @@ class Room(EventEmitter[EventTypes]):
             sid = self._first_sid_future.result()
 
         return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={ConnectionState.Name(self._connection_state)})"
-
-
-class SimulateScenario(enum.IntEnum):
-    """Reconnection / chaos scenarios that can be triggered via
-    :meth:`Room.simulate_scenario`. The values match the underlying FFI
-    ``SimulateScenarioKind`` proto enum."""
-
-    # Closes the signal channel locally; engine attempts a Resume reconnect
-    # (PeerConnection preserved, publications kept).
-    SIGNAL_RECONNECT = proto_room.SimulateScenarioKind.SIMULATE_SIGNAL_RECONNECT
-    SPEAKER = proto_room.SimulateScenarioKind.SIMULATE_SPEAKER
-    NODE_FAILURE = proto_room.SimulateScenarioKind.SIMULATE_NODE_FAILURE
-    SERVER_LEAVE = proto_room.SimulateScenarioKind.SIMULATE_SERVER_LEAVE
-    MIGRATION = proto_room.SimulateScenarioKind.SIMULATE_MIGRATION
-    FORCE_TCP = proto_room.SimulateScenarioKind.SIMULATE_FORCE_TCP
-    FORCE_TLS = proto_room.SimulateScenarioKind.SIMULATE_FORCE_TLS
-    # Asks the server to send LeaveRequest{Reconnect}, forcing a full
-    # reconnect (new RtcSession; SDK republishes existing local tracks;
-    # `Reconnected` event will fire).
-    FULL_RECONNECT = proto_room.SimulateScenarioKind.SIMULATE_FULL_RECONNECT
