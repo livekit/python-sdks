@@ -60,6 +60,7 @@ from .room import (
     Room,
     RoomOptions,
     RtcConfiguration,
+    SimulateScenario,
     SipDTMF,
     RtcStats,
 )
@@ -152,6 +153,7 @@ __all__ = [
     "Room",
     "RoomOptions",
     "RtcConfiguration",
+    "SimulateScenario",
     "SipDTMF",
     "RtcStats",
     "DataPacket",
