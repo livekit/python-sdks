@@ -473,6 +473,12 @@ class Room(EventEmitter[EventTypes]):
             req.connect.options.e2ee.key_provider_options.ratchet_window_size = (
                 options.e2ee.key_provider_options.ratchet_window_size
             )
+            req.connect.options.e2ee.key_provider_options.key_ring_size = (
+                options.e2ee.key_provider_options.key_ring_size
+            )
+            req.connect.options.e2ee.key_provider_options.key_derivation_function = (
+                options.e2ee.key_provider_options.key_derivation_function
+            )
 
         if options.encryption:
             req.connect.options.encryption.encryption_type = options.encryption.encryption_type
@@ -487,6 +493,12 @@ class Room(EventEmitter[EventTypes]):
             )
             req.connect.options.encryption.key_provider_options.ratchet_window_size = (
                 options.encryption.key_provider_options.ratchet_window_size
+            )
+            req.connect.options.encryption.key_provider_options.key_ring_size = (
+                options.encryption.key_provider_options.key_ring_size
+            )
+            req.connect.options.encryption.key_provider_options.key_derivation_function = (
+                options.encryption.key_provider_options.key_derivation_function
             )
 
         if options.rtc_config:

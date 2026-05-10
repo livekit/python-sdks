@@ -338,12 +338,15 @@ class CaptureVideoFrameRequest(_message.Message):
     BUFFER_FIELD_NUMBER: _builtins.int
     TIMESTAMP_US_FIELD_NUMBER: _builtins.int
     ROTATION_FIELD_NUMBER: _builtins.int
+    METADATA_FIELD_NUMBER: _builtins.int
     source_handle: _builtins.int
     timestamp_us: _builtins.int
     """In microseconds"""
     rotation: Global___VideoRotation.ValueType
     @_builtins.property
     def buffer(self) -> Global___VideoBufferInfo: ...
+    @_builtins.property
+    def metadata(self) -> Global___FrameMetadata: ...
     def __init__(
         self,
         *,
@@ -351,10 +354,11 @@ class CaptureVideoFrameRequest(_message.Message):
         buffer: Global___VideoBufferInfo | None = ...,
         timestamp_us: _builtins.int | None = ...,
         rotation: Global___VideoRotation.ValueType | None = ...,
+        metadata: Global___FrameMetadata | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     def WhichOneof(self, oneof_group: _Never) -> None: ...
 
@@ -539,6 +543,28 @@ class OwnedVideoBuffer(_message.Message):
 Global___OwnedVideoBuffer: _TypeAlias = OwnedVideoBuffer  # noqa: Y015
 
 @_typing.final
+class FrameMetadata(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
+
+    USER_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    FRAME_ID_FIELD_NUMBER: _builtins.int
+    user_timestamp: _builtins.int
+    frame_id: _builtins.int
+    def __init__(
+        self,
+        *,
+        user_timestamp: _builtins.int | None = ...,
+        frame_id: _builtins.int | None = ...,
+    ) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    def WhichOneof(self, oneof_group: _Never) -> None: ...
+
+Global___FrameMetadata: _TypeAlias = FrameMetadata  # noqa: Y015
+
+@_typing.final
 class VideoStreamInfo(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
@@ -617,21 +643,25 @@ class VideoFrameReceived(_message.Message):
     BUFFER_FIELD_NUMBER: _builtins.int
     TIMESTAMP_US_FIELD_NUMBER: _builtins.int
     ROTATION_FIELD_NUMBER: _builtins.int
+    METADATA_FIELD_NUMBER: _builtins.int
     timestamp_us: _builtins.int
     """In microseconds"""
     rotation: Global___VideoRotation.ValueType
     @_builtins.property
     def buffer(self) -> Global___OwnedVideoBuffer: ...
+    @_builtins.property
+    def metadata(self) -> Global___FrameMetadata: ...
     def __init__(
         self,
         *,
         buffer: Global___OwnedVideoBuffer | None = ...,
         timestamp_us: _builtins.int | None = ...,
         rotation: Global___VideoRotation.ValueType | None = ...,
+        metadata: Global___FrameMetadata | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]  # noqa: Y015
+    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "metadata", b"metadata", "rotation", b"rotation", "timestamp_us", b"timestamp_us"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     def WhichOneof(self, oneof_group: _Never) -> None: ...
 

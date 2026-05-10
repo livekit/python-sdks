@@ -1,15 +1,19 @@
 import asyncio
 import logging
+import os
 from signal import SIGINT, SIGTERM
 
 import numpy as np
 from livekit import rtc
 
-URL = "ws://localhost:7880"
-TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY"  # noqa
+URL = os.environ.get("LIVEKIT_URL", "ws://localhost:7880")
+TOKEN = os.environ.get(
+    "LIVEKIT_TOKEN",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE5MDY2MTMyODgsImlzcyI6IkFQSVRzRWZpZFpqclFvWSIsIm5hbWUiOiJuYXRpdmUiLCJuYmYiOjE2NzI2MTMyODgsInN1YiI6Im5hdGl2ZSIsInZpZGVvIjp7InJvb20iOiJ0ZXN0Iiwicm9vbUFkbWluIjp0cnVlLCJyb29tQ3JlYXRlIjp0cnVlLCJyb29tSm9pbiI6dHJ1ZSwicm9vbUxpc3QiOnRydWV9fQ.uSNIangMRu8jZD5mnRYoCHjcsQWCrJXgHCs0aNIgBFY",
+)  # noqa
 
-# ("livekitrocks") this is our shared key, it must match the one used by your clients
-SHARED_KEY = b"livekitrocks"
+# This shared key must match the one used by your clients
+SHARED_KEY = os.environ.get("E2EE_SHARED_KEY", "livekitrocks").encode()
 
 WIDTH, HEIGHT = 1280, 720
 
@@ -106,7 +110,7 @@ async def main(room: rtc.Room):
         e2ee_options.key_provider_options.shared_key = SHARED_KEY
 
         await room.connect(
-            URL, TOKEN, options=rtc.RoomOptions(auto_subscribe=True, e2ee=e2ee_options)
+            URL, TOKEN, options=rtc.RoomOptions(auto_subscribe=True, encryption=e2ee_options)
         )
 
         logging.info("connected to room %s", room.name)

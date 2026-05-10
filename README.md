@@ -274,6 +274,20 @@ LiveKit is a dynamic realtime environment and calls can fail for various reasons
 
 You may throw errors of the type `RpcError` with a string `message` in an RPC method handler and they will be received on the caller's side with the message intact. Other errors will not be transmitted and will instead arrive to the caller as `1500` ("Application Error"). Other built-in errors are detailed in `RpcError`.
 
+## Hardware video codec support
+
+The underlying Rust SDK ships with platform-specific hardware-accelerated encoders/decoders, These are used automatically when available and compatible with the runtime environment (OS, drivers, GPU, and codec).
+
+| Platform                       | Codec(s)   | Encoder | Decoder | Backend                                |
+| ------------------------------ | ---------- | ------- | ------- | -------------------------------------- |
+| macOS                          | H264, H265 | ✓       | ✓       | VideoToolbox                           |
+| Linux (AMD GPU)                | H264       | ✓       |         | VAAPI                                  |
+| Linux x64 (NVIDIA GPU)         | H264, H265 | ✓       | ✓       | NVENC / NVDEC (NVIDIA Video Codec SDK) |
+
+Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are used as a fallback when hardware acceleration is not available.
+
+> **Note:** Availability depends on the specific machine configuration, including GPU model, driver support, and runtime environment.
+
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)

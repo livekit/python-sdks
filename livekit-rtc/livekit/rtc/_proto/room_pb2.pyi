@@ -1347,6 +1347,7 @@ class TrackPublishOptions(_message.Message):
     SOURCE_FIELD_NUMBER: _builtins.int
     STREAM_FIELD_NUMBER: _builtins.int
     PRECONNECT_BUFFER_FIELD_NUMBER: _builtins.int
+    PACKET_TRAILER_FEATURES_FIELD_NUMBER: _builtins.int
     video_codec: _video_frame_pb2.VideoCodec.ValueType
     dtx: _builtins.bool
     red: _builtins.bool
@@ -1360,6 +1361,8 @@ class TrackPublishOptions(_message.Message):
 
     @_builtins.property
     def audio_encoding(self) -> Global___AudioEncoding: ...
+    @_builtins.property
+    def packet_trailer_features(self) -> _containers.RepeatedScalarFieldContainer[_track_pb2.PacketTrailerFeature.ValueType]: ...
     def __init__(
         self,
         *,
@@ -1372,10 +1375,11 @@ class TrackPublishOptions(_message.Message):
         source: _track_pb2.TrackSource.ValueType | None = ...,
         stream: _builtins.str | None = ...,
         preconnect_buffer: _builtins.bool | None = ...,
+        packet_trailer_features: _abc.Iterable[_track_pb2.PacketTrailerFeature.ValueType] | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     def WhichOneof(self, oneof_group: _Never) -> None: ...
 
@@ -2604,13 +2608,6 @@ Global___Reconnecting: _TypeAlias = Reconnecting  # noqa: Y015
 
 @_typing.final
 class Reconnected(_message.Message):
-    """Fired only when a full reconnect succeeded — the RtcSession was rebuilt and
-    the SDK has already re-published existing local tracks against it (Track
-    handles are preserved; publication SIDs are new). Signal-only (resume)
-    reconnects do not fire this event; applications can observe those via
-    ConnectionStateChanged.
-    """
-
     DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(

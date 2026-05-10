@@ -22,6 +22,7 @@ from ._proto import ffi_pb2 as proto_ffi
 DEFAULT_RATCHET_SALT = b"LKFrameEncryptionKey"
 DEFAULT_RATCHET_WINDOW_SIZE = 16
 DEFAULT_FAILURE_TOLERANCE = -1
+DEFAULT_KEY_RING_SIZE = 16
 
 
 @dataclass
@@ -30,6 +31,10 @@ class KeyProviderOptions:
     ratchet_salt: bytes = DEFAULT_RATCHET_SALT
     ratchet_window_size: int = DEFAULT_RATCHET_WINDOW_SIZE
     failure_tolerance: int = DEFAULT_FAILURE_TOLERANCE
+    key_ring_size: int = DEFAULT_KEY_RING_SIZE
+    key_derivation_function: proto_e2ee.KeyDerivationFunction.ValueType = (
+        proto_e2ee.KeyDerivationFunction.PBKDF2
+    )
 
 
 @dataclass

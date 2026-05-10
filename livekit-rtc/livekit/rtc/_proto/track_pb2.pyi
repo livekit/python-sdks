@@ -117,6 +117,21 @@ TF_PRECONNECT_BUFFER: AudioTrackFeature.ValueType  # 6
 """client will buffer audio once available and send it to the server via bytes stream once connected"""
 Global___AudioTrackFeature: _TypeAlias = AudioTrackFeature  # noqa: Y015
 
+class _PacketTrailerFeature:
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
+
+class _PacketTrailerFeatureEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_PacketTrailerFeature.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
+    PTF_USER_TIMESTAMP: _PacketTrailerFeature.ValueType  # 0
+    PTF_FRAME_ID: _PacketTrailerFeature.ValueType  # 1
+
+class PacketTrailerFeature(_PacketTrailerFeature, metaclass=_PacketTrailerFeatureEnumTypeWrapper): ...
+
+PTF_USER_TIMESTAMP: PacketTrailerFeature.ValueType  # 0
+PTF_FRAME_ID: PacketTrailerFeature.ValueType  # 1
+Global___PacketTrailerFeature: _TypeAlias = PacketTrailerFeature  # noqa: Y015
+
 @_typing.final
 class CreateVideoTrackRequest(_message.Message):
     """Create a new VideoTrack from a VideoSource"""
@@ -307,6 +322,7 @@ class TrackPublicationInfo(_message.Message):
     REMOTE_FIELD_NUMBER: _builtins.int
     ENCRYPTION_TYPE_FIELD_NUMBER: _builtins.int
     AUDIO_FEATURES_FIELD_NUMBER: _builtins.int
+    PACKET_TRAILER_FEATURES_FIELD_NUMBER: _builtins.int
     sid: _builtins.str
     name: _builtins.str
     kind: Global___TrackKind.ValueType
@@ -320,6 +336,8 @@ class TrackPublicationInfo(_message.Message):
     encryption_type: _e2ee_pb2.EncryptionType.ValueType
     @_builtins.property
     def audio_features(self) -> _containers.RepeatedScalarFieldContainer[Global___AudioTrackFeature.ValueType]: ...
+    @_builtins.property
+    def packet_trailer_features(self) -> _containers.RepeatedScalarFieldContainer[Global___PacketTrailerFeature.ValueType]: ...
     def __init__(
         self,
         *,
@@ -335,10 +353,11 @@ class TrackPublicationInfo(_message.Message):
         remote: _builtins.bool | None = ...,
         encryption_type: _e2ee_pb2.EncryptionType.ValueType | None = ...,
         audio_features: _abc.Iterable[Global___AudioTrackFeature.ValueType] | None = ...,
+        packet_trailer_features: _abc.Iterable[Global___PacketTrailerFeature.ValueType] | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]  # noqa: Y015
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "packet_trailer_features", b"packet_trailer_features", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]  # noqa: Y015
     def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
     def WhichOneof(self, oneof_group: _Never) -> None: ...
 

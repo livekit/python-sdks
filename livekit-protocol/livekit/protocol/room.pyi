@@ -10,7 +10,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CreateRoomRequest(_message.Message):
-    __slots__ = ("name", "room_preset", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "replay_enabled", "agents")
+    __slots__ = ("name", "room_preset", "empty_timeout", "departure_timeout", "max_participants", "node_id", "metadata", "tags", "egress", "min_playout_delay", "max_playout_delay", "sync_streams", "replay_enabled", "agents")
+    class TagsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_PRESET_FIELD_NUMBER: _ClassVar[int]
     EMPTY_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
@@ -18,6 +25,7 @@ class CreateRoomRequest(_message.Message):
     MAX_PARTICIPANTS_FIELD_NUMBER: _ClassVar[int]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
+    TAGS_FIELD_NUMBER: _ClassVar[int]
     EGRESS_FIELD_NUMBER: _ClassVar[int]
     MIN_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
     MAX_PLAYOUT_DELAY_FIELD_NUMBER: _ClassVar[int]
@@ -31,13 +39,14 @@ class CreateRoomRequest(_message.Message):
     max_participants: int
     node_id: str
     metadata: str
+    tags: _containers.ScalarMap[str, str]
     egress: RoomEgress
     min_playout_delay: int
     max_playout_delay: int
     sync_streams: bool
     replay_enabled: bool
     agents: _containers.RepeatedCompositeFieldContainer[_agent_dispatch.RoomAgentDispatch]
-    def __init__(self, name: _Optional[str] = ..., room_preset: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., replay_enabled: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., room_preset: _Optional[str] = ..., empty_timeout: _Optional[int] = ..., departure_timeout: _Optional[int] = ..., max_participants: _Optional[int] = ..., node_id: _Optional[str] = ..., metadata: _Optional[str] = ..., tags: _Optional[_Mapping[str, str]] = ..., egress: _Optional[_Union[RoomEgress, _Mapping]] = ..., min_playout_delay: _Optional[int] = ..., max_playout_delay: _Optional[int] = ..., sync_streams: bool = ..., replay_enabled: bool = ..., agents: _Optional[_Iterable[_Union[_agent_dispatch.RoomAgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class RoomEgress(_message.Message):
     __slots__ = ("room", "participant", "tracks")
