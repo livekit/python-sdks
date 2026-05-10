@@ -794,14 +794,16 @@ class DataTrackStreamEOS(_message.Message):
     DESCRIPTOR: _descriptor.Descriptor
 
     ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
-    """If the track could not be subscribed to, a message describing the error.
-    Absent if the stream ended normally.
-    """
+    @_builtins.property
+    def error(self) -> Global___SubscribeDataTrackError:
+        """Present if stream ended before any frames were emitted due to subscription establishment failing.
+        Absent if the stream ended normally (i.e., due to the track being unpublished).
+        """
+
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: Global___SubscribeDataTrackError | None = ...,
     ) -> None: ...
     _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
     def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
