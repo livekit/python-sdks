@@ -704,14 +704,16 @@ class DataTrackStreamEOS(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ERROR_FIELD_NUMBER: builtins.int
-    error: builtins.str
-    """If the track could not be subscribed to, a message describing the error.
-    Absent if the stream ended normally.
-    """
+    @property
+    def error(self) -> global___SubscribeDataTrackError:
+        """Present if stream ended before any frames were emitted due to subscription establishment failing.
+        Absent if the stream ended normally (i.e., due to the track being unpublished).
+        """
+
     def __init__(
         self,
         *,
-        error: builtins.str | None = ...,
+        error: global___SubscribeDataTrackError | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
