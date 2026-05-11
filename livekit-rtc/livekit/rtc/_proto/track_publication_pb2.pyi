@@ -16,26 +16,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import builtins
-import google.protobuf.descriptor
-import google.protobuf.internal.enum_type_wrapper
-import google.protobuf.message
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+import builtins as _builtins
 import sys
-import typing
+import typing as _typing
 
 if sys.version_info >= (3, 10):
-    import typing as typing_extensions
+    from typing import TypeAlias as _TypeAlias
 else:
-    import typing_extensions
+    from typing_extensions import TypeAlias as _TypeAlias
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+DESCRIPTOR: _descriptor.FileDescriptor
 
 class _VideoQuality:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _VideoQualityEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_VideoQuality.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _VideoQualityEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_VideoQuality.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     VIDEO_QUALITY_LOW: _VideoQuality.ValueType  # 0
     VIDEO_QUALITY_MEDIUM: _VideoQuality.ValueType  # 1
     VIDEO_QUALITY_HIGH: _VideoQuality.ValueType  # 2
@@ -46,100 +46,106 @@ class VideoQuality(_VideoQuality, metaclass=_VideoQualityEnumTypeWrapper):
 VIDEO_QUALITY_LOW: VideoQuality.ValueType  # 0
 VIDEO_QUALITY_MEDIUM: VideoQuality.ValueType  # 1
 VIDEO_QUALITY_HIGH: VideoQuality.ValueType  # 2
-global___VideoQuality = VideoQuality
+Global___VideoQuality: _TypeAlias = VideoQuality  # noqa: Y015
 
-@typing.final
-class EnableRemoteTrackPublicationRequest(google.protobuf.message.Message):
+@_typing.final
+class EnableRemoteTrackPublicationRequest(_message.Message):
     """Enable/Disable a remote track publication"""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
-    ENABLED_FIELD_NUMBER: builtins.int
-    track_publication_handle: builtins.int
-    enabled: builtins.bool
+    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: _builtins.int
+    ENABLED_FIELD_NUMBER: _builtins.int
+    track_publication_handle: _builtins.int
+    enabled: _builtins.bool
     def __init__(
         self,
         *,
-        track_publication_handle: builtins.int | None = ...,
-        enabled: builtins.bool | None = ...,
+        track_publication_handle: _builtins.int | None = ...,
+        enabled: _builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["enabled", b"enabled", "track_publication_handle", b"track_publication_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___EnableRemoteTrackPublicationRequest = EnableRemoteTrackPublicationRequest
+Global___EnableRemoteTrackPublicationRequest: _TypeAlias = EnableRemoteTrackPublicationRequest  # noqa: Y015
 
-@typing.final
-class EnableRemoteTrackPublicationResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class EnableRemoteTrackPublicationResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___EnableRemoteTrackPublicationResponse = EnableRemoteTrackPublicationResponse
+Global___EnableRemoteTrackPublicationResponse: _TypeAlias = EnableRemoteTrackPublicationResponse  # noqa: Y015
 
-@typing.final
-class UpdateRemoteTrackPublicationDimensionRequest(google.protobuf.message.Message):
+@_typing.final
+class UpdateRemoteTrackPublicationDimensionRequest(_message.Message):
     """update a remote track publication dimension"""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
-    WIDTH_FIELD_NUMBER: builtins.int
-    HEIGHT_FIELD_NUMBER: builtins.int
-    track_publication_handle: builtins.int
-    width: builtins.int
-    height: builtins.int
+    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: _builtins.int
+    WIDTH_FIELD_NUMBER: _builtins.int
+    HEIGHT_FIELD_NUMBER: _builtins.int
+    track_publication_handle: _builtins.int
+    width: _builtins.int
+    height: _builtins.int
     def __init__(
         self,
         *,
-        track_publication_handle: builtins.int | None = ...,
-        width: builtins.int | None = ...,
-        height: builtins.int | None = ...,
+        track_publication_handle: _builtins.int | None = ...,
+        width: _builtins.int | None = ...,
+        height: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["height", b"height", "track_publication_handle", b"track_publication_handle", "width", b"width"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___UpdateRemoteTrackPublicationDimensionRequest = UpdateRemoteTrackPublicationDimensionRequest
+Global___UpdateRemoteTrackPublicationDimensionRequest: _TypeAlias = UpdateRemoteTrackPublicationDimensionRequest  # noqa: Y015
 
-@typing.final
-class UpdateRemoteTrackPublicationDimensionResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class UpdateRemoteTrackPublicationDimensionResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___UpdateRemoteTrackPublicationDimensionResponse = UpdateRemoteTrackPublicationDimensionResponse
+Global___UpdateRemoteTrackPublicationDimensionResponse: _TypeAlias = UpdateRemoteTrackPublicationDimensionResponse  # noqa: Y015
 
-@typing.final
-class SetRemoteTrackPublicationQualityRequest(google.protobuf.message.Message):
+@_typing.final
+class SetRemoteTrackPublicationQualityRequest(_message.Message):
     """For tracks that support simulcasting, adjust subscribed quality."""
 
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
-    QUALITY_FIELD_NUMBER: builtins.int
-    track_publication_handle: builtins.int
-    quality: global___VideoQuality.ValueType
+    TRACK_PUBLICATION_HANDLE_FIELD_NUMBER: _builtins.int
+    QUALITY_FIELD_NUMBER: _builtins.int
+    track_publication_handle: _builtins.int
+    quality: Global___VideoQuality.ValueType
     def __init__(
         self,
         *,
-        track_publication_handle: builtins.int | None = ...,
-        quality: global___VideoQuality.ValueType | None = ...,
+        track_publication_handle: _builtins.int | None = ...,
+        quality: Global___VideoQuality.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["quality", b"quality", "track_publication_handle", b"track_publication_handle"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___SetRemoteTrackPublicationQualityRequest = SetRemoteTrackPublicationQualityRequest
+Global___SetRemoteTrackPublicationQualityRequest: _TypeAlias = SetRemoteTrackPublicationQualityRequest  # noqa: Y015
 
-@typing.final
-class SetRemoteTrackPublicationQualityResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class SetRemoteTrackPublicationQualityResponse(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
 
-global___SetRemoteTrackPublicationQualityResponse = SetRemoteTrackPublicationQualityResponse
+Global___SetRemoteTrackPublicationQualityResponse: _TypeAlias = SetRemoteTrackPublicationQualityResponse  # noqa: Y015

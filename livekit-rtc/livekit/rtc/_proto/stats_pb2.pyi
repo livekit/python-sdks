@@ -16,28 +16,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import builtins
-import collections.abc
-import google.protobuf.descriptor
-import google.protobuf.internal.containers
-import google.protobuf.internal.enum_type_wrapper
-import google.protobuf.message
+from collections import abc as _abc
+from google.protobuf import descriptor as _descriptor
+from google.protobuf import message as _message
+from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
+import builtins as _builtins
 import sys
-import typing
+import typing as _typing
 
 if sys.version_info >= (3, 10):
-    import typing as typing_extensions
+    from typing import TypeAlias as _TypeAlias
 else:
-    import typing_extensions
+    from typing_extensions import TypeAlias as _TypeAlias
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+DESCRIPTOR: _descriptor.FileDescriptor
 
 class _DataChannelState:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _DataChannelStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataChannelState.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _DataChannelStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_DataChannelState.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     DC_CONNECTING: _DataChannelState.ValueType  # 0
     DC_OPEN: _DataChannelState.ValueType  # 1
     DC_CLOSING: _DataChannelState.ValueType  # 2
@@ -49,14 +49,14 @@ DC_CONNECTING: DataChannelState.ValueType  # 0
 DC_OPEN: DataChannelState.ValueType  # 1
 DC_CLOSING: DataChannelState.ValueType  # 2
 DC_CLOSED: DataChannelState.ValueType  # 3
-global___DataChannelState = DataChannelState
+Global___DataChannelState: _TypeAlias = DataChannelState  # noqa: Y015
 
 class _QualityLimitationReason:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _QualityLimitationReasonEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_QualityLimitationReason.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _QualityLimitationReasonEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_QualityLimitationReason.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     LIMITATION_NONE: _QualityLimitationReason.ValueType  # 0
     LIMITATION_CPU: _QualityLimitationReason.ValueType  # 1
     LIMITATION_BANDWIDTH: _QualityLimitationReason.ValueType  # 2
@@ -68,14 +68,14 @@ LIMITATION_NONE: QualityLimitationReason.ValueType  # 0
 LIMITATION_CPU: QualityLimitationReason.ValueType  # 1
 LIMITATION_BANDWIDTH: QualityLimitationReason.ValueType  # 2
 LIMITATION_OTHER: QualityLimitationReason.ValueType  # 3
-global___QualityLimitationReason = QualityLimitationReason
+Global___QualityLimitationReason: _TypeAlias = QualityLimitationReason  # noqa: Y015
 
 class _IceRole:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceRoleEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceRole.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceRoleEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceRole.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     ICE_UNKNOWN: _IceRole.ValueType  # 0
     ICE_CONTROLLING: _IceRole.ValueType  # 1
     ICE_CONTROLLED: _IceRole.ValueType  # 2
@@ -85,14 +85,14 @@ class IceRole(_IceRole, metaclass=_IceRoleEnumTypeWrapper): ...
 ICE_UNKNOWN: IceRole.ValueType  # 0
 ICE_CONTROLLING: IceRole.ValueType  # 1
 ICE_CONTROLLED: IceRole.ValueType  # 2
-global___IceRole = IceRole
+Global___IceRole: _TypeAlias = IceRole  # noqa: Y015
 
 class _DtlsTransportState:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _DtlsTransportStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DtlsTransportState.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _DtlsTransportStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_DtlsTransportState.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     DTLS_TRANSPORT_NEW: _DtlsTransportState.ValueType  # 0
     DTLS_TRANSPORT_CONNECTING: _DtlsTransportState.ValueType  # 1
     DTLS_TRANSPORT_CONNECTED: _DtlsTransportState.ValueType  # 2
@@ -106,14 +106,14 @@ DTLS_TRANSPORT_CONNECTING: DtlsTransportState.ValueType  # 1
 DTLS_TRANSPORT_CONNECTED: DtlsTransportState.ValueType  # 2
 DTLS_TRANSPORT_CLOSED: DtlsTransportState.ValueType  # 3
 DTLS_TRANSPORT_FAILED: DtlsTransportState.ValueType  # 4
-global___DtlsTransportState = DtlsTransportState
+Global___DtlsTransportState: _TypeAlias = DtlsTransportState  # noqa: Y015
 
 class _IceTransportState:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceTransportStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceTransportState.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceTransportStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceTransportState.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     ICE_TRANSPORT_NEW: _IceTransportState.ValueType  # 0
     ICE_TRANSPORT_CHECKING: _IceTransportState.ValueType  # 1
     ICE_TRANSPORT_CONNECTED: _IceTransportState.ValueType  # 2
@@ -131,14 +131,14 @@ ICE_TRANSPORT_COMPLETED: IceTransportState.ValueType  # 3
 ICE_TRANSPORT_DISCONNECTED: IceTransportState.ValueType  # 4
 ICE_TRANSPORT_FAILED: IceTransportState.ValueType  # 5
 ICE_TRANSPORT_CLOSED: IceTransportState.ValueType  # 6
-global___IceTransportState = IceTransportState
+Global___IceTransportState: _TypeAlias = IceTransportState  # noqa: Y015
 
 class _DtlsRole:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _DtlsRoleEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DtlsRole.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _DtlsRoleEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_DtlsRole.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     DTLS_CLIENT: _DtlsRole.ValueType  # 0
     DTLS_SERVER: _DtlsRole.ValueType  # 1
     DTLS_UNKNOWN: _DtlsRole.ValueType  # 2
@@ -148,14 +148,14 @@ class DtlsRole(_DtlsRole, metaclass=_DtlsRoleEnumTypeWrapper): ...
 DTLS_CLIENT: DtlsRole.ValueType  # 0
 DTLS_SERVER: DtlsRole.ValueType  # 1
 DTLS_UNKNOWN: DtlsRole.ValueType  # 2
-global___DtlsRole = DtlsRole
+Global___DtlsRole: _TypeAlias = DtlsRole  # noqa: Y015
 
 class _IceCandidatePairState:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceCandidatePairStateEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceCandidatePairState.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceCandidatePairStateEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceCandidatePairState.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     PAIR_FROZEN: _IceCandidatePairState.ValueType  # 0
     PAIR_WAITING: _IceCandidatePairState.ValueType  # 1
     PAIR_IN_PROGRESS: _IceCandidatePairState.ValueType  # 2
@@ -169,14 +169,14 @@ PAIR_WAITING: IceCandidatePairState.ValueType  # 1
 PAIR_IN_PROGRESS: IceCandidatePairState.ValueType  # 2
 PAIR_FAILED: IceCandidatePairState.ValueType  # 3
 PAIR_SUCCEEDED: IceCandidatePairState.ValueType  # 4
-global___IceCandidatePairState = IceCandidatePairState
+Global___IceCandidatePairState: _TypeAlias = IceCandidatePairState  # noqa: Y015
 
 class _IceCandidateType:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceCandidateTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceCandidateType.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceCandidateTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceCandidateType.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     HOST: _IceCandidateType.ValueType  # 0
     SRFLX: _IceCandidateType.ValueType  # 1
     PRFLX: _IceCandidateType.ValueType  # 2
@@ -188,14 +188,14 @@ HOST: IceCandidateType.ValueType  # 0
 SRFLX: IceCandidateType.ValueType  # 1
 PRFLX: IceCandidateType.ValueType  # 2
 RELAY: IceCandidateType.ValueType  # 3
-global___IceCandidateType = IceCandidateType
+Global___IceCandidateType: _TypeAlias = IceCandidateType  # noqa: Y015
 
 class _IceServerTransportProtocol:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceServerTransportProtocolEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceServerTransportProtocol.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceServerTransportProtocolEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceServerTransportProtocol.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     TRANSPORT_UDP: _IceServerTransportProtocol.ValueType  # 0
     TRANSPORT_TCP: _IceServerTransportProtocol.ValueType  # 1
     TRANSPORT_TLS: _IceServerTransportProtocol.ValueType  # 2
@@ -205,14 +205,14 @@ class IceServerTransportProtocol(_IceServerTransportProtocol, metaclass=_IceServ
 TRANSPORT_UDP: IceServerTransportProtocol.ValueType  # 0
 TRANSPORT_TCP: IceServerTransportProtocol.ValueType  # 1
 TRANSPORT_TLS: IceServerTransportProtocol.ValueType  # 2
-global___IceServerTransportProtocol = IceServerTransportProtocol
+Global___IceServerTransportProtocol: _TypeAlias = IceServerTransportProtocol  # noqa: Y015
 
 class _IceTcpCandidateType:
-    ValueType = typing.NewType("ValueType", builtins.int)
-    V: typing_extensions.TypeAlias = ValueType
+    ValueType = _typing.NewType("ValueType", _builtins.int)
+    V: _TypeAlias = ValueType  # noqa: Y015
 
-class _IceTcpCandidateTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_IceTcpCandidateType.ValueType], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+class _IceTcpCandidateTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_IceTcpCandidateType.ValueType], _builtins.type):
+    DESCRIPTOR: _descriptor.EnumDescriptor
     CANDIDATE_ACTIVE: _IceTcpCandidateType.ValueType  # 0
     CANDIDATE_PASSIVE: _IceTcpCandidateType.ValueType  # 1
     CANDIDATE_SO: _IceTcpCandidateType.ValueType  # 2
@@ -222,1293 +222,1369 @@ class IceTcpCandidateType(_IceTcpCandidateType, metaclass=_IceTcpCandidateTypeEn
 CANDIDATE_ACTIVE: IceTcpCandidateType.ValueType  # 0
 CANDIDATE_PASSIVE: IceTcpCandidateType.ValueType  # 1
 CANDIDATE_SO: IceTcpCandidateType.ValueType  # 2
-global___IceTcpCandidateType = IceTcpCandidateType
+Global___IceTcpCandidateType: _TypeAlias = IceTcpCandidateType  # noqa: Y015
 
-@typing.final
-class RtcStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RtcStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    @typing.final
-    class Codec(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class Codec(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        CODEC_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def codec(self) -> global___CodecStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        CODEC_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def codec(self) -> Global___CodecStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            codec: global___CodecStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            codec: Global___CodecStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["codec", b"codec", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["codec", b"codec", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["codec", b"codec", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["codec", b"codec", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class InboundRtp(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class InboundRtp(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        STREAM_FIELD_NUMBER: builtins.int
-        RECEIVED_FIELD_NUMBER: builtins.int
-        INBOUND_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def stream(self) -> global___RtpStreamStats: ...
-        @property
-        def received(self) -> global___ReceivedRtpStreamStats: ...
-        @property
-        def inbound(self) -> global___InboundRtpStreamStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        STREAM_FIELD_NUMBER: _builtins.int
+        RECEIVED_FIELD_NUMBER: _builtins.int
+        INBOUND_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def stream(self) -> Global___RtpStreamStats: ...
+        @_builtins.property
+        def received(self) -> Global___ReceivedRtpStreamStats: ...
+        @_builtins.property
+        def inbound(self) -> Global___InboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            stream: global___RtpStreamStats | None = ...,
-            received: global___ReceivedRtpStreamStats | None = ...,
-            inbound: global___InboundRtpStreamStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            stream: Global___RtpStreamStats | None = ...,
+            received: Global___ReceivedRtpStreamStats | None = ...,
+            inbound: Global___InboundRtpStreamStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["inbound", b"inbound", "received", b"received", "rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class OutboundRtp(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class OutboundRtp(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        STREAM_FIELD_NUMBER: builtins.int
-        SENT_FIELD_NUMBER: builtins.int
-        OUTBOUND_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def stream(self) -> global___RtpStreamStats: ...
-        @property
-        def sent(self) -> global___SentRtpStreamStats: ...
-        @property
-        def outbound(self) -> global___OutboundRtpStreamStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        STREAM_FIELD_NUMBER: _builtins.int
+        SENT_FIELD_NUMBER: _builtins.int
+        OUTBOUND_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def stream(self) -> Global___RtpStreamStats: ...
+        @_builtins.property
+        def sent(self) -> Global___SentRtpStreamStats: ...
+        @_builtins.property
+        def outbound(self) -> Global___OutboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            stream: global___RtpStreamStats | None = ...,
-            sent: global___SentRtpStreamStats | None = ...,
-            outbound: global___OutboundRtpStreamStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            stream: Global___RtpStreamStats | None = ...,
+            sent: Global___SentRtpStreamStats | None = ...,
+            outbound: Global___OutboundRtpStreamStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["outbound", b"outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class RemoteInboundRtp(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class RemoteInboundRtp(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        STREAM_FIELD_NUMBER: builtins.int
-        RECEIVED_FIELD_NUMBER: builtins.int
-        REMOTE_INBOUND_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def stream(self) -> global___RtpStreamStats: ...
-        @property
-        def received(self) -> global___ReceivedRtpStreamStats: ...
-        @property
-        def remote_inbound(self) -> global___RemoteInboundRtpStreamStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        STREAM_FIELD_NUMBER: _builtins.int
+        RECEIVED_FIELD_NUMBER: _builtins.int
+        REMOTE_INBOUND_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def stream(self) -> Global___RtpStreamStats: ...
+        @_builtins.property
+        def received(self) -> Global___ReceivedRtpStreamStats: ...
+        @_builtins.property
+        def remote_inbound(self) -> Global___RemoteInboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            stream: global___RtpStreamStats | None = ...,
-            received: global___ReceivedRtpStreamStats | None = ...,
-            remote_inbound: global___RemoteInboundRtpStreamStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            stream: Global___RtpStreamStats | None = ...,
+            received: Global___ReceivedRtpStreamStats | None = ...,
+            remote_inbound: Global___RemoteInboundRtpStreamStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["received", b"received", "remote_inbound", b"remote_inbound", "rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class RemoteOutboundRtp(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class RemoteOutboundRtp(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        STREAM_FIELD_NUMBER: builtins.int
-        SENT_FIELD_NUMBER: builtins.int
-        REMOTE_OUTBOUND_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def stream(self) -> global___RtpStreamStats: ...
-        @property
-        def sent(self) -> global___SentRtpStreamStats: ...
-        @property
-        def remote_outbound(self) -> global___RemoteOutboundRtpStreamStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        STREAM_FIELD_NUMBER: _builtins.int
+        SENT_FIELD_NUMBER: _builtins.int
+        REMOTE_OUTBOUND_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def stream(self) -> Global___RtpStreamStats: ...
+        @_builtins.property
+        def sent(self) -> Global___SentRtpStreamStats: ...
+        @_builtins.property
+        def remote_outbound(self) -> Global___RemoteOutboundRtpStreamStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            stream: global___RtpStreamStats | None = ...,
-            sent: global___SentRtpStreamStats | None = ...,
-            remote_outbound: global___RemoteOutboundRtpStreamStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            stream: Global___RtpStreamStats | None = ...,
+            sent: Global___SentRtpStreamStats | None = ...,
+            remote_outbound: Global___RemoteOutboundRtpStreamStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["remote_outbound", b"remote_outbound", "rtc", b"rtc", "sent", b"sent", "stream", b"stream"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class MediaSource(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class MediaSource(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        SOURCE_FIELD_NUMBER: builtins.int
-        AUDIO_FIELD_NUMBER: builtins.int
-        VIDEO_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def source(self) -> global___MediaSourceStats: ...
-        @property
-        def audio(self) -> global___AudioSourceStats: ...
-        @property
-        def video(self) -> global___VideoSourceStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        SOURCE_FIELD_NUMBER: _builtins.int
+        AUDIO_FIELD_NUMBER: _builtins.int
+        VIDEO_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def source(self) -> Global___MediaSourceStats: ...
+        @_builtins.property
+        def audio(self) -> Global___AudioSourceStats: ...
+        @_builtins.property
+        def video(self) -> Global___VideoSourceStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            source: global___MediaSourceStats | None = ...,
-            audio: global___AudioSourceStats | None = ...,
-            video: global___VideoSourceStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            source: Global___MediaSourceStats | None = ...,
+            audio: Global___AudioSourceStats | None = ...,
+            video: Global___VideoSourceStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["audio", b"audio", "rtc", b"rtc", "source", b"source", "video", b"video"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class MediaPlayout(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class MediaPlayout(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        AUDIO_PLAYOUT_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def audio_playout(self) -> global___AudioPlayoutStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        AUDIO_PLAYOUT_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def audio_playout(self) -> Global___AudioPlayoutStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            audio_playout: global___AudioPlayoutStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            audio_playout: Global___AudioPlayoutStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_playout", b"audio_playout", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class PeerConnection(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class PeerConnection(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        PC_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def pc(self) -> global___PeerConnectionStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        PC_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def pc(self) -> Global___PeerConnectionStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            pc: global___PeerConnectionStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            pc: Global___PeerConnectionStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["pc", b"pc", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["pc", b"pc", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["pc", b"pc", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["pc", b"pc", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class DataChannel(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class DataChannel(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        DC_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def dc(self) -> global___DataChannelStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        DC_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def dc(self) -> Global___DataChannelStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            dc: global___DataChannelStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            dc: Global___DataChannelStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["dc", b"dc", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["dc", b"dc", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["dc", b"dc", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["dc", b"dc", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class Transport(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class Transport(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        TRANSPORT_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def transport(self) -> global___TransportStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        TRANSPORT_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def transport(self) -> Global___TransportStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            transport: global___TransportStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            transport: Global___TransportStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["rtc", b"rtc", "transport", b"transport"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["rtc", b"rtc", "transport", b"transport"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["rtc", b"rtc", "transport", b"transport"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["rtc", b"rtc", "transport", b"transport"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class CandidatePair(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class CandidatePair(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        CANDIDATE_PAIR_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def candidate_pair(self) -> global___CandidatePairStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        CANDIDATE_PAIR_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def candidate_pair(self) -> Global___CandidatePairStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            candidate_pair: global___CandidatePairStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            candidate_pair: Global___CandidatePairStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["candidate_pair", b"candidate_pair", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class LocalCandidate(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class LocalCandidate(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        CANDIDATE_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def candidate(self) -> global___IceCandidateStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        CANDIDATE_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def candidate(self) -> Global___IceCandidateStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            candidate: global___IceCandidateStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            candidate: Global___IceCandidateStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["candidate", b"candidate", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["candidate", b"candidate", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class RemoteCandidate(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class RemoteCandidate(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        CANDIDATE_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def candidate(self) -> global___IceCandidateStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        CANDIDATE_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def candidate(self) -> Global___IceCandidateStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            candidate: global___IceCandidateStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            candidate: Global___IceCandidateStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["candidate", b"candidate", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["candidate", b"candidate", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["candidate", b"candidate", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class Certificate(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class Certificate(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        CERTIFICATE_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def certificate(self) -> global___CertificateStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        CERTIFICATE_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def certificate(self) -> Global___CertificateStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            certificate: global___CertificateStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            certificate: Global___CertificateStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["certificate", b"certificate", "rtc", b"rtc"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["certificate", b"certificate", "rtc", b"rtc"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["certificate", b"certificate", "rtc", b"rtc"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["certificate", b"certificate", "rtc", b"rtc"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class Stream(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class Stream(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        RTC_FIELD_NUMBER: builtins.int
-        STREAM_FIELD_NUMBER: builtins.int
-        @property
-        def rtc(self) -> global___RtcStatsData: ...
-        @property
-        def stream(self) -> global___StreamStats: ...
+        RTC_FIELD_NUMBER: _builtins.int
+        STREAM_FIELD_NUMBER: _builtins.int
+        @_builtins.property
+        def rtc(self) -> Global___RtcStatsData: ...
+        @_builtins.property
+        def stream(self) -> Global___StreamStats: ...
         def __init__(
             self,
             *,
-            rtc: global___RtcStatsData | None = ...,
-            stream: global___StreamStats | None = ...,
+            rtc: Global___RtcStatsData | None = ...,
+            stream: Global___StreamStats | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["rtc", b"rtc", "stream", b"stream"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["rtc", b"rtc", "stream", b"stream"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    @typing.final
-    class Track(google.protobuf.message.Message):
+    @_typing.final
+    class Track(_message.Message):
         """Deprecated"""
 
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+        DESCRIPTOR: _descriptor.Descriptor
 
         def __init__(
             self,
         ) -> None: ...
 
-    CODEC_FIELD_NUMBER: builtins.int
-    INBOUND_RTP_FIELD_NUMBER: builtins.int
-    OUTBOUND_RTP_FIELD_NUMBER: builtins.int
-    REMOTE_INBOUND_RTP_FIELD_NUMBER: builtins.int
-    REMOTE_OUTBOUND_RTP_FIELD_NUMBER: builtins.int
-    MEDIA_SOURCE_FIELD_NUMBER: builtins.int
-    MEDIA_PLAYOUT_FIELD_NUMBER: builtins.int
-    PEER_CONNECTION_FIELD_NUMBER: builtins.int
-    DATA_CHANNEL_FIELD_NUMBER: builtins.int
-    TRANSPORT_FIELD_NUMBER: builtins.int
-    CANDIDATE_PAIR_FIELD_NUMBER: builtins.int
-    LOCAL_CANDIDATE_FIELD_NUMBER: builtins.int
-    REMOTE_CANDIDATE_FIELD_NUMBER: builtins.int
-    CERTIFICATE_FIELD_NUMBER: builtins.int
-    STREAM_FIELD_NUMBER: builtins.int
-    TRACK_FIELD_NUMBER: builtins.int
-    @property
-    def codec(self) -> global___RtcStats.Codec: ...
-    @property
-    def inbound_rtp(self) -> global___RtcStats.InboundRtp: ...
-    @property
-    def outbound_rtp(self) -> global___RtcStats.OutboundRtp: ...
-    @property
-    def remote_inbound_rtp(self) -> global___RtcStats.RemoteInboundRtp: ...
-    @property
-    def remote_outbound_rtp(self) -> global___RtcStats.RemoteOutboundRtp: ...
-    @property
-    def media_source(self) -> global___RtcStats.MediaSource: ...
-    @property
-    def media_playout(self) -> global___RtcStats.MediaPlayout: ...
-    @property
-    def peer_connection(self) -> global___RtcStats.PeerConnection: ...
-    @property
-    def data_channel(self) -> global___RtcStats.DataChannel: ...
-    @property
-    def transport(self) -> global___RtcStats.Transport: ...
-    @property
-    def candidate_pair(self) -> global___RtcStats.CandidatePair: ...
-    @property
-    def local_candidate(self) -> global___RtcStats.LocalCandidate: ...
-    @property
-    def remote_candidate(self) -> global___RtcStats.RemoteCandidate: ...
-    @property
-    def certificate(self) -> global___RtcStats.Certificate: ...
-    @property
-    def stream(self) -> global___RtcStats.Stream: ...
-    @property
-    def track(self) -> global___RtcStats.Track: ...
+    CODEC_FIELD_NUMBER: _builtins.int
+    INBOUND_RTP_FIELD_NUMBER: _builtins.int
+    OUTBOUND_RTP_FIELD_NUMBER: _builtins.int
+    REMOTE_INBOUND_RTP_FIELD_NUMBER: _builtins.int
+    REMOTE_OUTBOUND_RTP_FIELD_NUMBER: _builtins.int
+    MEDIA_SOURCE_FIELD_NUMBER: _builtins.int
+    MEDIA_PLAYOUT_FIELD_NUMBER: _builtins.int
+    PEER_CONNECTION_FIELD_NUMBER: _builtins.int
+    DATA_CHANNEL_FIELD_NUMBER: _builtins.int
+    TRANSPORT_FIELD_NUMBER: _builtins.int
+    CANDIDATE_PAIR_FIELD_NUMBER: _builtins.int
+    LOCAL_CANDIDATE_FIELD_NUMBER: _builtins.int
+    REMOTE_CANDIDATE_FIELD_NUMBER: _builtins.int
+    CERTIFICATE_FIELD_NUMBER: _builtins.int
+    STREAM_FIELD_NUMBER: _builtins.int
+    TRACK_FIELD_NUMBER: _builtins.int
+    @_builtins.property
+    def codec(self) -> Global___RtcStats.Codec: ...
+    @_builtins.property
+    def inbound_rtp(self) -> Global___RtcStats.InboundRtp: ...
+    @_builtins.property
+    def outbound_rtp(self) -> Global___RtcStats.OutboundRtp: ...
+    @_builtins.property
+    def remote_inbound_rtp(self) -> Global___RtcStats.RemoteInboundRtp: ...
+    @_builtins.property
+    def remote_outbound_rtp(self) -> Global___RtcStats.RemoteOutboundRtp: ...
+    @_builtins.property
+    def media_source(self) -> Global___RtcStats.MediaSource: ...
+    @_builtins.property
+    def media_playout(self) -> Global___RtcStats.MediaPlayout: ...
+    @_builtins.property
+    def peer_connection(self) -> Global___RtcStats.PeerConnection: ...
+    @_builtins.property
+    def data_channel(self) -> Global___RtcStats.DataChannel: ...
+    @_builtins.property
+    def transport(self) -> Global___RtcStats.Transport: ...
+    @_builtins.property
+    def candidate_pair(self) -> Global___RtcStats.CandidatePair: ...
+    @_builtins.property
+    def local_candidate(self) -> Global___RtcStats.LocalCandidate: ...
+    @_builtins.property
+    def remote_candidate(self) -> Global___RtcStats.RemoteCandidate: ...
+    @_builtins.property
+    def certificate(self) -> Global___RtcStats.Certificate: ...
+    @_builtins.property
+    def stream(self) -> Global___RtcStats.Stream: ...
+    @_builtins.property
+    def track(self) -> Global___RtcStats.Track: ...
     def __init__(
         self,
         *,
-        codec: global___RtcStats.Codec | None = ...,
-        inbound_rtp: global___RtcStats.InboundRtp | None = ...,
-        outbound_rtp: global___RtcStats.OutboundRtp | None = ...,
-        remote_inbound_rtp: global___RtcStats.RemoteInboundRtp | None = ...,
-        remote_outbound_rtp: global___RtcStats.RemoteOutboundRtp | None = ...,
-        media_source: global___RtcStats.MediaSource | None = ...,
-        media_playout: global___RtcStats.MediaPlayout | None = ...,
-        peer_connection: global___RtcStats.PeerConnection | None = ...,
-        data_channel: global___RtcStats.DataChannel | None = ...,
-        transport: global___RtcStats.Transport | None = ...,
-        candidate_pair: global___RtcStats.CandidatePair | None = ...,
-        local_candidate: global___RtcStats.LocalCandidate | None = ...,
-        remote_candidate: global___RtcStats.RemoteCandidate | None = ...,
-        certificate: global___RtcStats.Certificate | None = ...,
-        stream: global___RtcStats.Stream | None = ...,
-        track: global___RtcStats.Track | None = ...,
+        codec: Global___RtcStats.Codec | None = ...,
+        inbound_rtp: Global___RtcStats.InboundRtp | None = ...,
+        outbound_rtp: Global___RtcStats.OutboundRtp | None = ...,
+        remote_inbound_rtp: Global___RtcStats.RemoteInboundRtp | None = ...,
+        remote_outbound_rtp: Global___RtcStats.RemoteOutboundRtp | None = ...,
+        media_source: Global___RtcStats.MediaSource | None = ...,
+        media_playout: Global___RtcStats.MediaPlayout | None = ...,
+        peer_connection: Global___RtcStats.PeerConnection | None = ...,
+        data_channel: Global___RtcStats.DataChannel | None = ...,
+        transport: Global___RtcStats.Transport | None = ...,
+        candidate_pair: Global___RtcStats.CandidatePair | None = ...,
+        local_candidate: Global___RtcStats.LocalCandidate | None = ...,
+        remote_candidate: Global___RtcStats.RemoteCandidate | None = ...,
+        certificate: Global___RtcStats.Certificate | None = ...,
+        stream: Global___RtcStats.Stream | None = ...,
+        track: Global___RtcStats.Track | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["stats", b"stats"]) -> typing.Literal["codec", "inbound_rtp", "outbound_rtp", "remote_inbound_rtp", "remote_outbound_rtp", "media_source", "media_playout", "peer_connection", "data_channel", "transport", "candidate_pair", "local_candidate", "remote_candidate", "certificate", "stream", "track"] | None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["candidate_pair", b"candidate_pair", "certificate", b"certificate", "codec", b"codec", "data_channel", b"data_channel", "inbound_rtp", b"inbound_rtp", "local_candidate", b"local_candidate", "media_playout", b"media_playout", "media_source", b"media_source", "outbound_rtp", b"outbound_rtp", "peer_connection", b"peer_connection", "remote_candidate", b"remote_candidate", "remote_inbound_rtp", b"remote_inbound_rtp", "remote_outbound_rtp", b"remote_outbound_rtp", "stats", b"stats", "stream", b"stream", "track", b"track", "transport", b"transport"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
+    _WhichOneofReturnType_stats: _TypeAlias = _typing.Literal["codec", "inbound_rtp", "outbound_rtp", "remote_inbound_rtp", "remote_outbound_rtp", "media_source", "media_playout", "peer_connection", "data_channel", "transport", "candidate_pair", "local_candidate", "remote_candidate", "certificate", "stream", "track"]  # noqa: Y015
+    _WhichOneofArgType_stats: _TypeAlias = _typing.Literal["stats", b"stats"]  # noqa: Y015
+    def WhichOneof(self, oneof_group: _WhichOneofArgType_stats) -> _WhichOneofReturnType_stats | None: ...
 
-global___RtcStats = RtcStats
+Global___RtcStats: _TypeAlias = RtcStats  # noqa: Y015
 
-@typing.final
-class RtcStatsData(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RtcStatsData(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ID_FIELD_NUMBER: builtins.int
-    TIMESTAMP_FIELD_NUMBER: builtins.int
-    id: builtins.str
-    timestamp: builtins.int
+    ID_FIELD_NUMBER: _builtins.int
+    TIMESTAMP_FIELD_NUMBER: _builtins.int
+    id: _builtins.str
+    timestamp: _builtins.int
     def __init__(
         self,
         *,
-        id: builtins.str | None = ...,
-        timestamp: builtins.int | None = ...,
+        id: _builtins.str | None = ...,
+        timestamp: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id", "timestamp", b"timestamp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["id", b"id", "timestamp", b"timestamp"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "timestamp", b"timestamp"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "timestamp", b"timestamp"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RtcStatsData = RtcStatsData
+Global___RtcStatsData: _TypeAlias = RtcStatsData  # noqa: Y015
 
-@typing.final
-class CodecStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class CodecStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    PAYLOAD_TYPE_FIELD_NUMBER: builtins.int
-    TRANSPORT_ID_FIELD_NUMBER: builtins.int
-    MIME_TYPE_FIELD_NUMBER: builtins.int
-    CLOCK_RATE_FIELD_NUMBER: builtins.int
-    CHANNELS_FIELD_NUMBER: builtins.int
-    SDP_FMTP_LINE_FIELD_NUMBER: builtins.int
-    payload_type: builtins.int
-    transport_id: builtins.str
-    mime_type: builtins.str
-    clock_rate: builtins.int
-    channels: builtins.int
-    sdp_fmtp_line: builtins.str
+    PAYLOAD_TYPE_FIELD_NUMBER: _builtins.int
+    TRANSPORT_ID_FIELD_NUMBER: _builtins.int
+    MIME_TYPE_FIELD_NUMBER: _builtins.int
+    CLOCK_RATE_FIELD_NUMBER: _builtins.int
+    CHANNELS_FIELD_NUMBER: _builtins.int
+    SDP_FMTP_LINE_FIELD_NUMBER: _builtins.int
+    payload_type: _builtins.int
+    transport_id: _builtins.str
+    mime_type: _builtins.str
+    clock_rate: _builtins.int
+    channels: _builtins.int
+    sdp_fmtp_line: _builtins.str
     def __init__(
         self,
         *,
-        payload_type: builtins.int | None = ...,
-        transport_id: builtins.str | None = ...,
-        mime_type: builtins.str | None = ...,
-        clock_rate: builtins.int | None = ...,
-        channels: builtins.int | None = ...,
-        sdp_fmtp_line: builtins.str | None = ...,
+        payload_type: _builtins.int | None = ...,
+        transport_id: _builtins.str | None = ...,
+        mime_type: _builtins.str | None = ...,
+        clock_rate: _builtins.int | None = ...,
+        channels: _builtins.int | None = ...,
+        sdp_fmtp_line: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["channels", b"channels", "clock_rate", b"clock_rate", "mime_type", b"mime_type", "payload_type", b"payload_type", "sdp_fmtp_line", b"sdp_fmtp_line", "transport_id", b"transport_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___CodecStats = CodecStats
+Global___CodecStats: _TypeAlias = CodecStats  # noqa: Y015
 
-@typing.final
-class RtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    SSRC_FIELD_NUMBER: builtins.int
-    KIND_FIELD_NUMBER: builtins.int
-    TRANSPORT_ID_FIELD_NUMBER: builtins.int
-    CODEC_ID_FIELD_NUMBER: builtins.int
-    ssrc: builtins.int
-    kind: builtins.str
-    transport_id: builtins.str
-    codec_id: builtins.str
+    SSRC_FIELD_NUMBER: _builtins.int
+    KIND_FIELD_NUMBER: _builtins.int
+    TRANSPORT_ID_FIELD_NUMBER: _builtins.int
+    CODEC_ID_FIELD_NUMBER: _builtins.int
+    ssrc: _builtins.int
+    kind: _builtins.str
+    transport_id: _builtins.str
+    codec_id: _builtins.str
     def __init__(
         self,
         *,
-        ssrc: builtins.int | None = ...,
-        kind: builtins.str | None = ...,
-        transport_id: builtins.str | None = ...,
-        codec_id: builtins.str | None = ...,
+        ssrc: _builtins.int | None = ...,
+        kind: _builtins.str | None = ...,
+        transport_id: _builtins.str | None = ...,
+        codec_id: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["codec_id", b"codec_id", "kind", b"kind", "ssrc", b"ssrc", "transport_id", b"transport_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RtpStreamStats = RtpStreamStats
+Global___RtpStreamStats: _TypeAlias = RtpStreamStats  # noqa: Y015
 
-@typing.final
-class ReceivedRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class ReceivedRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    PACKETS_RECEIVED_FIELD_NUMBER: builtins.int
-    PACKETS_LOST_FIELD_NUMBER: builtins.int
-    JITTER_FIELD_NUMBER: builtins.int
-    packets_received: builtins.int
-    packets_lost: builtins.int
-    jitter: builtins.float
+    PACKETS_RECEIVED_FIELD_NUMBER: _builtins.int
+    PACKETS_LOST_FIELD_NUMBER: _builtins.int
+    JITTER_FIELD_NUMBER: _builtins.int
+    packets_received: _builtins.int
+    packets_lost: _builtins.int
+    jitter: _builtins.float
     def __init__(
         self,
         *,
-        packets_received: builtins.int | None = ...,
-        packets_lost: builtins.int | None = ...,
-        jitter: builtins.float | None = ...,
+        packets_received: _builtins.int | None = ...,
+        packets_lost: _builtins.int | None = ...,
+        jitter: _builtins.float | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["jitter", b"jitter", "packets_lost", b"packets_lost", "packets_received", b"packets_received"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___ReceivedRtpStreamStats = ReceivedRtpStreamStats
+Global___ReceivedRtpStreamStats: _TypeAlias = ReceivedRtpStreamStats  # noqa: Y015
 
-@typing.final
-class InboundRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class InboundRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_IDENTIFIER_FIELD_NUMBER: builtins.int
-    MID_FIELD_NUMBER: builtins.int
-    REMOTE_ID_FIELD_NUMBER: builtins.int
-    FRAMES_DECODED_FIELD_NUMBER: builtins.int
-    KEY_FRAMES_DECODED_FIELD_NUMBER: builtins.int
-    FRAMES_RENDERED_FIELD_NUMBER: builtins.int
-    FRAMES_DROPPED_FIELD_NUMBER: builtins.int
-    FRAME_WIDTH_FIELD_NUMBER: builtins.int
-    FRAME_HEIGHT_FIELD_NUMBER: builtins.int
-    FRAMES_PER_SECOND_FIELD_NUMBER: builtins.int
-    QP_SUM_FIELD_NUMBER: builtins.int
-    TOTAL_DECODE_TIME_FIELD_NUMBER: builtins.int
-    TOTAL_INTER_FRAME_DELAY_FIELD_NUMBER: builtins.int
-    TOTAL_SQUARED_INTER_FRAME_DELAY_FIELD_NUMBER: builtins.int
-    PAUSE_COUNT_FIELD_NUMBER: builtins.int
-    TOTAL_PAUSE_DURATION_FIELD_NUMBER: builtins.int
-    FREEZE_COUNT_FIELD_NUMBER: builtins.int
-    TOTAL_FREEZE_DURATION_FIELD_NUMBER: builtins.int
-    LAST_PACKET_RECEIVED_TIMESTAMP_FIELD_NUMBER: builtins.int
-    HEADER_BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    PACKETS_DISCARDED_FIELD_NUMBER: builtins.int
-    FEC_BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    FEC_PACKETS_RECEIVED_FIELD_NUMBER: builtins.int
-    FEC_PACKETS_DISCARDED_FIELD_NUMBER: builtins.int
-    BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    NACK_COUNT_FIELD_NUMBER: builtins.int
-    FIR_COUNT_FIELD_NUMBER: builtins.int
-    PLI_COUNT_FIELD_NUMBER: builtins.int
-    TOTAL_PROCESSING_DELAY_FIELD_NUMBER: builtins.int
-    ESTIMATED_PLAYOUT_TIMESTAMP_FIELD_NUMBER: builtins.int
-    JITTER_BUFFER_DELAY_FIELD_NUMBER: builtins.int
-    JITTER_BUFFER_TARGET_DELAY_FIELD_NUMBER: builtins.int
-    JITTER_BUFFER_EMITTED_COUNT_FIELD_NUMBER: builtins.int
-    JITTER_BUFFER_MINIMUM_DELAY_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_RECEIVED_FIELD_NUMBER: builtins.int
-    CONCEALED_SAMPLES_FIELD_NUMBER: builtins.int
-    SILENT_CONCEALED_SAMPLES_FIELD_NUMBER: builtins.int
-    CONCEALMENT_EVENTS_FIELD_NUMBER: builtins.int
-    INSERTED_SAMPLES_FOR_DECELERATION_FIELD_NUMBER: builtins.int
-    REMOVED_SAMPLES_FOR_ACCELERATION_FIELD_NUMBER: builtins.int
-    AUDIO_LEVEL_FIELD_NUMBER: builtins.int
-    TOTAL_AUDIO_ENERGY_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: builtins.int
-    FRAMES_RECEIVED_FIELD_NUMBER: builtins.int
-    DECODER_IMPLEMENTATION_FIELD_NUMBER: builtins.int
-    PLAYOUT_ID_FIELD_NUMBER: builtins.int
-    POWER_EFFICIENT_DECODER_FIELD_NUMBER: builtins.int
-    FRAMES_ASSEMBLED_FROM_MULTIPLE_PACKETS_FIELD_NUMBER: builtins.int
-    TOTAL_ASSEMBLY_TIME_FIELD_NUMBER: builtins.int
-    RETRANSMITTED_PACKETS_RECEIVED_FIELD_NUMBER: builtins.int
-    RETRANSMITTED_BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    RTX_SSRC_FIELD_NUMBER: builtins.int
-    FEC_SSRC_FIELD_NUMBER: builtins.int
-    track_identifier: builtins.str
-    mid: builtins.str
-    remote_id: builtins.str
-    frames_decoded: builtins.int
-    key_frames_decoded: builtins.int
-    frames_rendered: builtins.int
-    frames_dropped: builtins.int
-    frame_width: builtins.int
-    frame_height: builtins.int
-    frames_per_second: builtins.float
-    qp_sum: builtins.int
-    total_decode_time: builtins.float
-    total_inter_frame_delay: builtins.float
-    total_squared_inter_frame_delay: builtins.float
-    pause_count: builtins.int
-    total_pause_duration: builtins.float
-    freeze_count: builtins.int
-    total_freeze_duration: builtins.float
-    last_packet_received_timestamp: builtins.float
-    header_bytes_received: builtins.int
-    packets_discarded: builtins.int
-    fec_bytes_received: builtins.int
-    fec_packets_received: builtins.int
-    fec_packets_discarded: builtins.int
-    bytes_received: builtins.int
-    nack_count: builtins.int
-    fir_count: builtins.int
-    pli_count: builtins.int
-    total_processing_delay: builtins.float
-    estimated_playout_timestamp: builtins.float
-    jitter_buffer_delay: builtins.float
-    jitter_buffer_target_delay: builtins.float
-    jitter_buffer_emitted_count: builtins.int
-    jitter_buffer_minimum_delay: builtins.float
-    total_samples_received: builtins.int
-    concealed_samples: builtins.int
-    silent_concealed_samples: builtins.int
-    concealment_events: builtins.int
-    inserted_samples_for_deceleration: builtins.int
-    removed_samples_for_acceleration: builtins.int
-    audio_level: builtins.float
-    total_audio_energy: builtins.float
-    total_samples_duration: builtins.float
-    frames_received: builtins.int
-    decoder_implementation: builtins.str
-    playout_id: builtins.str
-    power_efficient_decoder: builtins.bool
-    frames_assembled_from_multiple_packets: builtins.int
-    total_assembly_time: builtins.float
-    retransmitted_packets_received: builtins.int
-    retransmitted_bytes_received: builtins.int
-    rtx_ssrc: builtins.int
-    fec_ssrc: builtins.int
+    TRACK_IDENTIFIER_FIELD_NUMBER: _builtins.int
+    MID_FIELD_NUMBER: _builtins.int
+    REMOTE_ID_FIELD_NUMBER: _builtins.int
+    FRAMES_DECODED_FIELD_NUMBER: _builtins.int
+    KEY_FRAMES_DECODED_FIELD_NUMBER: _builtins.int
+    FRAMES_RENDERED_FIELD_NUMBER: _builtins.int
+    FRAMES_DROPPED_FIELD_NUMBER: _builtins.int
+    FRAME_WIDTH_FIELD_NUMBER: _builtins.int
+    FRAME_HEIGHT_FIELD_NUMBER: _builtins.int
+    FRAMES_PER_SECOND_FIELD_NUMBER: _builtins.int
+    QP_SUM_FIELD_NUMBER: _builtins.int
+    TOTAL_DECODE_TIME_FIELD_NUMBER: _builtins.int
+    TOTAL_INTER_FRAME_DELAY_FIELD_NUMBER: _builtins.int
+    TOTAL_SQUARED_INTER_FRAME_DELAY_FIELD_NUMBER: _builtins.int
+    PAUSE_COUNT_FIELD_NUMBER: _builtins.int
+    TOTAL_PAUSE_DURATION_FIELD_NUMBER: _builtins.int
+    FREEZE_COUNT_FIELD_NUMBER: _builtins.int
+    TOTAL_FREEZE_DURATION_FIELD_NUMBER: _builtins.int
+    LAST_PACKET_RECEIVED_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    HEADER_BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    PACKETS_DISCARDED_FIELD_NUMBER: _builtins.int
+    FEC_BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    FEC_PACKETS_RECEIVED_FIELD_NUMBER: _builtins.int
+    FEC_PACKETS_DISCARDED_FIELD_NUMBER: _builtins.int
+    BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    NACK_COUNT_FIELD_NUMBER: _builtins.int
+    FIR_COUNT_FIELD_NUMBER: _builtins.int
+    PLI_COUNT_FIELD_NUMBER: _builtins.int
+    TOTAL_PROCESSING_DELAY_FIELD_NUMBER: _builtins.int
+    ESTIMATED_PLAYOUT_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    JITTER_BUFFER_DELAY_FIELD_NUMBER: _builtins.int
+    JITTER_BUFFER_TARGET_DELAY_FIELD_NUMBER: _builtins.int
+    JITTER_BUFFER_EMITTED_COUNT_FIELD_NUMBER: _builtins.int
+    JITTER_BUFFER_MINIMUM_DELAY_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_RECEIVED_FIELD_NUMBER: _builtins.int
+    CONCEALED_SAMPLES_FIELD_NUMBER: _builtins.int
+    SILENT_CONCEALED_SAMPLES_FIELD_NUMBER: _builtins.int
+    CONCEALMENT_EVENTS_FIELD_NUMBER: _builtins.int
+    INSERTED_SAMPLES_FOR_DECELERATION_FIELD_NUMBER: _builtins.int
+    REMOVED_SAMPLES_FOR_ACCELERATION_FIELD_NUMBER: _builtins.int
+    AUDIO_LEVEL_FIELD_NUMBER: _builtins.int
+    TOTAL_AUDIO_ENERGY_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: _builtins.int
+    FRAMES_RECEIVED_FIELD_NUMBER: _builtins.int
+    DECODER_IMPLEMENTATION_FIELD_NUMBER: _builtins.int
+    PLAYOUT_ID_FIELD_NUMBER: _builtins.int
+    POWER_EFFICIENT_DECODER_FIELD_NUMBER: _builtins.int
+    FRAMES_ASSEMBLED_FROM_MULTIPLE_PACKETS_FIELD_NUMBER: _builtins.int
+    TOTAL_ASSEMBLY_TIME_FIELD_NUMBER: _builtins.int
+    RETRANSMITTED_PACKETS_RECEIVED_FIELD_NUMBER: _builtins.int
+    RETRANSMITTED_BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    RTX_SSRC_FIELD_NUMBER: _builtins.int
+    FEC_SSRC_FIELD_NUMBER: _builtins.int
+    track_identifier: _builtins.str
+    mid: _builtins.str
+    remote_id: _builtins.str
+    frames_decoded: _builtins.int
+    key_frames_decoded: _builtins.int
+    frames_rendered: _builtins.int
+    frames_dropped: _builtins.int
+    frame_width: _builtins.int
+    frame_height: _builtins.int
+    frames_per_second: _builtins.float
+    qp_sum: _builtins.int
+    total_decode_time: _builtins.float
+    total_inter_frame_delay: _builtins.float
+    total_squared_inter_frame_delay: _builtins.float
+    pause_count: _builtins.int
+    total_pause_duration: _builtins.float
+    freeze_count: _builtins.int
+    total_freeze_duration: _builtins.float
+    last_packet_received_timestamp: _builtins.float
+    header_bytes_received: _builtins.int
+    packets_discarded: _builtins.int
+    fec_bytes_received: _builtins.int
+    fec_packets_received: _builtins.int
+    fec_packets_discarded: _builtins.int
+    bytes_received: _builtins.int
+    nack_count: _builtins.int
+    fir_count: _builtins.int
+    pli_count: _builtins.int
+    total_processing_delay: _builtins.float
+    estimated_playout_timestamp: _builtins.float
+    jitter_buffer_delay: _builtins.float
+    jitter_buffer_target_delay: _builtins.float
+    jitter_buffer_emitted_count: _builtins.int
+    jitter_buffer_minimum_delay: _builtins.float
+    total_samples_received: _builtins.int
+    concealed_samples: _builtins.int
+    silent_concealed_samples: _builtins.int
+    concealment_events: _builtins.int
+    inserted_samples_for_deceleration: _builtins.int
+    removed_samples_for_acceleration: _builtins.int
+    audio_level: _builtins.float
+    total_audio_energy: _builtins.float
+    total_samples_duration: _builtins.float
+    frames_received: _builtins.int
+    decoder_implementation: _builtins.str
+    playout_id: _builtins.str
+    power_efficient_decoder: _builtins.bool
+    frames_assembled_from_multiple_packets: _builtins.int
+    total_assembly_time: _builtins.float
+    retransmitted_packets_received: _builtins.int
+    retransmitted_bytes_received: _builtins.int
+    rtx_ssrc: _builtins.int
+    fec_ssrc: _builtins.int
     def __init__(
         self,
         *,
-        track_identifier: builtins.str | None = ...,
-        mid: builtins.str | None = ...,
-        remote_id: builtins.str | None = ...,
-        frames_decoded: builtins.int | None = ...,
-        key_frames_decoded: builtins.int | None = ...,
-        frames_rendered: builtins.int | None = ...,
-        frames_dropped: builtins.int | None = ...,
-        frame_width: builtins.int | None = ...,
-        frame_height: builtins.int | None = ...,
-        frames_per_second: builtins.float | None = ...,
-        qp_sum: builtins.int | None = ...,
-        total_decode_time: builtins.float | None = ...,
-        total_inter_frame_delay: builtins.float | None = ...,
-        total_squared_inter_frame_delay: builtins.float | None = ...,
-        pause_count: builtins.int | None = ...,
-        total_pause_duration: builtins.float | None = ...,
-        freeze_count: builtins.int | None = ...,
-        total_freeze_duration: builtins.float | None = ...,
-        last_packet_received_timestamp: builtins.float | None = ...,
-        header_bytes_received: builtins.int | None = ...,
-        packets_discarded: builtins.int | None = ...,
-        fec_bytes_received: builtins.int | None = ...,
-        fec_packets_received: builtins.int | None = ...,
-        fec_packets_discarded: builtins.int | None = ...,
-        bytes_received: builtins.int | None = ...,
-        nack_count: builtins.int | None = ...,
-        fir_count: builtins.int | None = ...,
-        pli_count: builtins.int | None = ...,
-        total_processing_delay: builtins.float | None = ...,
-        estimated_playout_timestamp: builtins.float | None = ...,
-        jitter_buffer_delay: builtins.float | None = ...,
-        jitter_buffer_target_delay: builtins.float | None = ...,
-        jitter_buffer_emitted_count: builtins.int | None = ...,
-        jitter_buffer_minimum_delay: builtins.float | None = ...,
-        total_samples_received: builtins.int | None = ...,
-        concealed_samples: builtins.int | None = ...,
-        silent_concealed_samples: builtins.int | None = ...,
-        concealment_events: builtins.int | None = ...,
-        inserted_samples_for_deceleration: builtins.int | None = ...,
-        removed_samples_for_acceleration: builtins.int | None = ...,
-        audio_level: builtins.float | None = ...,
-        total_audio_energy: builtins.float | None = ...,
-        total_samples_duration: builtins.float | None = ...,
-        frames_received: builtins.int | None = ...,
-        decoder_implementation: builtins.str | None = ...,
-        playout_id: builtins.str | None = ...,
-        power_efficient_decoder: builtins.bool | None = ...,
-        frames_assembled_from_multiple_packets: builtins.int | None = ...,
-        total_assembly_time: builtins.float | None = ...,
-        retransmitted_packets_received: builtins.int | None = ...,
-        retransmitted_bytes_received: builtins.int | None = ...,
-        rtx_ssrc: builtins.int | None = ...,
-        fec_ssrc: builtins.int | None = ...,
+        track_identifier: _builtins.str | None = ...,
+        mid: _builtins.str | None = ...,
+        remote_id: _builtins.str | None = ...,
+        frames_decoded: _builtins.int | None = ...,
+        key_frames_decoded: _builtins.int | None = ...,
+        frames_rendered: _builtins.int | None = ...,
+        frames_dropped: _builtins.int | None = ...,
+        frame_width: _builtins.int | None = ...,
+        frame_height: _builtins.int | None = ...,
+        frames_per_second: _builtins.float | None = ...,
+        qp_sum: _builtins.int | None = ...,
+        total_decode_time: _builtins.float | None = ...,
+        total_inter_frame_delay: _builtins.float | None = ...,
+        total_squared_inter_frame_delay: _builtins.float | None = ...,
+        pause_count: _builtins.int | None = ...,
+        total_pause_duration: _builtins.float | None = ...,
+        freeze_count: _builtins.int | None = ...,
+        total_freeze_duration: _builtins.float | None = ...,
+        last_packet_received_timestamp: _builtins.float | None = ...,
+        header_bytes_received: _builtins.int | None = ...,
+        packets_discarded: _builtins.int | None = ...,
+        fec_bytes_received: _builtins.int | None = ...,
+        fec_packets_received: _builtins.int | None = ...,
+        fec_packets_discarded: _builtins.int | None = ...,
+        bytes_received: _builtins.int | None = ...,
+        nack_count: _builtins.int | None = ...,
+        fir_count: _builtins.int | None = ...,
+        pli_count: _builtins.int | None = ...,
+        total_processing_delay: _builtins.float | None = ...,
+        estimated_playout_timestamp: _builtins.float | None = ...,
+        jitter_buffer_delay: _builtins.float | None = ...,
+        jitter_buffer_target_delay: _builtins.float | None = ...,
+        jitter_buffer_emitted_count: _builtins.int | None = ...,
+        jitter_buffer_minimum_delay: _builtins.float | None = ...,
+        total_samples_received: _builtins.int | None = ...,
+        concealed_samples: _builtins.int | None = ...,
+        silent_concealed_samples: _builtins.int | None = ...,
+        concealment_events: _builtins.int | None = ...,
+        inserted_samples_for_deceleration: _builtins.int | None = ...,
+        removed_samples_for_acceleration: _builtins.int | None = ...,
+        audio_level: _builtins.float | None = ...,
+        total_audio_energy: _builtins.float | None = ...,
+        total_samples_duration: _builtins.float | None = ...,
+        frames_received: _builtins.int | None = ...,
+        decoder_implementation: _builtins.str | None = ...,
+        playout_id: _builtins.str | None = ...,
+        power_efficient_decoder: _builtins.bool | None = ...,
+        frames_assembled_from_multiple_packets: _builtins.int | None = ...,
+        total_assembly_time: _builtins.float | None = ...,
+        retransmitted_packets_received: _builtins.int | None = ...,
+        retransmitted_bytes_received: _builtins.int | None = ...,
+        rtx_ssrc: _builtins.int | None = ...,
+        fec_ssrc: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_level", b"audio_level", "bytes_received", b"bytes_received", "concealed_samples", b"concealed_samples", "concealment_events", b"concealment_events", "decoder_implementation", b"decoder_implementation", "estimated_playout_timestamp", b"estimated_playout_timestamp", "fec_bytes_received", b"fec_bytes_received", "fec_packets_discarded", b"fec_packets_discarded", "fec_packets_received", b"fec_packets_received", "fec_ssrc", b"fec_ssrc", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_assembled_from_multiple_packets", b"frames_assembled_from_multiple_packets", "frames_decoded", b"frames_decoded", "frames_dropped", b"frames_dropped", "frames_per_second", b"frames_per_second", "frames_received", b"frames_received", "frames_rendered", b"frames_rendered", "freeze_count", b"freeze_count", "header_bytes_received", b"header_bytes_received", "inserted_samples_for_deceleration", b"inserted_samples_for_deceleration", "jitter_buffer_delay", b"jitter_buffer_delay", "jitter_buffer_emitted_count", b"jitter_buffer_emitted_count", "jitter_buffer_minimum_delay", b"jitter_buffer_minimum_delay", "jitter_buffer_target_delay", b"jitter_buffer_target_delay", "key_frames_decoded", b"key_frames_decoded", "last_packet_received_timestamp", b"last_packet_received_timestamp", "mid", b"mid", "nack_count", b"nack_count", "packets_discarded", b"packets_discarded", "pause_count", b"pause_count", "playout_id", b"playout_id", "pli_count", b"pli_count", "power_efficient_decoder", b"power_efficient_decoder", "qp_sum", b"qp_sum", "remote_id", b"remote_id", "removed_samples_for_acceleration", b"removed_samples_for_acceleration", "retransmitted_bytes_received", b"retransmitted_bytes_received", "retransmitted_packets_received", b"retransmitted_packets_received", "rtx_ssrc", b"rtx_ssrc", "silent_concealed_samples", b"silent_concealed_samples", "total_assembly_time", b"total_assembly_time", "total_audio_energy", b"total_audio_energy", "total_decode_time", b"total_decode_time", "total_freeze_duration", b"total_freeze_duration", "total_inter_frame_delay", b"total_inter_frame_delay", "total_pause_duration", b"total_pause_duration", "total_processing_delay", b"total_processing_delay", "total_samples_duration", b"total_samples_duration", "total_samples_received", b"total_samples_received", "total_squared_inter_frame_delay", b"total_squared_inter_frame_delay", "track_identifier", b"track_identifier"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___InboundRtpStreamStats = InboundRtpStreamStats
+Global___InboundRtpStreamStats: _TypeAlias = InboundRtpStreamStats  # noqa: Y015
 
-@typing.final
-class SentRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class SentRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    PACKETS_SENT_FIELD_NUMBER: builtins.int
-    BYTES_SENT_FIELD_NUMBER: builtins.int
-    packets_sent: builtins.int
-    bytes_sent: builtins.int
+    PACKETS_SENT_FIELD_NUMBER: _builtins.int
+    BYTES_SENT_FIELD_NUMBER: _builtins.int
+    packets_sent: _builtins.int
+    bytes_sent: _builtins.int
     def __init__(
         self,
         *,
-        packets_sent: builtins.int | None = ...,
-        bytes_sent: builtins.int | None = ...,
+        packets_sent: _builtins.int | None = ...,
+        bytes_sent: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["bytes_sent", b"bytes_sent", "packets_sent", b"packets_sent"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___SentRtpStreamStats = SentRtpStreamStats
+Global___SentRtpStreamStats: _TypeAlias = SentRtpStreamStats  # noqa: Y015
 
-@typing.final
-class OutboundRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class OutboundRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    @typing.final
-    class QualityLimitationDurationsEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+    @_typing.final
+    class QualityLimitationDurationsEntry(_message.Message):
+        DESCRIPTOR: _descriptor.Descriptor
 
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: builtins.str
-        value: builtins.float
+        KEY_FIELD_NUMBER: _builtins.int
+        VALUE_FIELD_NUMBER: _builtins.int
+        key: _builtins.str
+        value: _builtins.float
         def __init__(
             self,
             *,
-            key: builtins.str | None = ...,
-            value: builtins.float | None = ...,
+            key: _builtins.str | None = ...,
+            value: _builtins.float | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+        _HasFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+        _ClearFieldArgType: _TypeAlias = _typing.Literal["key", b"key", "value", b"value"]  # noqa: Y015
+        def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-    MID_FIELD_NUMBER: builtins.int
-    MEDIA_SOURCE_ID_FIELD_NUMBER: builtins.int
-    REMOTE_ID_FIELD_NUMBER: builtins.int
-    RID_FIELD_NUMBER: builtins.int
-    HEADER_BYTES_SENT_FIELD_NUMBER: builtins.int
-    RETRANSMITTED_PACKETS_SENT_FIELD_NUMBER: builtins.int
-    RETRANSMITTED_BYTES_SENT_FIELD_NUMBER: builtins.int
-    RTX_SSRC_FIELD_NUMBER: builtins.int
-    TARGET_BITRATE_FIELD_NUMBER: builtins.int
-    TOTAL_ENCODED_BYTES_TARGET_FIELD_NUMBER: builtins.int
-    FRAME_WIDTH_FIELD_NUMBER: builtins.int
-    FRAME_HEIGHT_FIELD_NUMBER: builtins.int
-    FRAMES_PER_SECOND_FIELD_NUMBER: builtins.int
-    FRAMES_SENT_FIELD_NUMBER: builtins.int
-    HUGE_FRAMES_SENT_FIELD_NUMBER: builtins.int
-    FRAMES_ENCODED_FIELD_NUMBER: builtins.int
-    KEY_FRAMES_ENCODED_FIELD_NUMBER: builtins.int
-    QP_SUM_FIELD_NUMBER: builtins.int
-    TOTAL_ENCODE_TIME_FIELD_NUMBER: builtins.int
-    TOTAL_PACKET_SEND_DELAY_FIELD_NUMBER: builtins.int
-    QUALITY_LIMITATION_REASON_FIELD_NUMBER: builtins.int
-    QUALITY_LIMITATION_DURATIONS_FIELD_NUMBER: builtins.int
-    QUALITY_LIMITATION_RESOLUTION_CHANGES_FIELD_NUMBER: builtins.int
-    NACK_COUNT_FIELD_NUMBER: builtins.int
-    FIR_COUNT_FIELD_NUMBER: builtins.int
-    PLI_COUNT_FIELD_NUMBER: builtins.int
-    ENCODER_IMPLEMENTATION_FIELD_NUMBER: builtins.int
-    POWER_EFFICIENT_ENCODER_FIELD_NUMBER: builtins.int
-    ACTIVE_FIELD_NUMBER: builtins.int
-    SCALABILITY_MODE_FIELD_NUMBER: builtins.int
-    mid: builtins.str
-    media_source_id: builtins.str
-    remote_id: builtins.str
-    rid: builtins.str
-    header_bytes_sent: builtins.int
-    retransmitted_packets_sent: builtins.int
-    retransmitted_bytes_sent: builtins.int
-    rtx_ssrc: builtins.int
-    target_bitrate: builtins.float
-    total_encoded_bytes_target: builtins.int
-    frame_width: builtins.int
-    frame_height: builtins.int
-    frames_per_second: builtins.float
-    frames_sent: builtins.int
-    huge_frames_sent: builtins.int
-    frames_encoded: builtins.int
-    key_frames_encoded: builtins.int
-    qp_sum: builtins.int
-    total_encode_time: builtins.float
-    total_packet_send_delay: builtins.float
-    quality_limitation_reason: global___QualityLimitationReason.ValueType
-    quality_limitation_resolution_changes: builtins.int
-    nack_count: builtins.int
-    fir_count: builtins.int
-    pli_count: builtins.int
-    encoder_implementation: builtins.str
-    power_efficient_encoder: builtins.bool
-    active: builtins.bool
-    scalability_mode: builtins.str
-    @property
-    def quality_limitation_durations(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.float]: ...
+    MID_FIELD_NUMBER: _builtins.int
+    MEDIA_SOURCE_ID_FIELD_NUMBER: _builtins.int
+    REMOTE_ID_FIELD_NUMBER: _builtins.int
+    RID_FIELD_NUMBER: _builtins.int
+    HEADER_BYTES_SENT_FIELD_NUMBER: _builtins.int
+    RETRANSMITTED_PACKETS_SENT_FIELD_NUMBER: _builtins.int
+    RETRANSMITTED_BYTES_SENT_FIELD_NUMBER: _builtins.int
+    RTX_SSRC_FIELD_NUMBER: _builtins.int
+    TARGET_BITRATE_FIELD_NUMBER: _builtins.int
+    TOTAL_ENCODED_BYTES_TARGET_FIELD_NUMBER: _builtins.int
+    FRAME_WIDTH_FIELD_NUMBER: _builtins.int
+    FRAME_HEIGHT_FIELD_NUMBER: _builtins.int
+    FRAMES_PER_SECOND_FIELD_NUMBER: _builtins.int
+    FRAMES_SENT_FIELD_NUMBER: _builtins.int
+    HUGE_FRAMES_SENT_FIELD_NUMBER: _builtins.int
+    FRAMES_ENCODED_FIELD_NUMBER: _builtins.int
+    KEY_FRAMES_ENCODED_FIELD_NUMBER: _builtins.int
+    QP_SUM_FIELD_NUMBER: _builtins.int
+    TOTAL_ENCODE_TIME_FIELD_NUMBER: _builtins.int
+    TOTAL_PACKET_SEND_DELAY_FIELD_NUMBER: _builtins.int
+    QUALITY_LIMITATION_REASON_FIELD_NUMBER: _builtins.int
+    QUALITY_LIMITATION_DURATIONS_FIELD_NUMBER: _builtins.int
+    QUALITY_LIMITATION_RESOLUTION_CHANGES_FIELD_NUMBER: _builtins.int
+    NACK_COUNT_FIELD_NUMBER: _builtins.int
+    FIR_COUNT_FIELD_NUMBER: _builtins.int
+    PLI_COUNT_FIELD_NUMBER: _builtins.int
+    ENCODER_IMPLEMENTATION_FIELD_NUMBER: _builtins.int
+    POWER_EFFICIENT_ENCODER_FIELD_NUMBER: _builtins.int
+    ACTIVE_FIELD_NUMBER: _builtins.int
+    SCALABILITY_MODE_FIELD_NUMBER: _builtins.int
+    mid: _builtins.str
+    media_source_id: _builtins.str
+    remote_id: _builtins.str
+    rid: _builtins.str
+    header_bytes_sent: _builtins.int
+    retransmitted_packets_sent: _builtins.int
+    retransmitted_bytes_sent: _builtins.int
+    rtx_ssrc: _builtins.int
+    target_bitrate: _builtins.float
+    total_encoded_bytes_target: _builtins.int
+    frame_width: _builtins.int
+    frame_height: _builtins.int
+    frames_per_second: _builtins.float
+    frames_sent: _builtins.int
+    huge_frames_sent: _builtins.int
+    frames_encoded: _builtins.int
+    key_frames_encoded: _builtins.int
+    qp_sum: _builtins.int
+    total_encode_time: _builtins.float
+    total_packet_send_delay: _builtins.float
+    quality_limitation_reason: Global___QualityLimitationReason.ValueType
+    quality_limitation_resolution_changes: _builtins.int
+    nack_count: _builtins.int
+    fir_count: _builtins.int
+    pli_count: _builtins.int
+    encoder_implementation: _builtins.str
+    power_efficient_encoder: _builtins.bool
+    active: _builtins.bool
+    scalability_mode: _builtins.str
+    @_builtins.property
+    def quality_limitation_durations(self) -> _containers.ScalarMap[_builtins.str, _builtins.float]: ...
     def __init__(
         self,
         *,
-        mid: builtins.str | None = ...,
-        media_source_id: builtins.str | None = ...,
-        remote_id: builtins.str | None = ...,
-        rid: builtins.str | None = ...,
-        header_bytes_sent: builtins.int | None = ...,
-        retransmitted_packets_sent: builtins.int | None = ...,
-        retransmitted_bytes_sent: builtins.int | None = ...,
-        rtx_ssrc: builtins.int | None = ...,
-        target_bitrate: builtins.float | None = ...,
-        total_encoded_bytes_target: builtins.int | None = ...,
-        frame_width: builtins.int | None = ...,
-        frame_height: builtins.int | None = ...,
-        frames_per_second: builtins.float | None = ...,
-        frames_sent: builtins.int | None = ...,
-        huge_frames_sent: builtins.int | None = ...,
-        frames_encoded: builtins.int | None = ...,
-        key_frames_encoded: builtins.int | None = ...,
-        qp_sum: builtins.int | None = ...,
-        total_encode_time: builtins.float | None = ...,
-        total_packet_send_delay: builtins.float | None = ...,
-        quality_limitation_reason: global___QualityLimitationReason.ValueType | None = ...,
-        quality_limitation_durations: collections.abc.Mapping[builtins.str, builtins.float] | None = ...,
-        quality_limitation_resolution_changes: builtins.int | None = ...,
-        nack_count: builtins.int | None = ...,
-        fir_count: builtins.int | None = ...,
-        pli_count: builtins.int | None = ...,
-        encoder_implementation: builtins.str | None = ...,
-        power_efficient_encoder: builtins.bool | None = ...,
-        active: builtins.bool | None = ...,
-        scalability_mode: builtins.str | None = ...,
+        mid: _builtins.str | None = ...,
+        media_source_id: _builtins.str | None = ...,
+        remote_id: _builtins.str | None = ...,
+        rid: _builtins.str | None = ...,
+        header_bytes_sent: _builtins.int | None = ...,
+        retransmitted_packets_sent: _builtins.int | None = ...,
+        retransmitted_bytes_sent: _builtins.int | None = ...,
+        rtx_ssrc: _builtins.int | None = ...,
+        target_bitrate: _builtins.float | None = ...,
+        total_encoded_bytes_target: _builtins.int | None = ...,
+        frame_width: _builtins.int | None = ...,
+        frame_height: _builtins.int | None = ...,
+        frames_per_second: _builtins.float | None = ...,
+        frames_sent: _builtins.int | None = ...,
+        huge_frames_sent: _builtins.int | None = ...,
+        frames_encoded: _builtins.int | None = ...,
+        key_frames_encoded: _builtins.int | None = ...,
+        qp_sum: _builtins.int | None = ...,
+        total_encode_time: _builtins.float | None = ...,
+        total_packet_send_delay: _builtins.float | None = ...,
+        quality_limitation_reason: Global___QualityLimitationReason.ValueType | None = ...,
+        quality_limitation_durations: _abc.Mapping[_builtins.str, _builtins.float] | None = ...,
+        quality_limitation_resolution_changes: _builtins.int | None = ...,
+        nack_count: _builtins.int | None = ...,
+        fir_count: _builtins.int | None = ...,
+        pli_count: _builtins.int | None = ...,
+        encoder_implementation: _builtins.str | None = ...,
+        power_efficient_encoder: _builtins.bool | None = ...,
+        active: _builtins.bool | None = ...,
+        scalability_mode: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_durations", b"quality_limitation_durations", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["active", b"active", "encoder_implementation", b"encoder_implementation", "fir_count", b"fir_count", "frame_height", b"frame_height", "frame_width", b"frame_width", "frames_encoded", b"frames_encoded", "frames_per_second", b"frames_per_second", "frames_sent", b"frames_sent", "header_bytes_sent", b"header_bytes_sent", "huge_frames_sent", b"huge_frames_sent", "key_frames_encoded", b"key_frames_encoded", "media_source_id", b"media_source_id", "mid", b"mid", "nack_count", b"nack_count", "pli_count", b"pli_count", "power_efficient_encoder", b"power_efficient_encoder", "qp_sum", b"qp_sum", "quality_limitation_durations", b"quality_limitation_durations", "quality_limitation_reason", b"quality_limitation_reason", "quality_limitation_resolution_changes", b"quality_limitation_resolution_changes", "remote_id", b"remote_id", "retransmitted_bytes_sent", b"retransmitted_bytes_sent", "retransmitted_packets_sent", b"retransmitted_packets_sent", "rid", b"rid", "rtx_ssrc", b"rtx_ssrc", "scalability_mode", b"scalability_mode", "target_bitrate", b"target_bitrate", "total_encode_time", b"total_encode_time", "total_encoded_bytes_target", b"total_encoded_bytes_target", "total_packet_send_delay", b"total_packet_send_delay"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___OutboundRtpStreamStats = OutboundRtpStreamStats
+Global___OutboundRtpStreamStats: _TypeAlias = OutboundRtpStreamStats  # noqa: Y015
 
-@typing.final
-class RemoteInboundRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RemoteInboundRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    LOCAL_ID_FIELD_NUMBER: builtins.int
-    ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    FRACTION_LOST_FIELD_NUMBER: builtins.int
-    ROUND_TRIP_TIME_MEASUREMENTS_FIELD_NUMBER: builtins.int
-    local_id: builtins.str
-    round_trip_time: builtins.float
-    total_round_trip_time: builtins.float
-    fraction_lost: builtins.float
-    round_trip_time_measurements: builtins.int
+    LOCAL_ID_FIELD_NUMBER: _builtins.int
+    ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    FRACTION_LOST_FIELD_NUMBER: _builtins.int
+    ROUND_TRIP_TIME_MEASUREMENTS_FIELD_NUMBER: _builtins.int
+    local_id: _builtins.str
+    round_trip_time: _builtins.float
+    total_round_trip_time: _builtins.float
+    fraction_lost: _builtins.float
+    round_trip_time_measurements: _builtins.int
     def __init__(
         self,
         *,
-        local_id: builtins.str | None = ...,
-        round_trip_time: builtins.float | None = ...,
-        total_round_trip_time: builtins.float | None = ...,
-        fraction_lost: builtins.float | None = ...,
-        round_trip_time_measurements: builtins.int | None = ...,
+        local_id: _builtins.str | None = ...,
+        round_trip_time: _builtins.float | None = ...,
+        total_round_trip_time: _builtins.float | None = ...,
+        fraction_lost: _builtins.float | None = ...,
+        round_trip_time_measurements: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["fraction_lost", b"fraction_lost", "local_id", b"local_id", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RemoteInboundRtpStreamStats = RemoteInboundRtpStreamStats
+Global___RemoteInboundRtpStreamStats: _TypeAlias = RemoteInboundRtpStreamStats  # noqa: Y015
 
-@typing.final
-class RemoteOutboundRtpStreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class RemoteOutboundRtpStreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    LOCAL_ID_FIELD_NUMBER: builtins.int
-    REMOTE_TIMESTAMP_FIELD_NUMBER: builtins.int
-    REPORTS_SENT_FIELD_NUMBER: builtins.int
-    ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    ROUND_TRIP_TIME_MEASUREMENTS_FIELD_NUMBER: builtins.int
-    local_id: builtins.str
-    remote_timestamp: builtins.float
-    reports_sent: builtins.int
-    round_trip_time: builtins.float
-    total_round_trip_time: builtins.float
-    round_trip_time_measurements: builtins.int
+    LOCAL_ID_FIELD_NUMBER: _builtins.int
+    REMOTE_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    REPORTS_SENT_FIELD_NUMBER: _builtins.int
+    ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    ROUND_TRIP_TIME_MEASUREMENTS_FIELD_NUMBER: _builtins.int
+    local_id: _builtins.str
+    remote_timestamp: _builtins.float
+    reports_sent: _builtins.int
+    round_trip_time: _builtins.float
+    total_round_trip_time: _builtins.float
+    round_trip_time_measurements: _builtins.int
     def __init__(
         self,
         *,
-        local_id: builtins.str | None = ...,
-        remote_timestamp: builtins.float | None = ...,
-        reports_sent: builtins.int | None = ...,
-        round_trip_time: builtins.float | None = ...,
-        total_round_trip_time: builtins.float | None = ...,
-        round_trip_time_measurements: builtins.int | None = ...,
+        local_id: _builtins.str | None = ...,
+        remote_timestamp: _builtins.float | None = ...,
+        reports_sent: _builtins.int | None = ...,
+        round_trip_time: _builtins.float | None = ...,
+        total_round_trip_time: _builtins.float | None = ...,
+        round_trip_time_measurements: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["local_id", b"local_id", "remote_timestamp", b"remote_timestamp", "reports_sent", b"reports_sent", "round_trip_time", b"round_trip_time", "round_trip_time_measurements", b"round_trip_time_measurements", "total_round_trip_time", b"total_round_trip_time"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___RemoteOutboundRtpStreamStats = RemoteOutboundRtpStreamStats
+Global___RemoteOutboundRtpStreamStats: _TypeAlias = RemoteOutboundRtpStreamStats  # noqa: Y015
 
-@typing.final
-class MediaSourceStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class MediaSourceStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRACK_IDENTIFIER_FIELD_NUMBER: builtins.int
-    KIND_FIELD_NUMBER: builtins.int
-    track_identifier: builtins.str
-    kind: builtins.str
+    TRACK_IDENTIFIER_FIELD_NUMBER: _builtins.int
+    KIND_FIELD_NUMBER: _builtins.int
+    track_identifier: _builtins.str
+    kind: _builtins.str
     def __init__(
         self,
         *,
-        track_identifier: builtins.str | None = ...,
-        kind: builtins.str | None = ...,
+        track_identifier: _builtins.str | None = ...,
+        kind: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "track_identifier", b"track_identifier"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___MediaSourceStats = MediaSourceStats
+Global___MediaSourceStats: _TypeAlias = MediaSourceStats  # noqa: Y015
 
-@typing.final
-class AudioSourceStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class AudioSourceStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    AUDIO_LEVEL_FIELD_NUMBER: builtins.int
-    TOTAL_AUDIO_ENERGY_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: builtins.int
-    ECHO_RETURN_LOSS_FIELD_NUMBER: builtins.int
-    ECHO_RETURN_LOSS_ENHANCEMENT_FIELD_NUMBER: builtins.int
-    DROPPED_SAMPLES_DURATION_FIELD_NUMBER: builtins.int
-    DROPPED_SAMPLES_EVENTS_FIELD_NUMBER: builtins.int
-    TOTAL_CAPTURE_DELAY_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_CAPTURED_FIELD_NUMBER: builtins.int
-    audio_level: builtins.float
-    total_audio_energy: builtins.float
-    total_samples_duration: builtins.float
-    echo_return_loss: builtins.float
-    echo_return_loss_enhancement: builtins.float
-    dropped_samples_duration: builtins.float
-    dropped_samples_events: builtins.int
-    total_capture_delay: builtins.float
-    total_samples_captured: builtins.int
+    AUDIO_LEVEL_FIELD_NUMBER: _builtins.int
+    TOTAL_AUDIO_ENERGY_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: _builtins.int
+    ECHO_RETURN_LOSS_FIELD_NUMBER: _builtins.int
+    ECHO_RETURN_LOSS_ENHANCEMENT_FIELD_NUMBER: _builtins.int
+    DROPPED_SAMPLES_DURATION_FIELD_NUMBER: _builtins.int
+    DROPPED_SAMPLES_EVENTS_FIELD_NUMBER: _builtins.int
+    TOTAL_CAPTURE_DELAY_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_CAPTURED_FIELD_NUMBER: _builtins.int
+    audio_level: _builtins.float
+    total_audio_energy: _builtins.float
+    total_samples_duration: _builtins.float
+    echo_return_loss: _builtins.float
+    echo_return_loss_enhancement: _builtins.float
+    dropped_samples_duration: _builtins.float
+    dropped_samples_events: _builtins.int
+    total_capture_delay: _builtins.float
+    total_samples_captured: _builtins.int
     def __init__(
         self,
         *,
-        audio_level: builtins.float | None = ...,
-        total_audio_energy: builtins.float | None = ...,
-        total_samples_duration: builtins.float | None = ...,
-        echo_return_loss: builtins.float | None = ...,
-        echo_return_loss_enhancement: builtins.float | None = ...,
-        dropped_samples_duration: builtins.float | None = ...,
-        dropped_samples_events: builtins.int | None = ...,
-        total_capture_delay: builtins.float | None = ...,
-        total_samples_captured: builtins.int | None = ...,
+        audio_level: _builtins.float | None = ...,
+        total_audio_energy: _builtins.float | None = ...,
+        total_samples_duration: _builtins.float | None = ...,
+        echo_return_loss: _builtins.float | None = ...,
+        echo_return_loss_enhancement: _builtins.float | None = ...,
+        dropped_samples_duration: _builtins.float | None = ...,
+        dropped_samples_events: _builtins.int | None = ...,
+        total_capture_delay: _builtins.float | None = ...,
+        total_samples_captured: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_level", b"audio_level", "dropped_samples_duration", b"dropped_samples_duration", "dropped_samples_events", b"dropped_samples_events", "echo_return_loss", b"echo_return_loss", "echo_return_loss_enhancement", b"echo_return_loss_enhancement", "total_audio_energy", b"total_audio_energy", "total_capture_delay", b"total_capture_delay", "total_samples_captured", b"total_samples_captured", "total_samples_duration", b"total_samples_duration"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___AudioSourceStats = AudioSourceStats
+Global___AudioSourceStats: _TypeAlias = AudioSourceStats  # noqa: Y015
 
-@typing.final
-class VideoSourceStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class VideoSourceStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    WIDTH_FIELD_NUMBER: builtins.int
-    HEIGHT_FIELD_NUMBER: builtins.int
-    FRAMES_FIELD_NUMBER: builtins.int
-    FRAMES_PER_SECOND_FIELD_NUMBER: builtins.int
-    width: builtins.int
-    height: builtins.int
-    frames: builtins.int
-    frames_per_second: builtins.float
+    WIDTH_FIELD_NUMBER: _builtins.int
+    HEIGHT_FIELD_NUMBER: _builtins.int
+    FRAMES_FIELD_NUMBER: _builtins.int
+    FRAMES_PER_SECOND_FIELD_NUMBER: _builtins.int
+    width: _builtins.int
+    height: _builtins.int
+    frames: _builtins.int
+    frames_per_second: _builtins.float
     def __init__(
         self,
         *,
-        width: builtins.int | None = ...,
-        height: builtins.int | None = ...,
-        frames: builtins.int | None = ...,
-        frames_per_second: builtins.float | None = ...,
+        width: _builtins.int | None = ...,
+        height: _builtins.int | None = ...,
+        frames: _builtins.int | None = ...,
+        frames_per_second: _builtins.float | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["frames", b"frames", "frames_per_second", b"frames_per_second", "height", b"height", "width", b"width"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___VideoSourceStats = VideoSourceStats
+Global___VideoSourceStats: _TypeAlias = VideoSourceStats  # noqa: Y015
 
-@typing.final
-class AudioPlayoutStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class AudioPlayoutStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    KIND_FIELD_NUMBER: builtins.int
-    SYNTHESIZED_SAMPLES_DURATION_FIELD_NUMBER: builtins.int
-    SYNTHESIZED_SAMPLES_EVENTS_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: builtins.int
-    TOTAL_PLAYOUT_DELAY_FIELD_NUMBER: builtins.int
-    TOTAL_SAMPLES_COUNT_FIELD_NUMBER: builtins.int
-    kind: builtins.str
-    synthesized_samples_duration: builtins.float
-    synthesized_samples_events: builtins.int
-    total_samples_duration: builtins.float
-    total_playout_delay: builtins.float
-    total_samples_count: builtins.int
+    KIND_FIELD_NUMBER: _builtins.int
+    SYNTHESIZED_SAMPLES_DURATION_FIELD_NUMBER: _builtins.int
+    SYNTHESIZED_SAMPLES_EVENTS_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_DURATION_FIELD_NUMBER: _builtins.int
+    TOTAL_PLAYOUT_DELAY_FIELD_NUMBER: _builtins.int
+    TOTAL_SAMPLES_COUNT_FIELD_NUMBER: _builtins.int
+    kind: _builtins.str
+    synthesized_samples_duration: _builtins.float
+    synthesized_samples_events: _builtins.int
+    total_samples_duration: _builtins.float
+    total_playout_delay: _builtins.float
+    total_samples_count: _builtins.int
     def __init__(
         self,
         *,
-        kind: builtins.str | None = ...,
-        synthesized_samples_duration: builtins.float | None = ...,
-        synthesized_samples_events: builtins.int | None = ...,
-        total_samples_duration: builtins.float | None = ...,
-        total_playout_delay: builtins.float | None = ...,
-        total_samples_count: builtins.int | None = ...,
+        kind: _builtins.str | None = ...,
+        synthesized_samples_duration: _builtins.float | None = ...,
+        synthesized_samples_events: _builtins.int | None = ...,
+        total_samples_duration: _builtins.float | None = ...,
+        total_playout_delay: _builtins.float | None = ...,
+        total_samples_count: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["kind", b"kind", "synthesized_samples_duration", b"synthesized_samples_duration", "synthesized_samples_events", b"synthesized_samples_events", "total_playout_delay", b"total_playout_delay", "total_samples_count", b"total_samples_count", "total_samples_duration", b"total_samples_duration"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___AudioPlayoutStats = AudioPlayoutStats
+Global___AudioPlayoutStats: _TypeAlias = AudioPlayoutStats  # noqa: Y015
 
-@typing.final
-class PeerConnectionStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class PeerConnectionStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    DATA_CHANNELS_OPENED_FIELD_NUMBER: builtins.int
-    DATA_CHANNELS_CLOSED_FIELD_NUMBER: builtins.int
-    data_channels_opened: builtins.int
-    data_channels_closed: builtins.int
+    DATA_CHANNELS_OPENED_FIELD_NUMBER: _builtins.int
+    DATA_CHANNELS_CLOSED_FIELD_NUMBER: _builtins.int
+    data_channels_opened: _builtins.int
+    data_channels_closed: _builtins.int
     def __init__(
         self,
         *,
-        data_channels_opened: builtins.int | None = ...,
-        data_channels_closed: builtins.int | None = ...,
+        data_channels_opened: _builtins.int | None = ...,
+        data_channels_closed: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["data_channels_closed", b"data_channels_closed", "data_channels_opened", b"data_channels_opened"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___PeerConnectionStats = PeerConnectionStats
+Global___PeerConnectionStats: _TypeAlias = PeerConnectionStats  # noqa: Y015
 
-@typing.final
-class DataChannelStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class DataChannelStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    LABEL_FIELD_NUMBER: builtins.int
-    PROTOCOL_FIELD_NUMBER: builtins.int
-    DATA_CHANNEL_IDENTIFIER_FIELD_NUMBER: builtins.int
-    STATE_FIELD_NUMBER: builtins.int
-    MESSAGES_SENT_FIELD_NUMBER: builtins.int
-    BYTES_SENT_FIELD_NUMBER: builtins.int
-    MESSAGES_RECEIVED_FIELD_NUMBER: builtins.int
-    BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    label: builtins.str
-    protocol: builtins.str
-    data_channel_identifier: builtins.int
-    state: global___DataChannelState.ValueType
-    messages_sent: builtins.int
-    bytes_sent: builtins.int
-    messages_received: builtins.int
-    bytes_received: builtins.int
+    LABEL_FIELD_NUMBER: _builtins.int
+    PROTOCOL_FIELD_NUMBER: _builtins.int
+    DATA_CHANNEL_IDENTIFIER_FIELD_NUMBER: _builtins.int
+    STATE_FIELD_NUMBER: _builtins.int
+    MESSAGES_SENT_FIELD_NUMBER: _builtins.int
+    BYTES_SENT_FIELD_NUMBER: _builtins.int
+    MESSAGES_RECEIVED_FIELD_NUMBER: _builtins.int
+    BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    label: _builtins.str
+    protocol: _builtins.str
+    data_channel_identifier: _builtins.int
+    state: Global___DataChannelState.ValueType
+    messages_sent: _builtins.int
+    bytes_sent: _builtins.int
+    messages_received: _builtins.int
+    bytes_received: _builtins.int
     def __init__(
         self,
         *,
-        label: builtins.str | None = ...,
-        protocol: builtins.str | None = ...,
-        data_channel_identifier: builtins.int | None = ...,
-        state: global___DataChannelState.ValueType | None = ...,
-        messages_sent: builtins.int | None = ...,
-        bytes_sent: builtins.int | None = ...,
-        messages_received: builtins.int | None = ...,
-        bytes_received: builtins.int | None = ...,
+        label: _builtins.str | None = ...,
+        protocol: _builtins.str | None = ...,
+        data_channel_identifier: _builtins.int | None = ...,
+        state: Global___DataChannelState.ValueType | None = ...,
+        messages_sent: _builtins.int | None = ...,
+        bytes_sent: _builtins.int | None = ...,
+        messages_received: _builtins.int | None = ...,
+        bytes_received: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "data_channel_identifier", b"data_channel_identifier", "label", b"label", "messages_received", b"messages_received", "messages_sent", b"messages_sent", "protocol", b"protocol", "state", b"state"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___DataChannelStats = DataChannelStats
+Global___DataChannelStats: _TypeAlias = DataChannelStats  # noqa: Y015
 
-@typing.final
-class TransportStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class TransportStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    PACKETS_SENT_FIELD_NUMBER: builtins.int
-    PACKETS_RECEIVED_FIELD_NUMBER: builtins.int
-    BYTES_SENT_FIELD_NUMBER: builtins.int
-    BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    ICE_ROLE_FIELD_NUMBER: builtins.int
-    ICE_LOCAL_USERNAME_FRAGMENT_FIELD_NUMBER: builtins.int
-    DTLS_STATE_FIELD_NUMBER: builtins.int
-    ICE_STATE_FIELD_NUMBER: builtins.int
-    SELECTED_CANDIDATE_PAIR_ID_FIELD_NUMBER: builtins.int
-    LOCAL_CERTIFICATE_ID_FIELD_NUMBER: builtins.int
-    REMOTE_CERTIFICATE_ID_FIELD_NUMBER: builtins.int
-    TLS_VERSION_FIELD_NUMBER: builtins.int
-    DTLS_CIPHER_FIELD_NUMBER: builtins.int
-    DTLS_ROLE_FIELD_NUMBER: builtins.int
-    SRTP_CIPHER_FIELD_NUMBER: builtins.int
-    SELECTED_CANDIDATE_PAIR_CHANGES_FIELD_NUMBER: builtins.int
-    packets_sent: builtins.int
-    packets_received: builtins.int
-    bytes_sent: builtins.int
-    bytes_received: builtins.int
-    ice_role: global___IceRole.ValueType
-    ice_local_username_fragment: builtins.str
-    dtls_state: global___DtlsTransportState.ValueType
-    ice_state: global___IceTransportState.ValueType
-    selected_candidate_pair_id: builtins.str
-    local_certificate_id: builtins.str
-    remote_certificate_id: builtins.str
-    tls_version: builtins.str
-    dtls_cipher: builtins.str
-    dtls_role: global___DtlsRole.ValueType
-    srtp_cipher: builtins.str
-    selected_candidate_pair_changes: builtins.int
+    PACKETS_SENT_FIELD_NUMBER: _builtins.int
+    PACKETS_RECEIVED_FIELD_NUMBER: _builtins.int
+    BYTES_SENT_FIELD_NUMBER: _builtins.int
+    BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    ICE_ROLE_FIELD_NUMBER: _builtins.int
+    ICE_LOCAL_USERNAME_FRAGMENT_FIELD_NUMBER: _builtins.int
+    DTLS_STATE_FIELD_NUMBER: _builtins.int
+    ICE_STATE_FIELD_NUMBER: _builtins.int
+    SELECTED_CANDIDATE_PAIR_ID_FIELD_NUMBER: _builtins.int
+    LOCAL_CERTIFICATE_ID_FIELD_NUMBER: _builtins.int
+    REMOTE_CERTIFICATE_ID_FIELD_NUMBER: _builtins.int
+    TLS_VERSION_FIELD_NUMBER: _builtins.int
+    DTLS_CIPHER_FIELD_NUMBER: _builtins.int
+    DTLS_ROLE_FIELD_NUMBER: _builtins.int
+    SRTP_CIPHER_FIELD_NUMBER: _builtins.int
+    SELECTED_CANDIDATE_PAIR_CHANGES_FIELD_NUMBER: _builtins.int
+    packets_sent: _builtins.int
+    packets_received: _builtins.int
+    bytes_sent: _builtins.int
+    bytes_received: _builtins.int
+    ice_role: Global___IceRole.ValueType
+    ice_local_username_fragment: _builtins.str
+    dtls_state: Global___DtlsTransportState.ValueType
+    ice_state: Global___IceTransportState.ValueType
+    selected_candidate_pair_id: _builtins.str
+    local_certificate_id: _builtins.str
+    remote_certificate_id: _builtins.str
+    tls_version: _builtins.str
+    dtls_cipher: _builtins.str
+    dtls_role: Global___DtlsRole.ValueType
+    srtp_cipher: _builtins.str
+    selected_candidate_pair_changes: _builtins.int
     def __init__(
         self,
         *,
-        packets_sent: builtins.int | None = ...,
-        packets_received: builtins.int | None = ...,
-        bytes_sent: builtins.int | None = ...,
-        bytes_received: builtins.int | None = ...,
-        ice_role: global___IceRole.ValueType | None = ...,
-        ice_local_username_fragment: builtins.str | None = ...,
-        dtls_state: global___DtlsTransportState.ValueType | None = ...,
-        ice_state: global___IceTransportState.ValueType | None = ...,
-        selected_candidate_pair_id: builtins.str | None = ...,
-        local_certificate_id: builtins.str | None = ...,
-        remote_certificate_id: builtins.str | None = ...,
-        tls_version: builtins.str | None = ...,
-        dtls_cipher: builtins.str | None = ...,
-        dtls_role: global___DtlsRole.ValueType | None = ...,
-        srtp_cipher: builtins.str | None = ...,
-        selected_candidate_pair_changes: builtins.int | None = ...,
+        packets_sent: _builtins.int | None = ...,
+        packets_received: _builtins.int | None = ...,
+        bytes_sent: _builtins.int | None = ...,
+        bytes_received: _builtins.int | None = ...,
+        ice_role: Global___IceRole.ValueType | None = ...,
+        ice_local_username_fragment: _builtins.str | None = ...,
+        dtls_state: Global___DtlsTransportState.ValueType | None = ...,
+        ice_state: Global___IceTransportState.ValueType | None = ...,
+        selected_candidate_pair_id: _builtins.str | None = ...,
+        local_certificate_id: _builtins.str | None = ...,
+        remote_certificate_id: _builtins.str | None = ...,
+        tls_version: _builtins.str | None = ...,
+        dtls_cipher: _builtins.str | None = ...,
+        dtls_role: Global___DtlsRole.ValueType | None = ...,
+        srtp_cipher: _builtins.str | None = ...,
+        selected_candidate_pair_changes: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "dtls_cipher", b"dtls_cipher", "dtls_role", b"dtls_role", "dtls_state", b"dtls_state", "ice_local_username_fragment", b"ice_local_username_fragment", "ice_role", b"ice_role", "ice_state", b"ice_state", "local_certificate_id", b"local_certificate_id", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_certificate_id", b"remote_certificate_id", "selected_candidate_pair_changes", b"selected_candidate_pair_changes", "selected_candidate_pair_id", b"selected_candidate_pair_id", "srtp_cipher", b"srtp_cipher", "tls_version", b"tls_version"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___TransportStats = TransportStats
+Global___TransportStats: _TypeAlias = TransportStats  # noqa: Y015
 
-@typing.final
-class CandidatePairStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class CandidatePairStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRANSPORT_ID_FIELD_NUMBER: builtins.int
-    LOCAL_CANDIDATE_ID_FIELD_NUMBER: builtins.int
-    REMOTE_CANDIDATE_ID_FIELD_NUMBER: builtins.int
-    STATE_FIELD_NUMBER: builtins.int
-    NOMINATED_FIELD_NUMBER: builtins.int
-    PACKETS_SENT_FIELD_NUMBER: builtins.int
-    PACKETS_RECEIVED_FIELD_NUMBER: builtins.int
-    BYTES_SENT_FIELD_NUMBER: builtins.int
-    BYTES_RECEIVED_FIELD_NUMBER: builtins.int
-    LAST_PACKET_SENT_TIMESTAMP_FIELD_NUMBER: builtins.int
-    LAST_PACKET_RECEIVED_TIMESTAMP_FIELD_NUMBER: builtins.int
-    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    CURRENT_ROUND_TRIP_TIME_FIELD_NUMBER: builtins.int
-    AVAILABLE_OUTGOING_BITRATE_FIELD_NUMBER: builtins.int
-    AVAILABLE_INCOMING_BITRATE_FIELD_NUMBER: builtins.int
-    REQUESTS_RECEIVED_FIELD_NUMBER: builtins.int
-    REQUESTS_SENT_FIELD_NUMBER: builtins.int
-    RESPONSES_RECEIVED_FIELD_NUMBER: builtins.int
-    RESPONSES_SENT_FIELD_NUMBER: builtins.int
-    CONSENT_REQUESTS_SENT_FIELD_NUMBER: builtins.int
-    PACKETS_DISCARDED_ON_SEND_FIELD_NUMBER: builtins.int
-    BYTES_DISCARDED_ON_SEND_FIELD_NUMBER: builtins.int
-    transport_id: builtins.str
-    local_candidate_id: builtins.str
-    remote_candidate_id: builtins.str
-    state: global___IceCandidatePairState.ValueType
-    nominated: builtins.bool
-    packets_sent: builtins.int
-    packets_received: builtins.int
-    bytes_sent: builtins.int
-    bytes_received: builtins.int
-    last_packet_sent_timestamp: builtins.float
-    last_packet_received_timestamp: builtins.float
-    total_round_trip_time: builtins.float
-    current_round_trip_time: builtins.float
-    available_outgoing_bitrate: builtins.float
-    available_incoming_bitrate: builtins.float
-    requests_received: builtins.int
-    requests_sent: builtins.int
-    responses_received: builtins.int
-    responses_sent: builtins.int
-    consent_requests_sent: builtins.int
-    packets_discarded_on_send: builtins.int
-    bytes_discarded_on_send: builtins.int
+    TRANSPORT_ID_FIELD_NUMBER: _builtins.int
+    LOCAL_CANDIDATE_ID_FIELD_NUMBER: _builtins.int
+    REMOTE_CANDIDATE_ID_FIELD_NUMBER: _builtins.int
+    STATE_FIELD_NUMBER: _builtins.int
+    NOMINATED_FIELD_NUMBER: _builtins.int
+    PACKETS_SENT_FIELD_NUMBER: _builtins.int
+    PACKETS_RECEIVED_FIELD_NUMBER: _builtins.int
+    BYTES_SENT_FIELD_NUMBER: _builtins.int
+    BYTES_RECEIVED_FIELD_NUMBER: _builtins.int
+    LAST_PACKET_SENT_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    LAST_PACKET_RECEIVED_TIMESTAMP_FIELD_NUMBER: _builtins.int
+    TOTAL_ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    CURRENT_ROUND_TRIP_TIME_FIELD_NUMBER: _builtins.int
+    AVAILABLE_OUTGOING_BITRATE_FIELD_NUMBER: _builtins.int
+    AVAILABLE_INCOMING_BITRATE_FIELD_NUMBER: _builtins.int
+    REQUESTS_RECEIVED_FIELD_NUMBER: _builtins.int
+    REQUESTS_SENT_FIELD_NUMBER: _builtins.int
+    RESPONSES_RECEIVED_FIELD_NUMBER: _builtins.int
+    RESPONSES_SENT_FIELD_NUMBER: _builtins.int
+    CONSENT_REQUESTS_SENT_FIELD_NUMBER: _builtins.int
+    PACKETS_DISCARDED_ON_SEND_FIELD_NUMBER: _builtins.int
+    BYTES_DISCARDED_ON_SEND_FIELD_NUMBER: _builtins.int
+    transport_id: _builtins.str
+    local_candidate_id: _builtins.str
+    remote_candidate_id: _builtins.str
+    state: Global___IceCandidatePairState.ValueType
+    nominated: _builtins.bool
+    packets_sent: _builtins.int
+    packets_received: _builtins.int
+    bytes_sent: _builtins.int
+    bytes_received: _builtins.int
+    last_packet_sent_timestamp: _builtins.float
+    last_packet_received_timestamp: _builtins.float
+    total_round_trip_time: _builtins.float
+    current_round_trip_time: _builtins.float
+    available_outgoing_bitrate: _builtins.float
+    available_incoming_bitrate: _builtins.float
+    requests_received: _builtins.int
+    requests_sent: _builtins.int
+    responses_received: _builtins.int
+    responses_sent: _builtins.int
+    consent_requests_sent: _builtins.int
+    packets_discarded_on_send: _builtins.int
+    bytes_discarded_on_send: _builtins.int
     def __init__(
         self,
         *,
-        transport_id: builtins.str | None = ...,
-        local_candidate_id: builtins.str | None = ...,
-        remote_candidate_id: builtins.str | None = ...,
-        state: global___IceCandidatePairState.ValueType | None = ...,
-        nominated: builtins.bool | None = ...,
-        packets_sent: builtins.int | None = ...,
-        packets_received: builtins.int | None = ...,
-        bytes_sent: builtins.int | None = ...,
-        bytes_received: builtins.int | None = ...,
-        last_packet_sent_timestamp: builtins.float | None = ...,
-        last_packet_received_timestamp: builtins.float | None = ...,
-        total_round_trip_time: builtins.float | None = ...,
-        current_round_trip_time: builtins.float | None = ...,
-        available_outgoing_bitrate: builtins.float | None = ...,
-        available_incoming_bitrate: builtins.float | None = ...,
-        requests_received: builtins.int | None = ...,
-        requests_sent: builtins.int | None = ...,
-        responses_received: builtins.int | None = ...,
-        responses_sent: builtins.int | None = ...,
-        consent_requests_sent: builtins.int | None = ...,
-        packets_discarded_on_send: builtins.int | None = ...,
-        bytes_discarded_on_send: builtins.int | None = ...,
+        transport_id: _builtins.str | None = ...,
+        local_candidate_id: _builtins.str | None = ...,
+        remote_candidate_id: _builtins.str | None = ...,
+        state: Global___IceCandidatePairState.ValueType | None = ...,
+        nominated: _builtins.bool | None = ...,
+        packets_sent: _builtins.int | None = ...,
+        packets_received: _builtins.int | None = ...,
+        bytes_sent: _builtins.int | None = ...,
+        bytes_received: _builtins.int | None = ...,
+        last_packet_sent_timestamp: _builtins.float | None = ...,
+        last_packet_received_timestamp: _builtins.float | None = ...,
+        total_round_trip_time: _builtins.float | None = ...,
+        current_round_trip_time: _builtins.float | None = ...,
+        available_outgoing_bitrate: _builtins.float | None = ...,
+        available_incoming_bitrate: _builtins.float | None = ...,
+        requests_received: _builtins.int | None = ...,
+        requests_sent: _builtins.int | None = ...,
+        responses_received: _builtins.int | None = ...,
+        responses_sent: _builtins.int | None = ...,
+        consent_requests_sent: _builtins.int | None = ...,
+        packets_discarded_on_send: _builtins.int | None = ...,
+        bytes_discarded_on_send: _builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["available_incoming_bitrate", b"available_incoming_bitrate", "available_outgoing_bitrate", b"available_outgoing_bitrate", "bytes_discarded_on_send", b"bytes_discarded_on_send", "bytes_received", b"bytes_received", "bytes_sent", b"bytes_sent", "consent_requests_sent", b"consent_requests_sent", "current_round_trip_time", b"current_round_trip_time", "last_packet_received_timestamp", b"last_packet_received_timestamp", "last_packet_sent_timestamp", b"last_packet_sent_timestamp", "local_candidate_id", b"local_candidate_id", "nominated", b"nominated", "packets_discarded_on_send", b"packets_discarded_on_send", "packets_received", b"packets_received", "packets_sent", b"packets_sent", "remote_candidate_id", b"remote_candidate_id", "requests_received", b"requests_received", "requests_sent", b"requests_sent", "responses_received", b"responses_received", "responses_sent", b"responses_sent", "state", b"state", "total_round_trip_time", b"total_round_trip_time", "transport_id", b"transport_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___CandidatePairStats = CandidatePairStats
+Global___CandidatePairStats: _TypeAlias = CandidatePairStats  # noqa: Y015
 
-@typing.final
-class IceCandidateStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class IceCandidateStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    TRANSPORT_ID_FIELD_NUMBER: builtins.int
-    ADDRESS_FIELD_NUMBER: builtins.int
-    PORT_FIELD_NUMBER: builtins.int
-    PROTOCOL_FIELD_NUMBER: builtins.int
-    CANDIDATE_TYPE_FIELD_NUMBER: builtins.int
-    PRIORITY_FIELD_NUMBER: builtins.int
-    URL_FIELD_NUMBER: builtins.int
-    RELAY_PROTOCOL_FIELD_NUMBER: builtins.int
-    FOUNDATION_FIELD_NUMBER: builtins.int
-    RELATED_ADDRESS_FIELD_NUMBER: builtins.int
-    RELATED_PORT_FIELD_NUMBER: builtins.int
-    USERNAME_FRAGMENT_FIELD_NUMBER: builtins.int
-    TCP_TYPE_FIELD_NUMBER: builtins.int
-    transport_id: builtins.str
-    address: builtins.str
-    port: builtins.int
-    protocol: builtins.str
-    candidate_type: global___IceCandidateType.ValueType
-    priority: builtins.int
-    url: builtins.str
-    relay_protocol: global___IceServerTransportProtocol.ValueType
-    foundation: builtins.str
-    related_address: builtins.str
-    related_port: builtins.int
-    username_fragment: builtins.str
-    tcp_type: global___IceTcpCandidateType.ValueType
+    TRANSPORT_ID_FIELD_NUMBER: _builtins.int
+    ADDRESS_FIELD_NUMBER: _builtins.int
+    PORT_FIELD_NUMBER: _builtins.int
+    PROTOCOL_FIELD_NUMBER: _builtins.int
+    CANDIDATE_TYPE_FIELD_NUMBER: _builtins.int
+    PRIORITY_FIELD_NUMBER: _builtins.int
+    URL_FIELD_NUMBER: _builtins.int
+    RELAY_PROTOCOL_FIELD_NUMBER: _builtins.int
+    FOUNDATION_FIELD_NUMBER: _builtins.int
+    RELATED_ADDRESS_FIELD_NUMBER: _builtins.int
+    RELATED_PORT_FIELD_NUMBER: _builtins.int
+    USERNAME_FRAGMENT_FIELD_NUMBER: _builtins.int
+    TCP_TYPE_FIELD_NUMBER: _builtins.int
+    transport_id: _builtins.str
+    address: _builtins.str
+    port: _builtins.int
+    protocol: _builtins.str
+    candidate_type: Global___IceCandidateType.ValueType
+    priority: _builtins.int
+    url: _builtins.str
+    relay_protocol: Global___IceServerTransportProtocol.ValueType
+    foundation: _builtins.str
+    related_address: _builtins.str
+    related_port: _builtins.int
+    username_fragment: _builtins.str
+    tcp_type: Global___IceTcpCandidateType.ValueType
     def __init__(
         self,
         *,
-        transport_id: builtins.str | None = ...,
-        address: builtins.str | None = ...,
-        port: builtins.int | None = ...,
-        protocol: builtins.str | None = ...,
-        candidate_type: global___IceCandidateType.ValueType | None = ...,
-        priority: builtins.int | None = ...,
-        url: builtins.str | None = ...,
-        relay_protocol: global___IceServerTransportProtocol.ValueType | None = ...,
-        foundation: builtins.str | None = ...,
-        related_address: builtins.str | None = ...,
-        related_port: builtins.int | None = ...,
-        username_fragment: builtins.str | None = ...,
-        tcp_type: global___IceTcpCandidateType.ValueType | None = ...,
+        transport_id: _builtins.str | None = ...,
+        address: _builtins.str | None = ...,
+        port: _builtins.int | None = ...,
+        protocol: _builtins.str | None = ...,
+        candidate_type: Global___IceCandidateType.ValueType | None = ...,
+        priority: _builtins.int | None = ...,
+        url: _builtins.str | None = ...,
+        relay_protocol: Global___IceServerTransportProtocol.ValueType | None = ...,
+        foundation: _builtins.str | None = ...,
+        related_address: _builtins.str | None = ...,
+        related_port: _builtins.int | None = ...,
+        username_fragment: _builtins.str | None = ...,
+        tcp_type: Global___IceTcpCandidateType.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["address", b"address", "candidate_type", b"candidate_type", "foundation", b"foundation", "port", b"port", "priority", b"priority", "protocol", b"protocol", "related_address", b"related_address", "related_port", b"related_port", "relay_protocol", b"relay_protocol", "tcp_type", b"tcp_type", "transport_id", b"transport_id", "url", b"url", "username_fragment", b"username_fragment"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___IceCandidateStats = IceCandidateStats
+Global___IceCandidateStats: _TypeAlias = IceCandidateStats  # noqa: Y015
 
-@typing.final
-class CertificateStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class CertificateStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    FINGERPRINT_FIELD_NUMBER: builtins.int
-    FINGERPRINT_ALGORITHM_FIELD_NUMBER: builtins.int
-    BASE64_CERTIFICATE_FIELD_NUMBER: builtins.int
-    ISSUER_CERTIFICATE_ID_FIELD_NUMBER: builtins.int
-    fingerprint: builtins.str
-    fingerprint_algorithm: builtins.str
-    base64_certificate: builtins.str
-    issuer_certificate_id: builtins.str
+    FINGERPRINT_FIELD_NUMBER: _builtins.int
+    FINGERPRINT_ALGORITHM_FIELD_NUMBER: _builtins.int
+    BASE64_CERTIFICATE_FIELD_NUMBER: _builtins.int
+    ISSUER_CERTIFICATE_ID_FIELD_NUMBER: _builtins.int
+    fingerprint: _builtins.str
+    fingerprint_algorithm: _builtins.str
+    base64_certificate: _builtins.str
+    issuer_certificate_id: _builtins.str
     def __init__(
         self,
         *,
-        fingerprint: builtins.str | None = ...,
-        fingerprint_algorithm: builtins.str | None = ...,
-        base64_certificate: builtins.str | None = ...,
-        issuer_certificate_id: builtins.str | None = ...,
+        fingerprint: _builtins.str | None = ...,
+        fingerprint_algorithm: _builtins.str | None = ...,
+        base64_certificate: _builtins.str | None = ...,
+        issuer_certificate_id: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["base64_certificate", b"base64_certificate", "fingerprint", b"fingerprint", "fingerprint_algorithm", b"fingerprint_algorithm", "issuer_certificate_id", b"issuer_certificate_id"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___CertificateStats = CertificateStats
+Global___CertificateStats: _TypeAlias = CertificateStats  # noqa: Y015
 
-@typing.final
-class StreamStats(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+@_typing.final
+class StreamStats(_message.Message):
+    DESCRIPTOR: _descriptor.Descriptor
 
-    ID_FIELD_NUMBER: builtins.int
-    STREAM_IDENTIFIER_FIELD_NUMBER: builtins.int
-    id: builtins.str
-    stream_identifier: builtins.str
+    ID_FIELD_NUMBER: _builtins.int
+    STREAM_IDENTIFIER_FIELD_NUMBER: _builtins.int
+    id: _builtins.str
+    stream_identifier: _builtins.str
     """required int64 timestamp = 3;"""
     def __init__(
         self,
         *,
-        id: builtins.str | None = ...,
-        stream_identifier: builtins.str | None = ...,
+        id: _builtins.str | None = ...,
+        stream_identifier: _builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]) -> None: ...
+    _HasFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]  # noqa: Y015
+    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
+    _ClearFieldArgType: _TypeAlias = _typing.Literal["id", b"id", "stream_identifier", b"stream_identifier"]  # noqa: Y015
+    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
 
-global___StreamStats = StreamStats
+Global___StreamStats: _TypeAlias = StreamStats  # noqa: Y015

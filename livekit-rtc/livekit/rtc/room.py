@@ -725,6 +725,21 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
+        elif which == "local_track_republished":
+            republished = event.local_track_republished
+            publications = self.local_participant._track_publications
+            lpublication = publications.pop(republished.previous_sid, None)
+            if lpublication is None:
+                logging.warning(
+                    "received local_track_republished for unknown publication sid %s",
+                    republished.previous_sid,
+                )
+                return
+
+            lpublication._info.CopyFrom(republished.info)
+            if lpublication.track is not None:
+                lpublication.track._info.sid = lpublication.sid
+            publications[lpublication.sid] = lpublication
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
