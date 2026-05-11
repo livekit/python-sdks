@@ -460,9 +460,10 @@ class Room(EventEmitter[EventTypes]):
             )
 
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
-            req.connect.options.e2ee.key_provider_options.shared_key = (
-                options.e2ee.key_provider_options.shared_key  # type: ignore
-            )
+            if options.e2ee.key_provider_options.shared_key is not None:
+                req.connect.options.e2ee.key_provider_options.shared_key = (
+                    options.e2ee.key_provider_options.shared_key
+                )
             req.connect.options.e2ee.key_provider_options.ratchet_salt = (
                 options.e2ee.key_provider_options.ratchet_salt
             )
@@ -481,9 +482,10 @@ class Room(EventEmitter[EventTypes]):
 
         if options.encryption:
             req.connect.options.encryption.encryption_type = options.encryption.encryption_type
-            req.connect.options.encryption.key_provider_options.shared_key = (
-                options.encryption.key_provider_options.shared_key  # type: ignore
-            )
+            if options.encryption.key_provider_options.shared_key is not None:
+                req.connect.options.encryption.key_provider_options.shared_key = (
+                    options.encryption.key_provider_options.shared_key
+                )
             req.connect.options.encryption.key_provider_options.ratchet_salt = (
                 options.encryption.key_provider_options.ratchet_salt
             )
