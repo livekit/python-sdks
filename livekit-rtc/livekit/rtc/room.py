@@ -28,7 +28,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
 from ._proto.participant_pb2 import DisconnectReason
-from ._proto.room_pb2 import ConnectionState
+from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
@@ -594,6 +594,35 @@ class Room(EventEmitter[EventTypes]):
     def unregister_text_stream_handler(self, topic: str):
         if self._text_stream_handlers.get(topic):
             self._text_stream_handlers.pop(topic)
+
+    async def simulate_scenario(self, scenario: SimulateScenarioKind.ValueType) -> None:
+        """Trigger a reconnection / chaos scenario for testing.
+
+        See `SimulateScenarioKind` for the available variants. Most useful
+        in tests to deterministically force a Resume (signal-only reconnect
+        that preserves the PeerConnection and existing publications) or a
+        full reconnect (the SDK rebuilds the RtcSession and re-publishes
+        existing local tracks).
+
+        Raises a `RuntimeError` if the SDK reports a failure.
+        """
+        if not self.isconnected() or self._ffi_handle is None:
+            raise RuntimeError("simulate_scenario requires a connected room")
+
+        req = proto_ffi.FfiRequest()
+        req.simulate_scenario.room_handle = self._ffi_handle.handle
+        req.simulate_scenario.scenario = scenario
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.simulate_scenario.async_id == resp.simulate_scenario.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.simulate_scenario.HasField("error") and cb.simulate_scenario.error:
+            raise RuntimeError(f"simulate_scenario failed: {cb.simulate_scenario.error}")
 
     async def disconnect(
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED

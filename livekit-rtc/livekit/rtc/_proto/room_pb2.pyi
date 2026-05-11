@@ -40,6 +40,46 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _SimulateScenarioKind:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SimulateScenarioKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SimulateScenarioKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SIMULATE_SIGNAL_RECONNECT: _SimulateScenarioKind.ValueType  # 0
+    """Closes the signal channel locally; engine attempts a Resume."""
+    SIMULATE_SPEAKER: _SimulateScenarioKind.ValueType  # 1
+    SIMULATE_NODE_FAILURE: _SimulateScenarioKind.ValueType  # 2
+    SIMULATE_SERVER_LEAVE: _SimulateScenarioKind.ValueType  # 3
+    SIMULATE_MIGRATION: _SimulateScenarioKind.ValueType  # 4
+    SIMULATE_FORCE_TCP: _SimulateScenarioKind.ValueType  # 5
+    SIMULATE_FORCE_TLS: _SimulateScenarioKind.ValueType  # 6
+    SIMULATE_FULL_RECONNECT: _SimulateScenarioKind.ValueType  # 7
+    """Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
+    reconnect (new RtcSession; SDK republishes existing local tracks).
+    """
+
+class SimulateScenarioKind(_SimulateScenarioKind, metaclass=_SimulateScenarioKindEnumTypeWrapper):
+    """Simulate a reconnection scenario for testing. Mirrors the variants of
+    `livekit::SimulateScenario`. The Resume / FullReconnect variants are
+    the relevant ones for verifying that resume preserves publications and
+    full reconnect republishes them exactly once.
+    """
+
+SIMULATE_SIGNAL_RECONNECT: SimulateScenarioKind.ValueType  # 0
+"""Closes the signal channel locally; engine attempts a Resume."""
+SIMULATE_SPEAKER: SimulateScenarioKind.ValueType  # 1
+SIMULATE_NODE_FAILURE: SimulateScenarioKind.ValueType  # 2
+SIMULATE_SERVER_LEAVE: SimulateScenarioKind.ValueType  # 3
+SIMULATE_MIGRATION: SimulateScenarioKind.ValueType  # 4
+SIMULATE_FORCE_TCP: SimulateScenarioKind.ValueType  # 5
+SIMULATE_FORCE_TLS: SimulateScenarioKind.ValueType  # 6
+SIMULATE_FULL_RECONNECT: SimulateScenarioKind.ValueType  # 7
+"""Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
+reconnect (new RtcSession; SDK republishes existing local tracks).
+"""
+global___SimulateScenarioKind = SimulateScenarioKind
+
 class _IceTransportType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -295,6 +335,63 @@ class DisconnectCallback(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
 global___DisconnectCallback = DisconnectCallback
+
+@typing.final
+class SimulateScenarioRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    SCENARIO_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    scenario: global___SimulateScenarioKind.ValueType
+    request_async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+        scenario: global___SimulateScenarioKind.ValueType | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle", "scenario", b"scenario"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle", "scenario", b"scenario"]) -> None: ...
+
+global___SimulateScenarioRequest = SimulateScenarioRequest
+
+@typing.final
+class SimulateScenarioResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___SimulateScenarioResponse = SimulateScenarioResponse
+
+@typing.final
+class SimulateScenarioCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
+
+global___SimulateScenarioCallback = SimulateScenarioCallback
 
 @typing.final
 class PublishTrackRequest(google.protobuf.message.Message):

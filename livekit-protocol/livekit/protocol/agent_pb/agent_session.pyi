@@ -1,5 +1,6 @@
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
 from ..logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -29,6 +30,15 @@ class UserState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     US_SPEAKING: _ClassVar[UserState]
     US_LISTENING: _ClassVar[UserState]
     US_AWAY: _ClassVar[UserState]
+
+class AmdCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    AMD_UNKNOWN: _ClassVar[AmdCategory]
+    AMD_HUMAN: _ClassVar[AmdCategory]
+    AMD_MACHINE_IVR: _ClassVar[AmdCategory]
+    AMD_MACHINE_VM: _ClassVar[AmdCategory]
+    AMD_MACHINE_UNAVAILABLE: _ClassVar[AmdCategory]
+    AMD_UNCERTAIN: _ClassVar[AmdCategory]
 DEVELOPER: ChatRole
 SYSTEM: ChatRole
 USER: ChatRole
@@ -41,6 +51,12 @@ AS_SPEAKING: AgentState
 US_SPEAKING: UserState
 US_LISTENING: UserState
 US_AWAY: UserState
+AMD_UNKNOWN: AmdCategory
+AMD_HUMAN: AmdCategory
+AMD_MACHINE_IVR: AmdCategory
+AMD_MACHINE_VM: AmdCategory
+AMD_MACHINE_UNAVAILABLE: AmdCategory
+AMD_UNCERTAIN: AmdCategory
 
 class MetricsReport(_message.Message):
     __slots__ = ("started_speaking_at", "stopped_speaking_at", "transcription_delay", "end_of_turn_delay", "on_user_turn_completed_delay", "llm_node_ttft", "tts_node_ttfb", "e2e_latency")
@@ -276,7 +292,7 @@ class AgentSessionUsage(_message.Message):
     def __init__(self, model_usage: _Optional[_Iterable[_Union[ModelUsage, _Mapping]]] = ...) -> None: ...
 
 class AgentSessionEvent(_message.Message):
-    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated")
+    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction")
     class AgentStateChanged(_message.Message):
         __slots__ = ("old_state", "new_state")
         OLD_STATE_FIELD_NUMBER: _ClassVar[int]
@@ -328,6 +344,19 @@ class AgentSessionEvent(_message.Message):
         detection_delay: float
         detected_at: _timestamp_pb2.Timestamp
         def __init__(self, is_interruption: bool = ..., overlap_started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., detection_delay: _Optional[float] = ..., detected_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    class AmdPrediction(_message.Message):
+        __slots__ = ("speech_duration", "category", "reason", "transcript", "delay")
+        SPEECH_DURATION_FIELD_NUMBER: _ClassVar[int]
+        CATEGORY_FIELD_NUMBER: _ClassVar[int]
+        REASON_FIELD_NUMBER: _ClassVar[int]
+        TRANSCRIPT_FIELD_NUMBER: _ClassVar[int]
+        DELAY_FIELD_NUMBER: _ClassVar[int]
+        speech_duration: _duration_pb2.Duration
+        category: AmdCategory
+        reason: str
+        transcript: str
+        delay: _duration_pb2.Duration
+        def __init__(self, speech_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., category: _Optional[_Union[AmdCategory, str]] = ..., reason: _Optional[str] = ..., transcript: _Optional[str] = ..., delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
     class SessionUsageUpdated(_message.Message):
         __slots__ = ("usage",)
         USAGE_FIELD_NUMBER: _ClassVar[int]
@@ -342,6 +371,7 @@ class AgentSessionEvent(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OVERLAPPING_SPEECH_FIELD_NUMBER: _ClassVar[int]
     SESSION_USAGE_UPDATED_FIELD_NUMBER: _ClassVar[int]
+    AMD_PREDICTION_FIELD_NUMBER: _ClassVar[int]
     created_at: _timestamp_pb2.Timestamp
     agent_state_changed: AgentSessionEvent.AgentStateChanged
     user_state_changed: AgentSessionEvent.UserStateChanged
@@ -351,7 +381,8 @@ class AgentSessionEvent(_message.Message):
     error: AgentSessionEvent.Error
     overlapping_speech: AgentSessionEvent.OverlappingSpeech
     session_usage_updated: AgentSessionEvent.SessionUsageUpdated
-    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ...) -> None: ...
+    amd_prediction: AgentSessionEvent.AmdPrediction
+    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ...) -> None: ...
 
 class SessionRequest(_message.Message):
     __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
