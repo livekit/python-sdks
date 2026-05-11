@@ -175,20 +175,18 @@ async def test_e2ee_shared_key():
     publish_task: asyncio.Task | None = None
 
     try:
-        connect_options = rtc.RoomOptions(
-            auto_subscribe=True, encryption=make_e2ee_options()
-        )
+        connect_options = rtc.RoomOptions(auto_subscribe=True, encryption=make_e2ee_options())
 
         await publisher_room.connect(url, publisher_token, options=connect_options)
         await receiver1_room.connect(
-            url, receiver1_token, options=rtc.RoomOptions(
-                auto_subscribe=True, encryption=make_e2ee_options()
-            )
+            url,
+            receiver1_token,
+            options=rtc.RoomOptions(auto_subscribe=True, encryption=make_e2ee_options()),
         )
         await receiver2_room.connect(
-            url, receiver2_token, options=rtc.RoomOptions(
-                auto_subscribe=True, encryption=make_e2ee_options()
-            )
+            url,
+            receiver2_token,
+            options=rtc.RoomOptions(auto_subscribe=True, encryption=make_e2ee_options()),
         )
 
         # 1) all connected
@@ -202,9 +200,7 @@ async def test_e2ee_shared_key():
         publish_options.source = rtc.TrackSource.SOURCE_CAMERA
         publish_options.video_codec = rtc.VideoCodec.VP8
         publish_options.simulcast = True
-        publication = await publisher_room.local_participant.publish_track(
-            track, publish_options
-        )
+        publication = await publisher_room.local_participant.publish_track(track, publish_options)
         assert publication is not None and publication.sid
 
         publish_task = asyncio.create_task(publish_dummy_video(source, publish_stop))

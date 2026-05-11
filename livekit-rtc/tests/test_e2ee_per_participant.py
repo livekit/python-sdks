@@ -230,9 +230,7 @@ async def test_e2ee_per_participant():
         publish_options.source = rtc.TrackSource.SOURCE_CAMERA
         publish_options.video_codec = rtc.VideoCodec.VP8
         publish_options.simulcast = True
-        publication = await publisher_room.local_participant.publish_track(
-            track, publish_options
-        )
+        publication = await publisher_room.local_participant.publish_track(track, publish_options)
         assert publication is not None and publication.sid
 
         publish_task = asyncio.create_task(publish_dummy_video(source, publish_stop))
@@ -247,15 +245,13 @@ async def test_e2ee_per_participant():
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver1"],
             message=(
-                "receiver1 did not reach EncryptionState.OK "
-                f"(saw {e2ee_state_log['receiver1']})"
+                f"receiver1 did not reach EncryptionState.OK (saw {e2ee_state_log['receiver1']})"
             ),
         )
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver2"],
             message=(
-                "receiver2 did not reach EncryptionState.OK "
-                f"(saw {e2ee_state_log['receiver2']})"
+                f"receiver2 did not reach EncryptionState.OK (saw {e2ee_state_log['receiver2']})"
             ),
         )
 
@@ -317,15 +313,13 @@ async def test_e2ee_per_participant():
         await assert_eventually(
             lambda: rtc.EncryptionState.DECRYPTION_FAILED in seen_e2ee_states["receiver1"],
             message=(
-                "receiver1 did not observe DECRYPTION_FAILED "
-                f"(saw {e2ee_state_log['receiver1']})"
+                f"receiver1 did not observe DECRYPTION_FAILED (saw {e2ee_state_log['receiver1']})"
             ),
         )
         await assert_eventually(
             lambda: rtc.EncryptionState.DECRYPTION_FAILED in seen_e2ee_states["receiver2"],
             message=(
-                "receiver2 did not observe DECRYPTION_FAILED "
-                f"(saw {e2ee_state_log['receiver2']})"
+                f"receiver2 did not observe DECRYPTION_FAILED (saw {e2ee_state_log['receiver2']})"
             ),
         )
 
