@@ -190,7 +190,9 @@ async def _capture_loop(
 
         now = time.perf_counter()
         if now - last_log_at >= 2.0:
-            logging.info("published %s frames at ~%.1f fps", submitted, submitted / (now - last_log_at))
+            logging.info(
+                "published %s frames at ~%.1f fps", submitted, submitted / (now - last_log_at)
+            )
             submitted = 0
             last_log_at = now
 

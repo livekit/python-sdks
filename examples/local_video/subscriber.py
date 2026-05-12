@@ -37,7 +37,9 @@ def parse_args() -> argparse.Namespace:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--room-name", default="video-room", help="LiveKit room name")
-    parser.add_argument("--identity", default="python-video-subscriber", help="Participant identity")
+    parser.add_argument(
+        "--identity", default="python-video-subscriber", help="Participant identity"
+    )
     parser.add_argument(
         "--participant",
         help="Only subscribe to video from this participant identity",
@@ -150,9 +152,7 @@ def _draw_timestamp_overlay(
     thickness = 1
     line_height = 22
     padding = 8
-    text_sizes = [
-        cv2.getTextSize(line, font_face, font_scale, thickness)[0] for line in lines
-    ]
+    text_sizes = [cv2.getTextSize(line, font_face, font_scale, thickness)[0] for line in lines]
     box_width = max(width for width, _ in text_sizes) + (padding * 2)
     box_height = (line_height * len(lines)) + (padding * 2)
     cv2.rectangle(image, (8, 8), (8 + box_width, 8 + box_height), (0, 0, 0), -1)
