@@ -1,9 +1,20 @@
-"""End-to-end Test for simulcast video quality layers.
+"""End-to-end Test for simulcast / SVC video quality layers.
 
-The test publishes a 1280x720 simulcast video track (rolling colored bars) using
-both VP8 and H264 codecs, and on the receiver side verifies that subscribing to
-each simulcast quality layer (HIGH=f, MEDIUM=h, LOW=q) yields frames of the
+The test publishes a 1280x720 video track (rolling colored bars) with four
+codec configurations and, on the receiver side, verifies that subscribing
+to each quality layer (HIGH=f, MEDIUM=h, LOW=q) yields frames of the
 expected resolution.
+
+Codecs covered:
+    - VP8   (simulcast: three independent encoders)
+    - H264  (simulcast: three independent encoders)
+    - H265  (simulcast: three independent encoders, hardware-only on most platforms)
+    - VP9   (SVC: single bitstream with three spatial layers)
+    - AV1   (SVC: single bitstream with three spatial layers)
+
+For VP9 and AV1, libwebrtc converts the multiple RtpEncodingParameters
+produced by `simulcast=True` into SVC spatial layers, so the SFU still
+exposes the same f/h/q quality switches.
 
 Requires the following environment variables to run:
     LIVEKIT_URL
@@ -15,6 +26,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import sys
 import time
 import uuid
 from typing import Callable, Optional, Tuple
@@ -213,19 +225,46 @@ async def _wait_for_layer(
     raise AssertionError(f"timed out waiting for ~{expected_w}x{expected_h}, last seen={last}")
 
 
+# H265 is hardware-only on most platforms and unreliable in CI — opt in via
+# LIVEKIT_TEST_H265=1. H264 on macOS depends on VideoToolbox being available
+# to the CI runner, which we cannot assume — opt in via LIVEKIT_TEST_H264_MACOS=1.
+_H265_ENABLED = os.getenv("LIVEKIT_TEST_H265") == "1"
+_H264_MACOS_ENABLED = os.getenv("LIVEKIT_TEST_H264_MACOS") == "1"
+_IS_MACOS = sys.platform == "darwin"
+
+
 @skip_if_no_credentials()
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "video_codec, codec_name",
+    "video_codec, codec_name, mode",
     [
-        (rtc.VideoCodec.VP8, "vp8"),
-        (rtc.VideoCodec.H264, "h264"),
+        (rtc.VideoCodec.VP8, "vp8", "simulcast"),
+        pytest.param(
+            rtc.VideoCodec.H264,
+            "h264",
+            "simulcast",
+            marks=pytest.mark.skipif(
+                _IS_MACOS and not _H264_MACOS_ENABLED,
+                reason="H264 disabled on macOS by default; set LIVEKIT_TEST_H264_MACOS=1 to enable",
+            ),
+        ),
+        pytest.param(
+            rtc.VideoCodec.H265,
+            "h265",
+            "simulcast",
+            marks=pytest.mark.skipif(
+                not _H265_ENABLED,
+                reason="H265 disabled by default; set LIVEKIT_TEST_H265=1 to enable",
+            ),
+        ),
+        (rtc.VideoCodec.VP9, "vp9", "svc"),
+        (rtc.VideoCodec.AV1, "av1", "svc"),
     ],
 )
 async def test_simulcast_quality_layers(
-    video_codec: rtc.VideoCodec.ValueType, codec_name: str
+    video_codec: rtc.VideoCodec.ValueType, codec_name: str, mode: str
 ) -> None:
-    room_name = unique_room_name(f"py-simulcast-{codec_name}")
+    room_name = unique_room_name(f"py-{mode}-{codec_name}")
     url = os.environ["LIVEKIT_URL"]
 
     sender, receiver = rtc.Room(), rtc.Room()
@@ -234,13 +273,20 @@ async def test_simulcast_quality_layers(
     await _ensure_all_connected([sender, receiver])
 
     source = rtc.VideoSource(PUBLISH_WIDTH, PUBLISH_HEIGHT)
-    track = rtc.LocalVideoTrack.create_video_track(f"simulcast-{codec_name}", source)
+    track = rtc.LocalVideoTrack.create_video_track(f"{mode}-{codec_name}", source)
     options = rtc.TrackPublishOptions(
         source=rtc.TrackSource.SOURCE_CAMERA,
         simulcast=True,
         video_codec=video_codec,
         video_encoding=rtc.VideoEncoding(max_bitrate=3_000_000, max_framerate=PUBLISH_FPS),
     )
+    # For SVC codecs, ask libwebrtc to emit three spatial × three temporal
+    # layers in a single bitstream. Without an explicit scalability_mode AV1
+    # falls back to a single-layer stream and the SFU has nothing to switch
+    # down to. VP9 happens to work without it, but setting it is more
+    # predictable.
+    if mode == "svc":
+        options.scalability_mode = "L3T3_KEY"
 
     stop = asyncio.Event()
     pub_task = asyncio.create_task(_publish_loop(source, stop))
@@ -264,10 +310,11 @@ async def test_simulcast_quality_layers(
         remote_pub = await _ensure_track_subscribed(receiver, local_pub.sid)
         assert remote_pub.track is not None
 
-        # Give the SFU a moment to propagate simulcast layer metadata and
-        # let the encoder/bandwidth estimator ramp up to all layers before
-        # we start switching qualities.
-        await asyncio.sleep(5.0)
+        # Give the SFU a moment to propagate layer metadata and let the
+        # encoder/bandwidth estimator ramp up to all layers before we start
+        # switching qualities. SVC codecs (VP9/AV1) typically need more
+        # time than VP8/H264 simulcast to produce all spatial layers.
+        await asyncio.sleep(10.0 if mode == "svc" else 5.0)
         print(
             f"[{codec_name}] remote_pub: sid={remote_pub.sid} "
             f"simulcasted={remote_pub.simulcasted} "
