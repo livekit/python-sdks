@@ -740,11 +740,12 @@ class Room(EventEmitter[EventTypes]):
             # reference continues to see current state, then rekey it
             # under the new SID in the participant's publications dict.
             previous_sid = event.local_track_republished.previous_sid
-            lpublication = self.local_participant._track_publications.pop(previous_sid, None)
-            if lpublication is not None:
-                lpublication._info = event.local_track_republished.info
-                self.local_participant._track_publications[lpublication.sid] = lpublication
-                self.emit("local_track_republished", lpublication, previous_sid)
+            republished = self.local_participant._track_publications.get(previous_sid)
+            if republished is not None:
+                del self.local_participant._track_publications[previous_sid]
+                republished._info = event.local_track_republished.info
+                self.local_participant._track_publications[republished.sid] = republished
+                self.emit("local_track_republished", republished, previous_sid)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
