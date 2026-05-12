@@ -62,5 +62,6 @@ uv run --project examples/local_video python examples/local_video/subscriber.py 
 ```
 
 Use `--participant py-cam` to only subscribe to video from a specific participant identity.
+The subscriber keeps running across unpublish/republish cycles and will attach to the next matching video track.
 
 Press `q` in the video window or `Ctrl+C` in the terminal to exit.

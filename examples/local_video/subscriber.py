@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from dataclasses import dataclass
 from datetime import datetime, timezone
 import logging
 import os
@@ -21,6 +22,13 @@ except ImportError as exc:
 
 
 WINDOW_NAME = "livekit_video"
+
+
+@dataclass(frozen=True)
+class SubscribedVideoTrack:
+    track: rtc.Track
+    publication: rtc.RemoteTrackPublication
+    participant: rtc.RemoteParticipant
 
 
 def parse_args() -> argparse.Namespace:
@@ -181,28 +189,28 @@ def _window_is_open() -> bool:
         return False
 
 
-async def _wait_for_video_track(
-    track_ready: asyncio.Event,
+async def _next_video_track(
+    track_queue: asyncio.Queue[SubscribedVideoTrack],
     stop_event: asyncio.Event,
-) -> bool:
+) -> SubscribedVideoTrack | None:
     while not stop_event.is_set():
         try:
-            await asyncio.wait_for(track_ready.wait(), timeout=0.5)
-            return True
+            return await asyncio.wait_for(track_queue.get(), timeout=0.5)
         except asyncio.TimeoutError:
             continue
-    return False
+    return None
 
 
 async def _render_video(
     video_stream: rtc.VideoStream,
     args: argparse.Namespace,
     stop_event: asyncio.Event,
+    active_track_gone: asyncio.Event,
 ) -> None:
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_AUTOSIZE)
 
     try:
-        while not stop_event.is_set():
+        while not stop_event.is_set() and not active_track_gone.is_set():
             try:
                 frame_event = await asyncio.wait_for(video_stream.__anext__(), timeout=0.5)
             except asyncio.TimeoutError:
@@ -236,10 +244,9 @@ async def _render_video(
 async def run(args: argparse.Namespace, stop_event: asyncio.Event) -> None:
     url, api_key, api_secret = _require_connection(args)
     room = rtc.Room()
-    track_ready = asyncio.Event()
-    selected_track: rtc.Track | None = None
-    selected_publication: rtc.RemoteTrackPublication | None = None
-    selected_participant: rtc.RemoteParticipant | None = None
+    track_queue: asyncio.Queue[SubscribedVideoTrack] = asyncio.Queue()
+    active_publication_sid: str | None = None
+    active_track_gone = asyncio.Event()
     video_stream: rtc.VideoStream | None = None
 
     @room.on("track_subscribed")
@@ -248,9 +255,6 @@ async def run(args: argparse.Namespace, stop_event: asyncio.Event) -> None:
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ) -> None:
-        nonlocal selected_track, selected_publication, selected_participant
-        if selected_track is not None:
-            return
         if track.kind != rtc.TrackKind.KIND_VIDEO:
             return
         if args.participant and participant.identity != args.participant:
@@ -261,37 +265,67 @@ async def run(args: argparse.Namespace, stop_event: asyncio.Event) -> None:
             )
             return
 
-        selected_track = track
-        selected_publication = publication
-        selected_participant = participant
-        track_ready.set()
+        track_queue.put_nowait(
+            SubscribedVideoTrack(
+                track=track,
+                publication=publication,
+                participant=participant,
+            )
+        )
+
+    @room.on("track_unsubscribed")
+    def on_track_unsubscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ) -> None:
+        nonlocal active_publication_sid
+        if publication.sid == active_publication_sid:
+            logging.info("active video track unsubscribed: %s", publication.sid)
+            active_track_gone.set()
+
+    @room.on("track_unpublished")
+    def on_track_unpublished(
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ) -> None:
+        nonlocal active_publication_sid
+        if publication.sid == active_publication_sid:
+            logging.info("active video track unpublished: %s", publication.sid)
+            active_track_gone.set()
 
     try:
         token = _create_token(args, api_key, api_secret)
         logging.info("connecting to room %s as %s", args.room_name, args.identity)
         await room.connect(url, token)
         logging.info("connected to room %s", room.name)
-        logging.info("waiting for a video track")
 
-        if not await _wait_for_video_track(track_ready, stop_event):
-            return
+        while not stop_event.is_set():
+            logging.info("waiting for a video track")
+            subscribed = await _next_video_track(track_queue, stop_event)
+            if subscribed is None:
+                break
 
-        assert selected_track is not None
-        assert selected_publication is not None
-        assert selected_participant is not None
-        logging.info(
-            "subscribed to %s from %s with packet trailer features: %s",
-            selected_publication.sid,
-            selected_participant.identity,
-            _feature_names(list(selected_publication.packet_trailer_features)),
-        )
+            active_publication_sid = subscribed.publication.sid
+            active_track_gone = asyncio.Event()
+            logging.info(
+                "subscribed to %s from %s with packet trailer features: %s",
+                subscribed.publication.sid,
+                subscribed.participant.identity,
+                _feature_names(list(subscribed.publication.packet_trailer_features)),
+            )
 
-        video_stream = rtc.VideoStream.from_track(
-            track=selected_track,
-            format=rtc.VideoBufferType.RGB24,
-            capacity=1,
-        )
-        await _render_video(video_stream, args, stop_event)
+            video_stream = rtc.VideoStream.from_track(
+                track=subscribed.track,
+                format=rtc.VideoBufferType.RGB24,
+                capacity=1,
+            )
+            try:
+                await _render_video(video_stream, args, stop_event, active_track_gone)
+            finally:
+                await video_stream.aclose()
+                video_stream = None
+                active_publication_sid = None
     finally:
         if video_stream is not None:
             await video_stream.aclose()
