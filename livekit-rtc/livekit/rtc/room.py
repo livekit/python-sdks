@@ -52,6 +52,7 @@ EventTypes = Literal[
     "participant_active",
     "local_track_published",
     "local_track_unpublished",
+    "local_track_republished",
     "local_track_subscribed",
     "track_published",
     "track_unpublished",
@@ -346,6 +347,11 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `publication` (LocalTrackPublication), `track` (Track)
             - **"local_track_unpublished"**: Called when a local track is unpublished.
                 - Arguments: `publication` (LocalTrackPublication)
+            - **"local_track_republished"**: Called when the SDK auto-republished a local
+                track during a full reconnect. The publication object is updated in place
+                with the new server-assigned SIDs (its previous SID is passed alongside so
+                callers can reconcile any external state keyed by the old SID).
+                - Arguments: `publication` (LocalTrackPublication), `previous_sid` (str)
             - **"local_track_subscribed"**: Called when a local track is subscribed.
                 - Arguments: `track` (Track)
             - **"track_published"**: Called when a remote participant publishes a track.
@@ -725,6 +731,21 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
+        elif which == "local_track_republished":
+            # The SDK auto-republished a local track during a full
+            # reconnect: the underlying Track (and its bound source) is
+            # preserved, but the publication and track SIDs were re-issued
+            # by the server. Update the existing LocalTrackPublication
+            # object in place so application code holding a cached
+            # reference continues to see current state, then rekey it
+            # under the new SID in the participant's publications dict.
+            previous_sid = event.local_track_republished.previous_sid
+            republished = self.local_participant._track_publications.get(previous_sid)
+            if republished is not None:
+                del self.local_participant._track_publications[previous_sid]
+                republished._info = event.local_track_republished.info
+                self.local_participant._track_publications[republished.sid] = republished
+                self.emit("local_track_republished", republished, previous_sid)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
