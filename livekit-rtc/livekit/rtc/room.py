@@ -736,6 +736,8 @@ class Room(EventEmitter[EventTypes]):
                 )
                 return
 
+            lpublication._ffi_handle.dispose()
+            lpublication._ffi_handle = FfiHandle(republished.publication_handle)
             lpublication._info.CopyFrom(republished.info)
             if lpublication.track is not None:
                 lpublication.track._info.sid = lpublication.sid
