@@ -143,6 +143,167 @@ async def test_publish_track():
 
 @pytest.mark.asyncio
 @skip_if_no_credentials()
+async def test_video_packet_trailer_metadata():
+    """Test that packet trailer metadata can be sent and received on video frames."""
+    room_name = unique_room_name("test-video-packet-trailer")
+    url = os.getenv("LIVEKIT_URL")
+
+    publisher_room = rtc.Room()
+    subscriber_room = rtc.Room()
+
+    publisher_token = create_token("video-publisher", room_name)
+    subscriber_token = create_token("video-subscriber", room_name)
+
+    track_subscribed_event = asyncio.Event()
+    subscribed_track = None
+    subscribed_publication = None
+    video_stream = None
+    source = None
+
+    @subscriber_room.on("track_subscribed")
+    def on_track_subscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ):
+        nonlocal subscribed_track, subscribed_publication
+        if track.kind == rtc.TrackKind.KIND_VIDEO:
+            subscribed_track = track
+            subscribed_publication = publication
+            track_subscribed_event.set()
+
+    try:
+        await subscriber_room.connect(url, subscriber_token)
+        await publisher_room.connect(url, publisher_token)
+
+        source = rtc.VideoSource(2, 2)
+        track = rtc.LocalVideoTrack.create_video_track("metadata-video", source)
+        packet_trailer_features = [
+            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
+            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        ]
+        options = rtc.TrackPublishOptions(
+            source=rtc.TrackSource.SOURCE_CAMERA,
+            packet_trailer_features=packet_trailer_features,
+        )
+        publication = await publisher_room.local_participant.publish_track(track, options)
+
+        assert publication.packet_trailer_features == packet_trailer_features
+        await asyncio.wait_for(track_subscribed_event.wait(), timeout=5.0)
+        assert subscribed_track is not None
+        assert subscribed_publication is not None
+        assert subscribed_publication.packet_trailer_features == packet_trailer_features
+
+        video_stream = rtc.VideoStream.from_track(track=subscribed_track, capacity=1)
+        frame = rtc.VideoFrame(
+            width=2,
+            height=2,
+            type=rtc.VideoBufferType.RGBA,
+            data=bytes(
+                [
+                    255,
+                    0,
+                    0,
+                    255,
+                    0,
+                    255,
+                    0,
+                    255,
+                    0,
+                    0,
+                    255,
+                    255,
+                    255,
+                    255,
+                    255,
+                    255,
+                ]
+            ),
+        )
+        metadata = rtc.FrameMetadata(user_timestamp=123456789, frame_id=77)
+
+        async def publish_frames():
+            for _ in range(20):
+                source.capture_frame(frame, metadata=metadata)
+                await asyncio.sleep(0.05)
+
+        publish_task = asyncio.create_task(publish_frames())
+        event = await asyncio.wait_for(video_stream.__anext__(), timeout=5.0)
+        await publish_task
+
+        assert event.metadata is not None
+        assert event.metadata.HasField("user_timestamp")
+        assert event.metadata.HasField("frame_id")
+        assert event.metadata.user_timestamp == 123456789
+        assert event.metadata.frame_id == 77
+
+    finally:
+        if video_stream is not None:
+            await video_stream.aclose()
+        if source is not None:
+            await source.aclose()
+        await publisher_room.disconnect()
+        await subscriber_room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()
+async def test_full_reconnect_preserves_local_publication_object():
+    """Test that FFI local_track_republished updates the existing publication object."""
+    room_name = unique_room_name("test-local-republish")
+    url = os.getenv("LIVEKIT_URL")
+
+    room = rtc.Room()
+    token = create_token("publisher", room_name)
+    reconnected_event = asyncio.Event()
+    source = None
+
+    @room.on("reconnected")
+    def on_reconnected():
+        reconnected_event.set()
+
+    try:
+        await room.connect(url, token)
+
+        source = rtc.VideoSource(2, 2)
+        track = rtc.LocalVideoTrack.create_video_track("republish-video", source)
+        packet_trailer_features = [
+            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
+            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        ]
+        publication = await room.local_participant.publish_track(
+            track,
+            rtc.TrackPublishOptions(
+                source=rtc.TrackSource.SOURCE_CAMERA,
+                packet_trailer_features=packet_trailer_features,
+            ),
+        )
+        previous_sid = publication.sid
+
+        await room.simulate_scenario(rtc.SimulateScenarioKind.SIMULATE_FULL_RECONNECT)
+        await asyncio.wait_for(reconnected_event.wait(), timeout=10.0)
+
+        await assert_eventually(
+            lambda: (
+                publication.sid in room.local_participant.track_publications
+                and room.local_participant.track_publications[publication.sid] is publication
+            ),
+            timeout=10.0,
+            message="local publication was not rekeyed after full reconnect",
+        )
+
+        assert publication.sid != previous_sid
+        assert previous_sid not in room.local_participant.track_publications
+        assert publication.packet_trailer_features == packet_trailer_features
+
+    finally:
+        if source is not None:
+            await source.aclose()
+        await room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()
 async def test_audio_stream_subscribe():
     """Test that published audio can be consumed and has similar energy levels"""
     room_name = unique_room_name("test-audio-stream")

@@ -58,12 +58,16 @@ class VideoSource:
         *,
         timestamp_us: int = 0,
         rotation: proto_video.VideoRotation.ValueType = proto_video.VideoRotation.VIDEO_ROTATION_0,
+        metadata: proto_video.FrameMetadata | None = None,
     ) -> None:
+        """Capture a frame, optionally attaching packet trailer metadata."""
         req = proto_ffi.FfiRequest()
         req.capture_video_frame.source_handle = self._ffi_handle.handle
         req.capture_video_frame.buffer.CopyFrom(frame._proto_info())
         req.capture_video_frame.rotation = rotation
         req.capture_video_frame.timestamp_us = timestamp_us
+        if metadata is not None:
+            req.capture_video_frame.metadata.CopyFrom(metadata)
         FfiClient.instance.request(req)
 
     async def aclose(self) -> None:

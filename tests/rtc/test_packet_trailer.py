@@ -1,0 +1,167 @@
+from __future__ import annotations
+
+from types import SimpleNamespace
+
+import pytest
+
+from livekit import rtc
+from livekit.rtc import video_source as video_source_module
+from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
+from livekit.rtc._proto import handle_pb2 as proto_handle
+from livekit.rtc._proto import participant_pb2 as proto_participant
+from livekit.rtc._proto import room_pb2 as proto_room
+from livekit.rtc._proto import track_pb2 as proto_track
+from livekit.rtc.participant import LocalParticipant
+
+
+def _publication_info(
+    sid: str,
+    *,
+    packet_trailer_features: list[proto_track.PacketTrailerFeature.ValueType] | None = None,
+) -> proto_track.TrackPublicationInfo:
+    return proto_track.TrackPublicationInfo(
+        sid=sid,
+        name="camera",
+        kind=proto_track.KIND_VIDEO,
+        source=proto_track.SOURCE_CAMERA,
+        simulcasted=False,
+        width=640,
+        height=360,
+        mime_type="video/VP8",
+        muted=False,
+        remote=False,
+        encryption_type=proto_e2ee.NONE,
+        packet_trailer_features=packet_trailer_features or [],
+    )
+
+
+def _owned_publication(
+    sid: str,
+    *,
+    packet_trailer_features: list[proto_track.PacketTrailerFeature.ValueType] | None = None,
+) -> proto_track.OwnedTrackPublication:
+    return proto_track.OwnedTrackPublication(
+        handle=proto_handle.FfiOwnedHandle(id=0),
+        info=_publication_info(sid, packet_trailer_features=packet_trailer_features),
+    )
+
+
+def test_packet_trailer_symbols_are_exported() -> None:
+    metadata = rtc.FrameMetadata(user_timestamp=123, frame_id=7)
+
+    assert rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP == proto_track.PTF_USER_TIMESTAMP
+    assert rtc.PacketTrailerFeature.PTF_FRAME_ID == proto_track.PTF_FRAME_ID
+    assert metadata.HasField("user_timestamp")
+    assert metadata.HasField("frame_id")
+
+
+@pytest.mark.asyncio
+async def test_track_publication_exposes_packet_trailer_features() -> None:
+    publication = rtc.LocalTrackPublication(
+        _owned_publication(
+            "TR_OLD",
+            packet_trailer_features=[
+                proto_track.PTF_USER_TIMESTAMP,
+                proto_track.PTF_FRAME_ID,
+            ],
+        )
+    )
+
+    assert publication.packet_trailer_features == [
+        proto_track.PTF_USER_TIMESTAMP,
+        proto_track.PTF_FRAME_ID,
+    ]
+
+
+def test_video_source_capture_frame_copies_metadata(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured_requests = []
+
+    class FakeClient:
+        def request(self, req):
+            captured_requests.append(req)
+
+    class FakeFfiClient:
+        instance = FakeClient()
+
+    monkeypatch.setattr(video_source_module, "FfiClient", FakeFfiClient)
+
+    source = video_source_module.VideoSource.__new__(video_source_module.VideoSource)
+    source._ffi_handle = SimpleNamespace(handle=42)
+    frame = rtc.VideoFrame(
+        width=1,
+        height=1,
+        type=rtc.VideoBufferType.RGBA,
+        data=bytes([0, 0, 0, 255]),
+    )
+
+    source.capture_frame(
+        frame,
+        timestamp_us=99,
+        rotation=rtc.VideoRotation.VIDEO_ROTATION_90,
+        metadata=rtc.FrameMetadata(user_timestamp=123, frame_id=7),
+    )
+
+    request = captured_requests[0]
+    assert request.capture_video_frame.source_handle == 42
+    assert request.capture_video_frame.timestamp_us == 99
+    assert request.capture_video_frame.rotation == rtc.VideoRotation.VIDEO_ROTATION_90
+    assert request.capture_video_frame.HasField("metadata")
+    assert request.capture_video_frame.metadata.user_timestamp == 123
+    assert request.capture_video_frame.metadata.frame_id == 7
+
+
+@pytest.mark.asyncio
+async def test_local_track_republished_updates_existing_publication() -> None:
+    room = rtc.Room()
+    local_participant = LocalParticipant(
+        room._room_queue,
+        proto_participant.OwnedParticipant(
+            handle=proto_handle.FfiOwnedHandle(id=0),
+            info=proto_participant.ParticipantInfo(
+                sid="PA_LOCAL",
+                identity="publisher",
+                name="publisher",
+                state=proto_participant.PARTICIPANT_STATE_ACTIVE,
+                metadata="",
+                kind=proto_participant.PARTICIPANT_KIND_STANDARD,
+                disconnect_reason=proto_participant.UNKNOWN_REASON,
+                joined_at=0,
+                permission=proto_participant.ParticipantPermission(),
+            ),
+        ),
+    )
+    room._local_participant = local_participant
+
+    publication = rtc.LocalTrackPublication(
+        _owned_publication(
+            "TR_OLD",
+            packet_trailer_features=[proto_track.PTF_USER_TIMESTAMP],
+        )
+    )
+    publication._track = SimpleNamespace(_info=SimpleNamespace(sid="TR_OLD"))
+    local_participant._track_publications[publication.sid] = publication
+
+    room._on_room_event(
+        proto_room.RoomEvent(
+            room_handle=0,
+            local_track_republished=proto_room.LocalTrackRepublished(
+                publication_handle=0,
+                previous_sid="TR_OLD",
+                info=_publication_info(
+                    "TR_NEW",
+                    packet_trailer_features=[
+                        proto_track.PTF_USER_TIMESTAMP,
+                        proto_track.PTF_FRAME_ID,
+                    ],
+                ),
+            ),
+        )
+    )
+
+    assert "TR_OLD" not in local_participant.track_publications
+    assert local_participant.track_publications["TR_NEW"] is publication
+    assert publication.sid == "TR_NEW"
+    assert publication.packet_trailer_features == [
+        proto_track.PTF_USER_TIMESTAMP,
+        proto_track.PTF_FRAME_ID,
+    ]
