@@ -20,7 +20,18 @@ import datetime
 import os
 import mimetypes
 import aiofiles
-from typing import TYPE_CHECKING, List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    List,
+    Union,
+    Callable,
+    Dict,
+    Awaitable,
+    Optional,
+    Mapping,
+    cast,
+    TypeVar,
+)
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -779,9 +790,7 @@ class LocalParticipant(Participant):
 
                 if preconnect_buffer_auto_send_to:
                     if track.has_preconnect_buffer:
-                        self._setup_preconnect_auto_send(
-                            track, preconnect_buffer_auto_send_to
-                        )
+                        self._setup_preconnect_auto_send(track, preconnect_buffer_auto_send_to)
                     else:
                         logger.warning(
                             "preconnect_buffer_auto_send_to set but no preconnect buffer "
@@ -793,9 +802,7 @@ class LocalParticipant(Participant):
         finally:
             self._room_queue.unsubscribe(queue)
 
-    def _setup_preconnect_auto_send(
-        self, track: LocalAudioTrack, target_identity: str
-    ) -> None:
+    def _setup_preconnect_auto_send(self, track: LocalAudioTrack, target_identity: str) -> None:
         room = self._room
         if room is None:
             return

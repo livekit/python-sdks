@@ -52,9 +52,7 @@ class Config:
         api_key = os.getenv("LIVEKIT_API_KEY")
         api_secret = os.getenv("LIVEKIT_API_SECRET")
         if not url or not api_key or not api_secret:
-            raise RuntimeError(
-                "LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET must be set"
-            )
+            raise RuntimeError("LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET must be set")
 
         return Config(
             url=url,
@@ -62,17 +60,11 @@ class Config:
             api_secret=api_secret,
             room_name=os.getenv("LIVEKIT_ROOM", "wakeword-preconnect"),
             agent_name=os.getenv("LIVEKIT_AGENT_NAME", "test-agent"),
-            wakeword_model=Path(
-                os.getenv("LIVEKIT_WAKEWORD_MODEL", "./models/hey_livekit.onnx")
-            ),
+            wakeword_model=Path(os.getenv("LIVEKIT_WAKEWORD_MODEL", "./models/hey_livekit.onnx")),
             wakeword_name=os.getenv("LIVEKIT_WAKEWORD_NAME"),
             wakeword_threshold=float(os.getenv("LIVEKIT_WAKEWORD_THRESHOLD", "0.5")),
-            wakeword_preroll_seconds=float(
-                os.getenv("LIVEKIT_WAKEWORD_PREROLL_SECONDS", "2.0")
-            ),
-            preconnect_buffer_seconds=float(
-                os.getenv("LIVEKIT_PRECONNECT_BUFFER_SECONDS", "10.0")
-            ),
+            wakeword_preroll_seconds=float(os.getenv("LIVEKIT_WAKEWORD_PREROLL_SECONDS", "2.0")),
+            preconnect_buffer_seconds=float(os.getenv("LIVEKIT_PRECONNECT_BUFFER_SECONDS", "10.0")),
             preconnect_debug_wav=(
                 Path(debug_wav).expanduser()
                 if (debug_wav := os.getenv("LIVEKIT_PRECONNECT_DEBUG_WAV"))
@@ -80,12 +72,8 @@ class Config:
             ),
             agent_metadata=os.getenv("LIVEKIT_AGENT_METADATA", ""),
             agent_wait_timeout=float(os.getenv("LIVEKIT_AGENT_WAIT_TIMEOUT", "30.0")),
-            audio_input_device=Config._optional_int_from_env(
-                "LIVEKIT_AUDIO_INPUT_DEVICE"
-            ),
-            audio_output_device=Config._optional_int_from_env(
-                "LIVEKIT_AUDIO_OUTPUT_DEVICE"
-            ),
+            audio_input_device=Config._optional_int_from_env("LIVEKIT_AUDIO_INPUT_DEVICE"),
+            audio_output_device=Config._optional_int_from_env("LIVEKIT_AUDIO_OUTPUT_DEVICE"),
         )
 
     @staticmethod
@@ -501,10 +489,7 @@ async def _run_audio_loop(
         if participant.kind != rtc.ParticipantKind.PARTICIPANT_KIND_AGENT:
             return
 
-        if (
-            state.mode == ClientMode.IN_SESSION
-            and state.agent_identity == participant.identity
-        ):
+        if state.mode == ClientMode.IN_SESSION and state.agent_identity == participant.identity:
             logger.info("agent participant %s disconnected", participant.identity)
             _reset_to_idle("agent session ended")
 
@@ -670,9 +655,7 @@ async def main() -> None:
         reader: rtc.TextStreamReader,
         participant_identity: str,
     ) -> None:
-        _create_background_task(
-            _log_transcription_stream(reader, participant_identity)
-        )
+        _create_background_task(_log_transcription_stream(reader, participant_identity))
 
     def _maybe_play_agent_track(
         track: rtc.Track,
