@@ -68,6 +68,9 @@ class VideoGrants:
     # indicates that the holder can register as an Agent framework worker
     agent: Optional[bool] = None
 
+    # allow participant to manage an agent session via RemoteSession
+    can_manage_agent_session: Optional[bool] = None
+
 
 @dataclass
 class SIPGrants:
