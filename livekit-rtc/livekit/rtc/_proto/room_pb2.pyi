@@ -337,6 +337,32 @@ class DisconnectCallback(google.protobuf.message.Message):
 global___DisconnectCallback = DisconnectCallback
 
 @typing.final
+class ReadyForRoomEventRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
+
+global___ReadyForRoomEventRequest = ReadyForRoomEventRequest
+
+@typing.final
+class ReadyForRoomEventResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___ReadyForRoomEventResponse = ReadyForRoomEventResponse
+
+@typing.final
 class SimulateScenarioRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

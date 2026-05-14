@@ -171,6 +171,7 @@ class FfiRequest(google.protobuf.message.Message):
     REMOTE_DATA_TRACK_IS_PUBLISHED_FIELD_NUMBER: builtins.int
     DATA_TRACK_STREAM_READ_FIELD_NUMBER: builtins.int
     SIMULATE_SCENARIO_FIELD_NUMBER: builtins.int
+    READY_FOR_ROOM_EVENT_FIELD_NUMBER: builtins.int
     @property
     def dispose(self) -> global___DisposeRequest: ...
     @property
@@ -179,6 +180,8 @@ class FfiRequest(google.protobuf.message.Message):
 
     @property
     def disconnect(self) -> room_pb2.DisconnectRequest: ...
+    @property
+    def ready_for_room_event(self) -> room_pb2.ReadyForRoomEventRequest: ...
     @property
     def publish_track(self) -> room_pb2.PublishTrackRequest: ...
     @property
