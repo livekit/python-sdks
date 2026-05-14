@@ -176,7 +176,11 @@ async def test_video_packet_trailer_metadata():
         await subscriber_room.connect(url, subscriber_token)
         await publisher_room.connect(url, publisher_token)
 
-        source = rtc.VideoSource(2, 2)
+        # Use a real video resolution: WebRTC encoders (VP8/H.264) enforce a
+        # 16x16 minimum and assert internally on smaller inputs, which would
+        # crash the FFI process via panic=abort.
+        frame_width, frame_height = 320, 240
+        source = rtc.VideoSource(frame_width, frame_height)
         track = rtc.LocalVideoTrack.create_video_track("metadata-video", source)
         packet_trailer_features = [
             rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
@@ -196,39 +200,20 @@ async def test_video_packet_trailer_metadata():
 
         video_stream = rtc.VideoStream.from_track(track=subscribed_track, capacity=1)
         frame = rtc.VideoFrame(
-            width=2,
-            height=2,
+            width=frame_width,
+            height=frame_height,
             type=rtc.VideoBufferType.RGBA,
-            data=bytes(
-                [
-                    255,
-                    0,
-                    0,
-                    255,
-                    0,
-                    255,
-                    0,
-                    255,
-                    0,
-                    0,
-                    255,
-                    255,
-                    255,
-                    255,
-                    255,
-                    255,
-                ]
-            ),
+            data=bytes([255, 0, 0, 255] * (frame_width * frame_height)),
         )
         metadata = rtc.FrameMetadata(user_timestamp=123456789, frame_id=77)
 
         async def publish_frames():
-            for _ in range(20):
+            for _ in range(10):
                 source.capture_frame(frame, metadata=metadata)
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.2)
 
         publish_task = asyncio.create_task(publish_frames())
-        event = await asyncio.wait_for(video_stream.__anext__(), timeout=5.0)
+        event = await asyncio.wait_for(video_stream.__anext__(), timeout=10.0)
         await publish_task
 
         assert event.metadata is not None
