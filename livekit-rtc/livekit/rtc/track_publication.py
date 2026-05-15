@@ -119,7 +119,21 @@ class RemoteTrackPublication(TrackPublication):
         """For simulcasted video tracks, request a specific simulcast layer
         from the server. Use one of `rtc.VideoQuality.VIDEO_QUALITY_LOW` (q),
         `VIDEO_QUALITY_MEDIUM` (h), or `VIDEO_QUALITY_HIGH` (f).
+
+        Raises:
+            ValueError: if the publication is not a video track, or is not
+                simulcasted (selecting a layer requires multiple layers).
         """
+        if self.kind != proto_track.TrackKind.KIND_VIDEO:
+            raise ValueError(
+                "set_video_quality is only supported on video publications "
+                f"(sid={self.sid})"
+            )
+        if not self.simulcasted:
+            raise ValueError(
+                "set_video_quality requires a simulcasted publication "
+                f"(sid={self.sid})"
+            )
         req = proto_ffi.FfiRequest()
         req.set_remote_track_publication_quality.track_publication_handle = self._ffi_handle.handle
         req.set_remote_track_publication_quality.quality = quality
