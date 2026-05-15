@@ -19,7 +19,10 @@ from ._ffi_client import FfiHandle, FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
+from ._proto import track_publication_pb2 as proto_track_pub
 from .track import Track, LocalTrack, RemoteTrack
+
+VideoQuality = proto_track_pub.VideoQuality
 
 
 class TrackPublication:
@@ -110,6 +113,18 @@ class RemoteTrackPublication(TrackPublication):
         req = proto_ffi.FfiRequest()
         req.set_subscribed.subscribe = subscribed
         req.set_subscribed.publication_handle = self._ffi_handle.handle
+        FfiClient.instance.request(req)
+
+    def set_video_quality(self, quality: "VideoQuality.ValueType") -> None:
+        """For simulcasted video tracks, request a specific simulcast layer
+        from the server. Use one of `rtc.VideoQuality.VIDEO_QUALITY_LOW` (q),
+        `VIDEO_QUALITY_MEDIUM` (h), or `VIDEO_QUALITY_HIGH` (f).
+
+        This is a no-op (the SDK logs a warning) if the publication is not
+        simulcasted."""
+        req = proto_ffi.FfiRequest()
+        req.set_remote_track_publication_quality.track_publication_handle = self._ffi_handle.handle
+        req.set_remote_track_publication_quality.quality = quality
         FfiClient.instance.request(req)
 
     def __repr__(self) -> str:

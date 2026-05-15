@@ -43,6 +43,7 @@ from ._proto.track_pb2 import (
     TrackSource,
     ParticipantTrackPermission,
 )
+from ._proto.track_publication_pb2 import VideoQuality
 from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
@@ -185,6 +186,7 @@ __all__ = [
     "TranscriptionSegment",
     "VideoCodec",
     "VideoEncoding",
+    "VideoQuality",
     "VideoFrame",
     "VideoFrameEvent",
     "VideoSource",
