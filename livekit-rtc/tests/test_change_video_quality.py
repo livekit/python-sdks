@@ -1,3 +1,17 @@
+# Copyright 2026 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """End-to-end Test for simulcast / SVC video quality layers.
 
 The test publishes a 1280x720 video track (rolling colored bars) with four
@@ -54,8 +68,8 @@ LAYER_DIMENSIONS = {
 
 QUALITY_SEQUENCE = [
     (VideoQuality.VIDEO_QUALITY_HIGH, "f"),
-    (VideoQuality.VIDEO_QUALITY_MEDIUM, "h"),
     (VideoQuality.VIDEO_QUALITY_LOW, "q"),
+    (VideoQuality.VIDEO_QUALITY_MEDIUM, "h"),
 ]
 
 
@@ -93,7 +107,7 @@ async def _wait_until(
     interval: float = WAIT_INTERVAL,
     message: str = "condition not met",
 ) -> None:
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     deadline = loop.time() + timeout
     while loop.time() < deadline:
         if predicate():
@@ -132,7 +146,7 @@ def _expect_event(
     event: EventTypes,
     predicate: Optional[Callable[..., bool]] = None,
 ) -> asyncio.Future:
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     fut: asyncio.Future = loop.create_future()
 
     def _on_event(*args, **kwargs) -> None:
@@ -200,11 +214,11 @@ async def _wait_for_layer(
 ) -> Tuple[int, int]:
     """Drain frames until we observe `samples` consecutive frames whose
     dimensions match the expected layer (within `tolerance`)."""
-    deadline = asyncio.get_event_loop().time() + timeout
+    deadline = asyncio.get_running_loop().time() + timeout
     matches = 0
     last: Optional[Tuple[int, int]] = None
     iterator = stream.__aiter__()
-    while asyncio.get_event_loop().time() < deadline:
+    while asyncio.get_running_loop().time() < deadline:
         try:
             ev = await asyncio.wait_for(iterator.__anext__(), timeout=2.0)
         except asyncio.TimeoutError:
@@ -278,7 +292,7 @@ async def test_simulcast_quality_layers(
         source=rtc.TrackSource.SOURCE_CAMERA,
         simulcast=True,
         video_codec=video_codec,
-        video_encoding=rtc.VideoEncoding(max_bitrate=3_000_000, max_framerate=PUBLISH_FPS),
+        video_encoding=rtc.VideoEncoding(max_bitrate=6_000_000, max_framerate=PUBLISH_FPS),
     )
     # For SVC codecs, ask libwebrtc to emit three spatial × three temporal
     # layers in a single bitstream. Without an explicit scalability_mode AV1
@@ -309,12 +323,6 @@ async def test_simulcast_quality_layers(
         )
         remote_pub = await _ensure_track_subscribed(receiver, local_pub.sid)
         assert remote_pub.track is not None
-
-        # Give the SFU a moment to propagate layer metadata and let the
-        # encoder/bandwidth estimator ramp up to all layers before we start
-        # switching qualities. SVC codecs (VP9/AV1) typically need more
-        # time than VP8/H264 simulcast to produce all spatial layers.
-        await asyncio.sleep(10.0 if mode == "svc" else 5.0)
         print(
             f"[{codec_name}] remote_pub: sid={remote_pub.sid} "
             f"simulcasted={remote_pub.simulcasted} "
@@ -333,8 +341,8 @@ async def test_simulcast_quality_layers(
         stop.set()
         try:
             await pub_task
-        except Exception:
-            pass
+        except Exception as e:
+            raise AssertionError(f"pub_task failed: {e}") from e
         if stream is not None:
             await stream.aclose()
         await sender.disconnect()
