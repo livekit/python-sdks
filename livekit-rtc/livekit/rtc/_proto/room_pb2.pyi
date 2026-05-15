@@ -462,6 +462,32 @@ class PublishTrackCallback(google.protobuf.message.Message):
 global___PublishTrackCallback = PublishTrackCallback
 
 @typing.final
+class ReadyForRoomEventRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
+
+global___ReadyForRoomEventRequest = ReadyForRoomEventRequest
+
+@typing.final
+class ReadyForRoomEventResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___ReadyForRoomEventResponse = ReadyForRoomEventResponse
+
+@typing.final
 class UnpublishTrackRequest(google.protobuf.message.Message):
     """Unpublish a track from the room"""
 
@@ -1191,6 +1217,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     STREAM_FIELD_NUMBER: builtins.int
     PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
     PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
+    SCALABILITY_MODE_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
     dtx: builtins.bool
     red: builtins.bool
@@ -1198,6 +1225,11 @@ class TrackPublishOptions(google.protobuf.message.Message):
     source: track_pb2.TrackSource.ValueType
     stream: builtins.str
     preconnect_buffer: builtins.bool
+    scalability_mode: builtins.str
+    """RTP scalability mode (e.g. "L3T3_KEY"). When set, a single RTP
+    encoding is produced with this mode, enabling true SVC for codecs
+    that support it (VP9, AV1). Has no effect for VP8/H264.
+    """
     @property
     def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
@@ -1219,9 +1251,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
         stream: builtins.str | None = ...,
         preconnect_buffer: builtins.bool | None = ...,
         packet_trailer_features: collections.abc.Iterable[track_pb2.PacketTrailerFeature.ValueType] | None = ...,
+        scalability_mode: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 
