@@ -126,13 +126,11 @@ class RemoteTrackPublication(TrackPublication):
         """
         if self.kind != proto_track.TrackKind.KIND_VIDEO:
             raise ValueError(
-                "set_video_quality is only supported on video publications "
-                f"(sid={self.sid})"
+                f"set_video_quality is only supported on video publications (sid={self.sid})"
             )
         if not self.simulcasted:
             raise ValueError(
-                "set_video_quality requires a simulcasted publication "
-                f"(sid={self.sid})"
+                f"set_video_quality requires a simulcasted publication (sid={self.sid})"
             )
         req = proto_ffi.FfiRequest()
         req.set_remote_track_publication_quality.track_publication_handle = self._ffi_handle.handle
