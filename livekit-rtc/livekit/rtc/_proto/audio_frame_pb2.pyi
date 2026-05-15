@@ -16,30 +16,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections import abc as _abc
-from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
-from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
-import builtins as _builtins
-from . import handle_pb2 as _handle_pb2
+import builtins
+import collections.abc
+import google.protobuf.descriptor
+import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
+import google.protobuf.message
+from . import handle_pb2
 import sys
-from . import track_pb2 as _track_pb2
-import typing as _typing
+from . import track_pb2
+import typing
 
-if sys.version_info >= (3, 11):
-    from typing import TypeAlias as _TypeAlias, Never as _Never
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
 else:
-    from typing_extensions import TypeAlias as _TypeAlias, Never as _Never
+    import typing_extensions
 
-DESCRIPTOR: _descriptor.FileDescriptor
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class _SoxResamplerDataType:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _SoxResamplerDataTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_SoxResamplerDataType.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _SoxResamplerDataTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxResamplerDataType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     SOXR_DATATYPE_INT16I: _SoxResamplerDataType.ValueType  # 0
     """TODO(theomonnom): support other datatypes (shouldn't really be needed)"""
     SOXR_DATATYPE_INT16S: _SoxResamplerDataType.ValueType  # 1
@@ -49,14 +49,14 @@ class SoxResamplerDataType(_SoxResamplerDataType, metaclass=_SoxResamplerDataTyp
 SOXR_DATATYPE_INT16I: SoxResamplerDataType.ValueType  # 0
 """TODO(theomonnom): support other datatypes (shouldn't really be needed)"""
 SOXR_DATATYPE_INT16S: SoxResamplerDataType.ValueType  # 1
-Global___SoxResamplerDataType: _TypeAlias = SoxResamplerDataType  # noqa: Y015
+global___SoxResamplerDataType = SoxResamplerDataType
 
 class _SoxQualityRecipe:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _SoxQualityRecipeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_SoxQualityRecipe.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _SoxQualityRecipeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxQualityRecipe.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     SOXR_QUALITY_QUICK: _SoxQualityRecipe.ValueType  # 0
     SOXR_QUALITY_LOW: _SoxQualityRecipe.ValueType  # 1
     SOXR_QUALITY_MEDIUM: _SoxQualityRecipe.ValueType  # 2
@@ -70,14 +70,14 @@ SOXR_QUALITY_LOW: SoxQualityRecipe.ValueType  # 1
 SOXR_QUALITY_MEDIUM: SoxQualityRecipe.ValueType  # 2
 SOXR_QUALITY_HIGH: SoxQualityRecipe.ValueType  # 3
 SOXR_QUALITY_VERYHIGH: SoxQualityRecipe.ValueType  # 4
-Global___SoxQualityRecipe: _TypeAlias = SoxQualityRecipe  # noqa: Y015
+global___SoxQualityRecipe = SoxQualityRecipe
 
 class _SoxFlagBits:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _SoxFlagBitsEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_SoxFlagBits.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _SoxFlagBitsEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SoxFlagBits.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     SOXR_ROLLOFF_SMALL: _SoxFlagBits.ValueType  # 0
     """1 << 0"""
     SOXR_ROLLOFF_MEDIUM: _SoxFlagBits.ValueType  # 1
@@ -105,14 +105,14 @@ SOXR_DOUBLE_PRECISION: SoxFlagBits.ValueType  # 4
 """1 << 4"""
 SOXR_VR: SoxFlagBits.ValueType  # 5
 """1 << 5"""
-Global___SoxFlagBits: _TypeAlias = SoxFlagBits  # noqa: Y015
+global___SoxFlagBits = SoxFlagBits
 
 class _AudioStreamType:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _AudioStreamTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_AudioStreamType.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _AudioStreamTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_AudioStreamType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     AUDIO_STREAM_NATIVE: _AudioStreamType.ValueType  # 0
     AUDIO_STREAM_HTML: _AudioStreamType.ValueType  # 1
 
@@ -123,14 +123,14 @@ class AudioStreamType(_AudioStreamType, metaclass=_AudioStreamTypeEnumTypeWrappe
 
 AUDIO_STREAM_NATIVE: AudioStreamType.ValueType  # 0
 AUDIO_STREAM_HTML: AudioStreamType.ValueType  # 1
-Global___AudioStreamType: _TypeAlias = AudioStreamType  # noqa: Y015
+global___AudioStreamType = AudioStreamType
 
 class _AudioSourceType:
-    ValueType = _typing.NewType("ValueType", _builtins.int)
-    V: _TypeAlias = ValueType  # noqa: Y015
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-class _AudioSourceTypeEnumTypeWrapper(_enum_type_wrapper._EnumTypeWrapper[_AudioSourceType.ValueType], _builtins.type):
-    DESCRIPTOR: _descriptor.EnumDescriptor
+class _AudioSourceTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_AudioSourceType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     AUDIO_SOURCE_NATIVE: _AudioSourceType.ValueType  # 0
     """Push-based audio source - manually capture frames via CaptureAudioFrameRequest"""
     AUDIO_SOURCE_PLATFORM: _AudioSourceType.ValueType  # 1
@@ -146,33 +146,33 @@ AUDIO_SOURCE_PLATFORM: AudioSourceType.ValueType  # 1
 """Platform ADM-based audio source - captures from microphone automatically
 Requires PlatformAudio to be created first to enable ADM recording
 """
-Global___AudioSourceType: _TypeAlias = AudioSourceType  # noqa: Y015
+global___AudioSourceType = AudioSourceType
 
-@_typing.final
-class NewAudioStreamRequest(_message.Message):
+@typing.final
+class NewAudioStreamRequest(google.protobuf.message.Message):
     """Create a new AudioStream
     AudioStream is used to receive audio frames from a track
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRACK_HANDLE_FIELD_NUMBER: _builtins.int
-    TYPE_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: _builtins.int
-    AUDIO_FILTER_OPTIONS_FIELD_NUMBER: _builtins.int
-    FRAME_SIZE_MS_FIELD_NUMBER: _builtins.int
-    QUEUE_SIZE_FRAMES_FIELD_NUMBER: _builtins.int
-    track_handle: _builtins.int
-    type: Global___AudioStreamType.ValueType
-    sample_rate: _builtins.int
-    num_channels: _builtins.int
-    audio_filter_module_id: _builtins.str
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    TYPE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: builtins.int
+    AUDIO_FILTER_OPTIONS_FIELD_NUMBER: builtins.int
+    FRAME_SIZE_MS_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    type: global___AudioStreamType.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
+    audio_filter_module_id: builtins.str
     """Unique identifier passed in LoadAudioFilterPluginRequest"""
-    audio_filter_options: _builtins.str
-    frame_size_ms: _builtins.int
-    queue_size_frames: _builtins.int
+    audio_filter_options: builtins.str
+    frame_size_ms: builtins.int
+    queue_size_frames: builtins.int
     """Maximum number of queued WebRTC sink frames. Each frame is typically 10 ms
     of decoded PCM audio on the receive path. Omit this field to use the
     default bounded queue size of 10 frames. Set it to 0 to request unbounded
@@ -186,65 +186,59 @@ class NewAudioStreamRequest(_message.Message):
     def __init__(
         self,
         *,
-        track_handle: _builtins.int | None = ...,
-        type: Global___AudioStreamType.ValueType | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
-        audio_filter_module_id: _builtins.str | None = ...,
-        audio_filter_options: _builtins.str | None = ...,
-        frame_size_ms: _builtins.int | None = ...,
-        queue_size_frames: _builtins.int | None = ...,
+        track_handle: builtins.int | None = ...,
+        type: global___AudioStreamType.ValueType | None = ...,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
+        audio_filter_module_id: builtins.str | None = ...,
+        audio_filter_options: builtins.str | None = ...,
+        frame_size_ms: builtins.int | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_handle", b"track_handle", "type", b"type"]) -> None: ...
 
-Global___NewAudioStreamRequest: _TypeAlias = NewAudioStreamRequest  # noqa: Y015
+global___NewAudioStreamRequest = NewAudioStreamRequest
 
-@_typing.final
-class NewAudioStreamResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewAudioStreamResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    STREAM_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def stream(self) -> Global___OwnedAudioStream: ...
+    STREAM_FIELD_NUMBER: builtins.int
+    @property
+    def stream(self) -> global___OwnedAudioStream: ...
     def __init__(
         self,
         *,
-        stream: Global___OwnedAudioStream | None = ...,
+        stream: global___OwnedAudioStream | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
 
-Global___NewAudioStreamResponse: _TypeAlias = NewAudioStreamResponse  # noqa: Y015
+global___NewAudioStreamResponse = NewAudioStreamResponse
 
-@_typing.final
-class AudioStreamFromParticipantRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioStreamFromParticipantRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PARTICIPANT_HANDLE_FIELD_NUMBER: _builtins.int
-    TYPE_FIELD_NUMBER: _builtins.int
-    TRACK_SOURCE_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: _builtins.int
-    AUDIO_FILTER_OPTIONS_FIELD_NUMBER: _builtins.int
-    FRAME_SIZE_MS_FIELD_NUMBER: _builtins.int
-    QUEUE_SIZE_FRAMES_FIELD_NUMBER: _builtins.int
-    participant_handle: _builtins.int
-    type: Global___AudioStreamType.ValueType
-    track_source: _track_pb2.TrackSource.ValueType
-    sample_rate: _builtins.int
-    num_channels: _builtins.int
-    audio_filter_module_id: _builtins.str
-    audio_filter_options: _builtins.str
-    frame_size_ms: _builtins.int
-    queue_size_frames: _builtins.int
+    PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    TYPE_FIELD_NUMBER: builtins.int
+    TRACK_SOURCE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    AUDIO_FILTER_MODULE_ID_FIELD_NUMBER: builtins.int
+    AUDIO_FILTER_OPTIONS_FIELD_NUMBER: builtins.int
+    FRAME_SIZE_MS_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_FRAMES_FIELD_NUMBER: builtins.int
+    participant_handle: builtins.int
+    type: global___AudioStreamType.ValueType
+    track_source: track_pb2.TrackSource.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
+    audio_filter_module_id: builtins.str
+    audio_filter_options: builtins.str
+    frame_size_ms: builtins.int
+    queue_size_frames: builtins.int
     """Maximum number of queued WebRTC sink frames. Each frame is typically 10 ms
     of decoded PCM audio on the receive path. Omit this field to use the
     default bounded queue size of 10 frames. Set it to 0 to request unbounded
@@ -258,1061 +252,917 @@ class AudioStreamFromParticipantRequest(_message.Message):
     def __init__(
         self,
         *,
-        participant_handle: _builtins.int | None = ...,
-        type: Global___AudioStreamType.ValueType | None = ...,
-        track_source: _track_pb2.TrackSource.ValueType | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
-        audio_filter_module_id: _builtins.str | None = ...,
-        audio_filter_options: _builtins.str | None = ...,
-        frame_size_ms: _builtins.int | None = ...,
-        queue_size_frames: _builtins.int | None = ...,
+        participant_handle: builtins.int | None = ...,
+        type: global___AudioStreamType.ValueType | None = ...,
+        track_source: track_pb2.TrackSource.ValueType | None = ...,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
+        audio_filter_module_id: builtins.str | None = ...,
+        audio_filter_options: builtins.str | None = ...,
+        frame_size_ms: builtins.int | None = ...,
+        queue_size_frames: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_filter_module_id", b"audio_filter_module_id", "audio_filter_options", b"audio_filter_options", "frame_size_ms", b"frame_size_ms", "num_channels", b"num_channels", "participant_handle", b"participant_handle", "queue_size_frames", b"queue_size_frames", "sample_rate", b"sample_rate", "track_source", b"track_source", "type", b"type"]) -> None: ...
 
-Global___AudioStreamFromParticipantRequest: _TypeAlias = AudioStreamFromParticipantRequest  # noqa: Y015
+global___AudioStreamFromParticipantRequest = AudioStreamFromParticipantRequest
 
-@_typing.final
-class AudioStreamFromParticipantResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioStreamFromParticipantResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    STREAM_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def stream(self) -> Global___OwnedAudioStream: ...
+    STREAM_FIELD_NUMBER: builtins.int
+    @property
+    def stream(self) -> global___OwnedAudioStream: ...
     def __init__(
         self,
         *,
-        stream: Global___OwnedAudioStream | None = ...,
+        stream: global___OwnedAudioStream | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["stream", b"stream"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["stream", b"stream"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["stream", b"stream"]) -> None: ...
 
-Global___AudioStreamFromParticipantResponse: _TypeAlias = AudioStreamFromParticipantResponse  # noqa: Y015
+global___AudioStreamFromParticipantResponse = AudioStreamFromParticipantResponse
 
-@_typing.final
-class NewAudioSourceRequest(_message.Message):
+@typing.final
+class NewAudioSourceRequest(google.protobuf.message.Message):
     """Create a new AudioSource"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TYPE_FIELD_NUMBER: _builtins.int
-    OPTIONS_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    QUEUE_SIZE_MS_FIELD_NUMBER: _builtins.int
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    type: Global___AudioSourceType.ValueType
-    sample_rate: _builtins.int
-    num_channels: _builtins.int
-    queue_size_ms: _builtins.int
-    platform_audio_handle: _builtins.int
+    TYPE_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    QUEUE_SIZE_MS_FIELD_NUMBER: builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    type: global___AudioSourceType.ValueType
+    sample_rate: builtins.int
+    num_channels: builtins.int
+    queue_size_ms: builtins.int
+    platform_audio_handle: builtins.int
     """For AudioSourcePlatform: the PlatformAudio handle to configure audio processing on.
     If provided with options, audio processing will be configured on the PlatformAudio.
     """
-    @_builtins.property
-    def options(self) -> Global___AudioSourceOptions: ...
+    @property
+    def options(self) -> global___AudioSourceOptions: ...
     def __init__(
         self,
         *,
-        type: Global___AudioSourceType.ValueType | None = ...,
-        options: Global___AudioSourceOptions | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
-        queue_size_ms: _builtins.int | None = ...,
-        platform_audio_handle: _builtins.int | None = ...,
+        type: global___AudioSourceType.ValueType | None = ...,
+        options: global___AudioSourceOptions | None = ...,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
+        queue_size_ms: builtins.int | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
 
-Global___NewAudioSourceRequest: _TypeAlias = NewAudioSourceRequest  # noqa: Y015
+global___NewAudioSourceRequest = NewAudioSourceRequest
 
-@_typing.final
-class NewAudioSourceResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewAudioSourceResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SOURCE_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def source(self) -> Global___OwnedAudioSource: ...
+    SOURCE_FIELD_NUMBER: builtins.int
+    @property
+    def source(self) -> global___OwnedAudioSource: ...
     def __init__(
         self,
         *,
-        source: Global___OwnedAudioSource | None = ...,
+        source: global___OwnedAudioSource | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["source", b"source"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["source", b"source"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["source", b"source"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["source", b"source"]) -> None: ...
 
-Global___NewAudioSourceResponse: _TypeAlias = NewAudioSourceResponse  # noqa: Y015
+global___NewAudioSourceResponse = NewAudioSourceResponse
 
-@_typing.final
-class CaptureAudioFrameRequest(_message.Message):
+@typing.final
+class CaptureAudioFrameRequest(google.protobuf.message.Message):
     """Push a frame to an AudioSource
     The data provided must be available as long as the client receive the callback.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SOURCE_HANDLE_FIELD_NUMBER: _builtins.int
-    BUFFER_FIELD_NUMBER: _builtins.int
-    REQUEST_ASYNC_ID_FIELD_NUMBER: _builtins.int
-    source_handle: _builtins.int
-    request_async_id: _builtins.int
-    @_builtins.property
-    def buffer(self) -> Global___AudioFrameBufferInfo: ...
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    BUFFER_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
+    request_async_id: builtins.int
+    @property
+    def buffer(self) -> global___AudioFrameBufferInfo: ...
     def __init__(
         self,
         *,
-        source_handle: _builtins.int | None = ...,
-        buffer: Global___AudioFrameBufferInfo | None = ...,
-        request_async_id: _builtins.int | None = ...,
+        source_handle: builtins.int | None = ...,
+        buffer: global___AudioFrameBufferInfo | None = ...,
+        request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "request_async_id", b"request_async_id", "source_handle", b"source_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "request_async_id", b"request_async_id", "source_handle", b"source_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "request_async_id", b"request_async_id", "source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "request_async_id", b"request_async_id", "source_handle", b"source_handle"]) -> None: ...
 
-Global___CaptureAudioFrameRequest: _TypeAlias = CaptureAudioFrameRequest  # noqa: Y015
+global___CaptureAudioFrameRequest = CaptureAudioFrameRequest
 
-@_typing.final
-class CaptureAudioFrameResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class CaptureAudioFrameResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
 
-Global___CaptureAudioFrameResponse: _TypeAlias = CaptureAudioFrameResponse  # noqa: Y015
+global___CaptureAudioFrameResponse = CaptureAudioFrameResponse
 
-@_typing.final
-class CaptureAudioFrameCallback(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class CaptureAudioFrameCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ASYNC_ID_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    async_id: _builtins.int
-    error: _builtins.str
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        async_id: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["async_id", b"async_id", "error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
 
-Global___CaptureAudioFrameCallback: _TypeAlias = CaptureAudioFrameCallback  # noqa: Y015
+global___CaptureAudioFrameCallback = CaptureAudioFrameCallback
 
-@_typing.final
-class ClearAudioBufferRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ClearAudioBufferRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    SOURCE_HANDLE_FIELD_NUMBER: _builtins.int
-    source_handle: _builtins.int
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
     def __init__(
         self,
         *,
-        source_handle: _builtins.int | None = ...,
+        source_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["source_handle", b"source_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["source_handle", b"source_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["source_handle", b"source_handle"]) -> None: ...
 
-Global___ClearAudioBufferRequest: _TypeAlias = ClearAudioBufferRequest  # noqa: Y015
+global___ClearAudioBufferRequest = ClearAudioBufferRequest
 
-@_typing.final
-class ClearAudioBufferResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ClearAudioBufferResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___ClearAudioBufferResponse: _TypeAlias = ClearAudioBufferResponse  # noqa: Y015
+global___ClearAudioBufferResponse = ClearAudioBufferResponse
 
-@_typing.final
-class NewAudioResamplerRequest(_message.Message):
+@typing.final
+class NewAudioResamplerRequest(google.protobuf.message.Message):
     """Create a new AudioResampler"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___NewAudioResamplerRequest: _TypeAlias = NewAudioResamplerRequest  # noqa: Y015
+global___NewAudioResamplerRequest = NewAudioResamplerRequest
 
-@_typing.final
-class NewAudioResamplerResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewAudioResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RESAMPLER_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def resampler(self) -> Global___OwnedAudioResampler: ...
+    RESAMPLER_FIELD_NUMBER: builtins.int
+    @property
+    def resampler(self) -> global___OwnedAudioResampler: ...
     def __init__(
         self,
         *,
-        resampler: Global___OwnedAudioResampler | None = ...,
+        resampler: global___OwnedAudioResampler | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["resampler", b"resampler"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["resampler", b"resampler"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["resampler", b"resampler"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["resampler", b"resampler"]) -> None: ...
 
-Global___NewAudioResamplerResponse: _TypeAlias = NewAudioResamplerResponse  # noqa: Y015
+global___NewAudioResamplerResponse = NewAudioResamplerResponse
 
-@_typing.final
-class RemixAndResampleRequest(_message.Message):
+@typing.final
+class RemixAndResampleRequest(google.protobuf.message.Message):
     """Remix and resample an audio frame"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RESAMPLER_HANDLE_FIELD_NUMBER: _builtins.int
-    BUFFER_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    resampler_handle: _builtins.int
-    num_channels: _builtins.int
-    sample_rate: _builtins.int
-    @_builtins.property
-    def buffer(self) -> Global___AudioFrameBufferInfo: ...
+    RESAMPLER_HANDLE_FIELD_NUMBER: builtins.int
+    BUFFER_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    resampler_handle: builtins.int
+    num_channels: builtins.int
+    sample_rate: builtins.int
+    @property
+    def buffer(self) -> global___AudioFrameBufferInfo: ...
     def __init__(
         self,
         *,
-        resampler_handle: _builtins.int | None = ...,
-        buffer: Global___AudioFrameBufferInfo | None = ...,
-        num_channels: _builtins.int | None = ...,
-        sample_rate: _builtins.int | None = ...,
+        resampler_handle: builtins.int | None = ...,
+        buffer: global___AudioFrameBufferInfo | None = ...,
+        num_channels: builtins.int | None = ...,
+        sample_rate: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "num_channels", b"num_channels", "resampler_handle", b"resampler_handle", "sample_rate", b"sample_rate"]) -> None: ...
 
-Global___RemixAndResampleRequest: _TypeAlias = RemixAndResampleRequest  # noqa: Y015
+global___RemixAndResampleRequest = RemixAndResampleRequest
 
-@_typing.final
-class RemixAndResampleResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class RemixAndResampleResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    BUFFER_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def buffer(self) -> Global___OwnedAudioFrameBuffer: ...
+    BUFFER_FIELD_NUMBER: builtins.int
+    @property
+    def buffer(self) -> global___OwnedAudioFrameBuffer: ...
     def __init__(
         self,
         *,
-        buffer: Global___OwnedAudioFrameBuffer | None = ...,
+        buffer: global___OwnedAudioFrameBuffer | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["buffer", b"buffer"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer"]) -> None: ...
 
-Global___RemixAndResampleResponse: _TypeAlias = RemixAndResampleResponse  # noqa: Y015
+global___RemixAndResampleResponse = RemixAndResampleResponse
 
-@_typing.final
-class NewApmRequest(_message.Message):
+@typing.final
+class NewApmRequest(google.protobuf.message.Message):
     """AEC"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ECHO_CANCELLER_ENABLED_FIELD_NUMBER: _builtins.int
-    GAIN_CONTROLLER_ENABLED_FIELD_NUMBER: _builtins.int
-    HIGH_PASS_FILTER_ENABLED_FIELD_NUMBER: _builtins.int
-    NOISE_SUPPRESSION_ENABLED_FIELD_NUMBER: _builtins.int
-    echo_canceller_enabled: _builtins.bool
-    gain_controller_enabled: _builtins.bool
-    high_pass_filter_enabled: _builtins.bool
-    noise_suppression_enabled: _builtins.bool
+    ECHO_CANCELLER_ENABLED_FIELD_NUMBER: builtins.int
+    GAIN_CONTROLLER_ENABLED_FIELD_NUMBER: builtins.int
+    HIGH_PASS_FILTER_ENABLED_FIELD_NUMBER: builtins.int
+    NOISE_SUPPRESSION_ENABLED_FIELD_NUMBER: builtins.int
+    echo_canceller_enabled: builtins.bool
+    gain_controller_enabled: builtins.bool
+    high_pass_filter_enabled: builtins.bool
+    noise_suppression_enabled: builtins.bool
     def __init__(
         self,
         *,
-        echo_canceller_enabled: _builtins.bool | None = ...,
-        gain_controller_enabled: _builtins.bool | None = ...,
-        high_pass_filter_enabled: _builtins.bool | None = ...,
-        noise_suppression_enabled: _builtins.bool | None = ...,
+        echo_canceller_enabled: builtins.bool | None = ...,
+        gain_controller_enabled: builtins.bool | None = ...,
+        high_pass_filter_enabled: builtins.bool | None = ...,
+        noise_suppression_enabled: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> None: ...
 
-Global___NewApmRequest: _TypeAlias = NewApmRequest  # noqa: Y015
+global___NewApmRequest = NewApmRequest
 
-@_typing.final
-class NewApmResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewApmResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    APM_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def apm(self) -> Global___OwnedApm: ...
+    APM_FIELD_NUMBER: builtins.int
+    @property
+    def apm(self) -> global___OwnedApm: ...
     def __init__(
         self,
         *,
-        apm: Global___OwnedApm | None = ...,
+        apm: global___OwnedApm | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm", b"apm"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm", b"apm"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["apm", b"apm"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm", b"apm"]) -> None: ...
 
-Global___NewApmResponse: _TypeAlias = NewApmResponse  # noqa: Y015
+global___NewApmResponse = NewApmResponse
 
-@_typing.final
-class ApmProcessStreamRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmProcessStreamRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    APM_HANDLE_FIELD_NUMBER: _builtins.int
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    SIZE_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    apm_handle: _builtins.int
-    data_ptr: _builtins.int
+    APM_HANDLE_FIELD_NUMBER: builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    apm_handle: builtins.int
+    data_ptr: builtins.int
     """*mut i16"""
-    size: _builtins.int
+    size: builtins.int
     """in bytes"""
-    sample_rate: _builtins.int
-    num_channels: _builtins.int
+    sample_rate: builtins.int
+    num_channels: builtins.int
     def __init__(
         self,
         *,
-        apm_handle: _builtins.int | None = ...,
-        data_ptr: _builtins.int | None = ...,
-        size: _builtins.int | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
+        apm_handle: builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        size: builtins.int | None = ...,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]) -> None: ...
 
-Global___ApmProcessStreamRequest: _TypeAlias = ApmProcessStreamRequest  # noqa: Y015
+global___ApmProcessStreamRequest = ApmProcessStreamRequest
 
-@_typing.final
-class ApmProcessStreamResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmProcessStreamResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___ApmProcessStreamResponse: _TypeAlias = ApmProcessStreamResponse  # noqa: Y015
+global___ApmProcessStreamResponse = ApmProcessStreamResponse
 
-@_typing.final
-class ApmProcessReverseStreamRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmProcessReverseStreamRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    APM_HANDLE_FIELD_NUMBER: _builtins.int
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    SIZE_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    apm_handle: _builtins.int
-    data_ptr: _builtins.int
+    APM_HANDLE_FIELD_NUMBER: builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    apm_handle: builtins.int
+    data_ptr: builtins.int
     """*mut i16"""
-    size: _builtins.int
+    size: builtins.int
     """in bytes"""
-    sample_rate: _builtins.int
-    num_channels: _builtins.int
+    sample_rate: builtins.int
+    num_channels: builtins.int
     def __init__(
         self,
         *,
-        apm_handle: _builtins.int | None = ...,
-        data_ptr: _builtins.int | None = ...,
-        size: _builtins.int | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
+        apm_handle: builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        size: builtins.int | None = ...,
+        sample_rate: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "size", b"size"]) -> None: ...
 
-Global___ApmProcessReverseStreamRequest: _TypeAlias = ApmProcessReverseStreamRequest  # noqa: Y015
+global___ApmProcessReverseStreamRequest = ApmProcessReverseStreamRequest
 
-@_typing.final
-class ApmProcessReverseStreamResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmProcessReverseStreamResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___ApmProcessReverseStreamResponse: _TypeAlias = ApmProcessReverseStreamResponse  # noqa: Y015
+global___ApmProcessReverseStreamResponse = ApmProcessReverseStreamResponse
 
-@_typing.final
-class ApmSetStreamDelayRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmSetStreamDelayRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    APM_HANDLE_FIELD_NUMBER: _builtins.int
-    DELAY_MS_FIELD_NUMBER: _builtins.int
-    apm_handle: _builtins.int
-    delay_ms: _builtins.int
+    APM_HANDLE_FIELD_NUMBER: builtins.int
+    DELAY_MS_FIELD_NUMBER: builtins.int
+    apm_handle: builtins.int
+    delay_ms: builtins.int
     def __init__(
         self,
         *,
-        apm_handle: _builtins.int | None = ...,
-        delay_ms: _builtins.int | None = ...,
+        apm_handle: builtins.int | None = ...,
+        delay_ms: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["apm_handle", b"apm_handle", "delay_ms", b"delay_ms"]) -> None: ...
 
-Global___ApmSetStreamDelayRequest: _TypeAlias = ApmSetStreamDelayRequest  # noqa: Y015
+global___ApmSetStreamDelayRequest = ApmSetStreamDelayRequest
 
-@_typing.final
-class ApmSetStreamDelayResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class ApmSetStreamDelayResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___ApmSetStreamDelayResponse: _TypeAlias = ApmSetStreamDelayResponse  # noqa: Y015
+global___ApmSetStreamDelayResponse = ApmSetStreamDelayResponse
 
-@_typing.final
-class NewSoxResamplerRequest(_message.Message):
+@typing.final
+class NewSoxResamplerRequest(google.protobuf.message.Message):
     """New resampler using SoX (much better quality)"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    INPUT_RATE_FIELD_NUMBER: _builtins.int
-    OUTPUT_RATE_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    INPUT_DATA_TYPE_FIELD_NUMBER: _builtins.int
-    OUTPUT_DATA_TYPE_FIELD_NUMBER: _builtins.int
-    QUALITY_RECIPE_FIELD_NUMBER: _builtins.int
-    FLAGS_FIELD_NUMBER: _builtins.int
-    input_rate: _builtins.float
-    output_rate: _builtins.float
-    num_channels: _builtins.int
-    input_data_type: Global___SoxResamplerDataType.ValueType
-    output_data_type: Global___SoxResamplerDataType.ValueType
-    quality_recipe: Global___SoxQualityRecipe.ValueType
-    flags: _builtins.int
+    INPUT_RATE_FIELD_NUMBER: builtins.int
+    OUTPUT_RATE_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    INPUT_DATA_TYPE_FIELD_NUMBER: builtins.int
+    OUTPUT_DATA_TYPE_FIELD_NUMBER: builtins.int
+    QUALITY_RECIPE_FIELD_NUMBER: builtins.int
+    FLAGS_FIELD_NUMBER: builtins.int
+    input_rate: builtins.float
+    output_rate: builtins.float
+    num_channels: builtins.int
+    input_data_type: global___SoxResamplerDataType.ValueType
+    output_data_type: global___SoxResamplerDataType.ValueType
+    quality_recipe: global___SoxQualityRecipe.ValueType
+    flags: builtins.int
     def __init__(
         self,
         *,
-        input_rate: _builtins.float | None = ...,
-        output_rate: _builtins.float | None = ...,
-        num_channels: _builtins.int | None = ...,
-        input_data_type: Global___SoxResamplerDataType.ValueType | None = ...,
-        output_data_type: Global___SoxResamplerDataType.ValueType | None = ...,
-        quality_recipe: Global___SoxQualityRecipe.ValueType | None = ...,
-        flags: _builtins.int | None = ...,
+        input_rate: builtins.float | None = ...,
+        output_rate: builtins.float | None = ...,
+        num_channels: builtins.int | None = ...,
+        input_data_type: global___SoxResamplerDataType.ValueType | None = ...,
+        output_data_type: global___SoxResamplerDataType.ValueType | None = ...,
+        quality_recipe: global___SoxQualityRecipe.ValueType | None = ...,
+        flags: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["flags", b"flags", "input_data_type", b"input_data_type", "input_rate", b"input_rate", "num_channels", b"num_channels", "output_data_type", b"output_data_type", "output_rate", b"output_rate", "quality_recipe", b"quality_recipe"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["flags", b"flags", "input_data_type", b"input_data_type", "input_rate", b"input_rate", "num_channels", b"num_channels", "output_data_type", b"output_data_type", "output_rate", b"output_rate", "quality_recipe", b"quality_recipe"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["flags", b"flags", "input_data_type", b"input_data_type", "input_rate", b"input_rate", "num_channels", b"num_channels", "output_data_type", b"output_data_type", "output_rate", b"output_rate", "quality_recipe", b"quality_recipe"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["flags", b"flags", "input_data_type", b"input_data_type", "input_rate", b"input_rate", "num_channels", b"num_channels", "output_data_type", b"output_data_type", "output_rate", b"output_rate", "quality_recipe", b"quality_recipe"]) -> None: ...
 
-Global___NewSoxResamplerRequest: _TypeAlias = NewSoxResamplerRequest  # noqa: Y015
+global___NewSoxResamplerRequest = NewSoxResamplerRequest
 
-@_typing.final
-class NewSoxResamplerResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RESAMPLER_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
-    @_builtins.property
-    def resampler(self) -> Global___OwnedSoxResampler: ...
+    RESAMPLER_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    @property
+    def resampler(self) -> global___OwnedSoxResampler: ...
     def __init__(
         self,
         *,
-        resampler: Global___OwnedSoxResampler | None = ...,
-        error: _builtins.str | None = ...,
+        resampler: global___OwnedSoxResampler | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "message", b"message", "resampler", b"resampler"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "message", b"message", "resampler", b"resampler"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["resampler", "error"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "message", b"message", "resampler", b"resampler"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "message", b"message", "resampler", b"resampler"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["resampler", "error"] | None: ...
 
-Global___NewSoxResamplerResponse: _TypeAlias = NewSoxResamplerResponse  # noqa: Y015
+global___NewSoxResamplerResponse = NewSoxResamplerResponse
 
-@_typing.final
-class PushSoxResamplerRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PushSoxResamplerRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RESAMPLER_HANDLE_FIELD_NUMBER: _builtins.int
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    SIZE_FIELD_NUMBER: _builtins.int
-    resampler_handle: _builtins.int
-    data_ptr: _builtins.int
+    RESAMPLER_HANDLE_FIELD_NUMBER: builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    resampler_handle: builtins.int
+    data_ptr: builtins.int
     """*const i16"""
-    size: _builtins.int
+    size: builtins.int
     """in bytes"""
     def __init__(
         self,
         *,
-        resampler_handle: _builtins.int | None = ...,
-        data_ptr: _builtins.int | None = ...,
-        size: _builtins.int | None = ...,
+        resampler_handle: builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        size: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data_ptr", b"data_ptr", "resampler_handle", b"resampler_handle", "size", b"size"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data_ptr", b"data_ptr", "resampler_handle", b"resampler_handle", "size", b"size"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "resampler_handle", b"resampler_handle", "size", b"size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "resampler_handle", b"resampler_handle", "size", b"size"]) -> None: ...
 
-Global___PushSoxResamplerRequest: _TypeAlias = PushSoxResamplerRequest  # noqa: Y015
+global___PushSoxResamplerRequest = PushSoxResamplerRequest
 
-@_typing.final
-class PushSoxResamplerResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class PushSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    OUTPUT_PTR_FIELD_NUMBER: _builtins.int
-    SIZE_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    output_ptr: _builtins.int
+    OUTPUT_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    output_ptr: builtins.int
     """*const i16 (could be null)"""
-    size: _builtins.int
+    size: builtins.int
     """in bytes"""
-    error: _builtins.str
+    error: builtins.str
     def __init__(
         self,
         *,
-        output_ptr: _builtins.int | None = ...,
-        size: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        output_ptr: builtins.int | None = ...,
+        size: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> None: ...
 
-Global___PushSoxResamplerResponse: _TypeAlias = PushSoxResamplerResponse  # noqa: Y015
+global___PushSoxResamplerResponse = PushSoxResamplerResponse
 
-@_typing.final
-class FlushSoxResamplerRequest(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class FlushSoxResamplerRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RESAMPLER_HANDLE_FIELD_NUMBER: _builtins.int
-    resampler_handle: _builtins.int
+    RESAMPLER_HANDLE_FIELD_NUMBER: builtins.int
+    resampler_handle: builtins.int
     def __init__(
         self,
         *,
-        resampler_handle: _builtins.int | None = ...,
+        resampler_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["resampler_handle", b"resampler_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["resampler_handle", b"resampler_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["resampler_handle", b"resampler_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["resampler_handle", b"resampler_handle"]) -> None: ...
 
-Global___FlushSoxResamplerRequest: _TypeAlias = FlushSoxResamplerRequest  # noqa: Y015
+global___FlushSoxResamplerRequest = FlushSoxResamplerRequest
 
-@_typing.final
-class FlushSoxResamplerResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class FlushSoxResamplerResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    OUTPUT_PTR_FIELD_NUMBER: _builtins.int
-    SIZE_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    output_ptr: _builtins.int
+    OUTPUT_PTR_FIELD_NUMBER: builtins.int
+    SIZE_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    output_ptr: builtins.int
     """*const i16 (could be null)"""
-    size: _builtins.int
+    size: builtins.int
     """in bytes"""
-    error: _builtins.str
+    error: builtins.str
     def __init__(
         self,
         *,
-        output_ptr: _builtins.int | None = ...,
-        size: _builtins.int | None = ...,
-        error: _builtins.str | None = ...,
+        output_ptr: builtins.int | None = ...,
+        size: builtins.int | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "output_ptr", b"output_ptr", "size", b"size"]) -> None: ...
 
-Global___FlushSoxResamplerResponse: _TypeAlias = FlushSoxResamplerResponse  # noqa: Y015
+global___FlushSoxResamplerResponse = FlushSoxResamplerResponse
 
-@_typing.final
-class AudioFrameBufferInfo(_message.Message):
+@typing.final
+class AudioFrameBufferInfo(google.protobuf.message.Message):
     """
     AudioFrame buffer
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    DATA_PTR_FIELD_NUMBER: _builtins.int
-    NUM_CHANNELS_FIELD_NUMBER: _builtins.int
-    SAMPLE_RATE_FIELD_NUMBER: _builtins.int
-    SAMPLES_PER_CHANNEL_FIELD_NUMBER: _builtins.int
-    data_ptr: _builtins.int
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    NUM_CHANNELS_FIELD_NUMBER: builtins.int
+    SAMPLE_RATE_FIELD_NUMBER: builtins.int
+    SAMPLES_PER_CHANNEL_FIELD_NUMBER: builtins.int
+    data_ptr: builtins.int
     """*const i16"""
-    num_channels: _builtins.int
-    sample_rate: _builtins.int
-    samples_per_channel: _builtins.int
+    num_channels: builtins.int
+    sample_rate: builtins.int
+    samples_per_channel: builtins.int
     def __init__(
         self,
         *,
-        data_ptr: _builtins.int | None = ...,
-        num_channels: _builtins.int | None = ...,
-        sample_rate: _builtins.int | None = ...,
-        samples_per_channel: _builtins.int | None = ...,
+        data_ptr: builtins.int | None = ...,
+        num_channels: builtins.int | None = ...,
+        sample_rate: builtins.int | None = ...,
+        samples_per_channel: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_ptr", b"data_ptr", "num_channels", b"num_channels", "sample_rate", b"sample_rate", "samples_per_channel", b"samples_per_channel"]) -> None: ...
 
-Global___AudioFrameBufferInfo: _TypeAlias = AudioFrameBufferInfo  # noqa: Y015
+global___AudioFrameBufferInfo = AudioFrameBufferInfo
 
-@_typing.final
-class OwnedAudioFrameBuffer(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedAudioFrameBuffer(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___AudioFrameBufferInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___AudioFrameBufferInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___AudioFrameBufferInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___AudioFrameBufferInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedAudioFrameBuffer: _TypeAlias = OwnedAudioFrameBuffer  # noqa: Y015
+global___OwnedAudioFrameBuffer = OwnedAudioFrameBuffer
 
-@_typing.final
-class AudioStreamInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioStreamInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TYPE_FIELD_NUMBER: _builtins.int
-    type: Global___AudioStreamType.ValueType
+    TYPE_FIELD_NUMBER: builtins.int
+    type: global___AudioStreamType.ValueType
     def __init__(
         self,
         *,
-        type: Global___AudioStreamType.ValueType | None = ...,
+        type: global___AudioStreamType.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["type", b"type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["type", b"type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
 
-Global___AudioStreamInfo: _TypeAlias = AudioStreamInfo  # noqa: Y015
+global___AudioStreamInfo = AudioStreamInfo
 
-@_typing.final
-class OwnedAudioStream(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedAudioStream(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___AudioStreamInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___AudioStreamInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___AudioStreamInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___AudioStreamInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedAudioStream: _TypeAlias = OwnedAudioStream  # noqa: Y015
+global___OwnedAudioStream = OwnedAudioStream
 
-@_typing.final
-class AudioStreamEvent(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioStreamEvent(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    STREAM_HANDLE_FIELD_NUMBER: _builtins.int
-    FRAME_RECEIVED_FIELD_NUMBER: _builtins.int
-    EOS_FIELD_NUMBER: _builtins.int
-    stream_handle: _builtins.int
-    @_builtins.property
-    def frame_received(self) -> Global___AudioFrameReceived: ...
-    @_builtins.property
-    def eos(self) -> Global___AudioStreamEOS: ...
+    STREAM_HANDLE_FIELD_NUMBER: builtins.int
+    FRAME_RECEIVED_FIELD_NUMBER: builtins.int
+    EOS_FIELD_NUMBER: builtins.int
+    stream_handle: builtins.int
+    @property
+    def frame_received(self) -> global___AudioFrameReceived: ...
+    @property
+    def eos(self) -> global___AudioStreamEOS: ...
     def __init__(
         self,
         *,
-        stream_handle: _builtins.int | None = ...,
-        frame_received: Global___AudioFrameReceived | None = ...,
-        eos: Global___AudioStreamEOS | None = ...,
+        stream_handle: builtins.int | None = ...,
+        frame_received: global___AudioFrameReceived | None = ...,
+        eos: global___AudioStreamEOS | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["frame_received", "eos"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["eos", b"eos", "frame_received", b"frame_received", "message", b"message", "stream_handle", b"stream_handle"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["frame_received", "eos"] | None: ...
 
-Global___AudioStreamEvent: _TypeAlias = AudioStreamEvent  # noqa: Y015
+global___AudioStreamEvent = AudioStreamEvent
 
-@_typing.final
-class AudioFrameReceived(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioFrameReceived(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    FRAME_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def frame(self) -> Global___OwnedAudioFrameBuffer: ...
+    FRAME_FIELD_NUMBER: builtins.int
+    @property
+    def frame(self) -> global___OwnedAudioFrameBuffer: ...
     def __init__(
         self,
         *,
-        frame: Global___OwnedAudioFrameBuffer | None = ...,
+        frame: global___OwnedAudioFrameBuffer | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["frame", b"frame"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame", b"frame"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame", b"frame"]) -> None: ...
 
-Global___AudioFrameReceived: _TypeAlias = AudioFrameReceived  # noqa: Y015
+global___AudioFrameReceived = AudioFrameReceived
 
-@_typing.final
-class AudioStreamEOS(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioStreamEOS(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___AudioStreamEOS: _TypeAlias = AudioStreamEOS  # noqa: Y015
+global___AudioStreamEOS = AudioStreamEOS
 
-@_typing.final
-class AudioSourceOptions(_message.Message):
+@typing.final
+class AudioSourceOptions(google.protobuf.message.Message):
     """
     AudioSource
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ECHO_CANCELLATION_FIELD_NUMBER: _builtins.int
-    NOISE_SUPPRESSION_FIELD_NUMBER: _builtins.int
-    AUTO_GAIN_CONTROL_FIELD_NUMBER: _builtins.int
-    PREFER_HARDWARE_FIELD_NUMBER: _builtins.int
-    echo_cancellation: _builtins.bool
-    noise_suppression: _builtins.bool
-    auto_gain_control: _builtins.bool
-    prefer_hardware: _builtins.bool
+    ECHO_CANCELLATION_FIELD_NUMBER: builtins.int
+    NOISE_SUPPRESSION_FIELD_NUMBER: builtins.int
+    AUTO_GAIN_CONTROL_FIELD_NUMBER: builtins.int
+    PREFER_HARDWARE_FIELD_NUMBER: builtins.int
+    echo_cancellation: builtins.bool
+    noise_suppression: builtins.bool
+    auto_gain_control: builtins.bool
+    prefer_hardware: builtins.bool
     """Prefer hardware audio processing (e.g., iOS VPIO). Lower latency.
     Only applies to AudioSourcePlatform. Default: true.
     """
     def __init__(
         self,
         *,
-        echo_cancellation: _builtins.bool | None = ...,
-        noise_suppression: _builtins.bool | None = ...,
-        auto_gain_control: _builtins.bool | None = ...,
-        prefer_hardware: _builtins.bool | None = ...,
+        echo_cancellation: builtins.bool | None = ...,
+        noise_suppression: builtins.bool | None = ...,
+        auto_gain_control: builtins.bool | None = ...,
+        prefer_hardware: builtins.bool | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]) -> None: ...
 
-Global___AudioSourceOptions: _TypeAlias = AudioSourceOptions  # noqa: Y015
+global___AudioSourceOptions = AudioSourceOptions
 
-@_typing.final
-class AudioSourceInfo(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class AudioSourceInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TYPE_FIELD_NUMBER: _builtins.int
-    type: Global___AudioSourceType.ValueType
+    TYPE_FIELD_NUMBER: builtins.int
+    type: global___AudioSourceType.ValueType
     def __init__(
         self,
         *,
-        type: Global___AudioSourceType.ValueType | None = ...,
+        type: global___AudioSourceType.ValueType | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["type", b"type"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["type", b"type"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["type", b"type"]) -> None: ...
 
-Global___AudioSourceInfo: _TypeAlias = AudioSourceInfo  # noqa: Y015
+global___AudioSourceInfo = AudioSourceInfo
 
-@_typing.final
-class OwnedAudioSource(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedAudioSource(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___AudioSourceInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___AudioSourceInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___AudioSourceInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___AudioSourceInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedAudioSource: _TypeAlias = OwnedAudioSource  # noqa: Y015
+global___OwnedAudioSource = OwnedAudioSource
 
-@_typing.final
-class AudioResamplerInfo(_message.Message):
+@typing.final
+class AudioResamplerInfo(google.protobuf.message.Message):
     """
     AudioResampler
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___AudioResamplerInfo: _TypeAlias = AudioResamplerInfo  # noqa: Y015
+global___AudioResamplerInfo = AudioResamplerInfo
 
-@_typing.final
-class OwnedAudioResampler(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedAudioResampler(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___AudioResamplerInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___AudioResamplerInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___AudioResamplerInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___AudioResamplerInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedAudioResampler: _TypeAlias = OwnedAudioResampler  # noqa: Y015
+global___OwnedAudioResampler = OwnedAudioResampler
 
-@_typing.final
-class OwnedApm(_message.Message):
+@typing.final
+class OwnedApm(google.protobuf.message.Message):
     """
     AEC
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle"]) -> None: ...
 
-Global___OwnedApm: _TypeAlias = OwnedApm  # noqa: Y015
+global___OwnedApm = OwnedApm
 
-@_typing.final
-class SoxResamplerInfo(_message.Message):
+@typing.final
+class SoxResamplerInfo(google.protobuf.message.Message):
     """
     Sox AudioResampler
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___SoxResamplerInfo: _TypeAlias = SoxResamplerInfo  # noqa: Y015
+global___SoxResamplerInfo = SoxResamplerInfo
 
-@_typing.final
-class OwnedSoxResampler(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class OwnedSoxResampler(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___SoxResamplerInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___SoxResamplerInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___SoxResamplerInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___SoxResamplerInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedSoxResampler: _TypeAlias = OwnedSoxResampler  # noqa: Y015
+global___OwnedSoxResampler = OwnedSoxResampler
 
-@_typing.final
-class LoadAudioFilterPluginRequest(_message.Message):
+@typing.final
+class LoadAudioFilterPluginRequest(google.protobuf.message.Message):
     """Audio Filter Plugin"""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLUGIN_PATH_FIELD_NUMBER: _builtins.int
-    DEPENDENCIES_FIELD_NUMBER: _builtins.int
-    MODULE_ID_FIELD_NUMBER: _builtins.int
-    plugin_path: _builtins.str
+    PLUGIN_PATH_FIELD_NUMBER: builtins.int
+    DEPENDENCIES_FIELD_NUMBER: builtins.int
+    MODULE_ID_FIELD_NUMBER: builtins.int
+    plugin_path: builtins.str
     """path for ffi audio filter plugin"""
-    module_id: _builtins.str
+    module_id: builtins.str
     """Unique identifier of the plugin"""
-    @_builtins.property
-    def dependencies(self) -> _containers.RepeatedScalarFieldContainer[_builtins.str]:
+    @property
+    def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
         """Optional: paths for dependency dylibs"""
 
     def __init__(
         self,
         *,
-        plugin_path: _builtins.str | None = ...,
-        dependencies: _abc.Iterable[_builtins.str] | None = ...,
-        module_id: _builtins.str | None = ...,
+        plugin_path: builtins.str | None = ...,
+        dependencies: collections.abc.Iterable[builtins.str] | None = ...,
+        module_id: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["module_id", b"module_id", "plugin_path", b"plugin_path"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["dependencies", b"dependencies", "module_id", b"module_id", "plugin_path", b"plugin_path"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["module_id", b"module_id", "plugin_path", b"plugin_path"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["dependencies", b"dependencies", "module_id", b"module_id", "plugin_path", b"plugin_path"]) -> None: ...
 
-Global___LoadAudioFilterPluginRequest: _TypeAlias = LoadAudioFilterPluginRequest  # noqa: Y015
+global___LoadAudioFilterPluginRequest = LoadAudioFilterPluginRequest
 
-@_typing.final
-class LoadAudioFilterPluginResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class LoadAudioFilterPluginResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___LoadAudioFilterPluginResponse: _TypeAlias = LoadAudioFilterPluginResponse  # noqa: Y015
+global___LoadAudioFilterPluginResponse = LoadAudioFilterPluginResponse
 
-@_typing.final
-class AudioDeviceInfo(_message.Message):
+@typing.final
+class AudioDeviceInfo(google.protobuf.message.Message):
     """
     PlatformAudio - Platform audio device management via WebRTC's ADM
 
@@ -1334,16 +1184,16 @@ class AudioDeviceInfo(_message.Message):
     Information about an audio device.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    INDEX_FIELD_NUMBER: _builtins.int
-    NAME_FIELD_NUMBER: _builtins.int
-    GUID_FIELD_NUMBER: _builtins.int
-    index: _builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    GUID_FIELD_NUMBER: builtins.int
+    index: builtins.int
     """Device index (0-based). Note: indices can change when devices are added/removed."""
-    name: _builtins.str
+    name: builtins.str
     """Device name as reported by the operating system."""
-    guid: _builtins.str
+    guid: builtins.str
     """Platform-specific unique device identifier (GUID).
     This is stable across device additions/removals and should be preferred
     over index for device selection. Format varies by platform:
@@ -1354,72 +1204,63 @@ class AudioDeviceInfo(_message.Message):
     def __init__(
         self,
         *,
-        index: _builtins.int | None = ...,
-        name: _builtins.str | None = ...,
-        guid: _builtins.str | None = ...,
+        index: builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        guid: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]) -> None: ...
 
-Global___AudioDeviceInfo: _TypeAlias = AudioDeviceInfo  # noqa: Y015
+global___AudioDeviceInfo = AudioDeviceInfo
 
-@_typing.final
-class PlatformAudioInfo(_message.Message):
+@typing.final
+class PlatformAudioInfo(google.protobuf.message.Message):
     """Information about a PlatformAudio instance."""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    RECORDING_DEVICE_COUNT_FIELD_NUMBER: _builtins.int
-    PLAYOUT_DEVICE_COUNT_FIELD_NUMBER: _builtins.int
-    recording_device_count: _builtins.int
+    RECORDING_DEVICE_COUNT_FIELD_NUMBER: builtins.int
+    PLAYOUT_DEVICE_COUNT_FIELD_NUMBER: builtins.int
+    recording_device_count: builtins.int
     """Number of available recording (microphone) devices."""
-    playout_device_count: _builtins.int
+    playout_device_count: builtins.int
     """Number of available playout (speaker) devices."""
     def __init__(
         self,
         *,
-        recording_device_count: _builtins.int | None = ...,
-        playout_device_count: _builtins.int | None = ...,
+        recording_device_count: builtins.int | None = ...,
+        playout_device_count: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]) -> None: ...
 
-Global___PlatformAudioInfo: _TypeAlias = PlatformAudioInfo  # noqa: Y015
+global___PlatformAudioInfo = PlatformAudioInfo
 
-@_typing.final
-class OwnedPlatformAudio(_message.Message):
+@typing.final
+class OwnedPlatformAudio(google.protobuf.message.Message):
     """Owned PlatformAudio handle with info."""
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    HANDLE_FIELD_NUMBER: _builtins.int
-    INFO_FIELD_NUMBER: _builtins.int
-    @_builtins.property
-    def handle(self) -> _handle_pb2.FfiOwnedHandle: ...
-    @_builtins.property
-    def info(self) -> Global___PlatformAudioInfo: ...
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___PlatformAudioInfo: ...
     def __init__(
         self,
         *,
-        handle: _handle_pb2.FfiOwnedHandle | None = ...,
-        info: Global___PlatformAudioInfo | None = ...,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___PlatformAudioInfo | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["handle", b"handle", "info", b"info"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
 
-Global___OwnedPlatformAudio: _TypeAlias = OwnedPlatformAudio  # noqa: Y015
+global___OwnedPlatformAudio = OwnedPlatformAudio
 
-@_typing.final
-class NewPlatformAudioRequest(_message.Message):
+@typing.final
+class NewPlatformAudioRequest(google.protobuf.message.Message):
     """Create a new PlatformAudio instance.
 
     This enables the platform ADM for microphone capture and speaker playout.
@@ -1429,140 +1270,122 @@ class NewPlatformAudioRequest(_message.Message):
     When all handles are released, the ADM is automatically disabled.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     def __init__(
         self,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _Never  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
 
-Global___NewPlatformAudioRequest: _TypeAlias = NewPlatformAudioRequest  # noqa: Y015
+global___NewPlatformAudioRequest = NewPlatformAudioRequest
 
-@_typing.final
-class NewPlatformAudioResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class NewPlatformAudioResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    PLATFORM_AUDIO_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if creation failed."""
-    @_builtins.property
-    def platform_audio(self) -> Global___OwnedPlatformAudio:
+    @property
+    def platform_audio(self) -> global___OwnedPlatformAudio:
         """The PlatformAudio handle on success."""
 
     def __init__(
         self,
         *,
-        platform_audio: Global___OwnedPlatformAudio | None = ...,
-        error: _builtins.str | None = ...,
+        platform_audio: global___OwnedPlatformAudio | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    _WhichOneofReturnType_message: _TypeAlias = _typing.Literal["platform_audio", "error"]  # noqa: Y015
-    _WhichOneofArgType_message: _TypeAlias = _typing.Literal["message", b"message"]  # noqa: Y015
-    def WhichOneof(self, oneof_group: _WhichOneofArgType_message) -> _WhichOneofReturnType_message | None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["platform_audio", "error"] | None: ...
 
-Global___NewPlatformAudioResponse: _TypeAlias = NewPlatformAudioResponse  # noqa: Y015
+global___NewPlatformAudioResponse = NewPlatformAudioResponse
 
-@_typing.final
-class GetAudioDevicesRequest(_message.Message):
+@typing.final
+class GetAudioDevicesRequest(google.protobuf.message.Message):
     """Get available audio devices.
 
     Returns lists of available recording (microphone) and playout (speaker) devices.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    platform_audio_handle: _builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
     """The PlatformAudio handle."""
     def __init__(
         self,
         *,
-        platform_audio_handle: _builtins.int | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
 
-Global___GetAudioDevicesRequest: _TypeAlias = GetAudioDevicesRequest  # noqa: Y015
+global___GetAudioDevicesRequest = GetAudioDevicesRequest
 
-@_typing.final
-class GetAudioDevicesResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class GetAudioDevicesResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLAYOUT_DEVICES_FIELD_NUMBER: _builtins.int
-    RECORDING_DEVICES_FIELD_NUMBER: _builtins.int
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    PLAYOUT_DEVICES_FIELD_NUMBER: builtins.int
+    RECORDING_DEVICES_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if enumeration failed, empty/absent on success."""
-    @_builtins.property
-    def playout_devices(self) -> _containers.RepeatedCompositeFieldContainer[Global___AudioDeviceInfo]:
+    @property
+    def playout_devices(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AudioDeviceInfo]:
         """Available playout devices (speakers/headphones)."""
 
-    @_builtins.property
-    def recording_devices(self) -> _containers.RepeatedCompositeFieldContainer[Global___AudioDeviceInfo]:
+    @property
+    def recording_devices(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AudioDeviceInfo]:
         """Available recording devices (microphones)."""
 
     def __init__(
         self,
         *,
-        playout_devices: _abc.Iterable[Global___AudioDeviceInfo] | None = ...,
-        recording_devices: _abc.Iterable[Global___AudioDeviceInfo] | None = ...,
-        error: _builtins.str | None = ...,
+        playout_devices: collections.abc.Iterable[global___AudioDeviceInfo] | None = ...,
+        recording_devices: collections.abc.Iterable[global___AudioDeviceInfo] | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error", "playout_devices", b"playout_devices", "recording_devices", b"recording_devices"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "playout_devices", b"playout_devices", "recording_devices", b"recording_devices"]) -> None: ...
 
-Global___GetAudioDevicesResponse: _TypeAlias = GetAudioDevicesResponse  # noqa: Y015
+global___GetAudioDevicesResponse = GetAudioDevicesResponse
 
-@_typing.final
-class SetRecordingDeviceRequest(_message.Message):
+@typing.final
+class SetRecordingDeviceRequest(google.protobuf.message.Message):
     """Set the recording device (microphone).
 
     Call this before creating audio tracks to select which microphone to use.
     Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    DEVICE_ID_FIELD_NUMBER: _builtins.int
-    platform_audio_handle: _builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    DEVICE_ID_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
     """The PlatformAudio handle."""
-    device_id: _builtins.str
+    device_id: builtins.str
     """Device GUID from AudioDeviceInfo.guid - stable across device additions/removals."""
     def __init__(
         self,
         *,
-        platform_audio_handle: _builtins.int | None = ...,
-        device_id: _builtins.str | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
+        device_id: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> None: ...
 
-Global___SetRecordingDeviceRequest: _TypeAlias = SetRecordingDeviceRequest  # noqa: Y015
+global___SetRecordingDeviceRequest = SetRecordingDeviceRequest
 
-@_typing.final
-class SetRecordingDeviceResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetRecordingDeviceResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if the operation failed:
     - "Device not found" if GUID doesn't match any device
     - Other platform-specific errors
@@ -1571,52 +1394,46 @@ class SetRecordingDeviceResponse(_message.Message):
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___SetRecordingDeviceResponse: _TypeAlias = SetRecordingDeviceResponse  # noqa: Y015
+global___SetRecordingDeviceResponse = SetRecordingDeviceResponse
 
-@_typing.final
-class SetPlayoutDeviceRequest(_message.Message):
+@typing.final
+class SetPlayoutDeviceRequest(google.protobuf.message.Message):
     """Set the playout device (speaker/headphones).
 
     Call this before connecting to select which speaker to use for audio output.
     Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    DEVICE_ID_FIELD_NUMBER: _builtins.int
-    platform_audio_handle: _builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    DEVICE_ID_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
     """The PlatformAudio handle."""
-    device_id: _builtins.str
+    device_id: builtins.str
     """Device GUID from AudioDeviceInfo.guid - stable across device additions/removals."""
     def __init__(
         self,
         *,
-        platform_audio_handle: _builtins.int | None = ...,
-        device_id: _builtins.str | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
+        device_id: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> None: ...
 
-Global___SetPlayoutDeviceRequest: _TypeAlias = SetPlayoutDeviceRequest  # noqa: Y015
+global___SetPlayoutDeviceRequest = SetPlayoutDeviceRequest
 
-@_typing.final
-class SetPlayoutDeviceResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class SetPlayoutDeviceResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if the operation failed:
     - "Device not found" if GUID doesn't match any device
     - Other platform-specific errors
@@ -1625,18 +1442,15 @@ class SetPlayoutDeviceResponse(_message.Message):
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___SetPlayoutDeviceResponse: _TypeAlias = SetPlayoutDeviceResponse  # noqa: Y015
+global___SetPlayoutDeviceResponse = SetPlayoutDeviceResponse
 
-@_typing.final
-class StartRecordingRequest(_message.Message):
+@typing.final
+class StartRecordingRequest(google.protobuf.message.Message):
     """Start recording from the microphone.
 
     Recording is started automatically when PlatformAudio is created.
@@ -1644,48 +1458,42 @@ class StartRecordingRequest(_message.Message):
     This also turns on the system's recording privacy indicator.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    platform_audio_handle: _builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
     """The PlatformAudio handle."""
     def __init__(
         self,
         *,
-        platform_audio_handle: _builtins.int | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
 
-Global___StartRecordingRequest: _TypeAlias = StartRecordingRequest  # noqa: Y015
+global___StartRecordingRequest = StartRecordingRequest
 
-@_typing.final
-class StartRecordingResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class StartRecordingResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if the operation failed.
     Empty/absent on success.
     """
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___StartRecordingResponse: _TypeAlias = StartRecordingResponse  # noqa: Y015
+global___StartRecordingResponse = StartRecordingResponse
 
-@_typing.final
-class StopRecordingRequest(_message.Message):
+@typing.final
+class StopRecordingRequest(google.protobuf.message.Message):
     """Stop recording from the microphone.
 
     Use this to temporarily stop recording without disposing PlatformAudio.
@@ -1693,42 +1501,36 @@ class StopRecordingRequest(_message.Message):
     Call StartRecording to resume recording.
     """
 
-    DESCRIPTOR: _descriptor.Descriptor
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: _builtins.int
-    platform_audio_handle: _builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
     """The PlatformAudio handle."""
     def __init__(
         self,
         *,
-        platform_audio_handle: _builtins.int | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["platform_audio_handle", b"platform_audio_handle"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
 
-Global___StopRecordingRequest: _TypeAlias = StopRecordingRequest  # noqa: Y015
+global___StopRecordingRequest = StopRecordingRequest
 
-@_typing.final
-class StopRecordingResponse(_message.Message):
-    DESCRIPTOR: _descriptor.Descriptor
+@typing.final
+class StopRecordingResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ERROR_FIELD_NUMBER: _builtins.int
-    error: _builtins.str
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
     """Error message if the operation failed.
     Empty/absent on success.
     """
     def __init__(
         self,
         *,
-        error: _builtins.str | None = ...,
+        error: builtins.str | None = ...,
     ) -> None: ...
-    _HasFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def HasField(self, field_name: _HasFieldArgType) -> _builtins.bool: ...
-    _ClearFieldArgType: _TypeAlias = _typing.Literal["error", b"error"]  # noqa: Y015
-    def ClearField(self, field_name: _ClearFieldArgType) -> None: ...
-    def WhichOneof(self, oneof_group: _Never) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
-Global___StopRecordingResponse: _TypeAlias = StopRecordingResponse  # noqa: Y015
+global___StopRecordingResponse = StopRecordingResponse
