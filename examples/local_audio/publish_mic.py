@@ -1,19 +1,72 @@
-import os
+"""
+Publish microphone audio using PlatformAudio.
+
+This example demonstrates:
+- Using PlatformAudio for microphone capture with built-in voice processing (AEC, NS, AGC)
+- Monitoring microphone dB levels via AudioStream
+- Device enumeration and selection
+
+Usage:
+    python publish_mic.py
+    python publish_mic.py --list-devices
+    python publish_mic.py --mic-id "device-guid"
+"""
+
+import argparse
 import asyncio
 import logging
-import threading
+import os
 import queue
-from dotenv import load_dotenv, find_dotenv
+import threading
+
+try:
+    from dotenv import find_dotenv, load_dotenv
+    HAS_DOTENV = True
+except ImportError:
+    HAS_DOTENV = False
 
 from livekit import api, rtc
+
 from db_meter import calculate_db_level, display_single_db_meter
 
 
-async def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Publish microphone using PlatformAudio")
+    parser.add_argument(
+        "--list-devices",
+        action="store_true",
+        help="List available audio devices and exit",
+    )
+    parser.add_argument(
+        "--mic-id",
+        type=str,
+        help="Select microphone by device ID (from --list-devices)",
+    )
+    return parser.parse_args()
+
+
+def list_audio_devices() -> None:
+    """List available audio devices using PlatformAudio."""
+    try:
+        platform_audio = rtc.PlatformAudio()
+    except rtc.PlatformAudioError as e:
+        print(f"Failed to initialize PlatformAudio: {e}")
+        return
+
+    print("\nRecording devices (microphones):")
+    for device in platform_audio.recording_devices():
+        print(f"  [{device.index}] {device.name}")
+        print(f"      ID: {device.id}")
+
+    print()
+
+
+async def main(args: argparse.Namespace) -> None:
     logging.basicConfig(level=logging.INFO)
 
     # Load environment variables from a .env file if present
-    load_dotenv(find_dotenv())
+    if HAS_DOTENV:
+        load_dotenv(find_dotenv())
 
     url = os.getenv("LIVEKIT_URL")
     api_key = os.getenv("LIVEKIT_API_KEY")
@@ -23,14 +76,27 @@ async def main() -> None:
             "LIVEKIT_URL and LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in env"
         )
 
+    # Initialize PlatformAudio for microphone capture
+    # PlatformAudio provides built-in AEC, NS, and AGC
+    try:
+        platform_audio = rtc.PlatformAudio()
+        logging.info("PlatformAudio initialized")
+    except rtc.PlatformAudioError as e:
+        logging.error(f"Failed to initialize PlatformAudio: {e}")
+        return
+
+    # Select microphone if specified
+    if args.mic_id:
+        try:
+            platform_audio.set_recording_device(args.mic_id)
+            logging.info(f"Selected microphone: {args.mic_id}")
+        except rtc.PlatformAudioError as e:
+            logging.warning(f"Failed to select microphone: {e}")
+
     room = rtc.Room()
 
-    # Create media devices helper and open default microphone with AEC enabled
-    devices = rtc.MediaDevices()
-    mic = devices.open_input(enable_aec=True)
-
     # dB level monitoring
-    mic_db_queue = queue.Queue()
+    mic_db_queue: queue.Queue[float] = queue.Queue()
 
     token = (
         api.AccessToken(api_key, api_secret)
@@ -49,11 +115,20 @@ async def main() -> None:
         await room.connect(url, token)
         logging.info("connected to room %s", room.name)
 
-        track = rtc.LocalAudioTrack.create_audio_track("mic", mic.source)
+        # Create audio source with voice processing enabled
+        source = platform_audio.create_audio_source(
+            rtc.PlatformAudioOptions(
+                echo_cancellation=True,
+                noise_suppression=True,
+                auto_gain_control=True,
+            )
+        )
+        track = rtc.LocalAudioTrack.create_audio_track("mic", source)
+
         pub_opts = rtc.TrackPublishOptions()
         pub_opts.source = rtc.TrackSource.SOURCE_MICROPHONE
         await room.local_participant.publish_track(track, pub_opts)
-        logging.info("published local microphone")
+        logging.info("published local microphone with PlatformAudio")
 
         # Start dB meter display in a separate thread
         meter_thread = threading.Thread(
@@ -61,7 +136,7 @@ async def main() -> None:
         )
         meter_thread.start()
 
-        # Monitor microphone dB levels
+        # Monitor microphone dB levels via AudioStream
         async def monitor_mic_db():
             mic_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
             try:
@@ -75,6 +150,8 @@ async def main() -> None:
                         mic_db_queue.put_nowait(db_level)
                     except queue.Full:
                         pass  # Drop if queue is full
+            except asyncio.CancelledError:
+                pass
             except Exception:
                 pass
             finally:
@@ -85,10 +162,9 @@ async def main() -> None:
         # Run until Ctrl+C
         while True:
             await asyncio.sleep(1)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, asyncio.CancelledError):
         pass
     finally:
-        await mic.aclose()
         try:
             await room.disconnect()
         except Exception:
@@ -96,4 +172,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    args = parse_args()
+
+    if args.list_devices:
+        list_audio_devices()
+    else:
+        asyncio.run(main(args))

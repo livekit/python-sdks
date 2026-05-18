@@ -155,8 +155,10 @@ def load_wav_file(path: str) -> tuple[bytes, int, int, int]:
             # Convert 24-bit to 16-bit (drop lower 8 bits)
             samples = []
             for i in range(0, len(frames), 3):
-                # 24-bit little-endian, take upper 16 bits
-                sample = struct.unpack("<i", frames[i : i + 3] + b"\x00")[0] >> 8
+                # 24-bit little-endian: sign-extend to 32-bit, then take upper 16 bits
+                # If high bit (bit 23) is set, the sample is negative - extend with 0xFF
+                sign_byte = b"\xff" if frames[i + 2] & 0x80 else b"\x00"
+                sample = struct.unpack("<i", frames[i : i + 3] + sign_byte)[0] >> 8
                 samples.append(sample)
             frames = struct.pack(f"{len(samples)}h", *samples)
             bits_per_sample = 16

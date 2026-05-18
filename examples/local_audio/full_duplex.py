@@ -1,19 +1,88 @@
-import os
+"""
+Full-duplex audio using PlatformAudio.
+
+This example demonstrates:
+- Using PlatformAudio for microphone capture with built-in voice processing (AEC, NS, AGC)
+- Automatic speaker playout for received audio (handled by PlatformAudio)
+- Monitoring microphone dB levels via AudioStream
+- Device enumeration and selection
+
+With PlatformAudio:
+- Microphone audio is captured with AEC, NS, and AGC applied automatically
+- Received audio from remote participants is played through speakers automatically
+- No manual audio routing needed
+
+Usage:
+    python full_duplex.py
+    python full_duplex.py --list-devices
+    python full_duplex.py --mic-id "mic-guid" --speaker-id "speaker-guid"
+"""
+
+import argparse
 import asyncio
 import logging
-import threading
+import os
 import queue
-from dotenv import load_dotenv, find_dotenv
+import threading
+
+try:
+    from dotenv import find_dotenv, load_dotenv
+    HAS_DOTENV = True
+except ImportError:
+    HAS_DOTENV = False
 
 from livekit import api, rtc
+
 from db_meter import calculate_db_level, display_single_db_meter
 
 
-async def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Full-duplex audio using PlatformAudio")
+    parser.add_argument(
+        "--list-devices",
+        action="store_true",
+        help="List available audio devices and exit",
+    )
+    parser.add_argument(
+        "--mic-id",
+        type=str,
+        help="Select microphone by device ID (from --list-devices)",
+    )
+    parser.add_argument(
+        "--speaker-id",
+        type=str,
+        help="Select speaker by device ID (from --list-devices)",
+    )
+    return parser.parse_args()
+
+
+def list_audio_devices() -> None:
+    """List available audio devices using PlatformAudio."""
+    try:
+        platform_audio = rtc.PlatformAudio()
+    except rtc.PlatformAudioError as e:
+        print(f"Failed to initialize PlatformAudio: {e}")
+        return
+
+    print("\nRecording devices (microphones):")
+    for device in platform_audio.recording_devices():
+        print(f"  [{device.index}] {device.name}")
+        print(f"      ID: {device.id}")
+
+    print("\nPlayout devices (speakers):")
+    for device in platform_audio.playout_devices():
+        print(f"  [{device.index}] {device.name}")
+        print(f"      ID: {device.id}")
+
+    print()
+
+
+async def main(args: argparse.Namespace) -> None:
     logging.basicConfig(level=logging.INFO)
 
     # Load environment variables from a .env file if present
-    load_dotenv(find_dotenv())
+    if HAS_DOTENV:
+        load_dotenv(find_dotenv())
 
     url = os.getenv("LIVEKIT_URL")
     api_key = os.getenv("LIVEKIT_API_KEY")
@@ -25,25 +94,50 @@ async def main() -> None:
             "LIVEKIT_TOKEN or LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be set in env"
         )
 
+    # Initialize PlatformAudio for microphone capture and speaker playout
+    # PlatformAudio provides:
+    # - Built-in AEC (echo cancellation), NS (noise suppression), AGC (auto gain control)
+    # - Automatic speaker playout for received audio
+    try:
+        platform_audio = rtc.PlatformAudio()
+        logging.info("PlatformAudio initialized")
+    except rtc.PlatformAudioError as e:
+        logging.error(f"Failed to initialize PlatformAudio: {e}")
+        return
+
+    # Select microphone if specified
+    if args.mic_id:
+        try:
+            platform_audio.set_recording_device(args.mic_id)
+            logging.info(f"Selected microphone: {args.mic_id}")
+        except rtc.PlatformAudioError as e:
+            logging.warning(f"Failed to select microphone: {e}")
+
+    # Select speaker if specified
+    if args.speaker_id:
+        try:
+            platform_audio.set_playout_device(args.speaker_id)
+            logging.info(f"Selected speaker: {args.speaker_id}")
+        except rtc.PlatformAudioError as e:
+            logging.warning(f"Failed to select speaker: {e}")
+
     room = rtc.Room()
 
-    devices = rtc.MediaDevices()
-
-    # Open microphone & speaker
-    mic = devices.open_input()
-    player = devices.open_output()
-
     # dB level monitoring (mic only)
-    mic_db_queue = queue.Queue()
+    mic_db_queue: queue.Queue[float] = queue.Queue()
 
+    # With PlatformAudio, received audio is automatically played through speakers
+    # We just log when tracks are subscribed/unsubscribed
     def on_track_subscribed(
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ):
         if track.kind == rtc.TrackKind.KIND_AUDIO:
-            asyncio.create_task(player.add_track(track))
-            logging.info("subscribed to audio from %s", participant.identity)
+            logging.info(
+                "Subscribed to audio from %s (auto-playing through speaker)",
+                participant.identity,
+            )
 
     room.on("track_subscribed", on_track_subscribed)
 
@@ -52,8 +146,8 @@ async def main() -> None:
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ):
-        asyncio.create_task(player.remove_track(track))
-        logging.info("unsubscribed from audio of %s", participant.identity)
+        if track.kind == rtc.TrackKind.KIND_AUDIO:
+            logging.info("Unsubscribed from audio of %s", participant.identity)
 
     room.on("track_unsubscribed", on_track_unsubscribed)
 
@@ -76,12 +170,20 @@ async def main() -> None:
         await room.connect(url, token)
         logging.info("connected to room %s", room.name)
 
-        # Publish microphone
-        track = rtc.LocalAudioTrack.create_audio_track("mic", mic.source)
+        # Create audio source with voice processing enabled
+        source = platform_audio.create_audio_source(
+            rtc.PlatformAudioOptions(
+                echo_cancellation=True,
+                noise_suppression=True,
+                auto_gain_control=True,
+            )
+        )
+        track = rtc.LocalAudioTrack.create_audio_track("mic", source)
+
         pub_opts = rtc.TrackPublishOptions()
         pub_opts.source = rtc.TrackSource.SOURCE_MICROPHONE
         await room.local_participant.publish_track(track, pub_opts)
-        logging.info("published local microphone")
+        logging.info("published local microphone with PlatformAudio")
 
         # Start dB meter display in a separate thread
         meter_thread = threading.Thread(
@@ -92,10 +194,7 @@ async def main() -> None:
         )
         meter_thread.start()
 
-        # Start playing mixed remote audio (tracks added via event handlers)
-        await player.start()
-
-        # Monitor microphone dB levels
+        # Monitor microphone dB levels via AudioStream
         async def monitor_mic_db():
             mic_stream = rtc.AudioStream(track, sample_rate=48000, num_channels=1)
             frame_count = 0
@@ -117,6 +216,8 @@ async def main() -> None:
                         mic_db_queue.put_nowait(db_level)
                     except queue.Full:
                         pass  # Drop if queue is full
+            except asyncio.CancelledError:
+                pass
             except Exception:
                 pass
             finally:
@@ -127,11 +228,9 @@ async def main() -> None:
         # Run until Ctrl+C
         while True:
             await asyncio.sleep(1)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, asyncio.CancelledError):
         pass
     finally:
-        await mic.aclose()
-        await player.aclose()
         try:
             await room.disconnect()
         except Exception:
@@ -139,4 +238,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    args = parse_args()
+
+    if args.list_devices:
+        list_audio_devices()
+    else:
+        asyncio.run(main(args))
