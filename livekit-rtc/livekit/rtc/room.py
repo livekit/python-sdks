@@ -744,6 +744,8 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
             ltrack = lpublication.track
+            if ltrack is not None:
+                ltrack._set_room(self)
             self.emit("local_track_published", lpublication, ltrack)
         elif which == "local_track_unpublished":
             # During teardown the publication may already have been removed
@@ -757,6 +759,8 @@ class Room(EventEmitter[EventTypes]):
             unpublished = self.local_participant._track_publications.get(sid)
             if unpublished is not None:
                 del self.local_participant._track_publications[sid]
+                if unpublished.track is not None:
+                    unpublished.track._set_room(None)
                 self.emit("local_track_unpublished", unpublished)
             else:
                 logging.debug("local_track_unpublished for untracked publication sid %s", sid)
@@ -799,10 +803,12 @@ class Room(EventEmitter[EventTypes]):
             rpublication._subscribed = True
             if track_info.kind == TrackKind.KIND_VIDEO:
                 remote_video_track = RemoteVideoTrack(owned_track_info)
+                remote_video_track._set_room(self)
                 rpublication._track = remote_video_track
                 self.emit("track_subscribed", remote_video_track, rpublication, rparticipant)
             elif track_info.kind == TrackKind.KIND_AUDIO:
                 remote_audio_track = RemoteAudioTrack(owned_track_info)
+                remote_audio_track._set_room(self)
                 rpublication._track = remote_audio_track
                 self.emit("track_subscribed", remote_audio_track, rpublication, rparticipant)
         elif which == "track_unsubscribed":
@@ -810,6 +816,8 @@ class Room(EventEmitter[EventTypes]):
             rparticipant = self._remote_participants[identity]
             rpublication = rparticipant.track_publications[event.track_unsubscribed.track_sid]
             rtrack = rpublication.track
+            if rtrack is not None:
+                rtrack._set_room(None)
             rpublication._track = None
             rpublication._subscribed = False
             self.emit("track_unsubscribed", rtrack, rpublication, rparticipant)

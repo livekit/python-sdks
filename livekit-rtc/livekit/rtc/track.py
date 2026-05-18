@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, List, Union
+import weakref
+from typing import TYPE_CHECKING, List, Optional, Union
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
@@ -20,6 +21,8 @@ from ._proto import stats_pb2 as proto_stats
 
 if TYPE_CHECKING:
     from .audio_source import AudioSource
+    from .audio_stream import AudioStream
+    from .room import Room
     from .video_source import VideoSource
 
 
@@ -27,6 +30,21 @@ class Track:
     def __init__(self, owned_info: proto_track.OwnedTrack):
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
+        self._room: Optional["Room"] = None
+        self._audio_streams: "weakref.WeakSet[AudioStream]" = weakref.WeakSet()
+
+    def _set_room(self, room: Optional["Room"]) -> None:
+        self._room = room
+        for stream in self._audio_streams:
+            stream._set_room(room)
+
+    def _register_audio_stream(self, stream: "AudioStream") -> None:
+        self._audio_streams.add(stream)
+        if self._room is not None:
+            stream._set_room(self._room)
+
+    def _unregister_audio_stream(self, stream: "AudioStream") -> None:
+        self._audio_streams.discard(stream)
 
     @property
     def sid(self) -> str:

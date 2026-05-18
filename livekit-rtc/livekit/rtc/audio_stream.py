@@ -17,7 +17,7 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass
-from typing import Any, AsyncIterator, Optional
+from typing import TYPE_CHECKING, Any, AsyncIterator, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -29,6 +29,9 @@ from .log import logger
 from .participant import Participant
 from .track import Track
 from .frame_processor import FrameProcessor
+
+if TYPE_CHECKING:
+    from .room import Room
 
 
 @dataclass
@@ -65,6 +68,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        room: Optional["Room"] = None,
         **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -81,6 +85,9 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
+            room (Optional[Room], optional): The room this stream's track belongs to, used to
+                resolve `room_name`, `participant_identity`, and `publication_sid`. May be `None`
+                if the track is not (yet) associated with a room.
 
         Example:
             ```python
@@ -98,6 +105,8 @@ class AudioStream:
             ```
         """
         self._track: Track | None = track
+        self._room: Room | None = room
+        print("ROOM:", room)
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
@@ -132,6 +141,9 @@ class AudioStream:
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
 
+        if self._track is not None:
+            self._track._register_audio_stream(self)
+
     @classmethod
     def from_participant(
         cls,
@@ -144,6 +156,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        room: Optional["Room"] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -181,6 +194,7 @@ class AudioStream:
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
+            room=room,
         )
 
     @classmethod
@@ -194,6 +208,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        room: Optional["Room"] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -227,7 +242,53 @@ class AudioStream:
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
+            room=room,
         )
+
+    def _set_room(self, room: Optional["Room"]) -> None:
+        self._room = room
+        print("ROOM UPDATE:", room)
+
+    @property
+    def room(self) -> Optional["Room"]:
+        return self._room
+
+    @property
+    def room_name(self) -> Optional[str]:
+        return self._room.name if self._room is not None else None
+
+    @property
+    def participant_identity(self) -> Optional[str]:
+        pub = self._find_publication()
+        if pub is None:
+            return None
+        identity, _ = pub
+        return identity
+
+    @property
+    def publication_sid(self) -> Optional[str]:
+        pub = self._find_publication()
+        if pub is None:
+            return None
+        _, sid = pub
+        return sid
+
+    def _find_publication(self) -> Optional[tuple[str, str]]:
+        if self._room is None or self._track is None:
+            return None
+        track_sid = self._track.sid
+        if not track_sid:
+            return None
+        for participant in self._room.remote_participants.values():
+            publication = participant.track_publications.get(track_sid)
+            if publication is not None:
+                return participant.identity, publication.sid
+        local = self._room._local_participant
+        if local is not None:
+            for publication in local.track_publications.values():
+                if publication.sid == track_sid:
+                    return local.identity, publication.sid
+        return None
 
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -303,6 +364,8 @@ class AudioStream:
         This method cleans up resources associated with the audio stream and waits for
         any pending operations to complete.
         """
+        if self._track is not None:
+            self._track._unregister_audio_stream(self)
         self._ffi_handle.dispose()
         await self._task
 
