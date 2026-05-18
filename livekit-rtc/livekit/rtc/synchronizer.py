@@ -2,7 +2,7 @@ import asyncio
 import logging
 import time
 from collections import deque
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from .video_frame import VideoFrame
 from .audio_frame import AudioFrame
@@ -149,7 +149,7 @@ class _FPSController:
     async def __aenter__(self) -> None:
         await self.wait_next_process()
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         self.after_process()
 
     def reset(self) -> None:

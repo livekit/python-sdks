@@ -117,7 +117,7 @@ class LocalDataTrack:
         req.local_data_track_is_published.track_handle = self._ffi_handle.handle
 
         resp = FfiClient.instance.request(req)
-        return resp.local_data_track_is_published.is_published
+        return bool(resp.local_data_track_is_published.is_published)
 
     async def unpublish(self) -> None:
         """Unpublishes the track."""
@@ -181,7 +181,7 @@ class RemoteDataTrack:
         req.remote_data_track_is_published.track_handle = self._ffi_handle.handle
 
         resp = FfiClient.instance.request(req)
-        return resp.remote_data_track_is_published.is_published
+        return bool(resp.remote_data_track_is_published.is_published)
 
     def __repr__(self) -> str:
         return (
