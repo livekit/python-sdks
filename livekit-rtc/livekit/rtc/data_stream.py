@@ -230,7 +230,7 @@ class BaseStreamWriter:
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-        if cb.send_stream_chunk.error:
+        if cb.send_stream_trailer.error:
             raise ConnectionError(cb.send_stream_trailer.error)
 
     async def aclose(
