@@ -37,7 +37,7 @@ export LIVEKIT_API_SECRET=secret
 | [video-stream/](video-stream/) | Video/audio sync with AVSynchronizer |
 | [data_tracks/](data_tracks/) | Data channel examples |
 | [data-streams/](data-streams/) | Data streaming examples |
-| [local_audio/](local_audio/) | Local audio capture examples |
+| [local_audio/](local_audio/) | Local audio capture with dB metering |
 
 ---
 
@@ -155,6 +155,39 @@ Use cases: background music while speaking, sound effects, mixing pre-recorded a
 | Custom audio processing | Synthetic |
 | ML audio effects | Synthetic |
 | Background music + voice | Both |
+
+---
+
+## local_audio/
+
+Examples for local audio capture with microphone and speaker management.
+
+### full_duplex.py
+
+Full-duplex audio with microphone capture and speaker playout.
+
+```bash
+cd local_audio
+python full_duplex.py
+```
+
+Features:
+- Microphone capture via MediaDevices
+- Speaker playout for received audio
+- Real-time dB level metering
+
+### publish_mic.py
+
+Publish microphone audio with dB level monitoring.
+
+```bash
+cd local_audio
+python publish_mic.py
+```
+
+Features:
+- Microphone capture with AEC enabled
+- Real-time dB level visualization
 
 ---
 
