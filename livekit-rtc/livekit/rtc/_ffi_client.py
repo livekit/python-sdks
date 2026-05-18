@@ -34,7 +34,7 @@ _resource_files = ExitStack()
 atexit.register(_resource_files.close)
 
 
-def _lib_name() -> str | None:
+def _lib_name() -> Optional[str]:
     if platform.system() == "Linux":
         return "liblivekit_ffi.so"
     elif platform.system() == "Darwin":
