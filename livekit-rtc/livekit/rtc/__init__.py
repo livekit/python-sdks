@@ -96,6 +96,13 @@ from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .audio_mixer import AudioMixer
 from .apm import AudioProcessingModule
+from .platform_audio import (
+    PlatformAudio,
+    PlatformAudioSource,
+    PlatformAudioOptions,
+    PlatformAudioError,
+    AudioDeviceInfo,
+)
 
 try:
     from .media_devices import MediaDevices as MediaDevices
@@ -204,6 +211,11 @@ __all__ = [
     "ByteStreamReader",
     "ByteStreamWriter",
     "AudioProcessingModule",
+    "PlatformAudio",
+    "PlatformAudioSource",
+    "PlatformAudioOptions",
+    "PlatformAudioError",
+    "AudioDeviceInfo",
     "FrameProcessor",
     "LocalDataTrack",
     "RemoteDataTrack",

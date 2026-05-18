@@ -21,6 +21,7 @@ from ._proto import stats_pb2 as proto_stats
 if TYPE_CHECKING:
     from .audio_source import AudioSource
     from .video_source import VideoSource
+    from .platform_audio import PlatformAudioSource
 
 
 class Track:
@@ -72,7 +73,34 @@ class LocalAudioTrack(Track):
         super().__init__(info)
 
     @staticmethod
-    def create_audio_track(name: str, source: "AudioSource") -> "LocalAudioTrack":
+    def create_audio_track(
+        name: str, source: Union["AudioSource", "PlatformAudioSource"]
+    ) -> "LocalAudioTrack":
+        """Create a local audio track from an audio source.
+
+        Args:
+            name: The name of the track (e.g., "microphone", "audio-file").
+            source: Either an AudioSource (synthetic mode for manual frame capture)
+                or a PlatformAudioSource (from PlatformAudio, uses WebRTC ADM).
+
+        Returns:
+            A LocalAudioTrack that can be published to a room.
+
+        Example with PlatformAudio (recommended for most use cases):
+            ```python
+            platform_audio = rtc.PlatformAudio()
+            source = platform_audio.create_audio_source()
+            track = rtc.LocalAudioTrack.create_audio_track("microphone", source)
+            ```
+
+        Example with AudioSource (synthetic mode for custom processing):
+            ```python
+            # Synthetic mode: You must manually capture frames
+            source = rtc.AudioSource(sample_rate=48000, num_channels=1)
+            track = rtc.LocalAudioTrack.create_audio_track("audio", source)
+            # Then in a loop: await source.capture_frame(frame)
+            ```
+        """
         req = proto_ffi.FfiRequest()
         req.create_audio_track.name = name
         req.create_audio_track.source_handle = source._ffi_handle.handle
