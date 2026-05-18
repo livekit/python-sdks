@@ -9,8 +9,7 @@ FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixture
 
 
 def test_audio_resampler() -> None:
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    wav_file_path = os.path.join(current_dir, "test_audio.wav")
+    wav_file_path = os.path.join(FIXTURES_DIR, "test_audio.wav")
 
     # Open the wave file
     with wave.open(wav_file_path, "rb") as wf_in:
