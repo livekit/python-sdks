@@ -34,6 +34,16 @@ _resource_files = ExitStack()
 atexit.register(_resource_files.close)
 
 
+def _lib_name() -> str | None:
+    if platform.system() == "Linux":
+        return "liblivekit_ffi.so"
+    elif platform.system() == "Darwin":
+        return "liblivekit_ffi.dylib"
+    elif platform.system() == "Windows":
+        return "livekit_ffi.dll"
+    return None
+
+
 def get_ffi_lib() -> ctypes.CDLL:
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
