@@ -128,7 +128,7 @@ jobs:
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
           source .test-venv/bin/activate
-          pytest tests/
+          pytest tests/ livekit-rtc/tests
 
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
@@ -136,6 +136,6 @@ jobs:
           LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
-        run: .test-venv\Scripts\python.exe -m pytest tests/
+        run: .test-venv\Scripts\python.exe -m pytest tests/ livekit-rtc/tests
         shell: pwsh
         
