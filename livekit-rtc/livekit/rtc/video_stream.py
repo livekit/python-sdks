@@ -45,7 +45,7 @@ class VideoStream:
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
         format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         self._loop = loop or asyncio.get_event_loop()
         # Only subscribe to video_stream_event to avoid unnecessary memory allocations

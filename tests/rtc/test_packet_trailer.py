@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
 from livekit import rtc
 from livekit.rtc import video_source as video_source_module
+from livekit.rtc._ffi_client import FfiHandle
 from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
+from livekit.rtc._proto import ffi_pb2 as proto_ffi
 from livekit.rtc._proto import handle_pb2 as proto_handle
 from livekit.rtc._proto import participant_pb2 as proto_participant
 from livekit.rtc._proto import room_pb2 as proto_room
 from livekit.rtc._proto import track_pb2 as proto_track
 from livekit.rtc.participant import LocalParticipant
+from livekit.rtc.track import Track
 
 
 def _publication_info(
@@ -74,10 +78,10 @@ async def test_track_publication_exposes_packet_trailer_features() -> None:
 
 
 def test_video_source_capture_frame_copies_metadata(monkeypatch: pytest.MonkeyPatch) -> None:
-    captured_requests = []
+    captured_requests: list[proto_ffi.FfiRequest] = []
 
     class FakeClient:
-        def request(self, req):
+        def request(self, req: proto_ffi.FfiRequest) -> None:
             captured_requests.append(req)
 
     class FakeFfiClient:
@@ -86,7 +90,7 @@ def test_video_source_capture_frame_copies_metadata(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(video_source_module, "FfiClient", FakeFfiClient)
 
     source = video_source_module.VideoSource.__new__(video_source_module.VideoSource)
-    source._ffi_handle = SimpleNamespace(handle=42)
+    source._ffi_handle = cast(FfiHandle, SimpleNamespace(handle=42))
     frame = rtc.VideoFrame(
         width=1,
         height=1,
@@ -138,7 +142,7 @@ async def test_local_track_republished_updates_existing_publication() -> None:
             packet_trailer_features=[proto_track.PTF_USER_TIMESTAMP],
         )
     )
-    publication._track = SimpleNamespace(_info=SimpleNamespace(sid="TR_OLD"))
+    publication._track = cast(Track, SimpleNamespace(_info=SimpleNamespace(sid="TR_OLD")))
     local_participant._track_publications[publication.sid] = publication
 
     room._on_room_event(

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, cast
 
 from ._ffi_client import FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
@@ -89,7 +89,7 @@ class KeyProvider:
         req.e2ee.get_shared_key.key_index = key_index
         resp = FfiClient.instance.request(req)
         key = resp.e2ee.get_shared_key.key
-        return key
+        return cast(bytes, key)
 
     def ratchet_shared_key(self, key_index: int) -> bytes:
         """Ratchets the shared encryption key to a new key.
@@ -112,7 +112,7 @@ class KeyProvider:
         resp = FfiClient.instance.request(req)
 
         new_key = resp.e2ee.ratchet_shared_key.new_key
-        return new_key
+        return cast(bytes, new_key)
 
     def set_key(self, participant_identity: str, key: bytes, key_index: int) -> None:
         """Sets the encryption key for a specific participant.
@@ -157,7 +157,7 @@ class KeyProvider:
         req.e2ee.get_key.key_index = key_index
         resp = FfiClient.instance.request(req)
         key = resp.e2ee.get_key.key
-        return key
+        return cast(bytes, key)
 
     def ratchet_key(self, participant_identity: str, key_index: int) -> bytes:
         """Ratchets the encryption key for a specific participant to a new key.
@@ -181,7 +181,7 @@ class KeyProvider:
 
         resp = FfiClient.instance.request(req)
         new_key = resp.e2ee.ratchet_key.new_key
-        return new_key
+        return cast(bytes, new_key)
 
 
 class FrameCryptor:

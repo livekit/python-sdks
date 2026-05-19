@@ -1,6 +1,6 @@
 import datetime
 
-import pytest  # type: ignore
+import pytest
 from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
@@ -9,7 +9,7 @@ TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"
 
 
-def test_verify_token():
+def test_verify_token() -> None:
     grants = VideoGrants(room_join=True, room="test_room")
     sip = SIPGrants(admin=True)
 
@@ -30,11 +30,12 @@ def test_verify_token():
     assert claims.metadata == "test_metadata"
     assert claims.video == grants
     assert claims.sip == sip
+    assert claims.attributes is not None
     assert claims.attributes["key1"] == "value1"
     assert claims.attributes["key2"] == "value2"
 
 
-def test_agent_config():
+def test_agent_config() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")
@@ -50,6 +51,7 @@ def test_agent_config():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     claims = token_verifier.verify(token)
     # Verify the decoded claims match
+    assert claims.room_config is not None
     assert claims.room_config.agents[0].agent_name == "test-agent"
 
     # Split token into header.payload.signature
@@ -74,7 +76,7 @@ def test_agent_config():
     assert payload_json["roomConfig"]["agents"][0]["agentName"] == "test-agent"
 
 
-def test_verify_token_invalid():
+def test_verify_token_invalid() -> None:
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
     token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
@@ -86,7 +88,7 @@ def test_verify_token_invalid():
         token_verifier.verify(token)
 
 
-def test_verify_token_expired():
+def test_verify_token_expired() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")

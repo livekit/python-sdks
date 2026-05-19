@@ -19,7 +19,7 @@ from __future__ import annotations
 import asyncio
 import os
 import uuid
-from typing import Callable, TypeVar
+from typing import Any, Callable, TypeVar
 
 import pytest
 
@@ -40,7 +40,7 @@ FRAME_RATE = 15
 T = TypeVar("T")
 
 
-def skip_if_no_credentials():
+def skip_if_no_credentials() -> Any:
     required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
     missing = [var for var in required_vars if not os.getenv(var)]
     return pytest.mark.skipif(
@@ -126,8 +126,8 @@ async def publish_dummy_video(source: rtc.VideoSource, stop_event: asyncio.Event
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_e2ee_per_participant():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_e2ee_per_participant() -> None:
     """E2E test for per-participant E2EE keys.
 
     E2EE per-participant E2E test:
@@ -146,6 +146,7 @@ async def test_e2ee_per_participant():
     """
     room_name = unique_room_name("test-e2ee-per-participant")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     receiver1_room = rtc.Room()
@@ -197,7 +198,7 @@ async def test_e2ee_per_participant():
     wire_receiver(receiver2_room, "receiver2")
 
     publish_stop = asyncio.Event()
-    publish_task: asyncio.Task | None = None
+    publish_task: asyncio.Task[None] | None = None
 
     try:
         # 1) connect all three rooms with per-participant E2EE options
@@ -340,8 +341,12 @@ async def test_e2ee_per_participant():
 
         set_key_index_on_all_cryptors(publisher_room, 1)
         key1_bytes, _ = PUBLISHER_KEYS[1]
-        receiver1_room.e2ee_manager.key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
-        receiver2_room.e2ee_manager.key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
+        receiver1_key_provider = receiver1_room.e2ee_manager.key_provider
+        receiver2_key_provider = receiver2_room.e2ee_manager.key_provider
+        assert receiver1_key_provider is not None
+        assert receiver2_key_provider is not None
+        receiver1_key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
+        receiver2_key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver1"],

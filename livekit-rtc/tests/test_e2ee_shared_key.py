@@ -19,7 +19,7 @@ from __future__ import annotations
 import asyncio
 import os
 import uuid
-from typing import Callable, TypeVar
+from typing import Any, Callable, TypeVar
 
 import pytest
 
@@ -34,7 +34,7 @@ FRAME_RATE = 15
 T = TypeVar("T")
 
 
-def skip_if_no_credentials():
+def skip_if_no_credentials() -> Any:
     required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
     missing = [var for var in required_vars if not os.getenv(var)]
     return pytest.mark.skipif(
@@ -105,8 +105,8 @@ async def publish_dummy_video(source: rtc.VideoSource, stop_event: asyncio.Event
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_e2ee_shared_key():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_e2ee_shared_key() -> None:
     """E2E test for shared-key E2EE.
 
     E2EE shared key E2E test:
@@ -124,6 +124,7 @@ async def test_e2ee_shared_key():
     """
     room_name = unique_room_name("test-e2ee-shared-key")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     receiver1_room = rtc.Room()
@@ -179,7 +180,7 @@ async def test_e2ee_shared_key():
     wire_receiver(receiver2_room, "receiver2")
 
     publish_stop = asyncio.Event()
-    publish_task: asyncio.Task | None = None
+    publish_task: asyncio.Task[None] | None = None
 
     try:
         connect_options = rtc.RoomOptions(auto_subscribe=True, encryption=make_e2ee_options())
@@ -318,8 +319,12 @@ async def test_e2ee_shared_key():
         await asyncio.sleep(1.0)
 
         key_provider.set_shared_key(SHARED_KEY, key_index=0)
-        receiver1_room.e2ee_manager.key_provider.set_shared_key(SHARED_KEY, key_index=0)
-        receiver2_room.e2ee_manager.key_provider.set_shared_key(SHARED_KEY, key_index=0)
+        receiver1_key_provider = receiver1_room.e2ee_manager.key_provider
+        receiver2_key_provider = receiver2_room.e2ee_manager.key_provider
+        assert receiver1_key_provider is not None
+        assert receiver2_key_provider is not None
+        receiver1_key_provider.set_shared_key(SHARED_KEY, key_index=0)
+        receiver2_key_provider.set_shared_key(SHARED_KEY, key_index=0)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver1"],
