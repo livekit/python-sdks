@@ -1,7 +1,7 @@
 """Smoke test: import the SDK and initialize the FFI library."""
 
 
-def test_import_and_ffi_initialize():
+def test_import_and_ffi_initialize() -> None:
     from livekit import rtc  # noqa: F401
     from livekit.rtc._ffi_client import FfiClient
 

@@ -12,6 +12,24 @@
       "matchManagers": ["pip_requirements", "pip_setup", "pep621"],
       "groupName": "python deps",
       "schedule": ["before 9am on monday"]
+    },
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["dev", "dependency-groups"],
+      "matchPackageNames": ["!/^livekit/"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "python dev deps (non-major)",
+      "schedule": ["before 9am on monday"]
+    },
+    {
+      "matchFileNames": ["livekit-rtc/jupyter-html/package.json"],
+      "matchPackageNames": ["livekit-client", "/^@livekit//"],
+      "groupName": "jupyter-html livekit deps"
+    },
+    {
+      "matchFileNames": ["livekit-rtc/jupyter-html/package.json"],
+      "matchPackageNames": ["!livekit-client", "!/^@livekit//"],
+      "groupName": "jupyter-html deps"
     }
   ]
 }

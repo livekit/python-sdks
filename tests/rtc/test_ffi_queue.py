@@ -19,6 +19,7 @@ FfiQueue can be imported without loading the native FFI library.
 """
 
 import asyncio
+from collections.abc import Generator
 from dataclasses import dataclass
 
 import pytest
@@ -40,15 +41,17 @@ class TestFfiQueueFilterFn:
     """Test suite for FfiQueue filter_fn functionality."""
 
     @pytest.fixture
-    def event_loop(self):
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
         """Create event loop for tests."""
         loop = asyncio.new_event_loop()
         yield loop
         loop.close()
 
-    def test_subscribe_without_filter_receives_all_events(self, event_loop):
+    def test_subscribe_without_filter_receives_all_events(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Subscriber without filter_fn receives all events."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
         sub = queue.subscribe(event_loop, filter_fn=None)
 
         events = [
@@ -69,9 +72,11 @@ class TestFfiQueueFilterFn:
 
         assert len(received) == 4
 
-    def test_subscribe_with_filter_receives_only_matching_events(self, event_loop):
+    def test_subscribe_with_filter_receives_only_matching_events(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Subscriber with filter_fn only receives matching events."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
         sub = queue.subscribe(
             event_loop,
             filter_fn=lambda e: e.WhichOneof("message") == "audio_stream_event",
@@ -97,9 +102,11 @@ class TestFfiQueueFilterFn:
         assert len(received) == 2
         assert all(e._message_type == "audio_stream_event" for e in received)
 
-    def test_multiple_subscribers_different_filters(self, event_loop):
+    def test_multiple_subscribers_different_filters(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Multiple subscribers can have different filters."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
 
         sub_audio = queue.subscribe(
             event_loop,
@@ -142,9 +149,11 @@ class TestFfiQueueFilterFn:
         assert video_count == 1
         assert all_count == 4
 
-    def test_filter_with_multiple_event_types(self, event_loop):
+    def test_filter_with_multiple_event_types(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Filter can match multiple event types."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
         sub = queue.subscribe(
             event_loop,
             filter_fn=lambda e: (
@@ -172,9 +181,11 @@ class TestFfiQueueFilterFn:
         types = {e._message_type for e in received}
         assert types == {"audio_stream_event", "video_stream_event"}
 
-    def test_unsubscribe_works_with_filtered_subscriber(self, event_loop):
+    def test_unsubscribe_works_with_filtered_subscriber(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Unsubscribe correctly removes filtered subscriber."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
         sub = queue.subscribe(
             event_loop,
             filter_fn=lambda e: e.WhichOneof("message") == "audio_stream_event",
@@ -195,11 +206,11 @@ class TestFfiQueueFilterFn:
 
         assert sub.empty()
 
-    def test_filter_error_delivers_item(self, event_loop):
+    def test_filter_error_delivers_item(self, event_loop: asyncio.AbstractEventLoop) -> None:
         """If filter_fn raises, item is still delivered."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
 
-        def bad_filter(e):
+        def bad_filter(e: MockFfiEvent) -> bool:
             raise ValueError("oops")
 
         sub = queue.subscribe(event_loop, filter_fn=bad_filter)
@@ -219,14 +230,16 @@ class TestFfiQueueMemoryReduction:
     """Test that filtering actually reduces object creation."""
 
     @pytest.fixture
-    def event_loop(self):
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
         loop = asyncio.new_event_loop()
         yield loop
         loop.close()
 
-    def test_filtering_reduces_callback_calls(self, event_loop):
+    def test_filtering_reduces_callback_calls(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
         """Verify filtering prevents call_soon_threadsafe for non-matching events."""
-        queue = FfiQueue()
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
 
         # Create 10 subscribers, each only wants audio events
         subscribers = []
