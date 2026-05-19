@@ -248,7 +248,7 @@ class DataTrackStream:
         elif detail == "eos":
             self._close()
             if stream_event.eos.HasField("error"):
-                raise SubscribeDataTrackError(stream_event.eos.error)
+                raise SubscribeDataTrackError(stream_event.eos.error.message)
             raise StopAsyncIteration
         else:
             self._close()

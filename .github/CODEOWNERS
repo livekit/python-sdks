@@ -1,0 +1,4 @@
+# CODEOWNERS for python-sdks
+# These owners will be requested for review on all PRs
+
+* @cloudwebrtc @lukasIO @xianshijing-lk

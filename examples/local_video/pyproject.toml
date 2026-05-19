@@ -1,0 +1,19 @@
+[project]
+name = "livekit-local-video-example"
+version = "0.1.0"
+description = "Local video packet-trailer examples for the LiveKit Python SDK"
+requires-python = ">=3.9"
+dependencies = [
+    "livekit",
+    "livekit-api",
+    "numpy",
+    "opencv-python",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+livekit = { path = "../../livekit-rtc", editable = true }
+livekit-api = { path = "../../livekit-api", editable = true }
+livekit-protocol = { path = "../../livekit-protocol", editable = true }
