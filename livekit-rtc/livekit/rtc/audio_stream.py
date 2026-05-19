@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import weakref
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, AsyncIterator, Optional
 
@@ -105,7 +106,9 @@ class AudioStream:
             ```
         """
         self._track: Track | None = track
-        self._room: Room | None = room
+        self._room_ref: "Optional[weakref.ref[Room]]" = (
+            weakref.ref(room) if room is not None else None
+        )
         print("ROOM:", room)
         self._sample_rate = sample_rate
         self._num_channels = num_channels
@@ -246,44 +249,33 @@ class AudioStream:
         )
 
     def _set_room(self, room: Optional["Room"]) -> None:
-        self._room = room
+        self._room_ref = weakref.ref(room) if room is not None else None
         print("ROOM UPDATE:", room)
 
-    @property
-    def room(self) -> Optional["Room"]:
-        return self._room
+        if self._processor:
+            room = self._resolve_room()
+            participant_identity, publication_sid = self._find_publication() or ("", "")
+            self._processor._on_stream_info_updated(
+                room_name=room.name if room is not None else "", # FIXME: default value?
+                participant_identity=participant_identity,
+                publication_sid=publication_sid,
+            )
 
-    @property
-    def room_name(self) -> Optional[str]:
-        return self._room.name if self._room is not None else None
-
-    @property
-    def participant_identity(self) -> Optional[str]:
-        pub = self._find_publication()
-        if pub is None:
-            return None
-        identity, _ = pub
-        return identity
-
-    @property
-    def publication_sid(self) -> Optional[str]:
-        pub = self._find_publication()
-        if pub is None:
-            return None
-        _, sid = pub
-        return sid
+    def _resolve_room(self) -> Optional["Room"]:
+        return self._room_ref() if self._room_ref is not None else None
 
     def _find_publication(self) -> Optional[tuple[str, str]]:
-        if self._room is None or self._track is None:
+        room = self._resolve_room()
+        if room is None or self._track is None:
             return None
         track_sid = self._track.sid
         if not track_sid:
             return None
-        for participant in self._room.remote_participants.values():
+        for participant in room.remote_participants.values():
             publication = participant.track_publications.get(track_sid)
             if publication is not None:
                 return participant.identity, publication.sid
-        local = self._room._local_participant
+        local = room._local_participant
         if local is not None:
             for publication in local.track_publications.values():
                 if publication.sid == track_sid:
