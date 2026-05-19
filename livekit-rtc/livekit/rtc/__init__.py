@@ -38,13 +38,14 @@ from ._proto.room_pb2 import (
     VideoEncoding,
 )
 from ._proto.track_pb2 import (
+    PacketTrailerFeature,
     StreamState,
     TrackKind,
     TrackSource,
     ParticipantTrackPermission,
 )
+from ._proto.video_frame_pb2 import FrameMetadata, VideoBufferType, VideoCodec, VideoRotation
 from ._proto.track_publication_pb2 import VideoQuality
-from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream, NoiseCancellationOptions
@@ -140,9 +141,11 @@ __all__ = [
     "StreamState",
     "TrackKind",
     "TrackSource",
+    "PacketTrailerFeature",
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
+    "FrameMetadata",
     "stats",
     "AudioFrame",
     "AudioSource",

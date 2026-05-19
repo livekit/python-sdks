@@ -132,10 +132,20 @@ class _AudioSourceType:
 class _AudioSourceTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_AudioSourceType.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     AUDIO_SOURCE_NATIVE: _AudioSourceType.ValueType  # 0
+    """Push-based audio source - manually capture frames via CaptureAudioFrameRequest"""
+    AUDIO_SOURCE_PLATFORM: _AudioSourceType.ValueType  # 1
+    """Platform ADM-based audio source - captures from microphone automatically
+    Requires PlatformAudio to be created first to enable ADM recording
+    """
 
 class AudioSourceType(_AudioSourceType, metaclass=_AudioSourceTypeEnumTypeWrapper): ...
 
 AUDIO_SOURCE_NATIVE: AudioSourceType.ValueType  # 0
+"""Push-based audio source - manually capture frames via CaptureAudioFrameRequest"""
+AUDIO_SOURCE_PLATFORM: AudioSourceType.ValueType  # 1
+"""Platform ADM-based audio source - captures from microphone automatically
+Requires PlatformAudio to be created first to enable ADM recording
+"""
 global___AudioSourceType = AudioSourceType
 
 @typing.final
@@ -285,10 +295,15 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
     SAMPLE_RATE_FIELD_NUMBER: builtins.int
     NUM_CHANNELS_FIELD_NUMBER: builtins.int
     QUEUE_SIZE_MS_FIELD_NUMBER: builtins.int
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
     type: global___AudioSourceType.ValueType
     sample_rate: builtins.int
     num_channels: builtins.int
     queue_size_ms: builtins.int
+    platform_audio_handle: builtins.int
+    """For AudioSourcePlatform: the PlatformAudio handle to configure audio processing on.
+    If provided with options, audio processing will be configured on the PlatformAudio.
+    """
     @property
     def options(self) -> global___AudioSourceOptions: ...
     def __init__(
@@ -299,9 +314,10 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
         sample_rate: builtins.int | None = ...,
         num_channels: builtins.int | None = ...,
         queue_size_ms: builtins.int | None = ...,
+        platform_audio_handle: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["num_channels", b"num_channels", "options", b"options", "platform_audio_handle", b"platform_audio_handle", "queue_size_ms", b"queue_size_ms", "sample_rate", b"sample_rate", "type", b"type"]) -> None: ...
 
 global___NewAudioSourceRequest = NewAudioSourceRequest
 
@@ -951,18 +967,24 @@ class AudioSourceOptions(google.protobuf.message.Message):
     ECHO_CANCELLATION_FIELD_NUMBER: builtins.int
     NOISE_SUPPRESSION_FIELD_NUMBER: builtins.int
     AUTO_GAIN_CONTROL_FIELD_NUMBER: builtins.int
+    PREFER_HARDWARE_FIELD_NUMBER: builtins.int
     echo_cancellation: builtins.bool
     noise_suppression: builtins.bool
     auto_gain_control: builtins.bool
+    prefer_hardware: builtins.bool
+    """Prefer hardware audio processing (e.g., iOS VPIO). Lower latency.
+    Only applies to AudioSourcePlatform. Default: true.
+    """
     def __init__(
         self,
         *,
         echo_cancellation: builtins.bool | None = ...,
         noise_suppression: builtins.bool | None = ...,
         auto_gain_control: builtins.bool | None = ...,
+        prefer_hardware: builtins.bool | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["auto_gain_control", b"auto_gain_control", "echo_cancellation", b"echo_cancellation", "noise_suppression", b"noise_suppression", "prefer_hardware", b"prefer_hardware"]) -> None: ...
 
 global___AudioSourceOptions = AudioSourceOptions
 
@@ -1138,3 +1160,377 @@ class LoadAudioFilterPluginResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
 global___LoadAudioFilterPluginResponse = LoadAudioFilterPluginResponse
+
+@typing.final
+class AudioDeviceInfo(google.protobuf.message.Message):
+    """
+    PlatformAudio - Platform audio device management via WebRTC's ADM
+
+    PlatformAudio provides access to the platform's audio devices (microphones and
+    speakers) via WebRTC's Audio Device Module (ADM). Use it to:
+
+    - Capture audio from the microphone for publishing
+    - Play received audio through the speakers
+    - Enumerate and select audio devices
+
+    # Usage
+
+    1. Create a PlatformAudio handle with NewPlatformAudioRequest
+    2. Enumerate devices with GetAudioDevicesRequest (optional)
+    3. Select devices with SetRecordingDeviceRequest/SetPlayoutDeviceRequest (optional)
+    4. Create an audio track using AudioSourcePlatform type
+    5. When done, drop the handle (the ADM is disabled when all handles are released)
+
+    Information about an audio device.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    INDEX_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    GUID_FIELD_NUMBER: builtins.int
+    index: builtins.int
+    """Device index (0-based). Note: indices can change when devices are added/removed."""
+    name: builtins.str
+    """Device name as reported by the operating system."""
+    guid: builtins.str
+    """Platform-specific unique device identifier (GUID).
+    This is stable across device additions/removals and should be preferred
+    over index for device selection. Format varies by platform:
+    - Windows: Device interface path
+    - macOS: AudioObjectID as string
+    - Linux: ALSA/PulseAudio device identifier
+    """
+    def __init__(
+        self,
+        *,
+        index: builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        guid: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["guid", b"guid", "index", b"index", "name", b"name"]) -> None: ...
+
+global___AudioDeviceInfo = AudioDeviceInfo
+
+@typing.final
+class PlatformAudioInfo(google.protobuf.message.Message):
+    """Information about a PlatformAudio instance."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RECORDING_DEVICE_COUNT_FIELD_NUMBER: builtins.int
+    PLAYOUT_DEVICE_COUNT_FIELD_NUMBER: builtins.int
+    recording_device_count: builtins.int
+    """Number of available recording (microphone) devices."""
+    playout_device_count: builtins.int
+    """Number of available playout (speaker) devices."""
+    def __init__(
+        self,
+        *,
+        recording_device_count: builtins.int | None = ...,
+        playout_device_count: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["playout_device_count", b"playout_device_count", "recording_device_count", b"recording_device_count"]) -> None: ...
+
+global___PlatformAudioInfo = PlatformAudioInfo
+
+@typing.final
+class OwnedPlatformAudio(google.protobuf.message.Message):
+    """Owned PlatformAudio handle with info."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    HANDLE_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    @property
+    def handle(self) -> handle_pb2.FfiOwnedHandle: ...
+    @property
+    def info(self) -> global___PlatformAudioInfo: ...
+    def __init__(
+        self,
+        *,
+        handle: handle_pb2.FfiOwnedHandle | None = ...,
+        info: global___PlatformAudioInfo | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["handle", b"handle", "info", b"info"]) -> None: ...
+
+global___OwnedPlatformAudio = OwnedPlatformAudio
+
+@typing.final
+class NewPlatformAudioRequest(google.protobuf.message.Message):
+    """Create a new PlatformAudio instance.
+
+    This enables the platform ADM for microphone capture and speaker playout.
+    If another PlatformAudio instance exists, this reuses the same underlying ADM.
+
+    The returned handle must be kept alive while platform audio is needed.
+    When all handles are released, the ADM is automatically disabled.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___NewPlatformAudioRequest = NewPlatformAudioRequest
+
+@typing.final
+class NewPlatformAudioResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if creation failed."""
+    @property
+    def platform_audio(self) -> global___OwnedPlatformAudio:
+        """The PlatformAudio handle on success."""
+
+    def __init__(
+        self,
+        *,
+        platform_audio: global___OwnedPlatformAudio | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "message", b"message", "platform_audio", b"platform_audio"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["platform_audio", "error"] | None: ...
+
+global___NewPlatformAudioResponse = NewPlatformAudioResponse
+
+@typing.final
+class GetAudioDevicesRequest(google.protobuf.message.Message):
+    """Get available audio devices.
+
+    Returns lists of available recording (microphone) and playout (speaker) devices.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
+    """The PlatformAudio handle."""
+    def __init__(
+        self,
+        *,
+        platform_audio_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
+
+global___GetAudioDevicesRequest = GetAudioDevicesRequest
+
+@typing.final
+class GetAudioDevicesResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLAYOUT_DEVICES_FIELD_NUMBER: builtins.int
+    RECORDING_DEVICES_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if enumeration failed, empty/absent on success."""
+    @property
+    def playout_devices(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AudioDeviceInfo]:
+        """Available playout devices (speakers/headphones)."""
+
+    @property
+    def recording_devices(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AudioDeviceInfo]:
+        """Available recording devices (microphones)."""
+
+    def __init__(
+        self,
+        *,
+        playout_devices: collections.abc.Iterable[global___AudioDeviceInfo] | None = ...,
+        recording_devices: collections.abc.Iterable[global___AudioDeviceInfo] | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "playout_devices", b"playout_devices", "recording_devices", b"recording_devices"]) -> None: ...
+
+global___GetAudioDevicesResponse = GetAudioDevicesResponse
+
+@typing.final
+class SetRecordingDeviceRequest(google.protobuf.message.Message):
+    """Set the recording device (microphone).
+
+    Call this before creating audio tracks to select which microphone to use.
+    Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    DEVICE_ID_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
+    """The PlatformAudio handle."""
+    device_id: builtins.str
+    """Device GUID from AudioDeviceInfo.guid - stable across device additions/removals."""
+    def __init__(
+        self,
+        *,
+        platform_audio_handle: builtins.int | None = ...,
+        device_id: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> None: ...
+
+global___SetRecordingDeviceRequest = SetRecordingDeviceRequest
+
+@typing.final
+class SetRecordingDeviceResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if the operation failed:
+    - "Device not found" if GUID doesn't match any device
+    - Other platform-specific errors
+    Empty/absent on success.
+    """
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___SetRecordingDeviceResponse = SetRecordingDeviceResponse
+
+@typing.final
+class SetPlayoutDeviceRequest(google.protobuf.message.Message):
+    """Set the playout device (speaker/headphones).
+
+    Call this before connecting to select which speaker to use for audio output.
+    Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    DEVICE_ID_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
+    """The PlatformAudio handle."""
+    device_id: builtins.str
+    """Device GUID from AudioDeviceInfo.guid - stable across device additions/removals."""
+    def __init__(
+        self,
+        *,
+        platform_audio_handle: builtins.int | None = ...,
+        device_id: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["device_id", b"device_id", "platform_audio_handle", b"platform_audio_handle"]) -> None: ...
+
+global___SetPlayoutDeviceRequest = SetPlayoutDeviceRequest
+
+@typing.final
+class SetPlayoutDeviceResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if the operation failed:
+    - "Device not found" if GUID doesn't match any device
+    - Other platform-specific errors
+    Empty/absent on success.
+    """
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___SetPlayoutDeviceResponse = SetPlayoutDeviceResponse
+
+@typing.final
+class StartRecordingRequest(google.protobuf.message.Message):
+    """Start recording from the microphone.
+
+    Recording is started automatically when PlatformAudio is created.
+    Use this to resume recording after calling StopRecording.
+    This also turns on the system's recording privacy indicator.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
+    """The PlatformAudio handle."""
+    def __init__(
+        self,
+        *,
+        platform_audio_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
+
+global___StartRecordingRequest = StartRecordingRequest
+
+@typing.final
+class StartRecordingResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if the operation failed.
+    Empty/absent on success.
+    """
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___StartRecordingResponse = StartRecordingResponse
+
+@typing.final
+class StopRecordingRequest(google.protobuf.message.Message):
+    """Stop recording from the microphone.
+
+    Use this to temporarily stop recording without disposing PlatformAudio.
+    This will turn off the system's recording privacy indicator (e.g., on macOS/iOS).
+    Call StartRecording to resume recording.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
+    platform_audio_handle: builtins.int
+    """The PlatformAudio handle."""
+    def __init__(
+        self,
+        *,
+        platform_audio_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["platform_audio_handle", b"platform_audio_handle"]) -> None: ...
+
+global___StopRecordingRequest = StopRecordingRequest
+
+@typing.final
+class StopRecordingResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ERROR_FIELD_NUMBER: builtins.int
+    error: builtins.str
+    """Error message if the operation failed.
+    Empty/absent on success.
+    """
+    def __init__(
+        self,
+        *,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+
+global___StopRecordingResponse = StopRecordingResponse

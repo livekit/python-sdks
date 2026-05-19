@@ -185,15 +185,27 @@ class KeyProvider:
 
 
 class FrameCryptor:
-    def __init__(self, room_handle: int, participant_identity: str, key_index: int, enabled: bool):
+    def __init__(
+        self,
+        room_handle: int,
+        participant_identity: str,
+        track_sid: str,
+        key_index: int,
+        enabled: bool,
+    ):
         self._room_handle = room_handle
         self._enabled = enabled
         self._participant_identity = participant_identity
+        self._track_sid = track_sid
         self._key_index = key_index
 
     @property
     def participant_identity(self) -> str:
         return self._participant_identity
+
+    @property
+    def track_sid(self) -> str:
+        return self._track_sid
 
     @property
     def key_index(self) -> int:
@@ -218,6 +230,7 @@ class FrameCryptor:
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.cryptor_set_enabled.participant_identity = self._participant_identity
+        req.e2ee.cryptor_set_enabled.track_sid = self._track_sid
         req.e2ee.cryptor_set_enabled.enabled = enabled
         FfiClient.instance.request(req)
 
@@ -236,6 +249,7 @@ class FrameCryptor:
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
         req.e2ee.cryptor_set_key_index.participant_identity = self._participant_identity
+        req.e2ee.cryptor_set_key_index.track_sid = self._track_sid
         req.e2ee.cryptor_set_key_index.key_index = key_index
         FfiClient.instance.request(req)
 
@@ -289,6 +303,7 @@ class E2EEManager:
         """
         req = proto_ffi.FfiRequest()
         req.e2ee.room_handle = self._room_handle
+        req.e2ee.manager_get_frame_cryptors.SetInParent()
 
         resp = FfiClient.instance.request(req)
         frame_cryptors = []
@@ -297,6 +312,7 @@ class E2EEManager:
                 FrameCryptor(
                     self._room_handle,
                     frame_cryptor.participant_identity,
+                    frame_cryptor.track_sid,
                     frame_cryptor.key_index,
                     frame_cryptor.enabled,
                 )
