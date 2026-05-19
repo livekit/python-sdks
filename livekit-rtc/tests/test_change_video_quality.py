@@ -156,7 +156,6 @@ def _expect_event(
             fut.set_result(args)
             room.off(event, _on_event)
 
-
     room.on(event, _on_event)
     return fut
 
