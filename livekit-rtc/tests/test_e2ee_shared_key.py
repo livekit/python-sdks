@@ -27,6 +27,7 @@ from livekit import api, rtc
 
 
 SHARED_KEY = b"12345678"
+WRONG_KEY = b"wrongkey"
 WIDTH, HEIGHT = 320, 180
 FRAME_RATE = 15
 
@@ -80,6 +81,9 @@ def make_e2ee_options() -> rtc.E2EEOptions:
     options = rtc.E2EEOptions()
     options.key_provider_options.shared_key = SHARED_KEY
     options.key_provider_options.ratchet_window_size = 16
+    # failure_tolerance must be >= 0 for the cryptor to surface DECRYPTION_FAILED;
+    # the default -1 means "infinite retries via auto-ratchet" and never emits.
+    options.key_provider_options.failure_tolerance = 3
     return options
 
 
@@ -112,8 +116,11 @@ async def test_e2ee_shared_key():
       3. All participants must use GCM encryption.
       4. Publisher ratchets the shared key; receivers must observe
          KEY_RATCHETED state.
-      5. Publisher disables E2EE; receivers must observe DECRYPTION_FAILED.
-      6. Publisher re-enables E2EE; receivers must observe OK again.
+      5. Publisher swaps its shared key for a wrong one; receivers must observe
+         DECRYPTION_FAILED.
+      6. After exhausting failure_tolerance, the receiver cryptor stops
+         retrying; restoring the correct key on the publisher and re-installing
+         it on the receivers must bring them back to OK.
     """
     room_name = unique_room_name("test-e2ee-shared-key")
     url = os.getenv("LIVEKIT_URL")
@@ -272,20 +279,22 @@ async def test_e2ee_shared_key():
             ),
         )
 
-        # 8) disable e2ee on the publisher; receivers should fail to decrypt
+        # 8) swap the publisher's shared key for a wrong one; receivers should
+        # fail to decrypt and surface DECRYPTION_FAILED once failure_tolerance
+        # is exhausted.
         seen_e2ee_states["receiver1"].clear()
         seen_e2ee_states["receiver2"].clear()
         e2ee_state_log["receiver1"].clear()
         e2ee_state_log["receiver2"].clear()
         await asyncio.sleep(1.0)
 
-        publisher_room.e2ee_manager.set_enabled(False)
+        key_provider.set_shared_key(WRONG_KEY, key_index=0)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.DECRYPTION_FAILED in seen_e2ee_states["receiver1"],
             timeout=15.0,
             message=(
-                "receiver1 did not observe DECRYPTION_FAILED after publisher disabled e2ee "
+                "receiver1 did not observe DECRYPTION_FAILED after publisher swapped key "
                 f"(saw {e2ee_state_log['receiver1']})"
             ),
         )
@@ -293,25 +302,30 @@ async def test_e2ee_shared_key():
             lambda: rtc.EncryptionState.DECRYPTION_FAILED in seen_e2ee_states["receiver2"],
             timeout=15.0,
             message=(
-                "receiver2 did not observe DECRYPTION_FAILED after publisher disabled e2ee "
+                "receiver2 did not observe DECRYPTION_FAILED after publisher swapped key "
                 f"(saw {e2ee_state_log['receiver2']})"
             ),
         )
 
-        # 9) re-enable e2ee on the publisher; receivers should reach OK again
+        # 9) restore the correct shared key on the publisher, and re-install it
+        # on the receivers too: once failure_tolerance is exhausted the
+        # receiver cryptor stops retrying, so a fresh key event is required to
+        # bring it back to OK.
         seen_e2ee_states["receiver1"].clear()
         seen_e2ee_states["receiver2"].clear()
         e2ee_state_log["receiver1"].clear()
         e2ee_state_log["receiver2"].clear()
         await asyncio.sleep(1.0)
 
-        publisher_room.e2ee_manager.set_enabled(True)
+        key_provider.set_shared_key(SHARED_KEY, key_index=0)
+        receiver1_room.e2ee_manager.key_provider.set_shared_key(SHARED_KEY, key_index=0)
+        receiver2_room.e2ee_manager.key_provider.set_shared_key(SHARED_KEY, key_index=0)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver1"],
             timeout=15.0,
             message=(
-                "receiver1 did not return to EncryptionState.OK after re-enable "
+                "receiver1 did not return to EncryptionState.OK after key restore "
                 f"(saw {e2ee_state_log['receiver1']})"
             ),
         )
@@ -319,7 +333,7 @@ async def test_e2ee_shared_key():
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver2"],
             timeout=15.0,
             message=(
-                "receiver2 did not return to EncryptionState.OK after re-enable "
+                "receiver2 did not return to EncryptionState.OK after key restore "
                 f"(saw {e2ee_state_log['receiver2']})"
             ),
         )

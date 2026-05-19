@@ -88,6 +88,9 @@ def make_per_participant_e2ee_options() -> rtc.E2EEOptions:
     # No shared key — keys are installed per participant after connect.
     options.key_provider_options.shared_key = None
     options.key_provider_options.ratchet_window_size = 16
+    # failure_tolerance must be >= 0 for the cryptor to surface DECRYPTION_FAILED;
+    # the default -1 means "infinite retries via auto-ratchet" and never emits.
+    options.key_provider_options.failure_tolerance = 3
     return options
 
 
@@ -134,9 +137,10 @@ async def test_e2ee_per_participant():
          track_published and an OK e2ee_state.
       3. All participants must use GCM encryption.
       4. Publisher ratchets key index 2 → receivers observe KEY_RATCHETED.
-      5. Publisher disables E2EE → receivers observe DECRYPTION_FAILED.
-      6. Publisher switches to key index 1 and re-enables E2EE → receivers
-         observe OK (since they already have key index 1).
+      5. Publisher overwrites key index 0 with a wrong key → receivers
+         observe DECRYPTION_FAILED.
+      6. Publisher switches to key index 1 → receivers observe OK
+         (since they already have key index 1).
       7. Publisher switches to key index 2 and ratchets it; receivers
          switch to key index 2 → receivers observe KEY_RATCHETED.
     """
@@ -301,14 +305,15 @@ async def test_e2ee_per_participant():
             ),
         )
 
-        # 7) disable e2ee on publisher → receivers observe DECRYPTION_FAILED
+        # 7) publisher overwrites key index 0 with a wrong key (receivers
+        #    still hold the original key 0) → receivers observe DECRYPTION_FAILED
         seen_e2ee_states["receiver1"].clear()
         seen_e2ee_states["receiver2"].clear()
         e2ee_state_log["receiver1"].clear()
         e2ee_state_log["receiver2"].clear()
         await asyncio.sleep(1.0)
 
-        publisher_room.e2ee_manager.set_enabled(False)
+        publisher_key_provider.set_key(PUBLISHER_IDENTITY, b"wrongkey", 0)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.DECRYPTION_FAILED in seen_e2ee_states["receiver1"],
@@ -323,8 +328,10 @@ async def test_e2ee_per_participant():
             ),
         )
 
-        # 8) publisher switches to key index 1 and re-enables e2ee
-        #    receivers already have key index 1 → should reach OK
+        # 8) publisher switches to key index 1 (still correct on both sides).
+        #    Once failure_tolerance is exhausted the receiver cryptor stops
+        #    retrying, so we also re-install key index 1 on the receivers to
+        #    deliver a fresh key event that wakes the cryptor back up.
         seen_e2ee_states["receiver1"].clear()
         seen_e2ee_states["receiver2"].clear()
         e2ee_state_log["receiver1"].clear()
@@ -332,7 +339,9 @@ async def test_e2ee_per_participant():
         await asyncio.sleep(1.0)
 
         set_key_index_on_all_cryptors(publisher_room, 1)
-        publisher_room.e2ee_manager.set_enabled(True)
+        key1_bytes, _ = PUBLISHER_KEYS[1]
+        receiver1_room.e2ee_manager.key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
+        receiver2_room.e2ee_manager.key_provider.set_key(PUBLISHER_IDENTITY, key1_bytes, 1)
 
         await assert_eventually(
             lambda: rtc.EncryptionState.OK in seen_e2ee_states["receiver1"],
