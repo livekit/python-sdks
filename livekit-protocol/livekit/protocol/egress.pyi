@@ -420,20 +420,24 @@ class ProxyConfig(_message.Message):
     def __init__(self, url: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ...) -> None: ...
 
 class ListEgressRequest(_message.Message):
-    __slots__ = ("room_name", "egress_id", "active")
+    __slots__ = ("room_name", "egress_id", "active", "page_token")
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
+    PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     room_name: str
     egress_id: str
     active: bool
-    def __init__(self, room_name: _Optional[str] = ..., egress_id: _Optional[str] = ..., active: bool = ...) -> None: ...
+    page_token: _models.TokenPagination
+    def __init__(self, room_name: _Optional[str] = ..., egress_id: _Optional[str] = ..., active: bool = ..., page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ...) -> None: ...
 
 class ListEgressResponse(_message.Message):
-    __slots__ = ("items",)
+    __slots__ = ("items", "next_page_token")
     ITEMS_FIELD_NUMBER: _ClassVar[int]
+    NEXT_PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
     items: _containers.RepeatedCompositeFieldContainer[EgressInfo]
-    def __init__(self, items: _Optional[_Iterable[_Union[EgressInfo, _Mapping]]] = ...) -> None: ...
+    next_page_token: _models.TokenPagination
+    def __init__(self, items: _Optional[_Iterable[_Union[EgressInfo, _Mapping]]] = ..., next_page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ...) -> None: ...
 
 class UpdateEgressRequest(_message.Message):
     __slots__ = ("egress_id", "url", "layout", "add_stream_urls", "remove_stream_urls")
