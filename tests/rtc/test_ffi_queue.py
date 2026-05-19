@@ -149,9 +149,7 @@ class TestFfiQueueFilterFn:
         assert video_count == 1
         assert all_count == 4
 
-    def test_filter_with_multiple_event_types(
-        self, event_loop: asyncio.AbstractEventLoop
-    ) -> None:
+    def test_filter_with_multiple_event_types(self, event_loop: asyncio.AbstractEventLoop) -> None:
         """Filter can match multiple event types."""
         queue: FfiQueue[MockFfiEvent] = FfiQueue()
         sub = queue.subscribe(
@@ -235,9 +233,7 @@ class TestFfiQueueMemoryReduction:
         yield loop
         loop.close()
 
-    def test_filtering_reduces_callback_calls(
-        self, event_loop: asyncio.AbstractEventLoop
-    ) -> None:
+    def test_filtering_reduces_callback_calls(self, event_loop: asyncio.AbstractEventLoop) -> None:
         """Verify filtering prevents call_soon_threadsafe for non-matching events."""
         queue: FfiQueue[MockFfiEvent] = FfiQueue()
 
