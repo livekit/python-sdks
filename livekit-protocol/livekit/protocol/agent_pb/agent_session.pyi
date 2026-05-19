@@ -273,17 +273,29 @@ class InterruptionModelUsage(_message.Message):
     total_requests: int
     def __init__(self, provider: _Optional[str] = ..., model: _Optional[str] = ..., total_requests: _Optional[int] = ...) -> None: ...
 
+class EotModelUsage(_message.Message):
+    __slots__ = ("provider", "model", "total_requests")
+    PROVIDER_FIELD_NUMBER: _ClassVar[int]
+    MODEL_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    provider: str
+    model: str
+    total_requests: int
+    def __init__(self, provider: _Optional[str] = ..., model: _Optional[str] = ..., total_requests: _Optional[int] = ...) -> None: ...
+
 class ModelUsage(_message.Message):
-    __slots__ = ("llm", "tts", "stt", "interruption")
+    __slots__ = ("llm", "tts", "stt", "interruption", "eot")
     LLM_FIELD_NUMBER: _ClassVar[int]
     TTS_FIELD_NUMBER: _ClassVar[int]
     STT_FIELD_NUMBER: _ClassVar[int]
     INTERRUPTION_FIELD_NUMBER: _ClassVar[int]
+    EOT_FIELD_NUMBER: _ClassVar[int]
     llm: LLMModelUsage
     tts: TTSModelUsage
     stt: STTModelUsage
     interruption: InterruptionModelUsage
-    def __init__(self, llm: _Optional[_Union[LLMModelUsage, _Mapping]] = ..., tts: _Optional[_Union[TTSModelUsage, _Mapping]] = ..., stt: _Optional[_Union[STTModelUsage, _Mapping]] = ..., interruption: _Optional[_Union[InterruptionModelUsage, _Mapping]] = ...) -> None: ...
+    eot: EotModelUsage
+    def __init__(self, llm: _Optional[_Union[LLMModelUsage, _Mapping]] = ..., tts: _Optional[_Union[TTSModelUsage, _Mapping]] = ..., stt: _Optional[_Union[STTModelUsage, _Mapping]] = ..., interruption: _Optional[_Union[InterruptionModelUsage, _Mapping]] = ..., eot: _Optional[_Union[EotModelUsage, _Mapping]] = ...) -> None: ...
 
 class AgentSessionUsage(_message.Message):
     __slots__ = ("model_usage",)
@@ -292,7 +304,7 @@ class AgentSessionUsage(_message.Message):
     def __init__(self, model_usage: _Optional[_Iterable[_Union[ModelUsage, _Mapping]]] = ...) -> None: ...
 
 class AgentSessionEvent(_message.Message):
-    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction")
+    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction", "eot_prediction")
     class AgentStateChanged(_message.Message):
         __slots__ = ("old_state", "new_state")
         OLD_STATE_FIELD_NUMBER: _ClassVar[int]
@@ -357,6 +369,17 @@ class AgentSessionEvent(_message.Message):
         transcript: str
         delay: _duration_pb2.Duration
         def __init__(self, speech_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., category: _Optional[_Union[AmdCategory, str]] = ..., reason: _Optional[str] = ..., transcript: _Optional[str] = ..., delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    class EotPrediction(_message.Message):
+        __slots__ = ("probability", "threshold", "inference_duration", "delay")
+        PROBABILITY_FIELD_NUMBER: _ClassVar[int]
+        THRESHOLD_FIELD_NUMBER: _ClassVar[int]
+        INFERENCE_DURATION_FIELD_NUMBER: _ClassVar[int]
+        DELAY_FIELD_NUMBER: _ClassVar[int]
+        probability: float
+        threshold: float
+        inference_duration: _duration_pb2.Duration
+        delay: _duration_pb2.Duration
+        def __init__(self, probability: _Optional[float] = ..., threshold: _Optional[float] = ..., inference_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
     class SessionUsageUpdated(_message.Message):
         __slots__ = ("usage",)
         USAGE_FIELD_NUMBER: _ClassVar[int]
@@ -372,6 +395,7 @@ class AgentSessionEvent(_message.Message):
     OVERLAPPING_SPEECH_FIELD_NUMBER: _ClassVar[int]
     SESSION_USAGE_UPDATED_FIELD_NUMBER: _ClassVar[int]
     AMD_PREDICTION_FIELD_NUMBER: _ClassVar[int]
+    EOT_PREDICTION_FIELD_NUMBER: _ClassVar[int]
     created_at: _timestamp_pb2.Timestamp
     agent_state_changed: AgentSessionEvent.AgentStateChanged
     user_state_changed: AgentSessionEvent.UserStateChanged
@@ -382,7 +406,8 @@ class AgentSessionEvent(_message.Message):
     overlapping_speech: AgentSessionEvent.OverlappingSpeech
     session_usage_updated: AgentSessionEvent.SessionUsageUpdated
     amd_prediction: AgentSessionEvent.AmdPrediction
-    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ...) -> None: ...
+    eot_prediction: AgentSessionEvent.EotPrediction
+    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ..., eot_prediction: _Optional[_Union[AgentSessionEvent.EotPrediction, _Mapping]] = ...) -> None: ...
 
 class SessionRequest(_message.Message):
     __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
