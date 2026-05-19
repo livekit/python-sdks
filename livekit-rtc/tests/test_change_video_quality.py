@@ -333,6 +333,15 @@ async def test_simulcast_quality_layers(
 
         stream = rtc.VideoStream.from_track(track=remote_pub.track)
 
+        # Bandwidth can be unstable right after subscribe — explicitly request
+        # the top layer and wait until we see HIGH-resolution frames before
+        # starting the quality-switching assertions. Use a longer timeout
+        # here since the encoder may need extra time to ramp up to f.
+        remote_pub.set_video_quality(VideoQuality.VIDEO_QUALITY_HIGH)
+        ew, eh = LAYER_DIMENSIONS["f"]
+        warmup = await _wait_for_layer(stream, ew, eh, timeout=40.0)
+        print(f"[{codec_name}] warmup HIGH/f got={warmup[0]}x{warmup[1]}")
+
         for quality, layer in QUALITY_SEQUENCE:
             remote_pub.set_video_quality(quality)
             ew, eh = LAYER_DIMENSIONS[layer]
