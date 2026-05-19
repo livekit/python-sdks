@@ -154,6 +154,7 @@ def _expect_event(
             return
         if predicate is None or predicate(*args, **kwargs):
             fut.set_result(args)
+        room.off(event, _on_event)
 
     room.on(event, _on_event)
     return fut
