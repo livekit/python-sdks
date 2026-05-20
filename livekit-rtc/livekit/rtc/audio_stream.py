@@ -106,9 +106,7 @@ class AudioStream:
             ```
         """
         self._track: Track | None = track
-        self._room_ref: "Optional[weakref.ref[Room]]" = (
-            weakref.ref(room) if room is not None else None
-        )
+        self._room_ref: "Optional[weakref.ref[Room]]" = None
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
@@ -142,6 +140,8 @@ class AudioStream:
             stream = self._create_owned_stream()
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
+
+        self._set_room(room)
 
         if self._track is not None:
             self._track._register_audio_stream(self)
@@ -248,20 +248,33 @@ class AudioStream:
         )
 
     def _set_room(self, room: Optional["Room"]) -> None:
+        old_room = self._resolve_room()
+        if old_room is not room:
+            if old_room is not None:
+                old_room.off("token_refreshed", self._on_room_token_refreshed)
+            if room is not None:
+                room.on("token_refreshed", self._on_room_token_refreshed)
+
         self._room_ref = weakref.ref(room) if room is not None else None
 
-        if self._processor:
-            room = self._resolve_room()
-            if room:
-                if room._token is not None and room._server_url is not None:
-                    self._processor._on_credentials_updated(token=room._token, url=room._server_url)
+        if self._processor and room is not None:
+            if room._token is not None and room._server_url is not None:
+                self._processor._on_credentials_updated(token=room._token, url=room._server_url)
 
-                participant_identity, publication_sid = self._find_publication() or ("", "")
-                self._processor._on_stream_info_updated(
-                    room_name=room.name,
-                    participant_identity=participant_identity,
-                    publication_sid=publication_sid,
-                )
+            participant_identity, publication_sid = self._find_publication() or ("", "")
+            self._processor._on_stream_info_updated(
+                room_name=room.name,
+                participant_identity=participant_identity,
+                publication_sid=publication_sid,
+            )
+
+    def _on_room_token_refreshed(self) -> None:
+        if self._processor is None:
+            return
+        room = self._resolve_room()
+        if room is None or room._token is None or room._server_url is None:
+            return
+        self._processor._on_credentials_updated(token=room._token, url=room._server_url)
 
     def _resolve_room(self) -> Optional["Room"]:
         return self._room_ref() if self._room_ref is not None else None
@@ -360,6 +373,7 @@ class AudioStream:
         """
         if self._track is not None:
             self._track._unregister_audio_stream(self)
+        self._set_room(None)
         self._ffi_handle.dispose()
         await self._task
 
