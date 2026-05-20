@@ -109,7 +109,6 @@ class AudioStream:
         self._room_ref: "Optional[weakref.ref[Room]]" = (
             weakref.ref(room) if room is not None else None
         )
-        print("ROOM:", room)
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
@@ -250,7 +249,6 @@ class AudioStream:
 
     def _set_room(self, room: Optional["Room"]) -> None:
         self._room_ref = weakref.ref(room) if room is not None else None
-        print("ROOM UPDATE:", room)
 
         if self._processor:
             room = self._resolve_room()
