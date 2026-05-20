@@ -254,6 +254,9 @@ class AudioStream:
 
         if self._processor:
             room = self._resolve_room()
+            if room and room._token is not None and room._server_url is not None:
+                self._processor._on_credentials_updated(token=room._token, url=room._server_url)
+
             participant_identity, publication_sid = self._find_publication() or ("", "")
             self._processor._on_stream_info_updated(
                 room_name=room.name if room is not None else "", # FIXME: default value?
