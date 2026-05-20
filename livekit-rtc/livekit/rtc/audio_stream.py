@@ -257,7 +257,7 @@ class AudioStream:
 
             participant_identity, publication_sid = self._find_publication() or ("", "")
             self._processor._on_stream_info_updated(
-                room_name=room.name if room is not None else "", # FIXME: default value?
+                room_name=room.name if room is not None else "",  # FIXME: default value?
                 participant_identity=participant_identity,
                 publication_sid=publication_sid,
             )
