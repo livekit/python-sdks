@@ -557,11 +557,10 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
-        # TODO(sxian): Re-enable once a new livekit-ffi release includes ReadyForRoomEvent
         # Unblock the FFI server once this SDK is ready to receive room events.
-        # ready_req = proto_ffi.FfiRequest()
-        # ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
-        # FfiClient.instance.request(ready_req)
+        ready_req = proto_ffi.FfiRequest()
+        ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
+        FfiClient.instance.request(ready_req)
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
