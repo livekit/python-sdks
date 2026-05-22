@@ -462,6 +462,32 @@ class PublishTrackCallback(google.protobuf.message.Message):
 global___PublishTrackCallback = PublishTrackCallback
 
 @typing.final
+class ReadyForRoomEventRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
+
+global___ReadyForRoomEventRequest = ReadyForRoomEventRequest
+
+@typing.final
+class ReadyForRoomEventResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___ReadyForRoomEventResponse = ReadyForRoomEventResponse
+
+@typing.final
 class UnpublishTrackRequest(google.protobuf.message.Message):
     """Unpublish a track from the room"""
 

@@ -580,6 +580,58 @@ class RemoteDataTrackIsPublishedResponse(google.protobuf.message.Message):
 global___RemoteDataTrackIsPublishedResponse = RemoteDataTrackIsPublishedResponse
 
 @typing.final
+class RemoteDataTrackPipelineOptions(google.protobuf.message.Message):
+    """Track-level options that configure how the incoming-frame pipeline reassembles packets for a remote data track."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MAX_PARTIAL_FRAMES_FIELD_NUMBER: builtins.int
+    max_partial_frames: builtins.int
+    """Maximum number of partial frames the depacketizer will track concurrently for this track.
+
+    Zero is not a valid value; if a value of zero is provided, it will be clamped to one.
+    """
+    def __init__(
+        self,
+        *,
+        max_partial_frames: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_partial_frames", b"max_partial_frames"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["max_partial_frames", b"max_partial_frames"]) -> None: ...
+
+global___RemoteDataTrackPipelineOptions = RemoteDataTrackPipelineOptions
+
+@typing.final
+class RemoteDataTrackSetPipelineOptionsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    @property
+    def options(self) -> global___RemoteDataTrackPipelineOptions: ...
+    def __init__(
+        self,
+        *,
+        track_handle: builtins.int | None = ...,
+        options: global___RemoteDataTrackPipelineOptions | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> None: ...
+
+global___RemoteDataTrackSetPipelineOptionsRequest = RemoteDataTrackSetPipelineOptionsRequest
+
+@typing.final
+class RemoteDataTrackSetPipelineOptionsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___RemoteDataTrackSetPipelineOptionsResponse = RemoteDataTrackSetPipelineOptionsResponse
+
+@typing.final
 class SubscribeDataTrackRequest(google.protobuf.message.Message):
     """Subscribe to a data track."""
 
@@ -645,9 +697,18 @@ global___DataTrackStreamReadRequest = DataTrackStreamReadRequest
 class DataTrackStreamReadResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    EOS_EVENT_FIELD_NUMBER: builtins.int
+    @property
+    def eos_event(self) -> global___DataTrackStreamEOS:
+        """The end-of-stream event if the stream has already ended."""
+
     def __init__(
         self,
+        *,
+        eos_event: global___DataTrackStreamEOS | None = ...,
     ) -> None: ...
+    def HasField(self, field_name: typing.Literal["eos_event", b"eos_event"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["eos_event", b"eos_event"]) -> None: ...
 
 global___DataTrackStreamReadResponse = DataTrackStreamReadResponse
 
