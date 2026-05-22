@@ -23,7 +23,7 @@ import pytest
 
 from livekit import rtc
 
-from utils import (
+from utils import (  # type: ignore[import-not-found]
     assert_eventually,
     create_token,
     skip_if_no_credentials,
@@ -65,7 +65,7 @@ async def publish_dummy_video(source: rtc.VideoSource, stop_event: asyncio.Event
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_e2ee_shared_key() -> None:
     """E2E test for shared-key E2EE.
 

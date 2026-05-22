@@ -29,7 +29,7 @@ import pytest
 from livekit import rtc
 from livekit.rtc.audio_frame import AudioFrame
 
-from utils import create_token, skip_if_no_credentials, unique_room_name
+from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
 
 
 SAMPLE_RATE = 48000

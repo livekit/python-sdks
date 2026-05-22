@@ -51,7 +51,7 @@ from livekit import rtc
 from livekit.rtc._proto.track_publication_pb2 import VideoQuality
 from livekit.rtc.room import EventTypes
 
-from utils import create_token, skip_if_no_credentials, unique_room_name
+from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
 
 
 WAIT_TIMEOUT = 30.0
@@ -222,7 +222,7 @@ _H264_MACOS_ENABLED = os.getenv("LIVEKIT_TEST_H264_MACOS") == "1"
 _IS_MACOS = sys.platform == "darwin"
 
 
-@skip_if_no_credentials()
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "video_codec, codec_name, mode",

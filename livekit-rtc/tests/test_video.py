@@ -26,7 +26,7 @@ import numpy as np
 
 from livekit import rtc
 
-from utils import create_token, skip_if_no_credentials, unique_room_name
+from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
 
 
 VIDEO_WIDTH = 640
