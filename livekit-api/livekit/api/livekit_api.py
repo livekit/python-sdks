@@ -6,7 +6,7 @@ from .ingress_service import IngressService
 from .sip_service import SipService
 from .agent_dispatch_service import AgentDispatchService
 from .connector_service import ConnectorService
-from typing import Optional
+from typing import Any, Optional
 
 
 class LiveKitAPI:
@@ -96,21 +96,21 @@ class LiveKitAPI:
         """Instance of the ConnectorService"""
         return self._connector
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         """Close the API client
 
         Call this before your application exits or when the API client is no longer needed."""
         # we do not close custom sessions, that's up to the caller
-        if not self._custom_session:
+        if not self._custom_session and self._session is not None:
             await self._session.close()
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "LiveKitAPI":
         """@private
 
         Support for `async with`"""
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """@private
 
         Support for `async with`"""

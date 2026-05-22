@@ -68,6 +68,9 @@ class VideoGrants:
     # indicates that the holder can register as an Agent framework worker
     agent: Optional[bool] = None
 
+    # allow participant to manage an agent session via RemoteSession
+    can_manage_agent_session: Optional[bool] = None
+
 
 @dataclass
 class SIPGrants:
@@ -278,9 +281,9 @@ class TokenVerifier:
         return grant_claims
 
 
-def camel_to_snake(t: str):
+def camel_to_snake(t: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", t).lower()
 
 
-def snake_to_lower_camel(t: str):
+def snake_to_lower_camel(t: str) -> str:
     return "".join(word.capitalize() if i else word for i, word in enumerate(t.split("_")))

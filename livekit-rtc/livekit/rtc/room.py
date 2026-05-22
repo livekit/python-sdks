@@ -28,7 +28,7 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
 from ._proto.participant_pb2 import DisconnectReason
-from ._proto.room_pb2 import ConnectionState
+from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
@@ -52,6 +52,7 @@ EventTypes = Literal[
     "participant_active",
     "local_track_published",
     "local_track_unpublished",
+    "local_track_republished",
     "local_track_subscribed",
     "track_published",
     "track_unpublished",
@@ -346,6 +347,11 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `publication` (LocalTrackPublication), `track` (Track)
             - **"local_track_unpublished"**: Called when a local track is unpublished.
                 - Arguments: `publication` (LocalTrackPublication)
+            - **"local_track_republished"**: Called when the SDK auto-republished a local
+                track during a full reconnect. The publication object is updated in place
+                with the new server-assigned SIDs (its previous SID is passed alongside so
+                callers can reconcile any external state keyed by the old SID).
+                - Arguments: `publication` (LocalTrackPublication), `previous_sid` (str)
             - **"local_track_subscribed"**: Called when a local track is subscribed.
                 - Arguments: `track` (Track)
             - **"track_published"**: Called when a remote participant publishes a track.
@@ -460,9 +466,10 @@ class Room(EventEmitter[EventTypes]):
             )
 
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
-            req.connect.options.e2ee.key_provider_options.shared_key = (
-                options.e2ee.key_provider_options.shared_key  # type: ignore
-            )
+            if options.e2ee.key_provider_options.shared_key is not None:
+                req.connect.options.e2ee.key_provider_options.shared_key = (
+                    options.e2ee.key_provider_options.shared_key
+                )
             req.connect.options.e2ee.key_provider_options.ratchet_salt = (
                 options.e2ee.key_provider_options.ratchet_salt
             )
@@ -481,9 +488,10 @@ class Room(EventEmitter[EventTypes]):
 
         if options.encryption:
             req.connect.options.encryption.encryption_type = options.encryption.encryption_type
-            req.connect.options.encryption.key_provider_options.shared_key = (
-                options.encryption.key_provider_options.shared_key  # type: ignore
-            )
+            if options.encryption.key_provider_options.shared_key is not None:
+                req.connect.options.encryption.key_provider_options.shared_key = (
+                    options.encryption.key_provider_options.shared_key
+                )
             req.connect.options.encryption.key_provider_options.ratchet_salt = (
                 options.encryption.key_provider_options.ratchet_salt
             )
@@ -503,10 +511,10 @@ class Room(EventEmitter[EventTypes]):
         if options.rtc_config:
             req.connect.options.rtc_config.ice_transport_type = (
                 options.rtc_config.ice_transport_type
-            )  # type: ignore
+            )
             req.connect.options.rtc_config.continual_gathering_policy = (
                 options.rtc_config.continual_gathering_policy
-            )  # type: ignore
+            )
             req.connect.options.rtc_config.ice_servers.extend(options.rtc_config.ice_servers)
 
         # subscribe before connecting so we don't miss any events
@@ -549,6 +557,11 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
+        # Unblock the FFI server once this SDK is ready to receive room events.
+        ready_req = proto_ffi.FfiRequest()
+        ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
+        FfiClient.instance.request(ready_req)
+
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
             raise RuntimeError("the room isn't connected")
@@ -573,27 +586,56 @@ class Room(EventEmitter[EventTypes]):
 
         return RtcStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
 
-    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
+    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler) -> None:
         existing_handler = self._byte_stream_handlers.get(topic)
         if existing_handler is None:
             self._byte_stream_handlers[topic] = handler
         else:
             raise ValueError("byte stream handler for topic '%s' already set" % topic)
 
-    def unregister_byte_stream_handler(self, topic: str):
+    def unregister_byte_stream_handler(self, topic: str) -> None:
         if self._byte_stream_handlers.get(topic):
             self._byte_stream_handlers.pop(topic)
 
-    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler):
+    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler) -> None:
         existing_handler = self._text_stream_handlers.get(topic)
         if existing_handler is None:
             self._text_stream_handlers[topic] = handler
         else:
             raise ValueError("text stream handler for topic '%s' already set" % topic)
 
-    def unregister_text_stream_handler(self, topic: str):
+    def unregister_text_stream_handler(self, topic: str) -> None:
         if self._text_stream_handlers.get(topic):
             self._text_stream_handlers.pop(topic)
+
+    async def simulate_scenario(self, scenario: SimulateScenarioKind.ValueType) -> None:
+        """Trigger a reconnection / chaos scenario for testing.
+
+        See `SimulateScenarioKind` for the available variants. Most useful
+        in tests to deterministically force a Resume (signal-only reconnect
+        that preserves the PeerConnection and existing publications) or a
+        full reconnect (the SDK rebuilds the RtcSession and re-publishes
+        existing local tracks).
+
+        Raises a `RuntimeError` if the SDK reports a failure.
+        """
+        if not self.isconnected() or self._ffi_handle is None:
+            raise RuntimeError("simulate_scenario requires a connected room")
+
+        req = proto_ffi.FfiRequest()
+        req.simulate_scenario.room_handle = self._ffi_handle.handle
+        req.simulate_scenario.scenario = scenario
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.simulate_scenario.async_id == resp.simulate_scenario.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.simulate_scenario.HasField("error") and cb.simulate_scenario.error:
+            raise RuntimeError(f"simulate_scenario failed: {cb.simulate_scenario.error}")
 
     async def disconnect(
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
@@ -607,7 +649,7 @@ class Room(EventEmitter[EventTypes]):
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-        req.disconnect.reason = reason  # type: ignore
+        req.disconnect.reason = reason
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -654,7 +696,7 @@ class Room(EventEmitter[EventTypes]):
         await self._drain_rpc_invocation_tasks()
         await self._drain_data_stream_tasks()
 
-    def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
+    def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent) -> None:
         if self._local_participant is None:
             return
 
@@ -672,7 +714,7 @@ class Room(EventEmitter[EventTypes]):
             self._rpc_invocation_tasks.add(task)
             task.add_done_callback(self._rpc_invocation_tasks.discard)
 
-    def _on_room_event(self, event: proto_room.RoomEvent):
+    def _on_room_event(self, event: proto_room.RoomEvent) -> None:
         which = event.WhichOneof("message")
         if which == "participant_connected":
             rparticipant = self._create_remote_participant(event.participant_connected.info)
@@ -696,6 +738,21 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_unpublished.publication_sid
             lpublication = self.local_participant.track_publications[sid]
             self.emit("local_track_unpublished", lpublication)
+        elif which == "local_track_republished":
+            # The SDK auto-republished a local track during a full
+            # reconnect: the underlying Track (and its bound source) is
+            # preserved, but the publication and track SIDs were re-issued
+            # by the server. Update the existing LocalTrackPublication
+            # object in place so application code holding a cached
+            # reference continues to see current state, then rekey it
+            # under the new SID in the participant's publications dict.
+            previous_sid = event.local_track_republished.previous_sid
+            republished = self.local_participant._track_publications.get(previous_sid)
+            if republished is not None:
+                del self.local_participant._track_publications[previous_sid]
+                republished._info = event.local_track_republished.info
+                self.local_participant._track_publications[republished.sid] = republished
+                self.emit("local_track_republished", republished, previous_sid)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
@@ -828,7 +885,7 @@ class Room(EventEmitter[EventTypes]):
                 participant,
                 event.participant_encryption_status_changed.is_encrypted,
             )
-        elif which == "participant_permissions_changed":
+        elif which == "participant_permission_changed":
             identity = event.participant_permission_changed.participant_identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
@@ -963,7 +1020,7 @@ class Room(EventEmitter[EventTypes]):
 
     def _handle_stream_header(
         self, header: proto_room.DataStream.Header, participant_identity: str
-    ):
+    ) -> None:
         stream_type = header.WhichOneof("content_header")
         if stream_type == "text_header":
             text_stream_handler = self._text_stream_handlers.get(header.topic)
@@ -993,7 +1050,7 @@ class Room(EventEmitter[EventTypes]):
             logging.warning("received unknown header type, %s", stream_type)
         pass
 
-    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
+    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk) -> None:
         text_reader = self._text_stream_readers.get(chunk.stream_id)
         file_reader = self._byte_stream_readers.get(chunk.stream_id)
 
@@ -1002,7 +1059,7 @@ class Room(EventEmitter[EventTypes]):
         elif file_reader:
             await file_reader._on_chunk_update(chunk)
 
-    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
+    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer) -> None:
         text_reader = self._text_stream_readers.get(trailer.stream_id)
         file_reader = self._byte_stream_readers.get(trailer.stream_id)
 

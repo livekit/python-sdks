@@ -40,6 +40,46 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _SimulateScenarioKind:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _SimulateScenarioKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_SimulateScenarioKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SIMULATE_SIGNAL_RECONNECT: _SimulateScenarioKind.ValueType  # 0
+    """Closes the signal channel locally; engine attempts a Resume."""
+    SIMULATE_SPEAKER: _SimulateScenarioKind.ValueType  # 1
+    SIMULATE_NODE_FAILURE: _SimulateScenarioKind.ValueType  # 2
+    SIMULATE_SERVER_LEAVE: _SimulateScenarioKind.ValueType  # 3
+    SIMULATE_MIGRATION: _SimulateScenarioKind.ValueType  # 4
+    SIMULATE_FORCE_TCP: _SimulateScenarioKind.ValueType  # 5
+    SIMULATE_FORCE_TLS: _SimulateScenarioKind.ValueType  # 6
+    SIMULATE_FULL_RECONNECT: _SimulateScenarioKind.ValueType  # 7
+    """Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
+    reconnect (new RtcSession; SDK republishes existing local tracks).
+    """
+
+class SimulateScenarioKind(_SimulateScenarioKind, metaclass=_SimulateScenarioKindEnumTypeWrapper):
+    """Simulate a reconnection scenario for testing. Mirrors the variants of
+    `livekit::SimulateScenario`. The Resume / FullReconnect variants are
+    the relevant ones for verifying that resume preserves publications and
+    full reconnect republishes them exactly once.
+    """
+
+SIMULATE_SIGNAL_RECONNECT: SimulateScenarioKind.ValueType  # 0
+"""Closes the signal channel locally; engine attempts a Resume."""
+SIMULATE_SPEAKER: SimulateScenarioKind.ValueType  # 1
+SIMULATE_NODE_FAILURE: SimulateScenarioKind.ValueType  # 2
+SIMULATE_SERVER_LEAVE: SimulateScenarioKind.ValueType  # 3
+SIMULATE_MIGRATION: SimulateScenarioKind.ValueType  # 4
+SIMULATE_FORCE_TCP: SimulateScenarioKind.ValueType  # 5
+SIMULATE_FORCE_TLS: SimulateScenarioKind.ValueType  # 6
+SIMULATE_FULL_RECONNECT: SimulateScenarioKind.ValueType  # 7
+"""Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
+reconnect (new RtcSession; SDK republishes existing local tracks).
+"""
+global___SimulateScenarioKind = SimulateScenarioKind
+
 class _IceTransportType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -297,6 +337,63 @@ class DisconnectCallback(google.protobuf.message.Message):
 global___DisconnectCallback = DisconnectCallback
 
 @typing.final
+class SimulateScenarioRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    SCENARIO_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    scenario: global___SimulateScenarioKind.ValueType
+    request_async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+        scenario: global___SimulateScenarioKind.ValueType | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle", "scenario", b"scenario"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "room_handle", b"room_handle", "scenario", b"scenario"]) -> None: ...
+
+global___SimulateScenarioRequest = SimulateScenarioRequest
+
+@typing.final
+class SimulateScenarioResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___SimulateScenarioResponse = SimulateScenarioResponse
+
+@typing.final
+class SimulateScenarioCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
+
+global___SimulateScenarioCallback = SimulateScenarioCallback
+
+@typing.final
 class PublishTrackRequest(google.protobuf.message.Message):
     """Publish a track to the room"""
 
@@ -363,6 +460,32 @@ class PublishTrackCallback(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "publication"] | None: ...
 
 global___PublishTrackCallback = PublishTrackCallback
+
+@typing.final
+class ReadyForRoomEventRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ROOM_HANDLE_FIELD_NUMBER: builtins.int
+    room_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        room_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["room_handle", b"room_handle"]) -> None: ...
+
+global___ReadyForRoomEventRequest = ReadyForRoomEventRequest
+
+@typing.final
+class ReadyForRoomEventResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___ReadyForRoomEventResponse = ReadyForRoomEventResponse
 
 @typing.final
 class UnpublishTrackRequest(google.protobuf.message.Message):
@@ -1094,6 +1217,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     STREAM_FIELD_NUMBER: builtins.int
     PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
     PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
+    SCALABILITY_MODE_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
     dtx: builtins.bool
     red: builtins.bool
@@ -1101,6 +1225,11 @@ class TrackPublishOptions(google.protobuf.message.Message):
     source: track_pb2.TrackSource.ValueType
     stream: builtins.str
     preconnect_buffer: builtins.bool
+    scalability_mode: builtins.str
+    """RTP scalability mode (e.g. "L3T3_KEY"). When set, a single RTP
+    encoding is produced with this mode, enabling true SVC for codecs
+    that support it (VP9, AV1). Has no effect for VP8/H264.
+    """
     @property
     def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
@@ -1122,9 +1251,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
         stream: builtins.str | None = ...,
         preconnect_buffer: builtins.bool | None = ...,
         packet_trailer_features: collections.abc.Iterable[track_pb2.PacketTrailerFeature.ValueType] | None = ...,
+        scalability_mode: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 
@@ -1342,6 +1472,7 @@ class RoomEvent(google.protobuf.message.Message):
     PARTICIPANT_ACTIVE_FIELD_NUMBER: builtins.int
     DATA_TRACK_PUBLISHED_FIELD_NUMBER: builtins.int
     DATA_TRACK_UNPUBLISHED_FIELD_NUMBER: builtins.int
+    LOCAL_TRACK_REPUBLISHED_FIELD_NUMBER: builtins.int
     room_handle: builtins.int
     @property
     def participant_connected(self) -> global___ParticipantConnected: ...
@@ -1443,6 +1574,8 @@ class RoomEvent(google.protobuf.message.Message):
     def data_track_published(self) -> global___DataTrackPublished: ...
     @property
     def data_track_unpublished(self) -> global___DataTrackUnpublished: ...
+    @property
+    def local_track_republished(self) -> global___LocalTrackRepublished: ...
     def __init__(
         self,
         *,
@@ -1490,10 +1623,11 @@ class RoomEvent(google.protobuf.message.Message):
         participant_active: global___ParticipantActive | None = ...,
         data_track_published: global___DataTrackPublished | None = ...,
         data_track_unpublished: global___DataTrackUnpublished | None = ...,
+        local_track_republished: global___LocalTrackRepublished | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed", "byte_stream_opened", "text_stream_opened", "room_updated", "moved", "participants_updated", "participant_encryption_status_changed", "participant_permission_changed", "token_refreshed", "participant_active", "data_track_published", "data_track_unpublished"] | None: ...
+    def HasField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_republished", b"local_track_republished", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["active_speakers_changed", b"active_speakers_changed", "byte_stream_opened", b"byte_stream_opened", "chat_message", b"chat_message", "connection_quality_changed", b"connection_quality_changed", "connection_state_changed", b"connection_state_changed", "data_channel_low_threshold_changed", b"data_channel_low_threshold_changed", "data_packet_received", b"data_packet_received", "data_track_published", b"data_track_published", "data_track_unpublished", b"data_track_unpublished", "disconnected", b"disconnected", "e2ee_state_changed", b"e2ee_state_changed", "eos", b"eos", "local_track_published", b"local_track_published", "local_track_republished", b"local_track_republished", "local_track_subscribed", b"local_track_subscribed", "local_track_unpublished", b"local_track_unpublished", "message", b"message", "moved", b"moved", "participant_active", b"participant_active", "participant_attributes_changed", b"participant_attributes_changed", "participant_connected", b"participant_connected", "participant_disconnected", b"participant_disconnected", "participant_encryption_status_changed", b"participant_encryption_status_changed", "participant_metadata_changed", b"participant_metadata_changed", "participant_name_changed", b"participant_name_changed", "participant_permission_changed", b"participant_permission_changed", "participants_updated", b"participants_updated", "reconnected", b"reconnected", "reconnecting", b"reconnecting", "room_handle", b"room_handle", "room_metadata_changed", b"room_metadata_changed", "room_sid_changed", b"room_sid_changed", "room_updated", b"room_updated", "stream_chunk_received", b"stream_chunk_received", "stream_header_received", b"stream_header_received", "stream_trailer_received", b"stream_trailer_received", "text_stream_opened", b"text_stream_opened", "token_refreshed", b"token_refreshed", "track_muted", b"track_muted", "track_published", b"track_published", "track_subscribed", b"track_subscribed", "track_subscription_failed", b"track_subscription_failed", "track_unmuted", b"track_unmuted", "track_unpublished", b"track_unpublished", "track_unsubscribed", b"track_unsubscribed", "transcription_received", b"transcription_received"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["participant_connected", "participant_disconnected", "local_track_published", "local_track_unpublished", "local_track_subscribed", "track_published", "track_unpublished", "track_subscribed", "track_unsubscribed", "track_subscription_failed", "track_muted", "track_unmuted", "active_speakers_changed", "room_metadata_changed", "room_sid_changed", "participant_metadata_changed", "participant_name_changed", "participant_attributes_changed", "connection_quality_changed", "connection_state_changed", "disconnected", "reconnecting", "reconnected", "e2ee_state_changed", "eos", "data_packet_received", "transcription_received", "chat_message", "stream_header_received", "stream_chunk_received", "stream_trailer_received", "data_channel_low_threshold_changed", "byte_stream_opened", "text_stream_opened", "room_updated", "moved", "participants_updated", "participant_encryption_status_changed", "participant_permission_changed", "token_refreshed", "participant_active", "data_track_published", "data_track_unpublished", "local_track_republished"] | None: ...
 
 global___RoomEvent = RoomEvent
 
@@ -1669,6 +1803,38 @@ class LocalTrackUnpublished(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["publication_sid", b"publication_sid"]) -> None: ...
 
 global___LocalTrackUnpublished = LocalTrackUnpublished
+
+@typing.final
+class LocalTrackRepublished(google.protobuf.message.Message):
+    """Fired when the SDK auto-republishes a local track during a full
+    reconnect. The FfiPublication handle is preserved across the cycle —
+    language bindings should look up the existing publication object by
+    `previous_sid` (its old SID), update its TrackPublicationInfo in place
+    with `info`, and rekey it under the new SID. Apps holding a cached
+    reference to the publication continue to see a valid object whose
+    reads/writes hit current state.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PUBLICATION_HANDLE_FIELD_NUMBER: builtins.int
+    PREVIOUS_SID_FIELD_NUMBER: builtins.int
+    INFO_FIELD_NUMBER: builtins.int
+    publication_handle: builtins.int
+    previous_sid: builtins.str
+    @property
+    def info(self) -> track_pb2.TrackPublicationInfo: ...
+    def __init__(
+        self,
+        *,
+        publication_handle: builtins.int | None = ...,
+        previous_sid: builtins.str | None = ...,
+        info: track_pb2.TrackPublicationInfo | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["info", b"info", "previous_sid", b"previous_sid", "publication_handle", b"publication_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["info", b"info", "previous_sid", b"previous_sid", "publication_handle", b"publication_handle"]) -> None: ...
+
+global___LocalTrackRepublished = LocalTrackRepublished
 
 @typing.final
 class LocalTrackSubscribed(google.protobuf.message.Message):

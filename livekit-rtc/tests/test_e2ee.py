@@ -18,7 +18,7 @@
 class TestKeyProviderOptions:
     """Tests for KeyProviderOptions dataclass."""
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         """Test that KeyProviderOptions has correct default values."""
         from livekit.rtc.e2ee import (
             KeyProviderOptions,
@@ -38,7 +38,7 @@ class TestKeyProviderOptions:
         assert options.key_ring_size == DEFAULT_KEY_RING_SIZE
         assert options.key_derivation_function == proto_e2ee.KeyDerivationFunction.PBKDF2
 
-    def test_custom_values(self):
+    def test_custom_values(self) -> None:
         """Test KeyProviderOptions with custom values."""
         from livekit.rtc.e2ee import KeyProviderOptions
         from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
@@ -59,7 +59,7 @@ class TestKeyProviderOptions:
         assert options.key_ring_size == 8
         assert options.key_derivation_function == proto_e2ee.KeyDerivationFunction.HKDF
 
-    def test_various_key_lengths(self):
+    def test_various_key_lengths(self) -> None:
         """Test that shared_key accepts various lengths."""
         from livekit.rtc.e2ee import KeyProviderOptions
 
@@ -85,7 +85,7 @@ class TestKeyProviderOptions:
 class TestE2EEOptions:
     """Tests for E2EEOptions dataclass."""
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         """Test E2EEOptions default values."""
         from livekit.rtc.e2ee import E2EEOptions, KeyProviderOptions
         from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
@@ -95,7 +95,7 @@ class TestE2EEOptions:
         assert isinstance(options.key_provider_options, KeyProviderOptions)
         assert options.encryption_type == proto_e2ee.EncryptionType.GCM
 
-    def test_with_shared_key(self):
+    def test_with_shared_key(self) -> None:
         """Test E2EEOptions with a shared key."""
         from livekit.rtc.e2ee import E2EEOptions, KeyProviderOptions
 
@@ -108,7 +108,7 @@ class TestE2EEOptions:
 class TestProtoMessageBuilding:
     """Tests for proto message building with E2EE options."""
 
-    def test_proto_key_provider_options_fields(self):
+    def test_proto_key_provider_options_fields(self) -> None:
         """Test that proto KeyProviderOptions has all required fields."""
         from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
 
@@ -130,7 +130,7 @@ class TestProtoMessageBuilding:
         assert proto_options.key_ring_size == 16
         assert proto_options.key_derivation_function == proto_e2ee.KeyDerivationFunction.PBKDF2
 
-    def test_proto_serialization(self):
+    def test_proto_serialization(self) -> None:
         """Test that proto message can be serialized without errors."""
         from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
 
@@ -151,7 +151,7 @@ class TestProtoMessageBuilding:
         assert parsed.key_ring_size == 16
         assert parsed.key_derivation_function == proto_e2ee.KeyDerivationFunction.PBKDF2
 
-    def test_e2ee_options_proto_serialization(self):
+    def test_e2ee_options_proto_serialization(self) -> None:
         """Test full E2eeOptions proto serialization."""
         from livekit.rtc._proto import e2ee_pb2 as proto_e2ee
 
@@ -174,7 +174,7 @@ class TestProtoMessageBuilding:
 class TestPublicExports:
     """Tests for public API exports."""
 
-    def test_key_derivation_function_exported(self):
+    def test_key_derivation_function_exported(self) -> None:
         """Test that KeyDerivationFunction is exported from the package."""
         from livekit.rtc import KeyDerivationFunction
 
@@ -182,7 +182,7 @@ class TestPublicExports:
         assert KeyDerivationFunction.PBKDF2 == 0
         assert KeyDerivationFunction.HKDF == 1
 
-    def test_encryption_type_exported(self):
+    def test_encryption_type_exported(self) -> None:
         """Test that EncryptionType is exported from the package."""
         from livekit.rtc import EncryptionType
 
@@ -190,7 +190,7 @@ class TestPublicExports:
         assert EncryptionType.GCM == 1
         assert EncryptionType.CUSTOM == 2
 
-    def test_e2ee_classes_exported(self):
+    def test_e2ee_classes_exported(self) -> None:
         """Test that E2EE classes are exported from the package."""
         from livekit.rtc import E2EEOptions, KeyProviderOptions
 
