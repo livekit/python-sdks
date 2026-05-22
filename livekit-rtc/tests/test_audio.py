@@ -14,19 +14,22 @@
 
 """End-to-end audio publish/subscribe tests."""
 
+from __future__ import annotations
+
 import asyncio
 import ctypes
 import math
 import os
-import uuid
 import wave
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-from livekit import api, rtc
+from livekit import rtc
 from livekit.rtc.audio_frame import AudioFrame
+
+from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
 
 
 SAMPLE_RATE = 48000
@@ -34,33 +37,6 @@ NUM_CHANNELS = 1
 TONE_DURATION_SEC = 1.0
 FREQUENCIES_HZ = [100, 300, 500, 700, 1000]
 AMPLITUDE = 0.5
-
-
-def skip_if_no_credentials():
-    required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
-    missing = [var for var in required_vars if not os.getenv(var)]
-    return pytest.mark.skipif(
-        bool(missing), reason=f"Missing environment variables: {', '.join(missing)}"
-    )
-
-
-def create_token(identity: str, room_name: str) -> str:
-    return (
-        api.AccessToken()
-        .with_identity(identity)
-        .with_name(identity)
-        .with_grants(
-            api.VideoGrants(
-                room_join=True,
-                room=room_name,
-            )
-        )
-        .to_jwt()
-    )
-
-
-def unique_room_name(base: str) -> str:
-    return f"{base}-{uuid.uuid4().hex[:8]}"
 
 
 def _generate_sine_wave(
@@ -132,7 +108,7 @@ def _band_energies(
 class TestAudioStreamPublishSubscribe:
     """End-to-end: publish a sine sweep into a room and verify spectrum on the subscriber."""
 
-    async def test_audio_stream_publish_subscribe(self):
+    async def test_audio_stream_publish_subscribe(self) -> None:
         """Publish 5 seconds of 100/300/500/700/1000 Hz tones and FFT-verify received audio."""
         url = os.environ["LIVEKIT_URL"]
         room_name = unique_room_name("test-audio-sweep")
@@ -151,7 +127,7 @@ class TestAudioStreamPublishSubscribe:
             track: rtc.Track,
             publication: rtc.RemoteTrackPublication,
             participant: rtc.RemoteParticipant,
-        ):
+        ) -> None:
             nonlocal subscribed_track
             if track.kind == rtc.TrackKind.KIND_AUDIO:
                 subscribed_track = track

@@ -42,15 +42,16 @@ import asyncio
 import os
 import sys
 import time
-import uuid
-from typing import Callable, Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 import numpy as np
 import pytest
 
-from livekit import api, rtc
+from livekit import rtc
 from livekit.rtc._proto.track_publication_pb2 import VideoQuality
 from livekit.rtc.room import EventTypes
+
+from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
 
 
 WAIT_TIMEOUT = 30.0
@@ -71,33 +72,6 @@ QUALITY_SEQUENCE = [
     (VideoQuality.VIDEO_QUALITY_LOW, "q"),
     (VideoQuality.VIDEO_QUALITY_MEDIUM, "h"),
 ]
-
-
-def skip_if_no_credentials():
-    required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
-    missing = [var for var in required_vars if not os.getenv(var)]
-    return pytest.mark.skipif(
-        bool(missing), reason=f"Missing environment variables: {', '.join(missing)}"
-    )
-
-
-def create_token(identity: str, room_name: str) -> str:
-    return (
-        api.AccessToken()
-        .with_identity(identity)
-        .with_name(identity)
-        .with_grants(
-            api.VideoGrants(
-                room_join=True,
-                room=room_name,
-            )
-        )
-        .to_jwt()
-    )
-
-
-def unique_room_name(base: str) -> str:
-    return f"{base}-{uuid.uuid4().hex[:8]}"
 
 
 async def _wait_until(
@@ -149,7 +123,7 @@ def _expect_event(
     loop = asyncio.get_running_loop()
     fut: asyncio.Future = loop.create_future()
 
-    def _on_event(*args, **kwargs) -> None:
+    def _on_event(*args: Any, **kwargs: Any) -> None:
         if fut.done():
             return
         if predicate is None or predicate(*args, **kwargs):
@@ -248,7 +222,7 @@ _H264_MACOS_ENABLED = os.getenv("LIVEKIT_TEST_H264_MACOS") == "1"
 _IS_MACOS = sys.platform == "darwin"
 
 
-@skip_if_no_credentials()
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "video_codec, codec_name, mode",

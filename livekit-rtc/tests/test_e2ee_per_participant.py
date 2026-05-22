@@ -18,12 +18,17 @@ from __future__ import annotations
 
 import asyncio
 import os
-import uuid
-from typing import Any, Callable, TypeVar
 
 import pytest
 
-from livekit import api, rtc
+from livekit import rtc
+
+from utils import (  # type: ignore[import-not-found]
+    assert_eventually,
+    create_token,
+    skip_if_no_credentials,
+    unique_room_name,
+)
 
 
 # Per-participant keys (publisher identity → list of (key_bytes, key_index))
@@ -36,51 +41,6 @@ PUBLISHER_KEYS: list[tuple[bytes, int]] = [
 
 WIDTH, HEIGHT = 320, 180
 FRAME_RATE = 15
-
-T = TypeVar("T")
-
-
-def skip_if_no_credentials() -> Any:
-    required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
-    missing = [var for var in required_vars if not os.getenv(var)]
-    return pytest.mark.skipif(
-        bool(missing), reason=f"Missing environment variables: {', '.join(missing)}"
-    )
-
-
-def create_token(identity: str, room_name: str) -> str:
-    return (
-        api.AccessToken()
-        .with_identity(identity)
-        .with_name(identity)
-        .with_grants(
-            api.VideoGrants(
-                room_join=True,
-                room=room_name,
-            )
-        )
-        .to_jwt()
-    )
-
-
-def unique_room_name(base: str) -> str:
-    return f"{base}-{uuid.uuid4().hex[:8]}"
-
-
-async def assert_eventually(
-    condition: Callable[[], T],
-    timeout: float = 15.0,
-    interval: float = 0.1,
-    message: str = "Condition not met within timeout",
-) -> T:
-    deadline = asyncio.get_event_loop().time() + timeout
-    last_result = None
-    while asyncio.get_event_loop().time() < deadline:
-        last_result = condition()
-        if last_result:
-            return last_result
-        await asyncio.sleep(interval)
-    raise AssertionError(f"{message} (last result: {last_result})")
 
 
 def make_per_participant_e2ee_options() -> rtc.E2EEOptions:
