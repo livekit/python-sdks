@@ -14,17 +14,19 @@
 
 """End-to-end video publish/subscribe tests."""
 
+from __future__ import annotations
+
 import asyncio
 import os
 import struct
-import uuid
 import zlib
 from pathlib import Path
 
 import numpy as np
-import pytest
 
-from livekit import api, rtc
+from livekit import rtc
+
+from utils import create_token, skip_if_no_credentials, unique_room_name
 
 
 VIDEO_WIDTH = 640
@@ -39,33 +41,6 @@ VIDEO_COLOR_SEQUENCE: list[tuple[str, tuple[int, int, int]]] = [
     ("white", (255, 255, 255)),
     ("black", (0, 0, 0)),
 ]
-
-
-def skip_if_no_credentials():
-    required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
-    missing = [var for var in required_vars if not os.getenv(var)]
-    return pytest.mark.skipif(
-        bool(missing), reason=f"Missing environment variables: {', '.join(missing)}"
-    )
-
-
-def create_token(identity: str, room_name: str) -> str:
-    return (
-        api.AccessToken()
-        .with_identity(identity)
-        .with_name(identity)
-        .with_grants(
-            api.VideoGrants(
-                room_join=True,
-                room=room_name,
-            )
-        )
-        .to_jwt()
-    )
-
-
-def unique_room_name(base: str) -> str:
-    return f"{base}-{uuid.uuid4().hex[:8]}"
 
 
 def _solid_color_rgba_frame(width: int, height: int, rgb: tuple[int, int, int]) -> rtc.VideoFrame:
@@ -129,7 +104,7 @@ def _save_rgba_frame_as_png(frame_rgba: np.ndarray, path: Path) -> None:
 class TestVideoStreamPublishSubscribe:
     """End-to-end: publish a 640x480 color-cycle video and verify colors on the subscriber."""
 
-    async def test_video_stream_publish_subscribe(self):
+    async def test_video_stream_publish_subscribe(self) -> None:
         """Publish red/green/blue/white/black (1s each, 15fps) and verify color sequence."""
         url = os.environ["LIVEKIT_URL"]
         room_name = unique_room_name("test-video-colors")
@@ -148,7 +123,7 @@ class TestVideoStreamPublishSubscribe:
             track: rtc.Track,
             publication: rtc.RemoteTrackPublication,
             participant: rtc.RemoteParticipant,
-        ):
+        ) -> None:
             nonlocal subscribed_track
             if track.kind == rtc.TrackKind.KIND_VIDEO:
                 subscribed_track = track
