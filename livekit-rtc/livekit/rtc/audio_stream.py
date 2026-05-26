@@ -260,9 +260,6 @@ class AudioStream:
         self._processor._on_credentials_updated(token=token, url=url)
 
     def __del__(self) -> None:
-        if self._processor is not None and not self._processor_leave_open:
-            self._processor._close()
-
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     def _create_owned_stream(self) -> Any:
@@ -336,6 +333,8 @@ class AudioStream:
         This method cleans up resources associated with the audio stream and waits for
         any pending operations to complete.
         """
+        if self._processor is not None and not self._processor_leave_open:
+            self._processor._close()
         if self._track is not None:
             self._track._unregister_audio_stream(self)
         self._ffi_handle.dispose()
