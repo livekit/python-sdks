@@ -65,6 +65,8 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        *,
+        noise_cancellation_leave_open: bool = False,
         **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -81,6 +83,9 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
+            noise_cancellation_leave_open (bool):
+                When the audio stream closes, leaves the FrameProcessor in an unclosed state so it
+                can be used with another AudioStream.
 
         Example:
             ```python
@@ -113,11 +118,13 @@ class AudioStream:
         self._audio_filter_module: str | None = None
         self._audio_filter_options: dict[str, Any] | None = None
         self._processor: FrameProcessor[AudioFrame] | None = None
+        self._processor_leave_open = False
         if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
         elif isinstance(noise_cancellation, FrameProcessor):
             self._processor = noise_cancellation
+            self._processor_leave_open = noise_cancellation_leave_open
 
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
@@ -253,6 +260,9 @@ class AudioStream:
         self._processor._on_credentials_updated(token=token, url=url)
 
     def __del__(self) -> None:
+        if self._processor is not None and not self._processor_leave_open:
+            self._processor._close()
+
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     def _create_owned_stream(self) -> Any:
