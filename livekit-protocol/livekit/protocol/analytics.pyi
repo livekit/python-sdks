@@ -1,9 +1,9 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from . import models as _models
 from . import egress as _egress
 from . import ingress as _ingress
-from . import sip as _sip
+from . import models as _models
 from . import room as _room
+from . import sip as _sip
 from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -364,9 +364,11 @@ class FeatureUsageInfo(_message.Message):
         KRISP_NOISE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
         KRISP_BACKGROUND_VOICE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
         AIC_AUDIO_ENHANCEMENT: _ClassVar[FeatureUsageInfo.Feature]
+        KRISP_VIVA: _ClassVar[FeatureUsageInfo.Feature]
     KRISP_NOISE_CANCELLATION: FeatureUsageInfo.Feature
     KRISP_BACKGROUND_VOICE_CANCELLATION: FeatureUsageInfo.Feature
     AIC_AUDIO_ENHANCEMENT: FeatureUsageInfo.Feature
+    KRISP_VIVA: FeatureUsageInfo.Feature
     class FeatureInfoEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
