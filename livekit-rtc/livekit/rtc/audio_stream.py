@@ -65,7 +65,6 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        *,
         noise_cancellation_leave_open: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -206,6 +205,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        noise_cancellation_leave_open: bool = False,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -215,9 +215,12 @@ class AudioStream:
             capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
             sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
-            noise_cancellation (Optional[NoiseCancellationOptions], optional):
-                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+            noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
+            noise_cancellation_leave_open (bool):
+                When the audio stream closes, leaves the FrameProcessor in an unclosed state so it
+                can be used with another AudioStream.
 
         Returns:
             AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
@@ -237,8 +240,9 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
-            noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
+            noise_cancellation=noise_cancellation,
+            noise_cancellation_leave_open=noise_cancellation_leave_open,
         )
 
     def _on_processor_stream_info_updated(
