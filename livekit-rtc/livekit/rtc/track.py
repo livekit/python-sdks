@@ -61,10 +61,14 @@ class Track:
     def _push_processor_metadata_to_stream(self, stream: AudioStream, room: Optional[Room]) -> None:
         if room is None:
             # track left a room — clear processor's room context
+            # FIXME: This isn't really good, and I can't figure out what should happen here
+            # Closing the processor doesn't work (the track could get added to another room later)
+            # Empty values like this don't work, because it causes a drm::Error in the plugin
+            # Talk to lukas about this in a 1:1 and see if he can think of anything better
             stream._on_processor_stream_info_updated(
                 room_name="", participant_identity="", publication_sid=""
             )
-            stream._on_processor_credentials_updated(token="", url="")
+            # stream._on_processor_credentials_updated(token="", url="")
             return
 
         identity = ""
