@@ -87,8 +87,7 @@ class AudioStream:
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
             room (Optional[Room], optional): The room this stream's track belongs to, used to
-                resolve `room_name`, `participant_identity`, and `publication_sid`. May be `None`
-                if the track is not (yet) associated with a room.
+                resolve metadata required to properly initialize an associated FrameProcessor.
 
         Example:
             ```python
