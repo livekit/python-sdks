@@ -83,9 +83,9 @@ class Track:
             else:
                 local = room._local_participant
                 if local is not None:
-                    for publication in local.track_publications.values():
-                        if publication.sid == track_sid:
-                            identity, pub_sid = local.identity, publication.sid
+                    for local_publication in local.track_publications.values():
+                        if local_publication.sid == track_sid:
+                            identity, pub_sid = local.identity, local_publication.sid
                             break
 
         stream._on_processor_stream_info_updated(
