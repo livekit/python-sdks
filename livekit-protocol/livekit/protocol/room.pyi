@@ -99,12 +99,14 @@ class ListParticipantsResponse(_message.Message):
     def __init__(self, participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ...) -> None: ...
 
 class RoomParticipantIdentity(_message.Message):
-    __slots__ = ("room", "identity")
+    __slots__ = ("room", "identity", "revoke_token_ts")
     ROOM_FIELD_NUMBER: _ClassVar[int]
     IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    REVOKE_TOKEN_TS_FIELD_NUMBER: _ClassVar[int]
     room: str
     identity: str
-    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ...) -> None: ...
+    revoke_token_ts: int
+    def __init__(self, room: _Optional[str] = ..., identity: _Optional[str] = ..., revoke_token_ts: _Optional[int] = ...) -> None: ...
 
 class RemoveParticipantResponse(_message.Message):
     __slots__ = ()
