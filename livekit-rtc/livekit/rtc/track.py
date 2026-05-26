@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import weakref
 from typing import TYPE_CHECKING, List, Optional, Union
 from ._ffi_client import FfiHandle, FfiClient
@@ -30,24 +32,24 @@ class Track:
     def __init__(self, owned_info: proto_track.OwnedTrack):
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
-        self._room_ref: "Optional[weakref.ref[Room]]" = None
-        self._audio_streams: "weakref.WeakSet[AudioStream]" = weakref.WeakSet()
+        self._room_ref: Optional[weakref.ref[Room]] = None
+        self._audio_streams: weakref.WeakSet[AudioStream] = weakref.WeakSet()
 
-    def _resolve_room(self) -> Optional["Room"]:
+    def _resolve_room(self) -> Optional[Room]:
         return self._room_ref() if self._room_ref is not None else None
 
-    def _set_room(self, room: Optional["Room"]) -> None:
+    def _set_room(self, room: Optional[Room]) -> None:
         self._room_ref = weakref.ref(room) if room is not None else None
         for stream in self._audio_streams:
             stream._set_room(room)
 
-    def _register_audio_stream(self, stream: "AudioStream") -> None:
+    def _register_audio_stream(self, stream: AudioStream) -> None:
         self._audio_streams.add(stream)
         room = self._resolve_room()
         if room is not None:
             stream._set_room(room)
 
-    def _unregister_audio_stream(self, stream: "AudioStream") -> None:
+    def _unregister_audio_stream(self, stream: AudioStream) -> None:
         self._audio_streams.discard(stream)
 
     @property

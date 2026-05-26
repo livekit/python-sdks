@@ -69,7 +69,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional["Room"] = None,
+        room: Optional[Room] = None,
         **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -106,7 +106,7 @@ class AudioStream:
             ```
         """
         self._track: Track | None = track
-        self._room_ref: "Optional[weakref.ref[Room]]" = None
+        self._room_ref: Optional[weakref.ref[Room]] = None
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
@@ -158,7 +158,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional["Room"] = None,
+        room: Optional[Room] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -210,7 +210,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional["Room"] = None,
+        room: Optional[Room] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -247,7 +247,7 @@ class AudioStream:
             room=room,
         )
 
-    def _set_room(self, room: Optional["Room"]) -> None:
+    def _set_room(self, room: Optional[Room]) -> None:
         old_room = self._resolve_room()
         if old_room is not room:
             if old_room is not None:
@@ -276,7 +276,7 @@ class AudioStream:
             return
         self._processor._on_credentials_updated(token=room._token, url=room._server_url)
 
-    def _resolve_room(self) -> Optional["Room"]:
+    def _resolve_room(self) -> Optional[Room]:
         return self._room_ref() if self._room_ref is not None else None
 
     def _find_publication(self) -> Optional[tuple[str, str]]:
