@@ -16,9 +16,8 @@ from __future__ import annotations
 
 import asyncio
 import json
-import weakref
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, AsyncIterator, Optional
+from typing import Any, AsyncIterator, Optional
 
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -30,9 +29,6 @@ from .log import logger
 from .participant import Participant
 from .track import Track
 from .frame_processor import FrameProcessor
-
-if TYPE_CHECKING:
-    from .room import Room
 
 
 @dataclass
@@ -69,7 +65,6 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional[Room] = None,
         **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -86,8 +81,6 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
-            room (Optional[Room], optional): The room this stream's track belongs to, used to
-                resolve metadata required to properly initialize an associated FrameProcessor.
 
         Example:
             ```python
@@ -105,7 +98,6 @@ class AudioStream:
             ```
         """
         self._track: Track | None = track
-        self._room_ref: Optional[weakref.ref[Room]] = None
         self._sample_rate = sample_rate
         self._num_channels = num_channels
         self._frame_size_ms = frame_size_ms
@@ -140,8 +132,6 @@ class AudioStream:
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
 
-        self._set_room(room)
-
         if self._track is not None:
             self._track._register_audio_stream(self)
 
@@ -157,7 +147,6 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional[Room] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -195,7 +184,6 @@ class AudioStream:
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
-            room=room,
         )
 
     @classmethod
@@ -209,7 +197,6 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        room: Optional[Room] = None,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -243,58 +230,27 @@ class AudioStream:
             num_channels=num_channels,
             noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
-            room=room,
         )
 
-    def _set_room(self, room: Optional[Room]) -> None:
-        old_room = self._resolve_room()
-        if old_room is not room:
-            if old_room is not None:
-                old_room.off("token_refreshed", self._on_room_token_refreshed)
-            if room is not None:
-                room.on("token_refreshed", self._on_room_token_refreshed)
-
-        self._room_ref = weakref.ref(room) if room is not None else None
-
-        if self._processor and room is not None:
-            if room._token is not None and room._server_url is not None:
-                self._processor._on_credentials_updated(token=room._token, url=room._server_url)
-
-            participant_identity, publication_sid = self._find_publication() or ("", "")
-            self._processor._on_stream_info_updated(
-                room_name=room.name,
-                participant_identity=participant_identity,
-                publication_sid=publication_sid,
-            )
-
-    def _on_room_token_refreshed(self) -> None:
+    def _on_processor_stream_info_updated(
+        self,
+        *,
+        room_name: str,
+        participant_identity: str,
+        publication_sid: str,
+    ) -> None:
         if self._processor is None:
             return
-        room = self._resolve_room()
-        if room is None or room._token is None or room._server_url is None:
+        self._processor._on_stream_info_updated(
+            room_name=room_name,
+            participant_identity=participant_identity,
+            publication_sid=publication_sid,
+        )
+
+    def _on_processor_credentials_updated(self, *, token: str, url: str) -> None:
+        if self._processor is None:
             return
-        self._processor._on_credentials_updated(token=room._token, url=room._server_url)
-
-    def _resolve_room(self) -> Optional[Room]:
-        return self._room_ref() if self._room_ref is not None else None
-
-    def _find_publication(self) -> Optional[tuple[str, str]]:
-        room = self._resolve_room()
-        if room is None or self._track is None:
-            return None
-        track_sid = self._track.sid
-        if not track_sid:
-            return None
-        for participant in room.remote_participants.values():
-            publication = participant.track_publications.get(track_sid)
-            if publication is not None:
-                return participant.identity, publication.sid
-        local = room._local_participant
-        if local is not None:
-            for publication in local.track_publications.values():
-                if publication.sid == track_sid:
-                    return local.identity, publication.sid
-        return None
+        self._processor._on_credentials_updated(token=token, url=url)
 
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -372,7 +328,6 @@ class AudioStream:
         """
         if self._track is not None:
             self._track._unregister_audio_stream(self)
-        self._set_room(None)
         self._ffi_handle.dispose()
         await self._task
 

@@ -39,15 +39,64 @@ class Track:
         return self._room_ref() if self._room_ref is not None else None
 
     def _set_room(self, room: Optional[Room]) -> None:
+        old_room = self._resolve_room()
+        if old_room is not room:
+            if old_room is not None:
+                old_room.off("token_refreshed", self._on_room_token_refreshed)
+            if room is not None:
+                room.on("token_refreshed", self._on_room_token_refreshed)
+
         self._room_ref = weakref.ref(room) if room is not None else None
+
         for stream in self._audio_streams:
-            stream._set_room(room)
+            self._push_processor_metadata_to_stream(stream, room)
+
+    def _on_room_token_refreshed(self) -> None:
+        room = self._resolve_room()
+        if room is None or room._token is None or room._server_url is None:
+            return
+        for stream in self._audio_streams:
+            stream._on_processor_credentials_updated(token=room._token, url=room._server_url)
+
+    def _push_processor_metadata_to_stream(self, stream: AudioStream, room: Optional[Room]) -> None:
+        if room is None:
+            # track left a room — clear processor's room context
+            stream._on_processor_stream_info_updated(
+                room_name="", participant_identity="", publication_sid=""
+            )
+            stream._on_processor_credentials_updated(token="", url="")
+            return
+
+        identity = ""
+        pub_sid = ""
+        track_sid = self.sid
+        if track_sid:
+            for participant in room.remote_participants.values():
+                publication = participant.track_publications.get(track_sid)
+                if publication is not None:
+                    identity, pub_sid = participant.identity, publication.sid
+                    break
+            else:
+                local = room._local_participant
+                if local is not None:
+                    for publication in local.track_publications.values():
+                        if publication.sid == track_sid:
+                            identity, pub_sid = local.identity, publication.sid
+                            break
+
+        stream._on_processor_stream_info_updated(
+            room_name=room.name,
+            participant_identity=identity,
+            publication_sid=pub_sid,
+        )
+        if room._token is not None and room._server_url is not None:
+            stream._on_processor_credentials_updated(token=room._token, url=room._server_url)
 
     def _register_audio_stream(self, stream: AudioStream) -> None:
         self._audio_streams.add(stream)
         room = self._resolve_room()
         if room is not None:
-            stream._set_room(room)
+            self._push_processor_metadata_to_stream(stream, room)
 
     def _unregister_audio_stream(self, stream: AudioStream) -> None:
         self._audio_streams.discard(stream)
