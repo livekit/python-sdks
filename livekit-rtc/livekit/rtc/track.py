@@ -56,19 +56,18 @@ class Track:
         if room is None or room._token is None or room._server_url is None:
             return
         for stream in self._audio_streams:
-            stream._on_processor_credentials_updated(token=room._token, url=room._server_url)
+            if not stream._processor:
+                continue
+            stream._processor._on_credentials_updated(token=room._token, url=room._server_url)
 
     def _push_processor_metadata_to_stream(self, stream: AudioStream, room: Optional[Room]) -> None:
+        if not stream._processor:
+            return
+
         if room is None:
             # track left a room — clear processor's room context
-            # FIXME: This isn't really good, and I can't figure out what should happen here
-            # Closing the processor doesn't work (the track could get added to another room later)
-            # Empty values like this don't work, because it causes a drm::Error in the plugin
-            # Talk to lukas about this in a 1:1 and see if he can think of anything better
-            stream._on_processor_stream_info_updated(
-                room_name="", participant_identity="", publication_sid=""
-            )
-            # stream._on_processor_credentials_updated(token="", url="")
+            stream._processor._on_stream_info_cleared()
+            stream._processor._on_credentials_cleared()
             return
 
         identity = ""
@@ -88,13 +87,13 @@ class Track:
                             identity, pub_sid = local.identity, local_publication.sid
                             break
 
-        stream._on_processor_stream_info_updated(
+        stream._processor._on_stream_info_updated(
             room_name=room.name,
             participant_identity=identity,
             publication_sid=pub_sid,
         )
         if room._token is not None and room._server_url is not None:
-            stream._on_processor_credentials_updated(token=room._token, url=room._server_url)
+            stream._processor._on_credentials_updated(token=room._token, url=room._server_url)
 
     def _register_audio_stream(self, stream: AudioStream) -> None:
         self._audio_streams.add(stream)

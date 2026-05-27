@@ -245,26 +245,6 @@ class AudioStream:
             noise_cancellation_leave_open=noise_cancellation_leave_open,
         )
 
-    def _on_processor_stream_info_updated(
-        self,
-        *,
-        room_name: str,
-        participant_identity: str,
-        publication_sid: str,
-    ) -> None:
-        if self._processor is None:
-            return
-        self._processor._on_stream_info_updated(
-            room_name=room_name,
-            participant_identity=participant_identity,
-            publication_sid=publication_sid,
-        )
-
-    def _on_processor_credentials_updated(self, *, token: str, url: str) -> None:
-        if self._processor is None:
-            return
-        self._processor._on_credentials_updated(token=token, url=url)
-
     def __del__(self) -> None:
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
