@@ -319,12 +319,12 @@ class AudioStream:
         This method cleans up resources associated with the audio stream and waits for
         any pending operations to complete.
         """
-        if self._processor is not None and not self._processor_leave_open:
-            self._processor._close()
         if self._track is not None:
             self._track._unregister_audio_stream(self)
         self._ffi_handle.dispose()
         await self._task
+        if self._processor is not None and not self._processor_leave_open:
+            self._processor._close()
 
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.audio_stream_event.stream_handle == self._ffi_handle.handle

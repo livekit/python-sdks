@@ -65,7 +65,7 @@ class Track:
             return
 
         if room is None:
-            # track left a room — clear processor's room context
+            # track left a room - clear processor's room context
             stream._processor._on_stream_info_cleared()
             stream._processor._on_credentials_cleared()
             return
