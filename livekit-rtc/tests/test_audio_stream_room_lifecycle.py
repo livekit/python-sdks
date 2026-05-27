@@ -15,11 +15,14 @@ from __future__ import annotations
 import asyncio
 import weakref
 from types import SimpleNamespace
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import pytest
 
 from livekit import rtc
+from livekit.rtc._proto import participant_pb2 as proto_participant
+from livekit.rtc._proto import room_pb2 as proto_room
+from livekit.rtc._proto import track_pb2 as proto_track
 from livekit.rtc.event_emitter import EventEmitter
 
 
@@ -30,7 +33,7 @@ def _make_room(name: str = "room-x", token: str = "tok-x", url: str = "wss://x")
     """Build a real `rtc.Room` via __new__, injecting just the fields Track reads."""
     room = rtc.Room.__new__(rtc.Room)
     EventEmitter.__init__(room)
-    room._info = SimpleNamespace(name=name)
+    room._info = proto_room.RoomInfo(name=name)
     room._token = token
     room._server_url = url
     room._remote_participants = {}
@@ -41,21 +44,21 @@ def _make_room(name: str = "room-x", token: str = "tok-x", url: str = "wss://x")
 
 def _make_remote_participant(identity: str) -> rtc.RemoteParticipant:
     p = rtc.RemoteParticipant.__new__(rtc.RemoteParticipant)
-    p._info = SimpleNamespace(identity=identity)
+    p._info = proto_participant.ParticipantInfo(identity=identity)
     p._track_publications = {}
     return p
 
 
 def _make_remote_publication(sid: str) -> rtc.RemoteTrackPublication:
     pub = rtc.RemoteTrackPublication.__new__(rtc.RemoteTrackPublication)
-    pub._info = SimpleNamespace(sid=sid)
+    pub._info = proto_track.TrackPublicationInfo(sid=sid)
     return pub
 
 
 def _make_track(sid: str = "TR_x") -> rtc.Track:
     track = rtc.Track.__new__(rtc.Track)
-    track._info = SimpleNamespace(sid=sid)
-    track._ffi_handle = None
+    track._info = proto_track.TrackInfo(sid=sid)
+    track._ffi_handle = cast(Any, None)
     track._room_ref = None
     track._audio_streams = weakref.WeakSet()
     return track
@@ -73,7 +76,7 @@ def _make_stream(
     processor: Optional[rtc.FrameProcessor[rtc.AudioFrame]] = None,
 ) -> rtc.AudioStream:
     """Build an AudioStream without going through the FFI-touching __init__."""
-    stream: Any = rtc.AudioStream.__new__(rtc.AudioStream)
+    stream = rtc.AudioStream.__new__(rtc.AudioStream)
     stream._track = track
     stream._processor = processor
     stream._audio_filter_module = None
@@ -92,11 +95,9 @@ def _make_closeable_stream(
 ) -> rtc.AudioStream:
     """Extends _make_stream with the minimal state `aclose()` touches."""
     stream = _make_stream(track=track, processor=processor)
-    stream._processor_leave_open = leave_open  # type: ignore[attr-defined]
-    fut = asyncio.get_event_loop().create_future()
-    fut.set_result(None)
-    stream._task = fut  # type: ignore[attr-defined]
-    stream._ffi_handle = SimpleNamespace(dispose=lambda: None)  # type: ignore[attr-defined]
+    stream._processor_leave_open = leave_open
+    stream._task = asyncio.ensure_future(asyncio.sleep(0))
+    stream._ffi_handle = cast(Any, SimpleNamespace(dispose=lambda: None))
     return stream
 
 
