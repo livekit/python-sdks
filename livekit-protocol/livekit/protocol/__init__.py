@@ -1,6 +1,7 @@
 from . import agent
 from . import agent_pb
 from . import agent_dispatch
+from . import agent_worker
 from . import analytics
 from . import egress
 from . import ingress
@@ -16,6 +17,7 @@ __all__ = [
     "agent",
     "agent_pb",
     "agent_dispatch",
+    "agent_worker",
     "analytics",
     "egress",
     "ingress",
