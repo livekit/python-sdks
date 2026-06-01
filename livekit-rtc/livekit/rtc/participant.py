@@ -799,8 +799,12 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self._track_publications.pop(track_sid)
-            publication._track = None
+            # The local_track_unpublished room event may have already removed
+            # this publication from the dict (the FFI event and this async
+            # response race during teardown), so pop defensively.
+            publication = self._track_publications.pop(track_sid, None)
+            if publication is not None:
+                publication._track = None
             queue.task_done()
         finally:
             self._room_queue.unsubscribe(queue)
