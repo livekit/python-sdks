@@ -33,6 +33,7 @@ protoc \
     $API_PROTOCOL/livekit_models.proto \
     $API_PROTOCOL/livekit_agent.proto \
     $API_PROTOCOL/livekit_agent_dispatch.proto \
+    $API_PROTOCOL/livekit_agent_worker.proto \
     $API_PROTOCOL/livekit_metrics.proto \
     $API_PROTOCOL/livekit_sip.proto \
     $API_PROTOCOL/livekit_analytics.proto \
@@ -72,6 +73,8 @@ mv "$API_OUT_PYTHON/livekit_agent_pb2.py" "$API_OUT_PYTHON/agent.py"
 mv "$API_OUT_PYTHON/livekit_agent_pb2.pyi" "$API_OUT_PYTHON/agent.pyi"
 mv "$API_OUT_PYTHON/livekit_agent_dispatch_pb2.py" "$API_OUT_PYTHON/agent_dispatch.py"
 mv "$API_OUT_PYTHON/livekit_agent_dispatch_pb2.pyi" "$API_OUT_PYTHON/agent_dispatch.pyi"
+mv "$API_OUT_PYTHON/livekit_agent_worker_pb2.py" "$API_OUT_PYTHON/agent_worker.py"
+mv "$API_OUT_PYTHON/livekit_agent_worker_pb2.pyi" "$API_OUT_PYTHON/agent_worker.pyi"
 mv "$API_OUT_PYTHON/livekit_analytics_pb2.py" "$API_OUT_PYTHON/analytics.py"
 mv "$API_OUT_PYTHON/livekit_analytics_pb2.pyi" "$API_OUT_PYTHON/analytics.pyi"
 mv "$API_OUT_PYTHON/livekit_sip_pb2.py" "$API_OUT_PYTHON/sip.py"

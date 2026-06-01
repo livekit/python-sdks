@@ -15,7 +15,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import descriptor_pb2 as google_dot_protobuf_dot_descriptor__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto*W\n\x0bSensitivity\x12\x1b\n\x17SENSITIVITY_UNSPECIFIED\x10\x00\x12\x13\n\x0fSENSITIVITY_PII\x10\x01\x12\x16\n\x12SENSITIVITY_SECRET\x10\x02:5\n\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\x86\n \x01(\t:,\n\x04name\x12\x1d.google.protobuf.FieldOptions\x18\x87\n \x01(\t:H\n\x0bsensitivity\x12\x1d.google.protobuf.FieldOptions\x18\x88\n \x01(\x0e\x32\x13.logger.SensitivityBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:.\n\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\x85\n \x01(\x08:5\n\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\x86\n \x01(\t:,\n\x04name\x12\x1d.google.protobuf.FieldOptions\x18\x87\n \x01(\tBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,6 +23,4 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'logger.options_pb2', _globa
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z*github.com/livekit/protocol/livekit/logger\252\002\rLiveKit.Proto\352\002\016LiveKit::Proto'
-  _globals['_SENSITIVITY']._serialized_start=66
-  _globals['_SENSITIVITY']._serialized_end=153
 # @@protoc_insertion_point(module_scope)
