@@ -26,6 +26,7 @@ from livekit import rtc
 from utils import (  # type: ignore[import-not-found]
     assert_eventually,
     create_token,
+    publish_dummy_video,
     skip_if_no_credentials,
     unique_room_name,
 )
@@ -66,23 +67,6 @@ def set_key_index_on_all_cryptors(room: rtc.Room, key_index: int) -> None:
     """Equivalent of dart's e2eeManager.setKeyIndex(idx): apply to every cryptor."""
     for cryptor in room.e2ee_manager.frame_cryptors():
         cryptor.set_key_index(key_index)
-
-
-async def publish_dummy_video(source: rtc.VideoSource, stop_event: asyncio.Event) -> None:
-    """Continuously publish frames until stop_event is set."""
-    pixel_count = WIDTH * HEIGHT
-    frame_idx = 0
-    while not stop_event.is_set():
-        fill = frame_idx % 256
-        pixel = bytes((255, fill, (fill + 85) % 256, (fill + 170) % 256))
-        buf = pixel * pixel_count
-        frame = rtc.VideoFrame(WIDTH, HEIGHT, rtc.VideoBufferType.ARGB, buf)
-        source.capture_frame(frame)
-        frame_idx += 1
-        try:
-            await asyncio.wait_for(stop_event.wait(), timeout=1.0 / FRAME_RATE)
-        except asyncio.TimeoutError:
-            pass
 
 
 @pytest.mark.asyncio

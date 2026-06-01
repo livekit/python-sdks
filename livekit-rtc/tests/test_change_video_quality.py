@@ -42,20 +42,25 @@ import asyncio
 import os
 import sys
 import time
-from typing import Any, Callable, Optional, Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 import pytest
 
 from livekit import rtc
 from livekit.rtc._proto.track_publication_pb2 import VideoQuality
-from livekit.rtc.room import EventTypes
 
-from utils import create_token, skip_if_no_credentials, unique_room_name  # type: ignore[import-not-found]
+from utils import (  # type: ignore[import-not-found]
+    await_event,
+    create_token,
+    ensure_rooms_all_connected,
+    ensure_track_subscribed,
+    expect_room_event,
+    skip_if_no_credentials,
+    unique_room_name,
+)
 
 
-WAIT_TIMEOUT = 30.0
-WAIT_INTERVAL = 0.1
 PUBLISH_WIDTH = 1280
 PUBLISH_HEIGHT = 720
 PUBLISH_FPS = 15
@@ -72,73 +77,6 @@ QUALITY_SEQUENCE = [
     (VideoQuality.VIDEO_QUALITY_LOW, "q"),
     (VideoQuality.VIDEO_QUALITY_MEDIUM, "h"),
 ]
-
-
-async def _wait_until(
-    predicate: Callable[[], bool],
-    *,
-    timeout: float = WAIT_TIMEOUT,
-    interval: float = WAIT_INTERVAL,
-    message: str = "condition not met",
-) -> None:
-    loop = asyncio.get_running_loop()
-    deadline = loop.time() + timeout
-    while loop.time() < deadline:
-        if predicate():
-            return
-        await asyncio.sleep(interval)
-    raise AssertionError(f"timeout waiting: {message}")
-
-
-async def _ensure_all_connected(rooms: list[rtc.Room]) -> None:
-    await _wait_until(
-        lambda: all(r.connection_state == rtc.ConnectionState.CONN_CONNECTED for r in rooms),
-        message="not all rooms reached CONN_CONNECTED",
-    )
-
-
-async def _ensure_track_subscribed(room: rtc.Room, track_sid: str) -> rtc.RemoteTrackPublication:
-    holder: dict[str, rtc.RemoteTrackPublication] = {}
-
-    def _has_subscribed() -> bool:
-        for participant in room.remote_participants.values():
-            pub = participant.track_publications.get(track_sid)
-            if pub is not None and pub.subscribed and pub.track is not None:
-                holder["pub"] = pub
-                return True
-        return False
-
-    await _wait_until(
-        _has_subscribed,
-        message=f"room did not subscribe to track {track_sid}",
-    )
-    return holder["pub"]
-
-
-def _expect_event(
-    room: rtc.Room,
-    event: EventTypes,
-    predicate: Optional[Callable[..., bool]] = None,
-) -> asyncio.Future:
-    loop = asyncio.get_running_loop()
-    fut: asyncio.Future = loop.create_future()
-
-    def _on_event(*args: Any, **kwargs: Any) -> None:
-        if fut.done():
-            return
-        if predicate is None or predicate(*args, **kwargs):
-            fut.set_result(args)
-            room.off(event, _on_event)
-
-    room.on(event, _on_event)
-    return fut
-
-
-async def _await_event(fut: asyncio.Future, timeout: float = WAIT_TIMEOUT) -> None:
-    try:
-        await asyncio.wait_for(fut, timeout=timeout)
-    except asyncio.TimeoutError as e:
-        raise AssertionError("timed out waiting for event") from e
 
 
 def _make_rolling_i420(width: int, height: int, t: float) -> rtc.VideoFrame:
@@ -259,7 +197,7 @@ async def test_simulcast_quality_layers(
     sender, receiver = rtc.Room(), rtc.Room()
     await sender.connect(url, create_token("sender", room_name))
     await receiver.connect(url, create_token("receiver", room_name))
-    await _ensure_all_connected([sender, receiver])
+    await ensure_rooms_all_connected([sender, receiver])
 
     source = rtc.VideoSource(PUBLISH_WIDTH, PUBLISH_HEIGHT)
     track = rtc.LocalVideoTrack.create_video_track(f"{mode}-{codec_name}", source)
@@ -282,13 +220,13 @@ async def test_simulcast_quality_layers(
 
     stream: Optional[rtc.VideoStream] = None
     try:
-        track_published = _expect_event(
+        track_published = expect_room_event(
             receiver,
             "track_published",
             predicate=lambda pub, _p: pub.kind == rtc.TrackKind.KIND_VIDEO,
         )
         local_pub = await sender.local_participant.publish_track(track, options)
-        await _await_event(track_published)
+        await await_event(track_published)
 
         print(
             f"[{codec_name}] local_pub: sid={local_pub.sid} "
@@ -296,7 +234,7 @@ async def test_simulcast_quality_layers(
             f"mime_type={local_pub.mime_type} "
             f"{local_pub.width}x{local_pub.height}"
         )
-        remote_pub = await _ensure_track_subscribed(receiver, local_pub.sid)
+        remote_pub = await ensure_track_subscribed(receiver, local_pub.sid)
         assert remote_pub.track is not None
         print(
             f"[{codec_name}] remote_pub: sid={remote_pub.sid} "
