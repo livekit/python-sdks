@@ -65,7 +65,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        noise_cancellation_leave_open: bool = False,
+        auto_close_noise_cancellation: bool = True,
         **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
@@ -82,9 +82,9 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
-            noise_cancellation_leave_open (bool):
-                When the audio stream closes, leaves the FrameProcessor in an unclosed state so it
-                can be used with another AudioStream.
+            auto_close_noise_cancellation (bool):
+                When the audio stream closes, should the FrameProcessor's close method be run? If
+                False, then the frame processor can be reused with another AudioStream.
 
         Example:
             ```python
@@ -117,13 +117,13 @@ class AudioStream:
         self._audio_filter_module: str | None = None
         self._audio_filter_options: dict[str, Any] | None = None
         self._processor: FrameProcessor[AudioFrame] | None = None
-        self._processor_leave_open = False
+        self._processor_auto_close = True
         if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
         elif isinstance(noise_cancellation, FrameProcessor):
             self._processor = noise_cancellation
-            self._processor_leave_open = noise_cancellation_leave_open
+            self._processor_auto_close = auto_close_noise_cancellation
 
         self._task = self._loop.create_task(self._run())
         self._task.add_done_callback(task_done_logger)
@@ -153,7 +153,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        noise_cancellation_leave_open: bool = False,
+        auto_close_noise_cancellation: bool = False,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -191,7 +191,7 @@ class AudioStream:
             num_channels=num_channels,
             frame_size_ms=frame_size_ms,
             noise_cancellation=noise_cancellation,
-            noise_cancellation_leave_open=noise_cancellation_leave_open,
+            auto_close_noise_cancellation=auto_close_noise_cancellation,
         )
 
     @classmethod
@@ -205,7 +205,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        noise_cancellation_leave_open: bool = False,
+        auto_close_noise_cancellation: bool = False,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -218,7 +218,7 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
-            noise_cancellation_leave_open (bool):
+            auto_close_noise_cancellation (bool):
                 When the audio stream closes, leaves the FrameProcessor in an unclosed state so it
                 can be used with another AudioStream.
 
@@ -242,7 +242,7 @@ class AudioStream:
             num_channels=num_channels,
             frame_size_ms=frame_size_ms,
             noise_cancellation=noise_cancellation,
-            noise_cancellation_leave_open=noise_cancellation_leave_open,
+            auto_close_noise_cancellation=auto_close_noise_cancellation,
         )
 
     def __del__(self) -> None:
@@ -323,7 +323,7 @@ class AudioStream:
             self._track._unregister_audio_stream(self)
         self._ffi_handle.dispose()
         await self._task
-        if self._processor is not None and not self._processor_leave_open:
+        if self._processor is not None and self._processor_auto_close:
             self._processor._close()
 
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:

@@ -7,7 +7,7 @@ contract that an attached FrameProcessor receives:
   - `_on_stream_info_updated` / `_on_credentials_updated` on every room transition
     or token refresh,
   - `_on_stream_info_cleared` / `_on_credentials_cleared` when the track leaves a room,
-and that `AudioStream.aclose()` honors `noise_cancellation_leave_open`.
+and that `AudioStream.aclose()` honors `auto_close_noise_cancellation`.
 """
 
 from __future__ import annotations
@@ -91,11 +91,11 @@ def _make_closeable_stream(
     *,
     track: Optional[rtc.Track] = None,
     processor: Optional[rtc.FrameProcessor[rtc.AudioFrame]] = None,
-    leave_open: bool = False,
+    auto_close: bool = True,
 ) -> rtc.AudioStream:
     """Extends _make_stream with the minimal state `aclose()` touches."""
     stream = _make_stream(track=track, processor=processor)
-    stream._processor_leave_open = leave_open
+    stream._processor_auto_close = auto_close
     stream._task = asyncio.ensure_future(asyncio.sleep(0))
     stream._ffi_handle = cast(Any, SimpleNamespace(dispose=lambda: None))
     return stream
@@ -446,11 +446,11 @@ def test_unregister_one_of_many_streams_only_fans_out_to_remaining() -> None:
 
 
 @pytest.mark.asyncio
-async def test_aclose_closes_processor_when_leave_open_false() -> None:
+async def test_aclose_closes_processor_when_auto_close_true() -> None:
     """`aclose()` calls `_close()` on the attached FrameProcessor when
-    `noise_cancellation_leave_open` is False (the default)."""
+    `auto_close_noise_cancellation` is True (the default)."""
     processor = _RecordingProcessor()
-    stream = _make_closeable_stream(processor=processor, leave_open=False)
+    stream = _make_closeable_stream(processor=processor, auto_close=True)
 
     await stream.aclose()
 
@@ -458,12 +458,12 @@ async def test_aclose_closes_processor_when_leave_open_false() -> None:
 
 
 @pytest.mark.asyncio
-async def test_aclose_leaves_processor_open_when_leave_open_true() -> None:
-    """`aclose()` does NOT call `_close()` when `noise_cancellation_leave_open`
-    is True — the agents SDK path for sharing one processor across many track
+async def test_aclose_leaves_processor_open_when_auto_close_false() -> None:
+    """`aclose()` does NOT call `_close()` when `auto_close_noise_cancellation`
+    is False — the agents SDK path for sharing one processor across many track
     attach/detach cycles."""
     processor = _RecordingProcessor()
-    stream = _make_closeable_stream(processor=processor, leave_open=True)
+    stream = _make_closeable_stream(processor=processor, auto_close=False)
 
     await stream.aclose()
 
