@@ -784,6 +784,13 @@ class LocalParticipant(Participant):
         Raises:
             UnpublishTrackError: If there is an error in unpublishing the track.
         """
+        # Capture the publication before the FFI round-trip. The
+        # local_track_unpublished room event races this async response and may
+        # remove it from _track_publications first; holding our own reference
+        # guarantees the track is cleared once unpublish completes, regardless
+        # of which path removes the publication from the dict.
+        publication = self._track_publications.get(track_sid)
+
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
@@ -799,10 +806,9 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            # The local_track_unpublished room event may have already removed
-            # this publication from the dict (the FFI event and this async
-            # response race during teardown), so pop defensively.
-            publication = self._track_publications.pop(track_sid, None)
+            # Remove defensively: the room-event handler may already have done
+            # so when it processed local_track_unpublished first.
+            self._track_publications.pop(track_sid, None)
             if publication is not None:
                 publication._track = None
             queue.task_done()
