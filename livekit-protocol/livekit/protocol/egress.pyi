@@ -161,16 +161,14 @@ class WebSource(_message.Message):
     def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ...) -> None: ...
 
 class MediaSource(_message.Message):
-    __slots__ = ("video_track_id", "participant_video", "audio", "data")
+    __slots__ = ("video_track_id", "participant_video", "audio")
     VIDEO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_VIDEO_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FIELD_NUMBER: _ClassVar[int]
-    DATA_FIELD_NUMBER: _ClassVar[int]
     video_track_id: str
     participant_video: ParticipantVideo
     audio: AudioConfig
-    data: DataConfig
-    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ..., data: _Optional[_Union[DataConfig, _Mapping]] = ...) -> None: ...
+    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ...) -> None: ...
 
 class ParticipantVideo(_message.Message):
     __slots__ = ("identity", "prefer_screen_share")
@@ -181,10 +179,12 @@ class ParticipantVideo(_message.Message):
     def __init__(self, identity: _Optional[str] = ..., prefer_screen_share: bool = ...) -> None: ...
 
 class AudioConfig(_message.Message):
-    __slots__ = ("routes",)
+    __slots__ = ("capture_all", "routes")
+    CAPTURE_ALL_FIELD_NUMBER: _ClassVar[int]
     ROUTES_FIELD_NUMBER: _ClassVar[int]
+    capture_all: bool
     routes: _containers.RepeatedCompositeFieldContainer[AudioRoute]
-    def __init__(self, routes: _Optional[_Iterable[_Union[AudioRoute, _Mapping]]] = ...) -> None: ...
+    def __init__(self, capture_all: bool = ..., routes: _Optional[_Iterable[_Union[AudioRoute, _Mapping]]] = ...) -> None: ...
 
 class AudioRoute(_message.Message):
     __slots__ = ("track_id", "participant_identity", "participant_kind", "channel")
@@ -199,20 +199,20 @@ class AudioRoute(_message.Message):
     def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
 
 class DataConfig(_message.Message):
-    __slots__ = ("selectors",)
+    __slots__ = ("capture_all", "selectors")
+    CAPTURE_ALL_FIELD_NUMBER: _ClassVar[int]
     SELECTORS_FIELD_NUMBER: _ClassVar[int]
+    capture_all: bool
     selectors: _containers.RepeatedCompositeFieldContainer[DataSelector]
-    def __init__(self, selectors: _Optional[_Iterable[_Union[DataSelector, _Mapping]]] = ...) -> None: ...
+    def __init__(self, capture_all: bool = ..., selectors: _Optional[_Iterable[_Union[DataSelector, _Mapping]]] = ...) -> None: ...
 
 class DataSelector(_message.Message):
-    __slots__ = ("track_id", "participant_identity", "topic")
+    __slots__ = ("track_id", "participant_identity")
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
-    TOPIC_FIELD_NUMBER: _ClassVar[int]
     track_id: str
     participant_identity: str
-    topic: str
-    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., topic: _Optional[str] = ...) -> None: ...
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ...) -> None: ...
 
 class EncodingOptions(_message.Message):
     __slots__ = ("width", "height", "depth", "framerate", "audio_codec", "audio_bitrate", "audio_frequency", "video_codec", "video_bitrate", "key_frame_interval", "audio_quality", "video_quality")
@@ -460,7 +460,7 @@ class StopEgressRequest(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ...) -> None: ...
 
 class EgressInfo(_message.Message):
-    __slots__ = ("egress_id", "room_id", "room_name", "source_type", "status", "started_at", "ended_at", "updated_at", "replay", "room_composite", "web", "participant", "track_composite", "track", "stream_results", "file_results", "segment_results", "image_results", "error", "error_code", "details", "manifest_location", "backup_storage_used", "retry_count", "stream", "file", "segments")
+    __slots__ = ("egress_id", "room_id", "room_name", "source_type", "status", "started_at", "ended_at", "updated_at", "egress", "replay", "room_composite", "web", "participant", "track_composite", "track", "stream_results", "file_results", "segment_results", "image_results", "error", "error_code", "details", "manifest_location", "backup_storage_used", "retry_count", "stream", "file", "segments")
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     ROOM_NAME_FIELD_NUMBER: _ClassVar[int]
@@ -469,6 +469,7 @@ class EgressInfo(_message.Message):
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     ENDED_AT_FIELD_NUMBER: _ClassVar[int]
     UPDATED_AT_FIELD_NUMBER: _ClassVar[int]
+    EGRESS_FIELD_NUMBER: _ClassVar[int]
     REPLAY_FIELD_NUMBER: _ClassVar[int]
     ROOM_COMPOSITE_FIELD_NUMBER: _ClassVar[int]
     WEB_FIELD_NUMBER: _ClassVar[int]
@@ -496,6 +497,7 @@ class EgressInfo(_message.Message):
     started_at: int
     ended_at: int
     updated_at: int
+    egress: StartEgressRequest
     replay: ExportReplayRequest
     room_composite: RoomCompositeEgressRequest
     web: WebEgressRequest
@@ -515,7 +517,7 @@ class EgressInfo(_message.Message):
     stream: StreamInfoList
     file: FileInfo
     segments: SegmentsInfo
-    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., replay: _Optional[_Union[ExportReplayRequest, _Mapping]] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., details: _Optional[str] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ..., retry_count: _Optional[int] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ...) -> None: ...
+    def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., egress: _Optional[_Union[StartEgressRequest, _Mapping]] = ..., replay: _Optional[_Union[ExportReplayRequest, _Mapping]] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., details: _Optional[str] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ..., retry_count: _Optional[int] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ...) -> None: ...
 
 class StreamInfo(_message.Message):
     __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries")
