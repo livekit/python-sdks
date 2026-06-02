@@ -59,13 +59,6 @@ from .data_track import LocalDataTrack
 from ._proto import data_track_pb2 as proto_data_track
 
 
-# Default maximum amount of time it should ever take for an RPC request to reach the
-# destination and for the ACK to come back. Set to 7 seconds to account for various
-# relay timeouts and retries in LiveKit Cloud that occur in rare cases. Most callers
-# should not need to change this.
-DEFAULT_MAX_ROUND_TRIP_LATENCY = 7.0
-
-
 class PublishTrackError(Exception):
     def __init__(self, message: str) -> None:
         self.message = message
@@ -331,7 +324,7 @@ class LocalParticipant(Participant):
         method: str,
         payload: str,
         response_timeout: Optional[float] = None,
-        max_round_trip_latency: float = DEFAULT_MAX_ROUND_TRIP_LATENCY,
+        max_round_trip_latency: Optional[float] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -361,7 +354,8 @@ class LocalParticipant(Participant):
         req.perform_rpc.payload = payload
         if response_timeout is not None:
             req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
-        req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
+        if max_round_trip_latency is not None:
+            req.perform_rpc.response_timeout_ms = int(max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
