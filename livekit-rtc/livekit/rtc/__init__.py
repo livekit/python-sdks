@@ -27,7 +27,6 @@ from ._proto.participant_pb2 import (
     DisconnectReason,
 )
 from ._proto.room_pb2 import (
-    ConnectionQuality,
     ConnectionState,
     ContinualGatheringPolicy,
     DataPacketKind,
@@ -58,6 +57,7 @@ from .e2ee import (
     KeyProviderOptions,
 )
 from .participant import (
+    ConnectionQuality,
     LocalParticipant,
     Participant,
     RemoteParticipant,
