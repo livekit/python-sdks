@@ -903,9 +903,7 @@ class Room(EventEmitter[EventTypes]):
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
             participant = self._retrieve_participant(identity)
-            quality = _connection_quality_from_proto(
-                event.connection_quality_changed.quality
-            )
+            quality = _connection_quality_from_proto(event.connection_quality_changed.quality)
             if participant:
                 participant._connection_quality = quality
             self.emit(
