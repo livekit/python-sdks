@@ -355,7 +355,7 @@ class LocalParticipant(Participant):
         if response_timeout is not None:
             req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
         if max_round_trip_latency is not None:
-            req.perform_rpc.response_timeout_ms = int(max_round_trip_latency * 1000)
+            req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
