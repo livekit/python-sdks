@@ -357,6 +357,7 @@ class LocalParticipant(Participant):
         method: str,
         payload: str,
         response_timeout: Optional[float] = None,
+        max_round_trip_latency: Optional[float] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -366,6 +367,12 @@ class LocalParticipant(Participant):
             method (str): The method name to call
             payload (str): The method payload
             response_timeout (Optional[float]): Timeout for receiving a response after initial connection
+            max_round_trip_latency (float): The maximum amount of time it should ever take for an RPC
+                request to reach the destination and for the ACK to come back. Defaults to 7 seconds to
+                account for various relay timeouts and retries in LiveKit Cloud that occur in rare cases.
+                Most callers should not need to change this, but it can be increased to tolerate
+                high-latency networks where RPC requests are backed up behind other messages on the
+                data channel.
 
         Returns:
             str: The response payload
@@ -380,6 +387,8 @@ class LocalParticipant(Participant):
         req.perform_rpc.payload = payload
         if response_timeout is not None:
             req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
+        if max_round_trip_latency is not None:
+            req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
