@@ -562,6 +562,12 @@ class Room(EventEmitter[EventTypes]):
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
 
+        # unsubscribe from the FFI queue once the listen task ends.
+        # disconnect() unsubscribes too, but it early-returns when the
+        # room is already disconnected (e.g. removed remotely).
+        ffi_queue = self._ffi_queue
+        self._task.add_done_callback(lambda _: FfiClient.instance.queue.unsubscribe(ffi_queue))
+
         # Unblock the FFI server once this SDK is ready to receive room events.
         ready_req = proto_ffi.FfiRequest()
         ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
