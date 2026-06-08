@@ -746,9 +746,20 @@ class Room(EventEmitter[EventTypes]):
             ltrack = lpublication.track
             self.emit("local_track_published", lpublication, ltrack)
         elif which == "local_track_unpublished":
+            # During teardown the publication may already have been removed
+            # from the participant's dict by LocalParticipant.unpublish_track
+            # (the FFI event races that async response), so the SID can be gone
+            # by the time this event is dispatched. Look it up defensively and
+            # skip the emit when it is no longer tracked, mirroring the
+            # local_track_republished and remote track_unpublished handlers,
+            # instead of raising a KeyError that _listen_task logs as an error.
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.track_publications[sid]
-            self.emit("local_track_unpublished", lpublication)
+            unpublished = self.local_participant._track_publications.get(sid)
+            if unpublished is not None:
+                del self.local_participant._track_publications[sid]
+                self.emit("local_track_unpublished", unpublished)
+            else:
+                logging.debug("local_track_unpublished for untracked publication sid %s", sid)
         elif which == "local_track_republished":
             # The SDK auto-republished a local track during a full
             # reconnect: the underlying Track (and its bound source) is
