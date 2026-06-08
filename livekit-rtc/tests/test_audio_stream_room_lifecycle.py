@@ -55,6 +55,20 @@ def _make_remote_publication(sid: str) -> rtc.RemoteTrackPublication:
     return pub
 
 
+def _make_local_participant(identity: str) -> rtc.LocalParticipant:
+    p = rtc.LocalParticipant.__new__(rtc.LocalParticipant)
+    p._info = proto_participant.ParticipantInfo(identity=identity)
+    p._track_publications = {}
+    return p
+
+
+def _make_local_publication(sid: str) -> rtc.LocalTrackPublication:
+    pub = rtc.LocalTrackPublication.__new__(rtc.LocalTrackPublication)
+    pub._info = proto_track.TrackPublicationInfo(sid=sid)
+    pub._track = None
+    return pub
+
+
 def _make_track(sid: str = "TR_x") -> rtc.Track:
     track = rtc.Track.__new__(rtc.Track)
     track._info = proto_track.TrackInfo(sid=sid)
@@ -468,3 +482,66 @@ async def test_aclose_leaves_processor_open_when_auto_close_false() -> None:
     await stream.aclose()
 
     assert processor.close_calls == 0
+
+
+# -- local_track_republished regression ---------------------------------------
+
+
+def test_local_track_republished_updates_track_sid_and_repushes_metadata() -> None:
+    """A full-reconnect republish re-issues the publication SID. The handler must
+    keep the local-track invariant (track.sid == publication.sid) intact and
+    re-push metadata so attached processors learn the new SID — otherwise the
+    SID-based lookup in Track._push_processor_metadata_to_stream fails and the
+    processor receives empty participant_identity / publication_sid.
+    """
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    local = _make_local_participant("agent")
+    room._local_participant = local
+
+    # Local track published under the OLD sid (mirrors publish_track:
+    # track.sid == publication.sid).
+    track = _make_track(sid="OLD")
+    publication = _make_local_publication(sid="OLD")
+    publication._track = track
+    local._track_publications["OLD"] = publication
+    track._set_room(room)
+
+    # Processor attached before the reconnect sees the OLD sid.
+    processor = _RecordingProcessor()
+    _stream = _make_stream(track=track, processor=processor)  # noqa: F841
+    assert processor.stream_info_calls[-1] == {
+        "room_name": "room-1",
+        "participant_identity": "agent",
+        "publication_sid": "OLD",
+    }
+
+    # Dispatch a synthetic local_track_republished re-issuing the sid as NEW.
+    event = proto_room.RoomEvent(
+        local_track_republished=proto_room.LocalTrackRepublished(
+            previous_sid="OLD",
+            info=proto_track.TrackPublicationInfo(sid="NEW"),
+        )
+    )
+    room._on_room_event(event)
+
+    # Invariant restored + dict rekeyed.
+    assert track.sid == "NEW"
+    assert "NEW" in local._track_publications
+    assert "OLD" not in local._track_publications
+
+    # Existing attached processor was re-pushed with the NEW sid (non-empty).
+    assert processor.stream_info_calls[-1] == {
+        "room_name": "room-1",
+        "participant_identity": "agent",
+        "publication_sid": "NEW",
+    }
+
+    # Regression guard: a stream created AFTER republish also resolves NEW
+    # (the exact path from the bug report — stale track.sid would yield "").
+    processor2 = _RecordingProcessor()
+    _stream2 = _make_stream(track=track, processor=processor2)  # noqa: F841
+    assert processor2.stream_info_calls[-1] == {
+        "room_name": "room-1",
+        "participant_identity": "agent",
+        "publication_sid": "NEW",
+    }

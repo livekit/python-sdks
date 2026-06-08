@@ -778,6 +778,15 @@ class Room(EventEmitter[EventTypes]):
                 del self.local_participant._track_publications[previous_sid]
                 republished._info = event.local_track_republished.info
                 self.local_participant._track_publications[republished.sid] = republished
+                if republished.track is not None:
+                    # Keep the local-track invariant (track.sid == publication.sid,
+                    # set at publish_track) intact across republish, then re-push
+                    # metadata so any attached FrameProcessor learns the new
+                    # publication SID / credentials. _set_room with the same room
+                    # is a no-op for the token_refreshed listener but re-fans the
+                    # metadata to every registered AudioStream.
+                    republished.track._info.sid = republished.sid
+                    republished.track._set_room(self)
                 self.emit("local_track_republished", republished, previous_sid)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
