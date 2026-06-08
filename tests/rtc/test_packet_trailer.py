@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import weakref
 from types import SimpleNamespace
 from typing import cast
 
@@ -142,7 +143,14 @@ async def test_local_track_republished_updates_existing_publication() -> None:
             packet_trailer_features=[proto_track.PTF_USER_TIMESTAMP],
         )
     )
-    publication._track = cast(Track, SimpleNamespace(_info=SimpleNamespace(sid="TR_OLD")))
+    # Build a real Track via __new__ (bypassing FFI) so the republish handler's
+    # track.sid invariant update and _set_room(...) re-push both work.
+    track = Track.__new__(Track)
+    track._info = proto_track.TrackInfo(sid="TR_OLD")
+    track._ffi_handle = cast(FfiHandle, None)
+    track._room_ref = None
+    track._audio_streams = weakref.WeakSet()
+    publication._track = track
     local_participant._track_publications[publication.sid] = publication
 
     room._on_room_event(
