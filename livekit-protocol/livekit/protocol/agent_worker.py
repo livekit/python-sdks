@@ -12,10 +12,9 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
-from .logger_pb import options as logger_dot_options__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1alivekit_agent_worker.proto\x12\x07livekit\x1a\x14logger/options.proto\"\x8e\x01\n\nWorkerInfo\x12\x13\n\x0bworker_type\x18\x01 \x01(\t\x12\x12\n\nagent_name\x18\x02 \x01(\t\x12\x13\n\x0b\x61\x63tive_jobs\x18\x03 \x01(\x02\x12\x13\n\x0bsdk_version\x18\x04 \x01(\t\x12\x13\n\x0bworker_load\x18\x05 \x01(\x02\x12\x18\n\x10protocol_version\x18\x06 \x01(\x05\x42\x46Z#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1alivekit_agent_worker.proto\x12\x07livekit\"\x8e\x01\n\nWorkerInfo\x12\x13\n\x0bworker_type\x18\x01 \x01(\t\x12\x12\n\nagent_name\x18\x02 \x01(\t\x12\x13\n\x0b\x61\x63tive_jobs\x18\x03 \x01(\x02\x12\x13\n\x0bsdk_version\x18\x04 \x01(\t\x12\x13\n\x0bworker_load\x18\x05 \x01(\x02\x12\x18\n\x10protocol_version\x18\x06 \x01(\x05\x42\x46Z#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,6 +22,6 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'agent_worker', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z#github.com/livekit/protocol/livekit\252\002\rLiveKit.Proto\352\002\016LiveKit::Proto'
-  _globals['_WORKERINFO']._serialized_start=62
-  _globals['_WORKERINFO']._serialized_end=204
+  _globals['_WORKERINFO']._serialized_start=40
+  _globals['_WORKERINFO']._serialized_end=182
 # @@protoc_insertion_point(module_scope)
