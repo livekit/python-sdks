@@ -20,9 +20,12 @@ from typing import Any, Optional, cast
 import pytest
 
 from livekit import rtc
+from livekit.rtc._ffi_client import FfiClient
+from livekit.rtc._proto import ffi_pb2 as proto_ffi
 from livekit.rtc._proto import participant_pb2 as proto_participant
 from livekit.rtc._proto import room_pb2 as proto_room
 from livekit.rtc._proto import track_pb2 as proto_track
+from livekit.rtc._utils import BroadcastQueue
 from livekit.rtc.event_emitter import EventEmitter
 
 
@@ -545,3 +548,60 @@ def test_local_track_republished_updates_track_sid_and_repushes_metadata() -> No
         "participant_identity": "agent",
         "publication_sid": "NEW",
     }
+
+
+# -- unpublish_track / room-event race ----------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_unpublish_track_clears_processor_when_it_wins_the_event_race(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`LocalParticipant.unpublish_track` races the `local_track_unpublished`
+    room event. When unpublish wins, the room-event handler later finds the
+    publication already gone and skips its `_set_room(None)`. The unpublish path
+    must therefore clear the processor itself, otherwise an attached
+    FrameProcessor never receives the cleared callbacks (and the token_refreshed
+    listener leaks). This drives unpublish_track with a mocked FFI round-trip and
+    asserts the clearing happened without any room event firing.
+    """
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    local = _make_local_participant("agent")
+    local._ffi_handle = cast(Any, SimpleNamespace(handle=1))
+    local._room_queue = BroadcastQueue()
+    room._local_participant = local
+
+    track = _make_track(sid="OLD")
+    publication = _make_local_publication(sid="OLD")
+    publication._track = track
+    local._track_publications["OLD"] = publication
+    track._set_room(room)
+
+    processor = _RecordingProcessor()
+    _stream = _make_stream(track=track, processor=processor)  # noqa: F841
+    cleared_info_before = processor.stream_info_cleared_calls
+    cleared_creds_before = processor.credentials_cleared_calls
+
+    # unpublish_track subscribes to _room_queue BEFORE calling request(), so a
+    # mocked request that broadcasts the matching callback makes wait_for resolve
+    # deterministically. The local_track_unpublished room event is never emitted
+    # here — this simulates unpublish_track winning the race.
+    resp = proto_ffi.FfiResponse()
+    resp.unpublish_track.async_id = 1
+    cb = proto_ffi.FfiEvent()
+    cb.unpublish_track.async_id = 1
+
+    def fake_request(req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        local._room_queue.put_nowait(cb)
+        return resp
+
+    monkeypatch.setattr(FfiClient.instance, "request", fake_request)
+
+    await local.unpublish_track("OLD")
+
+    assert "OLD" not in local._track_publications
+    assert publication.track is None
+    # the unpublish path cleared the processor's room context even though the
+    # room-event handler never ran
+    assert processor.stream_info_cleared_calls == cleared_info_before + 1
+    assert processor.credentials_cleared_calls == cleared_creds_before + 1
