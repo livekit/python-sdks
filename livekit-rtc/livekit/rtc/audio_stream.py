@@ -153,7 +153,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        auto_close_noise_cancellation: bool = False,
+        auto_close_noise_cancellation: bool = True,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
