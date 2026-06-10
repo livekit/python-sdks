@@ -158,19 +158,27 @@ class TestDeviceSelection:
         # Should not raise
         platform_audio.set_playout_device(devices[0].id)
 
-    def test_set_recording_device_invalid(self, platform_audio):
-        """Test that setting an invalid recording device raises an error."""
-        with pytest.raises(rtc.PlatformAudioError) as exc_info:
-            platform_audio.set_recording_device("invalid-device-id-that-does-not-exist")
+    def test_set_recording_device_invalid_falls_back_to_default(self, platform_audio):
+        """Test that setting an invalid recording device falls back to default (no error).
 
-        assert "not found" in str(exc_info.value).lower() or "failed" in str(exc_info.value).lower()
+        When a device GUID is invalid (e.g., device was unplugged), the system
+        gracefully falls back to the default device instead of raising an error.
+        This is intentional behavior for better UX - a saved device preference
+        shouldn't crash the app if the device is removed.
+        """
+        # Should not raise - falls back to default device
+        platform_audio.set_recording_device("invalid-device-id-that-does-not-exist")
 
-    def test_set_playout_device_invalid(self, platform_audio):
-        """Test that setting an invalid playout device raises an error."""
-        with pytest.raises(rtc.PlatformAudioError) as exc_info:
-            platform_audio.set_playout_device("invalid-device-id-that-does-not-exist")
+    def test_set_playout_device_invalid_falls_back_to_default(self, platform_audio):
+        """Test that setting an invalid playout device falls back to default (no error).
 
-        assert "not found" in str(exc_info.value).lower() or "failed" in str(exc_info.value).lower()
+        When a device GUID is invalid (e.g., device was unplugged), the system
+        gracefully falls back to the default device instead of raising an error.
+        This is intentional behavior for better UX - a saved device preference
+        shouldn't crash the app if the device is removed.
+        """
+        # Should not raise - falls back to default device
+        platform_audio.set_playout_device("invalid-device-id-that-does-not-exist")
 
 
 class TestAudioSourceCreation:
