@@ -48,7 +48,7 @@ import os
 import struct
 import wave
 from signal import SIGINT, SIGTERM
-from typing import Optional, Union
+from typing import Optional
 
 from livekit import api, rtc
 
@@ -100,8 +100,7 @@ def parse_args() -> argparse.Namespace:
         "--speaker-id",
         type=str,
         metavar="DEVICE_ID",
-        help="Select speaker by device ID (from --list-devices). "
-        "Only used with --platform-audio.",
+        help="Select speaker by device ID (from --list-devices). Only used with --platform-audio.",
     )
 
     return parser.parse_args()
@@ -172,9 +171,7 @@ def load_wav_file(path: str) -> tuple[bytes, int, int, int]:
         return frames, sample_rate, channels, bits_per_sample
 
 
-async def publish_wav_file(
-    room: rtc.Room, wav_path: str, running: asyncio.Event
-) -> None:
+async def publish_wav_file(room: rtc.Room, wav_path: str, running: asyncio.Event) -> None:
     """Publish audio from a WAV file using synthetic mode (AudioSource).
 
     This demonstrates synthetic mode where you manually push audio frames.
@@ -274,9 +271,7 @@ async def main(room: rtc.Room, args: argparse.Namespace) -> None:
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
     ) -> None:
-        logging.info(
-            f"Track subscribed: {track.kind} from {participant.identity}"
-        )
+        logging.info(f"Track subscribed: {track.kind} from {participant.identity}")
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             # When using PlatformAudio, received audio is automatically played
             # through the selected speaker. No manual handling needed.

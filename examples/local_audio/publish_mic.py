@@ -21,6 +21,7 @@ import threading
 
 try:
     from dotenv import find_dotenv, load_dotenv
+
     HAS_DOTENV = True
 except ImportError:
     HAS_DOTENV = False

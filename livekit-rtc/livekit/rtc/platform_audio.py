@@ -231,10 +231,7 @@ class PlatformAudio:
                 f"Failed to enumerate recording devices: {resp.get_audio_devices.error}"
             )
 
-        return [
-            AudioDeviceInfo._from_proto(d)
-            for d in resp.get_audio_devices.recording_devices
-        ]
+        return [AudioDeviceInfo._from_proto(d) for d in resp.get_audio_devices.recording_devices]
 
     def playout_devices(self) -> List[AudioDeviceInfo]:
         """Get available playout devices (speakers/headphones).
@@ -255,10 +252,7 @@ class PlatformAudio:
                 f"Failed to enumerate playout devices: {resp.get_audio_devices.error}"
             )
 
-        return [
-            AudioDeviceInfo._from_proto(d)
-            for d in resp.get_audio_devices.playout_devices
-        ]
+        return [AudioDeviceInfo._from_proto(d) for d in resp.get_audio_devices.playout_devices]
 
     def set_recording_device(self, device_id: str) -> None:
         """Select the recording device (microphone) to use.
@@ -279,10 +273,7 @@ class PlatformAudio:
 
         resp = FfiClient.instance.request(req)
 
-        if (
-            resp.set_recording_device.HasField("error")
-            and resp.set_recording_device.error
-        ):
+        if resp.set_recording_device.HasField("error") and resp.set_recording_device.error:
             raise PlatformAudioError(
                 f"Failed to set recording device: {resp.set_recording_device.error}"
             )
@@ -306,10 +297,7 @@ class PlatformAudio:
 
         resp = FfiClient.instance.request(req)
 
-        if (
-            resp.set_playout_device.HasField("error")
-            and resp.set_playout_device.error
-        ):
+        if resp.set_playout_device.HasField("error") and resp.set_playout_device.error:
             raise PlatformAudioError(
                 f"Failed to set playout device: {resp.set_playout_device.error}"
             )
@@ -349,9 +337,7 @@ class PlatformAudio:
             options = PlatformAudioOptions()
 
         req = proto_ffi.FfiRequest()
-        req.new_audio_source.type = (
-            proto_audio_frame.AudioSourceType.AUDIO_SOURCE_PLATFORM
-        )
+        req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_PLATFORM
         req.new_audio_source.platform_audio_handle = self._ffi_handle.handle
         req.new_audio_source.options.CopyFrom(options._to_proto())
         # For platform audio, the ADM determines the actual sample rate and channels.
