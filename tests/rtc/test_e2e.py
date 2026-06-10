@@ -22,7 +22,7 @@ import asyncio
 import os
 import time
 import uuid
-from typing import Callable, TypeVar
+from typing import Any, Callable, Dict, List, TypeVar
 import numpy as np
 import pytest
 
@@ -56,7 +56,7 @@ async def assert_eventually(
     raise AssertionError(f"{message} (last result: {last_result})")
 
 
-def skip_if_no_credentials():
+def skip_if_no_credentials() -> Any:
     required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
     missing = [var for var in required_vars if not os.getenv(var)]
     return pytest.mark.skipif(
@@ -84,11 +84,12 @@ def unique_room_name(base: str) -> str:
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_publish_track():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_publish_track() -> None:
     """Test that a published track can be subscribed by another participant"""
     room_name = unique_room_name("test-publish-track")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     subscriber_room = rtc.Room()
@@ -103,7 +104,7 @@ async def test_publish_track():
     @subscriber_room.on("track_published")
     def on_track_published(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         track_published_event.set()
 
     @subscriber_room.on("track_subscribed")
@@ -111,7 +112,7 @@ async def test_publish_track():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         nonlocal subscribed_track
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             subscribed_track = track
@@ -142,11 +143,160 @@ async def test_publish_track():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_audio_stream_subscribe():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_video_packet_trailer_metadata() -> None:
+    """Test that packet trailer metadata can be sent and received on video frames."""
+    room_name = unique_room_name("test-video-packet-trailer")
+    url = os.getenv("LIVEKIT_URL")
+    assert url is not None
+
+    publisher_room = rtc.Room()
+    subscriber_room = rtc.Room()
+
+    publisher_token = create_token("video-publisher", room_name)
+    subscriber_token = create_token("video-subscriber", room_name)
+
+    track_subscribed_event = asyncio.Event()
+    subscribed_track = None
+    subscribed_publication = None
+    video_stream = None
+    source = None
+
+    @subscriber_room.on("track_subscribed")
+    def on_track_subscribed(
+        track: rtc.Track,
+        publication: rtc.RemoteTrackPublication,
+        participant: rtc.RemoteParticipant,
+    ) -> None:
+        nonlocal subscribed_track, subscribed_publication
+        if track.kind == rtc.TrackKind.KIND_VIDEO:
+            subscribed_track = track
+            subscribed_publication = publication
+            track_subscribed_event.set()
+
+    try:
+        await subscriber_room.connect(url, subscriber_token)
+        await publisher_room.connect(url, publisher_token)
+
+        # Use a real video resolution: WebRTC encoders (VP8/H.264) enforce a
+        # 16x16 minimum and assert internally on smaller inputs, which would
+        # crash the FFI process via panic=abort.
+        frame_width, frame_height = 320, 240
+        source = rtc.VideoSource(frame_width, frame_height)
+        track = rtc.LocalVideoTrack.create_video_track("metadata-video", source)
+        packet_trailer_features = [
+            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
+            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        ]
+        options = rtc.TrackPublishOptions(
+            source=rtc.TrackSource.SOURCE_CAMERA,
+            packet_trailer_features=packet_trailer_features,
+        )
+        publication = await publisher_room.local_participant.publish_track(track, options)
+
+        assert publication.packet_trailer_features == packet_trailer_features
+        await asyncio.wait_for(track_subscribed_event.wait(), timeout=5.0)
+        assert subscribed_track is not None
+        assert subscribed_publication is not None
+        assert subscribed_publication.packet_trailer_features == packet_trailer_features
+
+        video_stream = rtc.VideoStream.from_track(track=subscribed_track, capacity=1)
+        frame = rtc.VideoFrame(
+            width=frame_width,
+            height=frame_height,
+            type=rtc.VideoBufferType.RGBA,
+            data=bytes([255, 0, 0, 255] * (frame_width * frame_height)),
+        )
+        metadata = rtc.FrameMetadata(user_timestamp=123456789, frame_id=77)
+
+        async def publish_frames() -> None:
+            for _ in range(10):
+                source.capture_frame(frame, metadata=metadata)
+                await asyncio.sleep(0.2)
+
+        publish_task = asyncio.create_task(publish_frames())
+        event = await asyncio.wait_for(video_stream.__anext__(), timeout=10.0)
+        await publish_task
+
+        assert event.metadata is not None
+        assert event.metadata.HasField("user_timestamp")
+        assert event.metadata.HasField("frame_id")
+        assert event.metadata.user_timestamp == 123456789
+        assert event.metadata.frame_id == 77
+
+    finally:
+        if video_stream is not None:
+            await video_stream.aclose()
+        if source is not None:
+            await source.aclose()
+        await publisher_room.disconnect()
+        await subscriber_room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_full_reconnect_preserves_local_publication_object() -> None:
+    """Test that FFI local_track_republished updates the existing publication object."""
+    room_name = unique_room_name("test-local-republish")
+    url = os.getenv("LIVEKIT_URL")
+    assert url is not None
+
+    room = rtc.Room()
+    token = create_token("publisher", room_name)
+    reconnected_event = asyncio.Event()
+    source = None
+
+    @room.on("reconnected")
+    def on_reconnected() -> None:
+        reconnected_event.set()
+
+    try:
+        await room.connect(url, token)
+
+        source = rtc.VideoSource(2, 2)
+        track = rtc.LocalVideoTrack.create_video_track("republish-video", source)
+        packet_trailer_features = [
+            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
+            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        ]
+        publication = await room.local_participant.publish_track(
+            track,
+            rtc.TrackPublishOptions(
+                source=rtc.TrackSource.SOURCE_CAMERA,
+                packet_trailer_features=packet_trailer_features,
+            ),
+        )
+        previous_sid = publication.sid
+
+        await room.simulate_scenario(rtc.SimulateScenarioKind.SIMULATE_FULL_RECONNECT)
+        await asyncio.wait_for(reconnected_event.wait(), timeout=10.0)
+
+        await assert_eventually(
+            lambda: (
+                publication.sid in room.local_participant.track_publications
+                and room.local_participant.track_publications[publication.sid] is publication
+            ),
+            timeout=10.0,
+            message="local publication was not rekeyed after full reconnect",
+        )
+
+        assert publication.sid != previous_sid
+        assert previous_sid not in room.local_participant.track_publications
+        assert publication.packet_trailer_features == packet_trailer_features
+
+    finally:
+        if source is not None:
+            await source.aclose()
+        await room.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_audio_stream_subscribe() -> None:
     """Test that published audio can be consumed and has similar energy levels"""
     room_name = unique_room_name("test-audio-stream")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     subscriber_room = rtc.Room()
@@ -162,7 +312,7 @@ async def test_audio_stream_subscribe():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         nonlocal subscribed_track
         if track.kind == rtc.TrackKind.KIND_AUDIO:
             subscribed_track = track
@@ -179,9 +329,9 @@ async def test_audio_stream_subscribe():
         await publisher_room.local_participant.publish_track(track, options)
         target_duration = 5.0
 
-        published_energy = []
+        published_energy: List[Any] = []
 
-        async def publish_audio():
+        async def publish_audio() -> None:
             async for frame in sine_wave_generator(440, target_duration, SAMPLE_RATE):
                 data = np.frombuffer(frame.data.tobytes(), dtype=np.int16)
                 energy = np.mean(np.abs(data.astype(np.float32)))
@@ -237,11 +387,12 @@ async def test_audio_stream_subscribe():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_room_lifecycle_events():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_room_lifecycle_events() -> None:
     """Test that room lifecycle and track events are fired properly"""
     room_name = unique_room_name("test-lifecycle-events")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     room1 = rtc.Room()
     room2 = rtc.Room()
@@ -249,7 +400,7 @@ async def test_room_lifecycle_events():
     token1 = create_token("participant-1", room_name)
     token2 = create_token("participant-2", room_name)
 
-    events = {
+    events: Dict[str, List[str]] = {
         "disconnected": [],
         "participant_connected": [],
         "participant_disconnected": [],
@@ -264,37 +415,37 @@ async def test_room_lifecycle_events():
     }
 
     @room1.on("disconnected")
-    def on_room1_disconnected(reason):
+    def on_room1_disconnected(reason: Any) -> None:
         events["disconnected"].append("room1")
 
     @room1.on("participant_connected")
-    def on_room1_participant_connected(participant: rtc.RemoteParticipant):
+    def on_room1_participant_connected(participant: rtc.RemoteParticipant) -> None:
         events["participant_connected"].append(f"room1-{participant.identity}")
 
     @room1.on("participant_disconnected")
-    def on_room1_participant_disconnected(participant: rtc.RemoteParticipant):
+    def on_room1_participant_disconnected(participant: rtc.RemoteParticipant) -> None:
         events["participant_disconnected"].append(f"room1-{participant.identity}")
 
     @room1.on("local_track_published")
-    def on_room1_local_track_published(publication: rtc.LocalTrackPublication, track):
+    def on_room1_local_track_published(publication: rtc.LocalTrackPublication, track: Any) -> None:
         events["local_track_published"].append(f"room1-{publication.sid}")
 
     @room1.on("local_track_unpublished")
-    def on_room1_local_track_unpublished(publication: rtc.LocalTrackPublication):
+    def on_room1_local_track_unpublished(publication: rtc.LocalTrackPublication) -> None:
         events["local_track_unpublished"].append(f"room1-{publication.sid}")
 
     @room1.on("room_updated")
-    def on_room1_room_updated():
+    def on_room1_room_updated() -> None:
         events["room_updated"].append("room1")
 
     @room1.on("connection_state_changed")
-    def on_room1_connection_state_changed(state: rtc.ConnectionState):
+    def on_room1_connection_state_changed(state: rtc.ConnectionState) -> None:
         events["connection_state_changed"].append(f"room1-{state}")
 
     @room2.on("track_published")
     def on_room2_track_published(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         events["track_published"].append(f"room2-{publication.sid}")
 
     @room2.on("track_subscribed")
@@ -302,13 +453,13 @@ async def test_room_lifecycle_events():
         track: rtc.Track,
         publication: rtc.RemoteTrackPublication,
         participant: rtc.RemoteParticipant,
-    ):
+    ) -> None:
         events["track_subscribed"].append(f"room2-{publication.sid}")
 
     @room2.on("track_unpublished")
     def on_room2_track_unpublished(
         publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant
-    ):
+    ) -> None:
         events["track_unpublished"].append(f"room2-{publication.sid}")
 
     try:
@@ -396,19 +547,20 @@ async def test_room_lifecycle_events():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
-async def test_connection_state_transitions():
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_connection_state_transitions() -> None:
     """Test that connection state transitions work correctly"""
     room_name = unique_room_name("test-connection-state")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     room = rtc.Room()
     token = create_token("state-test", room_name)
 
-    states = []
+    states: List[rtc.ConnectionState] = []
 
     @room.on("connection_state_changed")
-    def on_state_changed(state: rtc.ConnectionState):
+    def on_state_changed(state: rtc.ConnectionState) -> None:
         states.append(state)
 
     try:
@@ -421,7 +573,7 @@ async def test_connection_state_transitions():
             message="Room did not reach CONN_CONNECTED state",
         )
         await assert_eventually(
-            lambda: rtc.ConnectionState.CONN_CONNECTED in states,
+            lambda: rtc.ConnectionState.CONN_CONNECTED in states,  # type: ignore[comparison-overlap]
             message="CONN_CONNECTED state not in state change events",
         )
 
@@ -438,12 +590,12 @@ async def test_connection_state_transitions():
 
 
 @pytest.mark.asyncio
-@skip_if_no_credentials()
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 @pytest.mark.skipif(
     os.getenv("RUN_DATA_TRACK_TESTS") != "1",
     reason="SFU support requires data tracks support to be enabled via config; remove once this is no longer the case.",
 )
-async def test_data_track():
+async def test_data_track() -> None:
     """Test that a published data track delivers frames with correct payloads and timestamps."""
     FRAME_COUNT = 5
     PAYLOAD_SIZE = 64
@@ -454,6 +606,7 @@ async def test_data_track():
 
     room_name = unique_room_name("test-data-track")
     url = os.getenv("LIVEKIT_URL")
+    assert url is not None
 
     publisher_room = rtc.Room()
     subscriber_room = rtc.Room()
@@ -462,23 +615,24 @@ async def test_data_track():
     subscriber_token = create_token(SUBSCRIBER_IDENTITY, room_name)
 
     remote_track_event = asyncio.Event()
-    remote_track = None
+    remote_track: None | rtc.RemoteDataTrack = None
     unpublished_event = asyncio.Event()
     unpublished_sid = None
 
     @subscriber_room.on("data_track_published")
-    def on_data_track_published(track: rtc.RemoteDataTrack):
+    def on_data_track_published(track: rtc.RemoteDataTrack) -> None:
         nonlocal remote_track
         remote_track = track
         remote_track_event.set()
 
     @subscriber_room.on("data_track_unpublished")
-    def on_data_track_unpublished(sid: str):
+    def on_data_track_unpublished(sid: str) -> None:
         nonlocal unpublished_sid
         unpublished_sid = sid
         unpublished_event.set()
 
     try:
+        assert url is not None
         await subscriber_room.connect(url, subscriber_token)
         await publisher_room.connect(url, publisher_token)
 
@@ -495,7 +649,7 @@ async def test_data_track():
 
         stream = remote_track.subscribe()
 
-        async def push_frames():
+        async def push_frames() -> None:
             for i in range(FRAME_COUNT):
                 frame = rtc.DataTrackFrame(
                     payload=bytes([i] * PAYLOAD_SIZE),
@@ -505,7 +659,7 @@ async def test_data_track():
                 await asyncio.sleep(0.1)
             await local_track.unpublish()
 
-        async def publish_and_receive():
+        async def publish_and_receive(stream: rtc.DataTrackStream) -> int:
             push_task = asyncio.create_task(push_frames())
             recv_count = 0
             async for frame in stream:
@@ -519,7 +673,7 @@ async def test_data_track():
             await push_task
             return recv_count
 
-        recv_count = await asyncio.wait_for(publish_and_receive(), timeout=10.0)
+        recv_count = await asyncio.wait_for(publish_and_receive(stream), timeout=10.0)
         assert recv_count > 0, "No frames were received"
 
         await asyncio.wait_for(unpublished_event.wait(), timeout=5.0)

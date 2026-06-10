@@ -33,6 +33,7 @@ class VideoFrameEvent:
     frame: VideoFrame
     timestamp_us: int
     rotation: proto_video_frame.VideoRotation
+    metadata: proto_video_frame.FrameMetadata | None = None
 
 
 class VideoStream:
@@ -44,7 +45,7 @@ class VideoStream:
         loop: Optional[asyncio.AbstractEventLoop] = None,
         capacity: int = 0,
         format: Optional[proto_video_frame.VideoBufferType.ValueType] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         self._loop = loop or asyncio.get_event_loop()
         # Only subscribe to video_stream_event to avoid unnecessary memory allocations
@@ -142,13 +143,19 @@ class VideoStream:
             video_event = event.video_stream_event
 
             if video_event.HasField("frame_received"):
-                owned_buffer_info = video_event.frame_received.buffer
+                frame_received = video_event.frame_received
+                owned_buffer_info = frame_received.buffer
                 frame = VideoFrame._from_owned_info(owned_buffer_info)
+                metadata: proto_video_frame.FrameMetadata | None = None
+                if frame_received.HasField("metadata"):
+                    metadata = proto_video_frame.FrameMetadata()
+                    metadata.CopyFrom(frame_received.metadata)
 
                 event = VideoFrameEvent(
                     frame=frame,
-                    timestamp_us=video_event.frame_received.timestamp_us,
-                    rotation=video_event.frame_received.rotation,
+                    timestamp_us=frame_received.timestamp_us,
+                    rotation=frame_received.rotation,
+                    metadata=metadata,
                 )
 
                 self._queue.put(event)

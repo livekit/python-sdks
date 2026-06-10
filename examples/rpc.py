@@ -35,6 +35,12 @@ async def main():
             print("Error:", error)
 
         try:
+            print("\n\nRunning send long info example...")
+            await perform_send_very_long_info(callers_room)
+        except Exception as error:
+            print("Error:", error)
+
+        try:
             print("\n\nRunning error handling example...")
             await perform_divide(callers_room)
         except Exception as error:
@@ -93,6 +99,17 @@ def register_receiver_methods(greeters_room: rtc.Room, math_genius_room: rtc.Roo
         await asyncio.sleep(2)
         return "Welcome and have a wonderful day!"
 
+    @greeters_room.local_participant.register_rpc_method("exchanging-long-info")
+    async def exchanging_long_info_method(
+        data: RpcInvocationData,
+    ):
+        print(
+            f"[Greeter] {data.caller_identity} has arrived and said that its long info is "
+            f'{len(data.payload)} chars long and starts with: "{data.payload[:20]}..."'
+        )
+        await asyncio.sleep(2)
+        return "Y" * 20_000
+
     @math_genius_room.local_participant.register_rpc_method("square-root")
     async def square_root_method(
         data: RpcInvocationData,
@@ -141,6 +158,23 @@ async def perform_greeting(room: rtc.Room):
             destination_identity="greeter", method="arrival", payload="Hello"
         )
         print(f'[Caller] That\'s nice, the greeter said: "{response}"')
+    except Exception as error:
+        print(f"[Caller] RPC call failed: {error}")
+        raise
+
+
+async def perform_send_very_long_info(room: rtc.Room):
+    print("[Caller] Sending the greeter a very long message")
+    try:
+        response = await room.local_participant.perform_rpc(
+            destination_identity="greeter",
+            method="exchanging-long-info",
+            payload="X" * 20_000,
+        )
+        print(
+            f"[Caller] The greeter's long info is {len(response)} chars long and "
+            f'starts with: "{response[:20]}..."'
+        )
     except Exception as error:
         print(f"[Caller] RPC call failed: {error}")
         raise

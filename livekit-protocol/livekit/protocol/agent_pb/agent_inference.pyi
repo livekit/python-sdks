@@ -203,8 +203,19 @@ class InferenceResponse(_message.Message):
     def __init__(self, eot_inference_response: _Optional[_Union[EotInferenceResponse, _Mapping]] = ..., interruption_inference_response: _Optional[_Union[InterruptionInferenceResponse, _Mapping]] = ...) -> None: ...
 
 class SessionCreated(_message.Message):
-    __slots__ = ()
-    def __init__(self) -> None: ...
+    __slots__ = ("default_thresholds", "default_threshold")
+    class DefaultThresholdsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: float
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[float] = ...) -> None: ...
+    DEFAULT_THRESHOLDS_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_THRESHOLD_FIELD_NUMBER: _ClassVar[int]
+    default_thresholds: _containers.ScalarMap[str, float]
+    default_threshold: float
+    def __init__(self, default_thresholds: _Optional[_Mapping[str, float]] = ..., default_threshold: _Optional[float] = ...) -> None: ...
 
 class InferenceStarted(_message.Message):
     __slots__ = ()

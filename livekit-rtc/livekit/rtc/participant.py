@@ -17,6 +17,7 @@ from __future__ import annotations
 import ctypes
 import asyncio
 import datetime
+import enum
 import os
 import mimetypes
 import aiofiles
@@ -28,6 +29,9 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import (
     TrackPublishOptions,
+)
+from ._proto.room_pb2 import (
+    ConnectionQuality as ProtoConnectionQuality,
 )
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
@@ -50,6 +54,7 @@ from .log import logger
 from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
+    TextStreamInfo,
     ByteStreamWriter,
     ByteStreamInfo,
     STREAM_CHUNK_SIZE,
@@ -88,10 +93,29 @@ class PublishDataTrackError(Exception):
         self.message = message
 
 
+class ConnectionQuality(enum.IntEnum):
+    """Connection quality reported for a participant."""
+
+    QUALITY_UNKNOWN = -1
+    """No connection-quality update has been reported yet (no proto equivalent)."""
+    QUALITY_POOR = ProtoConnectionQuality.QUALITY_POOR
+    QUALITY_GOOD = ProtoConnectionQuality.QUALITY_GOOD
+    QUALITY_EXCELLENT = ProtoConnectionQuality.QUALITY_EXCELLENT
+    QUALITY_LOST = ProtoConnectionQuality.QUALITY_LOST
+
+
+def _connection_quality_from_proto(value: int) -> ConnectionQuality:
+    try:
+        return ConnectionQuality(value)
+    except ValueError:
+        return ConnectionQuality.QUALITY_UNKNOWN
+
+
 class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
+        self._connection_quality = ConnectionQuality.QUALITY_UNKNOWN
 
     @property
     @abstractmethod
@@ -152,6 +176,16 @@ class Participant(ABC):
         return self._info.permission
 
     @property
+    def connection_quality(self) -> ConnectionQuality:
+        """The participant's most recently reported connection quality.
+
+        Returns ``ConnectionQuality.QUALITY_UNKNOWN`` until the first
+        connection-quality update is received. Updated automatically whenever a
+        ``connection_quality_changed`` event fires for this participant.
+        """
+        return self._connection_quality
+
+    @property
     def disconnect_reason(
         self,
     ) -> Optional[proto_participant.DisconnectReason.ValueType]:
@@ -192,7 +226,7 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
 
     @property
@@ -323,6 +357,7 @@ class LocalParticipant(Participant):
         method: str,
         payload: str,
         response_timeout: Optional[float] = None,
+        max_round_trip_latency: Optional[float] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -332,6 +367,12 @@ class LocalParticipant(Participant):
             method (str): The method name to call
             payload (str): The method payload
             response_timeout (Optional[float]): Timeout for receiving a response after initial connection
+            max_round_trip_latency (float): The maximum amount of time it should ever take for an RPC
+                request to reach the destination and for the ACK to come back. Defaults to 7 seconds to
+                account for various relay timeouts and retries in LiveKit Cloud that occur in rare cases.
+                Most callers should not need to change this, but it can be increased to tolerate
+                high-latency networks where RPC requests are backed up behind other messages on the
+                data channel.
 
         Returns:
             str: The response payload
@@ -346,6 +387,8 @@ class LocalParticipant(Participant):
         req.perform_rpc.payload = payload
         if response_timeout is not None:
             req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
+        if max_round_trip_latency is not None:
+            req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -357,7 +400,7 @@ class LocalParticipant(Participant):
         if cb.perform_rpc.HasField("error"):
             raise RpcError._from_proto(cb.perform_rpc.error)
 
-        return cb.perform_rpc.payload
+        return cast(str, cb.perform_rpc.payload)
 
     def register_rpc_method(
         self,
@@ -617,7 +660,7 @@ class LocalParticipant(Participant):
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
-    ):
+    ) -> TextStreamInfo:
         total_size = len(text.encode())
         writer = await self.stream_text(
             destination_identities=destination_identities,
@@ -783,6 +826,13 @@ class LocalParticipant(Participant):
         Raises:
             UnpublishTrackError: If there is an error in unpublishing the track.
         """
+        # Capture the publication before the FFI round-trip. The
+        # local_track_unpublished room event races this async response and may
+        # remove it from _track_publications first; holding our own reference
+        # guarantees the track is cleared once unpublish completes, regardless
+        # of which path removes the publication from the dict.
+        publication = self._track_publications.get(track_sid)
+
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
@@ -798,8 +848,11 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self._track_publications.pop(track_sid)
-            publication._track = None
+            # Remove defensively: the room-event handler may already have done
+            # so when it processed local_track_unpublished first.
+            self._track_publications.pop(track_sid, None)
+            if publication is not None:
+                publication._track = None
             queue.task_done()
         finally:
             self._room_queue.unsubscribe(queue)
@@ -811,7 +864,7 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self._track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, RemoteTrackPublication] = {}
 
     @property
     def track_publications(self) -> Mapping[str, RemoteTrackPublication]:

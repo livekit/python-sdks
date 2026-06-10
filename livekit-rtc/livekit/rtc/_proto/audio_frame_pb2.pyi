@@ -298,7 +298,15 @@ class NewAudioSourceRequest(google.protobuf.message.Message):
     PLATFORM_AUDIO_HANDLE_FIELD_NUMBER: builtins.int
     type: global___AudioSourceType.ValueType
     sample_rate: builtins.int
+    """Sample rate in Hz. Optional - defaults to 48000 if not specified.
+    For AudioSourcePlatform: ignored, ADM uses hardware native sample rate.
+    For AudioSourceNative with queue_size_ms=0 (fast path): ignored, frame values used directly.
+    """
     num_channels: builtins.int
+    """Number of audio channels. Optional - defaults to 1 (mono) if not specified.
+    For AudioSourcePlatform: ignored, ADM uses hardware native channels.
+    For AudioSourceNative with queue_size_ms=0 (fast path): ignored, frame values used directly.
+    """
     queue_size_ms: builtins.int
     platform_audio_handle: builtins.int
     """For AudioSourcePlatform: the PlatformAudio handle to configure audio processing on.
@@ -1307,6 +1315,12 @@ class GetAudioDevicesRequest(google.protobuf.message.Message):
     """Get available audio devices.
 
     Returns lists of available recording (microphone) and playout (speaker) devices.
+
+    # Platform Notes
+
+    - Desktop (Windows/macOS/Linux): Returns all available devices with names and GUIDs.
+    - Mobile (iOS/Android): Returns only one "default" device with empty name and GUID.
+      Device enumeration is not meaningful on mobile - use for device count only.
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -1359,6 +1373,12 @@ class SetRecordingDeviceRequest(google.protobuf.message.Message):
 
     Call this before creating audio tracks to select which microphone to use.
     Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
+
+    # Platform Notes
+
+    - Desktop: Works as expected - selects from enumerated devices.
+    - Mobile (iOS/Android): No-op. Mobile platforms handle microphone selection at the
+      system level. This will succeed but has no effect. Skip calling on mobile.
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -1386,10 +1406,8 @@ class SetRecordingDeviceResponse(google.protobuf.message.Message):
 
     ERROR_FIELD_NUMBER: builtins.int
     error: builtins.str
-    """Error message if the operation failed:
-    - "Device not found" if GUID doesn't match any device
-    - Other platform-specific errors
-    Empty/absent on success.
+    """Error message if the operation failed.
+    Empty/absent on success (including no-op success on mobile).
     """
     def __init__(
         self,
@@ -1407,6 +1425,14 @@ class SetPlayoutDeviceRequest(google.protobuf.message.Message):
 
     Call this before connecting to select which speaker to use for audio output.
     Use the GUID from AudioDeviceInfo for stable device selection across hot-plug events.
+
+    # Platform Notes
+
+    - Desktop: Works as expected - selects from enumerated devices.
+    - Mobile (iOS/Android): No-op. Mobile platforms handle audio routing at the system level.
+      This will succeed but has no effect. For audio routing on mobile:
+      - iOS: Use AVAudioSession to control speaker/earpiece/Bluetooth routing
+      - Android: Use AudioManager.setSpeakerphoneOn() to switch outputs
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -1434,10 +1460,8 @@ class SetPlayoutDeviceResponse(google.protobuf.message.Message):
 
     ERROR_FIELD_NUMBER: builtins.int
     error: builtins.str
-    """Error message if the operation failed:
-    - "Device not found" if GUID doesn't match any device
-    - Other platform-specific errors
-    Empty/absent on success.
+    """Error message if the operation failed.
+    Empty/absent on success (including no-op success on mobile).
     """
     def __init__(
         self,
