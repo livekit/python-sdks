@@ -146,6 +146,12 @@ class PlatformAudioSource:
 
     Note: This class is created via PlatformAudio.create_audio_source() and should
     not be instantiated directly.
+
+    Resource Management:
+        Call `close()` when done to immediately release native resources. If not
+        called, resources are released when the object is garbage collected, but
+        GC timing is non-deterministic and may cause issues on some platforms
+        (especially Windows) where audio device handles must be released promptly.
     """
 
     def __init__(self, ffi_handle: FfiHandle, info: proto_audio_frame.AudioSourceInfo):
@@ -156,6 +162,27 @@ class PlatformAudioSource:
     def _handle(self) -> int:
         """Internal FFI handle for use with LocalAudioTrack.create_audio_track()."""
         return self._ffi_handle.handle
+
+    def close(self) -> None:
+        """Release the native audio source resources.
+
+        Call this method when you are done using the audio source to immediately
+        release the underlying native handle. This is especially important on
+        Windows where audio device handles must be released promptly to avoid
+        interfering with other audio operations.
+
+        If `close()` is not called, resources will be released when the object
+        is garbage collected. However, Python's garbage collection timing is
+        non-deterministic, which can lead to:
+        - Audio device contention if creating new audio sources before old ones
+          are collected
+        - Test failures when running multiple audio tests in sequence
+        - Resource leaks in long-running applications that frequently create
+          and discard audio sources
+
+        It is safe to call `close()` multiple times; subsequent calls are no-ops.
+        """
+        self._ffi_handle.dispose()
 
 
 class PlatformAudio:
@@ -185,12 +212,18 @@ class PlatformAudio:
         source = platform_audio.create_audio_source()
         track = rtc.LocalAudioTrack.create_audio_track("mic", source)
         await room.local_participant.publish_track(track)
+
+        # When done, close resources
+        source.close()
+        platform_audio.close()
         ```
 
-    Note:
-        The PlatformAudio instance must be kept alive while audio is needed.
-        When all PlatformAudio instances are garbage collected, the ADM is
-        automatically disabled.
+    Resource Management:
+        Call `close()` when done to immediately release native ADM resources.
+        If not called, resources are released via garbage collection, but GC
+        timing is non-deterministic. On Windows especially, failing to promptly
+        release ADM resources can cause audio device contention and interfere
+        with subsequent audio operations (including synthetic AudioSource usage).
     """
 
     def __init__(self) -> None:
@@ -353,3 +386,41 @@ class PlatformAudio:
             FfiHandle(source_info.handle.id),
             source_info,
         )
+
+    def close(self) -> None:
+        """Release the native Audio Device Module resources.
+
+        Call this method when you are done using PlatformAudio to immediately
+        release the underlying ADM handle and associated native resources.
+
+        Why call close() explicitly?
+            Python's garbage collection is non-deterministic. If you rely on GC
+            to clean up PlatformAudio, the ADM may remain active longer than
+            expected. This can cause problems on some platforms (especially
+            Windows) where:
+
+            - Audio device handles are held longer than necessary, preventing
+              other applications or audio subsystems from accessing the devices
+            - Subsequent audio operations (including synthetic AudioSource) may
+              fail or behave unexpectedly due to ADM still being active
+            - Tests running in sequence may interfere with each other if the
+              previous test's ADM resources haven't been collected yet
+
+        What happens if close() is not called?
+            Resources will eventually be released when the PlatformAudio object
+            is garbage collected. This works fine in simple applications where
+            the object goes out of scope and is collected promptly. However, in
+            these scenarios you should call close() explicitly:
+
+            - Running multiple tests that use audio
+            - Switching between PlatformAudio and synthetic AudioSource
+            - Long-running applications that create/destroy audio resources
+            - Applications where prompt device release is important
+
+        It is safe to call `close()` multiple times; subsequent calls are no-ops.
+
+        Note:
+            Always close PlatformAudioSource instances before closing the parent
+            PlatformAudio instance.
+        """
+        self._ffi_handle.dispose()

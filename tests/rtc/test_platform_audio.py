@@ -16,6 +16,14 @@ _platform_audio_available: Optional[bool] = None
 _platform_audio_error: Optional[str] = None
 
 
+def _dispose_track(track: rtc.Track) -> None:
+    """Release track handles created only for local PlatformAudio tests.
+
+    Note: Track doesn't have a public close() method yet, so we use the internal API.
+    """
+    track._ffi_handle.dispose()
+
+
 def _check_platform_audio_available() -> tuple[bool, Optional[str]]:
     """Check if PlatformAudio can be initialized on this system."""
     global _platform_audio_available, _platform_audio_error
@@ -27,8 +35,7 @@ def _check_platform_audio_available() -> tuple[bool, Optional[str]]:
         pa = rtc.PlatformAudio()
         _platform_audio_available = True
         _platform_audio_error = None
-        # Keep reference to avoid cleanup issues
-        del pa
+        pa.close()
     except rtc.PlatformAudioError as e:
         _platform_audio_available = False
         _platform_audio_error = str(e)
@@ -60,8 +67,10 @@ def platform_audio():
         pytest.skip(f"PlatformAudio not available: {error}")
 
     pa = rtc.PlatformAudio()
-    yield pa
-    # Cleanup handled by garbage collection
+    try:
+        yield pa
+    finally:
+        pa.close()
 
 
 class TestPlatformAudioCreation:
@@ -79,9 +88,12 @@ class TestPlatformAudioCreation:
             pytest.skip(f"PlatformAudio not available: {error}")
 
         pa2 = rtc.PlatformAudio()
-        assert pa2 is not None
-        # Both should work
-        assert platform_audio is not None
+        try:
+            assert pa2 is not None
+            # Both should work
+            assert platform_audio is not None
+        finally:
+            pa2.close()
 
 
 class TestDeviceEnumeration:
@@ -197,8 +209,11 @@ class TestAudioSourceCreation:
     def test_create_audio_source_default_options(self, platform_audio):
         """Test creating an audio source with default options."""
         source = platform_audio.create_audio_source()
-        assert source is not None
-        assert isinstance(source, rtc.PlatformAudioSource)
+        try:
+            assert source is not None
+            assert isinstance(source, rtc.PlatformAudioSource)
+        finally:
+            source.close()
 
     def test_create_audio_source_custom_options(self, platform_audio):
         """Test creating an audio source with custom options."""
@@ -209,8 +224,11 @@ class TestAudioSourceCreation:
             prefer_hardware=False,
         )
         source = platform_audio.create_audio_source(options)
-        assert source is not None
-        assert isinstance(source, rtc.PlatformAudioSource)
+        try:
+            assert source is not None
+            assert isinstance(source, rtc.PlatformAudioSource)
+        finally:
+            source.close()
 
     def test_create_audio_source_all_processing_disabled(self, platform_audio):
         """Test creating an audio source with all processing disabled."""
@@ -220,24 +238,35 @@ class TestAudioSourceCreation:
             auto_gain_control=False,
         )
         source = platform_audio.create_audio_source(options)
-        assert source is not None
+        try:
+            assert source is not None
+        finally:
+            source.close()
 
     def test_audio_source_has_handle(self, platform_audio):
         """Test that created audio source has a valid internal handle."""
         source = platform_audio.create_audio_source()
-        # The _handle property is used internally for track creation
-        assert hasattr(source, "_handle")
-        assert source._handle > 0
+        try:
+            # The _handle property is used internally for track creation
+            assert hasattr(source, "_handle")
+            assert source._handle > 0
+        finally:
+            source.close()
 
     def test_create_multiple_audio_sources(self, platform_audio):
         """Test creating multiple audio sources from the same PlatformAudio."""
         source1 = platform_audio.create_audio_source()
-        source2 = platform_audio.create_audio_source()
-
-        assert source1 is not None
-        assert source2 is not None
-        # Each source should have a unique handle
-        assert source1._handle != source2._handle
+        source2 = None
+        try:
+            source2 = platform_audio.create_audio_source()
+            assert source1 is not None
+            assert source2 is not None
+            # Each source should have a unique handle
+            assert source1._handle != source2._handle
+        finally:
+            source1.close()
+            if source2 is not None:
+                source2.close()
 
 
 class TestPlatformAudioOptions:
@@ -291,8 +320,13 @@ class TestIntegrationWithTrack:
     def test_create_track_from_platform_audio_source(self, platform_audio):
         """Test creating a LocalAudioTrack from PlatformAudioSource."""
         source = platform_audio.create_audio_source()
-        track = rtc.LocalAudioTrack.create_audio_track("test-mic", source)
-
-        assert track is not None
-        assert track.name == "test-mic"
-        assert track.kind == rtc.TrackKind.KIND_AUDIO
+        track = None
+        try:
+            track = rtc.LocalAudioTrack.create_audio_track("test-mic", source)
+            assert track is not None
+            assert track.name == "test-mic"
+            assert track.kind == rtc.TrackKind.KIND_AUDIO
+        finally:
+            if track is not None:
+                _dispose_track(track)
+            source.close()

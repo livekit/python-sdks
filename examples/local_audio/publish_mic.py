@@ -54,12 +54,15 @@ def list_audio_devices() -> None:
         print(f"Failed to initialize PlatformAudio: {e}")
         return
 
-    print("\nRecording devices (microphones):")
-    for device in platform_audio.recording_devices():
-        print(f"  [{device.index}] {device.name}")
-        print(f"      ID: {device.id}")
+    try:
+        print("\nRecording devices (microphones):")
+        for device in platform_audio.recording_devices():
+            print(f"  [{device.index}] {device.name}")
+            print(f"      ID: {device.id}")
 
-    print()
+        print()
+    finally:
+        platform_audio.close()
 
 
 async def main(args: argparse.Namespace) -> None:
@@ -95,6 +98,7 @@ async def main(args: argparse.Namespace) -> None:
             logging.warning(f"Failed to select microphone: {e}")
 
     room = rtc.Room()
+    source = None
 
     # dB level monitoring
     mic_db_queue: queue.Queue[float] = queue.Queue()
@@ -170,6 +174,10 @@ async def main(args: argparse.Namespace) -> None:
             await room.disconnect()
         except Exception:
             pass
+        # Clean up PlatformAudio resources
+        if source is not None:
+            source.close()
+        platform_audio.close()
 
 
 if __name__ == "__main__":
