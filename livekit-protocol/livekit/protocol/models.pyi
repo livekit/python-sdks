@@ -789,8 +789,10 @@ class ClientInfo(_message.Message):
         __slots__ = ()
         CAP_UNUSED: _ClassVar[ClientInfo.Capability]
         CAP_PACKET_TRAILER: _ClassVar[ClientInfo.Capability]
+        CAP_COMPRESSION_DEFLATE_RAW: _ClassVar[ClientInfo.Capability]
     CAP_UNUSED: ClientInfo.Capability
     CAP_PACKET_TRAILER: ClientInfo.Capability
+    CAP_COMPRESSION_DEFLATE_RAW: ClientInfo.Capability
     SDK_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
@@ -1062,6 +1064,12 @@ class DataStream(_message.Message):
     UPDATE: DataStream.OperationType
     DELETE: DataStream.OperationType
     REACTION: DataStream.OperationType
+    class CompressionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        NONE: _ClassVar[DataStream.CompressionType]
+        DEFLATE_RAW: _ClassVar[DataStream.CompressionType]
+    NONE: DataStream.CompressionType
+    DEFLATE_RAW: DataStream.CompressionType
     class TextHeader(_message.Message):
         __slots__ = ("operation_type", "version", "reply_to_stream_id", "attached_stream_ids", "generated")
         OPERATION_TYPE_FIELD_NUMBER: _ClassVar[int]
@@ -1081,7 +1089,7 @@ class DataStream(_message.Message):
         name: str
         def __init__(self, name: _Optional[str] = ...) -> None: ...
     class Header(_message.Message):
-        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "attributes", "text_header", "byte_header")
+        __slots__ = ("stream_id", "timestamp", "topic", "mime_type", "total_length", "encryption_type", "attributes", "text_header", "byte_header", "inline_content", "compression")
         class AttributesEntry(_message.Message):
             __slots__ = ("key", "value")
             KEY_FIELD_NUMBER: _ClassVar[int]
@@ -1098,6 +1106,8 @@ class DataStream(_message.Message):
         ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
         TEXT_HEADER_FIELD_NUMBER: _ClassVar[int]
         BYTE_HEADER_FIELD_NUMBER: _ClassVar[int]
+        INLINE_CONTENT_FIELD_NUMBER: _ClassVar[int]
+        COMPRESSION_FIELD_NUMBER: _ClassVar[int]
         stream_id: str
         timestamp: int
         topic: str
@@ -1107,7 +1117,9 @@ class DataStream(_message.Message):
         attributes: _containers.ScalarMap[str, str]
         text_header: DataStream.TextHeader
         byte_header: DataStream.ByteHeader
-        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., byte_header: _Optional[_Union[DataStream.ByteHeader, _Mapping]] = ...) -> None: ...
+        inline_content: bytes
+        compression: DataStream.CompressionType
+        def __init__(self, stream_id: _Optional[str] = ..., timestamp: _Optional[int] = ..., topic: _Optional[str] = ..., mime_type: _Optional[str] = ..., total_length: _Optional[int] = ..., encryption_type: _Optional[_Union[Encryption.Type, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., text_header: _Optional[_Union[DataStream.TextHeader, _Mapping]] = ..., byte_header: _Optional[_Union[DataStream.ByteHeader, _Mapping]] = ..., inline_content: _Optional[bytes] = ..., compression: _Optional[_Union[DataStream.CompressionType, str]] = ...) -> None: ...
     class Chunk(_message.Message):
         __slots__ = ("stream_id", "chunk_index", "content", "version", "iv")
         STREAM_ID_FIELD_NUMBER: _ClassVar[int]
