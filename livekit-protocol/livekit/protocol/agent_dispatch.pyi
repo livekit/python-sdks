@@ -16,30 +16,48 @@ JRP_ON_FAILURE: JobRestartPolicy
 JRP_NEVER: JobRestartPolicy
 
 class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata", "restart_policy", "deployment")
+    __slots__ = ("agent_name", "room", "metadata", "restart_policy", "deployment", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     room: str
     metadata: str
     restart_policy: JobRestartPolicy
     deployment: str
-    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata", "restart_policy", "deployment")
+    __slots__ = ("agent_name", "metadata", "restart_policy", "deployment", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     metadata: str
     restart_policy: JobRestartPolicy
     deployment: str
-    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
     __slots__ = ("dispatch_id", "room")
@@ -64,7 +82,14 @@ class ListAgentDispatchResponse(_message.Message):
     def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy", "deployment")
+    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy", "deployment", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     ROOM_FIELD_NUMBER: _ClassVar[int]
@@ -72,6 +97,7 @@ class AgentDispatch(_message.Message):
     STATE_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     id: str
     agent_name: str
     room: str
@@ -79,7 +105,8 @@ class AgentDispatch(_message.Message):
     state: AgentDispatchState
     restart_policy: JobRestartPolicy
     deployment: str
-    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class AgentDispatchState(_message.Message):
     __slots__ = ("jobs", "created_at", "deleted_at")

@@ -203,8 +203,15 @@ class InferenceResponse(_message.Message):
     def __init__(self, eot_inference_response: _Optional[_Union[EotInferenceResponse, _Mapping]] = ..., interruption_inference_response: _Optional[_Union[InterruptionInferenceResponse, _Mapping]] = ...) -> None: ...
 
 class SessionCreated(_message.Message):
-    __slots__ = ("default_thresholds", "default_threshold")
+    __slots__ = ("default_thresholds", "default_threshold", "default_backchannel_thresholds", "default_backchannel_threshold")
     class DefaultThresholdsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: float
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[float] = ...) -> None: ...
+    class DefaultBackchannelThresholdsEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -213,9 +220,13 @@ class SessionCreated(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[float] = ...) -> None: ...
     DEFAULT_THRESHOLDS_FIELD_NUMBER: _ClassVar[int]
     DEFAULT_THRESHOLD_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_BACKCHANNEL_THRESHOLDS_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_BACKCHANNEL_THRESHOLD_FIELD_NUMBER: _ClassVar[int]
     default_thresholds: _containers.ScalarMap[str, float]
     default_threshold: float
-    def __init__(self, default_thresholds: _Optional[_Mapping[str, float]] = ..., default_threshold: _Optional[float] = ...) -> None: ...
+    default_backchannel_thresholds: _containers.ScalarMap[str, float]
+    default_backchannel_threshold: float
+    def __init__(self, default_thresholds: _Optional[_Mapping[str, float]] = ..., default_threshold: _Optional[float] = ..., default_backchannel_thresholds: _Optional[_Mapping[str, float]] = ..., default_backchannel_threshold: _Optional[float] = ...) -> None: ...
 
 class InferenceStarted(_message.Message):
     __slots__ = ()
@@ -230,7 +241,7 @@ class SessionClosed(_message.Message):
     def __init__(self) -> None: ...
 
 class EotPrediction(_message.Message):
-    __slots__ = ("probability", "inference_stats", "backend")
+    __slots__ = ("probability", "inference_stats", "backend", "backchannel_probability")
     class EotBackend(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         EOT_BACKEND_UNKNOWN: _ClassVar[EotPrediction.EotBackend]
@@ -242,10 +253,12 @@ class EotPrediction(_message.Message):
     PROBABILITY_FIELD_NUMBER: _ClassVar[int]
     INFERENCE_STATS_FIELD_NUMBER: _ClassVar[int]
     BACKEND_FIELD_NUMBER: _ClassVar[int]
+    BACKCHANNEL_PROBABILITY_FIELD_NUMBER: _ClassVar[int]
     probability: float
     inference_stats: InferenceStats
     backend: EotPrediction.EotBackend
-    def __init__(self, probability: _Optional[float] = ..., inference_stats: _Optional[_Union[InferenceStats, _Mapping]] = ..., backend: _Optional[_Union[EotPrediction.EotBackend, str]] = ...) -> None: ...
+    backchannel_probability: float
+    def __init__(self, probability: _Optional[float] = ..., inference_stats: _Optional[_Union[InferenceStats, _Mapping]] = ..., backend: _Optional[_Union[EotPrediction.EotBackend, str]] = ..., backchannel_probability: _Optional[float] = ...) -> None: ...
 
 class InterruptionPrediction(_message.Message):
     __slots__ = ("is_interruption", "probabilities", "inference_stats")
