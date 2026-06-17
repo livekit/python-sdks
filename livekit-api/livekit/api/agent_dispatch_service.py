@@ -35,7 +35,9 @@ class AgentDispatchService(Service):
         To use explicit dispatch, your agent must be registered with an `agentName`.
 
         Args:
-            req (CreateAgentDispatchRequest): Request containing dispatch creation parameters
+            req (CreateAgentDispatchRequest): Request containing dispatch creation parameters.
+                The request can include an optional `deployment` field to target a specific
+                deployment. Leave empty to target the production deployment.
 
         Returns:
             AgentDispatch: The created agent dispatch object

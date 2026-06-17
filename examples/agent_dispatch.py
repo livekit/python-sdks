@@ -5,11 +5,14 @@ room_name = "my-room"
 agent_name = "test-agent"
 
 """
-This example demonstrates how to have an agent join a room 
-without using the automatic dispatch. In order to use this 
-feature, you must have an agent running with `agent_name` set 
-when defining your WorkerOptions. A dispatch requests the 
+This example demonstrates how to have an agent join a room
+without using the automatic dispatch. In order to use this
+feature, you must have an agent running with `agent_name` set
+when defining your WorkerOptions. A dispatch requests the
 agent to enter a specific room with optional metadata.
+
+You can also specify a `deployment` to target a specific agent deployment.
+Leave empty to target the production deployment.
 """
 
 
@@ -18,7 +21,10 @@ async def create_explicit_dispatch():
 
     dispatch = await lkapi.agent_dispatch.create_dispatch(
         api.CreateAgentDispatchRequest(
-            agent_name=agent_name, room=room_name, metadata="my_metadata"
+            agent_name=agent_name,
+            room=room_name,
+            metadata="my_metadata",
+            # deployment="staging",  # Optional: target a specific deployment
         )
     )
     print("created dispatch", dispatch)
@@ -33,6 +39,9 @@ When agent name is set, the agent will no longer be automatically dispatched
 to new rooms. If you want that agent to be dispatched to a new room as soon as
 the participant connects, you can set the RoomConfiguration with the agent
 definition in the access token.
+
+You can also specify a `deployment` in the RoomAgentDispatch to target a specific
+agent deployment. Leave empty to target the production deployment.
 """
 
 
@@ -43,7 +52,13 @@ async def create_token_with_agent_dispatch() -> str:
         .with_grants(api.VideoGrants(room_join=True, room=room_name))
         .with_room_config(
             api.RoomConfiguration(
-                agents=[api.RoomAgentDispatch(agent_name="test-agent", metadata="my_metadata")],
+                agents=[
+                    api.RoomAgentDispatch(
+                        agent_name="test-agent",
+                        metadata="my_metadata",
+                        # deployment="staging",  # Optional: target a specific deployment
+                    )
+                ],
             ),
         )
         .to_jwt()
