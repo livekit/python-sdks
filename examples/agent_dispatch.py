@@ -19,23 +19,15 @@ Leave empty to target the production deployment.
 async def create_explicit_dispatch():
     lkapi = api.LiveKitAPI()
 
-    # Create a dispatch targeting the production deployment (default)
     dispatch = await lkapi.agent_dispatch.create_dispatch(
         api.CreateAgentDispatchRequest(
-            agent_name=agent_name, room=room_name, metadata="my_metadata"
+            agent_name=agent_name,
+            room=room_name,
+            metadata="my_metadata",
+            # deployment="staging",  # Optional: target a specific deployment
         )
     )
     print("created dispatch", dispatch)
-
-    # Create a dispatch targeting a specific deployment (e.g., "staging")
-    # dispatch = await lkapi.agent_dispatch.create_dispatch(
-    #     api.CreateAgentDispatchRequest(
-    #         agent_name=agent_name,
-    #         room=room_name,
-    #         metadata="my_metadata",
-    #         deployment="staging",
-    #     )
-    # )
 
     dispatches = await lkapi.agent_dispatch.list_dispatch(room_name=room_name)
     print(f"there are {len(dispatches)} dispatches in {room_name}")
