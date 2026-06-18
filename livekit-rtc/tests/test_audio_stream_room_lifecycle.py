@@ -621,3 +621,50 @@ def test_set_room_none_is_idempotent_for_cleared_callbacks() -> None:
     assert processor.stream_info_cleared_calls == 1
     assert processor.credentials_cleared_calls == 1
 
+
+def test_local_track_unpublished_event_nulls_publication_track() -> None:
+    """The `local_track_unpublished` room handler nulls
+    `unpublished._track` (mirroring `track_unsubscribed`) after clearing the
+    track's room. If only the room event fires (server-side removal with no
+    explicit `unpublish_track` call), the publication must not retain a stale
+    reference to the track.
+    """
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    local = _make_local_participant("agent")
+    room._local_participant = local
+
+    track = _make_track(sid="TR_1")
+    publication = _make_local_publication(sid="TR_1")
+    publication._track = track
+    local._track_publications["TR_1"] = publication
+    track._set_room(room)
+
+    room._on_room_event(
+        proto_room.RoomEvent(
+            local_track_unpublished=proto_room.LocalTrackUnpublished(publication_sid="TR_1"),
+        )
+    )
+
+    assert "TR_1" not in local._track_publications
+    assert publication.track is None
+
+
+def test_token_refresh_listener_only_removed_by_set_room_none() -> None:
+    """The `token_refreshed` listener a Track registers on its
+    Room is only ever removed by `_set_room(None)`. `Room.disconnect()` does not
+    walk tracks to clear them, so the listener (and the Room's strong reference to
+    the Track's bound method) lingers until the Room itself is collected. This
+    pins the listener lifecycle the leak stems from.
+    """
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    track = _make_track(sid="TR_1")
+
+    def _token_listeners(r: rtc.Room) -> int:
+        return len(r._events.get("token_refreshed", set()))
+
+    track._set_room(room)
+    assert _token_listeners(room) == 1
+
+    # Only _set_room(None) detaches it. Nothing in disconnect() does this today.
+    track._set_room(None)
+    assert _token_listeners(room) == 0

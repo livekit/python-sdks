@@ -761,6 +761,12 @@ class Room(EventEmitter[EventTypes]):
                 del self.local_participant._track_publications[sid]
                 if unpublished.track is not None:
                     unpublished.track._set_room(None)
+                    # Mirror track_unsubscribed: drop the publication's track
+                    # reference. This also makes unpublish_track's own
+                    # _set_room(None) a no-op when it loses the race (its
+                    # `publication._track is not None` guard short-circuits),
+                    # avoiding a redundant clear.
+                    unpublished._track = None
                 self.emit("local_track_unpublished", unpublished)
             else:
                 logging.debug("local_track_unpublished for untracked publication sid %s", sid)
