@@ -40,6 +40,12 @@ class Track:
 
     def _set_room(self, room: Optional[Room]) -> None:
         old_room = self._resolve_room()
+        if old_room is None and room is None:
+            # Already roomless — nothing to detach and nothing to re-clear.
+            # Without this guard a second _set_room(None) (e.g. the unpublish /
+            # local_track_unpublished race calling it from both paths) would
+            # re-fire _on_*_cleared on every registered processor.
+            return
         if old_room is not room:
             if old_room is not None:
                 old_room.off("token_refreshed", self._on_room_token_refreshed)

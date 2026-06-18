@@ -605,3 +605,19 @@ async def test_unpublish_track_clears_processor_when_it_wins_the_event_race(
     # room-event handler never ran
     assert processor.stream_info_cleared_calls == cleared_info_before + 1
     assert processor.credentials_cleared_calls == cleared_creds_before + 1
+
+
+def test_set_room_none_is_idempotent_for_cleared_callbacks() -> None:
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    _attach_publication(room, identity="alice", track_sid="TR_1", pub_sid="PUB_1")
+    track = _make_track(sid="TR_1")
+    track._set_room(room)
+    processor = _RecordingProcessor()
+    _stream = _make_stream(track=track, processor=processor)  # noqa: F841
+
+    track._set_room(None)  # first clear (e.g. room event handler)
+    track._set_room(None)  # second clear (e.g. unpublish_track on the same track)
+
+    assert processor.stream_info_cleared_calls == 1
+    assert processor.credentials_cleared_calls == 1
+
