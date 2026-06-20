@@ -36,9 +36,14 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
 
       - name: Install Protoc
+        # protoc 29.x emits gencode 5.x. Do NOT bump to 30+ (gencode 6+): the
+        # protobuf runtime is capped at <7 by livekit-agents deps
+        # (opentelemetry-proto, grpcio-tools), and generate_proto.sh enforces a
+        # gencode<=5 guard. gencode 5 loads on any runtime >=5 (5/6/7). See the
+        # comment block in livekit-protocol/generate_proto.sh.
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
         with:
-          version: "25.1"
+          version: "29.3"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: generate python stubs

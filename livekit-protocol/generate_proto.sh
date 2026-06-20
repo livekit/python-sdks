@@ -19,6 +19,48 @@
 set -e
 
 
+# --- protoc / gencode version guard -------------------------------------------
+#
+# Generated *_pb2.py stubs (protobuf>=5) embed a "gencode" version and a runtime
+# check that REFUSES to import when the installed protobuf runtime is OLDER than
+# the gencode (raising google.protobuf.runtime_version.VersionError). The only
+# rule is runtime >= gencode; there is NO lower bound, so gencode-N stubs load on
+# any runtime >= N (N, N+1, ...).
+#
+# IMPORTANT LIMITATION: the protobuf runtime is capped at <7 (tops out at 6.x)
+# because livekit-agents pulls deps that pin protobuf<7 — opentelemetry-proto
+# (via opentelemetry-exporter-otlp) and grpcio-tools (via the nvidia plugin).
+#
+# We target gencode 5 (protoc 26.x-29.x, e.g. protoc 29.3 => gencode 5.29.x):
+#   * gencode 5 needs only runtime >= 5, so it works on every 5.x / 6.x runtime
+#     AND a future 7.x — no regen needed when the <7 cap is eventually lifted.
+#   * gencode 6 would be minor-sensitive against today's pinned 6.x runtime
+#     (e.g. gencode 6.34 fails to import on runtime 6.33), so it is NOT safe yet.
+#   * gencode 7+ (libprotoc 35+) requires runtime >= 7 and breaks outright today.
+# This guard rejects gencode > 5. Ships stubs require protobuf>=5 (see pyproject).
+MAX_GENCODE_MAJOR=5
+
+_probe_dir=$(mktemp -d)
+trap 'rm -rf "$_probe_dir"' EXIT
+printf 'syntax = "proto3";\nmessage _ProtocVersionProbe {}\n' > "$_probe_dir/probe.proto"
+protoc -I="$_probe_dir" --python_out="$_probe_dir" "$_probe_dir/probe.proto"
+gencode_major=$(sed -n 's/^# Protobuf Python Version: \([0-9][0-9]*\).*/\1/p' "$_probe_dir/probe_pb2.py")
+
+if [ -z "$gencode_major" ]; then
+    # protoc <3.20 didn't stamp a version line; that predates the runtime guard
+    # entirely, so it's safe.
+    echo "note: protoc ($(protoc --version)) emits no gencode version stamp (pre-guard); proceeding."
+elif [ "$gencode_major" -gt "$MAX_GENCODE_MAJOR" ]; then
+    echo "ERROR: protoc ($(protoc --version)) emits gencode major ${gencode_major}, but this" >&2
+    echo "       package targets gencode ${MAX_GENCODE_MAJOR} (see the comment above). The" >&2
+    echo "       protobuf runtime is capped at <7 (6.x) by livekit-agents dependencies" >&2
+    echo "       (opentelemetry-proto, grpcio-tools), and gencode 6+ is not safe against it." >&2
+    echo "       Install protoc 26.x-29.x (e.g. a pinned protoc-29.3 download, or" >&2
+    echo "       'brew install protobuf@29'); protoc 29.3 emits gencode 5.29.x." >&2
+    exit 1
+fi
+
+
 API_PROTOCOL=./protocol/protobufs
 API_OUT_PYTHON=./livekit/protocol
 
