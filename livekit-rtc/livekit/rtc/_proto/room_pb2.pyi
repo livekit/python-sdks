@@ -80,6 +80,29 @@ reconnect (new RtcSession; SDK republishes existing local tracks).
 """
 global___SimulateScenarioKind = SimulateScenarioKind
 
+class _VideoEncoderBackend:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _VideoEncoderBackendEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_VideoEncoderBackend.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    ENCODER_BACKEND_AUTO: _VideoEncoderBackend.ValueType  # 0
+    ENCODER_BACKEND_SOFTWARE: _VideoEncoderBackend.ValueType  # 1
+    ENCODER_BACKEND_HARDWARE: _VideoEncoderBackend.ValueType  # 2
+    ENCODER_BACKEND_NVENC: _VideoEncoderBackend.ValueType  # 3
+    ENCODER_BACKEND_VAAPI: _VideoEncoderBackend.ValueType  # 4
+    ENCODER_BACKEND_VIDEOTOOLBOX: _VideoEncoderBackend.ValueType  # 5
+
+class VideoEncoderBackend(_VideoEncoderBackend, metaclass=_VideoEncoderBackendEnumTypeWrapper): ...
+
+ENCODER_BACKEND_AUTO: VideoEncoderBackend.ValueType  # 0
+ENCODER_BACKEND_SOFTWARE: VideoEncoderBackend.ValueType  # 1
+ENCODER_BACKEND_HARDWARE: VideoEncoderBackend.ValueType  # 2
+ENCODER_BACKEND_NVENC: VideoEncoderBackend.ValueType  # 3
+ENCODER_BACKEND_VAAPI: VideoEncoderBackend.ValueType  # 4
+ENCODER_BACKEND_VIDEOTOOLBOX: VideoEncoderBackend.ValueType  # 5
+global___VideoEncoderBackend = VideoEncoderBackend
+
 class _IceTransportType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -1218,6 +1241,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
     PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
     SCALABILITY_MODE_FIELD_NUMBER: builtins.int
+    VIDEO_ENCODER_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
     dtx: builtins.bool
     red: builtins.bool
@@ -1230,6 +1254,8 @@ class TrackPublishOptions(google.protobuf.message.Message):
     encoding is produced with this mode, enabling true SVC for codecs
     that support it (VP9, AV1). Has no effect for VP8/H264.
     """
+    video_encoder: global___VideoEncoderBackend.ValueType
+    """Preferred encoder backend to use when publishing a video track."""
     @property
     def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
@@ -1252,9 +1278,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
         preconnect_buffer: builtins.bool | None = ...,
         packet_trailer_features: collections.abc.Iterable[track_pb2.PacketTrailerFeature.ValueType] | None = ...,
         scalability_mode: builtins.str | None = ...,
+        video_encoder: global___VideoEncoderBackend.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoding", b"video_encoding"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 
