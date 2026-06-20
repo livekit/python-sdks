@@ -293,7 +293,7 @@ class ParticipantPermission(_message.Message):
     def __init__(self, can_subscribe: bool = ..., can_publish: bool = ..., can_publish_data: bool = ..., can_publish_sources: _Optional[_Iterable[_Union[TrackSource, str]]] = ..., hidden: bool = ..., recorder: bool = ..., can_update_metadata: bool = ..., agent: bool = ..., can_subscribe_metrics: bool = ..., can_manage_agent_session: bool = ...) -> None: ...
 
 class ParticipantInfo(_message.Message):
-    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks", "client_protocol")
+    __slots__ = ("sid", "identity", "state", "tracks", "metadata", "joined_at", "joined_at_ms", "name", "version", "permission", "region", "is_publisher", "kind", "attributes", "disconnect_reason", "kind_details", "data_tracks", "client_protocol", "capabilities")
     class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         JOINING: _ClassVar[ParticipantInfo.State]
@@ -357,6 +357,7 @@ class ParticipantInfo(_message.Message):
     KIND_DETAILS_FIELD_NUMBER: _ClassVar[int]
     DATA_TRACKS_FIELD_NUMBER: _ClassVar[int]
     CLIENT_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
+    CAPABILITIES_FIELD_NUMBER: _ClassVar[int]
     sid: str
     identity: str
     state: ParticipantInfo.State
@@ -375,7 +376,8 @@ class ParticipantInfo(_message.Message):
     kind_details: _containers.RepeatedScalarFieldContainer[ParticipantInfo.KindDetail]
     data_tracks: _containers.RepeatedCompositeFieldContainer[DataTrackInfo]
     client_protocol: int
-    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ..., client_protocol: _Optional[int] = ...) -> None: ...
+    capabilities: _containers.RepeatedScalarFieldContainer[ClientInfo.Capability]
+    def __init__(self, sid: _Optional[str] = ..., identity: _Optional[str] = ..., state: _Optional[_Union[ParticipantInfo.State, str]] = ..., tracks: _Optional[_Iterable[_Union[TrackInfo, _Mapping]]] = ..., metadata: _Optional[str] = ..., joined_at: _Optional[int] = ..., joined_at_ms: _Optional[int] = ..., name: _Optional[str] = ..., version: _Optional[int] = ..., permission: _Optional[_Union[ParticipantPermission, _Mapping]] = ..., region: _Optional[str] = ..., is_publisher: bool = ..., kind: _Optional[_Union[ParticipantInfo.Kind, str]] = ..., attributes: _Optional[_Mapping[str, str]] = ..., disconnect_reason: _Optional[_Union[DisconnectReason, str]] = ..., kind_details: _Optional[_Iterable[_Union[ParticipantInfo.KindDetail, str]]] = ..., data_tracks: _Optional[_Iterable[_Union[DataTrackInfo, _Mapping]]] = ..., client_protocol: _Optional[int] = ..., capabilities: _Optional[_Iterable[_Union[ClientInfo.Capability, str]]] = ...) -> None: ...
 
 class Encryption(_message.Message):
     __slots__ = ()
