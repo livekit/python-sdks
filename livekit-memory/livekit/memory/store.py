@@ -75,10 +75,13 @@ class MemoryStore:
         """
         self._embedder = coerce_embedder(embedder, dims)
         self._dims = self._embedder.dims
-        self._backend_name = backend
         self._lock = threading.RLock()
 
         self._collection: VectorIndex = make_index(self._dims, backend, expected_size=expected_size)
+        # Record the *resolved* concrete backend ("bruteforce"|"usearch"), not the
+        # configured one — "auto" depends on expected_size, which we don't persist, so
+        # snapshots and clear() must rebuild from what was actually selected.
+        self._backend_name = self._collection.kind
         # Facts are always exact and fully scanned — keep them brute-force regardless.
         self._facts: VectorIndex = BruteForceIndex(self._dims)
 

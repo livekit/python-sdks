@@ -3,6 +3,8 @@ offline with no model downloads (pure-Python, like tests/api/*)."""
 
 from __future__ import annotations
 
+import json
+
 import numpy as np
 import pytest
 
@@ -11,6 +13,7 @@ from livekit.memory import (
     BruteForceIndex,
     HashingEmbedder,
     MemoryStore,
+    UsearchIndex,
 )
 
 
@@ -114,6 +117,38 @@ def test_save_and_load(tmp_path):
     assert loaded.all(namespace=FACTS_NAMESPACE)[0].text == "user is Ada"
     hits = loaded.search("hiking trips", limit=1)
     assert hits[0].metadata == {"k": 1}
+
+
+def test_snapshot_records_resolved_backend_not_auto(tmp_path):
+    # backend="auto" must persist the concrete backend it resolved to, never "auto",
+    # so load() rebuilds the right index type.
+    store = make_store(backend="auto")
+    store.save(tmp_path / "snap")
+    with open(tmp_path / "snap" / "meta.json") as f:
+        meta = json.load(f)
+    assert meta["backend"] in ("bruteforce", "usearch")
+    assert meta["backend"] != "auto"
+
+
+def test_usearch_auto_save_load_roundtrip(tmp_path):
+    # Regression: backend="auto" + large expected_size selects UsearchIndex; the
+    # snapshot must reload as UsearchIndex rather than crashing in BruteForceIndex.load.
+    pytest.importorskip("usearch")
+    emb = HashingEmbedder(dims=64)
+    store = MemoryStore(embedder=emb, backend="auto", expected_size=200_000)
+    assert isinstance(store._collection, UsearchIndex)
+
+    store.upsert("name", "user is Ada")  # fact -> brute force
+    for i in range(20):
+        store.add(f"memory number {i} about topic {i % 5}")
+    store.save(tmp_path / "snap")
+
+    loaded = MemoryStore.load(tmp_path / "snap", embedder=HashingEmbedder(dims=64))
+    assert isinstance(loaded._collection, UsearchIndex)
+    assert len(loaded) == 21
+    assert loaded.all(namespace=FACTS_NAMESPACE)[0].text == "user is Ada"
+    hits = loaded.search("memory number 7 about topic 2", limit=1)
+    assert hits and "number 7" in hits[0].text
 
 
 def test_dimension_mismatch_rejected():

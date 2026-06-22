@@ -43,6 +43,10 @@ ANN_CROSSOVER = 100_000
 class VectorIndex(Protocol):
     """Minimal index interface used by `MemoryStore`."""
 
+    # Concrete backend tag ("bruteforce" | "usearch"); persisted in snapshots so a
+    # store created with backend="auto" reloads the same index type it resolved to.
+    kind: str
+
     @property
     def dims(self) -> int: ...
 
@@ -65,6 +69,8 @@ class BruteForceIndex:
     Vectors are stored already L2-normalized so search is one `matrix @ query` plus a
     partial top-k selection. Removal is O(1) swap-with-last to keep the matrix dense.
     """
+
+    kind = "bruteforce"
 
     def __init__(self, dims: int, *, initial_capacity: int = 1024) -> None:
         self._dims = int(dims)
@@ -156,6 +162,8 @@ class UsearchIndex:
     Use for large per-user corpora (≳100k vectors). Cosine metric; scores are returned
     as similarity (1 - distance) to match `BruteForceIndex`.
     """
+
+    kind = "usearch"
 
     def __init__(
         self,
