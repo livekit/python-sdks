@@ -759,15 +759,21 @@ class Room(EventEmitter[EventTypes]):
             unpublished = self.local_participant._track_publications.get(sid)
             if unpublished is not None:
                 del self.local_participant._track_publications[sid]
-                if unpublished.track is not None:
-                    unpublished.track._set_room(None)
-                    # Mirror track_unsubscribed: drop the publication's track
-                    # reference. This also makes unpublish_track's own
-                    # _set_room(None) a no-op when it loses the race (its
-                    # `publication._track is not None` guard short-circuits),
-                    # avoiding a redundant clear.
-                    unpublished._track = None
+                track = unpublished.track
+                if track is not None:
+                    track._set_room(None)
+                # Emit while `publication.track` is still set, preserving the
+                # pre-existing payload for callbacks. This handler is synchronous
+                # and emit() invokes listeners synchronously, so nulling the track
+                # right after still completes before any other coroutine (e.g.
+                # unpublish_track) can interleave.
                 self.emit("local_track_unpublished", unpublished)
+                # Mirror track_unsubscribed: drop the publication's track
+                # reference. This also makes unpublish_track's own _set_room(None)
+                # a no-op when it loses the race (its `publication._track is not
+                # None` guard short-circuits), avoiding a redundant clear.
+                if track is not None:
+                    unpublished._track = None
             else:
                 logging.debug("local_track_unpublished for untracked publication sid %s", sid)
         elif which == "local_track_republished":

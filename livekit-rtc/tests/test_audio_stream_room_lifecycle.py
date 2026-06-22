@@ -649,6 +649,40 @@ def test_local_track_unpublished_event_nulls_publication_track() -> None:
     assert publication.track is None
 
 
+def test_local_track_unpublished_callback_still_sees_track() -> None:
+    """Backwards-compat: `publication._track` is nulled AFTER the
+    `local_track_unpublished` event is emitted, so a callback that reads
+    `publication.track` during the event still observes the track (matching
+    pre-PR behavior), while the reference is dropped once the handler returns.
+    """
+    room = _make_room(name="room-1", token="tok-1", url="wss://r")
+    local = _make_local_participant("agent")
+    room._local_participant = local
+
+    track = _make_track(sid="TR_1")
+    publication = _make_local_publication(sid="TR_1")
+    publication._track = track
+    local._track_publications["TR_1"] = publication
+    track._set_room(room)
+
+    seen_track: list[Optional[rtc.Track]] = []
+
+    @room.on("local_track_unpublished")
+    def _on_unpublished(pub: rtc.LocalTrackPublication) -> None:
+        seen_track.append(pub.track)
+
+    room._on_room_event(
+        proto_room.RoomEvent(
+            local_track_unpublished=proto_room.LocalTrackUnpublished(publication_sid="TR_1"),
+        )
+    )
+
+    # the callback saw the track (backwards-compatible payload) ...
+    assert seen_track == [track]
+    # ... and the reference is dropped once the handler returns
+    assert publication.track is None
+
+
 def test_token_refresh_listener_only_removed_by_set_room_none() -> None:
     """The `token_refreshed` listener a Track registers on its
     Room is only ever removed by `_set_room(None)`. `Room.disconnect()` does not
