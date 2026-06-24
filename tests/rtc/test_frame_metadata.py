@@ -78,6 +78,24 @@ async def test_track_publication_exposes_frame_metadata_features() -> None:
     ]
 
 
+def test_packet_trailer_names_remain_as_deprecated_aliases() -> None:
+    # The old "Packet Trailer" names are kept as backwards-compatible aliases.
+    assert rtc.PacketTrailerFeature is rtc.FrameMetadataFeature
+
+
+@pytest.mark.asyncio
+async def test_packet_trailer_features_property_is_deprecated_alias() -> None:
+    publication = rtc.LocalTrackPublication(
+        _owned_publication(
+            "TR_OLD",
+            frame_metadata_features=[proto_track.FMF_USER_TIMESTAMP],
+        )
+    )
+
+    with pytest.deprecated_call():
+        assert publication.packet_trailer_features == publication.frame_metadata_features
+
+
 def test_video_source_capture_frame_copies_metadata(monkeypatch: pytest.MonkeyPatch) -> None:
     captured_requests: list[proto_ffi.FfiRequest] = []
 

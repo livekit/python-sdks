@@ -14,6 +14,7 @@
 
 from typing import List, Optional, cast
 import asyncio
+import warnings
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import e2ee_pb2 as proto_e2ee
@@ -82,6 +83,16 @@ class TrackPublication:
     @property
     def frame_metadata_features(self) -> List[proto_track.FrameMetadataFeature.ValueType]:
         return list(self._info.frame_metadata_features)
+
+    @property
+    def packet_trailer_features(self) -> List[proto_track.FrameMetadataFeature.ValueType]:
+        """Deprecated: renamed to :attr:`frame_metadata_features`."""
+        warnings.warn(
+            "packet_trailer_features is deprecated, use frame_metadata_features instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return self.frame_metadata_features
 
 
 class LocalTrackPublication(TrackPublication):

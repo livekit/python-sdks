@@ -134,6 +134,10 @@ from .data_track import (
 )
 from .frame_processor import FrameProcessor
 
+# Deprecated alias: "Packet Trailer" was renamed to "Frame Metadata" upstream.
+# Prefer FrameMetadataFeature; this alias will be removed in a future release.
+PacketTrailerFeature = FrameMetadataFeature
+
 __all__ = [
     "ConnectionQuality",
     "ConnectionState",
@@ -149,6 +153,7 @@ __all__ = [
     "TrackKind",
     "TrackSource",
     "FrameMetadataFeature",
+    "PacketTrailerFeature",
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
