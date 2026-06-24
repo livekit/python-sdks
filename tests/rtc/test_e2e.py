@@ -144,9 +144,9 @@ async def test_publish_track() -> None:
 
 @pytest.mark.asyncio
 @skip_if_no_credentials()  # type: ignore[untyped-decorator]
-async def test_video_packet_trailer_metadata() -> None:
-    """Test that packet trailer metadata can be sent and received on video frames."""
-    room_name = unique_room_name("test-video-packet-trailer")
+async def test_video_frame_metadata() -> None:
+    """Test that frame metadata can be sent and received on video frames."""
+    room_name = unique_room_name("test-video-frame-metadata")
     url = os.getenv("LIVEKIT_URL")
     assert url is not None
 
@@ -184,21 +184,21 @@ async def test_video_packet_trailer_metadata() -> None:
         frame_width, frame_height = 320, 240
         source = rtc.VideoSource(frame_width, frame_height)
         track = rtc.LocalVideoTrack.create_video_track("metadata-video", source)
-        packet_trailer_features = [
-            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
-            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        frame_metadata_features = [
+            rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP,
+            rtc.FrameMetadataFeature.FMF_FRAME_ID,
         ]
         options = rtc.TrackPublishOptions(
             source=rtc.TrackSource.SOURCE_CAMERA,
-            packet_trailer_features=packet_trailer_features,
+            frame_metadata_features=frame_metadata_features,
         )
         publication = await publisher_room.local_participant.publish_track(track, options)
 
-        assert publication.packet_trailer_features == packet_trailer_features
+        assert publication.frame_metadata_features == frame_metadata_features
         await asyncio.wait_for(track_subscribed_event.wait(), timeout=5.0)
         assert subscribed_track is not None
         assert subscribed_publication is not None
-        assert subscribed_publication.packet_trailer_features == packet_trailer_features
+        assert subscribed_publication.frame_metadata_features == frame_metadata_features
 
         video_stream = rtc.VideoStream.from_track(track=subscribed_track, capacity=1)
         frame = rtc.VideoFrame(
@@ -255,15 +255,15 @@ async def test_full_reconnect_preserves_local_publication_object() -> None:
 
         source = rtc.VideoSource(2, 2)
         track = rtc.LocalVideoTrack.create_video_track("republish-video", source)
-        packet_trailer_features = [
-            rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP,
-            rtc.PacketTrailerFeature.PTF_FRAME_ID,
+        frame_metadata_features = [
+            rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP,
+            rtc.FrameMetadataFeature.FMF_FRAME_ID,
         ]
         publication = await room.local_participant.publish_track(
             track,
             rtc.TrackPublishOptions(
                 source=rtc.TrackSource.SOURCE_CAMERA,
-                packet_trailer_features=packet_trailer_features,
+                frame_metadata_features=frame_metadata_features,
             ),
         )
         previous_sid = publication.sid
@@ -282,7 +282,7 @@ async def test_full_reconnect_preserves_local_publication_object() -> None:
 
         assert publication.sid != previous_sid
         assert previous_sid not in room.local_participant.track_publications
-        assert publication.packet_trailer_features == packet_trailer_features
+        assert publication.frame_metadata_features == frame_metadata_features
 
     finally:
         if source is not None:

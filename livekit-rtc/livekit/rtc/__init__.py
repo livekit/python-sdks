@@ -37,7 +37,7 @@ from ._proto.room_pb2 import (
     VideoEncoding,
 )
 from ._proto.track_pb2 import (
-    PacketTrailerFeature,
+    FrameMetadataFeature,
     StreamState,
     TrackKind,
     TrackSource,
@@ -148,7 +148,7 @@ __all__ = [
     "StreamState",
     "TrackKind",
     "TrackSource",
-    "PacketTrailerFeature",
+    "FrameMetadataFeature",
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",

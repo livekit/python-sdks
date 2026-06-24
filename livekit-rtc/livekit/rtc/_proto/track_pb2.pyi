@@ -117,20 +117,20 @@ TF_PRECONNECT_BUFFER: AudioTrackFeature.ValueType  # 6
 """client will buffer audio once available and send it to the server via bytes stream once connected"""
 global___AudioTrackFeature = AudioTrackFeature
 
-class _PacketTrailerFeature:
+class _FrameMetadataFeature:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _PacketTrailerFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PacketTrailerFeature.ValueType], builtins.type):
+class _FrameMetadataFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_FrameMetadataFeature.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
-    PTF_USER_TIMESTAMP: _PacketTrailerFeature.ValueType  # 0
-    PTF_FRAME_ID: _PacketTrailerFeature.ValueType  # 1
+    FMF_USER_TIMESTAMP: _FrameMetadataFeature.ValueType  # 0
+    FMF_FRAME_ID: _FrameMetadataFeature.ValueType  # 1
 
-class PacketTrailerFeature(_PacketTrailerFeature, metaclass=_PacketTrailerFeatureEnumTypeWrapper): ...
+class FrameMetadataFeature(_FrameMetadataFeature, metaclass=_FrameMetadataFeatureEnumTypeWrapper): ...
 
-PTF_USER_TIMESTAMP: PacketTrailerFeature.ValueType  # 0
-PTF_FRAME_ID: PacketTrailerFeature.ValueType  # 1
-global___PacketTrailerFeature = PacketTrailerFeature
+FMF_USER_TIMESTAMP: FrameMetadataFeature.ValueType  # 0
+FMF_FRAME_ID: FrameMetadataFeature.ValueType  # 1
+global___FrameMetadataFeature = FrameMetadataFeature
 
 @typing.final
 class CreateVideoTrackRequest(google.protobuf.message.Message):
@@ -296,7 +296,7 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     REMOTE_FIELD_NUMBER: builtins.int
     ENCRYPTION_TYPE_FIELD_NUMBER: builtins.int
     AUDIO_FEATURES_FIELD_NUMBER: builtins.int
-    PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
+    FRAME_METADATA_FEATURES_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     kind: global___TrackKind.ValueType
@@ -311,7 +311,7 @@ class TrackPublicationInfo(google.protobuf.message.Message):
     @property
     def audio_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___AudioTrackFeature.ValueType]: ...
     @property
-    def packet_trailer_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___PacketTrailerFeature.ValueType]: ...
+    def frame_metadata_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[global___FrameMetadataFeature.ValueType]: ...
     def __init__(
         self,
         *,
@@ -327,10 +327,10 @@ class TrackPublicationInfo(google.protobuf.message.Message):
         remote: builtins.bool | None = ...,
         encryption_type: e2ee_pb2.EncryptionType.ValueType | None = ...,
         audio_features: collections.abc.Iterable[global___AudioTrackFeature.ValueType] | None = ...,
-        packet_trailer_features: collections.abc.Iterable[global___PacketTrailerFeature.ValueType] | None = ...,
+        frame_metadata_features: collections.abc.Iterable[global___FrameMetadataFeature.ValueType] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "packet_trailer_features", b"packet_trailer_features", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["audio_features", b"audio_features", "encryption_type", b"encryption_type", "frame_metadata_features", b"frame_metadata_features", "height", b"height", "kind", b"kind", "mime_type", b"mime_type", "muted", b"muted", "name", b"name", "remote", b"remote", "sid", b"sid", "simulcasted", b"simulcasted", "source", b"source", "width", b"width"]) -> None: ...
 
 global___TrackPublicationInfo = TrackPublicationInfo
 

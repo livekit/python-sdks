@@ -58,6 +58,11 @@ class _SimulateScenarioKindEnumTypeWrapper(google.protobuf.internal.enum_type_wr
     """Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
     reconnect (new RtcSession; SDK republishes existing local tracks).
     """
+    SIMULATE_DISCONNECT_SIGNAL_ON_RESUME: _SimulateScenarioKind.ValueType  # 8
+    """Asks the server to drop the signalling connection during the next resume,
+    then triggers a resume locally. The resume cannot complete, so the engine
+    escalates to a full reconnect — exercising the resume→full escalation path.
+    """
 
 class SimulateScenarioKind(_SimulateScenarioKind, metaclass=_SimulateScenarioKindEnumTypeWrapper):
     """Simulate a reconnection scenario for testing. Mirrors the variants of
@@ -77,6 +82,11 @@ SIMULATE_FORCE_TLS: SimulateScenarioKind.ValueType  # 6
 SIMULATE_FULL_RECONNECT: SimulateScenarioKind.ValueType  # 7
 """Asks the server to send `LeaveRequest{Reconnect}`, forcing a full
 reconnect (new RtcSession; SDK republishes existing local tracks).
+"""
+SIMULATE_DISCONNECT_SIGNAL_ON_RESUME: SimulateScenarioKind.ValueType  # 8
+"""Asks the server to drop the signalling connection during the next resume,
+then triggers a resume locally. The resume cannot complete, so the engine
+escalates to a full reconnect — exercising the resume→full escalation path.
 """
 global___SimulateScenarioKind = SimulateScenarioKind
 
@@ -1239,7 +1249,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     SOURCE_FIELD_NUMBER: builtins.int
     STREAM_FIELD_NUMBER: builtins.int
     PRECONNECT_BUFFER_FIELD_NUMBER: builtins.int
-    PACKET_TRAILER_FEATURES_FIELD_NUMBER: builtins.int
+    FRAME_METADATA_FEATURES_FIELD_NUMBER: builtins.int
     SCALABILITY_MODE_FIELD_NUMBER: builtins.int
     VIDEO_ENCODER_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
@@ -1263,7 +1273,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     @property
     def audio_encoding(self) -> global___AudioEncoding: ...
     @property
-    def packet_trailer_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[track_pb2.PacketTrailerFeature.ValueType]: ...
+    def frame_metadata_features(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[track_pb2.FrameMetadataFeature.ValueType]: ...
     def __init__(
         self,
         *,
@@ -1276,12 +1286,12 @@ class TrackPublishOptions(google.protobuf.message.Message):
         source: track_pb2.TrackSource.ValueType | None = ...,
         stream: builtins.str | None = ...,
         preconnect_buffer: builtins.bool | None = ...,
-        packet_trailer_features: collections.abc.Iterable[track_pb2.PacketTrailerFeature.ValueType] | None = ...,
+        frame_metadata_features: collections.abc.Iterable[track_pb2.FrameMetadataFeature.ValueType] | None = ...,
         scalability_mode: builtins.str | None = ...,
         video_encoder: global___VideoEncoderBackend.ValueType | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "packet_trailer_features", b"packet_trailer_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "frame_metadata_features", b"frame_metadata_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 
