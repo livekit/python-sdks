@@ -18,6 +18,8 @@
 See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for more information.
 """
 
+import warnings
+
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
 from ._proto.participant_pb2 import (
@@ -134,9 +136,38 @@ from .data_track import (
 )
 from .frame_processor import FrameProcessor
 
-# Deprecated alias: "Packet Trailer" was renamed to "Frame Metadata" upstream.
+class _PacketTrailerFeature:
+    """Deprecated alias for :class:`FrameMetadataFeature`.
+
+    "Packet Trailer" was renamed to "Frame Metadata" upstream. This shim keeps
+    the old ``PacketTrailerFeature`` name working, including the old ``PTF_*``
+    value names (which now map to their ``FMF_*`` equivalents), and forwards
+    everything else to :class:`FrameMetadataFeature`. Prefer
+    ``FrameMetadataFeature`` / the ``FMF_*`` values; this will be removed in a
+    future release.
+    """
+
+    _RENAMED = {
+        "PTF_USER_TIMESTAMP": "FMF_USER_TIMESTAMP",
+        "PTF_FRAME_ID": "FMF_FRAME_ID",
+    }
+
+    def __getattr__(self, name: str):
+        renamed = self._RENAMED.get(name)
+        if renamed is not None:
+            warnings.warn(
+                f"PacketTrailerFeature.{name} is deprecated, "
+                f"use FrameMetadataFeature.{renamed} instead",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            name = renamed
+        return getattr(FrameMetadataFeature, name)
+
+
+# Deprecated: "Packet Trailer" was renamed to "Frame Metadata" upstream.
 # Prefer FrameMetadataFeature; this alias will be removed in a future release.
-PacketTrailerFeature = FrameMetadataFeature
+PacketTrailerFeature = _PacketTrailerFeature()
 
 __all__ = [
     "ConnectionQuality",

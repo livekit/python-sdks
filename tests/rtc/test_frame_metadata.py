@@ -80,7 +80,14 @@ async def test_track_publication_exposes_frame_metadata_features() -> None:
 
 def test_packet_trailer_names_remain_as_deprecated_aliases() -> None:
     # The old "Packet Trailer" names are kept as backwards-compatible aliases.
-    assert rtc.PacketTrailerFeature is rtc.FrameMetadataFeature
+    # The type name forwards to FrameMetadataFeature (incl. the new FMF_* values)...
+    assert rtc.PacketTrailerFeature.FMF_USER_TIMESTAMP == rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP
+
+    # ...and the old PTF_* value names still resolve, with a DeprecationWarning.
+    with pytest.deprecated_call():
+        assert rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP == rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP
+    with pytest.deprecated_call():
+        assert rtc.PacketTrailerFeature.PTF_FRAME_ID == rtc.FrameMetadataFeature.FMF_FRAME_ID
 
 
 @pytest.mark.asyncio
