@@ -19,7 +19,7 @@ See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for 
 """
 
 import warnings
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
@@ -154,7 +154,7 @@ class _PacketTrailerFeature:
         "PTF_FRAME_ID": "FMF_FRAME_ID",
     }
 
-    def __getattr__(self, name: str):
+    def __getattr__(self, name: str) -> Any:
         renamed = self._RENAMED.get(name)
         if renamed is not None:
             warnings.warn(
