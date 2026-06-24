@@ -137,6 +137,7 @@ from .data_track import (
 )
 from .frame_processor import FrameProcessor
 
+
 class _PacketTrailerFeature:
     """Deprecated alias for :class:`FrameMetadataFeature`.
 
@@ -200,6 +201,7 @@ else:
         instance. The deprecated ``packet_trailer_features`` keyword maps to
         ``frame_metadata_features`` and emits a ``DeprecationWarning``.
         """
+
 
 __all__ = [
     "ConnectionQuality",
