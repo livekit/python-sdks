@@ -60,7 +60,7 @@ class VideoSource:
         rotation: proto_video.VideoRotation.ValueType = proto_video.VideoRotation.VIDEO_ROTATION_0,
         metadata: proto_video.FrameMetadata | None = None,
     ) -> None:
-        """Capture a frame, optionally attaching packet trailer metadata."""
+        """Capture a frame, optionally attaching frame metadata."""
         req = proto_ffi.FfiRequest()
         req.capture_video_frame.source_handle = self._ffi_handle.handle
         req.capture_video_frame.buffer.CopyFrom(frame._proto_info())
