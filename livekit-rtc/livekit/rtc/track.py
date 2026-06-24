@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import TYPE_CHECKING, List, Union
+from __future__ import annotations
+
+import weakref
+from typing import TYPE_CHECKING, List, Optional, Union
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import track_pb2 as proto_track
@@ -20,6 +23,8 @@ from ._proto import stats_pb2 as proto_stats
 
 if TYPE_CHECKING:
     from .audio_source import AudioSource
+    from .audio_stream import AudioStream
+    from .room import Room
     from .video_source import VideoSource
     from .platform_audio import PlatformAudioSource
 
@@ -28,6 +33,83 @@ class Track:
     def __init__(self, owned_info: proto_track.OwnedTrack):
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
+        self._room_ref: Optional[weakref.ref[Room]] = None
+        self._audio_streams: weakref.WeakSet[AudioStream] = weakref.WeakSet()
+
+    def _resolve_room(self) -> Optional[Room]:
+        return self._room_ref() if self._room_ref is not None else None
+
+    def _set_room(self, room: Optional[Room]) -> None:
+        old_room = self._resolve_room()
+        if old_room is None and room is None:
+            # Already roomless — nothing to detach and nothing to re-clear.
+            # Without this guard a second _set_room(None) (e.g. the unpublish /
+            # local_track_unpublished race calling it from both paths) would
+            # re-fire _on_*_cleared on every registered processor.
+            return
+        if old_room is not room:
+            if old_room is not None:
+                old_room.off("token_refreshed", self._on_room_token_refreshed)
+            if room is not None:
+                room.on("token_refreshed", self._on_room_token_refreshed)
+
+        self._room_ref = weakref.ref(room) if room is not None else None
+
+        for stream in self._audio_streams:
+            self._push_processor_metadata_to_stream(stream, room)
+
+    def _on_room_token_refreshed(self) -> None:
+        room = self._resolve_room()
+        if room is None or room._token is None or room._server_url is None:
+            return
+        for stream in self._audio_streams:
+            if not stream._processor:
+                continue
+            stream._processor._on_credentials_updated(token=room._token, url=room._server_url)
+
+    def _push_processor_metadata_to_stream(self, stream: AudioStream, room: Optional[Room]) -> None:
+        if not stream._processor:
+            return
+
+        if room is None:
+            # track left a room - clear processor's room context
+            stream._processor._on_stream_info_cleared()
+            stream._processor._on_credentials_cleared()
+            return
+
+        identity = ""
+        pub_sid = ""
+        track_sid = self.sid
+        if track_sid:
+            for participant in room.remote_participants.values():
+                publication = participant.track_publications.get(track_sid)
+                if publication is not None:
+                    identity, pub_sid = participant.identity, publication.sid
+                    break
+            else:
+                local = room._local_participant
+                if local is not None:
+                    for local_publication in local.track_publications.values():
+                        if local_publication.sid == track_sid:
+                            identity, pub_sid = local.identity, local_publication.sid
+                            break
+
+        stream._processor._on_stream_info_updated(
+            room_name=room.name,
+            participant_identity=identity,
+            publication_sid=pub_sid,
+        )
+        if room._token is not None and room._server_url is not None:
+            stream._processor._on_credentials_updated(token=room._token, url=room._server_url)
+
+    def _register_audio_stream(self, stream: AudioStream) -> None:
+        self._audio_streams.add(stream)
+        room = self._resolve_room()
+        if room is not None:
+            self._push_processor_metadata_to_stream(stream, room)
+
+    def _unregister_audio_stream(self, stream: AudioStream) -> None:
+        self._audio_streams.discard(stream)
 
     @property
     def sid(self) -> str:

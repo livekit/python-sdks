@@ -852,6 +852,15 @@ class LocalParticipant(Participant):
             # so when it processed local_track_unpublished first.
             self._track_publications.pop(track_sid, None)
             if publication is not None:
+                # Clear the processor's room context here too: this path races
+                # the local_track_unpublished room event, and whichever loses
+                # the race finds the publication already gone and skips its own
+                # _set_room(None). Calling it from both paths guarantees the
+                # processor is cleared (and the token_refreshed listener
+                # detached) exactly once it matters; _set_room(None) is
+                # idempotent, so a double-clear when this path wins is safe.
+                if publication._track is not None:
+                    publication._track._set_room(None)
                 publication._track = None
             queue.task_done()
         finally:
