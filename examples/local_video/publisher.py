@@ -108,12 +108,12 @@ def _open_camera(args: argparse.Namespace) -> tuple[cv2.VideoCapture, int, int]:
     return capture, width, height
 
 
-def _packet_trailer_features(args: argparse.Namespace) -> list[int]:
+def _frame_metadata_features(args: argparse.Namespace) -> list[int]:
     features = []
     if args.attach_timestamp:
-        features.append(rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP)
+        features.append(rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP)
     if args.attach_frame_id:
-        features.append(rtc.PacketTrailerFeature.PTF_FRAME_ID)
+        features.append(rtc.FrameMetadataFeature.FMF_FRAME_ID)
     return features
 
 
@@ -224,13 +224,13 @@ async def run(args: argparse.Namespace, stop_event: asyncio.Event) -> None:
                 max_framerate=args.fps,
                 max_bitrate=3_000_000,
             ),
-            packet_trailer_features=_packet_trailer_features(args),
+            frame_metadata_features=_frame_metadata_features(args),
         )
         publication = await room.local_participant.publish_track(track, options)
         logging.info(
-            "published camera track %s with packet trailer features %s",
+            "published camera track %s with frame metadata features %s",
             publication.sid,
-            list(publication.packet_trailer_features),
+            list(publication.frame_metadata_features),
         )
 
         await _capture_loop(args, capture, source, width, height, stop_event)

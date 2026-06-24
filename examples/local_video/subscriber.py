@@ -176,7 +176,7 @@ def _feature_names(features: list[int]) -> str:
     names = []
     for feature in features:
         try:
-            names.append(rtc.PacketTrailerFeature.Name(feature))
+            names.append(rtc.FrameMetadataFeature.Name(feature))
         except ValueError:
             names.append(str(feature))
     return ", ".join(names) or "none"
@@ -309,10 +309,10 @@ async def run(args: argparse.Namespace, stop_event: asyncio.Event) -> None:
             active_publication_sid = subscribed.publication.sid
             active_track_gone = asyncio.Event()
             logging.info(
-                "subscribed to %s from %s with packet trailer features: %s",
+                "subscribed to %s from %s with frame metadata features: %s",
                 subscribed.publication.sid,
                 subscribed.participant.identity,
-                _feature_names(list(subscribed.publication.packet_trailer_features)),
+                _feature_names(list(subscribed.publication.frame_metadata_features)),
             )
 
             video_stream = rtc.VideoStream.from_track(

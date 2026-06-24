@@ -22,7 +22,7 @@ from livekit.rtc.track import Track
 def _publication_info(
     sid: str,
     *,
-    packet_trailer_features: list[proto_track.PacketTrailerFeature.ValueType] | None = None,
+    frame_metadata_features: list[proto_track.FrameMetadataFeature.ValueType] | None = None,
 ) -> proto_track.TrackPublicationInfo:
     return proto_track.TrackPublicationInfo(
         sid=sid,
@@ -36,45 +36,45 @@ def _publication_info(
         muted=False,
         remote=False,
         encryption_type=proto_e2ee.NONE,
-        packet_trailer_features=packet_trailer_features or [],
+        frame_metadata_features=frame_metadata_features or [],
     )
 
 
 def _owned_publication(
     sid: str,
     *,
-    packet_trailer_features: list[proto_track.PacketTrailerFeature.ValueType] | None = None,
+    frame_metadata_features: list[proto_track.FrameMetadataFeature.ValueType] | None = None,
 ) -> proto_track.OwnedTrackPublication:
     return proto_track.OwnedTrackPublication(
         handle=proto_handle.FfiOwnedHandle(id=0),
-        info=_publication_info(sid, packet_trailer_features=packet_trailer_features),
+        info=_publication_info(sid, frame_metadata_features=frame_metadata_features),
     )
 
 
-def test_packet_trailer_symbols_are_exported() -> None:
+def test_frame_metadata_symbols_are_exported() -> None:
     metadata = rtc.FrameMetadata(user_timestamp=123, frame_id=7)
 
-    assert rtc.PacketTrailerFeature.PTF_USER_TIMESTAMP == proto_track.PTF_USER_TIMESTAMP
-    assert rtc.PacketTrailerFeature.PTF_FRAME_ID == proto_track.PTF_FRAME_ID
+    assert rtc.FrameMetadataFeature.FMF_USER_TIMESTAMP == proto_track.FMF_USER_TIMESTAMP
+    assert rtc.FrameMetadataFeature.FMF_FRAME_ID == proto_track.FMF_FRAME_ID
     assert metadata.HasField("user_timestamp")
     assert metadata.HasField("frame_id")
 
 
 @pytest.mark.asyncio
-async def test_track_publication_exposes_packet_trailer_features() -> None:
+async def test_track_publication_exposes_frame_metadata_features() -> None:
     publication = rtc.LocalTrackPublication(
         _owned_publication(
             "TR_OLD",
-            packet_trailer_features=[
-                proto_track.PTF_USER_TIMESTAMP,
-                proto_track.PTF_FRAME_ID,
+            frame_metadata_features=[
+                proto_track.FMF_USER_TIMESTAMP,
+                proto_track.FMF_FRAME_ID,
             ],
         )
     )
 
-    assert publication.packet_trailer_features == [
-        proto_track.PTF_USER_TIMESTAMP,
-        proto_track.PTF_FRAME_ID,
+    assert publication.frame_metadata_features == [
+        proto_track.FMF_USER_TIMESTAMP,
+        proto_track.FMF_FRAME_ID,
     ]
 
 
@@ -140,7 +140,7 @@ async def test_local_track_republished_updates_existing_publication() -> None:
     publication = rtc.LocalTrackPublication(
         _owned_publication(
             "TR_OLD",
-            packet_trailer_features=[proto_track.PTF_USER_TIMESTAMP],
+            frame_metadata_features=[proto_track.FMF_USER_TIMESTAMP],
         )
     )
     # Build a real Track via __new__ (bypassing FFI) so the republish handler's
@@ -161,9 +161,9 @@ async def test_local_track_republished_updates_existing_publication() -> None:
                 previous_sid="TR_OLD",
                 info=_publication_info(
                     "TR_NEW",
-                    packet_trailer_features=[
-                        proto_track.PTF_USER_TIMESTAMP,
-                        proto_track.PTF_FRAME_ID,
+                    frame_metadata_features=[
+                        proto_track.FMF_USER_TIMESTAMP,
+                        proto_track.FMF_FRAME_ID,
                     ],
                 ),
             ),
@@ -173,7 +173,7 @@ async def test_local_track_republished_updates_existing_publication() -> None:
     assert "TR_OLD" not in local_participant.track_publications
     assert local_participant.track_publications["TR_NEW"] is publication
     assert publication.sid == "TR_NEW"
-    assert publication.packet_trailer_features == [
-        proto_track.PTF_USER_TIMESTAMP,
-        proto_track.PTF_FRAME_ID,
+    assert publication.frame_metadata_features == [
+        proto_track.FMF_USER_TIMESTAMP,
+        proto_track.FMF_FRAME_ID,
     ]

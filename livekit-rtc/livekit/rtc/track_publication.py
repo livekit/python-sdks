@@ -80,8 +80,8 @@ class TrackPublication:
         return list(self._info.audio_features)
 
     @property
-    def packet_trailer_features(self) -> List[proto_track.PacketTrailerFeature.ValueType]:
-        return list(self._info.packet_trailer_features)
+    def frame_metadata_features(self) -> List[proto_track.FrameMetadataFeature.ValueType]:
+        return list(self._info.frame_metadata_features)
 
 
 class LocalTrackPublication(TrackPublication):
