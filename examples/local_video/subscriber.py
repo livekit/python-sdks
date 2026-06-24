@@ -33,7 +33,7 @@ class SubscribedVideoTrack:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Subscribe to a LiveKit video track and optionally display packet metadata.",
+        description="Subscribe to a LiveKit video track and optionally display frame metadata.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--room-name", default="video-room", help="LiveKit room name")

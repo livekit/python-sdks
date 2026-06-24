@@ -21,7 +21,7 @@ except ImportError as exc:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Publish a local camera track with optional packet-trailer metadata.",
+        description="Publish a local camera track with optional frame metadata.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--camera-index", type=int, default=0, help="OpenCV camera index to use")
