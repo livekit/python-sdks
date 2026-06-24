@@ -3,15 +3,16 @@ name = "python-sdks"
 version = "0.1.0"
 description = "LiveKit Python SDKs monorepo"
 requires-python = ">=3.9"
-dependencies = ["livekit", "livekit-api", "livekit-protocol"]
+dependencies = ["livekit", "livekit-api", "livekit-protocol", "livekit-memory"]
 
 [tool.uv.workspace]
-members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
+members = ["livekit-rtc", "livekit-api", "livekit-protocol", "livekit-memory"]
 
 [tool.uv.sources]
 livekit = { workspace = true }
 livekit-api = { workspace = true }
 livekit-protocol = { workspace = true }
+livekit-memory = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -71,7 +72,13 @@ addopts = ["--import-mode=importlib", "--ignore=examples"]
 exclude = "(build|setup\\.py|livekit-rtc/rust-sdks.*)"
 namespace_packages = true
 explicit_package_bases = true
-mypy_path = "livekit-protocol:livekit-api:livekit-rtc"
+mypy_path = "livekit-protocol:livekit-api:livekit-rtc:livekit-memory"
 strict = true
 disallow_any_generics = false
 plugins = ["pydantic.mypy"]
+
+# Optional, untyped third-party deps used by livekit-memory (only present when the
+# corresponding extra is installed).
+[[tool.mypy.overrides]]
+module = ["model2vec.*", "usearch.*"]
+ignore_missing_imports = true

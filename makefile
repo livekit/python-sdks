@@ -70,7 +70,7 @@ lint-fix: ## Run ruff linter and fix issues automatically
 
 type-check: ## Run mypy type checker
 	@echo "$(BOLD)$(CYAN)Running type checker...$(RESET)"
-	@if uv run mypy livekit-protocol livekit-api livekit-rtc; then \
+	@if uv run mypy livekit-protocol livekit-api livekit-rtc livekit-memory; then \
 		echo "$(BOLD)$(GREEN)✓ Type checking passed$(RESET)"; \
 	else \
 		echo "$(BOLD)$(RED)✗ Type checking failed$(RESET)"; \
