@@ -18,9 +18,6 @@
 See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for more information.
 """
 
-import warnings
-from typing import TYPE_CHECKING, Any
-
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
 from ._proto.participant_pb2 import (
@@ -36,7 +33,7 @@ from ._proto.room_pb2 import (
     IceServer,
     IceTransportType,
     SimulateScenarioKind,
-    TrackPublishOptions as _TrackPublishOptions,
+    TrackPublishOptions,
     VideoEncoding,
 )
 from ._proto.track_pb2 import (
@@ -137,72 +134,6 @@ from .data_track import (
 )
 from .frame_processor import FrameProcessor
 
-
-class _PacketTrailerFeature:
-    """Deprecated alias for :class:`FrameMetadataFeature`.
-
-    "Packet Trailer" was renamed to "Frame Metadata" upstream. This shim keeps
-    the old ``PacketTrailerFeature`` name working, including the old ``PTF_*``
-    value names (which now map to their ``FMF_*`` equivalents), and forwards
-    everything else to :class:`FrameMetadataFeature`. Prefer
-    ``FrameMetadataFeature`` / the ``FMF_*`` values; this will be removed in a
-    future release.
-    """
-
-    _RENAMED = {
-        "PTF_USER_TIMESTAMP": "FMF_USER_TIMESTAMP",
-        "PTF_FRAME_ID": "FMF_FRAME_ID",
-    }
-
-    def __getattr__(self, name: str) -> Any:
-        renamed = self._RENAMED.get(name)
-        if renamed is not None:
-            warnings.warn(
-                f"PacketTrailerFeature.{name} is deprecated, "
-                f"use FrameMetadataFeature.{renamed} instead",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            name = renamed
-        return getattr(FrameMetadataFeature, name)
-
-
-# Deprecated: "Packet Trailer" was renamed to "Frame Metadata" upstream.
-# Prefer FrameMetadataFeature; this alias will be removed in a future release.
-PacketTrailerFeature = _PacketTrailerFeature()
-
-
-if TYPE_CHECKING:
-    # For type checkers, TrackPublishOptions is the proto message type.
-    TrackPublishOptions = _TrackPublishOptions
-else:
-
-    class _TrackPublishOptionsMeta(type):
-        def __instancecheck__(cls, instance):
-            return isinstance(instance, _TrackPublishOptions)
-
-        def __call__(cls, *args, packet_trailer_features=None, **kwargs):
-            # Deprecated: the "packet_trailer_features" field was renamed to
-            # "frame_metadata_features" upstream.
-            if packet_trailer_features is not None:
-                warnings.warn(
-                    "TrackPublishOptions(packet_trailer_features=...) is deprecated, "
-                    "use frame_metadata_features instead",
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-                kwargs.setdefault("frame_metadata_features", packet_trailer_features)
-            return _TrackPublishOptions(*args, **kwargs)
-
-    class TrackPublishOptions(metaclass=_TrackPublishOptionsMeta):
-        """``TrackPublishOptions`` proto message.
-
-        Constructing this returns a real ``_proto.room_pb2.TrackPublishOptions``
-        instance. The deprecated ``packet_trailer_features`` keyword maps to
-        ``frame_metadata_features`` and emits a ``DeprecationWarning``.
-        """
-
-
 __all__ = [
     "ConnectionQuality",
     "ConnectionState",
@@ -218,7 +149,6 @@ __all__ = [
     "TrackKind",
     "TrackSource",
     "FrameMetadataFeature",
-    "PacketTrailerFeature",
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
