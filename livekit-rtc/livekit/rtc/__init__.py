@@ -19,6 +19,7 @@ See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for 
 """
 
 import warnings
+from typing import TYPE_CHECKING
 
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
@@ -35,7 +36,7 @@ from ._proto.room_pb2 import (
     IceServer,
     IceTransportType,
     SimulateScenarioKind,
-    TrackPublishOptions,
+    TrackPublishOptions as _TrackPublishOptions,
     VideoEncoding,
 )
 from ._proto.track_pb2 import (
@@ -168,6 +169,37 @@ class _PacketTrailerFeature:
 # Deprecated: "Packet Trailer" was renamed to "Frame Metadata" upstream.
 # Prefer FrameMetadataFeature; this alias will be removed in a future release.
 PacketTrailerFeature = _PacketTrailerFeature()
+
+
+if TYPE_CHECKING:
+    # For type checkers, TrackPublishOptions is the proto message type.
+    TrackPublishOptions = _TrackPublishOptions
+else:
+
+    class _TrackPublishOptionsMeta(type):
+        def __instancecheck__(cls, instance):
+            return isinstance(instance, _TrackPublishOptions)
+
+        def __call__(cls, *args, packet_trailer_features=None, **kwargs):
+            # Deprecated: the "packet_trailer_features" field was renamed to
+            # "frame_metadata_features" upstream.
+            if packet_trailer_features is not None:
+                warnings.warn(
+                    "TrackPublishOptions(packet_trailer_features=...) is deprecated, "
+                    "use frame_metadata_features instead",
+                    DeprecationWarning,
+                    stacklevel=2,
+                )
+                kwargs.setdefault("frame_metadata_features", packet_trailer_features)
+            return _TrackPublishOptions(*args, **kwargs)
+
+    class TrackPublishOptions(metaclass=_TrackPublishOptionsMeta):
+        """``TrackPublishOptions`` proto message.
+
+        Constructing this returns a real ``_proto.room_pb2.TrackPublishOptions``
+        instance. The deprecated ``packet_trailer_features`` keyword maps to
+        ``frame_metadata_features`` and emits a ``DeprecationWarning``.
+        """
 
 __all__ = [
     "ConnectionQuality",

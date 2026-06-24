@@ -90,6 +90,18 @@ def test_packet_trailer_names_remain_as_deprecated_aliases() -> None:
         assert rtc.PacketTrailerFeature.PTF_FRAME_ID == rtc.FrameMetadataFeature.FMF_FRAME_ID
 
 
+def test_track_publish_options_packet_trailer_kwarg_is_deprecated_alias() -> None:
+    # The renamed proto field stays usable under its old kwarg name via the wrapper.
+    with pytest.deprecated_call():
+        options = rtc.TrackPublishOptions(packet_trailer_features=[proto_track.FMF_USER_TIMESTAMP])
+    assert list(options.frame_metadata_features) == [proto_track.FMF_USER_TIMESTAMP]
+    assert isinstance(options, rtc.TrackPublishOptions)
+
+    # The new kwarg works without a warning.
+    options = rtc.TrackPublishOptions(frame_metadata_features=[proto_track.FMF_FRAME_ID])
+    assert list(options.frame_metadata_features) == [proto_track.FMF_FRAME_ID]
+
+
 @pytest.mark.asyncio
 async def test_packet_trailer_features_property_is_deprecated_alias() -> None:
     publication = rtc.LocalTrackPublication(
