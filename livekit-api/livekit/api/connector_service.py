@@ -17,6 +17,8 @@ from livekit.protocol.connector_twilio import (
     ConnectTwilioCallResponse,
 )
 from ._service import Service
+from ._failover import FailoverConfig
+from typing import Optional
 from .access_token import VideoGrants
 
 SVC = "Connector"
@@ -35,8 +37,15 @@ class ConnectorService(Service):
     ```
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: Optional[FailoverConfig] = None,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def dial_whatsapp_call(
         self, request: DialWhatsAppCallRequest

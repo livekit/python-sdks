@@ -8,6 +8,7 @@ from livekit.protocol.agent_dispatch import (
     ListAgentDispatchResponse,
 )
 from ._service import Service
+from ._failover import FailoverConfig
 from .access_token import VideoGrants
 
 SVC = "AgentDispatchService"
@@ -26,8 +27,15 @@ class AgentDispatchService(Service):
     ```
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: Optional[FailoverConfig] = None,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
         """Create an explicit dispatch for an agent to join a room.

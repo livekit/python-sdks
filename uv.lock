@@ -1869,8 +1869,8 @@ dependencies = [
 requires-dist = [
     { name = "aiofiles", specifier = ">=24" },
     { name = "numpy", specifier = ">=1.26" },
-    { name = "protobuf", specifier = ">=4.25.0" },
-    { name = "types-protobuf", specifier = ">=3" },
+    { name = "protobuf", specifier = ">=5" },
+    { name = "types-protobuf", specifier = ">=5" },
 ]
 
 [[package]]
@@ -1908,8 +1908,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "protobuf", specifier = ">=4" },
-    { name = "types-protobuf", specifier = ">=4" },
+    { name = "protobuf", specifier = ">=5" },
+    { name = "types-protobuf", specifier = ">=5" },
 ]
 
 [[package]]

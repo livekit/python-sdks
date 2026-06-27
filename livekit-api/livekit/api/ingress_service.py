@@ -8,6 +8,8 @@ from livekit.protocol.ingress import (
     ListIngressResponse,
 )
 from ._service import Service
+from ._failover import FailoverConfig
+from typing import Optional
 from .access_token import VideoGrants
 
 SVC = "Ingress"
@@ -28,8 +30,15 @@ class IngressService(Service):
     Also see https://docs.livekit.io/home/ingress/overview/
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: Optional[FailoverConfig] = None,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def create_ingress(self, create: CreateIngressRequest) -> IngressInfo:
         return await self._client.request(
