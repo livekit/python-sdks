@@ -33,7 +33,7 @@ _DEFAULT_MAX_ATTEMPTS = 3
 _DEFAULT_BACKOFF_BASE = 0.2
 
 
-class FailoverConfig(TypedDict, total=False):
+class FailoverOptions(TypedDict, total=False):
     """Region-failover tuning, passed as the ``failover`` argument. Use it as a
     plain dict, e.g. ``failover={"max_attempts": 5}``. All keys are optional.
 
@@ -49,7 +49,7 @@ class FailoverConfig(TypedDict, total=False):
     backoff_base: float
 
 
-def failover_attempts(failover: Optional[FailoverConfig], host: Optional[str]) -> int:
+def failover_attempts(failover: Optional[FailoverOptions], host: Optional[str]) -> int:
     """Total request attempts including the initial one; 1 means no failover.
 
     With no config (``None``) failover is enabled only for LiveKit Cloud hosts.
@@ -60,7 +60,7 @@ def failover_attempts(failover: Optional[FailoverConfig], host: Optional[str]) -
     return max(1, failover.get("max_attempts", _DEFAULT_MAX_ATTEMPTS))
 
 
-def failover_backoff_base(failover: Optional[FailoverConfig]) -> float:
+def failover_backoff_base(failover: Optional[FailoverOptions]) -> float:
     return (failover or {}).get("backoff_base", _DEFAULT_BACKOFF_BASE)
 
 
@@ -143,7 +143,13 @@ class RegionCache:
         fetch_headers = {
             k: v for k, v in headers.items() if k.lower() not in ("content-type", "content-length")
         }
-        async with session.get(f"{origin}/settings/regions", headers=fetch_headers) as resp:
+        # Short timeout so a slow/unreachable discovery endpoint doesn't stall
+        # the failover path.
+        async with session.get(
+            f"{origin}/settings/regions",
+            headers=fetch_headers,
+            timeout=aiohttp.ClientTimeout(total=2),
+        ) as resp:
             if resp.status != 200:
                 raise RuntimeError(f"region discovery failed: {resp.status}")
             ttl = _parse_max_age(resp.headers.get("Cache-Control"))

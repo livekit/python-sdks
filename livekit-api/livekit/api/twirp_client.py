@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import asyncio
+import logging
 from typing import Dict, List, Optional, Type, TypeVar
 
 import aiohttp
@@ -20,7 +21,7 @@ from google.protobuf.message import Message
 from urllib.parse import urlparse
 
 from ._failover import (
-    FailoverConfig,
+    FailoverOptions,
     RegionCache,
     failover_attempts,
     failover_backoff_base,
@@ -30,6 +31,8 @@ from ._failover import (
 )
 
 DEFAULT_PREFIX = "twirp"
+
+logger = logging.getLogger("livekit")
 
 # Shared across all clients in the process so the region list is fetched once.
 _REGION_CACHE = RegionCache()
@@ -106,7 +109,7 @@ class TwirpClient:
         host: str,
         pkg: str,
         prefix: str = DEFAULT_PREFIX,
-        failover: Optional[FailoverConfig] = None,
+        failover: Optional[FailoverOptions] = None,
     ) -> None:
         parse_res = urlparse(host)
         scheme = parse_res.scheme
@@ -118,7 +121,7 @@ class TwirpClient:
         self.pkg = pkg
         self.prefix = prefix
         self._session = session
-        self._failover: Optional[FailoverConfig] = failover
+        self._failover: Optional[FailoverOptions] = failover
         self._origin = origin_of(self.host)
 
     async def request(
@@ -187,6 +190,13 @@ class TwirpClient:
                     raise transport_exc
                 raise self._twirp_error(error_data, retryable_status or 500)
 
+            reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
+            logger.warning(
+                "livekit API request to %s failed (%s), retrying with fallback url %s",
+                current_origin,
+                reason,
+                next_origin,
+            )
             await asyncio.sleep(failover_backoff_base(self._failover) * (2**attempt))
             attempted.add(host_key(next_origin))
             current_origin = next_origin

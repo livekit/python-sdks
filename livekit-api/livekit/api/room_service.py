@@ -25,7 +25,7 @@ from livekit.protocol.room import (
 )
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
-from ._failover import FailoverConfig
+from ._failover import FailoverOptions
 from typing import Optional
 from .access_token import VideoGrants
 
@@ -53,7 +53,7 @@ class RoomService(Service):
         url: str,
         api_key: str,
         api_secret: str,
-        failover: Optional[FailoverConfig] = None,
+        failover: Optional[FailoverOptions] = None,
     ):
         super().__init__(session, url, api_key, api_secret, failover=failover)
 

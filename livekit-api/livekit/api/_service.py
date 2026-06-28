@@ -3,7 +3,7 @@ from __future__ import annotations
 import aiohttp
 from abc import ABC
 from .twirp_client import TwirpClient
-from ._failover import FailoverConfig
+from ._failover import FailoverOptions
 from typing import Optional
 from .access_token import AccessToken, VideoGrants, SIPGrants
 
@@ -17,7 +17,7 @@ class Service(ABC):
         host: str,
         api_key: str,
         api_secret: str,
-        failover: Optional[FailoverConfig] = None,
+        failover: Optional[FailoverOptions] = None,
     ):
         self._client = TwirpClient(session, host, "livekit", failover=failover)
         self.api_key = api_key

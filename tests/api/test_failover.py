@@ -32,14 +32,14 @@ import pytest
 
 from typing import Optional
 
-from livekit.api import CreateRoomRequest, FailoverConfig, Room, TwirpError
+from livekit.api import CreateRoomRequest, FailoverOptions, Room, TwirpError
 from livekit.api.twirp_client import TwirpClient
 
 BASE = os.getenv("LK_TEST_SERVER_URL", "http://127.0.0.1:9999")
 
 # An explicit config enables failover on any host (the non-cloud mock) with a
 # tiny backoff so the tests run fast.
-FORCED: FailoverConfig = {"max_attempts": 3, "backoff_base": 0.001}
+FORCED: FailoverOptions = {"max_attempts": 3, "backoff_base": 0.001}
 
 
 def _server_up() -> bool:
@@ -55,7 +55,7 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-async def _call(directives: dict, failover: Optional[FailoverConfig] = FORCED) -> Room:
+async def _call(directives: dict, failover: Optional[FailoverOptions] = FORCED) -> Room:
     async with aiohttp.ClientSession() as session:
         client = TwirpClient(session, BASE, "livekit", failover=failover)
         headers = {"authorization": "Bearer test-token", **directives}

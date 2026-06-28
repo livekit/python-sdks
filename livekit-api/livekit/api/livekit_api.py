@@ -6,7 +6,7 @@ from .ingress_service import IngressService
 from .sip_service import SipService
 from .agent_dispatch_service import AgentDispatchService
 from .connector_service import ConnectorService
-from ._failover import FailoverConfig
+from ._failover import FailoverOptions
 from typing import Any, Optional
 
 
@@ -32,7 +32,7 @@ class LiveKitAPI:
         *,
         timeout: Optional[aiohttp.ClientTimeout] = None,
         session: Optional[aiohttp.ClientSession] = None,
-        failover: Optional[FailoverConfig] = None,
+        failover: Optional[FailoverOptions] = None,
     ):
         """Create a new LiveKitAPI instance.
 

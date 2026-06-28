@@ -38,7 +38,7 @@ from livekit.protocol.connector_twilio import *
 
 from .twirp_client import TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
-from ._failover import FailoverConfig
+from ._failover import FailoverOptions
 from .access_token import (
     InferenceGrants,
     ObservabilityGrants,
@@ -67,5 +67,5 @@ __all__ = [
     "WebhookReceiver",
     "TwirpError",
     "TwirpErrorCode",
-    "FailoverConfig",
+    "FailoverOptions",
 ]
