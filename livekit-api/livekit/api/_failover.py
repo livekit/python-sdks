@@ -38,7 +38,7 @@ def failover_attempts(enabled: bool, host: Optional[str], force: bool = False) -
     engages when enabled and the host is a LiveKit Cloud domain. ``force``
     bypasses the cloud-host check and is for internal testing only.
     """
-    if enabled and (force or (bool(host) and is_cloud(host))):
+    if enabled and (force or (host is not None and is_cloud(host))):
         return FAILOVER_MAX_ATTEMPTS
     return 1
 
