@@ -271,9 +271,10 @@ class TokenVerifier:
 
         if claims.get("roomPreset"):
             grant_claims.room_preset = claims.get("roomPreset")
-        if claims.get("roomConfig"):
+        room_config = claims.get("roomConfig")
+        if room_config:
             grant_claims.room_config = ParseDict(
-                claims.get("roomConfig"),
+                room_config,
                 RoomConfiguration(),
                 ignore_unknown_fields=True,
             )

@@ -33,8 +33,15 @@ class EgressService(Service):
     Also see https://docs.livekit.io/home/egress/overview/
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: bool = True,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def start_room_composite_egress(self, start: RoomCompositeEgressRequest) -> EgressInfo:
         """Starts a composite recording of a room."""

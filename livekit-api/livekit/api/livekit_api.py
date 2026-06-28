@@ -31,6 +31,7 @@ class LiveKitAPI:
         *,
         timeout: Optional[aiohttp.ClientTimeout] = None,
         session: Optional[aiohttp.ClientSession] = None,
+        failover: bool = True,
     ):
         """Create a new LiveKitAPI instance.
 
@@ -59,12 +60,14 @@ class LiveKitAPI:
                 timeout = aiohttp.ClientTimeout(total=60)
             self._session = aiohttp.ClientSession(timeout=timeout)
 
-        self._room = RoomService(self._session, url, api_key, api_secret)
-        self._ingress = IngressService(self._session, url, api_key, api_secret)
-        self._egress = EgressService(self._session, url, api_key, api_secret)
-        self._sip = SipService(self._session, url, api_key, api_secret)
-        self._agent_dispatch = AgentDispatchService(self._session, url, api_key, api_secret)
-        self._connector = ConnectorService(self._session, url, api_key, api_secret)
+        self._room = RoomService(self._session, url, api_key, api_secret, failover)
+        self._ingress = IngressService(self._session, url, api_key, api_secret, failover)
+        self._egress = EgressService(self._session, url, api_key, api_secret, failover)
+        self._sip = SipService(self._session, url, api_key, api_secret, failover)
+        self._agent_dispatch = AgentDispatchService(
+            self._session, url, api_key, api_secret, failover
+        )
+        self._connector = ConnectorService(self._session, url, api_key, api_secret, failover)
 
     @property
     def agent_dispatch(self) -> AgentDispatchService:
