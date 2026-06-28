@@ -21,10 +21,9 @@ from google.protobuf.message import Message
 from urllib.parse import urlparse
 
 from ._failover import (
-    FailoverOptions,
+    FAILOVER_BACKOFF_BASE,
     RegionCache,
     failover_attempts,
-    failover_backoff_base,
     host_key,
     origin_of,
     pick_next,
@@ -109,7 +108,10 @@ class TwirpClient:
         host: str,
         pkg: str,
         prefix: str = DEFAULT_PREFIX,
-        failover: Optional[FailoverOptions] = None,
+        failover: bool = True,
+        *,
+        _failover_force: bool = False,
+        _failover_backoff: float = FAILOVER_BACKOFF_BASE,
     ) -> None:
         parse_res = urlparse(host)
         scheme = parse_res.scheme
@@ -121,7 +123,10 @@ class TwirpClient:
         self.pkg = pkg
         self.prefix = prefix
         self._session = session
-        self._failover: Optional[FailoverOptions] = failover
+        # _failover_force / _failover_backoff are internal test-only knobs.
+        self._failover = failover
+        self._failover_force = _failover_force
+        self._failover_backoff = _failover_backoff
         self._origin = origin_of(self.host)
 
     async def request(
@@ -146,7 +151,7 @@ class TwirpClient:
         serialized_data = data.SerializeToString()
 
         host = urlparse(self._origin).hostname
-        max_attempts = failover_attempts(self._failover, host)
+        max_attempts = failover_attempts(self._failover, host, self._failover_force)
         attempted = {host_key(self._origin)}
         region_origins: Optional[List[str]] = None
         current_origin = self._origin
@@ -197,7 +202,7 @@ class TwirpClient:
                 reason,
                 next_origin,
             )
-            await asyncio.sleep(failover_backoff_base(self._failover) * (2**attempt))
+            await asyncio.sleep(self._failover_backoff * (2**attempt))
             attempted.add(host_key(next_origin))
             current_origin = next_origin
 

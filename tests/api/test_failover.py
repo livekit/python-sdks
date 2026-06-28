@@ -30,16 +30,10 @@ import urllib.request
 import aiohttp
 import pytest
 
-from typing import Optional
-
-from livekit.api import CreateRoomRequest, FailoverOptions, Room, TwirpError
+from livekit.api import CreateRoomRequest, Room, TwirpError
 from livekit.api.twirp_client import TwirpClient
 
 BASE = os.getenv("LK_TEST_SERVER_URL", "http://127.0.0.1:9999")
-
-# An explicit config enables failover on any host (the non-cloud mock) with a
-# tiny backoff so the tests run fast.
-FORCED: FailoverOptions = {"max_attempts": 3, "backoff_base": 0.001}
 
 
 def _server_up() -> bool:
@@ -55,9 +49,18 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-async def _call(directives: dict, failover: Optional[FailoverOptions] = FORCED) -> Room:
+# _failover_force bypasses the cloud-host check (the mock is on 127.0.0.1) and a
+# tiny backoff keeps the tests fast — both are internal, test-only knobs.
+async def _call(directives: dict, *, failover: bool = True, force: bool = True) -> Room:
     async with aiohttp.ClientSession() as session:
-        client = TwirpClient(session, BASE, "livekit", failover=failover)
+        client = TwirpClient(
+            session,
+            BASE,
+            "livekit",
+            failover=failover,
+            _failover_force=force,
+            _failover_backoff=0.001,
+        )
         headers = {"authorization": "Bearer test-token", **directives}
         return await client.request("RoomService", "CreateRoom", CreateRoomRequest(), headers, Room)
 
@@ -94,13 +97,13 @@ def test_region_discovery_unreachable():
         asyncio.run(_call({"x-lk-mock-fail-regions": "0", "x-lk-mock-regions-status": "500"}))
 
 
-def test_disabled_for_non_cloud():
-    # Default (None) against 127.0.0.1 (non-cloud) must not fail over.
+def test_not_cloud_host():
+    # Enabled but not forced; 127.0.0.1 is not a cloud host, so no failover.
     with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, failover=None))
+        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, force=False))
 
 
-def test_explicitly_disabled():
-    # max_attempts=1 (a single attempt) disables failover even with a config.
+def test_disabled():
+    # failover=False disables failover entirely.
     with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, failover={"max_attempts": 1}))
+        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, failover=False))

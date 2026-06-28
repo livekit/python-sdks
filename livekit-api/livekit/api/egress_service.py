@@ -13,8 +13,6 @@ from livekit.protocol.egress import (
     ListEgressResponse,
 )
 from ._service import Service
-from ._failover import FailoverOptions
-from typing import Optional
 from .access_token import VideoGrants
 
 SVC = "Egress"
@@ -41,7 +39,7 @@ class EgressService(Service):
         url: str,
         api_key: str,
         api_secret: str,
-        failover: Optional[FailoverOptions] = None,
+        failover: bool = True,
     ):
         super().__init__(session, url, api_key, api_secret, failover=failover)
 

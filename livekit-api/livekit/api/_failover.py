@@ -24,48 +24,27 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional, TypedDict
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 import aiohttp
 
-_DEFAULT_MAX_ATTEMPTS = 3
-_DEFAULT_BACKOFF_BASE = 0.2
+FAILOVER_MAX_ATTEMPTS = 3
+FAILOVER_BACKOFF_BASE = 0.2  # seconds
 
 
-class FailoverOptions(TypedDict, total=False):
-    """Region-failover tuning, passed as the ``failover`` argument. Use it as a
-    plain dict, e.g. ``failover={"max_attempts": 5}``. All keys are optional.
-
-    Keys:
-        max_attempts: total number of attempts including the initial request —
-            the original host plus up to ``max_attempts - 1`` fallback regions.
-            Defaults to 3. Set to 1 to disable failover (a single attempt).
-        backoff_base: seconds before the first retry; each subsequent retry
-            doubles it. Defaults to 0.2.
+def failover_attempts(enabled: bool, host: Optional[str], force: bool = False) -> int:
+    """Total request attempts for a host; 1 means no failover. Failover only
+    engages when enabled and the host is a LiveKit Cloud domain. ``force``
+    bypasses the cloud-host check and is for internal testing only.
     """
-
-    max_attempts: int
-    backoff_base: float
-
-
-def failover_attempts(failover: Optional[FailoverOptions], host: Optional[str]) -> int:
-    """Total request attempts including the initial one; 1 means no failover.
-
-    With no config (``None``) failover is enabled only for LiveKit Cloud hosts.
-    An explicit config enables it for any host; ``max_attempts=1`` disables it.
-    """
-    if failover is None:
-        return _DEFAULT_MAX_ATTEMPTS if (bool(host) and is_cloud(host)) else 1  # type: ignore[arg-type]
-    return max(1, failover.get("max_attempts", _DEFAULT_MAX_ATTEMPTS))
-
-
-def failover_backoff_base(failover: Optional[FailoverOptions]) -> float:
-    return (failover or {}).get("backoff_base", _DEFAULT_BACKOFF_BASE)
+    if enabled and (force or (bool(host) and is_cloud(host))):
+        return FAILOVER_MAX_ATTEMPTS
+    return 1
 
 
 def is_cloud(host: str) -> bool:
-    # Auto mode only enables failover for LiveKit Cloud project domains.
+    # Failover only engages for LiveKit Cloud project domains.
     return host.endswith(".livekit.cloud")
 
 
