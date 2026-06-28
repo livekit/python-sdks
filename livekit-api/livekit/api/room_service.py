@@ -25,7 +25,6 @@ from livekit.protocol.room import (
 )
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
-from typing import Optional
 from .access_token import VideoGrants
 
 SVC = "RoomService"
