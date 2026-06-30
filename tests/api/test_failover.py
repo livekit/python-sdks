@@ -61,7 +61,11 @@ async def _call(directives: dict, *, failover: bool = True, force: bool = True) 
             _failover_force=force,
             _failover_backoff=0.001,
         )
-        headers = {"authorization": "Bearer test-token", **directives}
+        headers = {
+            "authorization": "Bearer test-token",
+            "x-lk-mock-skip-auth": "true",
+            **directives,
+        }
         return await client.request("RoomService", "CreateRoom", CreateRoomRequest(), headers, Room)
 
 
