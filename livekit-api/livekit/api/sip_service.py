@@ -44,6 +44,22 @@ SVC = "SIP"
 SIP_DIAL_TIMEOUT = 30.0
 """@private"""
 
+# A dialing request must outlast the ringing window, or it would abort before
+# the call can be answered. Keep the request timeout at least this many seconds
+# above the request's ringing_timeout.
+RINGING_TIMEOUT_MARGIN = 2.0
+"""@private"""
+
+
+def _dial_timeout(user_timeout: Optional[float], request) -> float:
+    """Request timeout (seconds) for a phone-dialing call: the user-supplied
+    value (or the dial default) raised, when needed, to stay at least
+    RINGING_TIMEOUT_MARGIN above the request's ringing_timeout."""
+    effective = user_timeout if user_timeout else SIP_DIAL_TIMEOUT
+    if request.HasField("ringing_timeout"):
+        effective = max(effective, request.ringing_timeout.seconds + RINGING_TIMEOUT_MARGIN)
+    return effective
+
 
 class SipService(Service):
     """Client for LiveKit SIP Service API
@@ -785,13 +801,13 @@ class SipService(Service):
             SIPError: If the SIP operation fails
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
-        if timeout:
+        if create.wait_until_answered:
+            # Dialing a phone and waiting for an answer takes longer than a
+            # normal call, and the request must outlast ringing.
+            client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, create))
+        elif timeout:
             # obey user specified timeout
             client_timeout = aiohttp.ClientTimeout(total=timeout)
-        elif create.wait_until_answered:
-            # Dialing a phone and waiting for an answer takes longer than a
-            # normal call, so use a longer default.
-            client_timeout = aiohttp.ClientTimeout(total=SIP_DIAL_TIMEOUT)
 
         if trunk_id:
             create.sip_trunk_id = trunk_id
@@ -826,8 +842,9 @@ class SipService(Service):
             Updated SIP participant information
         """
         # Transferring a call dials a phone, which takes longer than a normal
-        # call, so use a longer default unless the user specified a timeout.
-        client_timeout = aiohttp.ClientTimeout(total=timeout if timeout else SIP_DIAL_TIMEOUT)
+        # call, so use a longer default unless the user specified a timeout, and
+        # keep the request alive past ringing so the destination can answer.
+        client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, transfer))
         return await self._client.request(
             SVC,
             "TransferSIPParticipant",
