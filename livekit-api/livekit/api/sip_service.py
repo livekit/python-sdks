@@ -38,6 +38,10 @@ from ._service import Service
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
+
+# Calls that dial a phone (CreateSIPParticipant with wait_until_answered,
+# TransferSIPParticipant) take longer than a normal request.
+SIP_DIAL_TIMEOUT = 30.0
 """@private"""
 
 
@@ -782,16 +786,12 @@ class SipService(Service):
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
         if timeout:
-            # obay user specified timeout
+            # obey user specified timeout
             client_timeout = aiohttp.ClientTimeout(total=timeout)
         elif create.wait_until_answered:
-            # ensure default timeout isn't too short when using sync mode
-            if (
-                self._client._session.timeout
-                and self._client._session.timeout.total
-                and self._client._session.timeout.total < 20
-            ):
-                client_timeout = aiohttp.ClientTimeout(total=20)
+            # Dialing a phone and waiting for an answer takes longer than a
+            # normal call, so use a longer default.
+            client_timeout = aiohttp.ClientTimeout(total=SIP_DIAL_TIMEOUT)
 
         if trunk_id:
             create.sip_trunk_id = trunk_id
@@ -831,6 +831,8 @@ class SipService(Service):
                 sip=SIPGrants(call=True),
             ),
             SIPParticipantInfo,
+            # Transferring a call dials a phone, which takes longer than normal.
+            timeout=aiohttp.ClientTimeout(total=SIP_DIAL_TIMEOUT),
         )
 
     def _admin_headers(self) -> dict[str, str]:

@@ -150,8 +150,15 @@ class TwirpClient:
         headers["Content-Type"] = "application/protobuf"
         serialized_data = data.SerializeToString()
 
+        # The effective per-attempt timeout is the per-call override, or the
+        # session default; used to gate failover for short requests.
+        effective_timeout = timeout.total if timeout else None
+        if effective_timeout is None and self._session.timeout is not None:
+            effective_timeout = self._session.timeout.total
         host = urlparse(self._origin).hostname
-        max_attempts = failover_attempts(self._failover, host, self._failover_force)
+        max_attempts = failover_attempts(
+            self._failover, host, self._failover_force, effective_timeout
+        )
         attempted = {host_key(self._origin)}
         region_origins: Optional[List[str]] = None
         current_origin = self._origin

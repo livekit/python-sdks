@@ -39,7 +39,7 @@ class LiveKitAPI:
             url: LiveKit server URL (read from `LIVEKIT_URL` environment variable if not provided)
             api_key: API key (read from `LIVEKIT_API_KEY` environment variable if not provided)
             api_secret: API secret (read from `LIVEKIT_API_SECRET` environment variable if not provided)
-            timeout: Request timeout (default: 60 seconds)
+            timeout: Request timeout (default: 10 seconds)
             session: aiohttp.ClientSession instance to use for requests, if not provided, a new one will be created
         """
         url = url or os.getenv("LIVEKIT_URL")
@@ -57,7 +57,7 @@ class LiveKitAPI:
         if not self._session:
             self._custom_session = False
             if not timeout:
-                timeout = aiohttp.ClientTimeout(total=60)
+                timeout = aiohttp.ClientTimeout(total=10)
             self._session = aiohttp.ClientSession(timeout=timeout)
 
         self._room = RoomService(self._session, url, api_key, api_secret, failover)
