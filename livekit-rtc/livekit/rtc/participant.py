@@ -114,7 +114,9 @@ class DegradationPreference(enum.IntEnum):
     """Degrade resolution to maintain framerate (prioritize smooth motion)."""
     MAINTAIN_RESOLUTION = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION
     """Degrade framerate to maintain resolution (prioritize image clarity)."""
-    MAINTAIN_FRAMERATE_AND_RESOLUTION = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION
+    MAINTAIN_FRAMERATE_AND_RESOLUTION = (
+        ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION
+    )
     """Maintain both framerate and resolution. Frames may be dropped before encoding
     if necessary to avoid overusing network and encoder resources."""
 
