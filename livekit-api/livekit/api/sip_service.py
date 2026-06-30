@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import aiohttp
 import warnings
-from typing import Optional
+from typing import Optional, Union
 
 from livekit.protocol.models import ListUpdate
 from livekit.protocol.sip import (
@@ -52,7 +52,10 @@ RINGING_TIMEOUT_MARGIN = 2.0
 """@private"""
 
 
-def _dial_timeout(user_timeout: Optional[float], request) -> float:
+def _dial_timeout(
+    user_timeout: Optional[float],
+    request: Union[CreateSIPParticipantRequest, TransferSIPParticipantRequest],
+) -> float:
     """Request timeout (seconds) for a phone-dialing call: the user-supplied
     value (or the dial default) raised, when needed, to stay at least
     RINGING_TIMEOUT_MARGIN above the request's ringing_timeout."""
