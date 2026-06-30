@@ -38,6 +38,7 @@ from ._service import Service
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
+"""@private"""
 
 # Calls that dial a phone (CreateSIPParticipant with wait_until_answered,
 # TransferSIPParticipant) take longer than a normal request.
