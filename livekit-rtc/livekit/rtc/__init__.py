@@ -58,6 +58,7 @@ from .e2ee import (
 )
 from .participant import (
     ConnectionQuality,
+    DegradationPreference,
     LocalParticipant,
     Participant,
     RemoteParticipant,
@@ -138,6 +139,7 @@ __all__ = [
     "ConnectionQuality",
     "ConnectionState",
     "DataPacketKind",
+    "DegradationPreference",
     "TrackPublishOptions",
     "IceTransportType",
     "ContinualGatheringPolicy",

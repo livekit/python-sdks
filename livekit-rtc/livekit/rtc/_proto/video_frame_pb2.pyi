@@ -503,16 +503,19 @@ class FrameMetadata(google.protobuf.message.Message):
 
     USER_TIMESTAMP_FIELD_NUMBER: builtins.int
     FRAME_ID_FIELD_NUMBER: builtins.int
+    USER_DATA_FIELD_NUMBER: builtins.int
     user_timestamp: builtins.int
     frame_id: builtins.int
+    user_data: builtins.bytes
     def __init__(
         self,
         *,
         user_timestamp: builtins.int | None = ...,
         frame_id: builtins.int | None = ...,
+        user_data: builtins.bytes | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_timestamp", b"user_timestamp"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_data", b"user_data", "user_timestamp", b"user_timestamp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame_id", b"frame_id", "user_data", b"user_data", "user_timestamp", b"user_timestamp"]) -> None: ...
 
 global___FrameMetadata = FrameMetadata
 

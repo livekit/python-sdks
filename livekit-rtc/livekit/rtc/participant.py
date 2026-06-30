@@ -32,6 +32,7 @@ from ._proto.room_pb2 import (
 )
 from ._proto.room_pb2 import (
     ConnectionQuality as ProtoConnectionQuality,
+    DegradationPreference as ProtoDegradationPreference,
 )
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
@@ -102,6 +103,22 @@ class ConnectionQuality(enum.IntEnum):
     QUALITY_GOOD = ProtoConnectionQuality.QUALITY_GOOD
     QUALITY_EXCELLENT = ProtoConnectionQuality.QUALITY_EXCELLENT
     QUALITY_LOST = ProtoConnectionQuality.QUALITY_LOST
+
+
+class DegradationPreference(enum.IntEnum):
+    """Controls how the encoder degrades quality when bandwidth is constrained."""
+
+    BALANCED = ProtoDegradationPreference.DEGRADATION_PREFERENCE_BALANCED
+    """Balance between framerate and resolution degradation."""
+    MAINTAIN_FRAMERATE = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE
+    """Degrade resolution to maintain framerate (prioritize smooth motion)."""
+    MAINTAIN_RESOLUTION = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION
+    """Degrade framerate to maintain resolution (prioritize image clarity)."""
+    MAINTAIN_FRAMERATE_AND_RESOLUTION = (
+        ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION
+    )
+    """Maintain both framerate and resolution. Frames may be dropped before encoding
+    if necessary to avoid overusing network and encoder resources."""
 
 
 def _connection_quality_from_proto(value: int) -> ConnectionQuality:

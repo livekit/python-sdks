@@ -125,11 +125,13 @@ class _FrameMetadataFeatureEnumTypeWrapper(google.protobuf.internal.enum_type_wr
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     FMF_USER_TIMESTAMP: _FrameMetadataFeature.ValueType  # 0
     FMF_FRAME_ID: _FrameMetadataFeature.ValueType  # 1
+    FMF_USER_DATA: _FrameMetadataFeature.ValueType  # 2
 
 class FrameMetadataFeature(_FrameMetadataFeature, metaclass=_FrameMetadataFeatureEnumTypeWrapper): ...
 
 FMF_USER_TIMESTAMP: FrameMetadataFeature.ValueType  # 0
 FMF_FRAME_ID: FrameMetadataFeature.ValueType  # 1
+FMF_USER_DATA: FrameMetadataFeature.ValueType  # 2
 global___FrameMetadataFeature = FrameMetadataFeature
 
 @typing.final

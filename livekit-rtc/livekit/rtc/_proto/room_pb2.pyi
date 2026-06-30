@@ -113,6 +113,46 @@ ENCODER_BACKEND_VAAPI: VideoEncoderBackend.ValueType  # 4
 ENCODER_BACKEND_VIDEOTOOLBOX: VideoEncoderBackend.ValueType  # 5
 global___VideoEncoderBackend = VideoEncoderBackend
 
+class _DegradationPreference:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _DegradationPreferenceEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DegradationPreference.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    DEGRADATION_PREFERENCE_BALANCED: _DegradationPreference.ValueType  # 0
+    """Balance between framerate and resolution degradation."""
+    DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE: _DegradationPreference.ValueType  # 1
+    """Degrade framerate to maintain resolution."""
+    DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION: _DegradationPreference.ValueType  # 2
+    """Degrade resolution to maintain framerate (drop frames to keep clarity)."""
+    DEGRADATION_PREFERENCE_DISABLED: _DegradationPreference.ValueType  # 3
+    """Deprecated: Use MAINTAIN_FRAMERATE_AND_RESOLUTION instead.
+    Maintained for backwards compatibility, maps to MAINTAIN_FRAMERATE_AND_RESOLUTION.
+    """
+    DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION: _DegradationPreference.ValueType  # 4
+    """Maintain both framerate and resolution. Frames may be dropped before encoding
+    if necessary to avoid overusing network and encoder resources.
+    """
+
+class DegradationPreference(_DegradationPreference, metaclass=_DegradationPreferenceEnumTypeWrapper):
+    """Controls how the encoder degrades quality when bandwidth is constrained."""
+
+DEGRADATION_PREFERENCE_BALANCED: DegradationPreference.ValueType  # 0
+"""Balance between framerate and resolution degradation."""
+DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE: DegradationPreference.ValueType  # 1
+"""Degrade framerate to maintain resolution."""
+DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION: DegradationPreference.ValueType  # 2
+"""Degrade resolution to maintain framerate (drop frames to keep clarity)."""
+DEGRADATION_PREFERENCE_DISABLED: DegradationPreference.ValueType  # 3
+"""Deprecated: Use MAINTAIN_FRAMERATE_AND_RESOLUTION instead.
+Maintained for backwards compatibility, maps to MAINTAIN_FRAMERATE_AND_RESOLUTION.
+"""
+DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION: DegradationPreference.ValueType  # 4
+"""Maintain both framerate and resolution. Frames may be dropped before encoding
+if necessary to avoid overusing network and encoder resources.
+"""
+global___DegradationPreference = DegradationPreference
+
 class _IceTransportType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -1252,6 +1292,7 @@ class TrackPublishOptions(google.protobuf.message.Message):
     FRAME_METADATA_FEATURES_FIELD_NUMBER: builtins.int
     SCALABILITY_MODE_FIELD_NUMBER: builtins.int
     VIDEO_ENCODER_FIELD_NUMBER: builtins.int
+    DEGRADATION_PREFERENCE_FIELD_NUMBER: builtins.int
     video_codec: video_frame_pb2.VideoCodec.ValueType
     dtx: builtins.bool
     red: builtins.bool
@@ -1266,6 +1307,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
     """
     video_encoder: global___VideoEncoderBackend.ValueType
     """Preferred encoder backend to use when publishing a video track."""
+    degradation_preference: global___DegradationPreference.ValueType
+    """Controls how the encoder trades off between resolution and framerate
+    when bandwidth is constrained. Default is MAINTAIN_RESOLUTION.
+    """
     @property
     def video_encoding(self) -> global___VideoEncoding:
         """encodings are optional"""
@@ -1289,9 +1334,10 @@ class TrackPublishOptions(google.protobuf.message.Message):
         frame_metadata_features: collections.abc.Iterable[track_pb2.FrameMetadataFeature.ValueType] | None = ...,
         scalability_mode: builtins.str | None = ...,
         video_encoder: global___VideoEncoderBackend.ValueType | None = ...,
+        degradation_preference: global___DegradationPreference.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "dtx", b"dtx", "frame_metadata_features", b"frame_metadata_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "degradation_preference", b"degradation_preference", "dtx", b"dtx", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["audio_encoding", b"audio_encoding", "degradation_preference", b"degradation_preference", "dtx", b"dtx", "frame_metadata_features", b"frame_metadata_features", "preconnect_buffer", b"preconnect_buffer", "red", b"red", "scalability_mode", b"scalability_mode", "simulcast", b"simulcast", "source", b"source", "stream", b"stream", "video_codec", b"video_codec", "video_encoder", b"video_encoder", "video_encoding", b"video_encoding"]) -> None: ...
 
 global___TrackPublishOptions = TrackPublishOptions
 

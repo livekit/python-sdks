@@ -6,6 +6,7 @@ import logging
 import os
 import signal
 import time
+from enum import Enum
 
 import numpy as np
 from livekit import api, rtc
@@ -17,6 +18,13 @@ except ImportError as exc:
         "opencv-python is required to run this example. "
         "Run it with `uv run --project examples/local_video python examples/local_video/publisher.py`."
     ) from exc
+
+
+class FrameFormat(str, Enum):
+    """Frame format to use for publishing."""
+
+    RGBA = "rgba"
+    I420 = "i420"
 
 
 def parse_args() -> argparse.Namespace:
@@ -45,6 +53,13 @@ def parse_args() -> argparse.Namespace:
         "--attach-frame-id",
         action="store_true",
         help="Attach a monotonically increasing FrameMetadata.frame_id",
+    )
+    parser.add_argument(
+        "--format",
+        type=FrameFormat,
+        default=FrameFormat.I420,
+        choices=list(FrameFormat),
+        help="Frame format: 'i420' (default, efficient) or 'rgba' (original behavior)",
     )
     return parser.parse_args()
 
@@ -147,6 +162,14 @@ def _install_signal_handlers(stop_event: asyncio.Event) -> None:
             pass
 
 
+def _bgr_to_i420(bgr: np.ndarray, width: int, height: int) -> bytes:
+    """Convert BGR image to I420 (YUV420p) format efficiently."""
+    # OpenCV's COLOR_BGR2YUV_I420 outputs planar YUV420p (I420)
+    # Layout: Y plane (width*height), U plane (width/2 * height/2), V plane (width/2 * height/2)
+    yuv = cv2.cvtColor(bgr, cv2.COLOR_BGR2YUV_I420)
+    return yuv.tobytes()
+
+
 async def _capture_loop(
     args: argparse.Namespace,
     capture: cv2.VideoCapture,
@@ -161,6 +184,9 @@ async def _capture_loop(
     frame_id = 1
     submitted = 0
     last_log_at = time.perf_counter()
+    use_i420 = args.format == FrameFormat.I420
+
+    logging.info("Using frame format: %s", args.format.value)
 
     while not stop_event.is_set():
         ok, bgr = await asyncio.to_thread(capture.read)
@@ -174,9 +200,17 @@ async def _capture_loop(
 
         user_timestamp = _unix_time_us()
         timestamp_us = (time.perf_counter_ns() - started_at_ns) // 1_000
-        rgba = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGBA)
-        rgba = np.ascontiguousarray(rgba)
-        frame = rtc.VideoFrame(width, height, rtc.VideoBufferType.RGBA, rgba.tobytes())
+
+        if use_i420:
+            # Direct BGR -> I420 conversion (single step, more efficient)
+            i420_data = _bgr_to_i420(bgr, width, height)
+            frame = rtc.VideoFrame(width, height, rtc.VideoBufferType.I420, i420_data)
+        else:
+            # Original path: BGR -> RGBA -> I420 (in FFI layer)
+            rgba = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGBA)
+            rgba = np.ascontiguousarray(rgba)
+            frame = rtc.VideoFrame(width, height, rtc.VideoBufferType.RGBA, rgba.tobytes())
+
         metadata = _metadata_for_frame(
             args,
             user_timestamp=user_timestamp,
@@ -191,7 +225,10 @@ async def _capture_loop(
         now = time.perf_counter()
         if now - last_log_at >= 2.0:
             logging.info(
-                "published %s frames at ~%.1f fps", submitted, submitted / (now - last_log_at)
+                "published %s frames at ~%.1f fps (format=%s)",
+                submitted,
+                submitted / (now - last_log_at),
+                args.format.value,
             )
             submitted = 0
             last_log_at = now
