@@ -809,16 +809,25 @@ class SipService(Service):
         )
 
     async def transfer_sip_participant(
-        self, transfer: TransferSIPParticipantRequest
+        self,
+        transfer: TransferSIPParticipantRequest,
+        *,
+        timeout: Optional[float] = None,
     ) -> SIPParticipantInfo:
         """Transfer a SIP participant to a different room.
 
         Args:
             transfer: Request containing transfer details
+            timeout: Optional request timeout in seconds. Transferring dials a
+                phone, which takes longer than normal, so it defaults to a
+                longer timeout when unset.
 
         Returns:
             Updated SIP participant information
         """
+        # Transferring a call dials a phone, which takes longer than a normal
+        # call, so use a longer default unless the user specified a timeout.
+        client_timeout = aiohttp.ClientTimeout(total=timeout if timeout else SIP_DIAL_TIMEOUT)
         return await self._client.request(
             SVC,
             "TransferSIPParticipant",
@@ -831,8 +840,7 @@ class SipService(Service):
                 sip=SIPGrants(call=True),
             ),
             SIPParticipantInfo,
-            # Transferring a call dials a phone, which takes longer than normal.
-            timeout=aiohttp.ClientTimeout(total=SIP_DIAL_TIMEOUT),
+            timeout=client_timeout,
         )
 
     def _admin_headers(self) -> dict[str, str]:
