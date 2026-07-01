@@ -1,6 +1,18 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Union
+
+from livekit.protocol.connector_whatsapp import AcceptWhatsAppCallRequest
+from livekit.protocol.sip import CreateSIPParticipantRequest, TransferSIPParticipantRequest
+
+# Requests that carry wait_until_answered / ringing_timeout and share the
+# phone-dialing timeout behavior.
+DialRequest = Union[
+    CreateSIPParticipantRequest,
+    TransferSIPParticipantRequest,
+    AcceptWhatsAppCallRequest,
+]
+"""@private"""
 
 # Calls that dial a phone (SIP CreateSIPParticipant with wait_until_answered and
 # TransferSIPParticipant; WhatsApp AcceptWhatsAppCall with wait_until_answered)
@@ -15,7 +27,7 @@ RINGING_TIMEOUT_MARGIN = 2.0
 """@private"""
 
 
-def dial_timeout(user_timeout: Optional[float], request) -> float:
+def dial_timeout(user_timeout: Optional[float], request: DialRequest) -> float:
     """Request timeout (seconds) for a phone-dialing call: the user-supplied
     value (or the dial default) raised, when needed, to stay at least
     RINGING_TIMEOUT_MARGIN above the request's ringing_timeout.
