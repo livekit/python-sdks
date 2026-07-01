@@ -18,7 +18,7 @@ from livekit.protocol.connector_twilio import (
     ConnectTwilioCallResponse,
 )
 from ._service import Service
-from ._dial_timeout import dial_timeout, pin_ringing_timeout
+from ._dial_timeout import DEFAULT_RINGING_TIMEOUT
 from .access_token import VideoGrants
 
 SVC = "Connector"
@@ -119,20 +119,21 @@ class ConnectorService(Service):
         Args:
             request: AcceptWhatsAppCallRequest containing call parameters and SDP
             timeout: Optional request timeout in seconds. When the request waits
-                for an answer (wait_until_answered), it defaults to a longer value
-                (dialing takes time) and is raised, if needed, to stay above the
-                request's ringing_timeout.
+                for an answer (wait_until_answered), it defaults to the standard
+                ring window; set it above the ringing_timeout passed to
+                dial_whatsapp_call (the two calls are separate, so the SDK can't
+                derive it).
 
         Returns:
             AcceptWhatsAppCallResponse with the room name
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
         if request.wait_until_answered:
-            # Waiting for the call to be answered dials a phone, which takes
-            # longer than a normal request and must outlast ringing. Pin the ring
-            # window so the timeout doesn't depend on the server's default.
-            pin_ringing_timeout(request)
-            client_timeout = aiohttp.ClientTimeout(total=dial_timeout(timeout, request))
+            # Accept can block until the call is answered, so default to the
+            # standard ring window; the caller overrides via timeout.
+            client_timeout = aiohttp.ClientTimeout(
+                total=timeout if timeout else DEFAULT_RINGING_TIMEOUT
+            )
         elif timeout:
             client_timeout = aiohttp.ClientTimeout(total=timeout)
 
