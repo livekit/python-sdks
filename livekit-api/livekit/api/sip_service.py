@@ -35,6 +35,10 @@ from livekit.protocol.sip import (
     SIPTransport,
 )
 from ._service import Service
+from ._dial_timeout import (
+    dial_timeout as _dial_timeout,
+    pin_ringing_timeout as _pin_ringing_timeout,
+)
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
@@ -781,17 +785,15 @@ class SipService(Service):
             SIPError: If the SIP operation fails
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
-        if timeout:
-            # obay user specified timeout
+        if create.wait_until_answered:
+            # Dialing a phone and waiting for an answer takes longer than a
+            # normal call, and the request must outlast ringing. Pin the ring
+            # window so the timeout doesn't depend on the server's default.
+            _pin_ringing_timeout(create)
+            client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, create))
+        elif timeout:
+            # obey user specified timeout
             client_timeout = aiohttp.ClientTimeout(total=timeout)
-        elif create.wait_until_answered:
-            # ensure default timeout isn't too short when using sync mode
-            if (
-                self._client._session.timeout
-                and self._client._session.timeout.total
-                and self._client._session.timeout.total < 20
-            ):
-                client_timeout = aiohttp.ClientTimeout(total=20)
 
         if trunk_id:
             create.sip_trunk_id = trunk_id
@@ -809,16 +811,27 @@ class SipService(Service):
         )
 
     async def transfer_sip_participant(
-        self, transfer: TransferSIPParticipantRequest
+        self,
+        transfer: TransferSIPParticipantRequest,
+        *,
+        timeout: Optional[float] = None,
     ) -> SIPParticipantInfo:
         """Transfer a SIP participant to a different room.
 
         Args:
             transfer: Request containing transfer details
+            timeout: Optional request timeout in seconds. Transferring dials a
+                phone, which takes longer than normal, so it defaults to a
+                longer timeout when unset.
 
         Returns:
             Updated SIP participant information
         """
+        # Transferring a call dials a phone, which takes longer than a normal
+        # call, so keep the request alive past ringing. Pin the ring window so the
+        # timeout doesn't depend on the server's default.
+        _pin_ringing_timeout(transfer)
+        client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, transfer))
         return await self._client.request(
             SVC,
             "TransferSIPParticipant",
@@ -831,6 +844,7 @@ class SipService(Service):
                 sip=SIPGrants(call=True),
             ),
             SIPParticipantInfo,
+            timeout=client_timeout,
         )
 
     def _admin_headers(self) -> dict[str, str]:

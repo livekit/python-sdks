@@ -31,16 +31,28 @@ import aiohttp
 
 FAILOVER_MAX_ATTEMPTS = 3
 FAILOVER_BACKOFF_BASE = 0.2  # seconds
+# Below this per-request timeout (seconds) a retry is unlikely to help and many
+# clients would retry in lockstep across regions, so a short request gets a
+# single attempt (thundering-herd guard).
+MIN_FAILOVER_TIMEOUT = 5.0
 
 
-def failover_attempts(enabled: bool, host: Optional[str], force: bool = False) -> int:
+def failover_attempts(
+    enabled: bool,
+    host: Optional[str],
+    force: bool = False,
+    timeout: Optional[float] = None,
+) -> int:
     """Total request attempts for a host; 1 means no failover. Failover only
-    engages when enabled and the host is a LiveKit Cloud domain. ``force``
-    bypasses the cloud-host check and is for internal testing only.
+    engages when enabled, the host is a LiveKit Cloud domain, and the request
+    timeout is long enough to retry. ``force`` bypasses the cloud-host check and
+    is for internal testing only.
     """
-    if enabled and (force or (host is not None and is_cloud(host))):
-        return FAILOVER_MAX_ATTEMPTS
-    return 1
+    if not (enabled and (force or (host is not None and is_cloud(host)))):
+        return 1
+    if timeout is not None and 0 < timeout < MIN_FAILOVER_TIMEOUT:
+        return 1
+    return FAILOVER_MAX_ATTEMPTS
 
 
 def is_cloud(host: str) -> bool:
