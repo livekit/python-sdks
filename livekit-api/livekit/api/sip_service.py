@@ -33,6 +33,7 @@ from livekit.protocol.sip import (
     TransferSIPParticipantRequest,
     SIPParticipantInfo,
     SIPTransport,
+    SIPMediaConfig,
 )
 from ._service import Service
 from .access_token import VideoGrants, SIPGrants
@@ -163,6 +164,7 @@ class SipService(Service):
         auth_password: Optional[str] = None,
         name: Optional[str] = None,
         metadata: Optional[str] = None,
+        media: Optional[SIPMediaConfig] = None,
     ) -> SIPInboundTrunkInfo:
         """Updates specific fields of an existing SIP inbound trunk.
 
@@ -173,6 +175,7 @@ class SipService(Service):
             auth_password=auth_password,
             name=name,
             metadata=metadata,
+            media=media,
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
@@ -342,6 +345,7 @@ class SipService(Service):
         auth_password: str | None = None,
         name: str | None = None,
         metadata: str | None = None,
+        media: Optional[SIPMediaConfig] = None,
     ) -> SIPOutboundTrunkInfo:
         """Updates specific fields of an existing SIP outbound trunk.
 
@@ -354,6 +358,7 @@ class SipService(Service):
             auth_password=auth_password,
             name=name,
             metadata=metadata,
+            media=media,
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
