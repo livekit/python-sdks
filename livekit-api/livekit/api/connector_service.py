@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import aiohttp
+from typing import Optional
 
 from livekit.protocol.connector_whatsapp import (
     DialWhatsAppCallRequest,
@@ -17,6 +18,7 @@ from livekit.protocol.connector_twilio import (
     ConnectTwilioCallResponse,
 )
 from ._service import Service
+from ._dial_timeout import dial_timeout
 from .access_token import VideoGrants
 
 SVC = "Connector"
@@ -106,23 +108,39 @@ class ConnectorService(Service):
         )
 
     async def accept_whatsapp_call(
-        self, request: AcceptWhatsAppCallRequest
+        self,
+        request: AcceptWhatsAppCallRequest,
+        *,
+        timeout: Optional[float] = None,
     ) -> AcceptWhatsAppCallResponse:
         """
         Accept an inbound WhatsApp call
 
         Args:
             request: AcceptWhatsAppCallRequest containing call parameters and SDP
+            timeout: Optional request timeout in seconds. When the request waits
+                for an answer (wait_until_answered), it defaults to a longer value
+                (dialing takes time) and is raised, if needed, to stay above the
+                request's ringing_timeout.
 
         Returns:
             AcceptWhatsAppCallResponse with the room name
         """
+        client_timeout: Optional[aiohttp.ClientTimeout] = None
+        if request.wait_until_answered:
+            # Waiting for the call to be answered dials a phone, which takes
+            # longer than a normal request and must outlast ringing.
+            client_timeout = aiohttp.ClientTimeout(total=dial_timeout(timeout, request))
+        elif timeout:
+            client_timeout = aiohttp.ClientTimeout(total=timeout)
+
         return await self._client.request(
             SVC,
             "AcceptWhatsAppCall",
             request,
             self._auth_header(VideoGrants(room_create=True)),
             AcceptWhatsAppCallResponse,
+            timeout=client_timeout,
         )
 
     async def connect_twilio_call(

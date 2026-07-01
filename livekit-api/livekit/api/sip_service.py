@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import aiohttp
 import warnings
-from typing import Optional, Union
+from typing import Optional
 
 from livekit.protocol.models import ListUpdate
 from livekit.protocol.sip import (
@@ -35,34 +35,11 @@ from livekit.protocol.sip import (
     SIPTransport,
 )
 from ._service import Service
+from ._dial_timeout import dial_timeout as _dial_timeout
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
 """@private"""
-
-# Calls that dial a phone (CreateSIPParticipant with wait_until_answered,
-# TransferSIPParticipant) take longer than a normal request.
-SIP_DIAL_TIMEOUT = 30.0
-"""@private"""
-
-# A dialing request must outlast the ringing window, or it would abort before
-# the call can be answered. Keep the request timeout at least this many seconds
-# above the request's ringing_timeout.
-RINGING_TIMEOUT_MARGIN = 2.0
-"""@private"""
-
-
-def _dial_timeout(
-    user_timeout: Optional[float],
-    request: Union[CreateSIPParticipantRequest, TransferSIPParticipantRequest],
-) -> float:
-    """Request timeout (seconds) for a phone-dialing call: the user-supplied
-    value (or the dial default) raised, when needed, to stay at least
-    RINGING_TIMEOUT_MARGIN above the request's ringing_timeout."""
-    effective = user_timeout if user_timeout else SIP_DIAL_TIMEOUT
-    if request.HasField("ringing_timeout"):
-        effective = max(effective, request.ringing_timeout.seconds + RINGING_TIMEOUT_MARGIN)
-    return effective
 
 
 class SipService(Service):
