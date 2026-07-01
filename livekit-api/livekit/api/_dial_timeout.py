@@ -14,27 +14,41 @@ DialRequest = Union[
 ]
 """@private"""
 
-# Calls that dial a phone (SIP CreateSIPParticipant with wait_until_answered and
-# TransferSIPParticipant; WhatsApp AcceptWhatsAppCall with wait_until_answered)
-# take longer than a normal request.
-DIAL_TIMEOUT = 30.0
+# Ring window (seconds) assumed when a request doesn't set ringing_timeout;
+# matches the server default. A dialing request must outlast it.
+DEFAULT_RINGING_TIMEOUT = 30.0
 """@private"""
 
 # A dialing request must outlast the ringing window, or it would abort before
 # the call can be answered. Keep the request timeout at least this many seconds
-# above the request's ringing_timeout.
+# above the ringing timeout.
 RINGING_TIMEOUT_MARGIN = 2.0
 """@private"""
 
 
-def dial_timeout(user_timeout: Optional[float], request: DialRequest) -> float:
-    """Request timeout (seconds) for a phone-dialing call: the user-supplied
-    value (or the dial default) raised, when needed, to stay at least
-    RINGING_TIMEOUT_MARGIN above the request's ringing_timeout.
+def pin_ringing_timeout(request: DialRequest) -> None:
+    """Set the ring window explicitly on a dialing request when the caller left it
+    unset, so the derived request timeout doesn't depend on the server's default
+    (which could change out from under us).
 
     @private
     """
-    effective = user_timeout if user_timeout else DIAL_TIMEOUT
+    if not request.HasField("ringing_timeout"):
+        request.ringing_timeout.seconds = int(DEFAULT_RINGING_TIMEOUT)
+
+
+def dial_timeout(user_timeout: Optional[float], request: DialRequest) -> float:
+    """Request timeout (seconds) for a phone-dialing call: the ring window plus a
+    margin, so the request doesn't abort before the call can be answered. The
+    ring window is the request's ringing_timeout when set, else
+    DEFAULT_RINGING_TIMEOUT. A longer user_timeout is honored; a shorter one is
+    raised to the floor.
+
+    @private
+    """
     if request.HasField("ringing_timeout"):
-        effective = max(effective, request.ringing_timeout.seconds + RINGING_TIMEOUT_MARGIN)
-    return effective
+        ring: float = request.ringing_timeout.seconds
+    else:
+        ring = DEFAULT_RINGING_TIMEOUT
+    floor = ring + RINGING_TIMEOUT_MARGIN
+    return max(user_timeout if user_timeout else floor, floor)

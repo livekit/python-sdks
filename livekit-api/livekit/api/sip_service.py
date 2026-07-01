@@ -35,7 +35,7 @@ from livekit.protocol.sip import (
     SIPTransport,
 )
 from ._service import Service
-from ._dial_timeout import dial_timeout as _dial_timeout
+from ._dial_timeout import dial_timeout as _dial_timeout, pin_ringing_timeout as _pin_ringing_timeout
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
@@ -784,7 +784,9 @@ class SipService(Service):
         client_timeout: Optional[aiohttp.ClientTimeout] = None
         if create.wait_until_answered:
             # Dialing a phone and waiting for an answer takes longer than a
-            # normal call, and the request must outlast ringing.
+            # normal call, and the request must outlast ringing. Pin the ring
+            # window so the timeout doesn't depend on the server's default.
+            _pin_ringing_timeout(create)
             client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, create))
         elif timeout:
             # obey user specified timeout
@@ -823,8 +825,9 @@ class SipService(Service):
             Updated SIP participant information
         """
         # Transferring a call dials a phone, which takes longer than a normal
-        # call, so use a longer default unless the user specified a timeout, and
-        # keep the request alive past ringing so the destination can answer.
+        # call, so keep the request alive past ringing. Pin the ring window so the
+        # timeout doesn't depend on the server's default.
+        _pin_ringing_timeout(transfer)
         client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, transfer))
         return await self._client.request(
             SVC,

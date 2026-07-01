@@ -18,7 +18,7 @@ from livekit.protocol.connector_twilio import (
     ConnectTwilioCallResponse,
 )
 from ._service import Service
-from ._dial_timeout import dial_timeout
+from ._dial_timeout import dial_timeout, pin_ringing_timeout
 from .access_token import VideoGrants
 
 SVC = "Connector"
@@ -129,7 +129,9 @@ class ConnectorService(Service):
         client_timeout: Optional[aiohttp.ClientTimeout] = None
         if request.wait_until_answered:
             # Waiting for the call to be answered dials a phone, which takes
-            # longer than a normal request and must outlast ringing.
+            # longer than a normal request and must outlast ringing. Pin the ring
+            # window so the timeout doesn't depend on the server's default.
+            pin_ringing_timeout(request)
             client_timeout = aiohttp.ClientTimeout(total=dial_timeout(timeout, request))
         elif timeout:
             client_timeout = aiohttp.ClientTimeout(total=timeout)
