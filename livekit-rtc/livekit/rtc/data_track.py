@@ -183,6 +183,29 @@ class RemoteDataTrack:
         resp = FfiClient.instance.request(req)
         return bool(resp.remote_data_track_is_published.is_published)
 
+    def set_pipeline_options(self, *, max_partial_frames: Optional[int] = None) -> None:
+        """Configures options for the pipeline handling incoming packets for this track.
+
+        These options apply to all current and future subscriptions of this track, and
+        may be set at any time. New options take effect with the next received packet.
+
+        Args:
+            max_partial_frames: Maximum number of partial frames the depacketizer will
+                track concurrently for this track. Defaults to 1. Higher values give more
+                out-of-order tolerance for high-frequency senders at the cost of additional
+                buffering. Zero is not a valid value; if a value of zero is provided, it
+                will be clamped to one. When ``None``, the current value is kept.
+        """
+        opts = proto_data_track.RemoteDataTrackPipelineOptions()
+        if max_partial_frames is not None:
+            opts.max_partial_frames = max_partial_frames
+
+        req = proto_ffi.FfiRequest()
+        req.remote_data_track_set_pipeline_options.track_handle = self._ffi_handle.handle
+        req.remote_data_track_set_pipeline_options.options.CopyFrom(opts)
+
+        FfiClient.instance.request(req)
+
     def __repr__(self) -> str:
         return (
             f"rtc.RemoteDataTrack(sid={self._info.sid}, name={self._info.name}, "
