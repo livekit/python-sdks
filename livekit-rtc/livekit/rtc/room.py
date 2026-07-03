@@ -33,6 +33,7 @@ from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
+from .log import logger
 from .participant import (
     LocalParticipant,
     Participant,
@@ -821,11 +822,22 @@ class Room(EventEmitter[EventTypes]):
             rparticipant._track_publications[rpublication.sid] = rpublication
             self.emit("track_published", rpublication, rparticipant)
         elif which == "track_unpublished":
-            rparticipant = self._remote_participants[event.track_unpublished.participant_identity]
-            rpublication = rparticipant._track_publications.pop(
-                event.track_unpublished.publication_sid
-            )
-            self.emit("track_unpublished", rpublication, rparticipant)
+            # The participant or publication may already have been removed by a
+            # racing disconnect or a duplicate event, so both lookups are done
+            # defensively and the emit is skipped when the entry is gone,
+            # mirroring the local_track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
+            identity = event.track_unpublished.participant_identity
+            sid = event.track_unpublished.publication_sid
+            rp = self._remote_participants.get(identity)
+            if rp is not None:
+                rpub = rp._track_publications.pop(sid, None)
+                if rpub is not None:
+                    self.emit("track_unpublished", rpub, rp)
+                else:
+                    logger.debug("track_unpublished for untracked publication sid %s", sid)
+            else:
+                logger.debug("track_unpublished for untracked participant %s", identity)
         elif which == "track_subscribed":
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
