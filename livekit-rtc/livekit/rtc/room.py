@@ -830,7 +830,7 @@ class Room(EventEmitter[EventTypes]):
             sid = event.track_unpublished.publication_sid
             rp = self._remote_participants.get(identity)
             if rp is not None:
-                rpub = rparticipant._track_publications.pop(sid, None)
+                rpub = rp._track_publications.pop(sid, None)
                 if rpub is not None:
                     self.emit("track_unpublished", rp, rpub)
                 else:
