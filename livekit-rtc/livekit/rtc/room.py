@@ -828,11 +828,11 @@ class Room(EventEmitter[EventTypes]):
             # KeyError that _listen_task logs as an error.
             identity = event.track_unpublished.participant_identity
             sid = event.track_unpublished.publication_sid
-            rparticipant = self._remote_participants.get(identity)
-            if rparticipant is not None:
-                rpublication = rparticipant._track_publications.pop(sid, None)
-                if rpublication is not None:
-                    self.emit("track_unpublished", rpublication, rparticipant)
+            rp = self._remote_participants.get(identity)
+            if rp is not None:
+                rpub = rparticipant._track_publications.pop(sid, None)
+                if rpub is not None:
+                    self.emit("track_unpublished", rp, rpub)
                 else:
                     logging.debug("track_unpublished for untracked publication sid %s", sid)
             else:
