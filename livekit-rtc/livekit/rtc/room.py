@@ -33,6 +33,7 @@ from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
+from .log import logger
 from .participant import (
     LocalParticipant,
     Participant,
@@ -834,9 +835,9 @@ class Room(EventEmitter[EventTypes]):
                 if rpub is not None:
                     self.emit("track_unpublished", rpub, rp)
                 else:
-                    logging.debug("track_unpublished for untracked publication sid %s", sid)
+                    logger.debug("track_unpublished for untracked publication sid %s", sid)
             else:
-                logging.debug("track_unpublished for untracked participant %s", identity)
+                logger.debug("track_unpublished for untracked participant %s", identity)
         elif which == "track_subscribed":
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
