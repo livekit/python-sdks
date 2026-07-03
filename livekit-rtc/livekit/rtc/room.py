@@ -832,7 +832,7 @@ class Room(EventEmitter[EventTypes]):
             if rp is not None:
                 rpub = rp._track_publications.pop(sid, None)
                 if rpub is not None:
-                    self.emit("track_unpublished", rp, rpub)
+                    self.emit("track_unpublished", rpub, rp)
                 else:
                     logging.debug("track_unpublished for untracked publication sid %s", sid)
             else:
