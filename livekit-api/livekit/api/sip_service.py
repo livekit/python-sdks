@@ -36,6 +36,7 @@ from livekit.protocol.sip import (
     SIPMediaConfig,
 )
 from ._service import Service
+from .twirp_client import SipCallError, ServerError
 from ._dial_timeout import (
     dial_timeout as _dial_timeout,
     pin_ringing_timeout as _pin_ringing_timeout,
@@ -44,6 +45,14 @@ from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
 """@private"""
+
+
+def _as_sip_error(err: ServerError) -> ServerError:
+    """Surface a SIP dialing failure as a SipCallError so callers can branch on
+    the SIP status; other failures (auth, validation) are returned unchanged."""
+    if "sip_status_code" in err.metadata:
+        return SipCallError.from_server_error(err)
+    return err
 
 
 class SipService(Service):
@@ -806,14 +815,17 @@ class SipService(Service):
         if outbound_trunk_config:
             create.trunk = outbound_trunk_config
 
-        return await self._client.request(
-            SVC,
-            "CreateSIPParticipant",
-            create,
-            self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
-            SIPParticipantInfo,
-            timeout=client_timeout,
-        )
+        try:
+            return await self._client.request(
+                SVC,
+                "CreateSIPParticipant",
+                create,
+                self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
+                SIPParticipantInfo,
+                timeout=client_timeout,
+            )
+        except ServerError as e:
+            raise _as_sip_error(e) from None
 
     async def transfer_sip_participant(
         self,
@@ -837,20 +849,23 @@ class SipService(Service):
         # timeout doesn't depend on the server's default.
         _pin_ringing_timeout(transfer)
         client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, transfer))
-        return await self._client.request(
-            SVC,
-            "TransferSIPParticipant",
-            transfer,
-            self._auth_header(
-                VideoGrants(
-                    room_admin=True,
-                    room=transfer.room_name,
+        try:
+            return await self._client.request(
+                SVC,
+                "TransferSIPParticipant",
+                transfer,
+                self._auth_header(
+                    VideoGrants(
+                        room_admin=True,
+                        room=transfer.room_name,
+                    ),
+                    sip=SIPGrants(call=True),
                 ),
-                sip=SIPGrants(call=True),
-            ),
-            SIPParticipantInfo,
-            timeout=client_timeout,
-        )
+                SIPParticipantInfo,
+                timeout=client_timeout,
+            )
+        except ServerError as e:
+            raise _as_sip_error(e) from None
 
     def _admin_headers(self) -> dict[str, str]:
         return self._auth_header(VideoGrants(), sip=SIPGrants(admin=True))
