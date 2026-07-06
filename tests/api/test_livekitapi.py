@@ -291,6 +291,13 @@ async def _sip_smoke():
                 numbers=["+15105550100"],
             ),
         )
+        # field-level (kwargs) update helpers
+        await lk.sip.update_inbound_trunk_fields(
+            "ST_abc123", name="inbound-v3", metadata="{}", numbers=["+15105550100"]
+        )
+        await lk.sip.update_outbound_trunk_fields(
+            "ST_abc123", name="outbound-v3", address="sip.telco.example.com"
+        )
         await lk.sip.list_inbound_trunk(
             api.ListSIPInboundTrunkRequest(trunk_ids=["ST_abc123"], numbers=["+15105550100"])
         )
@@ -319,6 +326,7 @@ async def _sip_smoke():
                 ),
             ),
         )
+        await lk.sip.update_dispatch_rule_fields("SDR_abc123", name="rule-v3", metadata="{}")
         await lk.sip.list_dispatch_rule(
             api.ListSIPDispatchRuleRequest(
                 dispatch_rule_ids=["SDR_abc123"], trunk_ids=["ST_abc123"]
