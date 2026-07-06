@@ -108,6 +108,32 @@ class CreateAgentV2Response(_message.Message):
     server_regions: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, agent_id: _Optional[str] = ..., status: _Optional[str] = ..., server_regions: _Optional[_Iterable[str]] = ...) -> None: ...
 
+class PromoteAgentRequest(_message.Message):
+    __slots__ = ("agent_id", "src_deployment", "dst_deployment")
+    AGENT_ID_FIELD_NUMBER: _ClassVar[int]
+    SRC_DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    DST_DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    agent_id: str
+    src_deployment: str
+    dst_deployment: str
+    def __init__(self, agent_id: _Optional[str] = ..., src_deployment: _Optional[str] = ..., dst_deployment: _Optional[str] = ...) -> None: ...
+
+class PromoteAgentResponse(_message.Message):
+    __slots__ = ("success", "message", "agent_id", "src_deployment", "dst_deployment", "version_tag")
+    SUCCESS_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    AGENT_ID_FIELD_NUMBER: _ClassVar[int]
+    SRC_DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    DST_DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    VERSION_TAG_FIELD_NUMBER: _ClassVar[int]
+    success: bool
+    message: str
+    agent_id: str
+    src_deployment: str
+    dst_deployment: str
+    version_tag: str
+    def __init__(self, success: bool = ..., message: _Optional[str] = ..., agent_id: _Optional[str] = ..., src_deployment: _Optional[str] = ..., dst_deployment: _Optional[str] = ..., version_tag: _Optional[str] = ...) -> None: ...
+
 class PresignedPostRequest(_message.Message):
     __slots__ = ("url", "values")
     class ValuesEntry(_message.Message):
@@ -124,7 +150,7 @@ class PresignedPostRequest(_message.Message):
     def __init__(self, url: _Optional[str] = ..., values: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class AgentDeployment(_message.Message):
-    __slots__ = ("region", "agent_id", "status", "replicas", "min_replicas", "max_replicas", "cpu_req", "cur_cpu", "cur_mem", "mem_req", "mem_limit", "cpu_limit", "server_region", "events", "deployment", "version", "agent_name", "deployment_enabled")
+    __slots__ = ("region", "agent_id", "status", "replicas", "min_replicas", "max_replicas", "cpu_req", "cur_cpu", "cur_mem", "mem_req", "mem_limit", "cpu_limit", "server_region", "events", "deployment", "version", "agent_name", "deployment_enabled", "last_scraped_at")
     REGION_FIELD_NUMBER: _ClassVar[int]
     AGENT_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
@@ -143,6 +169,7 @@ class AgentDeployment(_message.Message):
     VERSION_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_ENABLED_FIELD_NUMBER: _ClassVar[int]
+    LAST_SCRAPED_AT_FIELD_NUMBER: _ClassVar[int]
     region: str
     agent_id: str
     status: str
@@ -161,7 +188,8 @@ class AgentDeployment(_message.Message):
     version: str
     agent_name: str
     deployment_enabled: bool
-    def __init__(self, region: _Optional[str] = ..., agent_id: _Optional[str] = ..., status: _Optional[str] = ..., replicas: _Optional[int] = ..., min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., cpu_req: _Optional[str] = ..., cur_cpu: _Optional[str] = ..., cur_mem: _Optional[str] = ..., mem_req: _Optional[str] = ..., mem_limit: _Optional[str] = ..., cpu_limit: _Optional[str] = ..., server_region: _Optional[str] = ..., events: _Optional[_Iterable[_Union[AgentEvent, _Mapping]]] = ..., deployment: _Optional[str] = ..., version: _Optional[str] = ..., agent_name: _Optional[str] = ..., deployment_enabled: bool = ...) -> None: ...
+    last_scraped_at: _timestamp_pb2.Timestamp
+    def __init__(self, region: _Optional[str] = ..., agent_id: _Optional[str] = ..., status: _Optional[str] = ..., replicas: _Optional[int] = ..., min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., cpu_req: _Optional[str] = ..., cur_cpu: _Optional[str] = ..., cur_mem: _Optional[str] = ..., mem_req: _Optional[str] = ..., mem_limit: _Optional[str] = ..., cpu_limit: _Optional[str] = ..., server_region: _Optional[str] = ..., events: _Optional[_Iterable[_Union[AgentEvent, _Mapping]]] = ..., deployment: _Optional[str] = ..., version: _Optional[str] = ..., agent_name: _Optional[str] = ..., deployment_enabled: bool = ..., last_scraped_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class AgentInfo(_message.Message):
     __slots__ = ("agent_id", "agent_name", "version", "agent_deployments", "secrets", "deployed_at")
@@ -277,7 +305,14 @@ class RestartAgentResponse(_message.Message):
     def __init__(self, success: bool = ..., message: _Optional[str] = ...) -> None: ...
 
 class DeployAgentRequest(_message.Message):
-    __slots__ = ("agent_id", "agent_name", "secrets", "replicas", "max_replicas", "cpu_req", "deployment")
+    __slots__ = ("agent_id", "agent_name", "secrets", "replicas", "max_replicas", "cpu_req", "deployment", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AGENT_ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     SECRETS_FIELD_NUMBER: _ClassVar[int]
@@ -285,6 +320,7 @@ class DeployAgentRequest(_message.Message):
     MAX_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     CPU_REQ_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     agent_id: str
     agent_name: str
     secrets: _containers.RepeatedCompositeFieldContainer[AgentSecret]
@@ -292,7 +328,8 @@ class DeployAgentRequest(_message.Message):
     max_replicas: int
     cpu_req: str
     deployment: str
-    def __init__(self, agent_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., secrets: _Optional[_Iterable[_Union[AgentSecret, _Mapping]]] = ..., replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., cpu_req: _Optional[str] = ..., deployment: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, agent_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., secrets: _Optional[_Iterable[_Union[AgentSecret, _Mapping]]] = ..., replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., cpu_req: _Optional[str] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class DeployAgentResponse(_message.Message):
     __slots__ = ("success", "message", "agent_id", "presigned_url", "tag", "presigned_post_request", "deployment")
@@ -313,14 +350,23 @@ class DeployAgentResponse(_message.Message):
     def __init__(self, success: bool = ..., message: _Optional[str] = ..., agent_id: _Optional[str] = ..., presigned_url: _Optional[str] = ..., tag: _Optional[str] = ..., presigned_post_request: _Optional[_Union[PresignedPostRequest, _Mapping]] = ..., deployment: _Optional[str] = ...) -> None: ...
 
 class DeployAgentV2Request(_message.Message):
-    __slots__ = ("agent_id", "secrets", "deployment")
+    __slots__ = ("agent_id", "secrets", "deployment", "attributes")
+    class AttributesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     AGENT_ID_FIELD_NUMBER: _ClassVar[int]
     SECRETS_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     agent_id: str
     secrets: _containers.RepeatedCompositeFieldContainer[AgentSecret]
     deployment: str
-    def __init__(self, agent_id: _Optional[str] = ..., secrets: _Optional[_Iterable[_Union[AgentSecret, _Mapping]]] = ..., deployment: _Optional[str] = ...) -> None: ...
+    attributes: _containers.ScalarMap[str, str]
+    def __init__(self, agent_id: _Optional[str] = ..., secrets: _Optional[_Iterable[_Union[AgentSecret, _Mapping]]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class DeployAgentV2Response(_message.Message):
     __slots__ = ("success", "message", "agent_id", "tag", "presigned_req", "deployment")

@@ -122,6 +122,7 @@ class PacketTrailerFeature(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     PTF_USER_TIMESTAMP: _ClassVar[PacketTrailerFeature]
     PTF_FRAME_ID: _ClassVar[PacketTrailerFeature]
+    PTF_USER_DATA: _ClassVar[PacketTrailerFeature]
 DEFAULT_AC: AudioCodec
 OPUS: AudioCodec
 AAC: AudioCodec
@@ -191,6 +192,7 @@ TF_ENHANCED_NOISE_CANCELLATION: AudioTrackFeature
 TF_PRECONNECT_BUFFER: AudioTrackFeature
 PTF_USER_TIMESTAMP: PacketTrailerFeature
 PTF_FRAME_ID: PacketTrailerFeature
+PTF_USER_DATA: PacketTrailerFeature
 
 class Pagination(_message.Message):
     __slots__ = ("after_id", "limit")
@@ -454,16 +456,80 @@ class TrackInfo(_message.Message):
     def __init__(self, sid: _Optional[str] = ..., type: _Optional[_Union[TrackType, str]] = ..., name: _Optional[str] = ..., muted: bool = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., simulcast: bool = ..., disable_dtx: bool = ..., source: _Optional[_Union[TrackSource, str]] = ..., layers: _Optional[_Iterable[_Union[VideoLayer, _Mapping]]] = ..., mime_type: _Optional[str] = ..., mid: _Optional[str] = ..., codecs: _Optional[_Iterable[_Union[SimulcastCodecInfo, _Mapping]]] = ..., stereo: bool = ..., disable_red: bool = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., stream: _Optional[str] = ..., version: _Optional[_Union[TimedVersion, _Mapping]] = ..., audio_features: _Optional[_Iterable[_Union[AudioTrackFeature, str]]] = ..., backup_codec_policy: _Optional[_Union[BackupCodecPolicy, str]] = ..., packet_trailer_features: _Optional[_Iterable[_Union[PacketTrailerFeature, str]]] = ...) -> None: ...
 
 class DataTrackInfo(_message.Message):
-    __slots__ = ("pub_handle", "sid", "name", "encryption")
+    __slots__ = ("pub_handle", "sid", "name", "encryption", "frame_encoding", "schema")
     PUB_HANDLE_FIELD_NUMBER: _ClassVar[int]
     SID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
+    FRAME_ENCODING_FIELD_NUMBER: _ClassVar[int]
+    SCHEMA_FIELD_NUMBER: _ClassVar[int]
     pub_handle: int
     sid: str
     name: str
     encryption: Encryption.Type
-    def __init__(self, pub_handle: _Optional[int] = ..., sid: _Optional[str] = ..., name: _Optional[str] = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ...) -> None: ...
+    frame_encoding: DataTrackFrameEncoding
+    schema: DataTrackSchemaId
+    def __init__(self, pub_handle: _Optional[int] = ..., sid: _Optional[str] = ..., name: _Optional[str] = ..., encryption: _Optional[_Union[Encryption.Type, str]] = ..., frame_encoding: _Optional[_Union[DataTrackFrameEncoding, _Mapping]] = ..., schema: _Optional[_Union[DataTrackSchemaId, _Mapping]] = ...) -> None: ...
+
+class DataTrackFrameEncoding(_message.Message):
+    __slots__ = ("well_known", "custom")
+    class WellKnownFrameEncoding(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_ROS1: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_CDR: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_PROTOBUF: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_FLATBUFFER: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_CBOR: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_MSGPACK: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+        WELL_KNOWN_FRAME_ENCODING_JSON: _ClassVar[DataTrackFrameEncoding.WellKnownFrameEncoding]
+    WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_ROS1: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_CDR: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_PROTOBUF: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_FLATBUFFER: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_CBOR: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_MSGPACK: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FRAME_ENCODING_JSON: DataTrackFrameEncoding.WellKnownFrameEncoding
+    WELL_KNOWN_FIELD_NUMBER: _ClassVar[int]
+    CUSTOM_FIELD_NUMBER: _ClassVar[int]
+    well_known: DataTrackFrameEncoding.WellKnownFrameEncoding
+    custom: str
+    def __init__(self, well_known: _Optional[_Union[DataTrackFrameEncoding.WellKnownFrameEncoding, str]] = ..., custom: _Optional[str] = ...) -> None: ...
+
+class DataTrackSchemaEncoding(_message.Message):
+    __slots__ = ("well_known", "custom")
+    class WellKnownSchemaEncoding(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = ()
+        WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+        WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA: _ClassVar[DataTrackSchemaEncoding.WellKnownSchemaEncoding]
+    WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    WELL_KNOWN_FIELD_NUMBER: _ClassVar[int]
+    CUSTOM_FIELD_NUMBER: _ClassVar[int]
+    well_known: DataTrackSchemaEncoding.WellKnownSchemaEncoding
+    custom: str
+    def __init__(self, well_known: _Optional[_Union[DataTrackSchemaEncoding.WellKnownSchemaEncoding, str]] = ..., custom: _Optional[str] = ...) -> None: ...
+
+class DataTrackSchemaId(_message.Message):
+    __slots__ = ("name", "encoding")
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    ENCODING_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    encoding: DataTrackSchemaEncoding
+    def __init__(self, name: _Optional[str] = ..., encoding: _Optional[_Union[DataTrackSchemaEncoding, _Mapping]] = ...) -> None: ...
 
 class DataTrackExtensionParticipantSid(_message.Message):
     __slots__ = ("id", "participant_sid")
@@ -478,6 +544,22 @@ class DataTrackSubscriptionOptions(_message.Message):
     TARGET_FPS_FIELD_NUMBER: _ClassVar[int]
     target_fps: int
     def __init__(self, target_fps: _Optional[int] = ...) -> None: ...
+
+class DataBlobKey(_message.Message):
+    __slots__ = ("generic", "schema_id")
+    GENERIC_FIELD_NUMBER: _ClassVar[int]
+    SCHEMA_ID_FIELD_NUMBER: _ClassVar[int]
+    generic: str
+    schema_id: DataTrackSchemaId
+    def __init__(self, generic: _Optional[str] = ..., schema_id: _Optional[_Union[DataTrackSchemaId, _Mapping]] = ...) -> None: ...
+
+class DataBlob(_message.Message):
+    __slots__ = ("key", "contents")
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    CONTENTS_FIELD_NUMBER: _ClassVar[int]
+    key: DataBlobKey
+    contents: bytes
+    def __init__(self, key: _Optional[_Union[DataBlobKey, _Mapping]] = ..., contents: _Optional[bytes] = ...) -> None: ...
 
 class VideoLayer(_message.Message):
     __slots__ = ("quality", "width", "height", "bitrate", "ssrc", "spatial_layer", "rid", "repair_ssrc")
