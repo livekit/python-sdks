@@ -49,9 +49,15 @@ class LiveKitAPI:
             session: aiohttp.ClientSession instance to use for requests, if not provided, a new one will be created
         """
         url = url or os.getenv("LIVEKIT_URL")
-        token = token or os.getenv("LIVEKIT_TOKEN")
-        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
-        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
+
+        # Only fall back to environment credentials when none were provided
+        # explicitly, so an ambient LIVEKIT_TOKEN can't silently override an
+        # explicit api_key/secret (or vice versa).
+        if not token and not api_key and not api_secret:
+            token = os.getenv("LIVEKIT_TOKEN")
+        if not token and not api_key and not api_secret:
+            api_key = os.getenv("LIVEKIT_API_KEY")
+            api_secret = os.getenv("LIVEKIT_API_SECRET")
 
         if not url:
             raise ValueError("url must be set")
