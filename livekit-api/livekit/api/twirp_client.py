@@ -126,7 +126,7 @@ class SipCallError(ServerError):
 TwirpError = ServerError
 
 
-class TwirpErrorCode:
+class ServerErrorCode:
     CANCELED = "canceled"
     UNKNOWN = "unknown"
     INVALID_ARGUMENT = "invalid_argument"
@@ -145,6 +145,10 @@ class TwirpErrorCode:
     INTERNAL = "internal"
     UNAVAILABLE = "unavailable"
     DATA_LOSS = "dataloss"
+
+
+# Deprecated alias for :class:`ServerErrorCode`, kept for backwards compatibility.
+TwirpErrorCode = ServerErrorCode
 
 
 T = TypeVar("T", bound=Message)

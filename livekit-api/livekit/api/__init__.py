@@ -36,7 +36,13 @@ from livekit.protocol.sip import *
 from livekit.protocol.connector_whatsapp import *
 from livekit.protocol.connector_twilio import *
 
-from .twirp_client import ServerError, SipCallError, TwirpError, TwirpErrorCode
+from .twirp_client import (
+    ServerError,
+    ServerErrorCode,
+    SipCallError,
+    TwirpError,
+    TwirpErrorCode,
+)
 from .livekit_api import LiveKitAPI
 from .access_token import (
     InferenceGrants,
@@ -65,6 +71,7 @@ __all__ = [
     "TokenVerifier",
     "WebhookReceiver",
     "ServerError",
+    "ServerErrorCode",
     "TwirpError",
     "TwirpErrorCode",
     "SipCallError",
