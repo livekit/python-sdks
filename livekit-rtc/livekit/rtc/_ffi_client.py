@@ -83,7 +83,11 @@ class FfiHandle:
     def dispose(self) -> None:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True
-            assert FfiClient.instance._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
+            ffi = FfiClient._instance
+            if ffi is None or ffi._pid != os.getpid():
+                return
+            dropped = ffi._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
+            assert dropped
 
     def __repr__(self) -> str:
         return f"FfiHandle({self.handle})"
@@ -218,6 +222,7 @@ class FfiClient:
         return cls._instance
 
     def __init__(self) -> None:
+        self._pid = os.getpid()
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
@@ -253,9 +258,12 @@ class FfiClient:
         )
 
         ffi_lib = self._ffi_lib
+        init_pid = self._pid
 
         @atexit.register
         def _dispose_lk_ffi() -> None:
+            if os.getpid() != init_pid:
+                return
             ffi_lib.livekit_ffi_dispose()
 
     @property
@@ -263,6 +271,12 @@ class FfiClient:
         return self._queue
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        if self._pid != os.getpid():
+            raise RuntimeError(
+                "livekit.rtc was used in a parent process before fork(); the native "
+                "runtime cannot be used across fork(). Do not create or connect a Room "
+                "(or use any livekit.rtc object) before forking child processes."
+            )
         proto_data = req.SerializeToString()
         proto_len = len(proto_data)
         data = (ctypes.c_ubyte * proto_len)(*proto_data)
