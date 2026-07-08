@@ -119,18 +119,17 @@ class ConnectorService(Service):
         Args:
             request: AcceptWhatsAppCallRequest containing call parameters and SDP
             timeout: Optional request timeout in seconds. When the request waits
-                for an answer (wait_until_answered), it defaults to the standard
-                ring window; set it above the ringing_timeout passed to
-                dial_whatsapp_call (the two calls are separate, so the SDK can't
-                derive it).
+                for the inbound party to join (wait_until_answered), it defaults
+                to the standard ring window.
 
         Returns:
             AcceptWhatsAppCallResponse with the room name
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
         if request.wait_until_answered:
-            # Accept can block until the call is answered, so default to the
-            # standard ring window; the caller overrides via timeout.
+            # Waiting for the inbound party to join can block, so default the
+            # request timeout to the standard ring window; the caller overrides
+            # via timeout.
             client_timeout = aiohttp.ClientTimeout(
                 total=timeout if timeout else DEFAULT_RINGING_TIMEOUT
             )

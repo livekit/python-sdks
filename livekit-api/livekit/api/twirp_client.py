@@ -28,16 +28,20 @@ from ._failover import (
     origin_of,
     pick_next,
 )
+from .version import __version__
 
 DEFAULT_PREFIX = "twirp"
 
 logger = logging.getLogger("livekit")
 
+# Identifies the SDK and version to the server on every request.
+_USER_AGENT = f"livekit-server-sdk-python/{__version__}"
+
 # Shared across all clients in the process so the region list is fetched once.
 _REGION_CACHE = RegionCache()
 
 
-class TwirpError(Exception):
+class ServerError(Exception):
     def __init__(
         self,
         code: str,
@@ -66,18 +70,68 @@ class TwirpError(Exception):
 
     @property
     def metadata(self) -> Dict[str, str]:
-        """Twirp metadata"""
+        """Server-provided error metadata"""
         return self._metadata
 
     def __str__(self) -> str:
-        result = f"TwirpError(code={self.code}, message={self.message}, status={self.status}"
+        result = f"ServerError(code={self.code}, message={self.message}, status={self.status}"
         if self.metadata:
             result += f", metadata={self.metadata}"
         result += ")"
         return result
 
 
-class TwirpErrorCode:
+class SipCallError(ServerError):
+    """A :class:`ServerError` from a SIP dialing call (``create_sip_participant`` /
+    ``transfer_sip_participant``) that failed with a SIP response status. The SIP
+    code and reason are exposed as properties; any other error metadata remains
+    available via :attr:`metadata`."""
+
+    @property
+    def sip_status_code(self) -> Optional[int]:
+        """The SIP response code of the failed call, e.g. 486 (Busy Here)."""
+        raw = self.metadata.get("sip_status_code")
+        if raw is None:
+            return None
+        try:
+            return int(raw)
+        except ValueError:
+            return None
+
+    @property
+    def sip_status(self) -> Optional[str]:
+        """The SIP reason phrase of the failed call, e.g. "Busy Here"."""
+        return self.metadata.get("sip_status")
+
+    @classmethod
+    def from_server_error(cls, err: ServerError) -> "SipCallError":
+        return cls(err.code, err.message, status=err.status, metadata=err.metadata)
+
+    def __str__(self) -> str:
+        code = self.metadata.get("sip_status_code")
+        if code is None:
+            return super().__str__()
+        # A clear, SIP-specific representation, including any extra metadata.
+        reason = self.metadata.get("sip_status")
+        result = f"SIP call failed: {code}"
+        if reason:
+            result += f" {reason}"
+        result += f" ({self.code})"
+        extra = {
+            k: v
+            for k, v in self.metadata.items()
+            if k not in ("sip_status_code", "sip_status", "error_details")
+        }
+        if extra:
+            result += " [" + ", ".join(f"{k}={v}" for k, v in extra.items()) + "]"
+        return result
+
+
+# Deprecated alias for :class:`ServerError`, kept for backwards compatibility.
+TwirpError = ServerError
+
+
+class ServerErrorCode:
     CANCELED = "canceled"
     UNKNOWN = "unknown"
     INVALID_ARGUMENT = "invalid_argument"
@@ -96,6 +150,10 @@ class TwirpErrorCode:
     INTERNAL = "internal"
     UNAVAILABLE = "unavailable"
     DATA_LOSS = "dataloss"
+
+
+# Deprecated alias for :class:`ServerErrorCode`, kept for backwards compatibility.
+TwirpErrorCode = ServerErrorCode
 
 
 T = TypeVar("T", bound=Message)
@@ -145,8 +203,9 @@ class TwirpClient:
         headers intact — against the next untried region, with exponential
         backoff. A 4xx is returned immediately."""
         path = f"{self.prefix}/{self.pkg}.{service}/{method}"
-        forward_headers = dict(headers)  # for the discovery fetch (no content-type yet)
         headers = dict(headers)
+        headers["User-Agent"] = _USER_AGENT
+        forward_headers = dict(headers)  # for the discovery fetch (no content-type yet)
         headers["Content-Type"] = "application/protobuf"
         serialized_data = data.SerializeToString()
 
@@ -183,7 +242,7 @@ class TwirpClient:
                         error_data = {}
                     if resp.status < 500:
                         # 4xx is terminal.
-                        raise self._twirp_error(error_data, resp.status)
+                        raise self._server_error(error_data, resp.status)
                     retryable_status = resp.status
             except (aiohttp.ClientError, asyncio.TimeoutError) as e:
                 transport_exc = e
@@ -200,7 +259,7 @@ class TwirpClient:
             if next_origin is None:
                 if transport_exc is not None:
                     raise transport_exc
-                raise self._twirp_error(error_data, retryable_status or 500)
+                raise self._server_error(error_data, retryable_status or 500)
 
             reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
             logger.warning(
@@ -216,8 +275,8 @@ class TwirpClient:
         raise RuntimeError("failover loop exited without returning")  # unreachable
 
     @staticmethod
-    def _twirp_error(error_data: Dict, status: int) -> "TwirpError":
-        return TwirpError(
+    def _server_error(error_data: Dict, status: int) -> "ServerError":
+        return ServerError(
             error_data.get("code", "unknown"),
             error_data.get("msg", ""),
             status=status,

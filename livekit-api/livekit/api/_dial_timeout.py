@@ -2,15 +2,12 @@ from __future__ import annotations
 
 from typing import Optional, Union
 
-from livekit.protocol.connector_whatsapp import AcceptWhatsAppCallRequest
 from livekit.protocol.sip import CreateSIPParticipantRequest, TransferSIPParticipantRequest
 
-# Requests that carry wait_until_answered / ringing_timeout and share the
-# phone-dialing timeout behavior.
+# Requests that carry ringing_timeout and share the phone-dialing timeout behavior.
 DialRequest = Union[
     CreateSIPParticipantRequest,
     TransferSIPParticipantRequest,
-    AcceptWhatsAppCallRequest,
 ]
 """@private"""
 

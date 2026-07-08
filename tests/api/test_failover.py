@@ -18,19 +18,21 @@ LK_TEST_SERVER_URL (default http://127.0.0.1:9999); they skip when no server is
 reachable. The mock returns Cache-Control: max-age=0, so the region cache never
 stores entries and scenarios don't interfere.
 
-See cmd/test-server/README.md for the X-Lk-Mock-* control protocol. These tests
-drive TwirpClient.request() directly because the public service methods do not
-expose per-call headers.
+See cmd/test-server/README.md for the X-Lk-Mock JSON control protocol. These
+tests drive TwirpClient.request() directly because failover relies on internal
+test-only knobs (_failover_force/_failover_backoff) the public methods don't
+expose.
 """
 
 import asyncio
+import json
 import os
 import urllib.request
 
 import aiohttp
 import pytest
 
-from livekit.api import CreateRoomRequest, Room, TwirpError
+from livekit.api import CreateRoomRequest, Room, ServerError
 from livekit.api.twirp_client import TwirpClient
 
 BASE = os.getenv("LK_TEST_SERVER_URL", "http://127.0.0.1:9999")
@@ -51,7 +53,7 @@ pytestmark = pytest.mark.skipif(
 
 # _failover_force bypasses the cloud-host check (the mock is on 127.0.0.1) and a
 # tiny backoff keeps the tests fast — both are internal, test-only knobs.
-async def _call(directives: dict, *, failover: bool = True, force: bool = True) -> Room:
+async def _call(mock: dict, *, failover: bool = True, force: bool = True) -> Room:
     async with aiohttp.ClientSession() as session:
         client = TwirpClient(
             session,
@@ -63,8 +65,8 @@ async def _call(directives: dict, *, failover: bool = True, force: bool = True) 
         )
         headers = {
             "authorization": "Bearer test-token",
-            "x-lk-mock-skip-auth": "true",
-            **directives,
+            # These tests exercise failover, not authz; skip the mock's permission check.
+            "X-Lk-Mock": json.dumps({"skipAuth": True, **mock}),
         }
         return await client.request("RoomService", "CreateRoom", CreateRoomRequest(), headers, Room)
 
@@ -74,40 +76,40 @@ def test_healthy():
 
 
 def test_primary_unavailable():
-    asyncio.run(_call({"x-lk-mock-fail-regions": "0"}))
+    asyncio.run(_call({"failRegions": [0]}))
 
 
 def test_two_regions_unavailable():
-    asyncio.run(_call({"x-lk-mock-fail-regions": "0,1"}))
+    asyncio.run(_call({"failRegions": [0, 1]}))
 
 
 def test_all_unavailable():
-    with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0,1,2,3"}))
+    with pytest.raises(ServerError):
+        asyncio.run(_call({"failRegions": [0, 1, 2, 3]}))
 
 
 def test_client_error_not_retried():
-    with pytest.raises(TwirpError) as exc:
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0", "x-lk-mock-fail-status": "400"}))
+    with pytest.raises(ServerError) as exc:
+        asyncio.run(_call({"failRegions": [0], "failStatus": 400}))
     assert exc.value.code == "invalid_argument"
 
 
 def test_transport_error_failover():
-    asyncio.run(_call({"x-lk-mock-fail-regions": "0", "x-lk-mock-fail-mode": "drop"}))
+    asyncio.run(_call({"failRegions": [0], "failMode": "drop"}))
 
 
 def test_region_discovery_unreachable():
-    with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0", "x-lk-mock-regions-status": "500"}))
+    with pytest.raises(ServerError):
+        asyncio.run(_call({"failRegions": [0], "regionsStatus": 500}))
 
 
 def test_not_cloud_host():
     # Enabled but not forced; 127.0.0.1 is not a cloud host, so no failover.
-    with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, force=False))
+    with pytest.raises(ServerError):
+        asyncio.run(_call({"failRegions": [0]}, force=False))
 
 
 def test_disabled():
     # failover=False disables failover entirely.
-    with pytest.raises(TwirpError):
-        asyncio.run(_call({"x-lk-mock-fail-regions": "0"}, failover=False))
+    with pytest.raises(ServerError):
+        asyncio.run(_call({"failRegions": [0]}, failover=False))
