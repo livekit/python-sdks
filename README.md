@@ -65,6 +65,21 @@ async def main():
 asyncio.run(main())
 ```
 
+### Authentication
+
+Authenticate with an API key and secret (recommended for backend use), or with a
+pre-signed token for client-side use, where the API secret must not be exposed.
+Any omitted value falls back to `LIVEKIT_URL`, `LIVEKIT_API_KEY`,
+`LIVEKIT_API_SECRET`, and `LIVEKIT_TOKEN`.
+
+```python
+# API key & secret (backend)
+lkapi = api.LiveKitAPI("https://my-project.livekit.cloud", api_key="...", api_secret="...")
+
+# pre-signed token (client-side); the token must already carry the grants for the calls
+lkapi = api.LiveKitAPI.with_token(my_token, "https://my-project.livekit.cloud")
+```
+
 ### Using other APIs
 
 Services can be accessed via the LiveKitAPI object.
@@ -89,6 +104,38 @@ dispatch_svc = lkapi.agent_dispatch
 
 # Connector Service
 connector_svc = lkapi.connector
+```
+
+### Error handling
+
+A failed server API call raises `api.ServerError`, which exposes the error
+`code`, `message`, and any server-provided `metadata`.
+
+```python
+try:
+    await lkapi.room.create_room(api.CreateRoomRequest(name="my-room"))
+except api.ServerError as e:
+    print(e.code, e.message)
+```
+
+A failed SIP dial (e.g. the callee is busy or doesn't answer) raises
+`api.SipCallError`, a `ServerError` subclass that also exposes the SIP response
+status:
+
+```python
+try:
+    await lkapi.sip.create_sip_participant(api.CreateSIPParticipantRequest(
+        sip_trunk_id="ST_...",
+        sip_call_to="+15105550100",
+        room_name="my-room",
+        wait_until_answered=True,
+    ))
+except api.SipCallError as e:
+    print(e)                    # e.g. "SIP call failed: 486 Busy Here (resource_exhausted)"
+    if e.sip_status_code == 486:
+        ...                     # busy
+except api.ServerError as e:
+    print(e.code, e.message)    # any other API error
 ```
 
 ## Using Real-time SDK
