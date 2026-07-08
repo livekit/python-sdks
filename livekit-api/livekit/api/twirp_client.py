@@ -91,7 +91,12 @@ class SipCallError(ServerError):
     def sip_status_code(self) -> Optional[int]:
         """The SIP response code of the failed call, e.g. 486 (Busy Here)."""
         raw = self.metadata.get("sip_status_code")
-        return int(raw) if raw is not None else None
+        if raw is None:
+            return None
+        try:
+            return int(raw)
+        except ValueError:
+            return None
 
     @property
     def sip_status(self) -> Optional[str]:
