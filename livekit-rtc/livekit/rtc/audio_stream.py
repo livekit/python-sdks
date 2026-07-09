@@ -125,9 +125,6 @@ class AudioStream:
             self._processor = noise_cancellation
             self._processor_auto_close = auto_close_noise_cancellation
 
-        self._task = self._loop.create_task(self._run())
-        self._task.add_done_callback(task_done_logger)
-
         stream: Any = None
         if "participant" in kwargs:
             stream = self._create_owned_stream_from_participant(
@@ -137,6 +134,11 @@ class AudioStream:
             stream = self._create_owned_stream()
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
+
+        # Start _run only after _ffi_handle is set, so a failure above doesn't orphan
+        # a task that dereferences an unassigned _ffi_handle.
+        self._task = self._loop.create_task(self._run())
+        self._task.add_done_callback(task_done_logger)
 
         if self._track is not None:
             self._track._register_audio_stream(self)
