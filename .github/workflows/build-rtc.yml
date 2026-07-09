@@ -22,7 +22,7 @@ jobs:
   generate_protobuf:
     runs-on: ubuntu-latest
     name: Generating protobuf
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
 
     defaults:
       run:
