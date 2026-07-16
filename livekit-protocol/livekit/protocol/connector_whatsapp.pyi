@@ -83,12 +83,14 @@ class DisconnectWhatsAppCallResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ConnectWhatsAppCallRequest(_message.Message):
-    __slots__ = ("whatsapp_call_id", "sdp")
+    __slots__ = ("whatsapp_call_id", "sdp", "wait_until_answered")
     WHATSAPP_CALL_ID_FIELD_NUMBER: _ClassVar[int]
     SDP_FIELD_NUMBER: _ClassVar[int]
+    WAIT_UNTIL_ANSWERED_FIELD_NUMBER: _ClassVar[int]
     whatsapp_call_id: str
     sdp: _rtc.SessionDescription
-    def __init__(self, whatsapp_call_id: _Optional[str] = ..., sdp: _Optional[_Union[_rtc.SessionDescription, _Mapping]] = ...) -> None: ...
+    wait_until_answered: bool
+    def __init__(self, whatsapp_call_id: _Optional[str] = ..., sdp: _Optional[_Union[_rtc.SessionDescription, _Mapping]] = ..., wait_until_answered: bool = ...) -> None: ...
 
 class ConnectWhatsAppCallResponse(_message.Message):
     __slots__ = ()

@@ -36,7 +36,7 @@ JS_SUCCESS: JobStatus
 JS_FAILED: JobStatus
 
 class Job(_message.Message):
-    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording", "deployment", "attributes")
+    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording", "deployment", "attributes", "enable_redaction")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -56,6 +56,7 @@ class Job(_message.Message):
     ENABLE_RECORDING_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    ENABLE_REDACTION_FIELD_NUMBER: _ClassVar[int]
     id: str
     dispatch_id: str
     type: JobType
@@ -68,7 +69,8 @@ class Job(_message.Message):
     enable_recording: bool
     deployment: str
     attributes: _containers.ScalarMap[str, str]
-    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    enable_redaction: bool
+    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., enable_redaction: bool = ...) -> None: ...
 
 class JobState(_message.Message):
     __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id")

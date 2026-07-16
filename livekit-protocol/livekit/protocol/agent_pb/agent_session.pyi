@@ -81,7 +81,7 @@ AMD_MACHINE_UNAVAILABLE: AmdCategory
 AMD_UNCERTAIN: AmdCategory
 
 class MetricsReport(_message.Message):
-    __slots__ = ("started_speaking_at", "stopped_speaking_at", "transcription_delay", "end_of_turn_delay", "on_user_turn_completed_delay", "llm_node_ttft", "tts_node_ttfb", "e2e_latency")
+    __slots__ = ("started_speaking_at", "stopped_speaking_at", "transcription_delay", "end_of_turn_delay", "on_user_turn_completed_delay", "llm_node_ttft", "tts_node_ttfb", "e2e_latency", "llm_node_tps", "llm_node_ttfs")
     STARTED_SPEAKING_AT_FIELD_NUMBER: _ClassVar[int]
     STOPPED_SPEAKING_AT_FIELD_NUMBER: _ClassVar[int]
     TRANSCRIPTION_DELAY_FIELD_NUMBER: _ClassVar[int]
@@ -90,6 +90,8 @@ class MetricsReport(_message.Message):
     LLM_NODE_TTFT_FIELD_NUMBER: _ClassVar[int]
     TTS_NODE_TTFB_FIELD_NUMBER: _ClassVar[int]
     E2E_LATENCY_FIELD_NUMBER: _ClassVar[int]
+    LLM_NODE_TPS_FIELD_NUMBER: _ClassVar[int]
+    LLM_NODE_TTFS_FIELD_NUMBER: _ClassVar[int]
     started_speaking_at: _timestamp_pb2.Timestamp
     stopped_speaking_at: _timestamp_pb2.Timestamp
     transcription_delay: float
@@ -98,7 +100,9 @@ class MetricsReport(_message.Message):
     llm_node_ttft: float
     tts_node_ttfb: float
     e2e_latency: float
-    def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ...) -> None: ...
+    llm_node_tps: float
+    llm_node_ttfs: float
+    def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ..., llm_node_tps: _Optional[float] = ..., llm_node_ttfs: _Optional[float] = ...) -> None: ...
 
 class TimedString(_message.Message):
     __slots__ = ("text", "start_time", "end_time", "confidence", "start_time_offset", "speaker_id")
@@ -332,7 +336,7 @@ class DebugMessage(_message.Message):
     def __init__(self, payload: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class AgentSessionEvent(_message.Message):
-    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction", "eot_prediction", "function_tools_started", "debug_message", "tool_execution_updated")
+    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction", "eot_prediction", "function_tools_started", "debug_message", "tool_execution_updated", "agent_false_interruption")
     class AgentStateChanged(_message.Message):
         __slots__ = ("old_state", "new_state")
         OLD_STATE_FIELD_NUMBER: _ClassVar[int]
@@ -463,6 +467,11 @@ class AgentSessionEvent(_message.Message):
         reply_updated: AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated
         ended: AgentSessionEvent.ToolExecutionUpdated.Ended
         def __init__(self, started: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.Started, _Mapping]] = ..., call_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.CallUpdated, _Mapping]] = ..., reply_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated, _Mapping]] = ..., ended: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.Ended, _Mapping]] = ...) -> None: ...
+    class AgentFalseInterruption(_message.Message):
+        __slots__ = ("resumed",)
+        RESUMED_FIELD_NUMBER: _ClassVar[int]
+        resumed: bool
+        def __init__(self, resumed: bool = ...) -> None: ...
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     AGENT_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
     USER_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
@@ -477,6 +486,7 @@ class AgentSessionEvent(_message.Message):
     FUNCTION_TOOLS_STARTED_FIELD_NUMBER: _ClassVar[int]
     DEBUG_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     TOOL_EXECUTION_UPDATED_FIELD_NUMBER: _ClassVar[int]
+    AGENT_FALSE_INTERRUPTION_FIELD_NUMBER: _ClassVar[int]
     created_at: _timestamp_pb2.Timestamp
     agent_state_changed: AgentSessionEvent.AgentStateChanged
     user_state_changed: AgentSessionEvent.UserStateChanged
@@ -491,7 +501,8 @@ class AgentSessionEvent(_message.Message):
     function_tools_started: AgentSessionEvent.FunctionToolsStarted
     debug_message: DebugMessage
     tool_execution_updated: AgentSessionEvent.ToolExecutionUpdated
-    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ..., eot_prediction: _Optional[_Union[AgentSessionEvent.EotPrediction, _Mapping]] = ..., function_tools_started: _Optional[_Union[AgentSessionEvent.FunctionToolsStarted, _Mapping]] = ..., debug_message: _Optional[_Union[DebugMessage, _Mapping]] = ..., tool_execution_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated, _Mapping]] = ...) -> None: ...
+    agent_false_interruption: AgentSessionEvent.AgentFalseInterruption
+    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ..., eot_prediction: _Optional[_Union[AgentSessionEvent.EotPrediction, _Mapping]] = ..., function_tools_started: _Optional[_Union[AgentSessionEvent.FunctionToolsStarted, _Mapping]] = ..., debug_message: _Optional[_Union[DebugMessage, _Mapping]] = ..., tool_execution_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated, _Mapping]] = ..., agent_false_interruption: _Optional[_Union[AgentSessionEvent.AgentFalseInterruption, _Mapping]] = ...) -> None: ...
 
 class SessionRequest(_message.Message):
     __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info", "update_io", "finalize_simulation")
