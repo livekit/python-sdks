@@ -120,11 +120,13 @@ class SimulationRun(_message.Message):
     class JobMetrics(_message.Message):
         __slots__ = ("accuracy_score", "experience_score", "task_completion", "stt", "llm", "tts", "conversation", "simulator", "turns", "judge_model", "audio_judge_model", "has_remote_session", "t0")
         class STT(_message.Message):
-            __slots__ = ("wer", "words", "word_errors", "cer", "keyterm_recall", "keyterms_uttered", "keyterms_recognized", "transcription_latency_ms")
+            __slots__ = ("wer", "words", "word_errors", "cer", "chars", "char_errors", "keyterm_recall", "keyterms_uttered", "keyterms_recognized", "transcription_latency_ms")
             WER_FIELD_NUMBER: _ClassVar[int]
             WORDS_FIELD_NUMBER: _ClassVar[int]
             WORD_ERRORS_FIELD_NUMBER: _ClassVar[int]
             CER_FIELD_NUMBER: _ClassVar[int]
+            CHARS_FIELD_NUMBER: _ClassVar[int]
+            CHAR_ERRORS_FIELD_NUMBER: _ClassVar[int]
             KEYTERM_RECALL_FIELD_NUMBER: _ClassVar[int]
             KEYTERMS_UTTERED_FIELD_NUMBER: _ClassVar[int]
             KEYTERMS_RECOGNIZED_FIELD_NUMBER: _ClassVar[int]
@@ -133,11 +135,13 @@ class SimulationRun(_message.Message):
             words: int
             word_errors: int
             cer: float
+            chars: int
+            char_errors: int
             keyterm_recall: float
             keyterms_uttered: int
             keyterms_recognized: int
             transcription_latency_ms: int
-            def __init__(self, wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., keyterm_recall: _Optional[float] = ..., keyterms_uttered: _Optional[int] = ..., keyterms_recognized: _Optional[int] = ..., transcription_latency_ms: _Optional[int] = ...) -> None: ...
+            def __init__(self, wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., keyterm_recall: _Optional[float] = ..., keyterms_uttered: _Optional[int] = ..., keyterms_recognized: _Optional[int] = ..., transcription_latency_ms: _Optional[int] = ...) -> None: ...
         class LLM(_message.Message):
             __slots__ = ("ttft_ms", "ttfs_ms", "tokens_per_second", "conciseness_score")
             TTFT_MS_FIELD_NUMBER: _ClassVar[int]
@@ -150,20 +154,30 @@ class SimulationRun(_message.Message):
             conciseness_score: float
             def __init__(self, ttft_ms: _Optional[int] = ..., ttfs_ms: _Optional[int] = ..., tokens_per_second: _Optional[float] = ..., conciseness_score: _Optional[float] = ...) -> None: ...
         class TTS(_message.Message):
-            __slots__ = ("ttfa_ms", "ttfb_ms", "wer", "speech_rate_wpm", "naturalness_score", "enunciation_score")
+            __slots__ = ("ttfa_ms", "ttfb_ms", "wer", "words", "word_errors", "cer", "chars", "char_errors", "speech_rate_wpm", "naturalness_score", "enunciation_score")
             TTFA_MS_FIELD_NUMBER: _ClassVar[int]
             TTFB_MS_FIELD_NUMBER: _ClassVar[int]
             WER_FIELD_NUMBER: _ClassVar[int]
+            WORDS_FIELD_NUMBER: _ClassVar[int]
+            WORD_ERRORS_FIELD_NUMBER: _ClassVar[int]
+            CER_FIELD_NUMBER: _ClassVar[int]
+            CHARS_FIELD_NUMBER: _ClassVar[int]
+            CHAR_ERRORS_FIELD_NUMBER: _ClassVar[int]
             SPEECH_RATE_WPM_FIELD_NUMBER: _ClassVar[int]
             NATURALNESS_SCORE_FIELD_NUMBER: _ClassVar[int]
             ENUNCIATION_SCORE_FIELD_NUMBER: _ClassVar[int]
             ttfa_ms: int
             ttfb_ms: int
             wer: float
+            words: int
+            word_errors: int
+            cer: float
+            chars: int
+            char_errors: int
             speech_rate_wpm: float
             naturalness_score: float
             enunciation_score: float
-            def __init__(self, ttfa_ms: _Optional[int] = ..., ttfb_ms: _Optional[int] = ..., wer: _Optional[float] = ..., speech_rate_wpm: _Optional[float] = ..., naturalness_score: _Optional[float] = ..., enunciation_score: _Optional[float] = ...) -> None: ...
+            def __init__(self, ttfa_ms: _Optional[int] = ..., ttfb_ms: _Optional[int] = ..., wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., speech_rate_wpm: _Optional[float] = ..., naturalness_score: _Optional[float] = ..., enunciation_score: _Optional[float] = ...) -> None: ...
         class Conversation(_message.Message):
             __slots__ = ("turn_taking_score", "response_latency_p50_ms", "response_latency_p95_ms", "response_latency_p99_ms", "agent_yield_latency_ms", "eot_misprediction_count", "overlap_ratio", "overlap_speech_ms", "total_speech_ms", "silence_total_ms", "awkward_silence_count", "unanswered_persona_turns", "false_interruption_count", "false_interruption_unrecovered_count", "agent_reported_e2e_latency_ms")
             TURN_TAKING_SCORE_FIELD_NUMBER: _ClassVar[int]
@@ -265,7 +279,7 @@ class SimulationRun(_message.Message):
         t0: _timestamp_pb2.Timestamp
         def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., task_completion: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., simulator: _Optional[_Union[SimulationRun.JobMetrics.Simulator, _Mapping]] = ..., turns: _Optional[_Iterable[_Union[SimulationRun.JobMetrics.Turn, _Mapping]]] = ..., judge_model: _Optional[str] = ..., audio_judge_model: _Optional[str] = ..., has_remote_session: bool = ..., t0: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
     class RunMetrics(_message.Message):
-        __slots__ = ("accuracy_score", "experience_score", "scenario_pass_rate", "stt", "llm", "tts", "conversation", "jobs_total", "jobs_failed", "jobs_simulator_fault")
+        __slots__ = ("accuracy_score", "experience_score", "scenario_pass_rate", "stt", "llm", "tts", "conversation", "jobs_total", "jobs_measured", "jobs_simulator_fault")
         ACCURACY_SCORE_FIELD_NUMBER: _ClassVar[int]
         EXPERIENCE_SCORE_FIELD_NUMBER: _ClassVar[int]
         SCENARIO_PASS_RATE_FIELD_NUMBER: _ClassVar[int]
@@ -274,7 +288,7 @@ class SimulationRun(_message.Message):
         TTS_FIELD_NUMBER: _ClassVar[int]
         CONVERSATION_FIELD_NUMBER: _ClassVar[int]
         JOBS_TOTAL_FIELD_NUMBER: _ClassVar[int]
-        JOBS_FAILED_FIELD_NUMBER: _ClassVar[int]
+        JOBS_MEASURED_FIELD_NUMBER: _ClassVar[int]
         JOBS_SIMULATOR_FAULT_FIELD_NUMBER: _ClassVar[int]
         accuracy_score: float
         experience_score: float
@@ -284,9 +298,9 @@ class SimulationRun(_message.Message):
         tts: SimulationRun.JobMetrics.TTS
         conversation: SimulationRun.JobMetrics.Conversation
         jobs_total: int
-        jobs_failed: int
+        jobs_measured: int
         jobs_simulator_fault: int
-        def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., scenario_pass_rate: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., jobs_total: _Optional[int] = ..., jobs_failed: _Optional[int] = ..., jobs_simulator_fault: _Optional[int] = ...) -> None: ...
+        def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., scenario_pass_rate: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., jobs_total: _Optional[int] = ..., jobs_measured: _Optional[int] = ..., jobs_simulator_fault: _Optional[int] = ...) -> None: ...
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
