@@ -817,10 +817,19 @@ class Room(EventEmitter[EventTypes]):
             lpublication._first_subscription.set_result(None)
             self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
-            rparticipant = self._remote_participants[event.track_published.participant_identity]
-            rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant._track_publications[rpublication.sid] = rpublication
-            self.emit("track_published", rpublication, rparticipant)
+            # The participant may already have been removed by a racing
+            # disconnect or a duplicate event, so the lookup is done defensively
+            # and the emit is skipped when the participant is gone, mirroring the
+            # track_unpublished handler, instead of raising a KeyError that
+            # _listen_task logs as an error.
+            identity = event.track_published.participant_identity
+            published_participant = self._remote_participants.get(identity)
+            if published_participant is not None:
+                published = RemoteTrackPublication(event.track_published.publication)
+                published_participant._track_publications[published.sid] = published
+                self.emit("track_published", published, published_participant)
+            else:
+                logger.debug("track_published for untracked participant %s", identity)
         elif which == "track_unpublished":
             # The participant or publication may already have been removed by a
             # racing disconnect or a duplicate event, so both lookups are done
@@ -839,41 +848,85 @@ class Room(EventEmitter[EventTypes]):
             else:
                 logger.debug("track_unpublished for untracked participant %s", identity)
         elif which == "track_subscribed":
+            # The participant or publication may already have been removed by a
+            # racing disconnect or unpublish, so both lookups are done
+            # defensively and the emit is skipped when either entry is gone,
+            # mirroring the track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
-            rparticipant = self._remote_participants[event.track_subscribed.participant_identity]
-            rpublication = rparticipant.track_publications[track_info.sid]
-            rpublication._subscribed = True
-            if track_info.kind == TrackKind.KIND_VIDEO:
-                remote_video_track = RemoteVideoTrack(owned_track_info)
-                remote_video_track._set_room(self)
-                rpublication._track = remote_video_track
-                self.emit("track_subscribed", remote_video_track, rpublication, rparticipant)
-            elif track_info.kind == TrackKind.KIND_AUDIO:
-                remote_audio_track = RemoteAudioTrack(owned_track_info)
-                remote_audio_track._set_room(self)
-                rpublication._track = remote_audio_track
-                self.emit("track_subscribed", remote_audio_track, rpublication, rparticipant)
-        elif which == "track_unsubscribed":
-            identity = event.track_unsubscribed.participant_identity
-            rparticipant = self._remote_participants[identity]
-            rpublication = rparticipant.track_publications[event.track_unsubscribed.track_sid]
-            rtrack = rpublication.track
-            if rtrack is not None:
-                rtrack._set_room(None)
-            rpublication._track = None
-            rpublication._subscribed = False
-            self.emit("track_unsubscribed", rtrack, rpublication, rparticipant)
-        elif which == "track_subscription_failed":
-            identity = event.track_subscription_failed.participant_identity
-            rparticipant = self._remote_participants[identity]
-            error = event.track_subscription_failed.error
-            self.emit(
-                "track_subscription_failed",
-                rparticipant,
-                event.track_subscription_failed.track_sid,
-                error,
+            identity = event.track_subscribed.participant_identity
+            subscribed_participant = self._remote_participants.get(identity)
+            subscribed = (
+                subscribed_participant.track_publications.get(track_info.sid)
+                if subscribed_participant is not None
+                else None
             )
+            if subscribed_participant is not None and subscribed is not None:
+                subscribed._subscribed = True
+                if track_info.kind == TrackKind.KIND_VIDEO:
+                    remote_video_track = RemoteVideoTrack(owned_track_info)
+                    remote_video_track._set_room(self)
+                    subscribed._track = remote_video_track
+                    self.emit(
+                        "track_subscribed", remote_video_track, subscribed, subscribed_participant
+                    )
+                elif track_info.kind == TrackKind.KIND_AUDIO:
+                    remote_audio_track = RemoteAudioTrack(owned_track_info)
+                    remote_audio_track._set_room(self)
+                    subscribed._track = remote_audio_track
+                    self.emit(
+                        "track_subscribed", remote_audio_track, subscribed, subscribed_participant
+                    )
+            else:
+                logger.debug(
+                    "track_subscribed for untracked participant %s or publication %s",
+                    identity,
+                    track_info.sid,
+                )
+        elif which == "track_unsubscribed":
+            # The participant or publication may already have been removed by a
+            # racing disconnect or unpublish, so both lookups are done
+            # defensively and the emit is skipped when either entry is gone,
+            # mirroring the track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
+            identity = event.track_unsubscribed.participant_identity
+            unsubscribed_participant = self._remote_participants.get(identity)
+            unsubscribed = (
+                unsubscribed_participant.track_publications.get(event.track_unsubscribed.track_sid)
+                if unsubscribed_participant is not None
+                else None
+            )
+            if unsubscribed_participant is not None and unsubscribed is not None:
+                rtrack = unsubscribed.track
+                if rtrack is not None:
+                    rtrack._set_room(None)
+                unsubscribed._track = None
+                unsubscribed._subscribed = False
+                self.emit("track_unsubscribed", rtrack, unsubscribed, unsubscribed_participant)
+            else:
+                logger.debug(
+                    "track_unsubscribed for untracked participant %s or publication %s",
+                    identity,
+                    event.track_unsubscribed.track_sid,
+                )
+        elif which == "track_subscription_failed":
+            # The participant may already have been removed by a racing
+            # disconnect, so the lookup is done defensively and the emit is
+            # skipped when the participant is gone, instead of raising a KeyError
+            # that _listen_task logs as an error.
+            identity = event.track_subscription_failed.participant_identity
+            failed_participant = self._remote_participants.get(identity)
+            if failed_participant is not None:
+                error = event.track_subscription_failed.error
+                self.emit(
+                    "track_subscription_failed",
+                    failed_participant,
+                    event.track_subscription_failed.track_sid,
+                    error,
+                )
+            else:
+                logger.debug("track_subscription_failed for untracked participant %s", identity)
         elif which == "track_muted":
             identity = event.track_muted.participant_identity
             # TODO: pass participant identity
