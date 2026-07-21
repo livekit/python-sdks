@@ -861,6 +861,10 @@ class LocalParticipant(Participant):
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.unpublish_track.async_id == resp.unpublish_track.async_id
             )
+            # wait_for hands back one event the caller owns; mark it done before the
+            # error check, otherwise raising here leaves the room queue's join()
+            # waiting on it forever and the room event loop stalls.
+            queue.task_done()
 
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
@@ -879,7 +883,6 @@ class LocalParticipant(Participant):
                 if publication._track is not None:
                     publication._track._set_room(None)
                 publication._track = None
-            queue.task_done()
         finally:
             self._room_queue.unsubscribe(queue)
 
