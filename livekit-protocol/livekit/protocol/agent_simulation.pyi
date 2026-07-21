@@ -154,7 +154,7 @@ class SimulationRun(_message.Message):
             conciseness_score: float
             def __init__(self, ttft_ms: _Optional[int] = ..., ttfs_ms: _Optional[int] = ..., tokens_per_second: _Optional[float] = ..., conciseness_score: _Optional[float] = ...) -> None: ...
         class TTS(_message.Message):
-            __slots__ = ("ttfa_ms", "ttfb_ms", "wer", "words", "word_errors", "cer", "chars", "char_errors", "speech_rate_wpm", "naturalness_score", "enunciation_score")
+            __slots__ = ("ttfa_ms", "ttfb_ms", "wer", "words", "word_errors", "cer", "chars", "char_errors", "speech_rate_wpm", "heard_words", "speech_ms", "naturalness_score", "enunciation_score")
             TTFA_MS_FIELD_NUMBER: _ClassVar[int]
             TTFB_MS_FIELD_NUMBER: _ClassVar[int]
             WER_FIELD_NUMBER: _ClassVar[int]
@@ -164,6 +164,8 @@ class SimulationRun(_message.Message):
             CHARS_FIELD_NUMBER: _ClassVar[int]
             CHAR_ERRORS_FIELD_NUMBER: _ClassVar[int]
             SPEECH_RATE_WPM_FIELD_NUMBER: _ClassVar[int]
+            HEARD_WORDS_FIELD_NUMBER: _ClassVar[int]
+            SPEECH_MS_FIELD_NUMBER: _ClassVar[int]
             NATURALNESS_SCORE_FIELD_NUMBER: _ClassVar[int]
             ENUNCIATION_SCORE_FIELD_NUMBER: _ClassVar[int]
             ttfa_ms: int
@@ -175,15 +177,18 @@ class SimulationRun(_message.Message):
             chars: int
             char_errors: int
             speech_rate_wpm: float
+            heard_words: int
+            speech_ms: int
             naturalness_score: float
             enunciation_score: float
-            def __init__(self, ttfa_ms: _Optional[int] = ..., ttfb_ms: _Optional[int] = ..., wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., speech_rate_wpm: _Optional[float] = ..., naturalness_score: _Optional[float] = ..., enunciation_score: _Optional[float] = ...) -> None: ...
+            def __init__(self, ttfa_ms: _Optional[int] = ..., ttfb_ms: _Optional[int] = ..., wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., speech_rate_wpm: _Optional[float] = ..., heard_words: _Optional[int] = ..., speech_ms: _Optional[int] = ..., naturalness_score: _Optional[float] = ..., enunciation_score: _Optional[float] = ...) -> None: ...
         class Conversation(_message.Message):
-            __slots__ = ("turn_taking_score", "response_latency_p50_ms", "response_latency_p95_ms", "response_latency_p99_ms", "agent_yield_latency_ms", "eot_misprediction_count", "overlap_ratio", "overlap_speech_ms", "total_speech_ms", "silence_total_ms", "awkward_silence_count", "unanswered_persona_turns", "false_interruption_count", "false_interruption_unrecovered_count", "agent_reported_e2e_latency_ms")
+            __slots__ = ("turn_taking_score", "response_latency_p50_ms", "response_latency_p95_ms", "response_latency_p99_ms", "response_latency_ms", "agent_yield_latency_ms", "eot_misprediction_count", "overlap_ratio", "overlap_speech_ms", "total_speech_ms", "silence_total_ms", "awkward_silence_count", "unanswered_persona_turns", "false_interruption_count", "false_interruption_unrecovered_count", "agent_reported_e2e_latency_ms")
             TURN_TAKING_SCORE_FIELD_NUMBER: _ClassVar[int]
             RESPONSE_LATENCY_P50_MS_FIELD_NUMBER: _ClassVar[int]
             RESPONSE_LATENCY_P95_MS_FIELD_NUMBER: _ClassVar[int]
             RESPONSE_LATENCY_P99_MS_FIELD_NUMBER: _ClassVar[int]
+            RESPONSE_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
             AGENT_YIELD_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
             EOT_MISPREDICTION_COUNT_FIELD_NUMBER: _ClassVar[int]
             OVERLAP_RATIO_FIELD_NUMBER: _ClassVar[int]
@@ -199,6 +204,7 @@ class SimulationRun(_message.Message):
             response_latency_p50_ms: int
             response_latency_p95_ms: int
             response_latency_p99_ms: int
+            response_latency_ms: int
             agent_yield_latency_ms: int
             eot_misprediction_count: int
             overlap_ratio: float
@@ -210,7 +216,7 @@ class SimulationRun(_message.Message):
             false_interruption_count: int
             false_interruption_unrecovered_count: int
             agent_reported_e2e_latency_ms: int
-            def __init__(self, turn_taking_score: _Optional[float] = ..., response_latency_p50_ms: _Optional[int] = ..., response_latency_p95_ms: _Optional[int] = ..., response_latency_p99_ms: _Optional[int] = ..., agent_yield_latency_ms: _Optional[int] = ..., eot_misprediction_count: _Optional[int] = ..., overlap_ratio: _Optional[float] = ..., overlap_speech_ms: _Optional[int] = ..., total_speech_ms: _Optional[int] = ..., silence_total_ms: _Optional[int] = ..., awkward_silence_count: _Optional[int] = ..., unanswered_persona_turns: _Optional[int] = ..., false_interruption_count: _Optional[int] = ..., false_interruption_unrecovered_count: _Optional[int] = ..., agent_reported_e2e_latency_ms: _Optional[int] = ...) -> None: ...
+            def __init__(self, turn_taking_score: _Optional[float] = ..., response_latency_p50_ms: _Optional[int] = ..., response_latency_p95_ms: _Optional[int] = ..., response_latency_p99_ms: _Optional[int] = ..., response_latency_ms: _Optional[int] = ..., agent_yield_latency_ms: _Optional[int] = ..., eot_misprediction_count: _Optional[int] = ..., overlap_ratio: _Optional[float] = ..., overlap_speech_ms: _Optional[int] = ..., total_speech_ms: _Optional[int] = ..., silence_total_ms: _Optional[int] = ..., awkward_silence_count: _Optional[int] = ..., unanswered_persona_turns: _Optional[int] = ..., false_interruption_count: _Optional[int] = ..., false_interruption_unrecovered_count: _Optional[int] = ..., agent_reported_e2e_latency_ms: _Optional[int] = ...) -> None: ...
         class Simulator(_message.Message):
             __slots__ = ("early_termination", "late_termination")
             EARLY_TERMINATION_FIELD_NUMBER: _ClassVar[int]
@@ -219,38 +225,24 @@ class SimulationRun(_message.Message):
             late_termination: bool
             def __init__(self, early_termination: bool = ..., late_termination: bool = ...) -> None: ...
         class Turn(_message.Message):
-            __slots__ = ("index", "role", "start_ms", "end_ms", "response_latency_ms", "transcription_delay_ms", "llm_ttft_ms", "llm_ttfs_ms", "tts_ttfa_ms", "tts_ttfb_ms", "agent_reported_e2e_latency_ms", "conciseness_score", "naturalness_score", "enunciation_score", "flags")
+            __slots__ = ("index", "role", "start_ms", "end_ms", "stt", "llm", "tts", "conversation")
             INDEX_FIELD_NUMBER: _ClassVar[int]
             ROLE_FIELD_NUMBER: _ClassVar[int]
             START_MS_FIELD_NUMBER: _ClassVar[int]
             END_MS_FIELD_NUMBER: _ClassVar[int]
-            RESPONSE_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
-            TRANSCRIPTION_DELAY_MS_FIELD_NUMBER: _ClassVar[int]
-            LLM_TTFT_MS_FIELD_NUMBER: _ClassVar[int]
-            LLM_TTFS_MS_FIELD_NUMBER: _ClassVar[int]
-            TTS_TTFA_MS_FIELD_NUMBER: _ClassVar[int]
-            TTS_TTFB_MS_FIELD_NUMBER: _ClassVar[int]
-            AGENT_REPORTED_E2E_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
-            CONCISENESS_SCORE_FIELD_NUMBER: _ClassVar[int]
-            NATURALNESS_SCORE_FIELD_NUMBER: _ClassVar[int]
-            ENUNCIATION_SCORE_FIELD_NUMBER: _ClassVar[int]
-            FLAGS_FIELD_NUMBER: _ClassVar[int]
+            STT_FIELD_NUMBER: _ClassVar[int]
+            LLM_FIELD_NUMBER: _ClassVar[int]
+            TTS_FIELD_NUMBER: _ClassVar[int]
+            CONVERSATION_FIELD_NUMBER: _ClassVar[int]
             index: int
             role: _agent_session.ChatRole
             start_ms: int
             end_ms: int
-            response_latency_ms: int
-            transcription_delay_ms: int
-            llm_ttft_ms: int
-            llm_ttfs_ms: int
-            tts_ttfa_ms: int
-            tts_ttfb_ms: int
-            agent_reported_e2e_latency_ms: int
-            conciseness_score: float
-            naturalness_score: float
-            enunciation_score: float
-            flags: _containers.RepeatedScalarFieldContainer[str]
-            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., response_latency_ms: _Optional[int] = ..., transcription_delay_ms: _Optional[int] = ..., llm_ttft_ms: _Optional[int] = ..., llm_ttfs_ms: _Optional[int] = ..., tts_ttfa_ms: _Optional[int] = ..., tts_ttfb_ms: _Optional[int] = ..., agent_reported_e2e_latency_ms: _Optional[int] = ..., conciseness_score: _Optional[float] = ..., naturalness_score: _Optional[float] = ..., enunciation_score: _Optional[float] = ..., flags: _Optional[_Iterable[str]] = ...) -> None: ...
+            stt: SimulationRun.JobMetrics.STT
+            llm: SimulationRun.JobMetrics.LLM
+            tts: SimulationRun.JobMetrics.TTS
+            conversation: SimulationRun.JobMetrics.Conversation
+            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ...) -> None: ...
         ACCURACY_SCORE_FIELD_NUMBER: _ClassVar[int]
         EXPERIENCE_SCORE_FIELD_NUMBER: _ClassVar[int]
         TASK_COMPLETION_FIELD_NUMBER: _ClassVar[int]
