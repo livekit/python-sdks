@@ -32,7 +32,7 @@ dependencies = [
     "aiohttp>=3.9.0",
     "protobuf>=4",
     "types-protobuf>=4",
-    "livekit-protocol>=1.1.20,<2.0.0",
+    "livekit-protocol>=1.1.21,<2.0.0",
 ]
 
 [project.urls]
