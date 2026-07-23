@@ -467,6 +467,11 @@ class Room(EventEmitter[EventTypes]):
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
 
+        # The Python SDK still implements data streams in Python on top of raw FFI
+        # packets, so always advertise only legacy (v1) data stream support to other
+        # clients.
+        req.connect.options.data_stream.use_legacy_client_implementation = True
+
         if options.connect_timeout is not None:
             req.connect.options.connect_timeout_ms = int(options.connect_timeout * 1000)
 
