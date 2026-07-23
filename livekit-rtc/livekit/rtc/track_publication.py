@@ -83,6 +83,11 @@ class TrackPublication:
     def frame_metadata_features(self) -> List[proto_track.FrameMetadataFeature.ValueType]:
         return list(self._info.frame_metadata_features)
 
+    @property
+    def packet_trailer_features(self) -> List[proto_track.FrameMetadataFeature.ValueType]:
+        """Deprecated alias for :meth:`frame_metadata_features`."""
+        return self.frame_metadata_features
+
 
 class LocalTrackPublication(TrackPublication):
     def __init__(self, owned_info: proto_track.OwnedTrackPublication):

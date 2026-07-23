@@ -43,6 +43,10 @@ from ._proto.track_pb2 import (
     TrackSource,
     ParticipantTrackPermission,
 )
+
+# Backwards-compatible alias for the enum renamed to FrameMetadataFeature in the
+# FFI protocol (note: member names changed from PTF_* to FMF_*).
+PacketTrailerFeature = FrameMetadataFeature
 from ._proto.video_frame_pb2 import FrameMetadata, VideoBufferType, VideoCodec, VideoRotation
 from ._proto.track_publication_pb2 import VideoQuality
 from .audio_frame import AudioFrame
