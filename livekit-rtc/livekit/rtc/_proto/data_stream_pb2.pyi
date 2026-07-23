@@ -194,16 +194,39 @@ global___TextStreamReaderChunkReceived = TextStreamReaderChunkReceived
 class TextStreamReaderEOS(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str | None = ...,
+            value: builtins.str | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     ERROR_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
     @property
     def error(self) -> global___StreamError: ...
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+        """Final stream attributes, including any delivered in the stream trailer."""
+
     def __init__(
         self,
         *,
         error: global___StreamError | None = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "error", b"error"]) -> None: ...
 
 global___TextStreamReaderEOS = TextStreamReaderEOS
 
@@ -442,16 +465,39 @@ global___ByteStreamReaderChunkReceived = ByteStreamReaderChunkReceived
 class ByteStreamReaderEOS(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str | None = ...,
+            value: builtins.str | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     ERROR_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
     @property
     def error(self) -> global___StreamError: ...
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+        """Final stream attributes, including any delivered in the stream trailer."""
+
     def __init__(
         self,
         *,
         error: global___StreamError | None = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "error", b"error"]) -> None: ...
 
 global___ByteStreamReaderEOS = ByteStreamReaderEOS
 
@@ -833,21 +879,44 @@ class ByteStreamWriterCloseRequest(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str | None = ...,
+            value: builtins.str | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     REASON_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     reason: builtins.str
     request_async_id: builtins.int
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+        """Attributes to attach to the stream trailer."""
+
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         reason: builtins.str | None = ...,
         request_async_id: builtins.int | None = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___ByteStreamWriterCloseRequest = ByteStreamWriterCloseRequest
 
@@ -1046,21 +1115,44 @@ class TextStreamWriterCloseRequest(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing.final
+    class AttributesEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str | None = ...,
+            value: builtins.str | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     WRITER_HANDLE_FIELD_NUMBER: builtins.int
     REASON_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    ATTRIBUTES_FIELD_NUMBER: builtins.int
     writer_handle: builtins.int
     reason: builtins.str
     request_async_id: builtins.int
+    @property
+    def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]:
+        """Attributes to attach to the stream trailer."""
+
     def __init__(
         self,
         *,
         writer_handle: builtins.int | None = ...,
         reason: builtins.str | None = ...,
         request_async_id: builtins.int | None = ...,
+        attributes: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "reason", b"reason", "request_async_id", b"request_async_id", "writer_handle", b"writer_handle"]) -> None: ...
 
 global___TextStreamWriterCloseRequest = TextStreamWriterCloseRequest
 
@@ -1289,12 +1381,17 @@ class StreamTextOptions(google.protobuf.message.Message):
     REPLY_TO_STREAM_ID_FIELD_NUMBER: builtins.int
     ATTACHED_STREAM_IDS_FIELD_NUMBER: builtins.int
     GENERATED_FIELD_NUMBER: builtins.int
+    COMPRESS_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
     topic: builtins.str
     id: builtins.str
     operation_type: global___TextStreamInfo.OperationType.ValueType
     version: builtins.int
     reply_to_stream_id: builtins.str
     generated: builtins.bool
+    compress: builtins.bool
+    sender_identity: builtins.str
+    """Identity the stream's packets are attributed to; requires permission to impersonate."""
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
@@ -1313,9 +1410,11 @@ class StreamTextOptions(google.protobuf.message.Message):
         reply_to_stream_id: builtins.str | None = ...,
         attached_stream_ids: collections.abc.Iterable[builtins.str] | None = ...,
         generated: builtins.bool | None = ...,
+        compress: builtins.bool | None = ...,
+        sender_identity: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "topic", b"topic", "version", b"version"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "attributes", b"attributes", "destination_identities", b"destination_identities", "generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "topic", b"topic", "version", b"version"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["compress", b"compress", "generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "sender_identity", b"sender_identity", "topic", b"topic", "version", b"version"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attached_stream_ids", b"attached_stream_ids", "attributes", b"attributes", "compress", b"compress", "destination_identities", b"destination_identities", "generated", b"generated", "id", b"id", "operation_type", b"operation_type", "reply_to_stream_id", b"reply_to_stream_id", "sender_identity", b"sender_identity", "topic", b"topic", "version", b"version"]) -> None: ...
 
 global___StreamTextOptions = StreamTextOptions
 
@@ -1347,11 +1446,16 @@ class StreamByteOptions(google.protobuf.message.Message):
     NAME_FIELD_NUMBER: builtins.int
     MIME_TYPE_FIELD_NUMBER: builtins.int
     TOTAL_LENGTH_FIELD_NUMBER: builtins.int
+    COMPRESS_FIELD_NUMBER: builtins.int
+    SENDER_IDENTITY_FIELD_NUMBER: builtins.int
     topic: builtins.str
     id: builtins.str
     name: builtins.str
     mime_type: builtins.str
     total_length: builtins.int
+    compress: builtins.bool
+    sender_identity: builtins.str
+    """Identity the stream's packets are attributed to; requires permission to impersonate."""
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
@@ -1366,9 +1470,11 @@ class StreamByteOptions(google.protobuf.message.Message):
         name: builtins.str | None = ...,
         mime_type: builtins.str | None = ...,
         total_length: builtins.int | None = ...,
+        compress: builtins.bool | None = ...,
+        sender_identity: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["id", b"id", "mime_type", b"mime_type", "name", b"name", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "destination_identities", b"destination_identities", "id", b"id", "mime_type", b"mime_type", "name", b"name", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["compress", b"compress", "id", b"id", "mime_type", b"mime_type", "name", b"name", "sender_identity", b"sender_identity", "topic", b"topic", "total_length", b"total_length"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "compress", b"compress", "destination_identities", b"destination_identities", "id", b"id", "mime_type", b"mime_type", "name", b"name", "sender_identity", b"sender_identity", "topic", b"topic", "total_length", b"total_length"]) -> None: ...
 
 global___StreamByteOptions = StreamByteOptions
 
