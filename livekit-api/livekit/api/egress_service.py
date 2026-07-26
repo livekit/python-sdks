@@ -9,6 +9,7 @@ from livekit.protocol.egress import (
     UpdateStreamRequest,
     ListEgressRequest,
     StopEgressRequest,
+    StartEgressRequest,
     EgressInfo,
     ListEgressResponse,
 )
@@ -88,6 +89,16 @@ class EgressService(Service):
         return await self._client.request(
             SVC,
             "StartTrackEgress",
+            start,
+            self._auth_header(VideoGrants(room_record=True)),
+            EgressInfo,
+        )
+
+    async def start_egress(self, start: StartEgressRequest) -> EgressInfo:
+        """Starts an egress; the request's source and outputs determine the egress type."""
+        return await self._client.request(
+            SVC,
+            "StartEgress",
             start,
             self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
