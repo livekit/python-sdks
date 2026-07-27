@@ -120,7 +120,7 @@ class SimulationRun(_message.Message):
     class JobMetrics(_message.Message):
         __slots__ = ("accuracy_score", "experience_score", "task_completion", "stt", "llm", "tts", "conversation", "simulator", "turns", "judge_model", "audio_judge_model", "has_remote_session", "t0")
         class STT(_message.Message):
-            __slots__ = ("wer", "words", "word_errors", "cer", "chars", "char_errors", "keyterm_recall", "keyterms_uttered", "keyterms_recognized", "transcription_latency_ms")
+            __slots__ = ("wer", "words", "word_errors", "cer", "chars", "char_errors", "keyterm_recall", "keyterm_recognition", "keyterms_uttered", "keyterms_recognized", "keyterms_acquired_uttered", "keyterms_acquired_recognized", "transcription_latency_ms")
             WER_FIELD_NUMBER: _ClassVar[int]
             WORDS_FIELD_NUMBER: _ClassVar[int]
             WORD_ERRORS_FIELD_NUMBER: _ClassVar[int]
@@ -128,8 +128,11 @@ class SimulationRun(_message.Message):
             CHARS_FIELD_NUMBER: _ClassVar[int]
             CHAR_ERRORS_FIELD_NUMBER: _ClassVar[int]
             KEYTERM_RECALL_FIELD_NUMBER: _ClassVar[int]
+            KEYTERM_RECOGNITION_FIELD_NUMBER: _ClassVar[int]
             KEYTERMS_UTTERED_FIELD_NUMBER: _ClassVar[int]
             KEYTERMS_RECOGNIZED_FIELD_NUMBER: _ClassVar[int]
+            KEYTERMS_ACQUIRED_UTTERED_FIELD_NUMBER: _ClassVar[int]
+            KEYTERMS_ACQUIRED_RECOGNIZED_FIELD_NUMBER: _ClassVar[int]
             TRANSCRIPTION_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
             wer: float
             words: int
@@ -138,10 +141,13 @@ class SimulationRun(_message.Message):
             chars: int
             char_errors: int
             keyterm_recall: float
+            keyterm_recognition: float
             keyterms_uttered: int
             keyterms_recognized: int
+            keyterms_acquired_uttered: int
+            keyterms_acquired_recognized: int
             transcription_latency_ms: int
-            def __init__(self, wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., keyterm_recall: _Optional[float] = ..., keyterms_uttered: _Optional[int] = ..., keyterms_recognized: _Optional[int] = ..., transcription_latency_ms: _Optional[int] = ...) -> None: ...
+            def __init__(self, wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., keyterm_recall: _Optional[float] = ..., keyterm_recognition: _Optional[float] = ..., keyterms_uttered: _Optional[int] = ..., keyterms_recognized: _Optional[int] = ..., keyterms_acquired_uttered: _Optional[int] = ..., keyterms_acquired_recognized: _Optional[int] = ..., transcription_latency_ms: _Optional[int] = ...) -> None: ...
         class LLM(_message.Message):
             __slots__ = ("ttft_ms", "ttfs_ms", "tokens_per_second", "conciseness_score")
             TTFT_MS_FIELD_NUMBER: _ClassVar[int]

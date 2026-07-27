@@ -329,11 +329,13 @@ class ParticipantInfo(_message.Message):
         CONNECTOR_WHATSAPP: _ClassVar[ParticipantInfo.KindDetail]
         CONNECTOR_TWILIO: _ClassVar[ParticipantInfo.KindDetail]
         BRIDGE_RTSP: _ClassVar[ParticipantInfo.KindDetail]
+        SIMULATION: _ClassVar[ParticipantInfo.KindDetail]
     CLOUD_AGENT: ParticipantInfo.KindDetail
     FORWARDED: ParticipantInfo.KindDetail
     CONNECTOR_WHATSAPP: ParticipantInfo.KindDetail
     CONNECTOR_TWILIO: ParticipantInfo.KindDetail
     BRIDGE_RTSP: ParticipantInfo.KindDetail
+    SIMULATION: ParticipantInfo.KindDetail
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
