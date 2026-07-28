@@ -20,7 +20,6 @@ import datetime
 import enum
 import os
 import mimetypes
-import aiofiles
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
 from abc import abstractmethod, ABC
 
@@ -58,7 +57,9 @@ from .data_stream import (
     TextStreamInfo,
     ByteStreamWriter,
     ByteStreamInfo,
-    STREAM_CHUNK_SIZE,
+    StreamError,
+    _text_stream_info_from_proto,
+    _byte_stream_info_from_proto,
 )
 from .data_track import LocalDataTrack
 from ._proto import data_track_pb2 as proto_data_track
@@ -677,20 +678,36 @@ class LocalParticipant(Participant):
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
+        compress: bool | None = None,
     ) -> TextStreamInfo:
-        total_size = len(text.encode())
-        writer = await self.stream_text(
-            destination_identities=destination_identities,
-            topic=topic,
-            attributes=attributes,
-            reply_to_id=reply_to_id,
-            total_size=total_size,
-        )
+        req = proto_ffi.FfiRequest()
+        req.send_text.local_participant_handle = self._ffi_handle.handle
+        req.send_text.text = text
+        options = req.send_text.options
+        options.topic = topic
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if reply_to_id:
+            options.reply_to_stream_id = reply_to_id
+        if compress is not None:
+            options.compress = compress
+        options.sender_identity = self.identity
 
-        await writer.write(text)
-        await writer.aclose()
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_text.async_id == resp.send_text.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
-        return writer.info
+        if cb.send_text.HasField("error"):
+            raise StreamError(cb.send_text.error.description)
+
+        return _text_stream_info_from_proto(cb.send_text.info)
 
     async def stream_bytes(
         self,
@@ -730,29 +747,43 @@ class LocalParticipant(Participant):
         destination_identities: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
+        compress: bool | None = None,
     ) -> ByteStreamInfo:
-        file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
         if mime_type is None:
             mime_type = "application/octet-stream"  # Fallback MIME type for unknown files
 
-        writer: ByteStreamWriter = await self.stream_bytes(
-            name=file_name,
-            total_size=file_size,
-            mime_type=mime_type,
-            attributes=attributes,
-            stream_id=stream_id,
-            destination_identities=destination_identities,
-            topic=topic,
-        )
+        req = proto_ffi.FfiRequest()
+        req.send_file.local_participant_handle = self._ffi_handle.handle
+        req.send_file.file_path = file_path
+        options = req.send_file.options
+        options.topic = topic
+        options.name = file_name
+        options.mime_type = mime_type
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
+        if compress is not None:
+            options.compress = compress
+        options.sender_identity = self.identity
 
-        async with aiofiles.open(file_path, "rb") as f:
-            while bytes := await f.read(STREAM_CHUNK_SIZE):
-                await writer.write(bytes)
-        await writer.aclose()
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_file.async_id == resp.send_file.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
-        return writer.info
+        if cb.send_file.HasField("error"):
+            raise StreamError(cb.send_file.error.description)
+
+        return _byte_stream_info_from_proto(cb.send_file.info)
 
     async def publish_data_track(
         self,
