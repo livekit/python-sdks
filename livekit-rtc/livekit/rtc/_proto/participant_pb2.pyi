@@ -89,6 +89,7 @@ class _ParticipantKindDetailEnumTypeWrapper(google.protobuf.internal.enum_type_w
     PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: _ParticipantKindDetail.ValueType  # 2
     PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: _ParticipantKindDetail.ValueType  # 3
     PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: _ParticipantKindDetail.ValueType  # 4
+    PARTICIPANT_KIND_DETAIL_SIMULATION: _ParticipantKindDetail.ValueType  # 5
 
 class ParticipantKindDetail(_ParticipantKindDetail, metaclass=_ParticipantKindDetailEnumTypeWrapper): ...
 
@@ -97,6 +98,7 @@ PARTICIPANT_KIND_DETAIL_FORWARDED: ParticipantKindDetail.ValueType  # 1
 PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: ParticipantKindDetail.ValueType  # 2
 PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: ParticipantKindDetail.ValueType  # 3
 PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: ParticipantKindDetail.ValueType  # 4
+PARTICIPANT_KIND_DETAIL_SIMULATION: ParticipantKindDetail.ValueType  # 5
 global___ParticipantKindDetail = ParticipantKindDetail
 
 class _DisconnectReason:

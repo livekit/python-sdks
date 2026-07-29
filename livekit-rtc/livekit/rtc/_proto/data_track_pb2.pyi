@@ -76,6 +76,7 @@ class _PublishDataTrackErrorCodeEnumTypeWrapper(google.protobuf.internal.enum_ty
     PUBLISH_DATA_TRACK_ERROR_CODE_LIMIT_REACHED: _PublishDataTrackErrorCode.ValueType  # 7
     PUBLISH_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: _PublishDataTrackErrorCode.ValueType  # 8
     PUBLISH_DATA_TRACK_ERROR_CODE_INTERNAL: _PublishDataTrackErrorCode.ValueType  # 9
+    PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_SCHEMA: _PublishDataTrackErrorCode.ValueType  # 10
 
 class PublishDataTrackErrorCode(_PublishDataTrackErrorCode, metaclass=_PublishDataTrackErrorCodeEnumTypeWrapper): ...
 
@@ -89,6 +90,7 @@ PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_NAME: PublishDataTrackErrorCode.ValueType 
 PUBLISH_DATA_TRACK_ERROR_CODE_LIMIT_REACHED: PublishDataTrackErrorCode.ValueType  # 7
 PUBLISH_DATA_TRACK_ERROR_CODE_PROTOCOL_ERROR: PublishDataTrackErrorCode.ValueType  # 8
 PUBLISH_DATA_TRACK_ERROR_CODE_INTERNAL: PublishDataTrackErrorCode.ValueType  # 9
+PUBLISH_DATA_TRACK_ERROR_CODE_INVALID_SCHEMA: PublishDataTrackErrorCode.ValueType  # 10
 global___PublishDataTrackErrorCode = PublishDataTrackErrorCode
 
 class _LocalDataTrackTryPushErrorCode:
@@ -149,21 +151,33 @@ class DataTrackInfo(google.protobuf.message.Message):
     NAME_FIELD_NUMBER: builtins.int
     SID_FIELD_NUMBER: builtins.int
     USES_E2EE_FIELD_NUMBER: builtins.int
+    SCHEMA_FIELD_NUMBER: builtins.int
+    FRAME_ENCODING_FIELD_NUMBER: builtins.int
     name: builtins.str
     """Name of the track assigned by the publisher."""
     sid: builtins.str
     """SFU-assigned track identifier."""
     uses_e2ee: builtins.bool
     """Whether or not frames sent on the track use end-to-end encryption."""
+    @property
+    def schema(self) -> global___DataTrackSchemaId:
+        """Schema associated with frames sent on the track, if any."""
+
+    @property
+    def frame_encoding(self) -> global___DataTrackFrameEncoding:
+        """Encoding of frames sent on the track, if specified."""
+
     def __init__(
         self,
         *,
         name: builtins.str | None = ...,
         sid: builtins.str | None = ...,
         uses_e2ee: builtins.bool | None = ...,
+        schema: global___DataTrackSchemaId | None = ...,
+        frame_encoding: global___DataTrackFrameEncoding | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["name", b"name", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame_encoding", b"frame_encoding", "name", b"name", "schema", b"schema", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame_encoding", b"frame_encoding", "name", b"name", "schema", b"schema", "sid", b"sid", "uses_e2ee", b"uses_e2ee"]) -> None: ...
 
 global___DataTrackInfo = DataTrackInfo
 
@@ -274,18 +288,30 @@ class DataTrackOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     NAME_FIELD_NUMBER: builtins.int
+    SCHEMA_FIELD_NUMBER: builtins.int
+    FRAME_ENCODING_FIELD_NUMBER: builtins.int
     name: builtins.str
     """Track name used to identify the track to other participants.
 
     Must not be empty and must be unique per publisher.
     """
+    @property
+    def schema(self) -> global___DataTrackSchemaId:
+        """Schema describing frames sent on the track."""
+
+    @property
+    def frame_encoding(self) -> global___DataTrackFrameEncoding:
+        """Encoding of frames sent on the track."""
+
     def __init__(
         self,
         *,
         name: builtins.str | None = ...,
+        schema: global___DataTrackSchemaId | None = ...,
+        frame_encoding: global___DataTrackFrameEncoding | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["name", b"name"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["name", b"name"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["frame_encoding", b"frame_encoding", "name", b"name", "schema", b"schema"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["frame_encoding", b"frame_encoding", "name", b"name", "schema", b"schema"]) -> None: ...
 
 global___DataTrackOptions = DataTrackOptions
 
@@ -780,3 +806,268 @@ class DataTrackStreamEOS(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
 global___DataTrackStreamEOS = DataTrackStreamEOS
+
+@typing.final
+class DataTrackSchemaEncoding(google.protobuf.message.Message):
+    """MARK: - Schemas
+
+    Encoding used to interpret a data track schema definition.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    class _WellKnownSchemaEncoding:
+        ValueType = typing.NewType("ValueType", builtins.int)
+        V: typing_extensions.TypeAlias = ValueType
+
+    class _WellKnownSchemaEncodingEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType], builtins.type):
+        DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+        WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 0
+        WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 1
+        WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 2
+        WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 3
+        WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 4
+        WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 5
+        WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 6
+        WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA: DataTrackSchemaEncoding._WellKnownSchemaEncoding.ValueType  # 7
+
+    class WellKnownSchemaEncoding(_WellKnownSchemaEncoding, metaclass=_WellKnownSchemaEncodingEnumTypeWrapper):
+        """Well-known encoding for a schema definition."""
+
+    WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 0
+    WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 1
+    WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 2
+    WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 3
+    WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 4
+    WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 5
+    WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 6
+    WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA: DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType  # 7
+
+    WELL_KNOWN_FIELD_NUMBER: builtins.int
+    CUSTOM_FIELD_NUMBER: builtins.int
+    well_known: global___DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType
+    custom: builtins.str
+    """Identifier of a custom encoding not covered by the well-known cases.
+    This must be non-empty and no longer than 25 characters.
+    """
+    def __init__(
+        self,
+        *,
+        well_known: global___DataTrackSchemaEncoding.WellKnownSchemaEncoding.ValueType | None = ...,
+        custom: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["custom", b"custom", "encoding", b"encoding", "well_known", b"well_known"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["custom", b"custom", "encoding", b"encoding", "well_known", b"well_known"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["encoding", b"encoding"]) -> typing.Literal["well_known", "custom"] | None: ...
+
+global___DataTrackSchemaEncoding = DataTrackSchemaEncoding
+
+@typing.final
+class DataTrackFrameEncoding(google.protobuf.message.Message):
+    """Encoding used for frames sent on a data track."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    class _WellKnownFrameEncoding:
+        ValueType = typing.NewType("ValueType", builtins.int)
+        V: typing_extensions.TypeAlias = ValueType
+
+    class _WellKnownFrameEncodingEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType], builtins.type):
+        DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+        WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 0
+        WELL_KNOWN_FRAME_ENCODING_ROS1: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 1
+        WELL_KNOWN_FRAME_ENCODING_CDR: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 2
+        WELL_KNOWN_FRAME_ENCODING_PROTOBUF: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 3
+        WELL_KNOWN_FRAME_ENCODING_FLATBUFFER: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 4
+        WELL_KNOWN_FRAME_ENCODING_CBOR: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 5
+        WELL_KNOWN_FRAME_ENCODING_MSGPACK: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 6
+        WELL_KNOWN_FRAME_ENCODING_JSON: DataTrackFrameEncoding._WellKnownFrameEncoding.ValueType  # 7
+
+    class WellKnownFrameEncoding(_WellKnownFrameEncoding, metaclass=_WellKnownFrameEncodingEnumTypeWrapper):
+        """Well-known encoding for frame payloads."""
+
+    WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 0
+    WELL_KNOWN_FRAME_ENCODING_ROS1: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 1
+    WELL_KNOWN_FRAME_ENCODING_CDR: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 2
+    WELL_KNOWN_FRAME_ENCODING_PROTOBUF: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 3
+    WELL_KNOWN_FRAME_ENCODING_FLATBUFFER: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 4
+    WELL_KNOWN_FRAME_ENCODING_CBOR: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 5
+    WELL_KNOWN_FRAME_ENCODING_MSGPACK: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 6
+    WELL_KNOWN_FRAME_ENCODING_JSON: DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType  # 7
+
+    WELL_KNOWN_FIELD_NUMBER: builtins.int
+    CUSTOM_FIELD_NUMBER: builtins.int
+    well_known: global___DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType
+    custom: builtins.str
+    """Identifier of a custom encoding not covered by the well-known cases.
+    This must be non-empty and no longer than 25 characters.
+    """
+    def __init__(
+        self,
+        *,
+        well_known: global___DataTrackFrameEncoding.WellKnownFrameEncoding.ValueType | None = ...,
+        custom: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["custom", b"custom", "encoding", b"encoding", "well_known", b"well_known"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["custom", b"custom", "encoding", b"encoding", "well_known", b"well_known"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["encoding", b"encoding"]) -> typing.Literal["well_known", "custom"] | None: ...
+
+global___DataTrackFrameEncoding = DataTrackFrameEncoding
+
+@typing.final
+class DataTrackSchemaId(google.protobuf.message.Message):
+    """Uniquely identifies a data track schema."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    NAME_FIELD_NUMBER: builtins.int
+    ENCODING_FIELD_NUMBER: builtins.int
+    name: builtins.str
+    """Name component of the schema identifier."""
+    @property
+    def encoding(self) -> global___DataTrackSchemaEncoding:
+        """Encoding of the schema definition."""
+
+    def __init__(
+        self,
+        *,
+        name: builtins.str | None = ...,
+        encoding: global___DataTrackSchemaEncoding | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["encoding", b"encoding", "name", b"name"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["encoding", b"encoding", "name", b"name"]) -> None: ...
+
+global___DataTrackSchemaId = DataTrackSchemaId
+
+@typing.final
+class DefineSchemaRequest(google.protobuf.message.Message):
+    """Define (store) a schema definition for the local participant."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    SCHEMA_ID_FIELD_NUMBER: builtins.int
+    DEFINITION_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    definition: builtins.str
+    request_async_id: builtins.int
+    @property
+    def schema_id(self) -> global___DataTrackSchemaId: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int | None = ...,
+        schema_id: global___DataTrackSchemaId | None = ...,
+        definition: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["definition", b"definition", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "schema_id", b"schema_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["definition", b"definition", "local_participant_handle", b"local_participant_handle", "request_async_id", b"request_async_id", "schema_id", b"schema_id"]) -> None: ...
+
+global___DefineSchemaRequest = DefineSchemaRequest
+
+@typing.final
+class DefineSchemaResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___DefineSchemaResponse = DefineSchemaResponse
+
+@typing.final
+class DefineSchemaCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    """Present if the schema could not be defined."""
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error"]) -> None: ...
+
+global___DefineSchemaCallback = DefineSchemaCallback
+
+@typing.final
+class GetSchemaRequest(google.protobuf.message.Message):
+    """Retrieve a schema definition previously stored by a participant."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LOCAL_PARTICIPANT_HANDLE_FIELD_NUMBER: builtins.int
+    SCHEMA_ID_FIELD_NUMBER: builtins.int
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    local_participant_handle: builtins.int
+    participant_identity: builtins.str
+    """Identity of the participant who owns the schema."""
+    request_async_id: builtins.int
+    @property
+    def schema_id(self) -> global___DataTrackSchemaId: ...
+    def __init__(
+        self,
+        *,
+        local_participant_handle: builtins.int | None = ...,
+        schema_id: global___DataTrackSchemaId | None = ...,
+        participant_identity: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "schema_id", b"schema_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["local_participant_handle", b"local_participant_handle", "participant_identity", b"participant_identity", "request_async_id", b"request_async_id", "schema_id", b"schema_id"]) -> None: ...
+
+global___GetSchemaRequest = GetSchemaRequest
+
+@typing.final
+class GetSchemaResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___GetSchemaResponse = GetSchemaResponse
+
+@typing.final
+class GetSchemaCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    DEFINITION_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    definition: builtins.str
+    """The schema definition, present on success."""
+    error: builtins.str
+    """Present if the schema could not be retrieved."""
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        definition: builtins.str | None = ...,
+        error: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "definition", b"definition", "error", b"error"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "definition", b"definition", "error", b"error"]) -> None: ...
+
+global___GetSchemaCallback = GetSchemaCallback
