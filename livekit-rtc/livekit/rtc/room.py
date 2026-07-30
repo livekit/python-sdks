@@ -814,7 +814,8 @@ class Room(EventEmitter[EventTypes]):
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
-            lpublication._first_subscription.set_result(None)
+            if not lpublication._first_subscription.done():
+                lpublication._first_subscription.set_result(None)
             self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
             # The participant may already have been removed by a racing
