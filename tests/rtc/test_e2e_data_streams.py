@@ -16,6 +16,7 @@ Usage:
 """
 
 import asyncio
+import gc
 import os
 import random
 import string
@@ -657,6 +658,121 @@ async def test_abandoned_writer_disposed_on_disconnect() -> None:
         assert ffi_handle_is_dropped(handle)
     finally:
         await receiver.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_close_wakes_pending_read() -> None:
+    """Closing a reader while a read is parked awaiting the next chunk must end
+    that read, not leave it waiting for an event that can no longer arrive."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-close-wake"))
+    writer = None
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+        done: asyncio.Future[list] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)
+
+            async def read() -> None:
+                chunks = [chunk async for chunk in reader]
+                done.set_result(chunks)
+
+            asyncio.create_task(read())
+
+        receiver.register_text_stream_handler("close-wake-topic", handler)
+
+        writer = await sender.local_participant.stream_text(topic="close-wake-topic")
+        await writer.write("first")
+
+        reader = await asyncio.wait_for(got_reader, timeout=10.0)
+        # let the reader consume "first" and park waiting for more, with the
+        # stream deliberately left open by the sender
+        await asyncio.sleep(0.5)
+        assert not done.done()
+
+        reader.close()
+
+        # without a wake-up sentinel this wait_for is what times out
+        chunks = await asyncio.wait_for(done, timeout=5.0)
+        assert chunks == ["first"]
+    finally:
+        if writer is not None:
+            await writer.aclose()
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_undeclared_stream_size_is_zero_not_none() -> None:
+    """An incremental text stream cannot declare its length on the wire, so the
+    receiver sees a size of 0 — an int, as callers have always been given,
+    rather than None."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-size-shape"))
+    writer = None
+    try:
+        got_info: asyncio.Future[rtc.TextStreamInfo] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_info.set_result(reader.info)
+
+        receiver.register_text_stream_handler("size-topic", handler)
+
+        writer = await sender.local_participant.stream_text(topic="size-topic", total_size=1234)
+        await writer.write("data")
+
+        info = await asyncio.wait_for(got_info, timeout=10.0)
+        assert info.size == 0
+        assert isinstance(info.size, int)
+        # the sender still sees what it declared
+        assert writer.info.size == 1234
+    finally:
+        if writer is not None:
+            await writer.aclose()
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_send_text_size_reaches_receiver() -> None:
+    """send_text lets the FFI compute and transmit the length, so the receiver
+    does see a real size."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-size-sendtext"))
+    try:
+        text = "a size-carrying message"
+        got_info: asyncio.Future[rtc.TextStreamInfo] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_info.set_result(reader.info)
+
+        receiver.register_text_stream_handler("sendtext-size-topic", handler)
+
+        await sender.local_participant.send_text(text, topic="sendtext-size-topic")
+
+        info = await asyncio.wait_for(got_info, timeout=10.0)
+        assert info.size == len(text.encode())
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_abandoned_writer_disposed_on_gc() -> None:
+    """Dropping a writer without closing it releases the native writer at GC,
+    rather than holding it until the room disconnects."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-writer-gc"))
+    try:
+        writer = await sender.local_participant.stream_text(topic="writer-gc-topic")
+        handle = writer._writer_handle
+        assert handle is not None
+        await writer.write("data")
+
+        del writer  # abandoned without aclose()
+        gc.collect()
+
+        assert ffi_handle_is_dropped(handle)
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
 
 
 @pytest.mark.asyncio
