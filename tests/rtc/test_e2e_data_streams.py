@@ -26,7 +26,7 @@ from typing import Any, Optional, Tuple
 import pytest
 
 from livekit import api, rtc
-from livekit.rtc._ffi_client import FfiClient
+from livekit.rtc._ffi_client import FfiClient, FfiHandle
 
 
 def skip_if_no_credentials() -> Any:
@@ -71,6 +71,21 @@ def reader_is_subscribed(reader: Any) -> bool:
     """
     queue = reader._queue
     return any(q is queue for q, _, _ in FfiClient.instance.queue._subscribers)
+
+
+def ffi_handle_is_dropped(handle_id: int) -> bool:
+    """True when the FFI server no longer holds ``handle_id``.
+
+    Probes by trying to drop it: ``FfiHandle.dispose()`` asserts that the
+    native drop succeeded, so a handle that is already gone raises. Destructive
+    when the handle *is* still held — it gets dropped — so only call this once,
+    at the end of a test.
+    """
+    try:
+        FfiHandle(handle_id).dispose()
+    except AssertionError:
+        return True
+    return False
 
 
 async def wait_until_unsubscribed(reader: Any, timeout: float = 5.0) -> None:
@@ -599,6 +614,49 @@ async def test_fully_read_reader_needs_no_close() -> None:
         reader.close()
     finally:
         await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_writer_handle_untracked_after_close() -> None:
+    """Closing a writer consumes its handle natively, so it must drop out of
+    the open-writer set and not be dropped again at disconnect."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-writer-close"))
+    try:
+        local = sender.local_participant
+        writer = await local.stream_text(topic="writer-close-topic")
+        handle = writer._writer_handle
+        assert handle is not None
+        assert handle in local._open_stream_writers
+
+        await writer.write("data")
+        await writer.aclose()
+
+        assert handle not in local._open_stream_writers
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_abandoned_writer_disposed_on_disconnect() -> None:
+    """A writer opened and never closed holds its native writer in the FFI
+    handle table; disconnecting must drop it."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-writer-abandon"))
+    try:
+        writer = await sender.local_participant.stream_text(topic="writer-abandon-topic")
+        handle = writer._writer_handle
+        assert handle is not None
+
+        await writer.write("data")  # abandoned: aclose() is never called
+
+        await sender.disconnect()
+
+        # asserted against the FFI handle table rather than the SDK's
+        # bookkeeping, so this fails on an actually-leaked native writer
+        assert ffi_handle_is_dropped(handle)
+    finally:
+        await receiver.disconnect()
 
 
 @pytest.mark.asyncio

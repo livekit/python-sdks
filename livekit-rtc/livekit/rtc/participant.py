@@ -246,6 +246,14 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
+        # Handle ids of data stream writers that have been opened but not yet
+        # closed. The FFI close request consumes the handle (take_handle), so
+        # an entry is removed as soon as a close is sent for it; whatever is
+        # left when the room disconnects is dropped by
+        # _dispose_open_stream_writers(). Only the ids are kept — wrapping them
+        # in FfiHandle would make GC drop a handle the close request already
+        # consumed.
+        self._open_stream_writers: set[int] = set()
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -253,6 +261,22 @@ class LocalParticipant(Participant):
         A dictionary of track publications associated with the participant.
         """
         return self._track_publications
+
+    def _dispose_open_stream_writers(self) -> None:
+        """Drops the native writers of any data streams that were opened but
+        never closed — a writer the caller abandoned, or one left behind by a
+        failed write. Their handles would otherwise be held by the FFI server
+        for the lifetime of the process.
+
+        The room is already gone at this point, so the handles are dropped
+        directly rather than closed: there is no end-of-stream left to deliver.
+        """
+        for writer_handle in self._open_stream_writers:
+            try:
+                FfiHandle(writer_handle).dispose()
+            except Exception:
+                logger.exception("failed to dispose data stream writer handle")
+        self._open_stream_writers.clear()
 
     async def publish_data(
         self,

@@ -378,6 +378,21 @@ class BaseStreamWriter:
     def _provisional_timestamp(self) -> int:
         return int(datetime.datetime.now().timestamp() * 1000)
 
+    def _register_open(self) -> None:
+        """Records the freshly opened writer so that, if it is never closed,
+        the room can drop its native handle on disconnect."""
+        assert self._writer_handle is not None
+        self._local_participant._open_stream_writers.add(self._writer_handle)
+
+    def _unregister_open(self) -> None:
+        """Forgets the writer because a close request has been issued for it.
+
+        The close consumes the handle on the native side, so it must no longer
+        be dropped by the disconnect cleanup.
+        """
+        if self._writer_handle is not None:
+            self._local_participant._open_stream_writers.discard(self._writer_handle)
+
     async def _wait_for_callback(
         self, req: proto_ffi.FfiRequest, callback_field: str, response_field: str
     ) -> proto_ffi.FfiEvent:
@@ -403,6 +418,10 @@ class BaseStreamWriter:
         if self._writer_handle is None:
             raise RuntimeError("Stream is not open")
         self._closed = True
+        # unregister before sending: the request consumes the handle natively,
+        # so it must not be dropped again by the disconnect cleanup even if the
+        # close itself reports an error
+        self._unregister_open()
         await self._send_close(reason=reason, attributes=attributes)
 
     async def _send_close(self, *, reason: str, attributes: Optional[Dict[str, str]]) -> None:
@@ -461,6 +480,7 @@ class TextStreamWriter(BaseStreamWriter):
         cb = await self._wait_for_callback(req, "text_stream_open", "text_stream_open")
         owned = cb.text_stream_open.writer
         self._writer_handle = owned.handle.id
+        self._register_open()
         self._info = _text_stream_info_from_proto(owned.info)
         if self._info.size is None and self._total_size is not None:
             # total_size is not transmitted for text streams; keep it local
@@ -546,6 +566,7 @@ class ByteStreamWriter(BaseStreamWriter):
         cb = await self._wait_for_callback(req, "byte_stream_open", "byte_stream_open")
         owned = cb.byte_stream_open.writer
         self._writer_handle = owned.handle.id
+        self._register_open()
         self._info = _byte_stream_info_from_proto(owned.info)
 
     async def write(self, data: bytes) -> None:

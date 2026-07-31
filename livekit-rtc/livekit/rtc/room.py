@@ -686,6 +686,7 @@ class Room(EventEmitter[EventTypes]):
 
         await self._drain_rpc_invocation_tasks()
         self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -735,6 +736,7 @@ class Room(EventEmitter[EventTypes]):
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
         self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent) -> None:
         if self._local_participant is None:
@@ -1194,6 +1196,16 @@ class Room(EventEmitter[EventTypes]):
         byte_reader = ByteStreamReader(opened.reader, on_close=on_close)
         self._byte_stream_readers[handle_id] = byte_reader
         byte_stream_handler(byte_reader, opened.participant_identity)
+
+    def _dispose_open_stream_writers(self) -> None:
+        """Drops the native writers of data streams left open at disconnect.
+
+        A writer releases its handle only when it is closed, so one the
+        application abandoned — or left behind after a failed write — would
+        otherwise be held by the FFI server for the life of the process.
+        """
+        if self._local_participant is not None:
+            self._local_participant._dispose_open_stream_writers()
 
     def _error_stream_readers(self) -> None:
         """Wakes up any pending stream reads with a StreamError on disconnect.
