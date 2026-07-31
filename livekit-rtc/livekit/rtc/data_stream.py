@@ -89,6 +89,25 @@ def _byte_stream_info_from_proto(info: proto_data_stream.ByteStreamInfo) -> Byte
 
 
 class TextStreamReader:
+    """An incoming text stream.
+
+    Use as an async iterator to receive chunks, or :meth:`read_all` to collect
+    the whole payload::
+
+        async for chunk in reader:
+            process(chunk)
+
+    A reader subscribes to the FFI event queue as soon as it is handed to your
+    handler, so one that is never iterated to completion — abandoned after a
+    ``break``, or received by a handler that never reads it — must be closed
+    with :meth:`close`, or its subscription lives for the rest of the process.
+    Iterating to the end closes the reader for you.
+
+    If the stream terminates abnormally (aborted by the sender, oversized, or
+    the room disconnects mid-stream), :class:`StreamError` is raised instead of
+    a normal ``StopAsyncIteration``.
+    """
+
     def __init__(
         self,
         owned_info: proto_data_stream.OwnedTextStreamReader,
@@ -151,25 +170,80 @@ class TextStreamReader:
             final_string += chunk
         return final_string
 
+    def _unsubscribe(self) -> None:
+        """Drops the FFI queue subscription without ending the stream.
+
+        Events already delivered stay in the queue and remain readable; only
+        the global subscription, and the filter it runs against every FFI
+        event, goes away. Safe to call repeatedly — unsubscribing a queue that
+        is no longer registered is a no-op.
+
+        Only the subscription is released: the reader handle was consumed by
+        the read_incremental request in __init__, so there is nothing left to
+        dispose (and disposing it would drop a handle the FFI server no longer
+        owns).
+        """
+        FfiClient.instance.queue.unsubscribe(self._queue)
+
     def _close(self) -> None:
         if not self._closed:
             self._closed = True
-            FfiClient.instance.queue.unsubscribe(self._queue)
+            self._unsubscribe()
             if self._on_close is not None:
                 self._on_close()
 
+    def close(self) -> None:
+        """Explicitly close the reader and unsubscribe.
+
+        Call this on a reader you stop consuming before it ends. Closing a
+        reader that already reached end-of-stream is a no-op, and iterating a
+        closed reader raises ``StopAsyncIteration`` (or :class:`StreamError`
+        if the stream had already failed).
+        """
+        self._close()
+
+    async def aclose(self) -> None:
+        self.close()
+
     def _signal_disconnect(self) -> None:
         """Injects a synthetic EOS-with-error event so pending reads wake up
-        and raise StreamError when the room disconnects mid-stream."""
+        and raise StreamError when the room disconnects mid-stream.
+
+        Also drops the queue subscription, which would otherwise outlive the
+        room: no further events can arrive once the room is gone, and the
+        injected one is already queued. The reader is deliberately left open
+        so chunks that arrived before the disconnect are still delivered
+        before the StreamError, as they were before this was unsubscribed
+        here.
+        """
         if self._closed:
             return
         event = proto_ffi.FfiEvent()
         event.text_stream_reader_event.reader_handle = self._reader_handle
         event.text_stream_reader_event.eos.error.description = _DISCONNECT_ERROR
         self._queue.put_nowait(event)
+        self._unsubscribe()
 
 
 class ByteStreamReader:
+    """An incoming byte stream.
+
+    Use as an async iterator to receive chunks::
+
+        async for chunk in reader:
+            process(chunk)
+
+    A reader subscribes to the FFI event queue as soon as it is handed to your
+    handler, so one that is never iterated to completion — abandoned after a
+    ``break``, or received by a handler that never reads it — must be closed
+    with :meth:`close`, or its subscription lives for the rest of the process.
+    Iterating to the end closes the reader for you.
+
+    If the stream terminates abnormally (aborted by the sender, oversized, or
+    the room disconnects mid-stream), :class:`StreamError` is raised instead of
+    a normal ``StopAsyncIteration``.
+    """
+
     def __init__(
         self,
         owned_info: proto_data_stream.OwnedByteStreamReader,
@@ -225,22 +299,59 @@ class ByteStreamReader:
     def info(self) -> ByteStreamInfo:
         return self._info
 
+    def _unsubscribe(self) -> None:
+        """Drops the FFI queue subscription without ending the stream.
+
+        Events already delivered stay in the queue and remain readable; only
+        the global subscription, and the filter it runs against every FFI
+        event, goes away. Safe to call repeatedly — unsubscribing a queue that
+        is no longer registered is a no-op.
+
+        Only the subscription is released: the reader handle was consumed by
+        the read_incremental request in __init__, so there is nothing left to
+        dispose (and disposing it would drop a handle the FFI server no longer
+        owns).
+        """
+        FfiClient.instance.queue.unsubscribe(self._queue)
+
     def _close(self) -> None:
         if not self._closed:
             self._closed = True
-            FfiClient.instance.queue.unsubscribe(self._queue)
+            self._unsubscribe()
             if self._on_close is not None:
                 self._on_close()
 
+    def close(self) -> None:
+        """Explicitly close the reader and unsubscribe.
+
+        Call this on a reader you stop consuming before it ends. Closing a
+        reader that already reached end-of-stream is a no-op, and iterating a
+        closed reader raises ``StopAsyncIteration`` (or :class:`StreamError`
+        if the stream had already failed).
+        """
+        self._close()
+
+    async def aclose(self) -> None:
+        self.close()
+
     def _signal_disconnect(self) -> None:
         """Injects a synthetic EOS-with-error event so pending reads wake up
-        and raise StreamError when the room disconnects mid-stream."""
+        and raise StreamError when the room disconnects mid-stream.
+
+        Also drops the queue subscription, which would otherwise outlive the
+        room: no further events can arrive once the room is gone, and the
+        injected one is already queued. The reader is deliberately left open
+        so chunks that arrived before the disconnect are still delivered
+        before the StreamError, as they were before this was unsubscribed
+        here.
+        """
         if self._closed:
             return
         event = proto_ffi.FfiEvent()
         event.byte_stream_reader_event.reader_handle = self._reader_handle
         event.byte_stream_reader_event.eos.error.description = _DISCONNECT_ERROR
         self._queue.put_nowait(event)
+        self._unsubscribe()
 
 
 class BaseStreamWriter:

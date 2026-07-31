@@ -1196,10 +1196,18 @@ class Room(EventEmitter[EventTypes]):
         byte_stream_handler(byte_reader, opened.participant_identity)
 
     def _error_stream_readers(self) -> None:
-        """Wakes up any pending stream reads with a StreamError on disconnect."""
-        for text_reader in self._text_stream_readers.values():
+        """Wakes up any pending stream reads with a StreamError on disconnect.
+
+        This also drops each reader's FFI queue subscription, which would
+        otherwise outlive the room: a reader unsubscribes itself only once a
+        read consumes its end-of-stream event, so one the application never
+        finished reading would stay subscribed for the life of the process.
+        The readers stay open, so a read can still drain whatever arrived
+        before the disconnect and then raise StreamError.
+        """
+        for text_reader in list(self._text_stream_readers.values()):
             text_reader._signal_disconnect()
-        for byte_reader in self._byte_stream_readers.values():
+        for byte_reader in list(self._byte_stream_readers.values()):
             byte_reader._signal_disconnect()
         self._text_stream_readers.clear()
         self._byte_stream_readers.clear()

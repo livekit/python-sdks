@@ -26,6 +26,7 @@ from typing import Any, Optional, Tuple
 import pytest
 
 from livekit import api, rtc
+from livekit.rtc._ffi_client import FfiClient
 
 
 def skip_if_no_credentials() -> Any:
@@ -59,6 +60,26 @@ def pseudo_random_text(length: int, seed: int = 0x5EED) -> str:
     """
     rng = random.Random(seed)
     return "".join(rng.choices(string.ascii_lowercase, k=length))
+
+
+def reader_is_subscribed(reader: Any) -> bool:
+    """True while the reader's filtered subscriber is still on the FFI queue.
+
+    Checked by identity against the reader's own queue rather than by counting
+    subscribers, so unrelated churn (per-request callback subscriptions, the
+    room's own subscribers going away at disconnect) can't affect the result.
+    """
+    queue = reader._queue
+    return any(q is queue for q, _, _ in FfiClient.instance.queue._subscribers)
+
+
+async def wait_until_unsubscribed(reader: Any, timeout: float = 5.0) -> None:
+    deadline = asyncio.get_event_loop().time() + timeout
+    while asyncio.get_event_loop().time() < deadline:
+        if not reader_is_subscribed(reader):
+            return
+        await asyncio.sleep(0.02)
+    raise AssertionError("reader is still subscribed to the FFI event queue")
 
 
 async def connect_rooms(
@@ -439,6 +460,145 @@ async def test_receiver_disconnect_mid_stream() -> None:
         await writer.aclose()
     finally:
         await sender.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_abandoned_reader_releases_subscription_on_close() -> None:
+    """A reader abandoned mid-iteration never consumes its terminal eos event,
+    so it stays subscribed to the FFI queue until close() is called."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-abandon"))
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+        abandoned = asyncio.Event()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)
+
+            async def read() -> None:
+                async for _chunk in reader:
+                    break  # walk away without draining to end-of-stream
+                abandoned.set()
+
+            asyncio.create_task(read())
+
+        receiver.register_text_stream_handler("abandon-topic", handler)
+
+        await sender.local_participant.send_text(pseudo_random_text(50_000), topic="abandon-topic")
+        reader = await asyncio.wait_for(got_reader, timeout=10.0)
+        await asyncio.wait_for(abandoned.wait(), timeout=10.0)
+
+        assert reader_is_subscribed(reader)
+        reader.close()
+        await wait_until_unsubscribed(reader)
+
+        reader.close()  # idempotent
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_never_read_reader_releases_subscription_on_close() -> None:
+    """A handler that never iterates its reader still leaves a subscription
+    behind, because readers subscribe eagerly on construction."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-noread"))
+    writer = None
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)  # never read
+
+        receiver.register_text_stream_handler("noread-topic", handler)
+
+        writer = await sender.local_participant.stream_text(topic="noread-topic")
+        await writer.write("some data")
+
+        reader = await asyncio.wait_for(got_reader, timeout=10.0)
+        assert reader_is_subscribed(reader)
+
+        await reader.aclose()
+        await wait_until_unsubscribed(reader)
+    finally:
+        if writer is not None:
+            await writer.aclose()
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_disconnect_unsubscribes_unread_reader() -> None:
+    """Disconnecting must drop the subscriptions of readers the application
+    never consumed, without the application closing them.
+
+    The reader is left open, so a read starting after the disconnect still
+    drains whatever arrived beforehand and then reports the failure — the
+    behaviour callers had before disconnect released the subscription.
+    """
+    receiver, sender = await connect_rooms(unique_room_name("ds-disc-unread"))
+    writer = None
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)  # never read
+
+        receiver.register_text_stream_handler("disc-unread-topic", handler)
+
+        writer = await sender.local_participant.stream_text(topic="disc-unread-topic")
+        await writer.write("buffered ")
+        await writer.write("data")
+
+        reader = await asyncio.wait_for(got_reader, timeout=10.0)
+        assert reader_is_subscribed(reader)
+        # let the chunks land in the reader's queue while nothing is reading
+        await asyncio.sleep(0.5)
+
+        await receiver.disconnect()
+        await wait_until_unsubscribed(reader)
+
+        # chunks received before the disconnect are still delivered, and the
+        # stream then terminates with StreamError rather than a clean EOF
+        chunks = []
+        with pytest.raises(rtc.StreamError):
+            async for chunk in reader:
+                chunks.append(chunk)
+        assert "".join(chunks) == "buffered data"
+    finally:
+        if writer is not None:
+            await writer.aclose()
+        await sender.disconnect()
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_fully_read_reader_needs_no_close() -> None:
+    """Reading to end-of-stream unsubscribes on its own; close() afterwards is
+    a no-op."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-drain"))
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+        received: asyncio.Future[str] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)
+
+            async def read() -> None:
+                received.set_result(await reader.read_all())
+
+            asyncio.create_task(read())
+
+        receiver.register_text_stream_handler("drain-topic", handler)
+
+        await sender.local_participant.send_text("hello", topic="drain-topic")
+        assert await asyncio.wait_for(received, timeout=10.0) == "hello"
+
+        reader = await asyncio.wait_for(got_reader, timeout=5.0)
+        await wait_until_unsubscribed(reader)
+        reader.close()
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
 
 
 @pytest.mark.asyncio
