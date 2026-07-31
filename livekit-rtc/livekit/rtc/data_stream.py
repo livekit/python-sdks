@@ -70,7 +70,7 @@ def _text_stream_info_from_proto(info: proto_data_stream.TextStreamInfo) -> Text
         mime_type=info.mime_type,
         topic=info.topic,
         timestamp=info.timestamp,
-        size=info.total_length if info.HasField("total_length") else None,
+        size=info.total_length if info.HasField("total_length") else 0,
         attributes=dict(info.attributes),
         attachments=list(info.attached_stream_ids),
     )
@@ -82,7 +82,7 @@ def _byte_stream_info_from_proto(info: proto_data_stream.ByteStreamInfo) -> Byte
         mime_type=info.mime_type,
         topic=info.topic,
         timestamp=info.timestamp,
-        size=info.total_length if info.HasField("total_length") else None,
+        size=info.total_length if info.HasField("total_length") else 0,
         attributes=dict(info.attributes),
         name=info.name,
     )
