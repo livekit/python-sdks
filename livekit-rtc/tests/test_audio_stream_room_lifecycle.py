@@ -550,6 +550,38 @@ def test_local_track_republished_updates_track_sid_and_repushes_metadata() -> No
     }
 
 
+@pytest.mark.asyncio
+async def test_repeated_local_track_subscribed_event_does_not_raise() -> None:
+    """A full reconnect can repeat local_track_subscribed for a publication
+    whose first-subscription future is already complete.
+    """
+    room = _make_room()
+    local = _make_local_participant("agent")
+    room._local_participant = local
+
+    track = _make_track(sid="TR_1")
+    publication = _make_local_publication(sid="TR_1")
+    publication._track = track
+    publication._first_subscription = asyncio.Future()
+    local._track_publications["TR_1"] = publication
+
+    subscribed_tracks: list[rtc.Track | None] = []
+
+    @room.on("local_track_subscribed")
+    def _on_local_track_subscribed(subscribed_track: rtc.Track | None) -> None:
+        subscribed_tracks.append(subscribed_track)
+
+    event = proto_room.RoomEvent(
+        local_track_subscribed=proto_room.LocalTrackSubscribed(track_sid="TR_1")
+    )
+    room._on_room_event(event)
+    await publication.wait_for_subscription()
+    room._on_room_event(event)
+
+    assert publication._first_subscription.done()
+    assert subscribed_tracks == [track, track]
+
+
 # -- unpublish_track / room-event race ----------------------------------------
 
 
