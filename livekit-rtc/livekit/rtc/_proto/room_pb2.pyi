@@ -125,10 +125,6 @@ class _DegradationPreferenceEnumTypeWrapper(google.protobuf.internal.enum_type_w
     """Degrade framerate to maintain resolution."""
     DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION: _DegradationPreference.ValueType  # 2
     """Degrade resolution to maintain framerate (drop frames to keep clarity)."""
-    DEGRADATION_PREFERENCE_DISABLED: _DegradationPreference.ValueType  # 3
-    """Deprecated: Use MAINTAIN_FRAMERATE_AND_RESOLUTION instead.
-    Maintained for backwards compatibility, maps to MAINTAIN_FRAMERATE_AND_RESOLUTION.
-    """
     DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION: _DegradationPreference.ValueType  # 4
     """Maintain both framerate and resolution. Frames may be dropped before encoding
     if necessary to avoid overusing network and encoder resources.
@@ -143,10 +139,6 @@ DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE: DegradationPreference.ValueType  # 1
 """Degrade framerate to maintain resolution."""
 DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION: DegradationPreference.ValueType  # 2
 """Degrade resolution to maintain framerate (drop frames to keep clarity)."""
-DEGRADATION_PREFERENCE_DISABLED: DegradationPreference.ValueType  # 3
-"""Deprecated: Use MAINTAIN_FRAMERATE_AND_RESOLUTION instead.
-Maintained for backwards compatibility, maps to MAINTAIN_FRAMERATE_AND_RESOLUTION.
-"""
 DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION: DegradationPreference.ValueType  # 4
 """Maintain both framerate and resolution. Frames may be dropped before encoding
 if necessary to avoid overusing network and encoder resources.
@@ -1390,6 +1382,39 @@ class RtcConfig(google.protobuf.message.Message):
 global___RtcConfig = RtcConfig
 
 @typing.final
+class RoomDataStreamOptions(google.protobuf.message.Message):
+    """Options controlling data stream behavior for the room."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MAX_PAYLOAD_BYTE_LENGTH_FIELD_NUMBER: builtins.int
+    USE_LEGACY_CLIENT_IMPLEMENTATION_FIELD_NUMBER: builtins.int
+    max_payload_byte_length: builtins.int
+    """Maximum decompressed payload size in bytes accepted for a single incoming
+    data stream. Streams exceeding this limit terminate with an error on the
+    receiving side. Unset falls back to the SDK default.
+    """
+    use_legacy_client_implementation: builtins.bool
+    """Temporary migration aid for SDKs that still implement data streams in
+    their own client-side code on top of the FFI instead of using the FFI
+    data stream API. When true, this client does not advertise data streams
+    v2 support: ClientInfo.client_protocol is capped at 1 (DATA_STREAM_RPC),
+    so remote clients will not use v2-only behavior toward this client.
+    Defaults to false (v2 advertised). Will be removed once all FFI
+    consumers migrate.
+    """
+    def __init__(
+        self,
+        *,
+        max_payload_byte_length: builtins.int | None = ...,
+        use_legacy_client_implementation: builtins.bool | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["max_payload_byte_length", b"max_payload_byte_length", "use_legacy_client_implementation", b"use_legacy_client_implementation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["max_payload_byte_length", b"max_payload_byte_length", "use_legacy_client_implementation", b"use_legacy_client_implementation"]) -> None: ...
+
+global___RoomDataStreamOptions = RoomDataStreamOptions
+
+@typing.final
 class RoomOptions(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1402,6 +1427,7 @@ class RoomOptions(google.protobuf.message.Message):
     ENCRYPTION_FIELD_NUMBER: builtins.int
     SINGLE_PEER_CONNECTION_FIELD_NUMBER: builtins.int
     CONNECT_TIMEOUT_MS_FIELD_NUMBER: builtins.int
+    DATA_STREAM_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
@@ -1418,6 +1444,10 @@ class RoomOptions(google.protobuf.message.Message):
 
     @property
     def encryption(self) -> e2ee_pb2.E2eeOptions: ...
+    @property
+    def data_stream(self) -> global___RoomDataStreamOptions:
+        """data stream behavior for this room"""
+
     def __init__(
         self,
         *,
@@ -1430,9 +1460,10 @@ class RoomOptions(google.protobuf.message.Message):
         encryption: e2ee_pb2.E2eeOptions | None = ...,
         single_peer_connection: builtins.bool | None = ...,
         connect_timeout_ms: builtins.int | None = ...,
+        data_stream: global___RoomDataStreamOptions | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
 
 global___RoomOptions = RoomOptions
 

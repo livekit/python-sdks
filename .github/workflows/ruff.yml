@@ -18,8 +18,10 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
+      # Use the ruff version pinned in uv.lock rather than uvx's latest release,
+      # so lint results only change when the lockfile is intentionally updated.
       - name: Ruff livekit-api
-        run: uvx ruff check --output-format=github .
+        run: uv run ruff check --output-format=github .
 
       - name: Check format
-        run: uvx ruff format --check .
+        run: uv run ruff format --check .
