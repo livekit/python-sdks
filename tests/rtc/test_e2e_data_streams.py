@@ -17,9 +17,11 @@ Usage:
 
 import asyncio
 import os
+import random
+import string
 import time
 import uuid
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import pytest
 
@@ -49,22 +51,14 @@ def unique_room_name(base: str) -> str:
 
 
 def pseudo_random_text(length: int, seed: int = 0x5EED) -> str:
-    """Deterministic pseudo-random lowercase text (mulberry32 PRNG).
+    """Deterministic pseudo-random lowercase text.
 
     Random lowercase carries ~4.7 bits of entropy per 8-bit byte, so deflate
     compresses it well under its raw size — exercising the chunked-compressed
     wire path.
     """
-    a = seed & 0xFFFFFFFF
-    chars: List[str] = []
-    for _ in range(length):
-        a = (a + 0x6D2B79F5) & 0xFFFFFFFF
-        t = a
-        t = (t ^ (t >> 15)) * (t | 1) & 0xFFFFFFFF
-        t = (t + ((t ^ (t >> 7)) * (t | 61) & 0xFFFFFFFF)) & 0xFFFFFFFF
-        t = t ^ (t >> 14)
-        chars.append(chr(97 + t % 26))
-    return "".join(chars)
+    rng = random.Random(seed)
+    return "".join(rng.choices(string.ascii_lowercase, k=length))
 
 
 async def connect_rooms(
