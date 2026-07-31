@@ -20,6 +20,7 @@ import datetime
 import enum
 import os
 import mimetypes
+import weakref
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
 from abc import abstractmethod, ABC
 
@@ -246,14 +247,18 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
-        # Handle ids of data stream writers that have been opened but not yet
-        # closed. The FFI close request consumes the handle (take_handle), so
-        # an entry is removed as soon as a close is sent for it; whatever is
-        # left when the room disconnects is dropped by
-        # _dispose_open_stream_writers(). Only the ids are kept — wrapping them
-        # in FfiHandle would make GC drop a handle the close request already
-        # consumed.
-        self._open_stream_writers: set[int] = set()
+        # Handles of data stream writers that have been opened but not yet
+        # closed, so the room can drop them at disconnect. The FFI close
+        # request consumes the handle (take_handle), so an entry is removed as
+        # soon as a close is sent for it.
+        #
+        # Held weakly: the writer itself owns the FfiHandle, and a writer that
+        # is simply abandoned should be collectable so its handle is dropped at
+        # GC rather than lingering until disconnect. A strong reference here
+        # would pin every writer for the life of the room.
+        self._open_stream_writers: weakref.WeakValueDictionary[int, FfiHandle] = (
+            weakref.WeakValueDictionary()
+        )
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -271,9 +276,9 @@ class LocalParticipant(Participant):
         The room is already gone at this point, so the handles are dropped
         directly rather than closed: there is no end-of-stream left to deliver.
         """
-        for writer_handle in self._open_stream_writers:
+        for ffi_handle in list(self._open_stream_writers.values()):
             try:
-                FfiHandle(writer_handle).dispose()
+                ffi_handle.dispose()
             except Exception:
                 logger.exception("failed to dispose data stream writer handle")
         self._open_stream_writers.clear()

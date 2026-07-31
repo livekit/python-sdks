@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Optional, Dict, List
 from ._proto import data_stream_pb2 as proto_data_stream
 from ._proto import ffi_pb2 as proto_ffi
-from ._ffi_client import FfiClient
+from ._ffi_client import FfiClient, FfiHandle
 from typing import TYPE_CHECKING
 
 
@@ -185,10 +185,25 @@ class TextStreamReader:
         """
         FfiClient.instance.queue.unsubscribe(self._queue)
 
+    def _wake_pending_reads(self) -> None:
+        """Pushes a terminal event into this reader's own queue.
+
+        Closing unsubscribes, so no further FFI event can ever arrive; without
+        this, a read already parked in ``await self._queue.get()`` would wait
+        forever. The sentinel carries no error, so the woken read raises
+        ``StopAsyncIteration`` — or the stored :class:`StreamError`, which
+        ``__anext__`` checks first.
+        """
+        event = proto_ffi.FfiEvent()
+        event.text_stream_reader_event.reader_handle = self._reader_handle
+        event.text_stream_reader_event.eos.SetInParent()
+        self._queue.put_nowait(event)
+
     def _close(self) -> None:
         if not self._closed:
             self._closed = True
             self._unsubscribe()
+            self._wake_pending_reads()
             if self._on_close is not None:
                 self._on_close()
 
@@ -314,10 +329,25 @@ class ByteStreamReader:
         """
         FfiClient.instance.queue.unsubscribe(self._queue)
 
+    def _wake_pending_reads(self) -> None:
+        """Pushes a terminal event into this reader's own queue.
+
+        Closing unsubscribes, so no further FFI event can ever arrive; without
+        this, a read already parked in ``await self._queue.get()`` would wait
+        forever. The sentinel carries no error, so the woken read raises
+        ``StopAsyncIteration`` — or the stored :class:`StreamError`, which
+        ``__anext__`` checks first.
+        """
+        event = proto_ffi.FfiEvent()
+        event.byte_stream_reader_event.reader_handle = self._reader_handle
+        event.byte_stream_reader_event.eos.SetInParent()
+        self._queue.put_nowait(event)
+
     def _close(self) -> None:
         if not self._closed:
             self._closed = True
             self._unsubscribe()
+            self._wake_pending_reads()
             if self._on_close is not None:
                 self._on_close()
 
@@ -372,17 +402,27 @@ class BaseStreamWriter:
         # the writer handle is assigned by the FFI when the stream is opened;
         # the close request consumes it, so it is kept as a raw id
         self._writer_handle: Optional[int] = None
+        self._writer_ffi_handle: Optional[FfiHandle] = None
         self._write_lock = asyncio.Lock()
         self._closed = False
 
     def _provisional_timestamp(self) -> int:
         return int(datetime.datetime.now().timestamp() * 1000)
 
-    def _register_open(self) -> None:
-        """Records the freshly opened writer so that, if it is never closed,
-        the room can drop its native handle on disconnect."""
-        assert self._writer_handle is not None
-        self._local_participant._open_stream_writers.add(self._writer_handle)
+    def _register_open(self, handle_id: int) -> None:
+        """Takes ownership of a freshly opened writer handle.
+
+        Wrapping it in an FfiHandle means a writer that is simply dropped —
+        abandoned, or left behind by an exception or a cancelled task — still
+        releases the native writer when it is garbage collected. It is also
+        registered with the participant so the room can drop it deterministically
+        at disconnect, for writers still referenced at that point. The registry
+        holds the handle weakly, so registration does not itself keep an
+        abandoned writer alive.
+        """
+        self._writer_handle = handle_id
+        self._writer_ffi_handle = FfiHandle(handle_id)
+        self._local_participant._open_stream_writers[handle_id] = self._writer_ffi_handle
 
     def _unregister_open(self) -> None:
         """Forgets the writer because a close request has been issued for it.
@@ -390,8 +430,11 @@ class BaseStreamWriter:
         The close consumes the handle on the native side, so it must no longer
         be dropped by the disconnect cleanup.
         """
-        if self._writer_handle is not None:
-            self._local_participant._open_stream_writers.discard(self._writer_handle)
+        if self._writer_handle is None:
+            return
+        self._local_participant._open_stream_writers.pop(self._writer_handle, None)
+        if self._writer_ffi_handle is not None:
+            self._writer_ffi_handle.mark_consumed()
 
     async def _wait_for_callback(
         self, req: proto_ffi.FfiRequest, callback_field: str, response_field: str
@@ -479,10 +522,9 @@ class TextStreamWriter(BaseStreamWriter):
         req.text_stream_open.options.CopyFrom(self._options)
         cb = await self._wait_for_callback(req, "text_stream_open", "text_stream_open")
         owned = cb.text_stream_open.writer
-        self._writer_handle = owned.handle.id
-        self._register_open()
+        self._register_open(owned.handle.id)
         self._info = _text_stream_info_from_proto(owned.info)
-        if self._info.size is None and self._total_size is not None:
+        if not self._info.size and self._total_size is not None:
             # total_size is not transmitted for text streams; keep it local
             self._info.size = self._total_size
 
@@ -565,8 +607,7 @@ class ByteStreamWriter(BaseStreamWriter):
         req.byte_stream_open.options.CopyFrom(self._options)
         cb = await self._wait_for_callback(req, "byte_stream_open", "byte_stream_open")
         owned = cb.byte_stream_open.writer
-        self._writer_handle = owned.handle.id
-        self._register_open()
+        self._register_open(owned.handle.id)
         self._info = _byte_stream_info_from_proto(owned.info)
 
     async def write(self, data: bytes) -> None:
