@@ -347,9 +347,12 @@ async def test_receiver_rejects_oversized_payload() -> None:
     )
     try:
         text = pseudo_random_text(50_000)
+        handler_called = asyncio.Event()
         result: asyncio.Future[BaseException] = asyncio.get_event_loop().create_future()
 
         def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            handler_called.set()
+
             async def read() -> None:
                 try:
                     data = await reader.read_all()
@@ -365,8 +368,11 @@ async def test_receiver_rejects_oversized_payload() -> None:
 
         await sender.local_participant.send_text(text, topic="capped-topic")
 
+        await asyncio.wait_for(handler_called.wait(), timeout=10.0)
         error = await asyncio.wait_for(result, timeout=10.0)
-        assert "maximum size" in str(error)
+        # the full text, not just "maximum size": HeaderTooLarge reads
+        # "stream header exceeds maximum size" and shares that substring
+        assert "payload exceeds maximum size" in str(error)
     finally:
         await asyncio.gather(receiver.disconnect(), sender.disconnect())
 
