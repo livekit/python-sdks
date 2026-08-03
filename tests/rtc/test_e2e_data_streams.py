@@ -777,6 +777,41 @@ async def test_abandoned_writer_disposed_on_gc() -> None:
 
 @pytest.mark.asyncio
 @skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_reads_a_closed_reader_as_an_empty_stream() -> None:
+    """A reader closed before anything read it reads back as an empty stream.
+
+    The handler never touches the reader and the sender writes a chunk, so a
+    chunk may or may not have been queued by the time close() lands. Either
+    way ``read_all()`` must resolve to '' promptly rather than hanging (the
+    failure mode a closed-but-unwoken reader had) or raising. Note this
+    asserts termination, not buffer-discard: the test cannot observe whether
+    the chunk arrived before the close, so '' is the correct result either way.
+    """
+    receiver, sender = await connect_rooms(unique_room_name("ds-closed-readall"))
+    writer = None
+    try:
+        got_reader: asyncio.Future[rtc.TextStreamReader] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.TextStreamReader, _identity: str) -> None:
+            got_reader.set_result(reader)  # never read
+
+        receiver.register_text_stream_handler("closed-readall-topic", handler)
+
+        writer = await sender.local_participant.stream_text(topic="closed-readall-topic")
+        await writer.write("a chunk")
+
+        reader = await asyncio.wait_for(got_reader, timeout=10.0)
+        reader.close()
+
+        assert await asyncio.wait_for(reader.read_all(), timeout=5.0) == ""
+    finally:
+        if writer is not None:
+            await writer.aclose()
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_send_file_round_trip(tmp_path: Any) -> None:
     """send_file hands the path to the FFI, which reads and streams the file;
     the receiver gets the payload plus the derived name, size, and mime type."""
