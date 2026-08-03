@@ -194,6 +194,19 @@ async def _egress_smoke():
                 file=api.DirectFileOutput(filepath="track.mp4"),
             )
         )
+        await lk.egress.start_egress(
+            api.StartEgressRequest(
+                room_name="test-room",
+                web=api.WebSource(url="https://example.com/scene"),
+                outputs=[
+                    api.Output(
+                        file=api.FileOutput(
+                            file_type=api.EncodedFileType.MP4, filepath="unified.mp4"
+                        )
+                    )
+                ],
+            )
+        )
         await lk.egress.update_layout(
             api.UpdateLayoutRequest(egress_id="EG_abc123", layout="speaker")
         )
