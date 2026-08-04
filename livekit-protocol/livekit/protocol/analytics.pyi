@@ -455,7 +455,7 @@ class APICallInfo(_message.Message):
     def __init__(self, project_id: _Optional[str] = ..., request: _Optional[_Union[APICallRequest, _Mapping]] = ..., service: _Optional[str] = ..., method: _Optional[str] = ..., node_id: _Optional[str] = ..., status: _Optional[int] = ..., twirp_error_code: _Optional[str] = ..., twirp_error_message: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration_ns: _Optional[int] = ...) -> None: ...
 
 class WebhookInfo(_message.Message):
-    __slots__ = ("event_id", "event", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "egress_id", "ingress_id", "created_at", "queued_at", "queue_duration_ns", "sent_at", "send_duration_ns", "url", "num_dropped", "is_dropped", "service_status", "service_error_code", "service_error", "send_error")
+    __slots__ = ("event_id", "event", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "egress_id", "ingress_id", "created_at", "queued_at", "queue_duration_ns", "sent_at", "send_duration_ns", "url", "num_dropped", "is_dropped", "service_status", "service_error_code", "service_error", "send_error", "http_status_code")
     EVENT_ID_FIELD_NUMBER: _ClassVar[int]
     EVENT_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -478,6 +478,7 @@ class WebhookInfo(_message.Message):
     SERVICE_ERROR_CODE_FIELD_NUMBER: _ClassVar[int]
     SERVICE_ERROR_FIELD_NUMBER: _ClassVar[int]
     SEND_ERROR_FIELD_NUMBER: _ClassVar[int]
+    HTTP_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
     event_id: str
     event: str
     project_id: str
@@ -500,4 +501,5 @@ class WebhookInfo(_message.Message):
     service_error_code: int
     service_error: str
     send_error: str
-    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: bool = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ...) -> None: ...
+    http_status_code: int
+    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: bool = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ..., http_status_code: _Optional[int] = ...) -> None: ...
