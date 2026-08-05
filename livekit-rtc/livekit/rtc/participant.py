@@ -707,7 +707,7 @@ class LocalParticipant(Participant):
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
-        compress: bool | None = None,
+        compress: bool = True,
     ) -> TextStreamInfo:
         req = proto_ffi.FfiRequest()
         req.send_text.local_participant_handle = self._ffi_handle.handle
@@ -720,8 +720,7 @@ class LocalParticipant(Participant):
             options.destination_identities.extend(destination_identities)
         if reply_to_id:
             options.reply_to_stream_id = reply_to_id
-        if compress is not None:
-            options.compress = compress
+        options.compress = compress
         options.sender_identity = self.identity
 
         queue = FfiClient.instance.queue.subscribe()
@@ -776,7 +775,7 @@ class LocalParticipant(Participant):
         destination_identities: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
-        compress: bool | None = None,
+        compress: bool = True,
     ) -> ByteStreamInfo:
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
@@ -796,8 +795,7 @@ class LocalParticipant(Participant):
             options.destination_identities.extend(destination_identities)
         if stream_id is not None:
             options.id = stream_id
-        if compress is not None:
-            options.compress = compress
+        options.compress = compress
         options.sender_identity = self.identity
 
         queue = FfiClient.instance.queue.subscribe()
