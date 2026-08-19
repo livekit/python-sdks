@@ -1,5 +1,7 @@
+import calendar
 import datetime
 
+import jwt
 import pytest
 from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
 from livekit.protocol.room import RoomConfiguration
@@ -99,5 +101,18 @@ def test_verify_token_expired() -> None:
     token_verifier = TokenVerifier(
         TEST_API_KEY, TEST_API_SECRET, leeway=datetime.timedelta(seconds=0)
     )
+    with pytest.raises(Exception):
+        token_verifier.verify(token)
+
+
+def test_verify_token_missing_exp() -> None:
+    now = calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple())
+    token = jwt.encode(
+        {"sub": "test_identity", "iss": TEST_API_KEY, "nbf": now},
+        TEST_API_SECRET,
+        algorithm="HS256",
+    )
+
+    token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     with pytest.raises(Exception):
         token_verifier.verify(token)

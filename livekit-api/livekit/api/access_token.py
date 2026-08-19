@@ -233,13 +233,19 @@ class TokenVerifier:
         if verify_signature and (not self.api_key or not self.api_secret):
             raise ValueError("api_key and api_secret must be set")
 
+        options = {"verify_signature": verify_signature}
+        # First-party minters always set exp. Without this, a hand-rolled token
+        # with a valid signature and no exp verifies forever (livekit/protocol#1706).
+        if verify_signature:
+            options["require"] = ["exp"]
+
         claims = jwt.decode(
             token,
             key=self.api_secret or "",
             issuer=self.api_key or "",
             algorithms=["HS256"],
             leeway=self._leeway.total_seconds(),
-            options={"verify_signature": verify_signature},
+            options=options,
         )
         video_dict = claims.get("video", dict())
         video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
