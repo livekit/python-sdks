@@ -235,8 +235,6 @@ class TokenVerifier:
 
         # First-party minters always set exp. Without this, a hand-rolled token
         # with a valid signature and no exp verifies forever (livekit/protocol#1706).
-        # Inline each options literal so mypy matches PyJWT's Options TypedDict
-        # (a shared dict from a ternary widens to dict[str, object]).
         if verify_signature:
             claims = jwt.decode(
                 token,
