@@ -235,20 +235,26 @@ class TokenVerifier:
 
         # First-party minters always set exp. Without this, a hand-rolled token
         # with a valid signature and no exp verifies forever (livekit/protocol#1706).
-        decode_options = (
-            {"verify_signature": True, "require": ["exp"]}
-            if verify_signature
-            else {"verify_signature": False}
-        )
-
-        claims = jwt.decode(
-            token,
-            key=self.api_secret or "",
-            issuer=self.api_key or "",
-            algorithms=["HS256"],
-            leeway=self._leeway.total_seconds(),
-            options=decode_options,
-        )
+        # Inline each options literal so mypy matches PyJWT's Options TypedDict
+        # (a shared dict from a ternary widens to dict[str, object]).
+        if verify_signature:
+            claims = jwt.decode(
+                token,
+                key=self.api_secret or "",
+                issuer=self.api_key or "",
+                algorithms=["HS256"],
+                leeway=self._leeway.total_seconds(),
+                options={"verify_signature": True, "require": ["exp"]},
+            )
+        else:
+            claims = jwt.decode(
+                token,
+                key=self.api_secret or "",
+                issuer=self.api_key or "",
+                algorithms=["HS256"],
+                leeway=self._leeway.total_seconds(),
+                options={"verify_signature": False},
+            )
         video_dict = claims.get("video", dict())
         video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
         video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
