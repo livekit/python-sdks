@@ -19,7 +19,7 @@ import os
 import jwt
 import dataclasses
 from dataclasses import dataclass
-from typing import Optional, List, Literal
+from typing import Any, Optional, List, Literal
 from google.protobuf.json_format import MessageToDict, ParseDict
 
 from livekit.protocol.room import RoomConfiguration
@@ -233,7 +233,7 @@ class TokenVerifier:
         if verify_signature and (not self.api_key or not self.api_secret):
             raise ValueError("api_key and api_secret must be set")
 
-        options = {"verify_signature": verify_signature}
+        options: dict[str, Any] = {"verify_signature": verify_signature}
         # First-party minters always set exp. Without this, a hand-rolled token
         # with a valid signature and no exp verifies forever (livekit/protocol#1706).
         if verify_signature:
