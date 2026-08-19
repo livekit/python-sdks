@@ -625,7 +625,7 @@ class RoomMovedResponse(_message.Message):
     def __init__(self, room: _Optional[_Union[_models.Room, _Mapping]] = ..., token: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., other_participants: _Optional[_Iterable[_Union[_models.ParticipantInfo, _Mapping]]] = ...) -> None: ...
 
 class SyncState(_message.Message):
-    __slots__ = ("answer", "subscription", "publish_tracks", "data_channels", "offer", "track_sids_disabled", "datachannel_receive_states", "publish_data_tracks")
+    __slots__ = ("answer", "subscription", "publish_tracks", "data_channels", "offer", "track_sids_disabled", "datachannel_receive_states", "publish_data_tracks", "data_subscription")
     ANSWER_FIELD_NUMBER: _ClassVar[int]
     SUBSCRIPTION_FIELD_NUMBER: _ClassVar[int]
     PUBLISH_TRACKS_FIELD_NUMBER: _ClassVar[int]
@@ -634,6 +634,7 @@ class SyncState(_message.Message):
     TRACK_SIDS_DISABLED_FIELD_NUMBER: _ClassVar[int]
     DATACHANNEL_RECEIVE_STATES_FIELD_NUMBER: _ClassVar[int]
     PUBLISH_DATA_TRACKS_FIELD_NUMBER: _ClassVar[int]
+    DATA_SUBSCRIPTION_FIELD_NUMBER: _ClassVar[int]
     answer: SessionDescription
     subscription: UpdateSubscription
     publish_tracks: _containers.RepeatedCompositeFieldContainer[TrackPublishedResponse]
@@ -642,7 +643,8 @@ class SyncState(_message.Message):
     track_sids_disabled: _containers.RepeatedScalarFieldContainer[str]
     datachannel_receive_states: _containers.RepeatedCompositeFieldContainer[DataChannelReceiveState]
     publish_data_tracks: _containers.RepeatedCompositeFieldContainer[PublishDataTrackResponse]
-    def __init__(self, answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., publish_tracks: _Optional[_Iterable[_Union[TrackPublishedResponse, _Mapping]]] = ..., data_channels: _Optional[_Iterable[_Union[DataChannelInfo, _Mapping]]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., track_sids_disabled: _Optional[_Iterable[str]] = ..., datachannel_receive_states: _Optional[_Iterable[_Union[DataChannelReceiveState, _Mapping]]] = ..., publish_data_tracks: _Optional[_Iterable[_Union[PublishDataTrackResponse, _Mapping]]] = ...) -> None: ...
+    data_subscription: UpdateDataSubscription
+    def __init__(self, answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., publish_tracks: _Optional[_Iterable[_Union[TrackPublishedResponse, _Mapping]]] = ..., data_channels: _Optional[_Iterable[_Union[DataChannelInfo, _Mapping]]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., track_sids_disabled: _Optional[_Iterable[str]] = ..., datachannel_receive_states: _Optional[_Iterable[_Union[DataChannelReceiveState, _Mapping]]] = ..., publish_data_tracks: _Optional[_Iterable[_Union[PublishDataTrackResponse, _Mapping]]] = ..., data_subscription: _Optional[_Union[UpdateDataSubscription, _Mapping]] = ...) -> None: ...
 
 class DataChannelReceiveState(_message.Message):
     __slots__ = ("publisher_sid", "last_seq")

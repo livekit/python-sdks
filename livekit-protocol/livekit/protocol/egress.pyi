@@ -24,6 +24,7 @@ class EncodingOptionsPreset(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PORTRAIT_H264_720P_60: _ClassVar[EncodingOptionsPreset]
     PORTRAIT_H264_1080P_30: _ClassVar[EncodingOptionsPreset]
     PORTRAIT_H264_1080P_60: _ClassVar[EncodingOptionsPreset]
+    PASSTHROUGH: _ClassVar[EncodingOptionsPreset]
 
 class EncodedFileType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -86,6 +87,7 @@ PORTRAIT_H264_720P_30: EncodingOptionsPreset
 PORTRAIT_H264_720P_60: EncodingOptionsPreset
 PORTRAIT_H264_1080P_30: EncodingOptionsPreset
 PORTRAIT_H264_1080P_60: EncodingOptionsPreset
+PASSTHROUGH: EncodingOptionsPreset
 DEFAULT_FILETYPE: EncodedFileType
 MP4: EncodedFileType
 OGG: EncodedFileType
@@ -438,20 +440,6 @@ class ListEgressResponse(_message.Message):
     items: _containers.RepeatedCompositeFieldContainer[EgressInfo]
     next_page_token: _models.TokenPagination
     def __init__(self, items: _Optional[_Iterable[_Union[EgressInfo, _Mapping]]] = ..., next_page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ...) -> None: ...
-
-class UpdateEgressRequest(_message.Message):
-    __slots__ = ("egress_id", "url", "layout", "add_stream_urls", "remove_stream_urls")
-    EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
-    URL_FIELD_NUMBER: _ClassVar[int]
-    LAYOUT_FIELD_NUMBER: _ClassVar[int]
-    ADD_STREAM_URLS_FIELD_NUMBER: _ClassVar[int]
-    REMOVE_STREAM_URLS_FIELD_NUMBER: _ClassVar[int]
-    egress_id: str
-    url: str
-    layout: str
-    add_stream_urls: _containers.RepeatedScalarFieldContainer[str]
-    remove_stream_urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, egress_id: _Optional[str] = ..., url: _Optional[str] = ..., layout: _Optional[str] = ..., add_stream_urls: _Optional[_Iterable[str]] = ..., remove_stream_urls: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class StopEgressRequest(_message.Message):
     __slots__ = ("egress_id",)
