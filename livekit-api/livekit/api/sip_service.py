@@ -31,6 +31,7 @@ from livekit.protocol.sip import (
     DeleteSIPDispatchRuleRequest,
     CreateSIPParticipantRequest,
     TransferSIPParticipantRequest,
+    TransferSIPParticipantResponse,
     SIPParticipantInfo,
     SIPTransport,
     SIPMediaConfig,
@@ -832,8 +833,8 @@ class SipService(Service):
         transfer: TransferSIPParticipantRequest,
         *,
         timeout: Optional[float] = None,
-    ) -> SIPParticipantInfo:
-        """Transfer a SIP participant to a different room.
+    ) -> TransferSIPParticipantResponse:
+        """Transfer a SIP participant to another number or SIP endpoint.
 
         Args:
             transfer: Request containing transfer details
@@ -842,7 +843,10 @@ class SipService(Service):
                 longer timeout when unset.
 
         Returns:
-            Updated SIP participant information
+            The outcome of the transfer: its id, status, reason, and the SIP
+            status when the outcome came from a SIP response. A status other
+            than successful means the transfer did not complete, even when no
+            error was raised.
         """
         # Transferring a call dials a phone, which takes longer than a normal
         # call, so keep the request alive past ringing. Pin the ring window so the
@@ -861,7 +865,7 @@ class SipService(Service):
                     ),
                     sip=SIPGrants(call=True),
                 ),
-                SIPParticipantInfo,
+                TransferSIPParticipantResponse,
                 timeout=client_timeout,
             )
         except ServerError as e:
