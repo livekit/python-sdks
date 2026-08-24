@@ -66,6 +66,7 @@ from .participant import (
 from .room import (
     ConnectError,
     DataPacket,
+    DataStreamOptions,
     Room,
     RoomOptions,
     RtcConfiguration,
@@ -123,6 +124,7 @@ from .data_stream import (
     TextStreamWriter,
     ByteStreamWriter,
     ByteStreamReader,
+    StreamError,
 )
 from .data_track import (
     LocalDataTrack,
@@ -172,6 +174,7 @@ __all__ = [
     "ConnectError",
     "Room",
     "RoomOptions",
+    "DataStreamOptions",
     "RtcConfiguration",
     "SimulateScenarioKind",
     "SipDTMF",
@@ -217,6 +220,7 @@ __all__ = [
     "TextStreamWriter",
     "ByteStreamReader",
     "ByteStreamWriter",
+    "StreamError",
     "AudioProcessingModule",
     "PlatformAudio",
     "PlatformAudioSource",

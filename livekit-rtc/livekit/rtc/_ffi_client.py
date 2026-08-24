@@ -80,6 +80,15 @@ class FfiHandle:
     def disposed(self) -> bool:
         return self._disposed
 
+    def mark_consumed(self) -> None:
+        """Marks the handle as already released on the native side.
+
+        Some requests take ownership of their handle (``take_handle``) rather
+        than borrowing it. After issuing one, the handle must not be dropped
+        again, so this suppresses the drop that dispose/GC would otherwise do.
+        """
+        self._disposed = True
+
     def dispose(self) -> None:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True

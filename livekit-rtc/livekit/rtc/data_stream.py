@@ -15,16 +15,13 @@
 from __future__ import annotations
 
 import asyncio
-import uuid
 import datetime
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import AsyncIterator, Optional, Dict, List
-from ._proto.room_pb2 import DataStream as proto_DataStream
+from ._proto import data_stream_pb2 as proto_data_stream
 from ._proto import ffi_pb2 as proto_ffi
-from ._proto import room_pb2 as proto_room
-from ._ffi_client import FfiClient
-from ._utils import split_utf8
+from ._ffi_client import FfiClient, FfiHandle
 from typing import TYPE_CHECKING
 
 
@@ -32,6 +29,19 @@ if TYPE_CHECKING:
     from .participant import LocalParticipant
 
 STREAM_CHUNK_SIZE = 15_000
+"""Deprecated: chunking now happens inside the FFI; kept for compatibility."""
+
+_DISCONNECT_ERROR = "Disconnected while receiving"
+
+
+class StreamError(ConnectionError):
+    """Raised when a data stream operation fails or an incoming stream
+    terminates abnormally (e.g. aborted by the sender or exceeding the
+    room's maximum payload length)."""
+
+    def __init__(self, description: str) -> None:
+        super().__init__(description)
+        self.description = description
 
 
 @dataclass
@@ -49,40 +59,106 @@ class TextStreamInfo(BaseStreamInfo):
     attachments: List[str]
 
 
+@dataclass
+class ByteStreamInfo(BaseStreamInfo):
+    name: str
+
+
+def _text_stream_info_from_proto(info: proto_data_stream.TextStreamInfo) -> TextStreamInfo:
+    return TextStreamInfo(
+        stream_id=info.stream_id,
+        mime_type=info.mime_type,
+        topic=info.topic,
+        timestamp=info.timestamp,
+        size=info.total_length if info.HasField("total_length") else 0,
+        attributes=dict(info.attributes),
+        attachments=list(info.attached_stream_ids),
+    )
+
+
+def _byte_stream_info_from_proto(info: proto_data_stream.ByteStreamInfo) -> ByteStreamInfo:
+    return ByteStreamInfo(
+        stream_id=info.stream_id,
+        mime_type=info.mime_type,
+        topic=info.topic,
+        timestamp=info.timestamp,
+        size=info.total_length if info.HasField("total_length") else 0,
+        attributes=dict(info.attributes),
+        name=info.name,
+    )
+
+
 class TextStreamReader:
+    """An incoming text stream.
+
+    Use as an async iterator to receive chunks, or :meth:`read_all` to collect
+    the whole payload::
+
+        async for chunk in reader:
+            process(chunk)
+
+    A reader subscribes to the FFI event queue as soon as it is handed to your
+    handler, so one that is never iterated to completion — abandoned after a
+    ``break``, or received by a handler that never reads it — must be closed
+    with :meth:`close`, or its subscription lives for the rest of the process.
+    Iterating to the end closes the reader for you.
+
+    If the stream terminates abnormally (aborted by the sender, oversized, or
+    the room disconnects mid-stream), :class:`StreamError` is raised instead of
+    a normal ``StopAsyncIteration``.
+    """
+
     def __init__(
         self,
-        header: proto_DataStream.Header,
+        owned_info: proto_data_stream.OwnedTextStreamReader,
+        *,
+        on_close: Optional[Callable[[], None]] = None,
     ) -> None:
-        self._header = header
-        self._info = TextStreamInfo(
-            stream_id=header.stream_id,
-            mime_type=header.mime_type,
-            topic=header.topic,
-            timestamp=header.timestamp,
-            size=header.total_length,
-            attributes=dict(header.attributes),
-            attachments=list(header.text_header.attached_stream_ids),
+        self._info = _text_stream_info_from_proto(owned_info.info)
+        # the read_incremental request below consumes the FFI handle, so it
+        # must be kept as a raw id and never wrapped in an FfiHandle
+        handle_id = owned_info.handle.id
+        self._reader_handle = handle_id
+        self._on_close = on_close
+        self._closed = False
+        self._error: Optional[StreamError] = None
+        # subscribe before read_incremental so no reader event can be missed
+        self._queue = FfiClient.instance.queue.subscribe(
+            filter_fn=lambda e: (
+                e.WhichOneof("message") == "text_stream_reader_event"
+                and e.text_stream_reader_event.reader_handle == handle_id
+            ),
         )
-        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue()
-
-    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk) -> None:
-        await self._queue.put(chunk)
-
-    async def _on_stream_close(self, trailer: proto_DataStream.Trailer) -> None:
-        self.info.attributes = self.info.attributes or {}
-        self.info.attributes.update(trailer.attributes)
-        await self._queue.put(None)
+        req = proto_ffi.FfiRequest()
+        req.text_read_incremental.reader_handle = handle_id
+        FfiClient.instance.request(req)
 
     def __aiter__(self) -> AsyncIterator[str]:
         return self
 
     async def __anext__(self) -> str:
-        item = await self._queue.get()
-        if item is None:
-            raise StopAsyncIteration
-        decodedStr = item.content.decode()
-        return decodedStr
+        while True:
+            if self._closed:
+                if self._error is not None:
+                    raise self._error
+                raise StopAsyncIteration
+            event: proto_ffi.FfiEvent = await self._queue.get()
+            stream_event = event.text_stream_reader_event
+            detail = stream_event.WhichOneof("detail")
+            if detail == "chunk_received":
+                if not stream_event.chunk_received.content:
+                    continue
+                return stream_event.chunk_received.content
+            elif detail == "eos":
+                eos = stream_event.eos
+                self._info.attributes = self._info.attributes or {}
+                self._info.attributes.update(eos.attributes)
+                if eos.HasField("error"):
+                    self._error = StreamError(eos.error.description)
+                self._close()
+                if self._error is not None:
+                    raise self._error
+                raise StopAsyncIteration
 
     @property
     def info(self) -> TextStreamInfo:
@@ -94,47 +170,218 @@ class TextStreamReader:
             final_string += chunk
         return final_string
 
+    def _unsubscribe(self) -> None:
+        """Drops the FFI queue subscription without ending the stream.
 
-@dataclass
-class ByteStreamInfo(BaseStreamInfo):
-    name: str
+        Events already delivered stay in the queue and remain readable; only
+        the global subscription, and the filter it runs against every FFI
+        event, goes away. Safe to call repeatedly — unsubscribing a queue that
+        is no longer registered is a no-op.
+
+        Only the subscription is released: the reader handle was consumed by
+        the read_incremental request in __init__, so there is nothing left to
+        dispose (and disposing it would drop a handle the FFI server no longer
+        owns).
+        """
+        FfiClient.instance.queue.unsubscribe(self._queue)
+
+    def _wake_pending_reads(self) -> None:
+        """Pushes a terminal event into this reader's own queue.
+
+        Closing unsubscribes, so no further FFI event can ever arrive; without
+        this, a read already parked in ``await self._queue.get()`` would wait
+        forever. The sentinel carries no error, so the woken read raises
+        ``StopAsyncIteration`` — or the stored :class:`StreamError`, which
+        ``__anext__`` checks first.
+        """
+        event = proto_ffi.FfiEvent()
+        event.text_stream_reader_event.reader_handle = self._reader_handle
+        event.text_stream_reader_event.eos.SetInParent()
+        self._queue.put_nowait(event)
+
+    def _close(self) -> None:
+        if not self._closed:
+            self._closed = True
+            self._unsubscribe()
+            self._wake_pending_reads()
+            if self._on_close is not None:
+                self._on_close()
+
+    def close(self) -> None:
+        """Explicitly close the reader and unsubscribe.
+
+        Call this on a reader you stop consuming before it ends. Closing a
+        reader that already reached end-of-stream is a no-op, and iterating a
+        closed reader raises ``StopAsyncIteration`` (or :class:`StreamError`
+        if the stream had already failed).
+        """
+        self._close()
+
+    async def aclose(self) -> None:
+        self.close()
+
+    def _signal_disconnect(self) -> None:
+        """Injects a synthetic EOS-with-error event so pending reads wake up
+        and raise StreamError when the room disconnects mid-stream.
+
+        Also drops the queue subscription, which would otherwise outlive the
+        room: no further events can arrive once the room is gone, and the
+        injected one is already queued. The reader is deliberately left open
+        so chunks that arrived before the disconnect are still delivered
+        before the StreamError, as they were before this was unsubscribed
+        here.
+        """
+        if self._closed:
+            return
+        event = proto_ffi.FfiEvent()
+        event.text_stream_reader_event.reader_handle = self._reader_handle
+        event.text_stream_reader_event.eos.error.description = _DISCONNECT_ERROR
+        self._queue.put_nowait(event)
+        self._unsubscribe()
 
 
 class ByteStreamReader:
-    def __init__(self, header: proto_DataStream.Header, capacity: int = 0) -> None:
-        self._header = header
-        self._info = ByteStreamInfo(
-            stream_id=header.stream_id,
-            mime_type=header.mime_type,
-            topic=header.topic,
-            timestamp=header.timestamp,
-            size=header.total_length,
-            attributes=dict(header.attributes),
-            name=header.byte_header.name,
+    """An incoming byte stream.
+
+    Use as an async iterator to receive chunks::
+
+        async for chunk in reader:
+            process(chunk)
+
+    A reader subscribes to the FFI event queue as soon as it is handed to your
+    handler, so one that is never iterated to completion — abandoned after a
+    ``break``, or received by a handler that never reads it — must be closed
+    with :meth:`close`, or its subscription lives for the rest of the process.
+    Iterating to the end closes the reader for you.
+
+    If the stream terminates abnormally (aborted by the sender, oversized, or
+    the room disconnects mid-stream), :class:`StreamError` is raised instead of
+    a normal ``StopAsyncIteration``.
+    """
+
+    def __init__(
+        self,
+        owned_info: proto_data_stream.OwnedByteStreamReader,
+        capacity: int = 0,
+        *,
+        on_close: Optional[Callable[[], None]] = None,
+    ) -> None:
+        # capacity is ignored: chunk delivery is push-based from the FFI
+        self._info = _byte_stream_info_from_proto(owned_info.info)
+        handle_id = owned_info.handle.id
+        self._reader_handle = handle_id
+        self._on_close = on_close
+        self._closed = False
+        self._error: Optional[StreamError] = None
+        self._queue = FfiClient.instance.queue.subscribe(
+            filter_fn=lambda e: (
+                e.WhichOneof("message") == "byte_stream_reader_event"
+                and e.byte_stream_reader_event.reader_handle == handle_id
+            ),
         )
-        self._queue: asyncio.Queue[proto_DataStream.Chunk | None] = asyncio.Queue(capacity)
-
-    async def _on_chunk_update(self, chunk: proto_DataStream.Chunk) -> None:
-        await self._queue.put(chunk)
-
-    async def _on_stream_close(self, trailer: proto_DataStream.Trailer) -> None:
-        self.info.attributes = self.info.attributes or {}
-        self.info.attributes.update(trailer.attributes)
-        await self._queue.put(None)
+        req = proto_ffi.FfiRequest()
+        req.byte_read_incremental.reader_handle = handle_id
+        FfiClient.instance.request(req)
 
     def __aiter__(self) -> AsyncIterator[bytes]:
         return self
 
     async def __anext__(self) -> bytes:
-        item = await self._queue.get()
-        if item is None:
-            raise StopAsyncIteration
-
-        return item.content
+        while True:
+            if self._closed:
+                if self._error is not None:
+                    raise self._error
+                raise StopAsyncIteration
+            event: proto_ffi.FfiEvent = await self._queue.get()
+            stream_event = event.byte_stream_reader_event
+            detail = stream_event.WhichOneof("detail")
+            if detail == "chunk_received":
+                if not stream_event.chunk_received.content:
+                    continue
+                return stream_event.chunk_received.content
+            elif detail == "eos":
+                eos = stream_event.eos
+                self._info.attributes = self._info.attributes or {}
+                self._info.attributes.update(eos.attributes)
+                if eos.HasField("error"):
+                    self._error = StreamError(eos.error.description)
+                self._close()
+                if self._error is not None:
+                    raise self._error
+                raise StopAsyncIteration
 
     @property
     def info(self) -> ByteStreamInfo:
         return self._info
+
+    def _unsubscribe(self) -> None:
+        """Drops the FFI queue subscription without ending the stream.
+
+        Events already delivered stay in the queue and remain readable; only
+        the global subscription, and the filter it runs against every FFI
+        event, goes away. Safe to call repeatedly — unsubscribing a queue that
+        is no longer registered is a no-op.
+
+        Only the subscription is released: the reader handle was consumed by
+        the read_incremental request in __init__, so there is nothing left to
+        dispose (and disposing it would drop a handle the FFI server no longer
+        owns).
+        """
+        FfiClient.instance.queue.unsubscribe(self._queue)
+
+    def _wake_pending_reads(self) -> None:
+        """Pushes a terminal event into this reader's own queue.
+
+        Closing unsubscribes, so no further FFI event can ever arrive; without
+        this, a read already parked in ``await self._queue.get()`` would wait
+        forever. The sentinel carries no error, so the woken read raises
+        ``StopAsyncIteration`` — or the stored :class:`StreamError`, which
+        ``__anext__`` checks first.
+        """
+        event = proto_ffi.FfiEvent()
+        event.byte_stream_reader_event.reader_handle = self._reader_handle
+        event.byte_stream_reader_event.eos.SetInParent()
+        self._queue.put_nowait(event)
+
+    def _close(self) -> None:
+        if not self._closed:
+            self._closed = True
+            self._unsubscribe()
+            self._wake_pending_reads()
+            if self._on_close is not None:
+                self._on_close()
+
+    def close(self) -> None:
+        """Explicitly close the reader and unsubscribe.
+
+        Call this on a reader you stop consuming before it ends. Closing a
+        reader that already reached end-of-stream is a no-op, and iterating a
+        closed reader raises ``StopAsyncIteration`` (or :class:`StreamError`
+        if the stream had already failed).
+        """
+        self._close()
+
+    async def aclose(self) -> None:
+        self.close()
+
+    def _signal_disconnect(self) -> None:
+        """Injects a synthetic EOS-with-error event so pending reads wake up
+        and raise StreamError when the room disconnects mid-stream.
+
+        Also drops the queue subscription, which would otherwise outlive the
+        room: no further events can arrive once the room is gone, and the
+        injected one is already queued. The reader is deliberately left open
+        so chunks that arrived before the disconnect are still delivered
+        before the StreamError, as they were before this was unsubscribed
+        here.
+        """
+        if self._closed:
+            return
+        event = proto_ffi.FfiEvent()
+        event.byte_stream_reader_event.reader_handle = self._reader_handle
+        event.byte_stream_reader_event.eos.error.description = _DISCONNECT_ERROR
+        self._queue.put_nowait(event)
+        self._unsubscribe()
 
 
 class BaseStreamWriter:
@@ -150,100 +397,78 @@ class BaseStreamWriter:
         sender_identity: str | None = None,
     ):
         self._local_participant = local_participant
-        if stream_id is None:
-            stream_id = str(uuid.uuid4())
-        timestamp = int(datetime.datetime.now().timestamp() * 1000)
-        self._header = proto_DataStream.Header(
-            stream_id=stream_id,
-            timestamp=timestamp,
-            mime_type=mime_type,
-            topic=topic,
-            attributes=attributes,
-            total_length=total_size,
-        )
-        self._next_chunk_index: int = 0
-        self._destination_identities = destination_identities
+        self._total_size = total_size
         self._sender_identity = sender_identity or self._local_participant.identity
+        # the writer handle is assigned by the FFI when the stream is opened;
+        # the close request consumes it, so it is kept as a raw id
+        self._writer_handle: Optional[int] = None
+        self._writer_ffi_handle: Optional[FfiHandle] = None
+        self._write_lock = asyncio.Lock()
         self._closed = False
 
-    async def _send_header(self) -> None:
-        req = proto_ffi.FfiRequest(
-            send_stream_header=proto_room.SendStreamHeaderRequest(
-                header=self._header,
-                local_participant_handle=self._local_participant._ffi_handle.handle,
-                destination_identities=self._destination_identities,
-                sender_identity=self._sender_identity,
-            )
-        )
+    def _provisional_timestamp(self) -> int:
+        return int(datetime.datetime.now().timestamp() * 1000)
 
+    def _register_open(self, handle_id: int) -> None:
+        """Takes ownership of a freshly opened writer handle.
+
+        Wrapping it in an FfiHandle means a writer that is simply dropped —
+        abandoned, or left behind by an exception or a cancelled task — still
+        releases the native writer when it is garbage collected. It is also
+        registered with the participant so the room can drop it deterministically
+        at disconnect, for writers still referenced at that point. The registry
+        holds the handle weakly, so registration does not itself keep an
+        abandoned writer alive.
+        """
+        self._writer_handle = handle_id
+        self._writer_ffi_handle = FfiHandle(handle_id)
+        self._local_participant._open_stream_writers[handle_id] = self._writer_ffi_handle
+
+    def _unregister_open(self) -> None:
+        """Forgets the writer because a close request has been issued for it.
+
+        The close consumes the handle on the native side, so it must no longer
+        be dropped by the disconnect cleanup.
+        """
+        if self._writer_handle is None:
+            return
+        self._local_participant._open_stream_writers.pop(self._writer_handle, None)
+        if self._writer_ffi_handle is not None:
+            self._writer_ffi_handle.mark_consumed()
+
+    async def _wait_for_callback(
+        self, req: proto_ffi.FfiRequest, callback_field: str, response_field: str
+    ) -> proto_ffi.FfiEvent:
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
+            async_id = getattr(resp, response_field).async_id
             cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_header.async_id == resp.send_stream_header.async_id
+                lambda e: getattr(e, callback_field).async_id == async_id
             )
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-        if cb.send_stream_header.error:
-            raise ConnectionError(cb.send_stream_header.error)
-
-    async def _send_chunk(self, chunk: proto_DataStream.Chunk) -> None:
-        if self._closed:
-            raise RuntimeError(f"Cannot send chunk after stream is closed: {chunk}")
-        req = proto_ffi.FfiRequest(
-            send_stream_chunk=proto_room.SendStreamChunkRequest(
-                chunk=chunk,
-                local_participant_handle=self._local_participant._ffi_handle.handle,
-                sender_identity=self._local_participant.identity,
-                destination_identities=self._destination_identities,
-            )
-        )
-
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_chunk.async_id == resp.send_stream_chunk.async_id
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
-
-        if cb.send_stream_chunk.error:
-            raise ConnectionError(cb.send_stream_chunk.error)
-
-    async def _send_trailer(self, trailer: proto_DataStream.Trailer) -> None:
-        req = proto_ffi.FfiRequest(
-            send_stream_trailer=proto_room.SendStreamTrailerRequest(
-                trailer=trailer,
-                local_participant_handle=self._local_participant._ffi_handle.handle,
-                sender_identity=self._local_participant.identity,
-            )
-        )
-
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.send_stream_trailer.async_id == resp.send_stream_trailer.async_id
-            )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
-
-        if cb.send_stream_trailer.error:
-            raise ConnectionError(cb.send_stream_trailer.error)
+        if getattr(cb, callback_field).HasField("error"):
+            raise StreamError(getattr(cb, callback_field).error.description)
+        return cb
 
     async def aclose(
         self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
     ) -> None:
         if self._closed:
             raise RuntimeError("Stream already closed")
+        if self._writer_handle is None:
+            raise RuntimeError("Stream is not open")
         self._closed = True
-        await self._send_trailer(
-            trailer=proto_DataStream.Trailer(
-                stream_id=self._header.stream_id, reason=reason, attributes=attributes
-            )
-        )
+        # unregister before sending: the request consumes the handle natively,
+        # so it must not be dropped again by the disconnect cleanup even if the
+        # close itself reports an error
+        self._unregister_open()
+        await self._send_close(reason=reason, attributes=attributes)
+
+    async def _send_close(self, *, reason: str, attributes: Optional[Dict[str, str]]) -> None:
+        raise NotImplementedError
 
 
 class TextStreamWriter(BaseStreamWriter):
@@ -269,32 +494,59 @@ class TextStreamWriter(BaseStreamWriter):
             destination_identities=destination_identities,
             sender_identity=sender_identity,
         )
-        self._header.text_header.operation_type = proto_DataStream.OperationType.CREATE
+        options = proto_data_stream.StreamTextOptions(topic=topic)
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
         if reply_to_id:
-            self._header.text_header.reply_to_stream_id = reply_to_id
+            options.reply_to_stream_id = reply_to_id
+        options.sender_identity = self._sender_identity
+        self._options = options
+        # provisional info, replaced by the FFI-provided info once opened
         self._info = TextStreamInfo(
-            stream_id=self._header.stream_id,
-            mime_type=self._header.mime_type,
-            topic=self._header.topic,
-            timestamp=self._header.timestamp,
-            size=self._header.total_length,
-            attributes=dict(self._header.attributes),
-            attachments=list(self._header.text_header.attached_stream_ids),
+            stream_id=stream_id or "",
+            mime_type="text/plain",
+            topic=topic,
+            timestamp=self._provisional_timestamp(),
+            size=total_size,
+            attributes=dict(attributes) if attributes else {},
+            attachments=[],
         )
-        self._write_lock = asyncio.Lock()
+
+    async def _send_header(self) -> None:
+        req = proto_ffi.FfiRequest()
+        req.text_stream_open.local_participant_handle = self._local_participant._ffi_handle.handle
+        req.text_stream_open.options.CopyFrom(self._options)
+        cb = await self._wait_for_callback(req, "text_stream_open", "text_stream_open")
+        owned = cb.text_stream_open.writer
+        self._register_open(owned.handle.id)
+        self._info = _text_stream_info_from_proto(owned.info)
+        if not self._info.size and self._total_size is not None:
+            # total_size is not transmitted for text streams; keep it local
+            self._info.size = self._total_size
 
     async def write(self, text: str) -> None:
         async with self._write_lock:
-            for chunk in split_utf8(text, STREAM_CHUNK_SIZE):
-                content = chunk
-                chunk_index = self._next_chunk_index
-                self._next_chunk_index += 1
-                chunk_msg = proto_DataStream.Chunk(
-                    stream_id=self._header.stream_id,
-                    chunk_index=chunk_index,
-                    content=content,
-                )
-                await self._send_chunk(chunk_msg)
+            if self._closed:
+                raise RuntimeError("Cannot write after stream is closed")
+            if self._writer_handle is None:
+                raise RuntimeError("Stream is not open")
+            req = proto_ffi.FfiRequest()
+            req.text_stream_write.writer_handle = self._writer_handle
+            req.text_stream_write.text = text
+            await self._wait_for_callback(req, "text_stream_writer_write", "text_stream_write")
+
+    async def _send_close(self, *, reason: str, attributes: Optional[Dict[str, str]]) -> None:
+        assert self._writer_handle is not None
+        req = proto_ffi.FfiRequest()
+        req.text_stream_close.writer_handle = self._writer_handle
+        req.text_stream_close.reason = reason
+        if attributes:
+            req.text_stream_close.attributes.update(attributes)
+        await self._wait_for_callback(req, "text_stream_writer_close", "text_stream_close")
 
     @property
     def info(self) -> TextStreamInfo:
@@ -323,32 +575,60 @@ class ByteStreamWriter(BaseStreamWriter):
             mime_type=mime_type,
             destination_identities=destination_identities,
         )
-        self._header.byte_header.name = name
-        self._info = ByteStreamInfo(
-            stream_id=self._header.stream_id,
-            mime_type=self._header.mime_type,
-            topic=self._header.topic,
-            timestamp=self._header.timestamp,
-            size=self._header.total_length,
-            attributes=dict(self._header.attributes),
-            name=self._header.byte_header.name,
+        options = proto_data_stream.StreamByteOptions(
+            topic=topic,
+            name=name,
+            mime_type=mime_type,
         )
-        self._write_lock = asyncio.Lock()
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
+        if total_size is not None:
+            options.total_length = total_size
+        options.sender_identity = self._sender_identity
+        self._options = options
+        # provisional info, replaced by the FFI-provided info once opened
+        self._info = ByteStreamInfo(
+            stream_id=stream_id or "",
+            mime_type=mime_type,
+            topic=topic,
+            timestamp=self._provisional_timestamp(),
+            size=total_size,
+            attributes=dict(attributes) if attributes else {},
+            name=name,
+        )
+
+    async def _send_header(self) -> None:
+        req = proto_ffi.FfiRequest()
+        req.byte_stream_open.local_participant_handle = self._local_participant._ffi_handle.handle
+        req.byte_stream_open.options.CopyFrom(self._options)
+        cb = await self._wait_for_callback(req, "byte_stream_open", "byte_stream_open")
+        owned = cb.byte_stream_open.writer
+        self._register_open(owned.handle.id)
+        self._info = _byte_stream_info_from_proto(owned.info)
 
     async def write(self, data: bytes) -> None:
         async with self._write_lock:
-            chunked_data = [
-                data[i : i + STREAM_CHUNK_SIZE] for i in range(0, len(data), STREAM_CHUNK_SIZE)
-            ]
+            if self._closed:
+                raise RuntimeError("Cannot write after stream is closed")
+            if self._writer_handle is None:
+                raise RuntimeError("Stream is not open")
+            req = proto_ffi.FfiRequest()
+            req.byte_stream_write.writer_handle = self._writer_handle
+            req.byte_stream_write.bytes = data
+            await self._wait_for_callback(req, "byte_stream_writer_write", "byte_stream_write")
 
-            for chunk in chunked_data:
-                chunk_msg = proto_DataStream.Chunk(
-                    stream_id=self._header.stream_id,
-                    chunk_index=self._next_chunk_index,
-                    content=chunk,
-                )
-                await self._send_chunk(chunk_msg)
-                self._next_chunk_index += 1
+    async def _send_close(self, *, reason: str, attributes: Optional[Dict[str, str]]) -> None:
+        assert self._writer_handle is not None
+        req = proto_ffi.FfiRequest()
+        req.byte_stream_close.writer_handle = self._writer_handle
+        req.byte_stream_close.reason = reason
+        if attributes:
+            req.byte_stream_close.attributes.update(attributes)
+        await self._wait_for_callback(req, "byte_stream_writer_close", "byte_stream_close")
 
     @property
     def info(self) -> ByteStreamInfo:
