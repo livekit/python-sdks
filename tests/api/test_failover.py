@@ -28,12 +28,13 @@ import asyncio
 import json
 import os
 import urllib.request
+from typing import List, Optional
 
 import aiohttp
 import pytest
 
 from livekit.api import CreateRoomRequest, Room, ServerError
-from livekit.api.twirp_client import TwirpClient
+from livekit.api.twirp_client import REQUEST_ID_HEADER, TwirpClient
 
 BASE = os.getenv("LK_TEST_SERVER_URL", "http://127.0.0.1:9999")
 
@@ -53,8 +54,15 @@ pytestmark = pytest.mark.skipif(
 
 # _failover_force bypasses the cloud-host check (the mock is on 127.0.0.1) and a
 # tiny backoff keeps the tests fast — both are internal, test-only knobs.
-async def _call(mock: dict, *, failover: bool = True, force: bool = True) -> Room:
-    async with aiohttp.ClientSession() as session:
+async def _call(
+    mock: dict,
+    *,
+    failover: bool = True,
+    force: bool = True,
+    extra_headers: Optional[dict] = None,
+    trace_configs: Optional[List[aiohttp.TraceConfig]] = None,
+) -> Room:
+    async with aiohttp.ClientSession(trace_configs=trace_configs) as session:
         client = TwirpClient(
             session,
             BASE,
@@ -67,6 +75,7 @@ async def _call(mock: dict, *, failover: bool = True, force: bool = True) -> Roo
             "authorization": "Bearer test-token",
             # These tests exercise failover, not authz; skip the mock's permission check.
             "X-Lk-Mock": json.dumps({"skipAuth": True, **mock}),
+            **(extra_headers or {}),
         }
         return await client.request("RoomService", "CreateRoom", CreateRoomRequest(), headers, Room)
 
@@ -113,3 +122,38 @@ def test_disabled():
     # failover=False disables failover entirely.
     with pytest.raises(ServerError):
         asyncio.run(_call({"failRegions": [0]}, failover=False))
+
+
+# Records the request id header(s) the SDK put on the wire for each Twirp
+# attempt. Region discovery is a separate request, so it is not recorded.
+def _request_id_recorder(seen: List[List[str]]) -> aiohttp.TraceConfig:
+    trace = aiohttp.TraceConfig()
+
+    async def on_request_start(_session, _ctx, params) -> None:
+        if not params.url.path.endswith("/settings/regions"):
+            seen.append(list(params.headers.getall(REQUEST_ID_HEADER, [])))
+
+    trace.on_request_start.append(on_request_start)
+    return trace
+
+
+def test_request_id_stable_across_attempts():
+    # The id is generated once per logical call, so a replayed request carries
+    # the same idempotency key on every attempt and the server can dedup it.
+    seen: List[List[str]] = []
+    asyncio.run(_call({"failRegions": [0, 1]}, trace_configs=[_request_id_recorder(seen)]))
+    assert len(seen) == 3  # primary + two fallbacks
+    assert all(len(ids) == 1 for ids in seen)  # never duplicated
+    assert seen[0][0]
+    assert len({ids[0] for ids in seen}) == 1
+
+
+def test_request_id_unique_per_call():
+    # A new logical call is a new request, so it gets its own id.
+    seen: List[List[str]] = []
+    recorder = _request_id_recorder(seen)
+    asyncio.run(_call({}, trace_configs=[recorder]))
+    asyncio.run(_call({}, trace_configs=[recorder]))
+    assert len(seen) == 2
+    assert seen[0][0] and seen[1][0]
+    assert seen[0][0] != seen[1][0]
