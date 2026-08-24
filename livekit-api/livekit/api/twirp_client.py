@@ -213,8 +213,7 @@ class TwirpClient:
         headers["User-Agent"] = _USER_AGENT
         forward_headers = dict(headers)  # for the discovery fetch (no content-type yet)
         headers["Content-Type"] = "application/protobuf"
-        if not any(h.lower() == REQUEST_ID_HEADER.lower() for h in headers):
-            headers[REQUEST_ID_HEADER] = str(uuid.uuid4())
+        headers[REQUEST_ID_HEADER] = str(uuid.uuid4())
         serialized_data = data.SerializeToString()
 
         # The effective per-attempt timeout is the per-call override, or the
