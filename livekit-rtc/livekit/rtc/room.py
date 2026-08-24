@@ -108,6 +108,14 @@ class RtcConfiguration:
 
 
 @dataclass
+class DataStreamOptions:
+    max_payload_byte_length: int | None = None
+    """Maximum decompressed payload size in bytes accepted for a single incoming
+    data stream; oversized streams terminate with StreamError on the receiver.
+    When None, uses the FFI default."""
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     """Automatically subscribe to tracks when participants join."""
@@ -122,6 +130,8 @@ class RoomOptions:
     """Timeout in seconds for each signal connection attempt. When None, uses the default (5s)."""
     single_peer_connection: bool | None = None
     """Use a single peer connection for both publish and subscribe. When None, uses the default (false)."""
+    data_stream: DataStreamOptions | None = None
+    """Options for incoming data streams. When None, uses the FFI defaults."""
 
 
 @dataclass
@@ -174,15 +184,15 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
-        self._data_stream_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
 
-        self._text_stream_readers: Dict[str, TextStreamReader] = {}
-        self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
+        # active incoming stream readers, keyed by FFI reader handle id
+        self._text_stream_readers: Dict[int, TextStreamReader] = {}
+        self._byte_stream_readers: Dict[int, ByteStreamReader] = {}
         self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
         self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
 
@@ -467,10 +477,13 @@ class Room(EventEmitter[EventTypes]):
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
 
-        # The Python SDK still implements data streams in Python on top of raw FFI
-        # packets, so always advertise only legacy (v1) data stream support to other
-        # clients.
-        req.connect.options.data_stream.use_legacy_client_implementation = True
+        if (
+            options.data_stream is not None
+            and options.data_stream.max_payload_byte_length is not None
+        ):
+            req.connect.options.data_stream.max_payload_byte_length = (
+                options.data_stream.max_payload_byte_length
+            )
 
         if options.connect_timeout is not None:
             req.connect.options.connect_timeout_ms = int(options.connect_timeout * 1000)
@@ -672,7 +685,8 @@ class Room(EventEmitter[EventTypes]):
             return
 
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream_tasks()
+        self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
@@ -721,7 +735,8 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream_tasks()
+        self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent) -> None:
         if self._local_participant is None:
@@ -1109,23 +1124,10 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnecting")
         elif which == "reconnected":
             self.emit("reconnected")
-        elif which == "stream_header_received":
-            self._handle_stream_header(
-                event.stream_header_received.header,
-                event.stream_header_received.participant_identity,
-            )
-        elif which == "stream_chunk_received":
-            task = asyncio.create_task(self._handle_stream_chunk(event.stream_chunk_received.chunk))
-            self._data_stream_tasks.add(task)
-            task.add_done_callback(self._data_stream_tasks.discard)
-
-        elif which == "stream_trailer_received":
-            task = asyncio.create_task(
-                self._handle_stream_trailer(event.stream_trailer_received.trailer)
-            )
-            self._data_stream_tasks.add(task)
-            task.add_done_callback(self._data_stream_tasks.discard)
-
+        elif which == "text_stream_opened":
+            self._handle_text_stream_opened(event.text_stream_opened)
+        elif which == "byte_stream_opened":
+            self._handle_byte_stream_opened(event.byte_stream_opened)
         elif which == "room_updated":
             self._info = event.room_updated
             self._resolve_first_sid(self._info.sid)
@@ -1153,69 +1155,80 @@ class Room(EventEmitter[EventTypes]):
         elif which == "data_track_unpublished":
             self.emit("data_track_unpublished", event.data_track_unpublished.sid)
 
-    def _handle_stream_header(
-        self, header: proto_room.DataStream.Header, participant_identity: str
-    ) -> None:
-        stream_type = header.WhichOneof("content_header")
-        if stream_type == "text_header":
-            text_stream_handler = self._text_stream_handlers.get(header.topic)
-            if text_stream_handler is None:
-                logging.info(
-                    "ignoring text stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
+    def _handle_text_stream_opened(self, opened: proto_room.TextStreamOpened) -> None:
+        topic = opened.reader.info.topic
+        text_stream_handler = self._text_stream_handlers.get(topic)
+        handle_id = opened.reader.handle.id
+        if text_stream_handler is None:
+            logging.info(
+                "ignoring text stream with topic '%s', no callback attached",
+                topic,
+            )
+            # the reader is never consumed by read_incremental, so the owned
+            # handle (and its buffered chunks) must be disposed here
+            FfiHandle(handle_id).dispose()
+            return
 
-            text_reader = TextStreamReader(header)
-            self._text_stream_readers[header.stream_id] = text_reader
-            text_stream_handler(text_reader, participant_identity)
-        elif stream_type == "byte_header":
-            byte_stream_handler = self._byte_stream_handlers.get(header.topic)
-            if byte_stream_handler is None:
-                logging.info(
-                    "ignoring byte stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
+        def on_close() -> None:
+            self._text_stream_readers.pop(handle_id, None)
 
-            byte_reader = ByteStreamReader(header)
-            self._byte_stream_readers[header.stream_id] = byte_reader
-            byte_stream_handler(byte_reader, participant_identity)
-        else:
-            logging.warning("received unknown header type, %s", stream_type)
-        pass
+        text_reader = TextStreamReader(opened.reader, on_close=on_close)
+        self._text_stream_readers[handle_id] = text_reader
+        text_stream_handler(text_reader, opened.participant_identity)
 
-    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk) -> None:
-        text_reader = self._text_stream_readers.get(chunk.stream_id)
-        file_reader = self._byte_stream_readers.get(chunk.stream_id)
+    def _handle_byte_stream_opened(self, opened: proto_room.ByteStreamOpened) -> None:
+        topic = opened.reader.info.topic
+        byte_stream_handler = self._byte_stream_handlers.get(topic)
+        handle_id = opened.reader.handle.id
+        if byte_stream_handler is None:
+            logging.info(
+                "ignoring byte stream with topic '%s', no callback attached",
+                topic,
+            )
+            # the reader is never consumed by read_incremental, so the owned
+            # handle (and its buffered chunks) must be disposed here
+            FfiHandle(handle_id).dispose()
+            return
 
-        if text_reader:
-            await text_reader._on_chunk_update(chunk)
-        elif file_reader:
-            await file_reader._on_chunk_update(chunk)
+        def on_close() -> None:
+            self._byte_stream_readers.pop(handle_id, None)
 
-    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer) -> None:
-        text_reader = self._text_stream_readers.get(trailer.stream_id)
-        file_reader = self._byte_stream_readers.get(trailer.stream_id)
+        byte_reader = ByteStreamReader(opened.reader, on_close=on_close)
+        self._byte_stream_readers[handle_id] = byte_reader
+        byte_stream_handler(byte_reader, opened.participant_identity)
 
-        if text_reader:
-            await text_reader._on_stream_close(trailer)
-            self._text_stream_readers.pop(trailer.stream_id)
-        elif file_reader:
-            await file_reader._on_stream_close(trailer)
-            self._byte_stream_readers.pop(trailer.stream_id)
+    def _dispose_open_stream_writers(self) -> None:
+        """Drops the native writers of data streams left open at disconnect.
+
+        A writer releases its handle only when it is closed, so one the
+        application abandoned — or left behind after a failed write — would
+        otherwise be held by the FFI server for the life of the process.
+        """
+        if self._local_participant is not None:
+            self._local_participant._dispose_open_stream_writers()
+
+    def _error_stream_readers(self) -> None:
+        """Wakes up any pending stream reads with a StreamError on disconnect.
+
+        This also drops each reader's FFI queue subscription, which would
+        otherwise outlive the room: a reader unsubscribes itself only once a
+        read consumes its end-of-stream event, so one the application never
+        finished reading would stay subscribed for the life of the process.
+        The readers stay open, so a read can still drain whatever arrived
+        before the disconnect and then raise StreamError.
+        """
+        for text_reader in list(self._text_stream_readers.values()):
+            text_reader._signal_disconnect()
+        for byte_reader in list(self._byte_stream_readers.values()):
+            byte_reader._signal_disconnect()
+        self._text_stream_readers.clear()
+        self._byte_stream_readers.clear()
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
             for task in self._rpc_invocation_tasks:
                 task.cancel()
             await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
-
-    async def _drain_data_stream_tasks(self) -> None:
-        if self._data_stream_tasks:
-            for task in self._data_stream_tasks:
-                task.cancel()
-            await asyncio.gather(*self._data_stream_tasks, return_exceptions=True)
 
     def _retrieve_remote_participant(self, identity: str) -> Optional[RemoteParticipant]:
         """Retrieve a remote participant by identity"""

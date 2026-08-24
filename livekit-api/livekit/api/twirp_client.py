@@ -14,6 +14,7 @@
 
 import asyncio
 import logging
+import uuid
 from typing import Dict, List, Optional, Type, TypeVar
 
 import aiohttp
@@ -36,6 +37,11 @@ logger = logging.getLogger("livekit")
 
 # Identifies the SDK and version to the server on every request.
 _USER_AGENT = f"livekit-server-sdk-python/{__version__}"
+
+# Carries a per-request idempotency key. The SDK's auto-retries (see _failover)
+# keep the same key across attempts, so the server can identify and deduplicate
+# repeated requests.
+REQUEST_ID_HEADER = "X-Livekit-Request-Id"
 
 # Shared across all clients in the process so the region list is fetched once.
 _REGION_CACHE = RegionCache()
@@ -207,6 +213,7 @@ class TwirpClient:
         headers["User-Agent"] = _USER_AGENT
         forward_headers = dict(headers)  # for the discovery fetch (no content-type yet)
         headers["Content-Type"] = "application/protobuf"
+        headers[REQUEST_ID_HEADER] = str(uuid.uuid4())
         serialized_data = data.SerializeToString()
 
         # The effective per-attempt timeout is the per-call override, or the
