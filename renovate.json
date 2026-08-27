@@ -38,6 +38,10 @@
       "matchManagers": ["git-submodules"],
       "matchDepNames": ["livekit-rtc/rust-sdks"],
       "enabled": false
+    },
+    {
+      "matchManagers": ["git-submodules"],
+      "minimumReleaseAge": null
     }
   ]
 }
