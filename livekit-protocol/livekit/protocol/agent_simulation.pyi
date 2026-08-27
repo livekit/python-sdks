@@ -289,7 +289,7 @@ class SimulationRun(_message.Message):
         conversation_progression: float
         def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., task_completion: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., turns: _Optional[_Iterable[_Union[SimulationRun.JobMetrics.Turn, _Mapping]]] = ..., judge_model: _Optional[str] = ..., has_remote_session: bool = ..., t0: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conciseness: _Optional[float] = ..., unnecessary_tool_calls: bool = ..., information_loss: bool = ..., redundant_statements: bool = ..., poor_question_quality: bool = ..., conversation_progression: _Optional[float] = ...) -> None: ...
     class RunMetrics(_message.Message):
-        __slots__ = ("accuracy_score", "experience_score", "scenario_pass_rate", "stt", "llm", "tts", "conversation")
+        __slots__ = ("accuracy_score", "experience_score", "scenario_pass_rate", "stt", "llm", "tts", "conversation", "conciseness", "conversation_progression")
         ACCURACY_SCORE_FIELD_NUMBER: _ClassVar[int]
         EXPERIENCE_SCORE_FIELD_NUMBER: _ClassVar[int]
         SCENARIO_PASS_RATE_FIELD_NUMBER: _ClassVar[int]
@@ -297,6 +297,8 @@ class SimulationRun(_message.Message):
         LLM_FIELD_NUMBER: _ClassVar[int]
         TTS_FIELD_NUMBER: _ClassVar[int]
         CONVERSATION_FIELD_NUMBER: _ClassVar[int]
+        CONCISENESS_FIELD_NUMBER: _ClassVar[int]
+        CONVERSATION_PROGRESSION_FIELD_NUMBER: _ClassVar[int]
         accuracy_score: float
         experience_score: float
         scenario_pass_rate: float
@@ -304,7 +306,9 @@ class SimulationRun(_message.Message):
         llm: SimulationRun.JobMetrics.LLM
         tts: SimulationRun.JobMetrics.TTS
         conversation: SimulationRun.JobMetrics.Conversation
-        def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., scenario_pass_rate: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ...) -> None: ...
+        conciseness: float
+        conversation_progression: float
+        def __init__(self, accuracy_score: _Optional[float] = ..., experience_score: _Optional[float] = ..., scenario_pass_rate: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., conciseness: _Optional[float] = ..., conversation_progression: _Optional[float] = ...) -> None: ...
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
