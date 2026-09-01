@@ -94,6 +94,15 @@ class DisconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     MEDIA_FAILURE: _ClassVar[DisconnectReason]
     AGENT_ERROR: _ClassVar[DisconnectReason]
 
+class RoomEndReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    ROOM_END_UNKNOWN: _ClassVar[RoomEndReason]
+    ROOM_END_API_DELETE: _ClassVar[RoomEndReason]
+    ROOM_END_IDLE_TIMEOUT: _ClassVar[RoomEndReason]
+    ROOM_END_SERVER_SHUTDOWN: _ClassVar[RoomEndReason]
+    ROOM_END_SUPERSEDED: _ClassVar[RoomEndReason]
+    ROOM_END_OPEN_FAILED: _ClassVar[RoomEndReason]
+
 class ReconnectReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     RR_UNKNOWN: _ClassVar[ReconnectReason]
@@ -175,6 +184,12 @@ SIP_TRUNK_FAILURE: DisconnectReason
 CONNECTION_TIMEOUT: DisconnectReason
 MEDIA_FAILURE: DisconnectReason
 AGENT_ERROR: DisconnectReason
+ROOM_END_UNKNOWN: RoomEndReason
+ROOM_END_API_DELETE: RoomEndReason
+ROOM_END_IDLE_TIMEOUT: RoomEndReason
+ROOM_END_SERVER_SHUTDOWN: RoomEndReason
+ROOM_END_SUPERSEDED: RoomEndReason
+ROOM_END_OPEN_FAILED: RoomEndReason
 RR_UNKNOWN: ReconnectReason
 RR_SIGNAL_DISCONNECTED: ReconnectReason
 RR_PUBLISHER_FAILED: ReconnectReason
