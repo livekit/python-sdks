@@ -1428,6 +1428,7 @@ class RoomOptions(google.protobuf.message.Message):
     SINGLE_PEER_CONNECTION_FIELD_NUMBER: builtins.int
     CONNECT_TIMEOUT_MS_FIELD_NUMBER: builtins.int
     DATA_STREAM_FIELD_NUMBER: builtins.int
+    OTHER_SDKS_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
@@ -1436,6 +1437,10 @@ class RoomOptions(google.protobuf.message.Message):
     """use single peer connection for both publish/subscribe (default: false)"""
     connect_timeout_ms: builtins.int
     """timeout in milliseconds for each signal connection attempt (default: 5000)"""
+    other_sdks: builtins.str
+    """Comma separated list of additional LiveKit SDKs layered on top of this one, with versions,
+    e.g. "components-js:1.2.3,track-processors-js:1.2.3". Forwarded to ClientInfo.other_sdks.
+    """
     @property
     def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
     @property
@@ -1461,9 +1466,10 @@ class RoomOptions(google.protobuf.message.Message):
         single_peer_connection: builtins.bool | None = ...,
         connect_timeout_ms: builtins.int | None = ...,
         data_stream: global___RoomDataStreamOptions | None = ...,
+        other_sdks: builtins.str | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
 
 global___RoomOptions = RoomOptions
 
