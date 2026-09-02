@@ -375,20 +375,22 @@ class SimulationRun(_message.Message):
     class List(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "status", "page_token", "start_time", "end_time", "agent_name")
+            __slots__ = ("project_id", "status", "page_token", "start_time", "end_time", "agent_name", "mode")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             STATUS_FIELD_NUMBER: _ClassVar[int]
             PAGE_TOKEN_FIELD_NUMBER: _ClassVar[int]
             START_TIME_FIELD_NUMBER: _ClassVar[int]
             END_TIME_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
+            MODE_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             status: SimulationRun.Status
             page_token: _models.TokenPagination
             start_time: _timestamp_pb2.Timestamp
             end_time: _timestamp_pb2.Timestamp
             agent_name: str
-            def __init__(self, project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_name: _Optional[str] = ...) -> None: ...
+            mode: SimulationMode
+            def __init__(self, project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., page_token: _Optional[_Union[_models.TokenPagination, _Mapping]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_name: _Optional[str] = ..., mode: _Optional[_Union[SimulationMode, str]] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("runs", "next_page_token")
             RUNS_FIELD_NUMBER: _ClassVar[int]
@@ -400,18 +402,20 @@ class SimulationRun(_message.Message):
     class Counts(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "start_time", "end_time", "status", "agent_name")
+            __slots__ = ("project_id", "start_time", "end_time", "status", "agent_name", "mode")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             START_TIME_FIELD_NUMBER: _ClassVar[int]
             END_TIME_FIELD_NUMBER: _ClassVar[int]
             STATUS_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
+            MODE_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             start_time: _timestamp_pb2.Timestamp
             end_time: _timestamp_pb2.Timestamp
             status: SimulationRun.Status
             agent_name: str
-            def __init__(self, project_id: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_name: _Optional[str] = ...) -> None: ...
+            mode: SimulationMode
+            def __init__(self, project_id: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_name: _Optional[str] = ..., mode: _Optional[_Union[SimulationMode, str]] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("buckets", "interval")
             BUCKETS_FIELD_NUMBER: _ClassVar[int]
