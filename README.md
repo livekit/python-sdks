@@ -341,6 +341,7 @@ Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are us
 - [Basic room](https://github.com/livekit/python-sdks/blob/main/examples/basic_room.py): Connect to a room
 - [Publish hue](https://github.com/livekit/python-sdks/blob/main/examples/publish_hue.py): Publish a rainbow video track
 - [Publish wave](https://github.com/livekit/python-sdks/blob/main/examples/publish_wave.py): Publish a sine wave
+- [Publish desktop audio](examples/desktop_audio/): Publish application, system, or microphone audio with PocketStation
 
 ## Getting help / Contributing
 
