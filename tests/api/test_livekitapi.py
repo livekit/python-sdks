@@ -544,7 +544,7 @@ async def _sip_call_error(sip: dict, *, wait: bool = False):
 def test_sip_busy():
     err = asyncio.run(_sip_call_error({"code": 486, "status": "Busy Here"}))
     assert isinstance(err, ServerError)
-    assert err.code == "resource_exhausted"
+    assert err.code == "failed_precondition"
     assert err.sip_status_code == 486
     assert err.sip_status == "Busy Here"
     # printable representation makes the failure clear
