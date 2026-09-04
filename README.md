@@ -131,7 +131,7 @@ try:
         wait_until_answered=True,
     ))
 except api.SipCallError as e:
-    print(e)                    # e.g. "SIP call failed: 486 Busy Here (resource_exhausted)"
+    print(e)                    # e.g. "SIP call failed: 486 Busy Here (failed_precondition)"
     if e.sip_status_code == 486:
         ...                     # busy
 except api.ServerError as e:
