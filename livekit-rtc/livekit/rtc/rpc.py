@@ -81,7 +81,9 @@ class RpcInterceptor:
     reaches the caller. On the incoming side, any other exception raised by the handler is
     also visible; the SDK converts it to ``APPLICATION_ERROR`` only after the chain returns,
     and a call for an unregistered method reaches the chain with ``next`` raising
-    ``UNSUPPORTED_METHOD``.
+    ``UNSUPPORTED_METHOD``. The caller's ``response_timeout`` covers the whole incoming
+    chain: when it passes, the chain is cancelled (interceptors see ``CancelledError``) and
+    the caller receives ``RESPONSE_TIMEOUT``.
 
     Example:
         Time every RPC in both directions::

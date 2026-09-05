@@ -130,8 +130,9 @@ async def test_incoming_interceptors_wrap_the_handler_and_see_the_method() -> No
 
     lp._rpc_handlers["greet"] = greet  # register without the FFI round trip
 
-    handle = _incoming_chain(lp)
-    result = await handle(RpcInvocationData("req-1", "alice", "{}", 5.0, method="greet"))
+    result = await lp._run_incoming_chain(
+        RpcInvocationData("req-1", "alice", "{}", 5.0, method="greet")
+    )
 
     assert result == "hello alice"
     assert log == ["a:in:greet>", "a:in:greet<"]
@@ -152,10 +153,11 @@ async def test_incoming_chain_reports_unsupported_method_through_interceptors() 
                 raise
 
     lp.add_rpc_interceptor(Observe())
-    handle = _incoming_chain(lp)
 
     with pytest.raises(rtc.RpcError) as info:
-        await handle(RpcInvocationData("req-1", "alice", "{}", 5.0, method="missing"))
+        await lp._run_incoming_chain(
+            RpcInvocationData("req-1", "alice", "{}", 5.0, method="missing")
+        )
     assert info.value.code == rtc.RpcError.ErrorCode.UNSUPPORTED_METHOD
     assert seen == [info.value]
 
@@ -187,20 +189,77 @@ async def test_incoming_chain_surfaces_handler_exceptions_and_timeouts() -> None
         return "sync"
 
     lp._rpc_handlers.update({"boom": boom, "slow": slow, "sync_ok": sync_ok})
-    handle = _incoming_chain(lp)
 
     # the raw handler exception reaches interceptors; the SDK maps it to APPLICATION_ERROR
     # only when building the response, outside the chain
     with pytest.raises(ValueError):
-        await handle(RpcInvocationData("r1", "alice", "{}", 5.0, method="boom"))
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="boom"))
     assert isinstance(seen[-1], ValueError)
 
+    # the deadline cancels the chain (interceptors see the cancellation) and the caller
+    # gets RESPONSE_TIMEOUT
     with pytest.raises(rtc.RpcError) as info:
-        await handle(RpcInvocationData("r2", "alice", "{}", 0.01, method="slow"))
+        await lp._run_incoming_chain(RpcInvocationData("r2", "alice", "{}", 0.01, method="slow"))
     assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
-    assert seen[-1] is info.value
+    assert isinstance(seen[-1], asyncio.CancelledError)
 
-    assert await handle(RpcInvocationData("r3", "alice", "{}", 5.0, method="sync_ok")) == "sync"
+    result = await lp._run_incoming_chain(
+        RpcInvocationData("r3", "alice", "{}", 5.0, method="sync_ok")
+    )
+    assert result == "sync"
+
+
+@pytest.mark.parametrize("delay_position", ["before_next", "after_next"])
+async def test_response_deadline_covers_interceptor_time(delay_position: str) -> None:
+    """An interceptor that burns the deadline, on either side of ``next``, times the call out
+    instead of handing the handler a fresh full timeout."""
+    lp = _participant()
+    handler_ran = asyncio.Event()
+
+    class Slow(rtc.RpcInterceptor):
+        async def intercept_incoming(
+            self, invocation: RpcInvocationData, next: IncomingRpcNext
+        ) -> Optional[str]:
+            if delay_position == "before_next":
+                await asyncio.sleep(1.0)
+            result = await next(invocation)
+            if delay_position == "after_next":
+                await asyncio.sleep(1.0)
+            return result
+
+    async def fast(data: RpcInvocationData) -> str:
+        handler_ran.set()
+        return "fast"
+
+    lp.add_rpc_interceptor(Slow())
+    lp._rpc_handlers["fast"] = fast
+
+    start = asyncio.get_running_loop().time()
+    with pytest.raises(rtc.RpcError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 0.05, method="fast"))
+    assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
+    assert asyncio.get_running_loop().time() - start < 0.5
+    assert handler_ran.is_set() == (delay_position == "after_next")
+
+
+async def test_outside_cancellation_maps_to_recipient_disconnected() -> None:
+    lp = _participant()
+    started = asyncio.Event()
+
+    async def hang(data: RpcInvocationData) -> str:
+        started.set()
+        await asyncio.sleep(10)
+        return "never"
+
+    lp._rpc_handlers["hang"] = hang
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="hang"))
+    )
+    await started.wait()
+    task.cancel()  # what the room does when it disconnects mid-invocation
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
 
 
 async def test_add_and_remove_interceptors() -> None:
@@ -224,13 +283,28 @@ async def test_add_and_remove_interceptors() -> None:
     assert log == []
 
 
+def test_registration_is_by_identity_not_equality() -> None:
+    class Equalish(rtc.RpcInterceptor):
+        def __eq__(self, other: object) -> bool:
+            return isinstance(other, Equalish)
+
+        def __hash__(self) -> int:
+            return 1
+
+    lp = _participant()
+    first, second = Equalish(), Equalish()
+    assert first == second and first is not second
+
+    lp.add_rpc_interceptor(first)
+    lp.add_rpc_interceptor(second)
+    assert len(lp._rpc_interceptors) == 2, "distinct interceptors that compare equal coexist"
+
+    lp.remove_rpc_interceptor(second)
+    assert len(lp._rpc_interceptors) == 1
+    assert lp._rpc_interceptors[0] is first, "only the exact instance is removed"
+
+
 def test_invocation_data_defaults_keep_positional_construction() -> None:
     # existing code constructs it positionally without `method`
     data = RpcInvocationData("req", "alice", "{}", 2.5)
     assert data.method == ""
-
-
-def _incoming_chain(lp: LocalParticipant) -> IncomingRpcNext:
-    from livekit.rtc.rpc import _chain_incoming
-
-    return _chain_incoming(list(lp._rpc_interceptors), lp._invoke_rpc_handler)

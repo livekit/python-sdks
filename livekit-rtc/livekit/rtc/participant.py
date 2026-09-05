@@ -477,7 +477,8 @@ class LocalParticipant(Participant):
         Args:
             interceptor (RpcInterceptor): The interceptor to add.
         """
-        if interceptor not in self._rpc_interceptors:
+        # identity, not equality: two distinct interceptors that compare equal must coexist
+        if not any(existing is interceptor for existing in self._rpc_interceptors):
             self._rpc_interceptors.append(interceptor)
 
     def remove_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
@@ -488,8 +489,9 @@ class LocalParticipant(Participant):
         Args:
             interceptor (RpcInterceptor): The interceptor to remove.
         """
-        if interceptor in self._rpc_interceptors:
-            self._rpc_interceptors.remove(interceptor)
+        self._rpc_interceptors = [
+            existing for existing in self._rpc_interceptors if existing is not interceptor
+        ]
 
     def register_rpc_method(
         self,
@@ -598,9 +600,8 @@ class LocalParticipant(Participant):
             request_id, caller_identity, payload, response_timeout, method=method
         )
 
-        handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
         try:
-            response_payload = await handle(params)
+            response_payload = await self._run_incoming_chain(params)
         except RpcError as error:
             response_error = error
         except Exception:
@@ -625,26 +626,36 @@ class LocalParticipant(Participant):
             err = res.rpc_method_invocation_response.error
             logger.error(f"error sending rpc method invocation response: {err}")
 
+    async def _run_incoming_chain(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the interceptor chain and the handler under the caller's response deadline.
+
+        The deadline covers the whole chain, so time an interceptor spends before or after
+        ``next`` counts against it; when it passes, the chain is cancelled and the caller
+        gets ``RESPONSE_TIMEOUT``. Cancellation from outside (the room disconnecting) maps to
+        ``RECIPIENT_DISCONNECTED``, as before.
+        """
+        handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+        try:
+            return await asyncio.wait_for(handle(invocation), timeout=invocation.response_timeout)
+        except asyncio.TimeoutError:
+            raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
+        except asyncio.CancelledError:
+            raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
+
     async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
         """Run the registered handler for ``invocation`` (the innermost step of the chain).
 
-        Raises ``RpcError`` for an unregistered method, a handler timeout, or a cancelled
-        handler; any other exception from the handler propagates unchanged so interceptors
-        can observe it before the caller's response is built.
+        Raises ``RpcError(UNSUPPORTED_METHOD)`` when nothing is registered; any exception
+        from the handler propagates unchanged so interceptors can observe it before the
+        caller's response is built. The response deadline is enforced by the caller around
+        the whole chain.
         """
         handler = self._rpc_handlers.get(invocation.method)
         if not handler:
             raise RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
 
         if asyncio.iscoroutinefunction(handler):
-            try:
-                return await asyncio.wait_for(
-                    handler(invocation), timeout=invocation.response_timeout
-                )
-            except asyncio.TimeoutError:
-                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
-            except asyncio.CancelledError:
-                raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
+            return cast(Optional[str], await handler(invocation))
         return cast(Optional[str], handler(invocation))
 
     async def set_metadata(self, metadata: str) -> None:

@@ -225,7 +225,7 @@ You may find it useful to adjust the `response_timeout` parameter, which indicat
 
 #### Intercepting RPC calls
 
-An `RpcInterceptor` wraps every RPC the local participant performs or handles, which is useful for logging, tracing, or attaching metadata to payloads. Each method receives the call and a `next` continuation; return what `next` returns. Interceptors run in the order they were added, the first being outermost, and errors from the remote side or from your handler flow through them unchanged.
+An `RpcInterceptor` wraps every RPC the local participant performs or handles, which is useful for logging, tracing, or attaching metadata to payloads. Each method receives the call and a `next` continuation; return what `next` returns. Interceptors run in the order they were added, the first being outermost, and errors from the remote side or from your handler flow through them unchanged. On the incoming side the caller's `response_timeout` covers the whole chain, interceptors included.
 
 ```python
 class TimingInterceptor(rtc.RpcInterceptor):
