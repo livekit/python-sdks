@@ -272,6 +272,35 @@ async def test_timeout_raised_inside_the_chain_is_not_the_response_deadline() ->
         await lp2._run_incoming_chain(RpcInvocationData("r2", "alice", "{}", 5.0, method="m"))
 
 
+@pytest.mark.parametrize("cleanup_error", [asyncio.TimeoutError, RuntimeError])
+async def test_cleanup_errors_after_the_deadline_are_still_a_timeout(
+    cleanup_error: type[BaseException],
+) -> None:
+    """Once the deadline fired, whatever the chain raises while unwinding is not the
+    caller's business: they get RESPONSE_TIMEOUT."""
+    lp = _participant()
+
+    class RaisesOnCancel(rtc.RpcInterceptor):
+        async def intercept_incoming(
+            self, invocation: RpcInvocationData, next: IncomingRpcNext
+        ) -> Optional[str]:
+            try:
+                return await next(invocation)
+            except asyncio.CancelledError:
+                raise cleanup_error("cleanup failed while cancelling") from None
+
+    async def slow(data: RpcInvocationData) -> str:
+        await asyncio.sleep(10)
+        return "never"
+
+    lp.add_rpc_interceptor(RaisesOnCancel())
+    lp._rpc_handlers["slow"] = slow
+
+    with pytest.raises(rtc.RpcError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 0.02, method="slow"))
+    assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
+
+
 async def test_outside_cancellation_maps_to_recipient_disconnected() -> None:
     lp = _participant()
     started = asyncio.Event()

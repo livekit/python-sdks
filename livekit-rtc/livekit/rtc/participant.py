@@ -238,15 +238,6 @@ class Participant(ABC):
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
 
 
-class _ChainTimeoutError(Exception):
-    """A ``TimeoutError`` raised *inside* the incoming RPC chain (by the handler or an
-    interceptor), wrapped so it is distinguishable from the response deadline expiring."""
-
-    def __init__(self, error: asyncio.TimeoutError) -> None:
-        super().__init__(str(error))
-        self.error = error
-
-
 F = TypeVar(
     "F", bound=Callable[[RpcInvocationData], Union[Awaitable[Optional[str]], Optional[str]]]
 )
@@ -642,30 +633,46 @@ class LocalParticipant(Participant):
 
         The deadline covers the whole chain, so time an interceptor spends before or after
         ``next`` counts against it; when it passes, the chain is cancelled and the caller
-        gets ``RESPONSE_TIMEOUT``. Cancellation from outside (the room disconnecting) maps to
-        ``RECIPIENT_DISCONNECTED``, as before.
+        gets ``RESPONSE_TIMEOUT``, whatever the chain raises while unwinding. Cancellation
+        from outside (the room disconnecting) maps to ``RECIPIENT_DISCONNECTED``, as before.
 
-        A ``TimeoutError`` raised by the handler or an interceptor itself (an HTTP client
-        timing out, say) is not the response deadline: it propagates as an application
-        error rather than being reported to the caller as ``RESPONSE_TIMEOUT``.
+        A ``TimeoutError`` raised by the handler or an interceptor itself before the
+        deadline (an HTTP client timing out, say) is not the response deadline: it
+        propagates as an application error rather than being reported as
+        ``RESPONSE_TIMEOUT``.
         """
         handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+        loop = asyncio.get_running_loop()
+        # ensure_future: `next` continuations are typed as Awaitable, not Coroutine
+        chain_task: asyncio.Future[Optional[str]] = asyncio.ensure_future(handle(invocation))
 
-        async def _guarded() -> Optional[str]:
-            try:
-                return await handle(invocation)
-            except asyncio.TimeoutError as e:
-                # tag it so it cannot be mistaken for wait_for's own deadline expiry below
-                raise _ChainTimeoutError(e) from e
+        # the deadline is recorded independently of whatever the chain raises while it
+        # unwinds, so a TimeoutError (or anything else) from cancellation cleanup cannot be
+        # mistaken for an application failure, nor a genuine in-chain timeout for the deadline
+        deadline_fired = False
 
+        def _on_deadline() -> None:
+            nonlocal deadline_fired
+            deadline_fired = True
+            chain_task.cancel()
+
+        deadline = loop.call_later(invocation.response_timeout, _on_deadline)
         try:
-            return await asyncio.wait_for(_guarded(), timeout=invocation.response_timeout)
-        except _ChainTimeoutError as e:
-            raise e.error from e.error.__cause__
-        except asyncio.TimeoutError:
-            raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
+            return await chain_task
         except asyncio.CancelledError:
+            if deadline_fired:
+                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
+            # cancelled from outside: awaiting propagated the cancel into the chain; let it
+            # finish unwinding before answering the caller
+            if not chain_task.done():
+                await asyncio.wait([chain_task])
             raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
+        except Exception:
+            if deadline_fired:
+                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
+            raise
+        finally:
+            deadline.cancel()
 
     async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
         """Run the registered handler for ``invocation`` (the innermost step of the chain).
