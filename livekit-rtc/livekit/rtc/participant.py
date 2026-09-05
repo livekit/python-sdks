@@ -48,11 +48,17 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
-from .rpc import RpcError
+from .rpc import (
+    RpcCallInfo,
+    RpcError,
+    RpcInterceptor,
+    RpcInvocationData,
+    _chain_incoming,
+    _chain_outgoing,
+)
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
 
-from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
     TextStreamInfo,
@@ -247,6 +253,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
+        self._rpc_interceptors: List[RpcInterceptor] = []
         # Handles of data stream writers that have been opened but not yet
         # closed, so the room can drop them at disconnect. The FFI close
         # request consumes the handle (take_handle), so an entry is removed as
@@ -427,15 +434,27 @@ class LocalParticipant(Participant):
         Raises:
             RpcError: On failure. Details in `message`.
         """
+        call = RpcCallInfo(
+            destination_identity=destination_identity,
+            method=method,
+            payload=payload,
+            response_timeout=response_timeout,
+            max_round_trip_latency=max_round_trip_latency,
+        )
+        # snapshot the interceptor list so add/remove during a call is well defined
+        perform = _chain_outgoing(list(self._rpc_interceptors), self._perform_rpc_ffi)
+        return await perform(call)
+
+    async def _perform_rpc_ffi(self, call: RpcCallInfo) -> str:
         req = proto_ffi.FfiRequest()
         req.perform_rpc.local_participant_handle = self._ffi_handle.handle
-        req.perform_rpc.destination_identity = destination_identity
-        req.perform_rpc.method = method
-        req.perform_rpc.payload = payload
-        if response_timeout is not None:
-            req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
-        if max_round_trip_latency is not None:
-            req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
+        req.perform_rpc.destination_identity = call.destination_identity
+        req.perform_rpc.method = call.method
+        req.perform_rpc.payload = call.payload
+        if call.response_timeout is not None:
+            req.perform_rpc.response_timeout_ms = int(call.response_timeout * 1000)
+        if call.max_round_trip_latency is not None:
+            req.perform_rpc.max_round_trip_latency_ms = int(call.max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -448,6 +467,29 @@ class LocalParticipant(Participant):
             raise RpcError._from_proto(cb.perform_rpc.error)
 
         return cast(str, cb.perform_rpc.payload)
+
+    def add_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Add an :class:`RpcInterceptor` that wraps every RPC this participant performs or
+        handles. Interceptors run in the order they were added, the first being outermost.
+        Adding the same instance twice is a no-op.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to add.
+        """
+        if interceptor not in self._rpc_interceptors:
+            self._rpc_interceptors.append(interceptor)
+
+    def remove_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Remove a previously added :class:`RpcInterceptor`. Calls already in flight keep the
+        chain they started with.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to remove.
+        """
+        if interceptor in self._rpc_interceptors:
+            self._rpc_interceptors.remove(interceptor)
 
     def register_rpc_method(
         self,
@@ -552,33 +594,21 @@ class LocalParticipant(Participant):
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
 
-        params = RpcInvocationData(request_id, caller_identity, payload, response_timeout)
+        params = RpcInvocationData(
+            request_id, caller_identity, payload, response_timeout, method=method
+        )
 
-        handler = self._rpc_handlers.get(method)
-
-        if not handler:
-            response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
-        else:
-            try:
-                if asyncio.iscoroutinefunction(handler):
-                    try:
-                        response_payload = await asyncio.wait_for(
-                            handler(params), timeout=response_timeout
-                        )
-                    except asyncio.TimeoutError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
-                    except asyncio.CancelledError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
-                else:
-                    response_payload = cast(Optional[str], handler(params))
-            except RpcError as error:
-                response_error = error
-            except Exception:
-                logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}. "
-                    "Returning APPLICATION_ERROR instead. "
-                )
-                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+        handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+        try:
+            response_payload = await handle(params)
+        except RpcError as error:
+            response_error = error
+        except Exception:
+            logger.exception(
+                f"Uncaught error returned by RPC handler for {method}. "
+                "Returning APPLICATION_ERROR instead. "
+            )
+            response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
@@ -594,6 +624,28 @@ class LocalParticipant(Participant):
         if res.rpc_method_invocation_response.error:
             err = res.rpc_method_invocation_response.error
             logger.error(f"error sending rpc method invocation response: {err}")
+
+    async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the registered handler for ``invocation`` (the innermost step of the chain).
+
+        Raises ``RpcError`` for an unregistered method, a handler timeout, or a cancelled
+        handler; any other exception from the handler propagates unchanged so interceptors
+        can observe it before the caller's response is built.
+        """
+        handler = self._rpc_handlers.get(invocation.method)
+        if not handler:
+            raise RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
+
+        if asyncio.iscoroutinefunction(handler):
+            try:
+                return await asyncio.wait_for(
+                    handler(invocation), timeout=invocation.response_timeout
+                )
+            except asyncio.TimeoutError:
+                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
+            except asyncio.CancelledError:
+                raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
+        return cast(Optional[str], handler(invocation))
 
     async def set_metadata(self, metadata: str) -> None:
         """
