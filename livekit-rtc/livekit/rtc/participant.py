@@ -236,6 +236,17 @@ class Participant(ABC):
 
 
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
+
+
+class _ChainTimeoutError(Exception):
+    """A ``TimeoutError`` raised *inside* the incoming RPC chain (by the handler or an
+    interceptor), wrapped so it is distinguishable from the response deadline expiring."""
+
+    def __init__(self, error: asyncio.TimeoutError) -> None:
+        super().__init__(str(error))
+        self.error = error
+
+
 F = TypeVar(
     "F", bound=Callable[[RpcInvocationData], Union[Awaitable[Optional[str]], Optional[str]]]
 )
@@ -633,10 +644,24 @@ class LocalParticipant(Participant):
         ``next`` counts against it; when it passes, the chain is cancelled and the caller
         gets ``RESPONSE_TIMEOUT``. Cancellation from outside (the room disconnecting) maps to
         ``RECIPIENT_DISCONNECTED``, as before.
+
+        A ``TimeoutError`` raised by the handler or an interceptor itself (an HTTP client
+        timing out, say) is not the response deadline: it propagates as an application
+        error rather than being reported to the caller as ``RESPONSE_TIMEOUT``.
         """
         handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+
+        async def _guarded() -> Optional[str]:
+            try:
+                return await handle(invocation)
+            except asyncio.TimeoutError as e:
+                # tag it so it cannot be mistaken for wait_for's own deadline expiry below
+                raise _ChainTimeoutError(e) from e
+
         try:
-            return await asyncio.wait_for(handle(invocation), timeout=invocation.response_timeout)
+            return await asyncio.wait_for(_guarded(), timeout=invocation.response_timeout)
+        except _ChainTimeoutError as e:
+            raise e.error from e.error.__cause__
         except asyncio.TimeoutError:
             raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
         except asyncio.CancelledError:

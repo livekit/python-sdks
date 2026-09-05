@@ -242,6 +242,36 @@ async def test_response_deadline_covers_interceptor_time(delay_position: str) ->
     assert handler_ran.is_set() == (delay_position == "after_next")
 
 
+async def test_timeout_raised_inside_the_chain_is_not_the_response_deadline() -> None:
+    """An interceptor (or handler) whose own I/O times out raises TimeoutError well before
+    the response deadline. That is an application failure, not RESPONSE_TIMEOUT."""
+    lp = _participant()
+
+    class UpstreamTimesOut(rtc.RpcInterceptor):
+        async def intercept_incoming(
+            self, invocation: RpcInvocationData, next: IncomingRpcNext
+        ) -> Optional[str]:
+            raise asyncio.TimeoutError("upstream lookup timed out")
+
+    lp.add_rpc_interceptor(UpstreamTimesOut())
+    lp._rpc_handlers["m"] = lambda data: "unused"
+
+    # propagates as the original TimeoutError, which _handle_rpc_method_invocation maps to
+    # APPLICATION_ERROR like any other handler exception
+    with pytest.raises(asyncio.TimeoutError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="m"))
+    assert not isinstance(info.value, rtc.RpcError)
+    assert str(info.value) == "upstream lookup timed out"
+
+    async def handler_times_out(data: RpcInvocationData) -> str:
+        raise asyncio.TimeoutError("db timed out")
+
+    lp2 = _participant()
+    lp2._rpc_handlers["m"] = handler_times_out
+    with pytest.raises(asyncio.TimeoutError):
+        await lp2._run_incoming_chain(RpcInvocationData("r2", "alice", "{}", 5.0, method="m"))
+
+
 async def test_outside_cancellation_maps_to_recipient_disconnected() -> None:
     lp = _participant()
     started = asyncio.Event()
