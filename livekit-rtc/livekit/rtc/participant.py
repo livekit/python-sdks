@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ctypes
 import asyncio
+import functools
 import inspect
 import datetime
 import enum
@@ -241,6 +242,20 @@ RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Opt
 # how long a cancelled incoming RPC chain gets to unwind before the caller is answered
 # without it (the room's disconnect waits on these invocations)
 _RPC_CANCEL_UNWIND_TIMEOUT = 2.0
+
+
+def _observe_unwind(method: str, chain_task: "asyncio.Future[Optional[str]]") -> None:
+    """Consume what a cancelled chain raised while unwinding.
+
+    Nobody awaits the chain once the caller has been answered, and the shield that let the
+    outside cancel through stops watching the chain the moment its own future is cancelled;
+    without this the loop would report the exception as never retrieved at garbage collection.
+    """
+    if chain_task.cancelled():
+        return
+    exc = chain_task.exception()
+    if exc is not None:
+        logger.warning("RPC handler for %s raised while being cancelled", method, exc_info=exc)
 
 
 F = TypeVar(
@@ -682,6 +697,9 @@ class LocalParticipant(Participant):
                     invocation.method,
                     _RPC_CANCEL_UNWIND_TIMEOUT,
                 )
+                chain_task.add_done_callback(functools.partial(_observe_unwind, invocation.method))
+            else:
+                _observe_unwind(invocation.method, chain_task)
             raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
         except Exception:
             if deadline_fired:

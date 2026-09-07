@@ -22,6 +22,7 @@ built without a room. No credentials required.
 from __future__ import annotations
 
 import asyncio
+import gc
 from typing import Optional
 
 import pytest
@@ -362,6 +363,53 @@ async def test_unwind_after_outside_cancellation_is_bounded(
 
     release.set()  # let the orphaned handler finish so the loop closes clean
     await asyncio.sleep(0)
+
+
+@pytest.mark.parametrize("stops_within_bound", [True, False])
+async def test_cleanup_errors_after_outside_cancellation_are_observed(
+    stops_within_bound: bool, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """What the chain raises while unwinding from an outside cancel is nobody's result
+    anymore (the caller got RECIPIENT_DISCONNECTED); it must still be consumed and logged,
+    not reported by the loop as a never-retrieved task exception, whether the handler
+    stops within the unwind bound or after it."""
+    from livekit.rtc import participant as participant_mod
+
+    monkeypatch.setattr(participant_mod, "_RPC_CANCEL_UNWIND_TIMEOUT", 0.05)
+    lp = _participant()
+    started = asyncio.Event()
+    release = asyncio.Event()
+    unretrieved: list[str] = []
+    loop = asyncio.get_running_loop()
+    loop.set_exception_handler(lambda _loop, ctx: unretrieved.append(str(ctx.get("message"))))
+
+    async def failing_cleanup(data: RpcInvocationData) -> str:
+        started.set()
+        try:
+            await asyncio.sleep(10)
+        except asyncio.CancelledError:
+            if not stops_within_bound:
+                await release.wait()
+            raise RuntimeError("cleanup failed") from None
+
+    lp._rpc_handlers["m"] = failing_cleanup
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="m"))
+    )
+    await started.wait()
+    task.cancel()
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+
+    release.set()
+    await asyncio.sleep(0.01)
+    gc.collect()
+    assert unretrieved == []
+    assert any(
+        "raised while being cancelled" in r.getMessage() and r.exc_info is not None
+        for r in caplog.records
+    )
 
 
 async def test_handlers_returning_an_awaitable_are_awaited() -> None:
