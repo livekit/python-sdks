@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ctypes
 import asyncio
+import inspect
 import datetime
 import enum
 import os
@@ -236,6 +237,10 @@ class Participant(ABC):
 
 
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
+
+# how long a cancelled incoming RPC chain gets to unwind before the caller is answered
+# without it (the room's disconnect waits on these invocations)
+_RPC_CANCEL_UNWIND_TIMEOUT = 2.0
 
 
 F = TypeVar(
@@ -658,14 +663,25 @@ class LocalParticipant(Participant):
 
         deadline = loop.call_later(invocation.response_timeout, _on_deadline)
         try:
-            return await chain_task
+            # shielded: a cancel from outside (the room disconnecting) is raised here at
+            # once. Awaiting the chain directly would instead forward the cancel to it and
+            # keep this task parked until the chain finished, so a handler that ignored
+            # cancellation held up room.disconnect() for as long as the caller's deadline.
+            return await asyncio.shield(chain_task)
         except asyncio.CancelledError:
             if deadline_fired:
                 raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
-            # cancelled from outside: awaiting propagated the cancel into the chain; let it
-            # finish unwinding before answering the caller
-            if not chain_task.done():
-                await asyncio.wait([chain_task])
+            # cancelled from outside: stop the chain and let it unwind before answering the
+            # caller, but not for long; this is the path room.disconnect() waits on
+            chain_task.cancel()
+            _, pending = await asyncio.wait([chain_task], timeout=_RPC_CANCEL_UNWIND_TIMEOUT)
+            if pending:
+                logger.warning(
+                    "RPC handler for %s did not stop within %.1fs of being cancelled; "
+                    "answering the caller without it",
+                    invocation.method,
+                    _RPC_CANCEL_UNWIND_TIMEOUT,
+                )
             raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
         except Exception:
             if deadline_fired:
@@ -686,9 +702,13 @@ class LocalParticipant(Participant):
         if not handler:
             raise RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
 
-        if asyncio.iscoroutinefunction(handler):
-            return cast(Optional[str], await handler(invocation))
-        return cast(Optional[str], handler(invocation))
+        # RpcHandler admits any callable returning a payload or an awaitable of one: a
+        # coroutine function, but also a callable object with an async __call__ or a sync
+        # wrapper handing back a coroutine, which iscoroutinefunction would not recognize
+        result = handler(invocation)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
 
     async def set_metadata(self, metadata: str) -> None:
         """

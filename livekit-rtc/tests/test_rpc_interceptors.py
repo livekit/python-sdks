@@ -321,6 +321,73 @@ async def test_outside_cancellation_maps_to_recipient_disconnected() -> None:
     assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
 
 
+async def test_unwind_after_outside_cancellation_is_bounded(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """A handler that ignores cancellation must not hang the disconnect that cancelled it:
+    the caller is answered once the unwind bound passes, and the offender is named.
+
+    Awaiting the chain directly could never bound this: asyncio forwards the cancel to the
+    chain and keeps the awaiting task parked until the chain finishes, so the wait would
+    only begin once the stubborn handler had already stopped (at the caller's deadline)."""
+    from livekit.rtc import participant as participant_mod
+
+    monkeypatch.setattr(participant_mod, "_RPC_CANCEL_UNWIND_TIMEOUT", 0.05)
+    lp = _participant()
+    started = asyncio.Event()
+    release = asyncio.Event()
+
+    async def ignores_cancel(data: RpcInvocationData) -> str:
+        started.set()
+        try:
+            await asyncio.sleep(10)
+        except asyncio.CancelledError:
+            pass
+        await release.wait()  # keeps running long after it was told to stop
+        return "late"
+
+    lp._rpc_handlers["stubborn"] = ignores_cancel
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="stubborn"))
+    )
+    await started.wait()
+    task.cancel()
+    loop = asyncio.get_running_loop()
+    t0 = loop.time()
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+    assert loop.time() - t0 < 1.0
+    assert any("stubborn" in r.getMessage() for r in caplog.records)
+
+    release.set()  # let the orphaned handler finish so the loop closes clean
+    await asyncio.sleep(0)
+
+
+async def test_handlers_returning_an_awaitable_are_awaited() -> None:
+    """RpcHandler admits any callable returning a payload or an awaitable of one, not only
+    coroutine functions: a callable object with an async __call__, a sync wrapper handing
+    back a coroutine, and a plain sync handler all work."""
+    lp = _participant()
+
+    class Handler:
+        async def __call__(self, data: RpcInvocationData) -> str:
+            return f"obj:{data.payload}"
+
+    async def _inner(data: RpcInvocationData) -> str:
+        return f"wrapped:{data.payload}"
+
+    lp._rpc_handlers["obj"] = Handler()
+    lp._rpc_handlers["wrapped"] = lambda data: _inner(data)  # sync, returns a coroutine
+    lp._rpc_handlers["sync"] = lambda data: f"sync:{data.payload}"
+
+    for method, expected in (("obj", "obj:x"), ("wrapped", "wrapped:x"), ("sync", "sync:x")):
+        result = await lp._run_incoming_chain(
+            RpcInvocationData("r1", "alice", "x", 1.0, method=method)
+        )
+        assert result == expected, method
+
+
 async def test_add_and_remove_interceptors() -> None:
     lp = _participant()
     log: list[str] = []
