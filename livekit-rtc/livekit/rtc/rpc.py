@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Dict, Union, ClassVar
+from __future__ import annotations
+
+from typing import Awaitable, Callable, ClassVar, Dict, Optional, Sequence, Union
 from enum import IntEnum
 from ._proto import rpc_pb2 as proto_rpc
 from dataclasses import dataclass
@@ -27,12 +29,125 @@ class RpcInvocationData:
         caller_identity (str): The unique participant identity of the caller.
         payload (str): The payload of the request. User-definable format, typically JSON.
         response_timeout (float): The maximum time the caller will wait for a response.
+        method (str): The name of the invoked RPC method.
     """
 
     request_id: str
     caller_identity: str
     payload: str
     response_timeout: float
+    method: str = ""
+
+
+@dataclass
+class RpcCallInfo:
+    """An outgoing RPC call, as passed to :meth:`RpcInterceptor.intercept_outgoing`.
+
+    Mirrors the arguments of :meth:`LocalParticipant.perform_rpc`. An interceptor may pass a
+    modified copy to ``next`` (for example to add a header to a JSON payload).
+
+    Attributes:
+        destination_identity (str): The identity of the participant being called.
+        method (str): The method name.
+        payload (str): The request payload.
+        response_timeout (Optional[float]): Seconds to wait for a response, or ``None`` for the default.
+        max_round_trip_latency (Optional[float]): See :meth:`LocalParticipant.perform_rpc`.
+    """
+
+    destination_identity: str
+    method: str
+    payload: str
+    response_timeout: Optional[float] = None
+    max_round_trip_latency: Optional[float] = None
+
+
+OutgoingRpcNext = Callable[["RpcCallInfo"], Awaitable[str]]
+"""Continuation handed to :meth:`RpcInterceptor.intercept_outgoing`: performs the call."""
+IncomingRpcNext = Callable[["RpcInvocationData"], Awaitable[Optional[str]]]
+"""Continuation handed to :meth:`RpcInterceptor.intercept_incoming`: runs the handler."""
+
+
+class RpcInterceptor:
+    """Observe or wrap RPC calls made and handled by a :class:`LocalParticipant`.
+
+    Register with :meth:`LocalParticipant.add_rpc_interceptor`. Each method receives the call
+    and a ``next`` continuation and must return (or raise) what ``next`` returns (or raises),
+    unless it deliberately short-circuits the call. Interceptors run in registration order:
+    the first one added is the outermost. Both methods default to pass-through, so override
+    only the direction you care about.
+
+    Errors flow through the chain unchanged: a :class:`RpcError` raised by the remote side
+    (outgoing) or by the handler (incoming) is visible to every interceptor before it
+    reaches the caller. On the incoming side, any other exception raised by the handler is
+    also visible; the SDK converts it to ``APPLICATION_ERROR`` only after the chain returns,
+    and a call for an unregistered method reaches the chain with ``next`` raising
+    ``UNSUPPORTED_METHOD``. The caller's ``response_timeout`` covers the whole incoming
+    chain: when it passes, the chain is cancelled (interceptors see ``CancelledError``) and
+    the caller receives ``RESPONSE_TIMEOUT``.
+
+    Example:
+        Time every RPC in both directions::
+
+            class TimingInterceptor(rtc.RpcInterceptor):
+                async def intercept_outgoing(self, call, next):
+                    start = time.perf_counter()
+                    try:
+                        return await next(call)
+                    finally:
+                        log("rpc call", call.method, time.perf_counter() - start)
+
+                async def intercept_incoming(self, invocation, next):
+                    start = time.perf_counter()
+                    try:
+                        return await next(invocation)
+                    finally:
+                        log("rpc handled", invocation.method, time.perf_counter() - start)
+
+            room.local_participant.add_rpc_interceptor(TimingInterceptor())
+    """
+
+    async def intercept_outgoing(self, call: RpcCallInfo, next: OutgoingRpcNext) -> str:
+        """Wrap an outgoing :meth:`LocalParticipant.perform_rpc`. Return the response payload."""
+        return await next(call)
+
+    async def intercept_incoming(
+        self, invocation: RpcInvocationData, next: IncomingRpcNext
+    ) -> Optional[str]:
+        """Wrap the handling of an incoming invocation. Return the response payload."""
+        return await next(invocation)
+
+
+def _chain_outgoing(
+    interceptors: Sequence[RpcInterceptor], terminal: OutgoingRpcNext
+) -> OutgoingRpcNext:
+    """Compose ``interceptors`` around ``terminal``; the first interceptor is outermost."""
+    call_next = terminal
+    for interceptor in reversed(interceptors):
+        call_next = _bind_outgoing(interceptor, call_next)
+    return call_next
+
+
+def _chain_incoming(
+    interceptors: Sequence[RpcInterceptor], terminal: IncomingRpcNext
+) -> IncomingRpcNext:
+    call_next = terminal
+    for interceptor in reversed(interceptors):
+        call_next = _bind_incoming(interceptor, call_next)
+    return call_next
+
+
+def _bind_outgoing(interceptor: RpcInterceptor, call_next: OutgoingRpcNext) -> OutgoingRpcNext:
+    async def bound(call: RpcCallInfo) -> str:
+        return await interceptor.intercept_outgoing(call, call_next)
+
+    return bound
+
+
+def _bind_incoming(interceptor: RpcInterceptor, call_next: IncomingRpcNext) -> IncomingRpcNext:
+    async def bound(invocation: RpcInvocationData) -> Optional[str]:
+        return await interceptor.intercept_incoming(invocation, call_next)
+
+    return bound
 
 
 class RpcError(Exception):
