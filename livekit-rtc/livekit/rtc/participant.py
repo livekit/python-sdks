@@ -673,8 +673,10 @@ class LocalParticipant(Participant):
 
         def _on_deadline() -> None:
             nonlocal deadline_fired
-            deadline_fired = True
-            chain_task.cancel()
+            # only a cancel the chain accepted counts: cancel() is False when the chain has
+            # already finished, which can happen in the same loop iteration the timer fires
+            # while this task has not resumed yet; that result is the caller's, not a timeout
+            deadline_fired = chain_task.cancel()
 
         deadline = loop.call_later(invocation.response_timeout, _on_deadline)
         try:
@@ -709,6 +711,16 @@ class LocalParticipant(Participant):
             # whatever the chain raised while unwinding is not the caller's business
             _observe_unwind(invocation.method, chain_task)
             raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+        if chain_task.cancelled():
+            # nothing here cancelled it: an interceptor or the handler let a CancelledError
+            # of its own escape. That is a failure of the handler, and it must still be
+            # answered; result() would re-raise the CancelledError past the response code
+            # and leave the caller waiting for its timeout.
+            logger.warning(
+                "RPC handler for %s raised CancelledError; returning APPLICATION_ERROR",
+                invocation.method,
+            )
+            raise RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
         # the chain's own outcome: its exception, if any, propagates unchanged
         return chain_task.result()
 

@@ -302,6 +302,37 @@ async def test_cleanup_errors_after_the_deadline_are_still_a_timeout(
     assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
 
 
+async def test_chain_finishing_as_the_deadline_fires_keeps_its_result() -> None:
+    """The deadline timer can run in the same loop iteration the chain completes in, before
+    the waiting task resumes: its cancel is rejected (the chain is done) and the result is
+    the caller's. A zero deadline with an immediate handler pins that ordering."""
+    lp = _participant()
+    lp._rpc_handlers["fast"] = lambda data: "ok"
+
+    result = await lp._run_incoming_chain(
+        RpcInvocationData("r1", "alice", "{}", 0.0, method="fast")
+    )
+    assert result == "ok"
+
+
+async def test_cancelled_error_escaping_the_chain_is_an_application_error(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """A CancelledError that an interceptor or the handler lets escape on its own is not a
+    deadline nor a disconnect; the caller must still get an answer rather than wait out its
+    timeout because the cancellation slipped past the response code."""
+    lp = _participant()
+
+    async def leaks_cancel(data: RpcInvocationData) -> str:
+        raise asyncio.CancelledError()
+
+    lp._rpc_handlers["leaky"] = leaks_cancel
+    with pytest.raises(rtc.RpcError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 5.0, method="leaky"))
+    assert info.value.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR
+    assert any("leaky" in r.getMessage() for r in caplog.records)
+
+
 async def test_outside_cancellation_maps_to_recipient_disconnected() -> None:
     lp = _participant()
     started = asyncio.Event()
