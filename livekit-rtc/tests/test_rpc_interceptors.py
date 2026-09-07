@@ -391,6 +391,7 @@ async def test_cleanup_errors_after_outside_cancellation_are_observed(
             if not stops_within_bound:
                 await release.wait()
             raise RuntimeError("cleanup failed") from None
+        return "never"
 
     lp._rpc_handlers["m"] = failing_cleanup
     task = asyncio.ensure_future(
