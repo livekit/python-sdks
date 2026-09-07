@@ -247,9 +247,9 @@ _RPC_CANCEL_UNWIND_TIMEOUT = 2.0
 def _observe_unwind(method: str, chain_task: "asyncio.Future[Optional[str]]") -> None:
     """Consume what a cancelled chain raised while unwinding.
 
-    Nobody awaits the chain once the caller has been answered, and the shield that let the
-    outside cancel through stops watching the chain the moment its own future is cancelled;
-    without this the loop would report the exception as never retrieved at garbage collection.
+    The caller has been (or is being) answered without it, so nobody awaits the chain
+    anymore; unless its exception is retrieved here the loop reports it as never retrieved
+    when the task is garbage collected.
     """
     if chain_task.cancelled():
         return
@@ -678,14 +678,15 @@ class LocalParticipant(Participant):
 
         deadline = loop.call_later(invocation.response_timeout, _on_deadline)
         try:
-            # shielded: a cancel from outside (the room disconnecting) is raised here at
-            # once. Awaiting the chain directly would instead forward the cancel to it and
-            # keep this task parked until the chain finished, so a handler that ignored
-            # cancellation held up room.disconnect() for as long as the caller's deadline.
-            return await asyncio.shield(chain_task)
+            # asyncio.wait never cancels what it waits on, so a cancel from outside (the room
+            # disconnecting) is raised here at once with the chain untouched. Awaiting the
+            # chain directly would forward the cancel to it and keep this task parked until
+            # the chain finished, so a handler that ignored cancellation held up
+            # room.disconnect() for as long as the caller's deadline. (Not asyncio.shield:
+            # since Python 3.14 it reports the inner future's exception to the loop's
+            # exception handler once its outer future was cancelled.)
+            await asyncio.wait([chain_task])
         except asyncio.CancelledError:
-            if deadline_fired:
-                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
             # cancelled from outside: stop the chain and let it unwind before answering the
             # caller, but not for long; this is the path room.disconnect() waits on
             chain_task.cancel()
@@ -701,12 +702,15 @@ class LocalParticipant(Participant):
             else:
                 _observe_unwind(invocation.method, chain_task)
             raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
-        except Exception:
-            if deadline_fired:
-                raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT) from None
-            raise
         finally:
             deadline.cancel()
+
+        if deadline_fired:
+            # whatever the chain raised while unwinding is not the caller's business
+            _observe_unwind(invocation.method, chain_task)
+            raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+        # the chain's own outcome: its exception, if any, propagates unchanged
+        return chain_task.result()
 
     async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
         """Run the registered handler for ``invocation`` (the innermost step of the chain).
