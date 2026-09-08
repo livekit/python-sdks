@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import ctypes
 import asyncio
+import functools
+import inspect
 import datetime
 import enum
 import os
@@ -48,11 +50,17 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
-from .rpc import RpcError
+from .rpc import (
+    RpcCallInfo,
+    RpcError,
+    RpcInterceptor,
+    RpcInvocationData,
+    _chain_incoming,
+    _chain_outgoing,
+)
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
 
-from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
     TextStreamInfo,
@@ -230,6 +238,26 @@ class Participant(ABC):
 
 
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
+
+# how long a cancelled incoming RPC chain gets to unwind before the caller is answered
+# without it (the room's disconnect waits on these invocations)
+_RPC_CANCEL_UNWIND_TIMEOUT = 2.0
+
+
+def _observe_unwind(method: str, chain_task: "asyncio.Future[Optional[str]]") -> None:
+    """Consume what a cancelled chain raised while unwinding.
+
+    The caller has been (or is being) answered without it, so nobody awaits the chain
+    anymore; unless its exception is retrieved here the loop reports it as never retrieved
+    when the task is garbage collected.
+    """
+    if chain_task.cancelled():
+        return
+    exc = chain_task.exception()
+    if exc is not None:
+        logger.warning("RPC handler for %s raised while being cancelled", method, exc_info=exc)
+
+
 F = TypeVar(
     "F", bound=Callable[[RpcInvocationData], Union[Awaitable[Optional[str]], Optional[str]]]
 )
@@ -247,6 +275,7 @@ class LocalParticipant(Participant):
         self._room_queue = room_queue
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
+        self._rpc_interceptors: List[RpcInterceptor] = []
         # Handles of data stream writers that have been opened but not yet
         # closed, so the room can drop them at disconnect. The FFI close
         # request consumes the handle (take_handle), so an entry is removed as
@@ -427,15 +456,27 @@ class LocalParticipant(Participant):
         Raises:
             RpcError: On failure. Details in `message`.
         """
+        call = RpcCallInfo(
+            destination_identity=destination_identity,
+            method=method,
+            payload=payload,
+            response_timeout=response_timeout,
+            max_round_trip_latency=max_round_trip_latency,
+        )
+        # snapshot the interceptor list so add/remove during a call is well defined
+        perform = _chain_outgoing(list(self._rpc_interceptors), self._perform_rpc_ffi)
+        return await perform(call)
+
+    async def _perform_rpc_ffi(self, call: RpcCallInfo) -> str:
         req = proto_ffi.FfiRequest()
         req.perform_rpc.local_participant_handle = self._ffi_handle.handle
-        req.perform_rpc.destination_identity = destination_identity
-        req.perform_rpc.method = method
-        req.perform_rpc.payload = payload
-        if response_timeout is not None:
-            req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
-        if max_round_trip_latency is not None:
-            req.perform_rpc.max_round_trip_latency_ms = int(max_round_trip_latency * 1000)
+        req.perform_rpc.destination_identity = call.destination_identity
+        req.perform_rpc.method = call.method
+        req.perform_rpc.payload = call.payload
+        if call.response_timeout is not None:
+            req.perform_rpc.response_timeout_ms = int(call.response_timeout * 1000)
+        if call.max_round_trip_latency is not None:
+            req.perform_rpc.max_round_trip_latency_ms = int(call.max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -448,6 +489,31 @@ class LocalParticipant(Participant):
             raise RpcError._from_proto(cb.perform_rpc.error)
 
         return cast(str, cb.perform_rpc.payload)
+
+    def add_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Add an :class:`RpcInterceptor` that wraps every RPC this participant performs or
+        handles. Interceptors run in the order they were added, the first being outermost.
+        Adding the same instance twice is a no-op.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to add.
+        """
+        # identity, not equality: two distinct interceptors that compare equal must coexist
+        if not any(existing is interceptor for existing in self._rpc_interceptors):
+            self._rpc_interceptors.append(interceptor)
+
+    def remove_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Remove a previously added :class:`RpcInterceptor`. Calls already in flight keep the
+        chain they started with.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to remove.
+        """
+        self._rpc_interceptors = [
+            existing for existing in self._rpc_interceptors if existing is not interceptor
+        ]
 
     def register_rpc_method(
         self,
@@ -552,33 +618,20 @@ class LocalParticipant(Participant):
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
 
-        params = RpcInvocationData(request_id, caller_identity, payload, response_timeout)
+        params = RpcInvocationData(
+            request_id, caller_identity, payload, response_timeout, method=method
+        )
 
-        handler = self._rpc_handlers.get(method)
-
-        if not handler:
-            response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
-        else:
-            try:
-                if asyncio.iscoroutinefunction(handler):
-                    try:
-                        response_payload = await asyncio.wait_for(
-                            handler(params), timeout=response_timeout
-                        )
-                    except asyncio.TimeoutError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
-                    except asyncio.CancelledError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
-                else:
-                    response_payload = cast(Optional[str], handler(params))
-            except RpcError as error:
-                response_error = error
-            except Exception:
-                logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}. "
-                    "Returning APPLICATION_ERROR instead. "
-                )
-                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+        try:
+            response_payload = await self._run_incoming_chain(params)
+        except RpcError as error:
+            response_error = error
+        except Exception:
+            logger.exception(
+                f"Uncaught error returned by RPC handler for {method}. "
+                "Returning APPLICATION_ERROR instead. "
+            )
+            response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
@@ -594,6 +647,102 @@ class LocalParticipant(Participant):
         if res.rpc_method_invocation_response.error:
             err = res.rpc_method_invocation_response.error
             logger.error(f"error sending rpc method invocation response: {err}")
+
+    async def _run_incoming_chain(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the interceptor chain and the handler under the caller's response deadline.
+
+        The deadline covers the whole chain, so time an interceptor spends before or after
+        ``next`` counts against it; when it passes, the chain is cancelled and the caller
+        gets ``RESPONSE_TIMEOUT``, whatever the chain raises while unwinding. Cancellation
+        from outside (the room disconnecting) maps to ``RECIPIENT_DISCONNECTED``, as before.
+
+        A ``TimeoutError`` raised by the handler or an interceptor itself before the
+        deadline (an HTTP client timing out, say) is not the response deadline: it
+        propagates as an application error rather than being reported as
+        ``RESPONSE_TIMEOUT``.
+        """
+        handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+        loop = asyncio.get_running_loop()
+        # ensure_future: `next` continuations are typed as Awaitable, not Coroutine
+        chain_task: asyncio.Future[Optional[str]] = asyncio.ensure_future(handle(invocation))
+
+        # the deadline is recorded independently of whatever the chain raises while it
+        # unwinds, so a TimeoutError (or anything else) from cancellation cleanup cannot be
+        # mistaken for an application failure, nor a genuine in-chain timeout for the deadline
+        deadline_fired = False
+
+        def _on_deadline() -> None:
+            nonlocal deadline_fired
+            # only a cancel the chain accepted counts: cancel() is False when the chain has
+            # already finished, which can happen in the same loop iteration the timer fires
+            # while this task has not resumed yet; that result is the caller's, not a timeout
+            deadline_fired = chain_task.cancel()
+
+        deadline = loop.call_later(invocation.response_timeout, _on_deadline)
+        try:
+            # asyncio.wait never cancels what it waits on, so a cancel from outside (the room
+            # disconnecting) is raised here at once with the chain untouched. Awaiting the
+            # chain directly would forward the cancel to it and keep this task parked until
+            # the chain finished, so a handler that ignored cancellation held up
+            # room.disconnect() for as long as the caller's deadline. (Not asyncio.shield:
+            # since Python 3.14 it reports the inner future's exception to the loop's
+            # exception handler once its outer future was cancelled.)
+            await asyncio.wait([chain_task])
+        except asyncio.CancelledError:
+            # cancelled from outside: stop the chain and let it unwind before answering the
+            # caller, but not for long; this is the path room.disconnect() waits on
+            chain_task.cancel()
+            _, pending = await asyncio.wait([chain_task], timeout=_RPC_CANCEL_UNWIND_TIMEOUT)
+            if pending:
+                logger.warning(
+                    "RPC handler for %s did not stop within %.1fs of being cancelled; "
+                    "answering the caller without it",
+                    invocation.method,
+                    _RPC_CANCEL_UNWIND_TIMEOUT,
+                )
+                chain_task.add_done_callback(functools.partial(_observe_unwind, invocation.method))
+            else:
+                _observe_unwind(invocation.method, chain_task)
+            raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED) from None
+        finally:
+            deadline.cancel()
+
+        if deadline_fired:
+            # whatever the chain raised while unwinding is not the caller's business
+            _observe_unwind(invocation.method, chain_task)
+            raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+        if chain_task.cancelled():
+            # nothing here cancelled it: an interceptor or the handler let a CancelledError
+            # of its own escape. That is a failure of the handler, and it must still be
+            # answered; result() would re-raise the CancelledError past the response code
+            # and leave the caller waiting for its timeout.
+            logger.warning(
+                "RPC handler for %s raised CancelledError; returning APPLICATION_ERROR",
+                invocation.method,
+            )
+            raise RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+        # the chain's own outcome: its exception, if any, propagates unchanged
+        return chain_task.result()
+
+    async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the registered handler for ``invocation`` (the innermost step of the chain).
+
+        Raises ``RpcError(UNSUPPORTED_METHOD)`` when nothing is registered; any exception
+        from the handler propagates unchanged so interceptors can observe it before the
+        caller's response is built. The response deadline is enforced by the caller around
+        the whole chain.
+        """
+        handler = self._rpc_handlers.get(invocation.method)
+        if not handler:
+            raise RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
+
+        # RpcHandler admits any callable returning a payload or an awaitable of one: a
+        # coroutine function, but also a callable object with an async __call__ or a sync
+        # wrapper handing back a coroutine, which iscoroutinefunction would not recognize
+        result = handler(invocation)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
 
     async def set_metadata(self, metadata: str) -> None:
         """

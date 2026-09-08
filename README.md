@@ -131,7 +131,7 @@ try:
         wait_until_answered=True,
     ))
 except api.SipCallError as e:
-    print(e)                    # e.g. "SIP call failed: 486 Busy Here (resource_exhausted)"
+    print(e)                    # e.g. "SIP call failed: 486 Busy Here (failed_precondition)"
     if e.sip_status_code == 486:
         ...                     # busy
 except api.ServerError as e:
@@ -222,6 +222,29 @@ except Exception as e:
 ```
 
 You may find it useful to adjust the `response_timeout` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
+
+#### Intercepting RPC calls
+
+An `RpcInterceptor` wraps every RPC the local participant performs or handles, which is useful for logging, tracing, or attaching metadata to payloads. Each method receives the call and a `next` continuation; return what `next` returns. Interceptors run in the order they were added, the first being outermost, and errors from the remote side or from your handler flow through them unchanged. On the incoming side the caller's `response_timeout` covers the whole chain, interceptors included.
+
+```python
+class TimingInterceptor(rtc.RpcInterceptor):
+    async def intercept_outgoing(self, call, next):
+        start = time.perf_counter()
+        try:
+            return await next(call)
+        finally:
+            print(f"call {call.method} -> {call.destination_identity}: {time.perf_counter() - start:.3f}s")
+
+    async def intercept_incoming(self, invocation, next):
+        start = time.perf_counter()
+        try:
+            return await next(invocation)
+        finally:
+            print(f"handled {invocation.method} from {invocation.caller_identity}: {time.perf_counter() - start:.3f}s")
+
+room.local_participant.add_rpc_interceptor(TimingInterceptor())
+```
 
 ## Using local media devices
 
