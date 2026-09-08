@@ -567,9 +567,6 @@ def test_sip_no_answer():
 
 # -- transfer failures surface the reason -------------------------------------
 
-# These build the error directly: the reason depends on how the far end
-# behaves, which the mock cannot stage.
-
 
 def _transfer_error(**metadata: str) -> ServerError:
     return _as_sip_error(
