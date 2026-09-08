@@ -49,9 +49,10 @@ SVC = "SIP"
 
 
 def _as_sip_error(err: ServerError) -> ServerError:
-    """Surface a SIP dialing failure as a SipCallError so callers can branch on
-    the SIP status; other failures (auth, validation) are returned unchanged."""
-    if "sip_status_code" in err.metadata:
+    """Surface a SIP dialing or transfer failure as a SipCallError so callers can
+    branch on the SIP status or the transfer reason; other failures (auth,
+    validation) are returned unchanged."""
+    if "sip_status_code" in err.metadata or "sip_transfer_reason" in err.metadata:
         return SipCallError.from_server_error(err)
     return err
 
