@@ -676,7 +676,10 @@ class LocalParticipant(Participant):
             # only a cancel the chain accepted counts: cancel() is False when the chain has
             # already finished, which can happen in the same loop iteration the timer fires
             # while this task has not resumed yet; that result is the caller's, not a timeout
+            invocation.cancel_reason = RpcError.ErrorCode.RESPONSE_TIMEOUT
             deadline_fired = chain_task.cancel()
+            if not deadline_fired:
+                invocation.cancel_reason = None
 
         deadline = loop.call_later(invocation.response_timeout, _on_deadline)
         try:
@@ -691,6 +694,7 @@ class LocalParticipant(Participant):
         except asyncio.CancelledError:
             # cancelled from outside: stop the chain and let it unwind before answering the
             # caller, but not for long; this is the path room.disconnect() waits on
+            invocation.cancel_reason = RpcError.ErrorCode.RECIPIENT_DISCONNECTED
             chain_task.cancel()
             _, pending = await asyncio.wait([chain_task], timeout=_RPC_CANCEL_UNWIND_TIMEOUT)
             if pending:
