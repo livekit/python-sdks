@@ -26,6 +26,7 @@ from ._failover import (
     RegionCache,
     failover_attempts,
     host_key,
+    is_cloud_api,
     origin_of,
     pick_next,
 )
@@ -226,7 +227,8 @@ class TwirpClient:
             self._failover, host, self._failover_force, effective_timeout
         )
         attempted = {host_key(self._origin)}
-        region_origins: Optional[List[str]] = None
+        # A Cloud API host has a single origin; region discovery is never consulted.
+        region_origins: Optional[List[str]] = [] if host and is_cloud_api(host) else None
         current_origin = self._origin
 
         for attempt in range(max_attempts):
