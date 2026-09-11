@@ -570,16 +570,12 @@ def test_sip_no_answer():
 
 def _transfer_error(**metadata: str) -> ServerError:
     return _as_sip_error(
-        ServerError(
-            "deadline_exceeded", "call transfer failed", status=408, metadata=metadata
-        )
+        ServerError("deadline_exceeded", "call transfer failed", status=408, metadata=metadata)
     )
 
 
 def test_sip_transfer_reason():
-    err = _transfer_error(
-        sip_transfer_reason="STR_RINGING_TIMEOUT", sip_transfer_id="STR_abc"
-    )
+    err = _transfer_error(sip_transfer_reason="STR_RINGING_TIMEOUT", sip_transfer_id="STR_abc")
     assert isinstance(err, SipCallError)
     assert err.sip_transfer_reason == "STR_RINGING_TIMEOUT"
     assert err.sip_transfer_id == "STR_abc"
