@@ -264,9 +264,12 @@ class TwirpClient:
                 next_origin = pick_next(region_origins, attempted)
 
             if next_origin is None:
-                if transport_exc is not None:
-                    raise transport_exc
-                raise self._server_error(error_data, retryable_status or 500)
+                if is_last:
+                    if transport_exc is not None:
+                        raise transport_exc
+                    raise self._server_error(error_data, retryable_status or 500)
+                # With no fallback origin, a retryable failure is retried against the same host.
+                next_origin = current_origin
 
             reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
             logger.warning(
