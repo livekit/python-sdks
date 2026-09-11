@@ -87,10 +87,20 @@ class ServerError(Exception):
         return result
 
 
+_SIP_META_KEYS = (
+    "sip_status_code",
+    "sip_status",
+    "sip_transfer_reason",
+    "sip_transfer_id",
+    "error_details",
+)
+
+
 class SipCallError(ServerError):
     """A :class:`ServerError` from a SIP dialing call (``create_sip_participant`` /
-    ``transfer_sip_participant``) that failed with a SIP response status. The SIP
-    code and reason are exposed as properties; any other error metadata remains
+    ``transfer_sip_participant``) that failed with a SIP response status, or a
+    transfer that failed for any other reason. The SIP code and reason, and the
+    transfer reason, are exposed as properties; any other error metadata remains
     available via :attr:`metadata`."""
 
     @property
@@ -109,25 +119,36 @@ class SipCallError(ServerError):
         """The SIP reason phrase of the failed call, e.g. "Busy Here"."""
         return self.metadata.get("sip_status")
 
+    @property
+    def sip_transfer_reason(self) -> Optional[str]:
+        """Why a transfer failed, e.g. "STR_RINGING_TIMEOUT". Only set for
+        ``transfer_sip_participant``."""
+        return self.metadata.get("sip_transfer_reason")
+
+    @property
+    def sip_transfer_id(self) -> Optional[str]:
+        """The id of the failed transfer, for matching against SIP transfer logs."""
+        return self.metadata.get("sip_transfer_id")
+
     @classmethod
     def from_server_error(cls, err: ServerError) -> "SipCallError":
         return cls(err.code, err.message, status=err.status, metadata=err.metadata)
 
     def __str__(self) -> str:
         code = self.metadata.get("sip_status_code")
-        if code is None:
+        transfer_reason = self.metadata.get("sip_transfer_reason")
+        if code is None and transfer_reason is None:
             return super().__str__()
         # A clear, SIP-specific representation, including any extra metadata.
-        reason = self.metadata.get("sip_status")
-        result = f"SIP call failed: {code}"
-        if reason:
-            result += f" {reason}"
-        result += f" ({self.code})"
-        extra = {
-            k: v
-            for k, v in self.metadata.items()
-            if k not in ("sip_status_code", "sip_status", "error_details")
-        }
+        parts = []
+        if transfer_reason is not None:
+            parts.append(transfer_reason)
+        if code is not None:
+            reason = self.metadata.get("sip_status")
+            parts.append(f"{code} {reason}" if reason else str(code))
+        what = "SIP transfer failed" if transfer_reason is not None else "SIP call failed"
+        result = f"{what}: {', '.join(parts)} ({self.code})"
+        extra = {k: v for k, v in self.metadata.items() if k not in _SIP_META_KEYS}
         if extra:
             result += " [" + ", ".join(f"{k}={v}" for k, v in extra.items()) + "]"
         return result

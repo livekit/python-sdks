@@ -38,6 +38,7 @@ from google.protobuf.duration_pb2 import Duration
 
 import livekit.api as api
 from livekit.api import SipCallError, ServerError
+from livekit.api.sip_service import _as_sip_error
 from livekit.protocol.rtc import SessionDescription
 
 BASE = os.getenv("LK_TEST_SERVER_URL", "http://127.0.0.1:9999")
@@ -562,6 +563,43 @@ def test_sip_no_answer():
     err = asyncio.run(_sip_call_error({"code": 408, "status": "Request Timeout"}, wait=True))
     assert err.code == "deadline_exceeded"
     assert err.sip_status_code == 408
+
+
+# -- transfer failures surface the reason -------------------------------------
+
+
+def _transfer_error(**metadata: str) -> ServerError:
+    return _as_sip_error(
+        ServerError("deadline_exceeded", "call transfer failed", status=408, metadata=metadata)
+    )
+
+
+def test_sip_transfer_reason():
+    err = _transfer_error(sip_transfer_reason="STR_RINGING_TIMEOUT", sip_transfer_id="STR_abc")
+    assert isinstance(err, SipCallError)
+    assert err.sip_transfer_reason == "STR_RINGING_TIMEOUT"
+    assert err.sip_transfer_id == "STR_abc"
+    # No SIP response was involved in this failure.
+    assert err.sip_status_code is None
+    assert "STR_RINGING_TIMEOUT" in str(err)
+
+
+def test_sip_transfer_rejected_reports_reason_and_status():
+    err = _transfer_error(
+        sip_transfer_reason="STR_REJECTED",
+        sip_status_code="486",
+        sip_status="Busy Here",
+    )
+    assert err.sip_transfer_reason == "STR_REJECTED"
+    assert err.sip_status_code == 486
+    assert err.sip_status == "Busy Here"
+    assert "STR_REJECTED" in str(err)
+    assert "486" in str(err) and "Busy Here" in str(err)
+
+
+def test_non_sip_error_is_unchanged():
+    err = ServerError("unauthenticated", "bad token", status=401)
+    assert _as_sip_error(err) is err
 
 
 # -- cross-cutting: client-side dial timeout ----------------------------------
