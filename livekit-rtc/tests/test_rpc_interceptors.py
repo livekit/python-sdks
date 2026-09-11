@@ -505,6 +505,41 @@ async def test_cancel_reason_tells_interceptors_why_the_chain_was_cancelled() ->
     assert seen.seen[-1] is None
 
 
+@pytest.mark.parametrize("order", ["same_turn", "deadline_first", "disconnect_first"])
+async def test_deadline_and_disconnect_race_agree_on_the_reason(order: str) -> None:
+    """When the caller's deadline and a disconnect land close together, whichever cancelled
+    the chain first decides both what the interceptors saw and what the caller gets; the two
+    never diverge."""
+    lp = _participant()
+    seen = _SeesCancelReason()
+    lp.add_rpc_interceptor(seen)
+    started = asyncio.Event()
+
+    async def slow(data: RpcInvocationData) -> str:
+        started.set()
+        await asyncio.sleep(10)
+        return "never"
+
+    lp._rpc_handlers["slow"] = slow
+    timeout = 5.0 if order == "disconnect_first" else 0.0
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", timeout, method="slow"))
+    )
+    await started.wait()
+    if order == "deadline_first":
+        await asyncio.sleep(0.02)  # the zero deadline has fired by now
+    task.cancel()  # the room disconnecting (same loop turn as the timer in "same_turn")
+
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert seen.seen, "the interceptor never saw the cancellation"
+    assert seen.seen[-1] == info.value.code
+    if order == "deadline_first":
+        assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
+    if order == "disconnect_first":
+        assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+
+
 async def test_handlers_returning_an_awaitable_are_awaited() -> None:
     """RpcHandler admits any callable returning a payload or an awaitable of one, not only
     coroutine functions: a callable object with an async __call__, a sync wrapper handing
