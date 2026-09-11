@@ -44,11 +44,11 @@ def failover_attempts(
     timeout: Optional[float] = None,
 ) -> int:
     """Total request attempts for a host; 1 means no failover. Failover only
-    engages when enabled, the host is a LiveKit Cloud domain, and the request
-    timeout is long enough to retry. ``force`` bypasses the cloud-host check and
-    is for internal testing only.
+    engages when enabled, the host is a LiveKit Cloud project or Cloud API
+    domain, and the request timeout is long enough to retry. ``force`` bypasses
+    the cloud-host check and is for internal testing only.
     """
-    if not (enabled and (force or (host is not None and is_cloud(host)))):
+    if not (enabled and (force or (host is not None and (is_cloud(host) or is_cloud_api(host))))):
         return 1
     if timeout is not None and 0 < timeout < MIN_FAILOVER_TIMEOUT:
         return 1
@@ -58,6 +58,12 @@ def failover_attempts(
 def is_cloud(host: str) -> bool:
     # Failover only engages for LiveKit Cloud project domains.
     return host.endswith(".livekit.cloud")
+
+
+def is_cloud_api(host: str) -> bool:
+    # cloud-api.livekit.io or a cloud-api.<env>.livekit.io variant; hostnames are case-insensitive.
+    host = host.lower()
+    return host.startswith("cloud-api.") and host.endswith(".livekit.io")
 
 
 def to_http(url: str) -> str:
