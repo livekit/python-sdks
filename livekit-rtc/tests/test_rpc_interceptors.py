@@ -444,6 +444,102 @@ async def test_cleanup_errors_after_outside_cancellation_are_observed(
     )
 
 
+class _SeesCancelReason(rtc.RpcInterceptor):
+    """Records what ``invocation.cancel_reason`` says while unwinding from a cancellation."""
+
+    def __init__(self) -> None:
+        self.seen: list[object] = []
+
+    async def intercept_incoming(
+        self, invocation: RpcInvocationData, next: IncomingRpcNext
+    ) -> Optional[str]:
+        try:
+            return await next(invocation)
+        except asyncio.CancelledError:
+            self.seen.append(invocation.cancel_reason)
+            raise
+
+
+async def test_cancel_reason_tells_interceptors_why_the_chain_was_cancelled() -> None:
+    """The SDK maps a cancellation to an RpcError only after the chain has unwound, so an
+    interceptor sees a bare CancelledError; ``cancel_reason`` on the invocation says what the
+    caller will get: the deadline, the disconnect, or nothing for a cancel raised inside."""
+    lp = _participant()
+    seen = _SeesCancelReason()
+    lp.add_rpc_interceptor(seen)
+    started = asyncio.Event()
+
+    async def slow(data: RpcInvocationData) -> str:
+        started.set()
+        await asyncio.sleep(10)
+        return "never"
+
+    async def cancels_itself(data: RpcInvocationData) -> str:
+        raise asyncio.CancelledError()
+
+    lp._rpc_handlers["slow"] = slow
+    lp._rpc_handlers["self"] = cancels_itself
+
+    # the caller's deadline
+    with pytest.raises(rtc.RpcError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", 0.02, method="slow"))
+    assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
+    assert seen.seen == [rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT]
+
+    # the room disconnecting (the invocation task is cancelled from outside)
+    started.clear()
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r2", "alice", "{}", 5.0, method="slow"))
+    )
+    await started.wait()
+    task.cancel()
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+    assert seen.seen[-1] == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+
+    # a cancel raised inside the chain: not the SDK's doing, so no reason
+    with pytest.raises(rtc.RpcError) as info:
+        await lp._run_incoming_chain(RpcInvocationData("r3", "alice", "{}", 5.0, method="self"))
+    assert info.value.code == rtc.RpcError.ErrorCode.APPLICATION_ERROR
+    assert seen.seen[-1] is None
+
+
+@pytest.mark.parametrize("order", ["same_turn", "deadline_first", "disconnect_first"])
+async def test_deadline_and_disconnect_race_agree_on_the_reason(order: str) -> None:
+    """When the caller's deadline and a disconnect land close together, whichever cancelled
+    the chain first decides both what the interceptors saw and what the caller gets; the two
+    never diverge."""
+    lp = _participant()
+    seen = _SeesCancelReason()
+    lp.add_rpc_interceptor(seen)
+    started = asyncio.Event()
+
+    async def slow(data: RpcInvocationData) -> str:
+        started.set()
+        await asyncio.sleep(10)
+        return "never"
+
+    lp._rpc_handlers["slow"] = slow
+    timeout = 5.0 if order == "disconnect_first" else 0.0
+    task = asyncio.ensure_future(
+        lp._run_incoming_chain(RpcInvocationData("r1", "alice", "{}", timeout, method="slow"))
+    )
+    await started.wait()
+    if order == "deadline_first":
+        await asyncio.sleep(0.02)  # the zero deadline has fired by now
+    task.cancel()  # the room disconnecting (same loop turn as the timer in "same_turn")
+
+    with pytest.raises(rtc.RpcError) as info:
+        await task
+    assert seen.seen, "the interceptor never saw the cancellation"
+    assert seen.seen[-1] == info.value.code
+    if order == "deadline_first":
+        assert info.value.code == rtc.RpcError.ErrorCode.RESPONSE_TIMEOUT
+    if order == "disconnect_first":
+        assert info.value.code == rtc.RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+
+
 async def test_handlers_returning_an_awaitable_are_awaited() -> None:
     """RpcHandler admits any callable returning a payload or an awaitable of one, not only
     coroutine functions: a callable object with an async __call__, a sync wrapper handing

@@ -30,6 +30,12 @@ class RpcInvocationData:
         payload (str): The payload of the request. User-definable format, typically JSON.
         response_timeout (float): The maximum time the caller will wait for a response.
         method (str): The name of the invoked RPC method.
+        cancel_reason (Optional[RpcError.ErrorCode]): Why the SDK cancelled the handler chain,
+            set on this object just before it does: ``RESPONSE_TIMEOUT`` when the caller's
+            deadline passed, ``RECIPIENT_DISCONNECTED`` when the room disconnected. ``None``
+            while the chain runs, and for a ``CancelledError`` raised inside the chain (which
+            the caller receives as ``APPLICATION_ERROR``). Lets an interceptor unwinding from
+            the cancellation record the outcome the caller gets.
     """
 
     request_id: str
@@ -37,6 +43,7 @@ class RpcInvocationData:
     payload: str
     response_timeout: float
     method: str = ""
+    cancel_reason: Optional[RpcError.ErrorCode] = None
 
 
 @dataclass
