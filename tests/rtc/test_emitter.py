@@ -102,3 +102,106 @@ def test_throw() -> None:
     emitter.emit("error")
 
     assert len(calls) == 2
+
+
+class _OrderedHandler:
+    """A callable whose hash is fixed, so a set orders it independently of registration."""
+
+    def __init__(self, name: str, hash_value: int, sink: list[str]) -> None:
+        self._name = name
+        self._hash = hash_value
+        self._sink = sink
+
+    def __hash__(self) -> int:
+        return self._hash
+
+    def __eq__(self, other: object) -> bool:
+        return self is other
+
+    def __call__(self) -> None:
+        self._sink.append(self._name)
+
+
+def test_handlers_run_in_registration_order() -> None:
+    # Handlers were kept in a set, so dispatch order was hash-derived. The hashes here are
+    # picked so a set yields them in the opposite order to the one they were added in.
+    emitter = EventEmitter[str]()
+    order: list[str] = []
+
+    emitter.on("event", _OrderedHandler("first", 5, order))
+    emitter.on("event", _OrderedHandler("second", 1, order))
+
+    emitter.emit("event")
+    assert order == ["first", "second"]
+
+
+def test_a_mutating_handler_runs_before_a_peer_that_reads_it() -> None:
+    # The livekit-agents case: one handler stamps a field onto the emitted object and a
+    # user handler registered later reads it. Registration order has to decide.
+    class Event:
+        def __init__(self) -> None:
+            self.speech_id: Any = None
+
+    class Stamp:
+        def __hash__(self) -> int:
+            return 5
+
+        def __eq__(self, other: object) -> bool:
+            return self is other
+
+        def __call__(self, ev: Event) -> None:
+            ev.speech_id = "speech_1"
+
+    class Read:
+        def __init__(self, sink: list[Any]) -> None:
+            self._sink = sink
+
+        def __hash__(self) -> int:
+            return 1
+
+        def __eq__(self, other: object) -> bool:
+            return self is other
+
+        def __call__(self, ev: Event) -> None:
+            self._sink.append(ev.speech_id)
+
+    emitter = EventEmitter[str]()
+    seen: list[Any] = []
+    emitter.on("metrics", Stamp())
+    emitter.on("metrics", Read(seen))
+
+    for _ in range(5):
+        emitter.emit("metrics", Event())
+
+    assert seen == ["speech_1"] * 5
+
+
+def test_off_still_removes_a_handler() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[str] = []
+
+    @emitter.on("event")
+    def keep() -> None:
+        calls.append("keep")
+
+    @emitter.on("event")
+    def drop() -> None:
+        calls.append("drop")
+
+    emitter.off("event", drop)
+    emitter.off("event", drop)  # removing twice must not raise
+    emitter.emit("event")
+    assert calls == ["keep"]
+
+
+def test_registering_the_same_handler_twice_keeps_one_entry() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[str] = []
+
+    def handler() -> None:
+        calls.append("x")
+
+    emitter.on("event", handler)
+    emitter.on("event", handler)
+    emitter.emit("event")
+    assert calls == ["x"]

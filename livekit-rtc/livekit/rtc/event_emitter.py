@@ -1,6 +1,6 @@
 import inspect
 import asyncio
-from typing import Any, Callable, Dict, Set, Optional, Generic, TypeVar
+from typing import Any, Callable, Dict, Optional, Generic, TypeVar
 
 from .log import logger
 
@@ -12,7 +12,10 @@ class EventEmitter(Generic[T_contra]):
         """
         Initialize a new instance of EventEmitter.
         """
-        self._events: Dict[T_contra, Set[Callable]] = dict()
+        # A dict keyed by callback is an insertion-ordered set: handlers run in the
+        # order they were registered, so one that mutates the event still runs before
+        # a peer that reads it.
+        self._events: Dict[T_contra, Dict[Callable, None]] = dict()
 
     def emit(self, event: T_contra, *args: Any) -> None:
         """
@@ -36,7 +39,7 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            callables = self._events[event].copy()
+            callables = list(self._events[event])
             for callback in callables:
                 try:
                     sig = inspect.signature(callback)
@@ -163,8 +166,8 @@ class EventEmitter(Generic[T_contra]):
                 )
 
             if event not in self._events:
-                self._events[event] = set()
-            self._events[event].add(callback)
+                self._events[event] = {}
+            self._events[event][callback] = None
             return callback
         else:
 
@@ -197,4 +200,4 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].discard(callback)
+            self._events[event].pop(callback, None)
