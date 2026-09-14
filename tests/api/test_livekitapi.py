@@ -582,6 +582,7 @@ def test_sip_transfer_reason():
     # No SIP response was involved in this failure.
     assert err.sip_status_code is None
     assert "STR_RINGING_TIMEOUT" in str(err)
+    assert "STR_abc" in str(err)
 
 
 def test_sip_transfer_rejected_reports_reason_and_status():

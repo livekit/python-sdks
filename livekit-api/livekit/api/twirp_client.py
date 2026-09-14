@@ -91,7 +91,6 @@ _SIP_META_KEYS = (
     "sip_status_code",
     "sip_status",
     "sip_transfer_reason",
-    "sip_transfer_id",
     "error_details",
 )
 
