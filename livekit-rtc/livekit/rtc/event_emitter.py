@@ -1,8 +1,17 @@
-import inspect
 import asyncio
+import inspect
 from typing import Any, Callable, Dict, Set, Optional, Generic, TypeVar
 
 from .log import logger
+
+# `asyncio.iscoroutinefunction` also treats a callable tagged with this private
+# sentinel as a coroutine function (cpython/Lib/asyncio/coroutines.py:30-32);
+# `inspect.iscoroutinefunction` never has.
+# `@asyncio.coroutine` (removed in 3.11) applied the tag, but the sentinel itself
+# still exists on every version this package supports, so the check is kept on all
+# of them. Read defensively: it is private and may disappear with the deprecated
+# function in 3.16, and a bare attribute access would then fail at import time.
+_ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 
 T_contra = TypeVar("T_contra", contravariant=True)
 
@@ -157,7 +166,10 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-            if asyncio.iscoroutinefunction(callback):
+            if inspect.iscoroutinefunction(callback) or (
+                _ASYNCIO_COROUTINE_MARKER is not None
+                and getattr(callback, "_is_coroutine", None) is _ASYNCIO_COROUTINE_MARKER
+            ):
                 raise ValueError(
                     "Cannot register an async callback with `.on()`. Use `asyncio.create_task` within your synchronous callback instead."
                 )
