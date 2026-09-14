@@ -1,5 +1,4 @@
 import inspect
-import asyncio
 from typing import Any, Callable, Dict, Set, Optional, Generic, TypeVar
 
 from .log import logger
@@ -157,7 +156,7 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-            if asyncio.iscoroutinefunction(callback):
+            if inspect.iscoroutinefunction(callback):
                 raise ValueError(
                     "Cannot register an async callback with `.on()`. Use `asyncio.create_task` within your synchronous callback instead."
                 )

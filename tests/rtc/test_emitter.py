@@ -1,5 +1,7 @@
+import functools
 from livekit.rtc import EventEmitter
 from typing import Any, Literal
+import warnings
 import pytest
 
 
@@ -102,3 +104,41 @@ def test_throw() -> None:
     emitter.emit("error")
 
     assert len(calls) == 2
+
+
+def test_on_does_not_warn() -> None:
+    """Registering a callback must not emit a DeprecationWarning.
+
+    `asyncio.iscoroutinefunction` is deprecated in Python 3.14 and slated for removal
+    in 3.16; `inspect.iscoroutinefunction` is the supported replacement.
+    """
+    EventTypes = Literal["connected"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+
+        @emitter.on("connected")
+        def on_connected() -> None:
+            pass
+
+        emitter.once("connected", on_connected)
+
+    emitter.emit("connected")
+
+
+def test_on_rejects_async_callback() -> None:
+    """`.on()` refuses coroutine functions, however they are spelled."""
+    EventTypes = Literal["connected"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    async def on_connected() -> None:
+        pass
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.on("connected", on_connected)
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.on("connected", functools.partial(on_connected))
