@@ -871,6 +871,7 @@ class ClientInfo(_message.Message):
         NODE: _ClassVar[ClientInfo.SDK]
         UNREAL: _ClassVar[ClientInfo.SDK]
         ESP32: _ClassVar[ClientInfo.SDK]
+        DOTNET: _ClassVar[ClientInfo.SDK]
     UNKNOWN: ClientInfo.SDK
     JS: ClientInfo.SDK
     SWIFT: ClientInfo.SDK
@@ -886,6 +887,7 @@ class ClientInfo(_message.Message):
     NODE: ClientInfo.SDK
     UNREAL: ClientInfo.SDK
     ESP32: ClientInfo.SDK
+    DOTNET: ClientInfo.SDK
     class Capability(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         CAP_UNUSED: _ClassVar[ClientInfo.Capability]
