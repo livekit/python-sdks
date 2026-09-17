@@ -102,6 +102,7 @@ class _VideoEncoderBackendEnumTypeWrapper(google.protobuf.internal.enum_type_wra
     ENCODER_BACKEND_NVENC: _VideoEncoderBackend.ValueType  # 3
     ENCODER_BACKEND_VAAPI: _VideoEncoderBackend.ValueType  # 4
     ENCODER_BACKEND_VIDEOTOOLBOX: _VideoEncoderBackend.ValueType  # 5
+    ENCODER_BACKEND_PRE_ENCODED: _VideoEncoderBackend.ValueType  # 6
 
 class VideoEncoderBackend(_VideoEncoderBackend, metaclass=_VideoEncoderBackendEnumTypeWrapper): ...
 
@@ -111,6 +112,7 @@ ENCODER_BACKEND_HARDWARE: VideoEncoderBackend.ValueType  # 2
 ENCODER_BACKEND_NVENC: VideoEncoderBackend.ValueType  # 3
 ENCODER_BACKEND_VAAPI: VideoEncoderBackend.ValueType  # 4
 ENCODER_BACKEND_VIDEOTOOLBOX: VideoEncoderBackend.ValueType  # 5
+ENCODER_BACKEND_PRE_ENCODED: VideoEncoderBackend.ValueType  # 6
 global___VideoEncoderBackend = VideoEncoderBackend
 
 class _DegradationPreference:

@@ -55,6 +55,21 @@ VP9: VideoCodec.ValueType  # 3
 H265: VideoCodec.ValueType  # 4
 global___VideoCodec = VideoCodec
 
+class _EncodedFrameType:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _EncodedFrameTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_EncodedFrameType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    ENCODED_FRAME_KEY: _EncodedFrameType.ValueType  # 0
+    ENCODED_FRAME_DELTA: _EncodedFrameType.ValueType  # 1
+
+class EncodedFrameType(_EncodedFrameType, metaclass=_EncodedFrameTypeEnumTypeWrapper): ...
+
+ENCODED_FRAME_KEY: EncodedFrameType.ValueType  # 0
+ENCODED_FRAME_DELTA: EncodedFrameType.ValueType  # 1
+global___EncodedFrameType = EncodedFrameType
+
 class _VideoRotation:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
@@ -137,10 +152,12 @@ class _VideoSourceType:
 class _VideoSourceTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_VideoSourceType.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     VIDEO_SOURCE_NATIVE: _VideoSourceType.ValueType  # 0
+    VIDEO_SOURCE_ENCODED: _VideoSourceType.ValueType  # 1
 
 class VideoSourceType(_VideoSourceType, metaclass=_VideoSourceTypeEnumTypeWrapper): ...
 
 VIDEO_SOURCE_NATIVE: VideoSourceType.ValueType  # 0
+VIDEO_SOURCE_ENCODED: VideoSourceType.ValueType  # 1
 global___VideoSourceType = VideoSourceType
 
 @typing.final
@@ -352,6 +369,147 @@ class CaptureVideoFrameResponse(google.protobuf.message.Message):
     ) -> None: ...
 
 global___CaptureVideoFrameResponse = CaptureVideoFrameResponse
+
+@typing.final
+class EncodedVideoBufferInfo(google.protobuf.message.Message):
+    """Foreign-memory buffer containing one encoded video access unit.
+    The payload pointer only needs to remain valid for the duration of the
+    synchronous FFI request; the native implementation copies it before
+    returning.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATA_PTR_FIELD_NUMBER: builtins.int
+    DATA_LEN_FIELD_NUMBER: builtins.int
+    data_ptr: builtins.int
+    data_len: builtins.int
+    def __init__(
+        self,
+        *,
+        data_ptr: builtins.int | None = ...,
+        data_len: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["data_len", b"data_len", "data_ptr", b"data_ptr"]) -> None: ...
+
+global___EncodedVideoBufferInfo = EncodedVideoBufferInfo
+
+@typing.final
+class CaptureEncodedVideoFrameRequest(google.protobuf.message.Message):
+    """Push one complete pre-encoded access unit to an encoded VideoSource."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    BUFFER_FIELD_NUMBER: builtins.int
+    CODEC_FIELD_NUMBER: builtins.int
+    FRAME_TYPE_FIELD_NUMBER: builtins.int
+    WIDTH_FIELD_NUMBER: builtins.int
+    HEIGHT_FIELD_NUMBER: builtins.int
+    TIMESTAMP_US_FIELD_NUMBER: builtins.int
+    METADATA_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
+    codec: global___VideoCodec.ValueType
+    frame_type: global___EncodedFrameType.ValueType
+    width: builtins.int
+    height: builtins.int
+    timestamp_us: builtins.int
+    @property
+    def buffer(self) -> global___EncodedVideoBufferInfo: ...
+    @property
+    def metadata(self) -> global___FrameMetadata: ...
+    def __init__(
+        self,
+        *,
+        source_handle: builtins.int | None = ...,
+        buffer: global___EncodedVideoBufferInfo | None = ...,
+        codec: global___VideoCodec.ValueType | None = ...,
+        frame_type: global___EncodedFrameType.ValueType | None = ...,
+        width: builtins.int | None = ...,
+        height: builtins.int | None = ...,
+        timestamp_us: builtins.int | None = ...,
+        metadata: global___FrameMetadata | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["buffer", b"buffer", "codec", b"codec", "frame_type", b"frame_type", "height", b"height", "metadata", b"metadata", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us", "width", b"width"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["buffer", b"buffer", "codec", b"codec", "frame_type", b"frame_type", "height", b"height", "metadata", b"metadata", "source_handle", b"source_handle", "timestamp_us", b"timestamp_us", "width", b"width"]) -> None: ...
+
+global___CaptureEncodedVideoFrameRequest = CaptureEncodedVideoFrameRequest
+
+@typing.final
+class CaptureEncodedVideoFrameResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ACCEPTED_FIELD_NUMBER: builtins.int
+    accepted: builtins.bool
+    def __init__(
+        self,
+        *,
+        accepted: builtins.bool | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["accepted", b"accepted"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["accepted", b"accepted"]) -> None: ...
+
+global___CaptureEncodedVideoFrameResponse = CaptureEncodedVideoFrameResponse
+
+@typing.final
+class TakeEncodedVideoSourceFeedbackRequest(google.protobuf.message.Message):
+    """Consumes feedback accumulated by the pre-encoded passthrough encoder since
+    the previous call.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        source_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["source_handle", b"source_handle"]) -> None: ...
+
+global___TakeEncodedVideoSourceFeedbackRequest = TakeEncodedVideoSourceFeedbackRequest
+
+@typing.final
+class EncodedRateControl(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TARGET_BITRATE_BPS_FIELD_NUMBER: builtins.int
+    FRAMERATE_FPS_FIELD_NUMBER: builtins.int
+    target_bitrate_bps: builtins.int
+    framerate_fps: builtins.float
+    def __init__(
+        self,
+        *,
+        target_bitrate_bps: builtins.int | None = ...,
+        framerate_fps: builtins.float | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["framerate_fps", b"framerate_fps", "target_bitrate_bps", b"target_bitrate_bps"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["framerate_fps", b"framerate_fps", "target_bitrate_bps", b"target_bitrate_bps"]) -> None: ...
+
+global___EncodedRateControl = EncodedRateControl
+
+@typing.final
+class TakeEncodedVideoSourceFeedbackResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    KEYFRAME_REQUESTED_FIELD_NUMBER: builtins.int
+    RATE_CONTROL_FIELD_NUMBER: builtins.int
+    keyframe_requested: builtins.bool
+    @property
+    def rate_control(self) -> global___EncodedRateControl: ...
+    def __init__(
+        self,
+        *,
+        keyframe_requested: builtins.bool | None = ...,
+        rate_control: global___EncodedRateControl | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["keyframe_requested", b"keyframe_requested", "rate_control", b"rate_control"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["keyframe_requested", b"keyframe_requested", "rate_control", b"rate_control"]) -> None: ...
+
+global___TakeEncodedVideoSourceFeedbackResponse = TakeEncodedVideoSourceFeedbackResponse
 
 @typing.final
 class VideoConvertRequest(google.protobuf.message.Message):
