@@ -1,6 +1,6 @@
 import asyncio
 import inspect
-from typing import Any, Callable, Dict, Set, Optional, Generic, TypeVar
+from typing import Any, Callable, Dict, Optional, Generic, TypeVar
 
 from .log import logger
 
@@ -21,7 +21,13 @@ class EventEmitter(Generic[T_contra]):
         """
         Initialize a new instance of EventEmitter.
         """
-        self._events: Dict[T_contra, Set[Callable]] = dict()
+        # A dict is used as an ordered set: handlers are dispatched in the order they
+        # were registered. A set would order them by hash, which is stable for the life
+        # of a process but arbitrary between runs, so a handler that reads a field a
+        # peer handler mutates during the same emit would see a different value from
+        # one process to the next. Insertion order is also what the JS and Rust SDKs
+        # give, and what "on" reads like it promises.
+        self._events: Dict[T_contra, Dict[Callable, None]] = dict()
 
     def emit(self, event: T_contra, *args: Any) -> None:
         """
@@ -45,7 +51,9 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            callables = self._events[event].copy()
+            # Copied, so a handler may call `off` (or `once` can remove itself) without
+            # mutating the collection being iterated.
+            callables = list(self._events[event])
             for callback in callables:
                 try:
                     sig = inspect.signature(callback)
@@ -175,8 +183,10 @@ class EventEmitter(Generic[T_contra]):
                 )
 
             if event not in self._events:
-                self._events[event] = set()
-            self._events[event].add(callback)
+                self._events[event] = {}
+            # Re-registering an existing callback keeps its original position, which is
+            # what `set.add` did, so registering twice still dispatches once.
+            self._events[event].setdefault(callback, None)
             return callback
         else:
 
@@ -209,4 +219,4 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].discard(callback)
+            self._events[event].pop(callback, None)
