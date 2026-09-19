@@ -116,3 +116,39 @@ async def test_cancelled_connect_leaves_no_pending_work_when_the_server_errors(
     # there is no room to close, so nothing follows the connect
     assert [req.WhichOneof("message") for req in requests] == ["connect"]
     assert len(FfiClient.instance.queue._subscribers) == subscribers_before
+
+
+async def test_a_cancelled_disconnect_still_lets_the_cleanup_finish(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Giving up on disconnect() must not cancel the cleanup it is waiting on.
+
+    gather() cancels its children when it is cancelled, so a caller who bounds
+    disconnect() with a timeout, or abandons it on shutdown, would cancel the
+    task that answers the FFI's wait for ReadyForRoomEvent. The wait then times
+    out, the FFI panics, and the panic handler kills the process: the exact
+    failure the rest of this file is about, reintroduced one layer up.
+    """
+    requests = _install_fake_ffi(monkeypatch)
+
+    room = rtc.Room()
+    task = asyncio.create_task(room.connect("ws://localhost:7880", "token"))
+    await wait_until(lambda: bool(requests), message="connect request never issued")
+
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    # the cleanup is now parked on the connect callback, which has not arrived
+    closing = asyncio.create_task(room.disconnect())
+    await asyncio.sleep(0)
+    closing.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await closing
+
+    _deliver_connect_callback()
+    await wait_until(
+        lambda: any(r.WhichOneof("message") == "ready_for_room_event" for r in requests),
+        message="the cancelled disconnect took the cleanup down with it",
+    )
+    assert requests[1].ready_for_room_event.room_handle == ROOM_HANDLE

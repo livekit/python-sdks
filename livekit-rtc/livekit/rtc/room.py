@@ -741,7 +741,14 @@ class Room(EventEmitter[EventTypes]):
         if self._aborted_connect_tasks:
             # a cancelled connect may still be closing a room the FFI server opened.
             # wait for it so disconnect() leaves nothing behind.
-            await asyncio.gather(*tuple(self._aborted_connect_tasks), return_exceptions=True)
+            #
+            # shielded, because gather() cancels its children when it is cancelled.
+            # a caller who gives up on disconnect() would otherwise cancel the very
+            # cleanup that answers the FFI's wait, leaving it to time out and panic,
+            # which is the failure this path exists to prevent.
+            await asyncio.shield(
+                asyncio.gather(*tuple(self._aborted_connect_tasks), return_exceptions=True)
+            )
 
         if not self.isconnected():
             return
