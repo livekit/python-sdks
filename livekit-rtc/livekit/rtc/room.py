@@ -31,7 +31,7 @@ from ._proto.participant_pb2 import DisconnectReason
 from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, Queue, task_done_logger
 from .e2ee import E2EEManager, E2EEOptions
 from .log import logger
 from .participant import (
@@ -184,6 +184,7 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
+        self._aborted_connect_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -554,13 +555,25 @@ class Room(EventEmitter[EventTypes]):
         self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
 
         queue = FfiClient.instance.queue.subscribe()
+        aborted = False
         try:
             resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.connect.async_id == resp.connect.async_id
-            )
+            try:
+                cb: proto_ffi.FfiEvent = await queue.wait_for(
+                    lambda e: e.connect.async_id == resp.connect.async_id
+                )
+            except asyncio.CancelledError:
+                # the FFI server is already connecting and expects a ReadyForRoomEvent
+                # once it answers. leaving that unanswered panics it, and the panic
+                # handler terminates the process, so close the room from a task that
+                # outlives this cancellation.
+                aborted = True
+                FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+                self._close_aborted_connect(resp.connect.async_id, queue)
+                raise
         finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+            if not aborted:
+                FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.connect.error:
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -601,6 +614,50 @@ class Room(EventEmitter[EventTypes]):
         ready_req = proto_ffi.FfiRequest()
         ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
         FfiClient.instance.request(ready_req)
+
+    def _close_aborted_connect(self, async_id: int, queue: Queue[proto_ffi.FfiEvent]) -> None:
+        """Close a room that connect() was cancelled before it could own.
+
+        Takes ownership of `queue`. The FFI server has no cancel path for an in-flight
+        connect, so the room has to be created and then disconnected. Without this the
+        room also stays joined server-side and reconnecting with the same identity
+        evicts the new session as a duplicate.
+        """
+
+        async def _close() -> None:
+            try:
+                cb: proto_ffi.FfiEvent = await queue.wait_for(
+                    lambda e: e.connect.async_id == async_id
+                )
+            finally:
+                FfiClient.instance.queue.unsubscribe(queue)
+
+            if cb.connect.error:
+                return
+
+            ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
+
+            ready_req = proto_ffi.FfiRequest()
+            ready_req.ready_for_room_event.room_handle = ffi_handle.handle
+            FfiClient.instance.request(ready_req)
+
+            close_req = proto_ffi.FfiRequest()
+            close_req.disconnect.room_handle = ffi_handle.handle
+            close_req.disconnect.reason = DisconnectReason.CLIENT_INITIATED
+            close_queue = FfiClient.instance.queue.subscribe()
+            try:
+                resp = FfiClient.instance.request(close_req)
+                await close_queue.wait_for(
+                    lambda e: e.disconnect.async_id == resp.disconnect.async_id
+                )
+            finally:
+                FfiClient.instance.queue.unsubscribe(close_queue)
+
+        task = self._loop.create_task(_close())
+        self._aborted_connect_tasks.add(task)
+        task.add_done_callback(self._aborted_connect_tasks.discard)
+        # a failure here still ends in an FFI panic, so it must not be swallowed
+        task.add_done_callback(task_done_logger)
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
@@ -681,6 +738,18 @@ class Room(EventEmitter[EventTypes]):
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
+        if self._aborted_connect_tasks:
+            # a cancelled connect may still be closing a room the FFI server opened.
+            # wait for it so disconnect() leaves nothing behind.
+            #
+            # shielded, because gather() cancels its children when it is cancelled.
+            # a caller who gives up on disconnect() would otherwise cancel the very
+            # cleanup that answers the FFI's wait, leaving it to time out and panic,
+            # which is the failure this path exists to prevent.
+            await asyncio.shield(
+                asyncio.gather(*tuple(self._aborted_connect_tasks), return_exceptions=True)
+            )
+
         if not self.isconnected():
             return
 
