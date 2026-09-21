@@ -551,7 +551,14 @@ class Room(EventEmitter[EventTypes]):
             req.connect.options.rtc_config.ice_servers.extend(options.rtc_config.ice_servers)
 
         # subscribe before connecting so we don't miss any events
-        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
+        # Media streams have their own subscriptions. Keep other events, including
+        # the publish/unpublish callbacks forwarded through _room_queue.
+        self._ffi_queue = FfiClient.instance.queue.subscribe(
+            self._loop,
+            filter_fn=lambda e: (
+                e.WhichOneof("message") not in ("audio_stream_event", "video_stream_event")
+            ),
+        )
 
         queue = FfiClient.instance.queue.subscribe()
         try:
