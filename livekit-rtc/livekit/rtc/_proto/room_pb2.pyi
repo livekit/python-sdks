@@ -103,6 +103,7 @@ class _VideoEncoderBackendEnumTypeWrapper(google.protobuf.internal.enum_type_wra
     ENCODER_BACKEND_VAAPI: _VideoEncoderBackend.ValueType  # 4
     ENCODER_BACKEND_VIDEOTOOLBOX: _VideoEncoderBackend.ValueType  # 5
     ENCODER_BACKEND_PRE_ENCODED: _VideoEncoderBackend.ValueType  # 6
+    """Pre-encoded passthrough: the application supplies encoded frames."""
 
 class VideoEncoderBackend(_VideoEncoderBackend, metaclass=_VideoEncoderBackendEnumTypeWrapper): ...
 
@@ -113,6 +114,7 @@ ENCODER_BACKEND_NVENC: VideoEncoderBackend.ValueType  # 3
 ENCODER_BACKEND_VAAPI: VideoEncoderBackend.ValueType  # 4
 ENCODER_BACKEND_VIDEOTOOLBOX: VideoEncoderBackend.ValueType  # 5
 ENCODER_BACKEND_PRE_ENCODED: VideoEncoderBackend.ValueType  # 6
+"""Pre-encoded passthrough: the application supplies encoded frames."""
 global___VideoEncoderBackend = VideoEncoderBackend
 
 class _DegradationPreference:
