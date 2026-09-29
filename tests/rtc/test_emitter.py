@@ -287,3 +287,75 @@ def test_registering_the_same_handler_twice_keeps_one_entry() -> None:
     emitter.on("event", handler)
     emitter.emit("event")
     assert calls == ["x"]
+
+
+def test_off_removes_a_once_callback() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[bool] = []
+
+    def on_event() -> None:
+        calls.append(True)
+
+    emitter.once("event", on_event)
+    emitter.off("event", on_event)
+    emitter.emit("event")
+
+    assert calls == []
+
+
+def test_off_removes_a_once_bound_method() -> None:
+    class Handler:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def on_event(self) -> None:
+            self.calls += 1
+
+    emitter = EventEmitter[str]()
+    handler = Handler()
+
+    emitter.once("event", handler.on_event)
+    emitter.off("event", handler.on_event)
+    emitter.emit("event")
+
+    assert handler.calls == 0
+
+
+def test_once_passes_only_the_arguments_the_callback_accepts() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[tuple[Any, ...]] = []
+
+    def on_event(first: Any, second: Any) -> None:
+        calls.append((first, second))
+
+    emitter.once("event", on_event)
+    emitter.emit("event", 1, 2, 3, 4)  # only 2 arguments will be passed
+    emitter.emit("event", 1, 2, 3, 4)
+
+    assert calls == [(1, 2)]
+
+
+def test_once_with_no_parameters_ignores_emitted_arguments() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[bool] = []
+
+    @emitter.once("event")
+    def on_event() -> None:
+        calls.append(True)
+
+    emitter.emit("event", 1, 2)
+
+    assert calls == [True]
+
+
+def test_once_passes_all_arguments_to_a_varargs_callback() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[tuple[Any, ...]] = []
+
+    @emitter.once("event")
+    def on_event(*args: Any) -> None:
+        calls.append(args)
+
+    emitter.emit("event", 1, 2, 3)
+
+    assert calls == [(1, 2, 3)]
