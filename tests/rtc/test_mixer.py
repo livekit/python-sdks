@@ -1,9 +1,11 @@
 # type: ignore
 
+import asyncio
+
 import numpy as np
 import pytest
 
-from livekit.rtc import AudioMixer
+from livekit.rtc import AudioFrame, AudioMixer
 from livekit.rtc.utils import sine_wave_generator
 
 SAMPLE_RATE = 48000
@@ -56,3 +58,31 @@ async def test_mixer_two_sine_waves():
     # Assert that the peaks include 440Hz and 880Hz (with a tolerance of ±5 Hz)
     assert any(np.isclose(peak_freqs, 440, atol=5)), f"Expected 440 Hz in peaks, got: {peak_freqs}"
     assert any(np.isclose(peak_freqs, 880, atol=5)), f"Expected 880 Hz in peaks, got: {peak_freqs}"
+
+
+@pytest.mark.asyncio
+async def test_mixer_keeps_generator_stream_that_is_slower_than_the_timeout():
+    """
+    A stream that misses the timeout once must not be lost: its audio is mixed
+    once it arrives.
+    """
+
+    async def slow_stream():
+        await asyncio.sleep(0.3)  # longer than stream_timeout_ms
+        for _ in range(5):
+            yield AudioFrame(
+                np.ones(BLOCKSIZE, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, BLOCKSIZE
+            )
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, stream_timeout_ms=100)
+    mixer.add_stream(slow_stream())
+    mixer.end_input()
+
+    async def read_all():
+        return [frame async for frame in mixer]
+
+    frames = await asyncio.wait_for(read_all(), timeout=5)
+    await mixer.aclose()
+
+    frames_with_audio = [f for f in frames if np.any(np.frombuffer(f.data.tobytes(), np.int16))]
+    assert len(frames_with_audio) == 5

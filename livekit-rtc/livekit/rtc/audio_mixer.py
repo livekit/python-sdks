@@ -52,6 +52,10 @@ class AudioMixer:
         """
         self._streams: set[_Stream] = set()
         self._buffers: dict[_Stream, np.ndarray] = {}
+        # A read that timed out keeps running here and is awaited again on the
+        # next round. Cancelling it would also cancel the stream itself when the
+        # stream is an async generator, which then ends and drops all its audio.
+        self._pending: dict[_Stream, asyncio.Future[AudioFrame]] = {}
         self._sample_rate: int = sample_rate
         self._num_channels: int = num_channels
         self._chunk_size: int = blocksize if blocksize > 0 else int(sample_rate // 10)
@@ -90,6 +94,9 @@ class AudioMixer:
         """
         self._streams.discard(stream)
         self._buffers.pop(stream, None)
+        pending = self._pending.pop(stream, None)
+        if pending is not None:
+            pending.cancel()
 
     def __aiter__(self) -> "AudioMixer":
         return self
@@ -110,6 +117,9 @@ class AudioMixer:
         self._mixer_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await self._mixer_task
+        for pending in self._pending.values():
+            pending.cancel()
+        self._pending.clear()
 
     def end_input(self) -> None:
         """
@@ -174,13 +184,17 @@ class AudioMixer:
         had_data = buf.shape[0] > 0
         exhausted = False
         while buf.shape[0] < self._chunk_size and not exhausted:
-            try:
-                frame = await asyncio.wait_for(
-                    stream.__anext__(), timeout=self._stream_timeout_ms / 1000
-                )
-            except asyncio.TimeoutError:
+            pending = self._pending.get(stream)
+            if pending is None:
+                pending = asyncio.ensure_future(stream.__anext__())
+                self._pending[stream] = pending
+            done, _ = await asyncio.wait({pending}, timeout=self._stream_timeout_ms / 1000)
+            if not done:
                 logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
                 break
+            self._pending.pop(stream, None)
+            try:
+                frame = pending.result()
             except StopAsyncIteration:
                 exhausted = True
                 break
