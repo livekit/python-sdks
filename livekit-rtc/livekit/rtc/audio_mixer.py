@@ -56,6 +56,8 @@ class AudioMixer:
         # next round. Cancelling it would also cancel the stream itself when the
         # stream is an async generator, which then ends and drops all its audio.
         self._pending: dict[_Stream, asyncio.Future[AudioFrame]] = {}
+        # Reads cancelled by remove_stream that may still be finishing their cancellation.
+        self._cancelling: set[asyncio.Future[AudioFrame]] = set()
         self._sample_rate: int = sample_rate
         self._num_channels: int = num_channels
         self._chunk_size: int = blocksize if blocksize > 0 else int(sample_rate // 10)
@@ -97,6 +99,9 @@ class AudioMixer:
         pending = self._pending.pop(stream, None)
         if pending is not None:
             pending.cancel()
+            # aclose() waits for the cancellation to finish, which can outlive this call.
+            self._cancelling.add(pending)
+            pending.add_done_callback(self._cancelling.discard)
 
     def __aiter__(self) -> "AudioMixer":
         return self
@@ -117,9 +122,14 @@ class AudioMixer:
         self._mixer_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await self._mixer_task
-        for pending in self._pending.values():
-            pending.cancel()
+        pending_reads = list(self._pending.values())
         self._pending.clear()
+        for pending in pending_reads:
+            pending.cancel()
+        # Cancelling only requests cancellation; wait so stream cleanup has finished on return.
+        # Reads already cancelled by remove_stream are awaited but not cancelled a second time,
+        # which would interrupt their cleanup.
+        await asyncio.gather(*pending_reads, *self._cancelling, return_exceptions=True)
 
     def end_input(self) -> None:
         """

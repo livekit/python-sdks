@@ -86,3 +86,58 @@ async def test_mixer_keeps_generator_stream_that_is_slower_than_the_timeout():
 
     frames_with_audio = [f for f in frames if np.any(np.frombuffer(f.data.tobytes(), np.int16))]
     assert len(frames_with_audio) == 5
+
+
+@pytest.mark.asyncio
+async def test_mixer_aclose_waits_for_pending_stream_cleanup():
+    """
+    Closing the mixer must finish cancelling an in-flight stream read, so the
+    stream's cleanup has completed by the time `aclose` returns.
+    """
+    cleaned_up = False
+
+    async def stream_with_slow_cleanup():
+        nonlocal cleaned_up
+        try:
+            await asyncio.sleep(10)
+            yield AudioFrame(
+                np.ones(BLOCKSIZE, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, BLOCKSIZE
+            )
+        finally:
+            await asyncio.sleep(0.1)
+            cleaned_up = True
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, stream_timeout_ms=50)
+    mixer.add_stream(stream_with_slow_cleanup())
+    await asyncio.sleep(0.2)  # the read is pending and has missed the timeout
+
+    await mixer.aclose()
+
+    assert cleaned_up
+
+
+@pytest.mark.asyncio
+async def test_mixer_aclose_waits_for_cleanup_of_a_removed_stream():
+    """A stream removed while its read is pending is also finished by `aclose`."""
+    cleaned_up = False
+
+    async def stream_with_slow_cleanup():
+        nonlocal cleaned_up
+        try:
+            await asyncio.sleep(10)
+            yield AudioFrame(
+                np.ones(BLOCKSIZE, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, BLOCKSIZE
+            )
+        finally:
+            await asyncio.sleep(0.1)
+            cleaned_up = True
+
+    stream = stream_with_slow_cleanup()
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, stream_timeout_ms=50)
+    mixer.add_stream(stream)
+    await asyncio.sleep(0.2)
+    mixer.remove_stream(stream)
+
+    await mixer.aclose()
+
+    assert cleaned_up
