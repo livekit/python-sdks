@@ -87,6 +87,11 @@ class RingQueue(Generic[T]):
         self._queue.append(item)
         self._event.set()
 
+    def put_end(self, item: T) -> None:
+        """Appends an end-of-stream marker without evicting a queued item, even when full."""
+        self._queue.append(item)
+        self._event.set()
+
     async def get(self) -> T:
         while len(self._queue) == 0:
             await self._event.wait()

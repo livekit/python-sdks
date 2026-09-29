@@ -132,3 +132,31 @@ async def test_video_stream_ends_when_eos_arrives_during_read() -> None:
         FfiClient.instance.queue.put(_video_eos_event())
 
         assert await asyncio.wait_for(reader, timeout=2) == []
+
+
+async def test_audio_stream_keeps_last_frame_when_bounded_queue_is_full_at_eos() -> None:
+    with (
+        patch.object(FfiClient.instance, "request", return_value=_response("new_audio_stream")),
+        patch.object(audio_stream, "FfiHandle", side_effect=_ffi_handle),
+        patch.object(audio_stream.AudioFrame, "_from_owned_info", side_effect=lambda _: object()),
+    ):
+        stream = rtc.AudioStream(_track(), capacity=1)
+        for event in (_audio_frame_event(), _audio_eos_event()):
+            FfiClient.instance.queue.put(event)
+        await asyncio.wait_for(stream._task, timeout=2)
+
+        assert len(await _collect(stream)) == 1
+
+
+async def test_video_stream_keeps_last_frame_when_bounded_queue_is_full_at_eos() -> None:
+    with (
+        patch.object(FfiClient.instance, "request", return_value=_response("new_video_stream")),
+        patch.object(video_stream, "FfiHandle", side_effect=_ffi_handle),
+        patch.object(video_stream.VideoFrame, "_from_owned_info", side_effect=lambda _: object()),
+    ):
+        stream = rtc.VideoStream(_track(), capacity=1)
+        for event in (_video_frame_event(), _video_eos_event()):
+            FfiClient.instance.queue.put(event)
+        await asyncio.wait_for(stream._task, timeout=2)
+
+        assert len(await _collect(stream)) == 1

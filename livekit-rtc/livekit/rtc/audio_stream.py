@@ -310,7 +310,7 @@ class AudioStream:
                 event = AudioFrameEvent(frame)
                 self._queue.put(event)
             elif audio_event.HasField("eos"):
-                self._queue.put(None)
+                self._queue.put_end(None)
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)

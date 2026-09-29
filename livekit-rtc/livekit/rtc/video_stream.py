@@ -160,7 +160,7 @@ class VideoStream:
 
                 self._queue.put(event)
             elif video_event.HasField("eos"):
-                self._queue.put(None)
+                self._queue.put_end(None)
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
