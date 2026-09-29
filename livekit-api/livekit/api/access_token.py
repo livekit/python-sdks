@@ -270,12 +270,23 @@ class TokenVerifier:
         }
         inference = InferenceGrants(**inference_dict)
 
+        observability_dict = claims.get("observability", dict())
+        observability_dict = {camel_to_snake(k): v for k, v in observability_dict.items()}
+        observability_dict = {
+            k: v
+            for k, v in observability_dict.items()
+            if k in ObservabilityGrants.__dataclass_fields__
+        }
+        observability = ObservabilityGrants(**observability_dict)
+
         grant_claims = Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
+            kind=claims.get("kind", ""),
             video=video,
             sip=sip,
             inference=inference,
+            observability=observability,
             attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
