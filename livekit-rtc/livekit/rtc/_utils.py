@@ -93,6 +93,9 @@ class RingQueue(Generic[T]):
         self._event.clear()
         return self._queue.popleft()
 
+    def empty(self) -> bool:
+        return len(self._queue) == 0
+
 
 class Queue(asyncio.Queue[T]):
     """asyncio.Queue with utility functions."""

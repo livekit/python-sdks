@@ -160,6 +160,7 @@ class VideoStream:
 
                 self._queue.put(event)
             elif video_event.HasField("eos"):
+                self._queue.put(None)
                 break
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -175,7 +176,8 @@ class VideoStream:
         return self
 
     async def __anext__(self) -> VideoFrameEvent:
-        if self._task.done():
+        # frames queued before the stream ended are still delivered
+        if self._task.done() and self._queue.empty():
             raise StopAsyncIteration
 
         item = await self._queue.get()

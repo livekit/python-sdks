@@ -335,7 +335,8 @@ class AudioStream:
         return self
 
     async def __anext__(self) -> AudioFrameEvent:
-        if self._task.done():
+        # frames queued before the stream ended are still delivered
+        if self._task.done() and self._queue.empty():
             raise StopAsyncIteration
 
         item = await self._queue.get()
