@@ -121,8 +121,10 @@ class EventEmitter(Generic[T_contra]):
                 callback(*args, **kwargs)
 
             # `inspect.signature` follows `__wrapped__`, so `emit` trims the arguments to
-            # what `callback` accepts, and `off` can match the wrapper to `callback`.
+            # what `callback` accepts. `_once_of` is set only on these wrappers, so `off`
+            # can match them to `callback` without touching other decorated listeners.
             once_callback.__wrapped__ = callback  # type: ignore[attr-defined]
+            once_callback._once_of = callback  # type: ignore[attr-defined]
             return self.on(event, once_callback)
         else:
 
@@ -216,11 +218,7 @@ class EventEmitter(Generic[T_contra]):
         """
         if event in self._events:
             handlers = self._events[event]
-            if callback in handlers:
-                del handlers[callback]
-                return
-            # a callback registered with `once` is stored wrapped
-            for registered in handlers:
-                if getattr(registered, "__wrapped__", None) == callback:
-                    del handlers[registered]
-                    return
+            handlers.pop(callback, None)
+            # a callback registered with `once` is stored wrapped, possibly more than once
+            for registered in [h for h in handlers if getattr(h, "_once_of", None) == callback]:
+                del handlers[registered]

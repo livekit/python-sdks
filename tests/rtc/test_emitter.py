@@ -359,3 +359,36 @@ def test_once_passes_all_arguments_to_a_varargs_callback() -> None:
     emitter.emit("event", 1, 2, 3)
 
     assert calls == [(1, 2, 3)]
+
+
+def test_off_keeps_a_wraps_decorated_listener_of_another_callback() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[bool] = []
+
+    def original() -> None:
+        pass
+
+    @functools.wraps(original)
+    def listener() -> None:
+        calls.append(True)
+
+    emitter.on("event", listener)
+    emitter.off("event", original)
+    emitter.emit("event")
+
+    assert calls == [True]
+
+
+def test_off_removes_every_once_registration_of_a_callback() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[bool] = []
+
+    def handler() -> None:
+        calls.append(True)
+
+    emitter.once("event", handler)
+    emitter.once("event", handler)
+    emitter.off("event", handler)
+    emitter.emit("event")
+
+    assert calls == []
