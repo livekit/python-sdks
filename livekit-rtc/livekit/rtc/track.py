@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from .audio_stream import AudioStream
     from .room import Room
     from .video_source import VideoSource
+    from .encoded_video import EncodedVideoSource
     from .platform_audio import PlatformAudioSource
 
 
@@ -213,7 +214,9 @@ class LocalVideoTrack(Track):
         super().__init__(info)
 
     @staticmethod
-    def create_video_track(name: str, source: "VideoSource") -> "LocalVideoTrack":
+    def create_video_track(
+        name: str, source: "Union[VideoSource, EncodedVideoSource]"
+    ) -> "LocalVideoTrack":
         req = proto_ffi.FfiRequest()
         req.create_video_track.name = name
         req.create_video_track.source_handle = source._ffi_handle.handle
