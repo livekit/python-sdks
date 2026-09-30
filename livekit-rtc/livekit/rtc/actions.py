@@ -9,6 +9,7 @@ from .rpc import RpcError
 
 ACTIONS_ATTRIBUTE = "lk.actions"
 ACTION_METHOD_PREFIX = "action:"
+DESCRIBE_METHOD = "lk.actions.describe"
 ACTION_DECLINED_CODE = 1710
 
 
@@ -18,6 +19,12 @@ class ActionEntry:
     description: str
     parameters: Dict[str, Any] = field(default_factory=dict)
     consent: str = "none"
+
+
+@dataclass
+class ActionSummary:
+    name: str
+    summary: Optional[str] = None
 
 
 @dataclass
@@ -41,7 +48,7 @@ class ActionRegistration:
         await self._unregister()
 
 
-def parse_actions(raw: Optional[str]) -> List[ActionEntry]:
+def parse_actions(raw: Optional[str]) -> List[ActionSummary]:
     if not raw:
         return []
     try:
@@ -50,6 +57,24 @@ def parse_actions(raw: Optional[str]) -> List[ActionEntry]:
         return []
     if not isinstance(items, list):
         return []
+    return [
+        ActionSummary(name=item["name"], summary=item.get("summary") or None)
+        for item in items
+        if isinstance(item, dict) and isinstance(item.get("name"), str)
+    ]
+
+
+def serialize_actions(summaries: List[ActionSummary]) -> str:
+    return json.dumps(
+        [
+            {"name": s.name, "summary": s.summary} if s.summary else {"name": s.name}
+            for s in summaries
+        ]
+    )
+
+
+def parse_describe(raw: str) -> List[ActionEntry]:
+    items = json.loads(raw).get("actions", []) if raw else []
     return [
         ActionEntry(
             name=item["name"],
@@ -62,8 +87,8 @@ def parse_actions(raw: Optional[str]) -> List[ActionEntry]:
     ]
 
 
-def serialize_actions(entries: List[ActionEntry]) -> str:
-    return json.dumps([asdict(e) for e in entries])
+def serialize_describe(entries: List[ActionEntry]) -> str:
+    return json.dumps({"actions": [asdict(e) for e in entries]})
 
 
 async def invoke_handler(handler: ActionHandler, payload: str, caller_identity: str) -> str:

@@ -406,7 +406,7 @@ class Room(EventEmitter[EventTypes]):
             - **"participant_attributes_changed"**: Called when a participant's attributes change.
                 - Arguments: `changed_attributes` (dict), `participant` (Participant)
             - **"participant_actions_changed"**: Called when a participant's exposed actions change.
-                - Arguments: `participant` (Participant), `actions` (list[ActionEntry])
+                - Arguments: `actions` (list[ActionSummary]), `participant` (Participant)
             - **"participant_encryption_status_changed"**: Called when a participant's encryption status changes.
                 - Arguments `is_encrypted` (bool), `participant` (Participant)
             - **"connection_quality_changed"**: Called when a participant's connection quality changes.

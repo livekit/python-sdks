@@ -120,6 +120,7 @@ from .actions import (
     ActionDeclinedError,
     ActionEntry,
     ActionRegistration,
+    ActionSummary,
 )
 from .rpc import RpcCallInfo, RpcError, RpcInterceptor, RpcInvocationData
 from .synchronizer import AVSynchronizer
@@ -219,6 +220,7 @@ __all__ = [
     "ActionDeclinedError",
     "ActionEntry",
     "ActionRegistration",
+    "ActionSummary",
     "RpcError",
     "RpcInvocationData",
     "RpcCallInfo",

@@ -24,7 +24,19 @@ import enum
 import os
 import mimetypes
 import weakref
-from typing import Any, List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
+from typing import (
+    Any,
+    List,
+    Union,
+    Callable,
+    Dict,
+    Awaitable,
+    Optional,
+    Mapping,
+    Tuple,
+    cast,
+    TypeVar,
+)
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -64,13 +76,17 @@ from .actions import (
     ACTION_DECLINED_CODE,
     ACTION_METHOD_PREFIX,
     ACTIONS_ATTRIBUTE,
+    DESCRIBE_METHOD,
     ActionDeclinedError,
     ActionEntry,
     ActionHandler,
     ActionRegistration,
+    ActionSummary,
     invoke_handler,
     parse_actions,
+    parse_describe,
     serialize_actions,
+    serialize_describe,
 )
 from .log import logger
 
@@ -187,8 +203,12 @@ class Participant(ABC):
         return dict(self._info.attributes)
 
     @property
-    def actions(self) -> List[ActionEntry]:
-        """Snapshot of the actions this participant exposes."""
+    def actions(self) -> List[ActionSummary]:
+        """
+        Snapshot of the actions this participant exposes.
+
+        Use `LocalParticipant.describe_actions` to fetch their full entries.
+        """
         return parse_actions(self._info.attributes.get(ACTIONS_ATTRIBUTE))
 
     @property
@@ -294,7 +314,7 @@ class LocalParticipant(Participant):
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
         self._rpc_interceptors: List[RpcInterceptor] = []
-        self._action_catalog: Dict[str, ActionEntry] = {}
+        self._action_catalog: Dict[str, Tuple[ActionEntry, Optional[str]]] = {}
         # Handles of data stream writers that have been opened but not yet
         # closed, so the room can drop them at disconnect. The FFI close
         # request consumes the handle (take_handle), so an entry is removed as
@@ -611,12 +631,14 @@ class LocalParticipant(Participant):
         handler: ActionHandler,
         *,
         consent: str = "none",
+        summary: Optional[str] = None,
     ) -> ActionRegistration:
         """
         Expose an action other participants can discover and call.
 
         The handler receives the parsed arguments and an `ActionContext`, may be sync or async,
         and returns a JSON-serializable result. Raise `ActionDeclinedError` to decline.
+        `summary` is a one-line hint published with the name; the full entry is served on describe.
         """
         method = ACTION_METHOD_PREFIX + name
 
@@ -624,15 +646,39 @@ class LocalParticipant(Participant):
             return await invoke_handler(handler, data.payload, data.caller_identity)
 
         self.register_rpc_method(method, rpc_handler)
-        self._action_catalog[name] = ActionEntry(name, description, parameters, consent)
+        if not self._action_catalog:
+            self.register_rpc_method(DESCRIBE_METHOD, self._handle_describe)
+        self._action_catalog[name] = (ActionEntry(name, description, parameters, consent), summary)
         await self._publish_actions()
 
         async def unregister() -> None:
             self.unregister_rpc_method(method)
             self._action_catalog.pop(name, None)
+            if not self._action_catalog:
+                self.unregister_rpc_method(DESCRIBE_METHOD)
             await self._publish_actions()
 
         return ActionRegistration(unregister)
+
+    async def describe_actions(
+        self,
+        destination_identity: str,
+        names: List[str],
+        *,
+        response_timeout: Optional[float] = None,
+    ) -> List[ActionEntry]:
+        """
+        Fetch full entries for actions another participant exposes.
+
+        Entries are returned in request order; names the participant does not expose are omitted.
+        """
+        response = await self.perform_rpc(
+            destination_identity=destination_identity,
+            method=DESCRIBE_METHOD,
+            payload=json.dumps({"names": names}),
+            response_timeout=response_timeout,
+        )
+        return parse_describe(response)
 
     async def call_action(
         self,
@@ -662,10 +708,15 @@ class LocalParticipant(Participant):
             raise
         return json.loads(response) if response else None
 
-    async def _publish_actions(self) -> None:
-        await self.set_attributes(
-            {ACTIONS_ATTRIBUTE: serialize_actions(list(self._action_catalog.values()))}
+    def _handle_describe(self, data: RpcInvocationData) -> str:
+        names = json.loads(data.payload)["names"]
+        return serialize_describe(
+            [self._action_catalog[n][0] for n in names if n in self._action_catalog]
         )
+
+    async def _publish_actions(self) -> None:
+        summaries = [ActionSummary(e.name, s) for e, s in self._action_catalog.values()]
+        await self.set_attributes({ACTIONS_ATTRIBUTE: serialize_actions(summaries)})
 
     def _republish_actions(self) -> None:
         if self._action_catalog:
