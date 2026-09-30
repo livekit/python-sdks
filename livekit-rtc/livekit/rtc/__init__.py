@@ -115,6 +115,12 @@ try:
 except Exception:  # pragma: no cover - optional dependency (sounddevice)
     _HAS_MEDIA_DEVICES = False
 from .utils import combine_audio_frames
+from .actions import (
+    ActionContext,
+    ActionDeclinedError,
+    ActionEntry,
+    ActionRegistration,
+)
 from .rpc import RpcCallInfo, RpcError, RpcInterceptor, RpcInvocationData
 from .synchronizer import AVSynchronizer
 from .data_stream import (
@@ -209,6 +215,10 @@ __all__ = [
     "AudioMixer",
     "AudioResampler",
     "AudioResamplerQuality",
+    "ActionContext",
+    "ActionDeclinedError",
+    "ActionEntry",
+    "ActionRegistration",
     "RpcError",
     "RpcInvocationData",
     "RpcCallInfo",

@@ -33,6 +33,7 @@ from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
+from .actions import ACTIONS_ATTRIBUTE
 from .log import logger
 from .participant import (
     LocalParticipant,
@@ -72,6 +73,7 @@ EventTypes = Literal[
     "participant_metadata_changed",
     "participant_name_changed",
     "participant_attributes_changed",
+    "participant_actions_changed",
     "connection_quality_changed",
     "participant_encryption_status_changed",
     "participant_permissions_changed",
@@ -403,6 +405,8 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `participant` (Participant), `old_name` (str), `new_name` (str)
             - **"participant_attributes_changed"**: Called when a participant's attributes change.
                 - Arguments: `changed_attributes` (dict), `participant` (Participant)
+            - **"participant_actions_changed"**: Called when a participant's exposed actions change.
+                - Arguments: `participant` (Participant), `actions` (list[ActionEntry])
             - **"participant_encryption_status_changed"**: Called when a participant's encryption status changes.
                 - Arguments `is_encrypted` (bool), `participant` (Participant)
             - **"connection_quality_changed"**: Called when a participant's connection quality changes.
@@ -1030,6 +1034,8 @@ class Room(EventEmitter[EventTypes]):
                 changed_attributes,
                 participant,
             )
+            if ACTIONS_ATTRIBUTE in changed_attributes:
+                self.emit("participant_actions_changed", participant.actions, participant)
         elif which == "participant_encryption_status_changed":
             identity = event.participant_encryption_status_changed.participant_identity
             participant = self._retrieve_participant(identity)
@@ -1130,6 +1136,8 @@ class Room(EventEmitter[EventTypes]):
         elif which == "reconnecting":
             self.emit("reconnecting")
         elif which == "reconnected":
+            if self._local_participant is not None:
+                self._local_participant._republish_actions()
             self.emit("reconnected")
         elif which == "text_stream_opened":
             self._handle_text_stream_opened(event.text_stream_opened)

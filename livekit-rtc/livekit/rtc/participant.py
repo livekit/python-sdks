@@ -18,12 +18,13 @@ import ctypes
 import asyncio
 import functools
 import inspect
+import json
 import datetime
 import enum
 import os
 import mimetypes
 import weakref
-from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
+from typing import Any, List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -59,6 +60,18 @@ from .rpc import (
     _chain_outgoing,
 )
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
+from .actions import (
+    ACTION_DECLINED_CODE,
+    ACTION_METHOD_PREFIX,
+    ACTIONS_ATTRIBUTE,
+    ActionDeclinedError,
+    ActionEntry,
+    ActionHandler,
+    ActionRegistration,
+    invoke_handler,
+    parse_actions,
+    serialize_actions,
+)
 from .log import logger
 
 from .data_stream import (
@@ -174,6 +187,11 @@ class Participant(ABC):
         return dict(self._info.attributes)
 
     @property
+    def actions(self) -> List[ActionEntry]:
+        """Snapshot of the actions this participant exposes."""
+        return parse_actions(self._info.attributes.get(ACTIONS_ATTRIBUTE))
+
+    @property
     def kind(self) -> proto_participant.ParticipantKind.ValueType:
         """Participant's kind (e.g., regular participant, ingress, egress, sip, agent)."""
         return self._info.kind
@@ -276,6 +294,7 @@ class LocalParticipant(Participant):
         self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
         self._rpc_interceptors: List[RpcInterceptor] = []
+        self._action_catalog: Dict[str, ActionEntry] = {}
         # Handles of data stream writers that have been opened but not yet
         # closed, so the room can drop them at disconnect. The FFI close
         # request consumes the handle (take_handle), so an entry is removed as
@@ -583,6 +602,74 @@ class LocalParticipant(Participant):
         req.unregister_rpc_method.method = method
 
         FfiClient.instance.request(req)
+
+    async def register_action(
+        self,
+        name: str,
+        description: str,
+        parameters: Dict[str, Any],
+        handler: ActionHandler,
+        *,
+        consent: str = "none",
+    ) -> ActionRegistration:
+        """
+        Expose an action other participants can discover and call.
+
+        The handler receives the parsed arguments and an `ActionContext`, may be sync or async,
+        and returns a JSON-serializable result. Raise `ActionDeclinedError` to decline.
+        """
+        method = ACTION_METHOD_PREFIX + name
+
+        async def rpc_handler(data: RpcInvocationData) -> str:
+            return await invoke_handler(handler, data.payload, data.caller_identity)
+
+        self.register_rpc_method(method, rpc_handler)
+        self._action_catalog[name] = ActionEntry(name, description, parameters, consent)
+        await self._publish_actions()
+
+        async def unregister() -> None:
+            self.unregister_rpc_method(method)
+            self._action_catalog.pop(name, None)
+            await self._publish_actions()
+
+        return ActionRegistration(unregister)
+
+    async def call_action(
+        self,
+        destination_identity: str,
+        name: str,
+        args: Optional[Dict[str, Any]] = None,
+        *,
+        response_timeout: Optional[float] = None,
+    ) -> Any:
+        """
+        Call an action on another participant and return its parsed result.
+
+        Raises:
+            ActionDeclinedError: The participant declined the call.
+            RpcError: Unknown action, timeout, or other transport failure.
+        """
+        try:
+            response = await self.perform_rpc(
+                destination_identity=destination_identity,
+                method=ACTION_METHOD_PREFIX + name,
+                payload=json.dumps(args or {}),
+                response_timeout=response_timeout,
+            )
+        except RpcError as e:
+            if e.code == ACTION_DECLINED_CODE:
+                raise ActionDeclinedError(e.message) from e
+            raise
+        return json.loads(response) if response else None
+
+    async def _publish_actions(self) -> None:
+        await self.set_attributes(
+            {ACTIONS_ATTRIBUTE: serialize_actions(list(self._action_catalog.values()))}
+        )
+
+    def _republish_actions(self) -> None:
+        if self._action_catalog:
+            asyncio.ensure_future(self._publish_actions())
 
     def set_track_subscription_permissions(
         self,
