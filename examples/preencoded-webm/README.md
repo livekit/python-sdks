@@ -37,68 +37,23 @@ Use short GOPs and an appropriate bitrate for a file demonstration. Late joiners
 and packet loss may require waiting until the next keyframe. This example does not
 provide adaptive encoding or a loss-recovery policy.
 
-## Experimental single-track alpha transport
+## Transparency and container-preserving transport
 
-**This is a backend wire-format prototype, not interoperable transparent WebRTC.**
-Opaque publishing works with existing VP8/VP9 receivers. Alpha mode must only be
-used with matching test receivers in an isolated room; an ordinary browser/mobile
-LiveKit video track does not recognize the additional data. No browser or mobile
-playback adapter is implemented here.
+This example publishes opaque video as a standard VP8/VP9 media track. It removes
+WebM container framing, so it rejects alpha and BlockAdditional side data instead
+of silently losing them. It does not define a custom alpha payload or transport.
 
-By default, the demuxer rejects alpha WebM instead of silently dropping its alpha.
-To opt into the experimental VP9 envelope:
+To preserve transparent WebM, carry its original bytes, including the WebM header,
+track metadata, Clusters, and BlockAdditional elements. LiveKit's existing
+[byte-stream API](https://docs.livekit.io/transport/data/byte-streams/) can carry
+such bytes incrementally, but is a data stream rather than a video media track.
+An ordinary VP9 RTP media track does not accept a WebM container as its payload.
 
-```sh
-.venv/bin/python examples/preencoded-webm/publish.py transparent.webm \
-  --room alpha-experiment --experimental-alpha
-```
-
-The prototype extracts the VP9 color access unit and the separately compressed
-alpha access unit from WebM `BlockAdditional` with `BlockAddID=1`. It publishes both
-inside **one encoded-frame payload on one media track**, sharing one frame type,
-timestamp, and RTP frame boundary. There is no second track or data channel.
-The native passthrough encoder forwards the bytes, and normal RTP packetization
-can split them across multiple packets.
-
-The provisional payload is:
-
-```text
-[color access unit][alpha access unit]
-[color length: u32 big endian][alpha length: u32 big endian]["LKWA"][version: u8 = 1]
-```
-
-`LKWA` and version 1 are local proposal values, not an assigned LiveKit format.
-Lengths exclude the 13-byte footer. Both components must be nonempty and the
-entire payload must be at most 16 MiB in this example. A receiver validates the
-footer and sizes after RTP reassembly, then extracts the original compressed
-components **before** handing anything to an ordinary VP9 decoder. The included
-`unpack_alpha` function specifies that byte contract; it is not a video renderer.
-Sparse/reused alpha blocks and dimension changes are not supported. A WebM
-keyframe must contain independently decodable color and alpha components.
-
-This deliberately does not overload LiveKit's `FrameMetadata.user_data`: the
-native LKTS trailer has a one-byte length and a maximum total size of 255 bytes,
-while alpha access units can be many kilobytes. The media envelope precedes any
-native metadata trailer. Combining it with frame metadata or E2EE needs separate
-interoperability testing; this example does not enable either.
-
-### Required before this could become a supported feature
-
-- Agree on a versioned transport profile with LiveKit maintainers. The example's
-  track name identifies a prototype; it does **not** negotiate receiver support.
-- Add capability signaling and enforce it for every subscriber, including late
-  joins. Unsupported receivers must be rejected or explicitly offered an opaque
-  fallback. Today's server does not strip this custom alpha envelope for them.
-- Implement a receiver path for each target platform. A browser adapter could
-  investigate remuxing compressed color and alpha into WebM for native playback;
-  browser/MSE alpha support and latency must be tested. Native mobile SDKs need
-  their own supported decode/playback path. No cross-platform guarantee follows
-  from successful byte transport.
-- Validate loss/reordering/retransmission, congestion feedback, keyframe recovery,
-  codec profiles, resource limits, metadata, encryption, and reconnection.
-
-These are interoperability requirements, not additional Python encoder settings.
-Keep the alpha mode experimental until they are resolved.
+A future client adapter could feed an intact WebM byte stream into native media
+playback without application-side decoding or re-encoding. Streaming playback,
+alpha support, and latency still need validation on each target browser/mobile
+platform. The adjacent [WebM byte-stream example](../webm-byte-stream/) forwards the
+container intact. No client playback adapter is included.
 
 ## Validation
 
@@ -106,14 +61,7 @@ Keep the alpha mode experimental until they are resolved.
 uv run --with 'av>=16.1' pytest tests/rtc/test_encoded_video.py tests/rtc/test_webm_example.py
 ```
 
-Tests generate synthetic alpha WebM, verify unchanged compressed payloads and
-key/delta timestamps, read the first frame before a pipe reaches EOF, reject
-malformed/oversized envelopes, and check cancellation joins the active demux read.
-The base API's server-backed test publishes VP9 and verifies subscriber pixels.
-
-A separate local transport probe used Python FFI 0.12.80, LiveKit server 1.13.7,
-and a Go SDK 2.18.1 subscriber to reassemble RTP without decoding. A 37,630-byte
-compound frame (27,578 color bytes, 10,039 alpha bytes, 13-byte footer) crossed the
-server in 33 RTP packets with identical SHA-256 before and after. This demonstrates
-transport through the tested stack; it does not validate an alpha player or
-compatibility with every LiveKit deployment.
+Tests generate synthetic WebM, verify unchanged compressed video bytes and
+key/delta timestamps, reject alpha, read the first frame before a pipe or HTTP
+response reaches EOF, and check startup and cancellation cleanup. The base API's
+server-backed test publishes VP9 and verifies subscriber pixels.

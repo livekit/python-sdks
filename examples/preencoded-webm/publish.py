@@ -107,7 +107,7 @@ async def main(args: argparse.Namespace) -> None:
         buffer_size=4096,
         options={"probesize": "4096", "analyzeduration": "0"},
     ) as container:
-        frames = demux(container, experimental_alpha=args.experimental_alpha)
+        frames = demux(container)
         room = rtc.Room()
         token = (
             api.AccessToken()
@@ -117,11 +117,7 @@ async def main(args: argparse.Namespace) -> None:
         )
         try:
             await room.connect(os.environ["LIVEKIT_URL"], token)
-            await publish(
-                room,
-                frames,
-                name="experimental-webm-alpha-v1" if args.experimental_alpha else "webm",
-            )
+            await publish(room, frames, name="webm")
         finally:
             await room.disconnect()
 
@@ -130,10 +126,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", help="WebM file or streaming HTTP(S) URL")
     parser.add_argument("--room", default="preencoded-webm")
-    parser.add_argument(
-        "--experimental-alpha",
-        action="store_true",
-        help="use the unnegotiated alpha prototype; matching test receivers only",
-    )
     logging.basicConfig(level=logging.INFO)
     asyncio.run(main(parser.parse_args()))
