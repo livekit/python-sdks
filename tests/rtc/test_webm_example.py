@@ -99,6 +99,11 @@ def test_opaque_webm(codec: str) -> None:
 
 
 def test_demux_before_pipe_eof(alpha_webm: bytes) -> None:
+    class PipeReader(io.BufferedReader):
+        def seekable(self) -> bool:
+            # Windows can report an anonymous pipe as seekable; FFmpeg must not seek it.
+            return False
+
     read_fd, write_fd = os.pipe()
     decoded_first = threading.Event()
     writer_closed = threading.Event()
@@ -117,7 +122,7 @@ def test_demux_before_pipe_eof(alpha_webm: bytes) -> None:
     writer.start()
     try:
         with (
-            os.fdopen(read_fd, "rb") as pipe,
+            PipeReader(io.FileIO(read_fd, "rb")) as pipe,
             av.open(
                 pipe,
                 format="webm",
