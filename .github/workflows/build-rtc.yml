@@ -73,6 +73,8 @@ jobs:
             archs: aarch64
           - os: windows-latest
             archs: AMD64
+          - os: windows-11-arm
+            archs: ARM64
           - os: macos-latest
             archs: x86_64 arm64
     defaults:
@@ -166,6 +168,16 @@ jobs:
           - os: windows-latest
             python-version: "3.14"
             artifact: rtc-release-windows-latest
+          # Windows ARM64 tests
+          - os: windows-11-arm
+            python-version: "3.11"
+            artifact: rtc-release-windows-11-arm
+          - os: windows-11-arm
+            python-version: "3.12"
+            artifact: rtc-release-windows-11-arm
+          - os: windows-11-arm
+            python-version: "3.14"
+            artifact: rtc-release-windows-11-arm
     uses: ./.github/workflows/tests.yml
     with:
       os: ${{ matrix.os }}
