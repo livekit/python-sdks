@@ -1,0 +1,3 @@
+# Requires Python 3.10+.
+# Install the local SDK from the repository root first: uv sync --dev
+av>=16.1
