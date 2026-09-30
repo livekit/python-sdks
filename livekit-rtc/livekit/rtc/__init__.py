@@ -35,6 +35,7 @@ from ._proto.room_pb2 import (
     SimulateScenarioKind,
     TrackPublishOptions,
     VideoEncoding,
+    VideoEncoderBackend,
 )
 from ._proto.track_pb2 import (
     FrameMetadataFeature,
@@ -43,7 +44,13 @@ from ._proto.track_pb2 import (
     TrackSource,
     ParticipantTrackPermission,
 )
-from ._proto.video_frame_pb2 import FrameMetadata, VideoBufferType, VideoCodec, VideoRotation
+from ._proto.video_frame_pb2 import (
+    EncodedFrameType,
+    FrameMetadata,
+    VideoBufferType,
+    VideoCodec,
+    VideoRotation,
+)
 from ._proto.track_publication_pb2 import VideoQuality
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
@@ -95,6 +102,12 @@ from .version import __version__
 from .video_frame import (
     VideoFrame,
 )
+from .encoded_video import (
+    EncodedVideoFrame,
+    EncodedVideoSource,
+    EncodedVideoSourceFeedback,
+    EncodedRateControl,
+)
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
@@ -138,6 +151,12 @@ from .data_track import (
 from .frame_processor import FrameProcessor
 
 __all__ = [
+    "EncodedFrameType",
+    "EncodedVideoFrame",
+    "EncodedVideoSource",
+    "EncodedVideoSourceFeedback",
+    "EncodedRateControl",
+    "VideoEncoderBackend",
     "ConnectionQuality",
     "ConnectionState",
     "DataPacketKind",

@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           submodules: true
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -48,7 +49,13 @@ jobs:
       - name: generate python stubs
         run: ./generate_proto.sh
 
+      # Fork PR tokens cannot push generated changes. Verify them read-only.
+      - name: Check generated stubs on forks
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: git diff --exit-code -- livekit/rtc/_proto
+
       - name: Add changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11
         with:
           add: '["livekit-rtc/"]'
