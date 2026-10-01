@@ -202,8 +202,8 @@ class TwirpClient:
         if scheme.startswith("ws"):
             scheme = scheme.replace("ws", "http")
 
-        host = f"{scheme}://{parse_res.netloc}/{parse_res.path}"
-        self.host = host.rstrip("/")
+        self._base_path = parse_res.path.rstrip("/")
+        self.host = f"{scheme}://{parse_res.netloc}{self._base_path}"
         self.pkg = pkg
         self.prefix = prefix
         self._session = session
@@ -251,7 +251,7 @@ class TwirpClient:
 
         for attempt in range(max_attempts):
             is_last = attempt + 1 >= max_attempts
-            url = f"{current_origin}/{path}"
+            url = f"{current_origin}{self._base_path}/{path}"
 
             transport_exc: Optional[BaseException] = None
             retryable_status: Optional[int] = None
