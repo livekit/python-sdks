@@ -119,8 +119,12 @@ class Queue(asyncio.Queue[T]):
         Lets a ``join()`` that is already waiting on this queue return once there
         is no consumer left for it.
         """
-        while self._unfinished_tasks > 0:
-            self.task_done()
+        while True:
+            try:
+                self.task_done()
+            except ValueError:
+                # task_done() raises once every item is accounted for
+                return
 
 
 class BroadcastQueue(Generic[T]):
