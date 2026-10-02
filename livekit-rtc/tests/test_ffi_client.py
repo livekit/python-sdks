@@ -22,13 +22,16 @@ from livekit import rtc
 
 def test_request_leaves_no_cyclic_garbage() -> None:
     gc.collect()
-    gc.set_debug(gc.DEBUG_SAVEALL)
+    debug_flags = gc.get_debug()
+    garbage_len = len(gc.garbage)
+    gc.set_debug(debug_flags | gc.DEBUG_SAVEALL)
     try:
         for _ in range(50):
             rtc.AudioProcessingModule()
         gc.collect()
-        array_types = [o for o in gc.garbage if isinstance(o, type(ctypes.Array))]
+        new_garbage = gc.garbage[garbage_len:]
+        array_types = [o for o in new_garbage if isinstance(o, type(ctypes.Array))]
     finally:
-        gc.set_debug(0)
-        gc.garbage.clear()
+        gc.set_debug(debug_flags)
+        del gc.garbage[garbage_len:]
     assert array_types == []
