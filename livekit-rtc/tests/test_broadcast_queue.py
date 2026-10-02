@@ -23,7 +23,7 @@ async def _join_finishes(queue: BroadcastQueue, timeout: float = 1.0) -> bool:
 
 
 @pytest.mark.asyncio
-async def test_join_waits_for_a_subscriber_that_has_not_finished():
+async def test_join_waits_for_a_subscriber_that_has_not_finished() -> None:
     broadcast: BroadcastQueue[int] = BroadcastQueue()
     subscriber = broadcast.subscribe()
     broadcast.put_nowait(1)
@@ -36,7 +36,7 @@ async def test_join_waits_for_a_subscriber_that_has_not_finished():
 
 
 @pytest.mark.asyncio
-async def test_unsubscribe_releases_a_join_waiting_on_a_queued_event():
+async def test_unsubscribe_releases_a_join_waiting_on_a_queued_event() -> None:
     broadcast: BroadcastQueue[int] = BroadcastQueue()
     subscriber = broadcast.subscribe()
     broadcast.put_nowait(1)
@@ -52,7 +52,7 @@ async def test_unsubscribe_releases_a_join_waiting_on_a_queued_event():
 
 
 @pytest.mark.asyncio
-async def test_unsubscribe_releases_a_join_waiting_on_an_event_that_was_taken():
+async def test_unsubscribe_releases_a_join_waiting_on_an_event_that_was_taken() -> None:
     broadcast: BroadcastQueue[int] = BroadcastQueue()
     subscriber = broadcast.subscribe()
     broadcast.put_nowait(1)
@@ -68,7 +68,7 @@ async def test_unsubscribe_releases_a_join_waiting_on_an_event_that_was_taken():
 
 
 @pytest.mark.asyncio
-async def test_unsubscribe_keeps_other_subscribers_in_the_join():
+async def test_unsubscribe_keeps_other_subscribers_in_the_join() -> None:
     broadcast: BroadcastQueue[int] = BroadcastQueue()
     gone = broadcast.subscribe()
     staying = broadcast.subscribe()
@@ -86,7 +86,7 @@ async def test_unsubscribe_keeps_other_subscribers_in_the_join():
 
 
 @pytest.mark.asyncio
-async def test_unsubscribe_after_every_event_is_finished_is_a_no_op():
+async def test_unsubscribe_after_every_event_is_finished_is_a_no_op() -> None:
     broadcast: BroadcastQueue[int] = BroadcastQueue()
     subscriber = broadcast.subscribe()
     broadcast.put_nowait(1)
