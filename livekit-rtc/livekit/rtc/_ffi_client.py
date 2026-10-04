@@ -288,7 +288,6 @@ class FfiClient:
             )
         proto_data = req.SerializeToString()
         proto_len = len(proto_data)
-        # A `c_ubyte * n` array type is a reference cycle that only the gc frees.
         data = ctypes.cast(ctypes.c_char_p(proto_data), ctypes.POINTER(ctypes.c_ubyte))
 
         resp_ptr = ctypes.POINTER(ctypes.c_ubyte)()
