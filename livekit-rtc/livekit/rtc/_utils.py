@@ -113,6 +113,19 @@ class Queue(asyncio.Queue[T]):
 
             self.task_done()
 
+    def release(self) -> None:
+        """Mark every unfinished item as done.
+
+        Lets a ``join()`` that is already waiting on this queue return once there
+        is no consumer left for it.
+        """
+        while True:
+            try:
+                self.task_done()
+            except ValueError:
+                # task_done() raises once every item is accounted for
+                return
+
 
 class BroadcastQueue(Generic[T]):
     """Queue with multiple subscribers."""
@@ -135,6 +148,10 @@ class BroadcastQueue(Generic[T]):
 
     def unsubscribe(self, queue: Queue[T]) -> None:
         self._subscribers.remove(queue)
+        # A join() may already hold this queue. Events that are still queued, or that
+        # the subscriber took but never finished, have no consumer anymore, so
+        # release them instead of leaving the joiner waiting forever.
+        queue.release()
 
     async def join(self) -> None:
         async with self._lock:
