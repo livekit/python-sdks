@@ -1,0 +1,89 @@
+name: Dependency security
+
+on:
+  pull_request:
+    paths:
+      - "**/pyproject.toml"
+      - "**/uv.lock"
+      - "**/package.json"
+      - "**/pnpm-lock.yaml"
+      - "renovate.json"
+      - "scripts/audit_requirements.py"
+      - "scripts/check_notebook_audit.py"
+      - ".github/workflows/dependency-security.yml"
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python dependency audit (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.24"
+
+      - name: Export locked dependencies
+        run: |
+          uv export --locked --no-emit-workspace --no-hashes --output-file "$RUNNER_TEMP/dependencies.txt" > /dev/null
+          uv export --project examples/local_video --locked --no-emit-local --no-hashes --output-file "$RUNNER_TEMP/example.txt" > /dev/null
+
+      - name: Audit workspace and example
+        run: |
+          uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -r "$RUNNER_TEMP/dependencies.txt" --format json --output "$RUNNER_TEMP/python-audit.json"
+          uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -r "$RUNNER_TEMP/example.txt" --format json --output "$RUNNER_TEMP/example-audit.json"
+
+      - name: Report Python 3.9 findings
+        if: matrix.python-version == '3.12'
+        continue-on-error: true
+        run: |
+          uv run --no-project --with packaging==26.0 python scripts/audit_requirements.py "$RUNNER_TEMP/dependencies.txt" "$RUNNER_TEMP/python39.txt" --python-version 3.9
+          echo '::warning::Python 3.9 retains aiohttp/multidict advisories whose fixes require Python 3.10+. See the audit artifact.'
+          uvx --from pip-audit==2.10.1 pip-audit --disable-pip --no-deps -r "$RUNNER_TEMP/python39.txt" --format json --output "$RUNNER_TEMP/python39-audit.json"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: python-audit-${{ matrix.python-version }}
+          path: ${{ runner.temp }}/*audit.json
+
+  notebook:
+    name: Notebook dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+
+      - name: Audit notebook dependencies
+        run: |
+          npm install --global pnpm@10.28.2
+          # The checker handles the exact known unpatched finding and blocks all others.
+          if pnpm --dir livekit-rtc/jupyter-html audit --json > "$RUNNER_TEMP/notebook-audit.json"; then
+            echo "Notebook audit has no findings"
+          fi
+          python scripts/check_notebook_audit.py "$RUNNER_TEMP/notebook-audit.json"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: notebook-audit
+          path: ${{ runner.temp }}/notebook-audit.json
