@@ -77,7 +77,13 @@ jobs:
         run: |
           npm install --global pnpm@10.28.2
           # The checker handles the exact known unpatched finding and blocks all others.
-          if pnpm --dir livekit-rtc/jupyter-html audit --json > "$RUNNER_TEMP/notebook-audit.json"; then
+          audit_status=0
+          pnpm --dir livekit-rtc/jupyter-html audit --json > "$RUNNER_TEMP/notebook-audit.json" || audit_status=$?
+          if [ "$audit_status" -gt 1 ]; then
+            echo "::error::Notebook audit failed with exit status $audit_status"
+            exit "$audit_status"
+          fi
+          if [ "$audit_status" -eq 0 ]; then
             echo "Notebook audit has no findings"
           fi
           python scripts/check_notebook_audit.py "$RUNNER_TEMP/notebook-audit.json"
