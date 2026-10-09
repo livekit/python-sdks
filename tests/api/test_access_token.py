@@ -8,7 +8,7 @@ from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
 TEST_API_KEY = "myapikey"
-TEST_API_SECRET = "thiskeyistotallyunsafe"
+TEST_API_SECRET = "thiskeyistotallyunsafe-but-32-bytes-long"
 
 
 def test_verify_token() -> None:
@@ -81,7 +81,7 @@ def test_agent_config() -> None:
 def test_verify_token_invalid() -> None:
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
-    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
+    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret-padded-to-32-bytes-long")
     with pytest.raises(Exception):
         token_verifier.verify(token)
 
