@@ -26,6 +26,7 @@ export LIVEKIT_API_SECRET=secret
 | [publish_wave.py](#publish_wavepy) | Publish sine wave audio |
 | [publish_hue.py](#publish_huepy) | Publish color-cycling video |
 | [play_audio_stream.py](#play_audio_streampy) | Play received audio with sounddevice |
+| [desktop_audio/](desktop_audio/) | Publish application, system, or microphone audio with PocketStation |
 | [webhook.py](#webhookpy) | Webhook event handling |
 | [agent_dispatch.py](#agent_dispatchpy) | Manual agent dispatch |
 
@@ -279,6 +280,14 @@ Play incoming audio from remote participants using sounddevice.
 pip install sounddevice
 python play_audio_stream.py
 ```
+
+---
+
+## desktop_audio/
+
+Publish one running application, the complete desktop output mix, or an
+explicitly selected microphone as a LiveKit audio track. See the
+[desktop audio example](desktop_audio/).
 
 ---
 
