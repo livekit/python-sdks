@@ -26,7 +26,12 @@ on:
 
 jobs:
   failover:
+    name: API (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     services:
       mock-server:
         image: livekit/test-server:latest
@@ -42,7 +47,7 @@ jobs:
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: "3.12"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
@@ -51,7 +56,8 @@ jobs:
         run: |
           uv venv .failover-venv
           source .failover-venv/bin/activate
-          uv pip install ./livekit-protocol ./livekit-api pytest aiohttp
+          uv pip install ./livekit-protocol ./livekit-api "pytest>=9.0.3; python_version >= '3.10'" "pytest==8.4.2; python_version < '3.10'"
+          uv pip check
 
       - name: Wait for mock server
         run: |
@@ -64,4 +70,42 @@ jobs:
       - name: Run API tests
         run: |
           source .failover-venv/bin/activate
-          pytest tests/api -v
+          # Use a private directory instead of pytest's shared /tmp default.
+          pytest tests/api -v --basetemp="$(mktemp -d)"
+
+  wheels:
+    name: API wheels (${{ matrix.os }}, Python ${{ matrix.python-version }}, ${{ matrix.resolution }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: ["3.9", "3.14"]
+        resolution: [lowest-direct, highest]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+
+      - name: Build and install distributions
+        shell: bash
+        run: |
+          uv build --package livekit-api --out-dir dist
+          uv build --package livekit-protocol --out-dir dist
+          uv venv .api-wheel-venv
+          uv pip install --python .api-wheel-venv --resolution '${{ matrix.resolution }}' dist/*.whl "pytest>=9.0.3; python_version >= '3.10'" "pytest==8.4.2; python_version < '3.10'"
+          uv pip check --python .api-wheel-venv
+
+      - name: Test token and webhook compatibility
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            test_python=.api-wheel-venv/Scripts/python.exe
+          else
+            test_python=.api-wheel-venv/bin/python
+          fi
+          "$test_python" -m pytest tests/api/test_access_token.py tests/api/test_webhook.py -v --basetemp="$RUNNER_TEMP/pytest-api"
