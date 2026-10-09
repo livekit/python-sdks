@@ -404,6 +404,14 @@ Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are us
 
 Please join us on [Slack](https://livekit.io/join-slack) to get help from our devs / community members. We welcome your contributions(PRs) and details can be discussed there.
 
+### Development environment
+
+The published SDKs support Python 3.9 and later. Development and release tooling
+requires Python 3.10 or later so that patched versions of its dependencies can be
+installed. For example, run `uv sync --locked --dev --python 3.12` from the
+repository root. A Python 3.9 runtime environment can use
+`uv sync --locked --no-dev --python 3.9`.
+
 <!--BEGIN_REPO_NAV-->
 <br/><table>
 <thead><tr><th colspan="2">LiveKit Ecosystem</th></tr></thead>
