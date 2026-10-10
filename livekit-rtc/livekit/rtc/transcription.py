@@ -1,5 +1,5 @@
 from typing import List
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -17,3 +17,4 @@ class TranscriptionSegment:
     end_time: int
     language: str
     final: bool
+    words: List[dict] = field(default_factory=list)
