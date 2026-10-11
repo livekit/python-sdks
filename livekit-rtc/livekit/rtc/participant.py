@@ -974,6 +974,56 @@ class LocalParticipant(Participant):
 
         return _byte_stream_info_from_proto(cb.send_file.info)
 
+    async def send_bytes(
+        self,
+        data: bytes,
+        *,
+        topic: str = "",
+        name: str | None = None,
+        mime_type: str | None = None,
+        destination_identities: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        stream_id: str | None = None,
+        compress: bool = True,
+    ) -> ByteStreamInfo:
+        """
+        Sends an in-memory buffer as a complete byte stream in one call.
+        Unlike stream_bytes(), the whole payload is known up front, so short payloads can be
+        sent as a single packet and larger ones compressed, when every recipient supports it.
+        `name` defaults to "unknown" and `mime_type` to "application/octet-stream".
+        """
+        req = proto_ffi.FfiRequest()
+        req.send_bytes.local_participant_handle = self._ffi_handle.handle
+        req.send_bytes.bytes = data
+        options = req.send_bytes.options
+        options.topic = topic
+        if name is not None:
+            options.name = name
+        if mime_type is not None:
+            options.mime_type = mime_type
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
+        options.compress = compress
+        options.sender_identity = self.identity
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_bytes.async_id == resp.send_bytes.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.send_bytes.HasField("error"):
+            raise StreamError(cb.send_bytes.error.description)
+
+        return _byte_stream_info_from_proto(cb.send_bytes.info)
+
     async def publish_data_track(
         self,
         *,
