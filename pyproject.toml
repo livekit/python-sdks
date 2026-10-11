@@ -5,6 +5,20 @@ description = "LiveKit Python SDKs monorepo"
 requires-python = ">=3.9"
 dependencies = ["livekit", "livekit-api", "livekit-protocol"]
 
+[tool.uv]
+# Security floors for transitive development and release dependencies.
+constraint-dependencies = [
+    "cryptography>=50.0.0",
+    "filelock>=3.20.3",
+    "pillow>=12.3.0",
+    "pygments>=2.20.0",
+    "urllib3>=2.8.0",
+]
+
+[tool.uv.dependency-groups]
+# Patched tooling requires Python 3.10; published SDKs still support Python 3.9.
+dev = { requires-python = ">=3.10" }
+
 [tool.uv.workspace]
 members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
 
@@ -21,10 +35,10 @@ dev = [
     "types-aiofiles>=24",
     "ipython>=8.0.0",
     # Testing
-    "pytest>=8.3.4",
+    "pytest>=9.0.3",
     "pytest-asyncio>=0.24.0",
     # Build and packaging
-    "requests",
+    "requests>=2.33.0",
     "wheel",
     "twine",
     "auditwheel; sys_platform == 'linux'",
