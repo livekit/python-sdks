@@ -33,7 +33,7 @@ def _allocate_real_handle() -> int:
     resp = FfiClient.instance.request(req)
     handle_id = resp.new_audio_source.source.handle.id
     assert handle_id != 0
-    return handle_id
+    return int(handle_id)
 
 
 def test_active_runtime_invalid_handle_asserts() -> None:
