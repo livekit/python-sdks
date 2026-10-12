@@ -3,7 +3,15 @@ import datetime
 
 import jwt
 import pytest
-from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
+from livekit.api import (
+    AccessToken,
+    AgentEndpointGrants,
+    AgentGrants,
+    AgentThreadGrants,
+    SIPGrants,
+    TokenVerifier,
+    VideoGrants,
+)
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
@@ -35,6 +43,30 @@ def test_verify_token() -> None:
     assert claims.attributes is not None
     assert claims.attributes["key1"] == "value1"
     assert claims.attributes["key2"] == "value2"
+
+
+def test_agent_grants() -> None:
+    agent = AgentGrants(database_admin=True)
+    endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
+    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True)
+
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_agent_grants(agent)
+        .with_agent_endpoint_grants(endpoint)
+        .with_agent_thread_grants(thread)
+        .to_jwt()
+    )
+
+    decoded = jwt.decode(token, options={"verify_signature": False})
+    assert decoded["agentThread"]["threadIds"] == ["t1"]
+    assert decoded["agentEndpoint"]["agentName"] == "my-agent"
+    assert decoded["agent"]["databaseAdmin"] is True
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.agent == agent
+    assert claims.agent_endpoint == endpoint
+    assert claims.agent_thread == thread
 
 
 def test_agent_config() -> None:
