@@ -90,6 +90,15 @@ def test_verify_token_invalid() -> None:
         token_verifier.verify(token)
 
 
+def test_verify_token_padded_signature() -> None:
+    # PyJWT 2.15.0 rejected valid tokens with trailing Base64URL padding.
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+    header, payload, signature = token.split(".")
+    signature += "=" * (-len(signature) % 4)
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(f"{header}.{payload}.{signature}")
+    assert claims.identity == "test_identity"
+
+
 def test_verify_token_expired() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
