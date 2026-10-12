@@ -194,6 +194,40 @@ async def test_stream_bytes_small() -> None:
 
 @pytest.mark.asyncio
 @skip_if_no_credentials()  # type: ignore[untyped-decorator]
+async def test_send_bytes_small() -> None:
+    """Small in-memory buffer via send_bytes: info assertions + round trip."""
+    receiver, sender = await connect_rooms(unique_room_name("ds-send-bytes-small"))
+    try:
+        bytes_to_send = b"hello world"
+        received: asyncio.Future[bytes] = asyncio.get_event_loop().create_future()
+
+        def handler(reader: rtc.ByteStreamReader, participant_identity: str) -> None:
+            assert participant_identity == "sender"
+
+            async def read() -> None:
+                chunks = [chunk async for chunk in reader]
+                received.set_result(b"".join(chunks))
+
+            asyncio.create_task(read())
+
+        receiver.register_byte_stream_handler("some-topic", handler)
+
+        info = await sender.local_participant.send_bytes(
+            bytes_to_send, topic="some-topic", name="hello.bin"
+        )
+        assert info.stream_id
+        assert info.topic == "some-topic"
+        assert info.name == "hello.bin"
+        assert info.size == len(bytes_to_send)
+        assert info.mime_type == "application/octet-stream"
+
+        assert await asyncio.wait_for(received, timeout=5.0) == bytes_to_send
+    finally:
+        await asyncio.gather(receiver.disconnect(), sender.disconnect())
+
+
+@pytest.mark.asyncio
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
 async def test_send_text_large_compressible() -> None:
     """~50KB of pseudo-random lowercase: too big to inline and compresses well,
     exercising the chunked + deflate-raw wire path (rust compresses, rust
