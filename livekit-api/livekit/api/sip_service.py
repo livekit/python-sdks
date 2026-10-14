@@ -57,6 +57,14 @@ def _as_sip_error(err: ServerError) -> ServerError:
     return err
 
 
+def _set_list_update(dst: ListUpdate, value: ListUpdate | list[str]) -> None:
+    """Copy a list argument of the *_fields helpers into the request's ListUpdate."""
+    if isinstance(value, ListUpdate):
+        dst.CopyFrom(value)  # keeps clear as well as set/add/remove
+    else:
+        dst.set.extend(value)
+
+
 class SipService(Service):
     """Client for LiveKit SIP Service API
 
@@ -193,26 +201,11 @@ class SipService(Service):
             media=media,
         )
         if numbers is not None:
-            if isinstance(numbers, ListUpdate):
-                update.numbers.set.extend(numbers.set)
-                update.numbers.add.extend(numbers.add)
-                update.numbers.remove.extend(numbers.remove)
-            else:
-                update.numbers.set.extend(numbers)
+            _set_list_update(update.numbers, numbers)
         if allowed_addresses is not None:
-            if isinstance(allowed_addresses, ListUpdate):
-                update.allowed_addresses.set.extend(allowed_addresses.set)
-                update.allowed_addresses.add.extend(allowed_addresses.add)
-                update.allowed_addresses.remove.extend(allowed_addresses.remove)
-            else:
-                update.allowed_addresses.set.extend(allowed_addresses)
+            _set_list_update(update.allowed_addresses, allowed_addresses)
         if allowed_numbers is not None:
-            if isinstance(allowed_numbers, ListUpdate):
-                update.allowed_numbers.set.extend(allowed_numbers.set)
-                update.allowed_numbers.add.extend(allowed_numbers.add)
-                update.allowed_numbers.remove.extend(allowed_numbers.remove)
-            else:
-                update.allowed_numbers.set.extend(allowed_numbers)
+            _set_list_update(update.allowed_numbers, allowed_numbers)
 
         return await self._client.request(
             SVC,
@@ -376,12 +369,7 @@ class SipService(Service):
             media=media,
         )
         if numbers is not None:
-            if isinstance(numbers, ListUpdate):
-                update.numbers.set.extend(numbers.set)
-                update.numbers.add.extend(numbers.add)
-                update.numbers.remove.extend(numbers.remove)
-            else:
-                update.numbers.set.extend(numbers)
+            _set_list_update(update.numbers, numbers)
 
         return await self._client.request(
             SVC,
@@ -652,12 +640,7 @@ class SipService(Service):
             attributes=attributes,
         )
         if trunk_ids is not None:
-            if isinstance(trunk_ids, ListUpdate):
-                update.trunk_ids.set.extend(trunk_ids.set)
-                update.trunk_ids.add.extend(trunk_ids.add)
-                update.trunk_ids.remove.extend(trunk_ids.remove)
-            else:
-                update.trunk_ids.set.extend(trunk_ids)
+            _set_list_update(update.trunk_ids, trunk_ids)
 
         return await self._client.request(
             SVC,
