@@ -90,6 +90,26 @@ async def test_mixer_keeps_async_generator_after_a_timeout():
 
 
 @pytest.mark.asyncio
+async def test_mixer_drops_a_stalled_stream_after_end_input():
+    async def one_frame_then_stall():
+        yield AudioFrame(np.full(480, 1000, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, 480)
+        await asyncio.Event().wait()
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=50)
+    mixer.add_stream(one_frame_then_stall())
+    mixer.end_input()
+
+    async def drain():
+        return [frame async for frame in mixer]
+
+    draining = asyncio.ensure_future(drain())
+    done, _ = await asyncio.wait({draining}, timeout=1)
+    await mixer.aclose()
+    assert done
+    assert len(draining.result()) == 1
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize("how", ["remove_stream", "aclose"])
 async def test_mixer_cancels_a_pending_read_when_the_stream_goes_away(how):
     closed = asyncio.Event()

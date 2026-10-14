@@ -8,6 +8,9 @@ from .log import logger
 
 _Stream = AsyncIterator[AudioFrame]
 
+# consecutive timeouts after which a stream is dropped once end_input() was called
+_MAX_STALLED_ROUNDS = 10
+
 
 @dataclass
 class _Contribution:
@@ -55,6 +58,7 @@ class AudioMixer:
         # A read that timed out is kept for the next round: cancelling it would close an
         # async generator stream for good.
         self._pending_reads: dict[_Stream, asyncio.Future[AudioFrame]] = {}
+        self._stalled_rounds: dict[_Stream, int] = {}
         self._sample_rate: int = sample_rate
         self._num_channels: int = num_channels
         self._chunk_size: int = blocksize if blocksize > 0 else int(sample_rate // 10)
@@ -93,6 +97,7 @@ class AudioMixer:
         """
         self._streams.discard(stream)
         self._buffers.pop(stream, None)
+        self._stalled_rounds.pop(stream, None)
         pending = self._pending_reads.pop(stream, None)
         if pending is not None:
             _discard_read(pending)
@@ -198,7 +203,12 @@ class AudioMixer:
             done, _ = await asyncio.wait({read}, timeout=self._stream_timeout_ms / 1000)
             if not done:
                 logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
+                stalled = self._stalled_rounds.get(stream, 0) + 1
+                self._stalled_rounds[stream] = stalled
+                # after end_input() a stream that keeps stalling is dropped, so the drain ends
+                exhausted = self._ending and stalled >= _MAX_STALLED_ROUNDS
                 break
+            self._stalled_rounds.pop(stream, None)
             if self._pending_reads.get(stream) is read:
                 del self._pending_reads[stream]
             try:
