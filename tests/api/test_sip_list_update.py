@@ -59,5 +59,12 @@ def test_list_and_list_update_values_are_still_sent(method: str, arg: str, field
 
 
 @pytest.mark.parametrize(("method", "arg", "field"), LIST_FIELDS)
-def test_omitted_list_is_not_sent(method: str, arg: str, field: str) -> None:
-    assert not _sent_update(method, arg, None).HasField(field)
+@pytest.mark.parametrize(
+    "value", [None, [], ListUpdate()], ids=["omitted", "empty-list", "empty-update"]
+)
+def test_omitted_or_empty_list_is_not_sent(
+    method: str, arg: str, field: str, value: Optional[Union[ListUpdate, List[str]]]
+) -> None:
+    # the server rejects an empty ListUpdate ("unsupported list update operation"),
+    # which would fail the whole update, including its other fields
+    assert not _sent_update(method, arg, value).HasField(field)

@@ -59,9 +59,12 @@ def _as_sip_error(err: ServerError) -> ServerError:
 
 def _set_list_update(dst: ListUpdate, value: ListUpdate | list[str]) -> None:
     """Copy a list argument of the *_fields helpers into the request's ListUpdate."""
+    # The server rejects an empty ListUpdate, failing the whole update, so an empty
+    # value ([] or ListUpdate()) leaves the field unset: the list is not changed.
     if isinstance(value, ListUpdate):
-        dst.CopyFrom(value)  # keeps clear as well as set/add/remove
-    else:
+        if value.ByteSize():
+            dst.CopyFrom(value)  # keeps clear as well as set/add/remove
+    elif value:
         dst.set.extend(value)
 
 
