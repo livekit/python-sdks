@@ -12,6 +12,7 @@ from livekit.api import (
     TokenVerifier,
     VideoGrants,
 )
+from livekit.api.access_token import ObservabilityGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
@@ -157,3 +158,18 @@ def test_verify_token_missing_exp() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     with pytest.raises(Exception):
         token_verifier.verify(token)
+
+
+def test_verify_token_preserves_kind_and_observability() -> None:
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_kind("agent")
+        .with_observability_grants(ObservabilityGrants(write=True))
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.kind == "agent"
+    assert claims.observability is not None
+    assert claims.observability.write is True
