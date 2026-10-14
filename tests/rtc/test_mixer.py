@@ -114,3 +114,60 @@ async def test_mixer_cancels_a_pending_read_when_the_stream_goes_away(how):
     await asyncio.wait_for(closed.wait(), timeout=1)
     assert not mixer._pending_reads
     await mixer.aclose()
+
+
+@pytest.mark.asyncio
+async def test_mixer_starts_no_read_on_a_removed_stream():
+    # a round can be scheduled before remove_stream() and run after it
+    async def never_yields():
+        await asyncio.Event().wait()
+        yield  # pragma: no cover
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=10)
+    stream = never_yields()
+    mixer.add_stream(stream)
+    mixer.remove_stream(stream)
+
+    await mixer._get_contribution(stream, np.empty((0, 1), dtype=np.int16))
+    assert not mixer._pending_reads
+    await mixer.aclose()
+
+
+@pytest.mark.asyncio
+async def test_mixer_keeps_buffered_audio_when_a_stream_raises_timeout_error():
+    async def partial_then_timeout():
+        yield AudioFrame(np.full(240, 1000, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, 240)
+        raise asyncio.TimeoutError
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480)
+    mixer.add_stream(partial_then_timeout())
+    mixer.end_input()
+
+    with_audio = 0
+    async for frame in mixer:
+        if np.frombuffer(frame.data.tobytes(), dtype=np.int16).any():
+            with_audio += 1
+    await mixer.aclose()
+
+    assert with_audio == 1
+
+
+@pytest.mark.asyncio
+async def test_mixer_aclose_waits_for_a_cancelled_read_to_clean_up():
+    cleaned_up = False
+
+    async def slow_cleanup():
+        nonlocal cleaned_up
+        try:
+            await asyncio.Event().wait()
+            yield  # pragma: no cover
+        finally:
+            await asyncio.sleep(0.1)
+            cleaned_up = True
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=50)
+    mixer.add_stream(slow_cleanup())
+    await asyncio.sleep(0.12)
+
+    await mixer.aclose()
+    assert cleaned_up

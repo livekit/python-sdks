@@ -116,9 +116,12 @@ class AudioMixer:
         self._mixer_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await self._mixer_task
-        for pending in self._pending_reads.values():
-            _discard_read(pending)
+        pending = list(self._pending_reads.values())
         self._pending_reads.clear()
+        for read in pending:
+            _discard_read(read)
+        # let the streams finish their cleanup before the mixer counts as closed
+        await asyncio.gather(*pending, return_exceptions=True)
 
     def end_input(self) -> None:
         """
@@ -182,7 +185,8 @@ class AudioMixer:
     ) -> _Contribution:
         had_data = buf.shape[0] > 0
         exhausted = False
-        while buf.shape[0] < self._chunk_size and not exhausted:
+        # a round scheduled before remove_stream() must not start a new read on that stream
+        while buf.shape[0] < self._chunk_size and not exhausted and stream in self._streams:
             # The read stays in _pending_reads until it completes, so remove_stream()
             # and aclose() can always cancel it.
             read = self._pending_reads.get(stream)
@@ -199,6 +203,10 @@ class AudioMixer:
                 frame = read.result()
             except StopAsyncIteration:
                 exhausted = True
+                break
+            except asyncio.TimeoutError:
+                # raised by the stream itself: handled like the mixer's own timeout, as before
+                logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
                 break
             new_data = np.frombuffer(frame.data.tobytes(), dtype=np.int16).reshape(
                 -1, self._num_channels
@@ -217,8 +225,11 @@ class AudioMixer:
 
 
 def _discard_read(read: "asyncio.Future[AudioFrame]") -> None:
-    """Cancel a read that is no longer wanted, or consume the outcome of a finished one."""
-    if not read.done():
-        read.cancel()
-    elif not read.cancelled():
+    """Cancel a read that is no longer wanted and consume its outcome whenever it ends."""
+    read.cancel()
+    read.add_done_callback(_consume_outcome)
+
+
+def _consume_outcome(read: "asyncio.Future[AudioFrame]") -> None:
+    if not read.cancelled():
         read.exception()  # mark a failed read as handled
