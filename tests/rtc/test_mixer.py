@@ -1,9 +1,11 @@
 # type: ignore
 
+import asyncio
+
 import numpy as np
 import pytest
 
-from livekit.rtc import AudioMixer
+from livekit.rtc import AudioFrame, AudioMixer
 from livekit.rtc.utils import sine_wave_generator
 
 SAMPLE_RATE = 48000
@@ -56,3 +58,59 @@ async def test_mixer_two_sine_waves():
     # Assert that the peaks include 440Hz and 880Hz (with a tolerance of ±5 Hz)
     assert any(np.isclose(peak_freqs, 440, atol=5)), f"Expected 440 Hz in peaks, got: {peak_freqs}"
     assert any(np.isclose(peak_freqs, 880, atol=5)), f"Expected 880 Hz in peaks, got: {peak_freqs}"
+
+
+@pytest.mark.asyncio
+async def test_mixer_keeps_async_generator_after_a_timeout():
+    """
+    A stream that misses the timeout once must not be closed: cancelling the
+    pending read of an async generator ends it, which dropped the rest of its audio.
+    """
+    frames, block = 10, 480
+
+    async def late_once():
+        for i in range(frames):
+            if i == 3:
+                await asyncio.sleep(0.25)
+            yield AudioFrame(np.full(block, 1000, dtype=np.int16).tobytes(), SAMPLE_RATE, 1, block)
+
+    mixer = AudioMixer(
+        sample_rate=SAMPLE_RATE, num_channels=1, blocksize=block, stream_timeout_ms=100
+    )
+    mixer.add_stream(late_once())
+    mixer.end_input()
+
+    with_audio = 0
+    async for frame in mixer:
+        if np.frombuffer(frame.data.tobytes(), dtype=np.int16).any():
+            with_audio += 1
+    await mixer.aclose()
+
+    assert with_audio == frames
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("how", ["remove_stream", "aclose"])
+async def test_mixer_cancels_a_pending_read_when_the_stream_goes_away(how):
+    closed = asyncio.Event()
+
+    async def never_yields():
+        try:
+            await asyncio.Event().wait()
+            yield  # pragma: no cover
+        finally:
+            closed.set()
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=50)
+    stream = never_yields()
+    mixer.add_stream(stream)
+    await asyncio.sleep(0.12)  # at least one round has timed out on the stream
+
+    if how == "remove_stream":
+        mixer.remove_stream(stream)
+    else:
+        await mixer.aclose()
+
+    await asyncio.wait_for(closed.wait(), timeout=1)
+    assert not mixer._pending_reads
+    await mixer.aclose()
