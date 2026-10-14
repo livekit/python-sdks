@@ -202,7 +202,7 @@ class TwirpClient:
         if scheme.startswith("ws"):
             scheme = scheme.replace("ws", "http")
 
-        host = f"{scheme}://{parse_res.netloc}/{parse_res.path}"
+        host = f"{scheme}://{parse_res.netloc}{parse_res.path}"
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
@@ -248,10 +248,13 @@ class TwirpClient:
         attempted = {host_key(self._origin)}
         region_origins: Optional[List[str]] = None
         current_origin = self._origin
+        # The configured host may carry a base path (e.g. behind a reverse
+        # proxy); fallback regions are bare origins.
+        current_base = self.host
 
         for attempt in range(max_attempts):
             is_last = attempt + 1 >= max_attempts
-            url = f"{current_origin}/{path}"
+            url = f"{current_base}/{path}"
 
             transport_exc: Optional[BaseException] = None
             retryable_status: Optional[int] = None
@@ -298,6 +301,7 @@ class TwirpClient:
             await asyncio.sleep(self._failover_backoff * (2**attempt))
             attempted.add(host_key(next_origin))
             current_origin = next_origin
+            current_base = next_origin
 
         raise RuntimeError("failover loop exited without returning")  # unreachable
 
