@@ -111,6 +111,8 @@ class AudioMixer:
         Immediately stop mixing and close the mixer.
 
         This cancels the mixing task, and any unconsumed output in the queue may be dropped.
+        Pending stream reads are cancelled and awaited, so a stream must let
+        asyncio.CancelledError propagate once its cleanup is done.
         """
         self._ending = True
         self._mixer_task.cancel()
