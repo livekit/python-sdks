@@ -111,8 +111,6 @@ class AudioMixer:
         Immediately stop mixing and close the mixer.
 
         This cancels the mixing task, and any unconsumed output in the queue may be dropped.
-        Pending stream reads are cancelled, and their cleanup is awaited for up to
-        stream_timeout_ms.
         """
         self._ending = True
         self._mixer_task.cancel()
@@ -122,10 +120,8 @@ class AudioMixer:
         self._pending_reads.clear()
         for read in pending:
             _discard_read(read)
-        if pending:
-            # give the streams time to clean up, bounded so one that ignores
-            # cancellation cannot hang shutdown
-            await asyncio.wait(pending, timeout=self._stream_timeout_ms / 1000)
+        # let the streams finish their cleanup before the mixer counts as closed
+        await asyncio.gather(*pending, return_exceptions=True)
 
     def end_input(self) -> None:
         """
@@ -228,18 +224,12 @@ class AudioMixer:
         return _Contribution(stream, contrib, buf, had_data, exhausted)
 
 
-# cancelled reads that may outlive their mixer, kept until their outcome is consumed
-_cancelled_reads: "set[asyncio.Future[AudioFrame]]" = set()
-
-
 def _discard_read(read: "asyncio.Future[AudioFrame]") -> None:
     """Cancel a read that is no longer wanted and consume its outcome whenever it ends."""
     read.cancel()
-    _cancelled_reads.add(read)  # the event loop holds tasks weakly
     read.add_done_callback(_consume_outcome)
 
 
 def _consume_outcome(read: "asyncio.Future[AudioFrame]") -> None:
-    _cancelled_reads.discard(read)
     if not read.cancelled():
         read.exception()  # mark a failed read as handled
