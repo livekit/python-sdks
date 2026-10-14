@@ -162,7 +162,7 @@ async def test_mixer_aclose_waits_for_a_cancelled_read_to_clean_up():
             await asyncio.Event().wait()
             yield  # pragma: no cover
         finally:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.01)  # well within stream_timeout_ms
             cleaned_up = True
 
     mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=50)
@@ -171,3 +171,27 @@ async def test_mixer_aclose_waits_for_a_cancelled_read_to_clean_up():
 
     await mixer.aclose()
     assert cleaned_up
+
+
+@pytest.mark.asyncio
+async def test_mixer_aclose_returns_when_a_stream_ignores_cancellation():
+    release = asyncio.Event()
+
+    async def ignores_cancel():
+        while True:
+            try:
+                await release.wait()
+                return
+            except asyncio.CancelledError:
+                continue
+        yield  # pragma: no cover
+
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1, blocksize=480, stream_timeout_ms=50)
+    mixer.add_stream(ignores_cancel())
+    await asyncio.sleep(0.12)
+
+    closing = asyncio.ensure_future(mixer.aclose())
+    done, _ = await asyncio.wait({closing}, timeout=1)
+    release.set()
+    await closing
+    assert done
