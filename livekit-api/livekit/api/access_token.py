@@ -71,6 +71,9 @@ class VideoGrants:
     # allow participant to manage an agent session via RemoteSession
     can_manage_agent_session: Optional[bool] = None
 
+    # allow participant to subscribe to metrics
+    can_subscribe_metrics: Optional[bool] = None
+
 
 @dataclass
 class SIPGrants:
