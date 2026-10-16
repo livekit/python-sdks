@@ -24,6 +24,7 @@ from urllib.parse import urlparse
 from ._failover import (
     FAILOVER_BACKOFF_BASE,
     RegionCache,
+    backoff,
     failover_attempts,
     host_key,
     is_cloud_api,
@@ -227,8 +228,8 @@ class TwirpClient:
         """Issues a Twirp request, failing over to alternative regions on
         retryable errors. On any transport error or HTTP 5xx it discovers
         regions via ``/settings/regions`` and replays the request — body and
-        headers intact — against the next untried region, with exponential
-        backoff. A 4xx is returned immediately."""
+        headers intact — against the next untried region, with jittered
+        exponential backoff. A 4xx is returned immediately."""
         path = f"{self.prefix}/{self.pkg}.{service}/{method}"
         headers = dict(headers)
         headers["User-Agent"] = _USER_AGENT
@@ -303,7 +304,7 @@ class TwirpClient:
                 reason,
                 next_origin,
             )
-            await asyncio.sleep(self._failover_backoff * (2**attempt))
+            await asyncio.sleep(backoff(attempt, self._failover_backoff))
             attempted.add(host_key(next_origin))
             current_origin = next_origin
             current_base = next_origin

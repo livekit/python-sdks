@@ -16,12 +16,13 @@
 
 On a retryable failure (any transport error or HTTP 5xx) the client discovers
 alternative LiveKit Cloud regions via ``/settings/regions`` and replays the
-request against the next region, with exponential backoff. 4xx responses are
+request against the next region, with jittered exponential backoff. 4xx responses are
 returned immediately.
 """
 
 from __future__ import annotations
 
+import random
 import time
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -64,6 +65,12 @@ def is_cloud_api(host: str) -> bool:
     # cloud-api.livekit.io or a cloud-api.<env>.livekit.io variant; hostnames are case-insensitive.
     host = host.lower()
     return host.startswith("cloud-api.") and host.endswith(".livekit.io")
+
+
+def backoff(attempt: int, base: float) -> float:
+    """Full jitter: a uniform delay in [0, base * 2^attempt) so clients that
+    failed together don't retry in lockstep."""
+    return random.random() * base * (2**attempt)
 
 
 def to_http(url: str) -> str:

@@ -26,7 +26,7 @@ from aiohttp import web
 from aiohttp.test_utils import TestServer
 
 from livekit.api import CreateRoomRequest, Room
-from livekit.api._failover import FAILOVER_MAX_ATTEMPTS, failover_attempts
+from livekit.api._failover import FAILOVER_MAX_ATTEMPTS, backoff, failover_attempts
 from livekit.api.twirp_client import TwirpClient
 
 Handler = Callable[[int, web.Request], "web.StreamResponse | None"]
@@ -160,3 +160,13 @@ def test_retries_same_host_on_5xx():
 )
 def test_failover_attempts(host: str, expected: int):
     assert failover_attempts(True, host) == expected
+
+
+def test_backoff_is_full_jitter(monkeypatch: pytest.MonkeyPatch):
+    """The delay is drawn uniformly from [0, base * 2^attempt)."""
+    monkeypatch.setattr("random.random", lambda: 0.0)
+    assert backoff(2, 0.2) == 0.0
+    monkeypatch.setattr("random.random", lambda: 0.5)
+    assert backoff(0, 0.2) == pytest.approx(0.1)
+    assert backoff(1, 0.2) == pytest.approx(0.2)
+    assert backoff(2, 0.2) == pytest.approx(0.4)
