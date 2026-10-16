@@ -8,6 +8,9 @@ from .log import logger
 
 _Stream = AsyncIterator[AudioFrame]
 
+# consecutive timeouts after which a stream is dropped once end_input() was called
+_MAX_STALLED_ROUNDS = 10
+
 
 @dataclass
 class _Contribution:
@@ -52,6 +55,10 @@ class AudioMixer:
         """
         self._streams: set[_Stream] = set()
         self._buffers: dict[_Stream, np.ndarray] = {}
+        # A read that timed out is kept for the next round: cancelling it would close an
+        # async generator stream for good.
+        self._pending_reads: dict[_Stream, asyncio.Future[AudioFrame]] = {}
+        self._stalled_rounds: dict[_Stream, int] = {}
         self._sample_rate: int = sample_rate
         self._num_channels: int = num_channels
         self._chunk_size: int = blocksize if blocksize > 0 else int(sample_rate // 10)
@@ -90,6 +97,10 @@ class AudioMixer:
         """
         self._streams.discard(stream)
         self._buffers.pop(stream, None)
+        self._stalled_rounds.pop(stream, None)
+        pending = self._pending_reads.pop(stream, None)
+        if pending is not None:
+            _discard_read(pending)
 
     def __aiter__(self) -> "AudioMixer":
         return self
@@ -105,11 +116,19 @@ class AudioMixer:
         Immediately stop mixing and close the mixer.
 
         This cancels the mixing task, and any unconsumed output in the queue may be dropped.
+        Pending stream reads are cancelled and awaited, so a stream must let
+        asyncio.CancelledError propagate once its cleanup is done.
         """
         self._ending = True
         self._mixer_task.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await self._mixer_task
+        pending = list(self._pending_reads.values())
+        self._pending_reads.clear()
+        for read in pending:
+            _discard_read(read)
+        # let the streams finish their cleanup before the mixer counts as closed
+        await asyncio.gather(*pending, return_exceptions=True)
 
     def end_input(self) -> None:
         """
@@ -173,16 +192,33 @@ class AudioMixer:
     ) -> _Contribution:
         had_data = buf.shape[0] > 0
         exhausted = False
-        while buf.shape[0] < self._chunk_size and not exhausted:
-            try:
-                frame = await asyncio.wait_for(
-                    stream.__anext__(), timeout=self._stream_timeout_ms / 1000
-                )
-            except asyncio.TimeoutError:
+        # a round scheduled before remove_stream() must not start a new read on that stream
+        while buf.shape[0] < self._chunk_size and not exhausted and stream in self._streams:
+            # The read stays in _pending_reads until it completes, so remove_stream()
+            # and aclose() can always cancel it.
+            read = self._pending_reads.get(stream)
+            if read is None:
+                read = asyncio.ensure_future(stream.__anext__())
+                self._pending_reads[stream] = read
+            done, _ = await asyncio.wait({read}, timeout=self._stream_timeout_ms / 1000)
+            if not done:
                 logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
+                stalled = self._stalled_rounds.get(stream, 0) + 1
+                self._stalled_rounds[stream] = stalled
+                # after end_input() a stream that keeps stalling is dropped, so the drain ends
+                exhausted = self._ending and stalled >= _MAX_STALLED_ROUNDS
                 break
+            self._stalled_rounds.pop(stream, None)
+            if self._pending_reads.get(stream) is read:
+                del self._pending_reads[stream]
+            try:
+                frame = read.result()
             except StopAsyncIteration:
                 exhausted = True
+                break
+            except asyncio.TimeoutError:
+                # raised by the stream itself: handled like the mixer's own timeout, as before
+                logger.warning(f"AudioMixer: stream {stream} timeout, ignoring")
                 break
             new_data = np.frombuffer(frame.data.tobytes(), dtype=np.int16).reshape(
                 -1, self._num_channels
@@ -198,3 +234,14 @@ class AudioMixer:
                 np.empty((0, self._num_channels), dtype=np.int16),
             )
         return _Contribution(stream, contrib, buf, had_data, exhausted)
+
+
+def _discard_read(read: "asyncio.Future[AudioFrame]") -> None:
+    """Cancel a read that is no longer wanted and consume its outcome whenever it ends."""
+    read.cancel()
+    read.add_done_callback(_consume_outcome)
+
+
+def _consume_outcome(read: "asyncio.Future[AudioFrame]") -> None:
+    if not read.cancelled():
+        read.exception()  # mark a failed read as handled

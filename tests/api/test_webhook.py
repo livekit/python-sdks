@@ -68,6 +68,15 @@ def test_bad_hash() -> None:
         receiver.receive(TEST_EVENT, jwt)
 
 
+def test_missing_hash() -> None:
+    token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
+    receiver = WebhookReceiver(token_verifier)
+
+    jwt = AccessToken(TEST_API_KEY, TEST_API_SECRET).to_jwt()
+    with pytest.raises(Exception, match="sha256 was not found"):
+        receiver.receive(TEST_EVENT, jwt)
+
+
 def test_invalid_body() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     receiver = WebhookReceiver(token_verifier)

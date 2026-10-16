@@ -5,8 +5,6 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - main
 
 jobs:
   type-check:
@@ -17,25 +15,28 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Set up Python 3.9
+      - name: Set up Python 3.12
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: 3.9
+          python-version: "3.12"
 
       - name: Install uv
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
+          version: "0.12.24"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
       - name: Install the project
-        run: uv sync --all-extras --dev
+        run: uv sync --locked --all-extras --dev
 
       - name: Install workspace packages
         run: uv pip install -e livekit-protocol -e livekit-api -e livekit-rtc
 
       - name: Download ffi
-        run: uv run python livekit-rtc/rust-sdks/download_ffi.py --output .venv/lib/python3.9/site-packages/livekit/rtc/resources
+        run: uv run python livekit-rtc/rust-sdks/download_ffi.py --output livekit-rtc/livekit/rtc/resources
 
       - name: Check Types
-        run: uv run mypy livekit-protocol livekit-api livekit-rtc
+        run: |
+          uv run mypy livekit-protocol livekit-api livekit-rtc
+          uv run mypy --python-version 3.9 livekit-protocol/livekit livekit-api/livekit livekit-rtc/livekit

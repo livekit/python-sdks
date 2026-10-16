@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import signal
 import asyncio
 import sys
@@ -24,6 +26,7 @@ import os
 import platform
 import atexit
 import threading
+import weakref
 from typing import Callable, Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
@@ -68,10 +71,14 @@ ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_siz
 INVALID_HANDLE = 0
 
 
+_live_handles: weakref.WeakSet[FfiHandle] = weakref.WeakSet()
+
+
 class FfiHandle:
     def __init__(self, handle: int) -> None:
         self.handle = handle
         self._disposed = False
+        _live_handles.add(self)
 
     def __del__(self) -> None:
         self.dispose()
@@ -93,7 +100,7 @@ class FfiHandle:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True
             ffi = FfiClient._instance
-            if ffi is None or ffi._pid != os.getpid():
+            if ffi is None or ffi._pid != os.getpid() or getattr(FfiClient, "_ffi_disposed", False):
                 return
             dropped = ffi._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
             assert dropped
@@ -223,6 +230,7 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
 
 class FfiClient:
     _instance: Optional["FfiClient"] = None
+    _ffi_disposed: bool = False
 
     @classproperty
     def instance(cls) -> "FfiClient":
@@ -231,6 +239,7 @@ class FfiClient:
         return cls._instance
 
     def __init__(self) -> None:
+        FfiClient._ffi_disposed = False
         self._pid = os.getpid()
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
@@ -266,14 +275,17 @@ class FfiClient:
             ffi_event_callback, True, b"python", __version__.encode("ascii")
         )
 
-        ffi_lib = self._ffi_lib
-        init_pid = self._pid
-
         @atexit.register
         def _dispose_lk_ffi() -> None:
-            if os.getpid() != init_pid:
-                return
-            ffi_lib.livekit_ffi_dispose()
+            self._dispose()
+
+    def _dispose(self) -> None:
+        if self._pid != os.getpid() or FfiClient._ffi_disposed:
+            return
+        FfiClient._ffi_disposed = True
+        for handle in list(_live_handles):
+            handle.mark_consumed()
+        self._ffi_lib.livekit_ffi_dispose()
 
     @property
     def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
@@ -288,7 +300,7 @@ class FfiClient:
             )
         proto_data = req.SerializeToString()
         proto_len = len(proto_data)
-        data = (ctypes.c_ubyte * proto_len)(*proto_data)
+        data = ctypes.cast(ctypes.c_char_p(proto_data), ctypes.POINTER(ctypes.c_ubyte))
 
         resp_ptr = ctypes.POINTER(ctypes.c_ubyte)()
         resp_len = ctypes.c_size_t()

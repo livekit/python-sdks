@@ -3,7 +3,16 @@ import datetime
 
 import jwt
 import pytest
-from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
+from livekit.api import (
+    AccessToken,
+    AgentEndpointGrants,
+    AgentGrants,
+    AgentThreadGrants,
+    SIPGrants,
+    TokenVerifier,
+    VideoGrants,
+)
+from livekit.api.access_token import ObservabilityGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
@@ -35,6 +44,64 @@ def test_verify_token() -> None:
     assert claims.attributes is not None
     assert claims.attributes["key1"] == "value1"
     assert claims.attributes["key2"] == "value2"
+
+
+def test_verify_token_preserves_can_subscribe_metrics() -> None:
+    # minted the way other server SDKs do, with the canSubscribeMetrics video grant
+    now = calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple())
+    token = jwt.encode(
+        {
+            "iss": TEST_API_KEY,
+            "sub": "test_identity",
+            "nbf": now,
+            "exp": now + 3600,
+            "video": {"roomJoin": True, "room": "test_room", "canSubscribeMetrics": True},
+        },
+        TEST_API_SECRET,
+        algorithm="HS256",
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.video is not None
+    assert claims.video.can_subscribe_metrics is True
+
+
+def test_mint_token_with_can_subscribe_metrics() -> None:
+    grants = VideoGrants(room_join=True, room="test_room", can_subscribe_metrics=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_grants(grants)
+        .to_jwt()
+    )
+
+    payload = jwt.decode(token, options={"verify_signature": False})
+    assert payload["video"]["canSubscribeMetrics"] is True
+    assert TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token).video == grants
+
+
+def test_agent_grants() -> None:
+    agent = AgentGrants(database_admin=True)
+    endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
+    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True)
+
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_agent_grants(agent)
+        .with_agent_endpoint_grants(endpoint)
+        .with_agent_thread_grants(thread)
+        .to_jwt()
+    )
+
+    decoded = jwt.decode(token, options={"verify_signature": False})
+    assert decoded["agentThread"]["threadIds"] == ["t1"]
+    assert decoded["agentEndpoint"]["agentName"] == "my-agent"
+    assert decoded["agent"]["databaseAdmin"] is True
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.agent == agent
+    assert claims.agent_endpoint == endpoint
+    assert claims.agent_thread == thread
 
 
 def test_agent_config() -> None:
@@ -90,6 +157,15 @@ def test_verify_token_invalid() -> None:
         token_verifier.verify(token)
 
 
+def test_verify_token_padded_signature() -> None:
+    # PyJWT 2.15.0 rejected valid tokens with trailing Base64URL padding.
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+    header, payload, signature = token.split(".")
+    signature += "=" * (-len(signature) % 4)
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(f"{header}.{payload}.{signature}")
+    assert claims.identity == "test_identity"
+
+
 def test_verify_token_expired() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
@@ -116,3 +192,18 @@ def test_verify_token_missing_exp() -> None:
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     with pytest.raises(Exception):
         token_verifier.verify(token)
+
+
+def test_verify_token_preserves_kind_and_observability() -> None:
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_kind("agent")
+        .with_observability_grants(ObservabilityGrants(write=True))
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.kind == "agent"
+    assert claims.observability is not None
+    assert claims.observability.write is True

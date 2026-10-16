@@ -26,6 +26,7 @@ from ._failover import (
     RegionCache,
     failover_attempts,
     host_key,
+    is_cloud_api,
     origin_of,
     pick_next,
 )
@@ -202,7 +203,7 @@ class TwirpClient:
         if scheme.startswith("ws"):
             scheme = scheme.replace("ws", "http")
 
-        host = f"{scheme}://{parse_res.netloc}/{parse_res.path}"
+        host = f"{scheme}://{parse_res.netloc}{parse_res.path}"
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
@@ -246,12 +247,16 @@ class TwirpClient:
             self._failover, host, self._failover_force, effective_timeout
         )
         attempted = {host_key(self._origin)}
-        region_origins: Optional[List[str]] = None
+        # A Cloud API host has a single origin; region discovery is never consulted.
+        region_origins: Optional[List[str]] = [] if host and is_cloud_api(host) else None
         current_origin = self._origin
+        # The configured host may carry a base path (e.g. behind a reverse
+        # proxy); fallback regions are bare origins.
+        current_base = self.host
 
         for attempt in range(max_attempts):
             is_last = attempt + 1 >= max_attempts
-            url = f"{current_origin}/{path}"
+            url = f"{current_base}/{path}"
 
             transport_exc: Optional[BaseException] = None
             retryable_status: Optional[int] = None
@@ -284,9 +289,12 @@ class TwirpClient:
                 next_origin = pick_next(region_origins, attempted)
 
             if next_origin is None:
-                if transport_exc is not None:
-                    raise transport_exc
-                raise self._server_error(error_data, retryable_status or 500)
+                if is_last:
+                    if transport_exc is not None:
+                        raise transport_exc
+                    raise self._server_error(error_data, retryable_status or 500)
+                # With no fallback origin, a retryable failure is retried against the same host.
+                next_origin = current_origin
 
             reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
             logger.warning(
@@ -298,6 +306,7 @@ class TwirpClient:
             await asyncio.sleep(self._failover_backoff * (2**attempt))
             attempted.add(host_key(next_origin))
             current_origin = next_origin
+            current_base = next_origin
 
         raise RuntimeError("failover loop exited without returning")  # unreachable
 
