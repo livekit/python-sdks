@@ -16,6 +16,31 @@ _ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 T_contra = TypeVar("T_contra", contravariant=True)
 
 
+def _signature(handler: Callable) -> inspect.Signature:
+    """Signature emit() trims the arguments to: a once() handler's callback's, read at call time."""
+    callback = getattr(handler, "_once_callback", None)
+    if callback is not None:
+        try:
+            return inspect.signature(callback)
+        except (TypeError, ValueError):
+            pass  # no signature (e.g. a builtin): the wrapper's *args passes everything
+    return inspect.signature(handler)
+
+
+def _is_once_handler_for(handler: Callable, callback: Callable) -> bool:
+    """Whether handler is a once() wrapper of callback, matched the way a dict key is."""
+    target = getattr(handler, "_once_callback", None)
+    if target is None:
+        return False
+    if target is callback:
+        return True
+    try:
+        # compare hashes first, so an unrelated callback's __eq__ is never called
+        return hash(target) == hash(callback) and bool(target == callback)
+    except TypeError:  # unhashable
+        return False
+
+
 class EventEmitter(Generic[T_contra]):
     def __init__(self) -> None:
         """
@@ -51,7 +76,7 @@ class EventEmitter(Generic[T_contra]):
             callables = list(self._events[event])
             for callback in callables:
                 try:
-                    sig = inspect.signature(callback)
+                    sig = _signature(callback)
                     params = sig.parameters.values()
 
                     has_varargs = any(p.kind == p.VAR_POSITIONAL for p in params)
@@ -120,13 +145,8 @@ class EventEmitter(Generic[T_contra]):
                 self.off(event, once_callback)
                 callback(*args, **kwargs)
 
-            # emit() reads the signature to pass only the arguments the callback takes,
-            # as it does for on(); without one it passes them all
-            try:
-                once_callback.__signature__ = inspect.signature(callback)  # type: ignore[attr-defined]
-            except (TypeError, ValueError):
-                pass
-            # lets off() remove the handler by the callback it was registered with
+            # emit() trims the arguments to the callback's signature, as for on(), and
+            # off() removes the handler by the callback it was registered with
             once_callback._once_callback = callback  # type: ignore[attr-defined]
             return self.on(event, once_callback)
         else:
@@ -222,6 +242,6 @@ class EventEmitter(Generic[T_contra]):
         if event in self._events:
             handlers = self._events[event]
             handlers.pop(callback, None)
-            once_handlers = [h for h in handlers if getattr(h, "_once_callback", None) == callback]
+            once_handlers = [h for h in handlers if _is_once_handler_for(h, callback)]
             for handler in once_handlers:
                 handlers.pop(handler)

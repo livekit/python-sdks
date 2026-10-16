@@ -335,3 +335,42 @@ def test_off_removes_a_once_handler() -> None:
     emitter.emit("event")
 
     assert calls == []
+
+
+def test_once_trims_to_the_callback_signature_at_emit_time() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[tuple[Any, Any]] = []
+
+    def handler(a: Any, b: Any) -> None:
+        calls.append((a, b))
+
+    callback = functools.partial(handler, b="registered")
+    emitter.once("event", callback)
+    callback.keywords.clear()  # a partial's signature can change after registration
+    emitter.emit("event", 1, 2)
+
+    assert calls == [(1, 2)]
+
+
+def test_off_does_not_compare_unrelated_once_callbacks() -> None:
+    emitter = EventEmitter[str]()
+
+    class Strict:
+        def __call__(self) -> None:
+            pass
+
+        def __eq__(self, other: object) -> bool:
+            if not isinstance(other, Strict):
+                raise ValueError("compared with an unrelated callable")
+            return other is self
+
+        __hash__ = object.__hash__
+
+    def plain() -> None:
+        pass
+
+    emitter.once("event", Strict())
+    emitter.on("event", plain)
+    emitter.off("event", plain)
+
+    assert len(emitter._events["event"]) == 1
