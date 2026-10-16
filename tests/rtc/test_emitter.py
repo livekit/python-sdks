@@ -374,3 +374,17 @@ def test_off_does_not_compare_unrelated_once_callbacks() -> None:
     emitter.off("event", plain)
 
     assert len(emitter._events["event"]) == 1
+
+
+def test_an_on_handler_with_a_once_callback_attribute_keeps_its_signature() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[Any] = []
+
+    def handler(value: Any) -> None:
+        calls.append(value)
+
+    handler._once_callback = lambda: None  # type: ignore[attr-defined]
+    emitter.on("event", handler)
+    emitter.emit("event", 1)
+
+    assert calls == [1]

@@ -16,22 +16,34 @@ _ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 T_contra = TypeVar("T_contra", contravariant=True)
 
 
+class _OnceHandler:
+    """The handler once() registers: removes itself, then calls the callback."""
+
+    def __init__(self, emitter: "EventEmitter[Any]", event: Any, callback: Callable) -> None:
+        self._emitter = emitter
+        self._event = event
+        self.callback = callback
+
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
+        self._emitter.off(self._event, self)
+        self.callback(*args, **kwargs)
+
+
 def _signature(handler: Callable) -> inspect.Signature:
     """Signature emit() trims the arguments to: a once() handler's callback's, read at call time."""
-    callback = getattr(handler, "_once_callback", None)
-    if callback is not None:
+    if isinstance(handler, _OnceHandler):
         try:
-            return inspect.signature(callback)
+            return inspect.signature(handler.callback)
         except (TypeError, ValueError):
-            pass  # no signature (e.g. a builtin): the wrapper's *args passes everything
+            pass  # no signature (e.g. a builtin): the handler's *args passes everything
     return inspect.signature(handler)
 
 
 def _is_once_handler_for(handler: Callable, callback: Callable) -> bool:
-    """Whether handler is a once() wrapper of callback, matched the way a dict key is."""
-    target = getattr(handler, "_once_callback", None)
-    if target is None:
+    """Whether handler is a once() handler of callback, matched the way a dict key is."""
+    if not isinstance(handler, _OnceHandler):
         return False
+    target = handler.callback
     if target is callback:
         return True
     try:
@@ -140,15 +152,9 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-
-            def once_callback(*args: Any, **kwargs: Any) -> None:
-                self.off(event, once_callback)
-                callback(*args, **kwargs)
-
             # emit() trims the arguments to the callback's signature, as for on(), and
             # off() removes the handler by the callback it was registered with
-            once_callback._once_callback = callback  # type: ignore[attr-defined]
-            return self.on(event, once_callback)
+            return self.on(event, _OnceHandler(self, event, callback))
         else:
 
             def decorator(callback: Callable) -> Callable:
