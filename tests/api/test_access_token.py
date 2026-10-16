@@ -46,6 +46,40 @@ def test_verify_token() -> None:
     assert claims.attributes["key2"] == "value2"
 
 
+def test_verify_token_preserves_can_subscribe_metrics() -> None:
+    # minted the way other server SDKs do, with the canSubscribeMetrics video grant
+    now = calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple())
+    token = jwt.encode(
+        {
+            "iss": TEST_API_KEY,
+            "sub": "test_identity",
+            "nbf": now,
+            "exp": now + 3600,
+            "video": {"roomJoin": True, "room": "test_room", "canSubscribeMetrics": True},
+        },
+        TEST_API_SECRET,
+        algorithm="HS256",
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.video is not None
+    assert claims.video.can_subscribe_metrics is True
+
+
+def test_mint_token_with_can_subscribe_metrics() -> None:
+    grants = VideoGrants(room_join=True, room="test_room", can_subscribe_metrics=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_grants(grants)
+        .to_jwt()
+    )
+
+    payload = jwt.decode(token, options={"verify_signature": False})
+    assert payload["video"]["canSubscribeMetrics"] is True
+    assert TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token).video == grants
+
+
 def test_agent_grants() -> None:
     agent = AgentGrants(database_admin=True)
     endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
