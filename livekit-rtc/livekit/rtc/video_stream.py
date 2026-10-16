@@ -164,8 +164,14 @@ class VideoStream:
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    async def aclose(self) -> None:
+    def close(self) -> None:
+        """Synchronously close the video stream and release its resources."""
         self._ffi_handle.dispose()
+        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+
+    async def aclose(self) -> None:
+        """Asynchronously close the video stream without blocking the event loop."""
+        await asyncio.to_thread(self._ffi_handle.dispose)
         await self._task
 
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:

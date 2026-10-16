@@ -163,6 +163,10 @@ class AudioSource:
         await asyncio.shield(self._join_fut)
 
     def _release_waiter(self) -> None:
+        if self._join_handle is not None:
+            self._join_handle.cancel()
+            self._join_handle = None
+
         if self._join_fut is None:
             return  # could be None when clear_queue is called
 
@@ -173,9 +177,18 @@ class AudioSource:
         self._q_size = 0.0
         self._join_fut = None
 
-    async def aclose(self) -> None:
-        """Close the audio source
+    def close(self) -> None:
+        """Close the audio source.
 
         This method cleans up resources associated with the audio source.
         """
+        self._release_waiter()
         self._ffi_handle.dispose()
+
+    async def aclose(self) -> None:
+        """Close the audio source without blocking the event loop.
+
+        This method cleans up resources associated with the audio source.
+        """
+        self._release_waiter()
+        await asyncio.to_thread(self._ffi_handle.dispose)
