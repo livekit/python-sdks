@@ -287,3 +287,51 @@ def test_registering_the_same_handler_twice_keeps_one_entry() -> None:
     emitter.on("event", handler)
     emitter.emit("event")
     assert calls == ["x"]
+
+
+def test_once_passes_only_the_arguments_the_callback_takes() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[Any] = []
+
+    @emitter.once("event")
+    def on_event(first: Any) -> None:
+        calls.append(first)
+
+    emitter.emit("event", 1, 2, 3)  # like on(), the extra arguments are dropped
+    emitter.emit("event", 4)
+
+    assert calls == [1]
+
+
+def test_once_runs_a_callback_without_a_signature() -> None:
+    emitter = EventEmitter[str]()
+    results: list[Any] = []
+
+    emitter.once("event", min)  # builtins like min expose no signature
+    emitter.once("event", lambda *args: results.append(args))
+    emitter.emit("event", 2, 1)
+    emitter.emit("event", 3, 4)
+
+    assert results == [(2, 1)]
+    assert not emitter._events["event"]
+
+
+def test_off_removes_a_once_handler() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[str] = []
+
+    def handler() -> None:
+        calls.append("x")
+
+    class Listener:
+        def handle(self) -> None:
+            calls.append("method")
+
+    listener = Listener()
+    emitter.once("event", handler)
+    emitter.once("event", listener.handle)
+    emitter.off("event", handler)
+    emitter.off("event", listener.handle)  # a new bound method object, equal to the first
+    emitter.emit("event")
+
+    assert calls == []

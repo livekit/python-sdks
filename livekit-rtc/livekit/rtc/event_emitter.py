@@ -120,6 +120,14 @@ class EventEmitter(Generic[T_contra]):
                 self.off(event, once_callback)
                 callback(*args, **kwargs)
 
+            # emit() reads the signature to pass only the arguments the callback takes,
+            # as it does for on(); without one it passes them all
+            try:
+                once_callback.__signature__ = inspect.signature(callback)  # type: ignore[attr-defined]
+            except (TypeError, ValueError):
+                pass
+            # lets off() remove the handler by the callback it was registered with
+            once_callback._once_callback = callback  # type: ignore[attr-defined]
             return self.on(event, once_callback)
         else:
 
@@ -212,4 +220,8 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].pop(callback, None)
+            handlers = self._events[event]
+            handlers.pop(callback, None)
+            once_handlers = [h for h in handlers if getattr(h, "_once_callback", None) == callback]
+            for handler in once_handlers:
+                handlers.pop(handler)
