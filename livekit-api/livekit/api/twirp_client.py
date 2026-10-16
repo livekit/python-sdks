@@ -29,6 +29,7 @@ from ._failover import (
     host_key,
     is_cloud_api,
     origin_of,
+    parse_retry_after,
     pick_next,
 )
 from .version import __version__
@@ -226,7 +227,8 @@ class TwirpClient:
         timeout: Optional[aiohttp.ClientTimeout] = None,
     ) -> T:
         """Issues a Twirp request, failing over to alternative regions on
-        retryable errors. On any transport error or HTTP 5xx it discovers
+        retryable errors. On any transport error or HTTP 5xx (a 503 only with
+        Retry-After, which then sets the delay) it discovers
         regions via ``/settings/regions`` and replays the request — body and
         headers intact — against the next untried region, with jittered
         exponential backoff. A 4xx is returned immediately."""
@@ -261,6 +263,7 @@ class TwirpClient:
 
             transport_exc: Optional[BaseException] = None
             retryable_status: Optional[int] = None
+            retry_after: Optional[float] = None
             error_data: Dict = {}
             try:
                 async with self._session.post(
@@ -273,8 +276,10 @@ class TwirpClient:
                         error_data = await resp.json()
                     except Exception:
                         error_data = {}
-                    if resp.status < 500:
-                        # 4xx is terminal.
+                    retry_after = parse_retry_after(resp.headers.get("Retry-After"))
+                    # A 4xx is terminal. A 503 is the server shedding load, so
+                    # it is retried only when Retry-After says when.
+                    if resp.status < 500 or (resp.status == 503 and retry_after is None):
                         raise self._server_error(error_data, resp.status)
                     retryable_status = resp.status
             except (aiohttp.ClientError, asyncio.TimeoutError) as e:
@@ -304,7 +309,9 @@ class TwirpClient:
                 reason,
                 next_origin,
             )
-            await asyncio.sleep(backoff(attempt, self._failover_backoff))
+            await asyncio.sleep(
+                retry_after if retry_after is not None else backoff(attempt, self._failover_backoff)
+            )
             attempted.add(host_key(next_origin))
             current_origin = next_origin
             current_base = next_origin

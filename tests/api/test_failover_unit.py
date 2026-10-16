@@ -26,8 +26,13 @@ from aiohttp import web
 from aiohttp.test_utils import TestServer
 
 from livekit.api import CreateRoomRequest, Room
-from livekit.api._failover import FAILOVER_MAX_ATTEMPTS, backoff, failover_attempts
-from livekit.api.twirp_client import TwirpClient
+from livekit.api._failover import (
+    FAILOVER_MAX_ATTEMPTS,
+    backoff,
+    failover_attempts,
+    parse_retry_after,
+)
+from livekit.api.twirp_client import ServerError, TwirpClient
 
 Handler = Callable[[int, web.Request], "web.StreamResponse | None"]
 
@@ -140,6 +145,46 @@ def test_retries_same_host_on_5xx():
     room = asyncio.run(_call_single_host(behave, attempts))
     assert room.name == "r"
     assert len(attempts) == 2
+
+
+def test_503_without_retry_after_not_retried():
+    """A 503 without Retry-After is the server shedding load, so it is terminal."""
+
+    def behave(attempt: int, request: web.Request):
+        return web.json_response({"code": "unavailable", "msg": "busy"}, status=503)
+
+    attempts: List[int] = []
+    with pytest.raises(ServerError):
+        asyncio.run(_call_single_host(behave, attempts))
+    assert len(attempts) == 1
+
+
+def test_503_with_retry_after_retried():
+    """A 503 with Retry-After is retried."""
+
+    def behave(attempt: int, request: web.Request):
+        if attempt == 0:
+            return web.json_response(
+                {"code": "unavailable", "msg": "busy"}, status=503, headers={"Retry-After": "0"}
+            )
+        return _ok(request)
+
+    attempts: List[int] = []
+    room = asyncio.run(_call_single_host(behave, attempts))
+    assert room.name == "r"
+    assert len(attempts) == 2
+
+
+def test_parse_retry_after(monkeypatch: pytest.MonkeyPatch):
+    """Retry-After is delay-seconds or an HTTP-date; anything else is ignored."""
+    assert parse_retry_after(None) is None
+    assert parse_retry_after("") is None
+    assert parse_retry_after("soon") is None
+    assert parse_retry_after("0") == 0.0
+    assert parse_retry_after(" 2 ") == 2.0
+    monkeypatch.setattr("time.time", lambda: 1792567680.0)  # Wed, 21 Oct 2026 07:28:00 GMT
+    assert parse_retry_after("Wed, 21 Oct 2026 07:28:03 GMT") == pytest.approx(3.0)
+    assert parse_retry_after("Wed, 21 Oct 2026 07:27:00 GMT") == 0.0
 
 
 @pytest.mark.parametrize(
