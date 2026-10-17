@@ -1601,7 +1601,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", marker = "python_full_version < '3.10'", specifier = ">=3.13.5" },
-    { name = "aiohttp", marker = "python_full_version >= '3.10'", specifier = ">=3.14.4" },
+    { name = "aiohttp", marker = "python_full_version >= '3.10'", specifier = ">=3.14.3" },
     { name = "idna", specifier = ">=3.15" },
     { name = "livekit-protocol", editable = "livekit-protocol" },
     { name = "multidict", marker = "python_full_version >= '3.10'", specifier = ">=6.9.1" },
