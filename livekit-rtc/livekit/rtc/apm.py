@@ -56,7 +56,7 @@ class AudioProcessingModule:
         req = proto_ffi.FfiRequest()
         req.apm_process_stream.apm_handle = self._ffi_handle.handle
         req.apm_process_stream.data_ptr = get_address(data._data)
-        req.apm_process_stream.size = len(data._data)
+        req.apm_process_stream.size = data.data.nbytes
         req.apm_process_stream.sample_rate = data.sample_rate
         req.apm_process_stream.num_channels = data.num_channels
 
@@ -84,7 +84,7 @@ class AudioProcessingModule:
         req = proto_ffi.FfiRequest()
         req.apm_process_reverse_stream.apm_handle = self._ffi_handle.handle
         req.apm_process_reverse_stream.data_ptr = get_address(data._data)
-        req.apm_process_reverse_stream.size = len(data._data)
+        req.apm_process_reverse_stream.size = data.data.nbytes
         req.apm_process_reverse_stream.sample_rate = data.sample_rate
         req.apm_process_reverse_stream.num_channels = data.num_channels
 

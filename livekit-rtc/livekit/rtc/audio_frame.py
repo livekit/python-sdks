@@ -41,7 +41,8 @@ class AudioFrame:
 
         Args:
             data (Union[bytes, bytearray, memoryview]): The raw audio data, which must be at least
-                `num_channels * samples_per_channel * sizeof(int16)` bytes long.
+                `num_channels * samples_per_channel * sizeof(int16)` bytes long. Bytes past that
+                size are not part of the frame.
             sample_rate (int): The sample rate of the audio in Hz.
             num_channels (int): The number of audio channels (e.g., 1 for mono, 2 for stereo).
             samples_per_channel (int): The number of samples per channel.
@@ -121,9 +122,11 @@ class AudioFrame:
         Returns a memory view of the audio data as 16-bit signed integers.
 
         Returns:
-            memoryview: A memory view of the audio data.
+            memoryview: A memory view of the frame's `num_channels * samples_per_channel`
+                samples. Bytes of the buffer past them are left out.
         """
-        return memoryview(self._data).cast("B").cast("h")
+        size = self.num_channels * self.samples_per_channel * ctypes.sizeof(ctypes.c_int16)
+        return memoryview(self._data).cast("B")[:size].cast("h")
 
     @property
     def sample_rate(self) -> int:
@@ -180,7 +183,7 @@ class AudioFrame:
                 wav.setnchannels(self.num_channels)
                 wav.setsampwidth(2)
                 wav.setframerate(self.sample_rate)
-                wav.writeframes(self._data)
+                wav.writeframes(self.data)
 
             return wav_file.getvalue()
 
