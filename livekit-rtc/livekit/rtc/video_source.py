@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import video_frame_pb2 as proto_video
@@ -61,6 +63,9 @@ class VideoSource:
         metadata: proto_video.FrameMetadata | None = None,
     ) -> None:
         """Capture a frame, optionally attaching frame metadata."""
+        if self._ffi_handle.disposed:
+            return
+
         req = proto_ffi.FfiRequest()
         req.capture_video_frame.source_handle = self._ffi_handle.handle
         req.capture_video_frame.buffer.CopyFrom(frame._proto_info())
@@ -70,5 +75,16 @@ class VideoSource:
             req.capture_video_frame.metadata.CopyFrom(metadata)
         FfiClient.instance.request(req)
 
-    async def aclose(self) -> None:
+    def close(self) -> None:
+        """Close the video source.
+
+        This method cleans up resources associated with the video source.
+        """
         self._ffi_handle.dispose()
+
+    async def aclose(self) -> None:
+        """Close the video source without blocking the event loop.
+
+        This method cleans up resources associated with the video source.
+        """
+        await asyncio.to_thread(self._ffi_handle.dispose)
