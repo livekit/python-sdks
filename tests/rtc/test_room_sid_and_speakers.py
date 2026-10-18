@@ -18,6 +18,7 @@ import pytest
 
 from livekit import rtc
 from livekit.rtc import ConnectionState, Participant, RemoteParticipant
+from livekit.rtc._proto import ffi_pb2 as proto_ffi
 from livekit.rtc._proto import participant_pb2 as proto_participant
 from livekit.rtc._proto import room_pb2 as proto_room
 
@@ -198,3 +199,56 @@ async def test_room_disconnect_clears_active_speakers() -> None:
     assert len(emitted_speaker_identities) == 2
     assert emitted_speaker_identities[-1] == []
     assert room.active_speakers == []
+
+
+@pytest.mark.asyncio
+async def test_active_speakers_listener_mutation_does_not_corrupt_cache() -> None:
+    room = rtc.Room()
+    p1 = _create_mock_remote_participant("user-1", "PA_1")
+    room._remote_participants["user-1"] = p1
+
+    def mutating_listener(speakers: list[Participant]) -> None:
+        speakers.clear()
+
+    room.on("active_speakers_changed", mutating_listener)
+
+    ev = proto_room.RoomEvent()
+    ev.active_speakers_changed.participant_identities.append("user-1")
+    room._on_room_event(ev)
+
+    assert len(room.active_speakers) == 1
+    assert room.active_speakers[0].identity == "user-1"
+
+
+@pytest.mark.asyncio
+async def test_connect_cancellation_fails_sid_future_and_cleans_up(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    room = rtc.Room()
+
+    # Mock FfiClient request to never answer connect response
+    def mock_request(req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        resp = proto_ffi.FfiResponse()
+        resp.connect.async_id = 9999
+        return resp
+
+    monkeypatch.setattr(rtc._ffi_client.FfiClient.instance, "request", mock_request)
+
+    connect_task = asyncio.create_task(room.connect("ws://dummy", "dummy_token"))
+    await asyncio.sleep(0.01)
+
+    assert room._is_connecting
+
+    async def wait_sid() -> None:
+        await room.sid
+
+    sid_task = asyncio.create_task(wait_sid())
+    await asyncio.sleep(0.01)
+
+    connect_task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await connect_task
+
+    assert not room._is_connecting
+    with pytest.raises(RuntimeError, match="room connection was cancelled"):
+        await sid_task

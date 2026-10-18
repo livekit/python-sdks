@@ -251,7 +251,7 @@ class Room(EventEmitter[EventTypes]):
             if not self._first_sid_future.done():
                 self._first_sid_future.set_result(sid)
 
-    def _fail_first_sid(self, exc: Exception) -> None:
+    def _fail_first_sid(self, exc: BaseException) -> None:
         if not self._first_sid_future.done():
             self._first_sid_future.set_exception(exc)
             # Retrieve the exception to suppress unretrieved future warnings if unawaited
@@ -643,8 +643,14 @@ class Room(EventEmitter[EventTypes]):
 
             # start listening to room events
             self._task = self._loop.create_task(self._listen_task())
-        except Exception as e:
-            self._fail_first_sid(e)
+        except BaseException as e:
+            if self._ffi_handle is None and hasattr(self, "_ffi_queue"):
+                FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+            self._fail_first_sid(
+                RuntimeError("room connection was cancelled")
+                if isinstance(e, asyncio.CancelledError)
+                else e
+            )
             raise
         finally:
             self._is_connecting = False
@@ -1049,7 +1055,7 @@ class Room(EventEmitter[EventTypes]):
 
             if [p.identity for p in speakers] != [p.identity for p in self._active_speakers]:
                 self._active_speakers = speakers
-                self.emit("active_speakers_changed", speakers)
+                self.emit("active_speakers_changed", list(speakers))
         elif which == "room_metadata_changed":
             old_metadata = self.metadata
             self._info.metadata = event.room_metadata_changed.metadata
