@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
-import time
 import asyncio
+import threading
+import time
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -73,6 +74,7 @@ class AudioSource:
         self._last_capture = 0.0
         self._q_size = 0.0
         self._capture_gen = 0
+        self._lock = threading.Lock()
         self._join_handle: asyncio.TimerHandle | None = None
         self._join_fut: asyncio.Future[None] | None = None
 
@@ -89,7 +91,8 @@ class AudioSource:
     @property
     def queued_duration(self) -> float:
         """The current duration (in seconds) of audio data queued for playback."""
-        return max(self._q_size - time.monotonic() + self._last_capture, 0.0)
+        with self._lock:
+            return max(self._q_size - time.monotonic() + self._last_capture, 0.0)
 
     def clear_queue(self) -> None:
         """
@@ -103,7 +106,11 @@ class AudioSource:
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
         _ = FfiClient.instance.request(req)
-        self._release_waiter_threadsafe(gen=self._capture_gen)
+        with self._lock:
+            self._last_capture = 0.0
+            self._q_size = 0.0
+            target_gen = self._capture_gen
+        self._release_waiter_threadsafe(gen=target_gen)
 
     def _get_loop(self) -> asyncio.AbstractEventLoop:
         if self._loop is None or self._loop.is_closed():
@@ -132,25 +139,27 @@ class AudioSource:
 
         loop = self._get_loop()
 
-        self._capture_gen += 1
-        current_gen = self._capture_gen
+        with self._lock:
+            self._capture_gen += 1
+            current_gen = self._capture_gen
 
-        now = time.monotonic()
-        elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
-        self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
-        self._last_capture = now
+            now = time.monotonic()
+            elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
+            self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
+            self._last_capture = now
+            q_size = self._q_size
 
-        if self._join_handle:
-            self._join_handle.cancel()
+            if self._join_handle:
+                self._join_handle.cancel()
 
-        if (
-            self._join_fut is None
-            or self._join_fut.get_loop() is not loop
-            or self._join_fut.get_loop().is_closed()
-        ):
-            self._join_fut = loop.create_future()
+            if (
+                self._join_fut is None
+                or self._join_fut.get_loop() is not loop
+                or self._join_fut.get_loop().is_closed()
+            ):
+                self._join_fut = loop.create_future()
 
-        self._join_handle = loop.call_later(self._q_size, self._release_waiter, current_gen)
+            self._join_handle = loop.call_later(q_size, self._release_waiter, current_gen)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
@@ -183,22 +192,23 @@ class AudioSource:
         await asyncio.shield(self._join_fut)
 
     def _release_waiter(self, gen: int | None = None) -> None:
-        if gen is not None and gen != self._capture_gen:
-            return
+        with self._lock:
+            if gen is not None and gen != self._capture_gen:
+                return
 
-        if self._join_handle is not None:
-            self._join_handle.cancel()
-            self._join_handle = None
+            if self._join_handle is not None:
+                self._join_handle.cancel()
+                self._join_handle = None
 
-        if self._join_fut is None:
-            return  # could be None when clear_queue is called
+            if self._join_fut is None:
+                return  # could be None when clear_queue is called
 
-        if not self._join_fut.done():
-            self._join_fut.set_result(None)
+            if not self._join_fut.done():
+                self._join_fut.set_result(None)
 
-        self._last_capture = 0.0
-        self._q_size = 0.0
-        self._join_fut = None
+            self._last_capture = 0.0
+            self._q_size = 0.0
+            self._join_fut = None
 
     def _release_waiter_threadsafe(self, gen: int | None = None) -> None:
         try:

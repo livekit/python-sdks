@@ -169,3 +169,30 @@ def test_audio_source_clear_queue_does_not_cancel_subsequent_capture() -> None:
         await source.aclose()
 
     asyncio.run(_run())
+
+
+def test_audio_source_cross_thread_clear_queue_resets_queued_duration() -> None:
+    source = rtc.AudioSource(48000, 1, queue_size_ms=10000)
+    frame1 = rtc.AudioFrame.create(48000, 1, 48000)
+    frame2 = rtc.AudioFrame.create(48000, 1, 48000)
+
+    async def _run() -> None:
+        await source.capture_frame(frame1)
+        assert source.queued_duration > 0.8
+
+        t = threading.Thread(target=source.clear_queue)
+        t.start()
+        t.join()
+
+        # Queued duration should be reset immediately
+        assert source.queued_duration == 0.0
+
+        # Capture a new frame immediately after cross-thread clear
+        await source.capture_frame(frame2)
+
+        # Queued duration should reflect only the new frame (~1.0s), not ~2.0s
+        assert 0.8 < source.queued_duration <= 1.05
+
+        await source.aclose()
+
+    asyncio.run(_run())
