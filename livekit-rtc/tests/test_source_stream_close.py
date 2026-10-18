@@ -106,3 +106,36 @@ async def test_video_source_aclose_and_capture_after_close() -> None:
 
     # Repeated aclose is idempotent
     await asyncio.wait_for(source.aclose(), timeout=2.0)
+
+
+def test_audio_source_init_outside_loop_and_capture_in_asyncio_run() -> None:
+    source = rtc.AudioSource(48000, 1)
+    assert source._loop is None
+    frame = rtc.AudioFrame.create(48000, 1, 480)
+
+    async def _capture() -> None:
+        await asyncio.wait_for(source.capture_frame(frame), timeout=5.0)
+        assert source._loop is not None
+        assert source._loop.is_running()
+        await asyncio.wait_for(source.aclose(), timeout=5.0)
+
+    asyncio.run(_capture())
+
+
+def test_audio_source_cross_thread_clear_queue() -> None:
+    source = rtc.AudioSource(48000, 1)
+    frame = rtc.AudioFrame.create(48000, 1, 48000)
+
+    async def _run() -> None:
+        await source.capture_frame(frame)
+        assert source._join_fut is not None
+
+        t = threading.Thread(target=source.clear_queue)
+        t.start()
+        t.join()
+
+        # Playout waiter should be released by cross-thread clear_queue
+        await asyncio.wait_for(source.wait_for_playout(), timeout=2.0)
+        await source.aclose()
+
+    asyncio.run(_run())

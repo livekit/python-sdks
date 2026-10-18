@@ -53,17 +53,12 @@ class AudioSource:
         """
         self._sample_rate = sample_rate
         self._num_channels = num_channels
-
-        if loop is not None:
-            self._loop = loop
-        else:
+        self._loop: asyncio.AbstractEventLoop | None = loop
+        if self._loop is None:
             try:
                 self._loop = asyncio.get_running_loop()
             except RuntimeError:
-                try:
-                    self._loop = asyncio.get_event_loop()
-                except RuntimeError:
-                    self._loop = asyncio.new_event_loop()
+                self._loop = None
 
         req = proto_ffi.FfiRequest()
         req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
@@ -107,7 +102,12 @@ class AudioSource:
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
         _ = FfiClient.instance.request(req)
-        self._release_waiter()
+        self._release_waiter_threadsafe()
+
+    def _get_loop(self) -> asyncio.AbstractEventLoop:
+        if self._loop is None or self._loop.is_closed():
+            self._loop = asyncio.get_running_loop()
+        return self._loop
 
     async def capture_frame(self, frame: AudioFrame) -> None:
         """
@@ -129,6 +129,8 @@ class AudioSource:
         if frame.samples_per_channel == 0 or getattr(self._ffi_handle, "disposed", False):
             return
 
+        loop = self._get_loop()
+
         now = time.monotonic()
         elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
         self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
@@ -137,16 +139,20 @@ class AudioSource:
         if self._join_handle:
             self._join_handle.cancel()
 
-        if self._join_fut is None:
-            self._join_fut = self._loop.create_future()
+        if (
+            self._join_fut is None
+            or self._join_fut.get_loop() is not loop
+            or self._join_fut.get_loop().is_closed()
+        ):
+            self._join_fut = loop.create_future()
 
-        self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
+        self._join_handle = loop.call_later(self._q_size, self._release_waiter)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
 
-        queue = FfiClient.instance.queue.subscribe(loop=self._loop)
+        queue = FfiClient.instance.queue.subscribe(loop=loop)
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
@@ -187,23 +193,23 @@ class AudioSource:
         self._q_size = 0.0
         self._join_fut = None
 
-    def close(self) -> None:
-        """Close the audio source.
-
-        This method cleans up resources associated with the audio source.
-        """
+    def _release_waiter_threadsafe(self) -> None:
         try:
             running_loop = asyncio.get_running_loop()
         except RuntimeError:
             running_loop = None
 
-        if running_loop is self._loop:
-            self._release_waiter()
-        elif self._loop.is_running():
+        if self._loop is not None and self._loop.is_running() and running_loop is not self._loop:
             self._loop.call_soon_threadsafe(self._release_waiter)
         else:
             self._release_waiter()
 
+    def close(self) -> None:
+        """Close the audio source.
+
+        This method cleans up resources associated with the audio source.
+        """
+        self._release_waiter_threadsafe()
         self._ffi_handle.dispose()
 
     async def aclose(self) -> None:
