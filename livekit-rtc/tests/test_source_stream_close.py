@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import threading
 
 import pytest
 
@@ -24,22 +26,22 @@ from livekit import rtc
 async def test_audio_source_aclose_releases_waiter_and_cancels_timer() -> None:
     source = rtc.AudioSource(48000, 1)
     frame = rtc.AudioFrame.create(48000, 1, 48000)
-    await source.capture_frame(frame)
+    await asyncio.wait_for(source.capture_frame(frame), timeout=5.0)
 
     assert source._join_fut is not None
     assert source._join_handle is not None
 
-    await source.aclose()
+    await asyncio.wait_for(source.aclose(), timeout=5.0)
 
     assert source._ffi_handle.disposed
     assert source._join_fut is None
     assert source._join_handle is None
 
     # After aclose, wait_for_playout should return immediately without hanging
-    await source.wait_for_playout()
+    await asyncio.wait_for(source.wait_for_playout(), timeout=2.0)
 
     # Repeated calls are idempotent
-    await source.aclose()
+    await asyncio.wait_for(source.aclose(), timeout=2.0)
 
 
 def test_audio_source_sync_close() -> None:
@@ -53,6 +55,17 @@ def test_audio_source_sync_close() -> None:
     source.close()
 
 
+def test_audio_source_cross_thread_close() -> None:
+    source = rtc.AudioSource(48000, 1)
+    assert not source._ffi_handle.disposed
+
+    t = threading.Thread(target=source.close)
+    t.start()
+    t.join()
+
+    assert source._ffi_handle.disposed
+
+
 @pytest.mark.asyncio
 async def test_audio_source_capture_after_close_is_noop() -> None:
     source = rtc.AudioSource(48000, 1)
@@ -60,7 +73,7 @@ async def test_audio_source_capture_after_close_is_noop() -> None:
 
     frame = rtc.AudioFrame.create(48000, 1, 480)
     # Should safely return without error
-    await source.capture_frame(frame)
+    await asyncio.wait_for(source.capture_frame(frame), timeout=2.0)
 
 
 def test_video_source_sync_close() -> None:
@@ -79,7 +92,7 @@ async def test_video_source_aclose_and_capture_after_close() -> None:
     source = rtc.VideoSource(640, 480)
     assert not source._ffi_handle.disposed
 
-    await source.aclose()
+    await asyncio.wait_for(source.aclose(), timeout=5.0)
     assert source._ffi_handle.disposed
 
     # Capture after close is safely ignored
@@ -92,4 +105,4 @@ async def test_video_source_aclose_and_capture_after_close() -> None:
     source.capture_frame(frame)
 
     # Repeated aclose is idempotent
-    await source.aclose()
+    await asyncio.wait_for(source.aclose(), timeout=2.0)

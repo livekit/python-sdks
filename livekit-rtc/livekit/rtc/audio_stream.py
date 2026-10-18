@@ -315,24 +315,15 @@ class AudioStream:
 
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
-    def close(self) -> None:
-        """Synchronously close the audio stream and release its resources."""
-        if self._track is not None:
-            self._track._unregister_audio_stream(self)
-        self._ffi_handle.dispose()
-        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
-        if self._processor is not None and self._processor_auto_close:
-            self._processor._close()
-
     async def aclose(self) -> None:
         """Asynchronously close the audio stream.
 
         This method cleans up resources associated with the audio stream and waits for
-        any pending operations to complete without blocking the event loop.
+        any pending operations to complete.
         """
         if self._track is not None:
             self._track._unregister_audio_stream(self)
-        await asyncio.to_thread(self._ffi_handle.dispose)
+        self._ffi_handle.dispose()
         await self._task
         if self._processor is not None and self._processor_auto_close:
             self._processor._close()

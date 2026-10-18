@@ -63,7 +63,7 @@ class VideoSource:
         metadata: proto_video.FrameMetadata | None = None,
     ) -> None:
         """Capture a frame, optionally attaching frame metadata."""
-        if self._ffi_handle.disposed:
+        if getattr(self._ffi_handle, "disposed", False):
             return
 
         req = proto_ffi.FfiRequest()
@@ -87,4 +87,5 @@ class VideoSource:
 
         This method cleans up resources associated with the video source.
         """
-        await asyncio.to_thread(self._ffi_handle.dispose)
+        if not getattr(self._ffi_handle, "disposed", False):
+            await asyncio.to_thread(self._ffi_handle.dispose)

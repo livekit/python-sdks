@@ -53,7 +53,17 @@ class AudioSource:
         """
         self._sample_rate = sample_rate
         self._num_channels = num_channels
-        self._loop = loop or asyncio.get_event_loop()
+
+        if loop is not None:
+            self._loop = loop
+        else:
+            try:
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                try:
+                    self._loop = asyncio.get_event_loop()
+                except RuntimeError:
+                    self._loop = asyncio.new_event_loop()
 
         req = proto_ffi.FfiRequest()
         req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
@@ -116,7 +126,7 @@ class AudioSource:
             Exception: If there is an error during frame capture.
         """
 
-        if frame.samples_per_channel == 0 or self._ffi_handle.disposed:
+        if frame.samples_per_channel == 0 or getattr(self._ffi_handle, "disposed", False):
             return
 
         now = time.monotonic()
@@ -182,7 +192,18 @@ class AudioSource:
 
         This method cleans up resources associated with the audio source.
         """
-        self._release_waiter()
+        try:
+            running_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            running_loop = None
+
+        if running_loop is self._loop:
+            self._release_waiter()
+        elif self._loop.is_running():
+            self._loop.call_soon_threadsafe(self._release_waiter)
+        else:
+            self._release_waiter()
+
         self._ffi_handle.dispose()
 
     async def aclose(self) -> None:
@@ -191,4 +212,5 @@ class AudioSource:
         This method cleans up resources associated with the audio source.
         """
         self._release_waiter()
-        await asyncio.to_thread(self._ffi_handle.dispose)
+        if not getattr(self._ffi_handle, "disposed", False):
+            await asyncio.to_thread(self._ffi_handle.dispose)
