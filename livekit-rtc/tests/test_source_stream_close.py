@@ -139,3 +139,33 @@ def test_audio_source_cross_thread_clear_queue() -> None:
         await source.aclose()
 
     asyncio.run(_run())
+
+
+def test_audio_source_clear_queue_does_not_cancel_subsequent_capture() -> None:
+    source = rtc.AudioSource(48000, 1, queue_size_ms=10000)
+    frame1 = rtc.AudioFrame.create(48000, 1, 48000)
+    frame2 = rtc.AudioFrame.create(48000, 1, 48000)
+
+    async def _run() -> None:
+        await source.capture_frame(frame1)
+        gen1 = source._capture_gen
+
+        # Simulate clear_queue scheduled from another thread
+        loop = asyncio.get_running_loop()
+        loop.call_soon(source._release_waiter, gen1)
+
+        # Capture a subsequent frame before yielding
+        await source.capture_frame(frame2)
+        assert source._capture_gen > gen1
+        assert source._join_fut is not None
+
+        # Allow queued clear callback to execute
+        await asyncio.sleep(0.01)
+
+        # The subsequent frame's playout future and timer must not be cleared
+        assert source._join_fut is not None
+        assert not source._join_fut.done()
+
+        await source.aclose()
+
+    asyncio.run(_run())

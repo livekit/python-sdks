@@ -72,6 +72,7 @@ class AudioSource:
 
         self._last_capture = 0.0
         self._q_size = 0.0
+        self._capture_gen = 0
         self._join_handle: asyncio.TimerHandle | None = None
         self._join_fut: asyncio.Future[None] | None = None
 
@@ -102,7 +103,7 @@ class AudioSource:
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
         _ = FfiClient.instance.request(req)
-        self._release_waiter_threadsafe()
+        self._release_waiter_threadsafe(gen=self._capture_gen)
 
     def _get_loop(self) -> asyncio.AbstractEventLoop:
         if self._loop is None or self._loop.is_closed():
@@ -131,6 +132,9 @@ class AudioSource:
 
         loop = self._get_loop()
 
+        self._capture_gen += 1
+        current_gen = self._capture_gen
+
         now = time.monotonic()
         elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
         self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
@@ -146,7 +150,7 @@ class AudioSource:
         ):
             self._join_fut = loop.create_future()
 
-        self._join_handle = loop.call_later(self._q_size, self._release_waiter)
+        self._join_handle = loop.call_later(self._q_size, self._release_waiter, current_gen)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
@@ -178,7 +182,10 @@ class AudioSource:
 
         await asyncio.shield(self._join_fut)
 
-    def _release_waiter(self) -> None:
+    def _release_waiter(self, gen: int | None = None) -> None:
+        if gen is not None and gen != self._capture_gen:
+            return
+
         if self._join_handle is not None:
             self._join_handle.cancel()
             self._join_handle = None
@@ -193,16 +200,16 @@ class AudioSource:
         self._q_size = 0.0
         self._join_fut = None
 
-    def _release_waiter_threadsafe(self) -> None:
+    def _release_waiter_threadsafe(self, gen: int | None = None) -> None:
         try:
             running_loop = asyncio.get_running_loop()
         except RuntimeError:
             running_loop = None
 
         if self._loop is not None and self._loop.is_running() and running_loop is not self._loop:
-            self._loop.call_soon_threadsafe(self._release_waiter)
+            self._loop.call_soon_threadsafe(self._release_waiter, gen)
         else:
-            self._release_waiter()
+            self._release_waiter(gen)
 
     def close(self) -> None:
         """Close the audio source.
