@@ -200,6 +200,7 @@ class Room(EventEmitter[EventTypes]):
         self._server_url: str | None = None
         self._task: Optional[asyncio.Task] = None
         self._cleanup_task: Optional[asyncio.Task[None]] = None
+        self._cleanup_tasks: set[asyncio.Task[None]] = set()
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -225,6 +226,13 @@ class Room(EventEmitter[EventTypes]):
         # carries it so waiters do not depend on event ordering.
         if sid and not self._first_sid_future.done():
             self._first_sid_future.set_result(sid)
+
+    def _fail_sid_waiters(self, err: BaseException) -> None:
+        fut = self._first_sid_future
+        if not fut.done():
+            fut.set_exception(err)
+            fut.exception()
+        self._first_sid_future = asyncio.Future[str]()
 
     @property
     def local_participant(self) -> LocalParticipant:
@@ -469,9 +477,9 @@ class Room(EventEmitter[EventTypes]):
             await room.connect("ws://localhost:7880", "your_token")
             ```
         """
-        if self._cleanup_task is not None and not self._cleanup_task.done():
+        if self._cleanup_tasks:
             try:
-                await asyncio.shield(self._cleanup_task)
+                await asyncio.shield(asyncio.gather(*self._cleanup_tasks))
             except Exception:
                 pass
 
@@ -576,15 +584,19 @@ class Room(EventEmitter[EventTypes]):
                 cb: proto_ffi.FfiEvent = await queue.wait_for(
                     lambda e: e.connect.async_id == resp.connect.async_id
                 )
-            except asyncio.CancelledError:
+            except asyncio.CancelledError as e:
                 # The connect request was already dispatched to the FFI server.
                 # Transfer cleanup to a background task so the caller unblocks immediately,
                 # while guaranteeing that when ConnectCallback arrives the FFI handshake is
                 # completed and cleanly disconnected (Issues #784, #804).
                 queue_unsubscribed = True
-                self._cleanup_task = self._loop.create_task(
+                task = self._loop.create_task(
                     self._cleanup_cancelled_connect(queue, resp.connect.async_id, self._ffi_queue)
                 )
+                self._cleanup_task = task
+                self._cleanup_tasks.add(task)
+                task.add_done_callback(self._cleanup_tasks.discard)
+                self._fail_sid_waiters(e)
                 raise
         finally:
             if not queue_unsubscribed:
@@ -631,7 +643,7 @@ class Room(EventEmitter[EventTypes]):
             ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
             FfiClient.instance.request(ready_req)
             ready_sent = True
-        except BaseException:
+        except BaseException as e:
             if not ready_sent:
                 if self._task is not None and not self._task.done():
                     self._task.cancel()
@@ -641,8 +653,7 @@ class Room(EventEmitter[EventTypes]):
                 self._remote_participants.clear()
                 self._local_participant = None
                 self._info = proto_room.RoomInfo()
-                if self._first_sid_future.done():
-                    self._first_sid_future = asyncio.Future[str]()
+                self._fail_sid_waiters(e)
             raise
 
     @staticmethod
@@ -813,9 +824,9 @@ class Room(EventEmitter[EventTypes]):
     ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
-            if self._cleanup_task is not None and not self._cleanup_task.done():
+            if self._cleanup_tasks:
                 try:
-                    await asyncio.shield(self._cleanup_task)
+                    await asyncio.shield(asyncio.gather(*self._cleanup_tasks))
                 except Exception:
                     pass
             return

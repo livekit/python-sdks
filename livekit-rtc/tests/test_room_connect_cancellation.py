@@ -457,3 +457,37 @@ async def test_room_connect_subsequent_connect_waits_for_cleanup(
     connect_task2.cancel()
     with pytest.raises(asyncio.CancelledError):
         await connect_task2
+
+
+@pytest.mark.asyncio
+async def test_room_connect_cancellation_fails_sid_waiters(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    room = Room()
+    connect_async_id = 999
+
+    def fake_request(req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        which = req.WhichOneof("message")
+        if which == "connect":
+            resp = proto_ffi.FfiResponse()
+            resp.connect.async_id = connect_async_id
+            return resp
+        raise AssertionError(f"unexpected request: {which}")
+
+    monkeypatch.setattr(FfiClient.instance, "request", fake_request)
+
+    connect_task = asyncio.create_task(room.connect("ws://127.0.0.1:7880", "fake-token"))
+    await asyncio.sleep(0)
+
+    sid_task = asyncio.create_task(room.sid)
+    await asyncio.sleep(0)
+
+    connect_task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await connect_task
+
+    with pytest.raises(asyncio.CancelledError):
+        await sid_task
+
+    # Future SID waiter on the same room gets a fresh future
+    assert not room._first_sid_future.done()
