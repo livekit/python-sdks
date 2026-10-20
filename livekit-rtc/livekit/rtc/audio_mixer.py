@@ -67,6 +67,7 @@ class AudioMixer:
         # _ending signals that no new streams will be added,
         # but we continue processing until all streams are exhausted.
         self._ending: bool = False
+        self._closed: bool = False
         self._mixer_task: asyncio.Task = asyncio.create_task(self._mixer())
 
     def add_stream(self, stream: AsyncIterator[AudioFrame]) -> None:
@@ -106,8 +107,11 @@ class AudioMixer:
         return self
 
     async def __anext__(self) -> AudioFrame:
+        if self._closed:
+            raise StopAsyncIteration
         item = await self._queue.get()
         if item is None:
+            self._closed = True
             raise StopAsyncIteration
         return item
 
@@ -115,20 +119,27 @@ class AudioMixer:
         """
         Immediately stop mixing and close the mixer.
 
-        This cancels the mixing task, and any unconsumed output in the queue may be dropped.
+        This cancels the mixing task and drops any unconsumed output in the queue.
+        Waiting consumers are released, and subsequent iteration stops.
         Pending stream reads are cancelled and awaited, so a stream must let
         asyncio.CancelledError propagate once its cleanup is done.
         """
         self._ending = True
-        self._mixer_task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await self._mixer_task
-        pending = list(self._pending_reads.values())
-        self._pending_reads.clear()
-        for read in pending:
-            _discard_read(read)
-        # let the streams finish their cleanup before the mixer counts as closed
-        await asyncio.gather(*pending, return_exceptions=True)
+        self._closed = True
+        try:
+            self._mixer_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._mixer_task
+            pending = list(self._pending_reads.values())
+            self._pending_reads.clear()
+            for read in pending:
+                _discard_read(read)
+            # let the streams finish their cleanup before the mixer counts as closed
+            await asyncio.gather(*pending, return_exceptions=True)
+        finally:
+            while not self._queue.empty():
+                self._queue.get_nowait()
+            self._queue.put_nowait(None)
 
     def end_input(self) -> None:
         """
