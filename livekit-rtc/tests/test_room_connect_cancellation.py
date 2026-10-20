@@ -368,3 +368,86 @@ async def test_room_connect_repeated_cancellation_during_cleanup(
     assert disconnect_requests == [fake_room_handle_id]
     assert dropped_handles == [fake_room_handle_id]
     assert not room.isconnected()
+
+
+@pytest.mark.asyncio
+async def test_room_connect_subsequent_connect_waits_for_cleanup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    room = Room()
+    dropped_handles: list[int] = []
+    ready_requests: list[int] = []
+    disconnect_requests: list[int] = []
+    connect_requests: list[str] = []
+
+    fake_room_handle_id = 42
+    connect_async_id_1 = 101
+    connect_async_id_2 = 102
+    disconnect_async_id = 202
+
+    def fake_dispose(self: FfiHandle) -> None:
+        if not self._disposed:
+            self._disposed = True
+            dropped_handles.append(self.handle)
+
+    monkeypatch.setattr(FfiHandle, "dispose", fake_dispose)
+
+    call_count = 0
+
+    def fake_request(req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        nonlocal call_count
+        which = req.WhichOneof("message")
+        if which == "connect":
+            call_count += 1
+            connect_requests.append(req.connect.token)
+            resp = proto_ffi.FfiResponse()
+            resp.connect.async_id = connect_async_id_1 if call_count == 1 else connect_async_id_2
+            return resp
+        elif which == "ready_for_room_event":
+            ready_requests.append(req.ready_for_room_event.room_handle)
+            return proto_ffi.FfiResponse()
+        elif which == "disconnect":
+            disconnect_requests.append(req.disconnect.room_handle)
+            resp = proto_ffi.FfiResponse()
+            resp.disconnect.async_id = disconnect_async_id
+            disc_cb = proto_ffi.FfiEvent()
+            disc_cb.disconnect.async_id = disconnect_async_id
+            FfiClient.instance.queue.put(disc_cb)
+            return resp
+        raise AssertionError(f"unexpected request: {which}")
+
+    monkeypatch.setattr(FfiClient.instance, "request", fake_request)
+
+    # First attempt cancelled while connect is in flight
+    connect_task1 = asyncio.create_task(room.connect("ws://127.0.0.1:7880", "token-1"))
+    await asyncio.sleep(0)
+    connect_task1.cancel()
+
+    with pytest.raises(asyncio.CancelledError):
+        await connect_task1
+
+    assert room.cleanup_task is not None
+    assert not room.cleanup_task.done()
+
+    # Second connect attempt started immediately
+    connect_task2 = asyncio.create_task(room.connect("ws://127.0.0.1:7880", "token-2"))
+    await asyncio.sleep(0)
+
+    # The second attempt must NOT have dispatched req.connect yet because cleanup is pending
+    assert len(connect_requests) == 1
+
+    # Now deliver connect callback for attempt 1
+    connect_cb1 = proto_ffi.FfiEvent()
+    connect_cb1.connect.async_id = connect_async_id_1
+    connect_cb1.connect.result.room.handle.id = fake_room_handle_id
+    FfiClient.instance.queue.put(connect_cb1)
+
+    # Cleanup finishes and second connect proceeds to send request
+    await _wait_until_dropped(dropped_handles, fake_room_handle_id)
+    assert len(connect_requests) == 2
+    assert connect_requests == ["token-1", "token-2"]
+
+    # Cancel task 2 to finish cleanly
+    connect_task2.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await connect_task2

@@ -199,6 +199,7 @@ class Room(EventEmitter[EventTypes]):
         self._token: str | None = None
         self._server_url: str | None = None
         self._task: Optional[asyncio.Task] = None
+        self._cleanup_task: Optional[asyncio.Task[None]] = None
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -468,6 +469,12 @@ class Room(EventEmitter[EventTypes]):
             await room.connect("ws://localhost:7880", "your_token")
             ```
         """
+        if self._cleanup_task is not None and not self._cleanup_task.done():
+            try:
+                await asyncio.shield(self._cleanup_task)
+            except Exception:
+                pass
+
         self._server_url = url
         self._token = token
         req = proto_ffi.FfiRequest()
@@ -575,7 +582,7 @@ class Room(EventEmitter[EventTypes]):
                 # while guaranteeing that when ConnectCallback arrives the FFI handshake is
                 # completed and cleanly disconnected (Issues #784, #804).
                 queue_unsubscribed = True
-                self._loop.create_task(
+                self._cleanup_task = self._loop.create_task(
                     self._cleanup_cancelled_connect(queue, resp.connect.async_id, self._ffi_queue)
                 )
                 raise
@@ -796,11 +803,21 @@ class Room(EventEmitter[EventTypes]):
         if cb.simulate_scenario.HasField("error") and cb.simulate_scenario.error:
             raise RuntimeError(f"simulate_scenario failed: {cb.simulate_scenario.error}")
 
+    @property
+    def cleanup_task(self) -> Optional[asyncio.Task[None]]:
+        """Pending background cleanup task from a previously cancelled connect, if any."""
+        return self._cleanup_task
+
     async def disconnect(
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
+            if self._cleanup_task is not None and not self._cleanup_task.done():
+                try:
+                    await asyncio.shield(self._cleanup_task)
+                except Exception:
+                    pass
             return
 
         await self._drain_rpc_invocation_tasks()
