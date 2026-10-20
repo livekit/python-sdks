@@ -444,6 +444,12 @@ async def test_room_connect_subsequent_connect_waits_for_cleanup(
 
     # Cleanup finishes and second connect proceeds to send request
     await _wait_until_dropped(dropped_handles, fake_room_handle_id)
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + 2.0
+    while loop.time() < deadline:
+        if len(connect_requests) == 2:
+            break
+        await asyncio.sleep(0.01)
     assert len(connect_requests) == 2
     assert connect_requests == ["token-1", "token-2"]
 
