@@ -28,7 +28,8 @@ from livekit import rtc
 gc.collect()
 gc.set_debug(gc.DEBUG_SAVEALL)
 for _ in range(10):
-    rtc.AudioProcessingModule()
+    apm = rtc.AudioProcessingModule()
+    apm._ffi_handle.dispose()
 gc.collect()
 print(sum(isinstance(o, type(ctypes.Array)) for o in gc.garbage))
 """
