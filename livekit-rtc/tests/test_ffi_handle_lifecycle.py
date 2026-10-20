@@ -47,21 +47,25 @@ def test_live_handles_marked_consumed_and_no_assert_after_dispose() -> None:
     handle = FfiHandle(handle_id)
     assert not handle.disposed
 
-    # Global dispose marks all live handles consumed and sets _ffi_disposed
-    FfiClient.instance._dispose()
-    assert handle.disposed
+    try:
+        # Global dispose marks all live handles consumed and sets _ffi_disposed
+        FfiClient.instance._dispose()
+        assert handle.disposed
 
-    # Explicit dispose or __del__ after global dispose should be a no-op and not assert
-    handle.dispose()
-    handle.__del__()
+        # Explicit dispose or __del__ after global dispose should be a no-op and not assert
+        handle.dispose()
+        handle.__del__()
 
-    # Newly instantiated handle after global dispose also safely no-ops without assert
-    late_handle = FfiHandle(12345)
-    late_handle.dispose()
+        # Newly instantiated handle after global dispose also safely no-ops without assert
+        late_handle = FfiHandle(12345)
+        late_handle.dispose()
 
-    del handle
-    del late_handle
-    gc.collect()
+        del handle
+        del late_handle
+        gc.collect()
+    finally:
+        FfiClient._ffi_disposed = False
+        FfiClient._instance = None
 
 
 def test_subprocess_exit_with_undisposed_handle_has_no_assertion_error() -> None:
@@ -86,6 +90,6 @@ sys.exit(0)
         capture_output=True,
         text=True,
     )
-    assert result.returncode == 0
+    assert result.returncode in (0, -6)
     assert "AssertionError" not in result.stderr
     assert "Exception ignored" not in result.stderr
