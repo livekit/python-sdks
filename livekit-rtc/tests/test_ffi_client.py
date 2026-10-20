@@ -22,19 +22,20 @@ import sys
 _COUNT_ARRAY_TYPES_IN_GARBAGE = """
 import ctypes
 import gc
+import os
+import sys
 
 from livekit import rtc
 
 gc.collect()
 gc.set_debug(gc.DEBUG_SAVEALL)
-for _ in range(5):
-    apm = rtc.AudioProcessingModule()
-    apm._ffi_handle.dispose()
+for _ in range(10):
+    rtc.AudioProcessingModule()
 gc.collect()
 count = sum(isinstance(o, type(ctypes.Array)) for o in gc.garbage)
-gc.set_debug(0)
-gc.garbage.clear()
-print(count)
+sys.stdout.write(f"{count}\\n")
+sys.stdout.flush()
+os._exit(0)
 """
 
 
