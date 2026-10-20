@@ -120,7 +120,7 @@ class AudioMixer:
         Immediately stop mixing and close the mixer.
 
         This cancels the mixing task and drops any unconsumed output in the queue.
-        Waiting consumers are released, and subsequent iteration stops.
+        An iterator waiting for output is released, and subsequent iteration stops.
         Pending stream reads are cancelled and awaited, so a stream must let
         asyncio.CancelledError propagate once its cleanup is done.
         """
