@@ -60,3 +60,42 @@ async def test_video_stream_eos_terminates_iteration() -> None:
         assert frames == []
 
         await video_stream.aclose()
+
+
+async def test_video_stream_eos_does_not_evict_last_frame_at_capacity_one() -> None:
+    track = MagicMock(spec=rtc.Track)
+    stream_info = MagicMock()
+    stream_info.handle.id = 54321
+    stream_info.info = MagicMock()
+
+    with patch.object(rtc.VideoStream, "_create_owned_stream", return_value=stream_info):
+        video_stream = rtc.VideoStream(track, capacity=1)
+        video_stream._ffi_handle._disposed = True
+
+        mock_frame = MagicMock(spec=rtc.VideoFrame)
+        with patch.object(rtc.VideoFrame, "_from_owned_info", return_value=mock_frame):
+            # Enqueue frame and EOS before consumer reads
+            frame_event = proto_ffi.FfiEvent()
+            frame_event.video_stream_event.stream_handle = 54321
+            frame_event.video_stream_event.frame_received.timestamp_us = 1000
+            frame_event.video_stream_event.frame_received.rotation = (
+                proto_video_frame.VideoRotation.VIDEO_ROTATION_0
+            )
+            FfiClient.instance.queue.put(frame_event)
+
+            eos_event = proto_ffi.FfiEvent()
+            eos_event.video_stream_event.stream_handle = 54321
+            eos_event.video_stream_event.eos.CopyFrom(proto_video_frame.VideoStreamEOS())
+            FfiClient.instance.queue.put(eos_event)
+
+            # Consume stream
+            frames: list[rtc.VideoFrameEvent] = []
+            async for frame in video_stream:
+                frames.append(frame)
+
+            # The final frame must not be evicted by EOS sentinel
+            assert len(frames) == 1
+            assert frames[0].frame is mock_frame
+            assert frames[0].timestamp_us == 1000
+
+            await video_stream.aclose()
