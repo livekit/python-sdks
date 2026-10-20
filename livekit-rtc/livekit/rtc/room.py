@@ -189,7 +189,6 @@ class Room(EventEmitter[EventTypes]):
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
-        self._active_speakers: list[Participant] = []
         self._is_connecting: bool = False
 
         # active incoming stream readers, keyed by FFI reader handle id
@@ -225,23 +224,6 @@ class Room(EventEmitter[EventTypes]):
         # asyncio.wait_for(room.sid, ...), should not cancel it for future waiters.
         return await asyncio.shield(self._first_sid_future)
 
-    async def get_sid(self, timeout: float | None = None) -> str:
-        """Asynchronously retrieves the session ID (SID) of the room with an optional timeout.
-
-        Parameters:
-            timeout (float | None, optional): Maximum time in seconds to wait for the SID.
-
-        Returns:
-            str: The session ID of the room.
-
-        Raises:
-            RuntimeError: If the room is disconnected and no SID was received.
-            asyncio.TimeoutError: If the timeout expires before the SID is available.
-        """
-        if timeout is None:
-            return await self.sid
-        return await asyncio.wait_for(self.sid, timeout)
-
     def _resolve_first_sid(self, sid: str) -> None:
         # The room SID can arrive through the initial connect result or later
         # room update events. Resolve the first-SID waiter from any source that
@@ -256,15 +238,6 @@ class Room(EventEmitter[EventTypes]):
             self._first_sid_future.set_exception(exc)
             # Retrieve the exception to suppress unretrieved future warnings if unawaited
             self._first_sid_future.exception()
-
-    @property
-    def active_speakers(self) -> list[Participant]:
-        """Gets the list of currently active speakers in the room.
-
-        Returns:
-            list[Participant]: The list of active speakers.
-        """
-        return list(self._active_speakers)
 
     @property
     def local_participant(self) -> LocalParticipant:
@@ -771,9 +744,6 @@ class Room(EventEmitter[EventTypes]):
             self.local_participant._info.disconnect_reason = reason
             self._connection_state = ConnectionState.CONN_DISCONNECTED
             self._fail_first_sid(RuntimeError("room disconnected before receiving sid"))
-            if self._active_speakers:
-                self._active_speakers = []
-                self.emit("active_speakers_changed", [])
             self.emit("connection_state_changed", self._connection_state)
             self.emit("disconnected", reason)
 
@@ -838,9 +808,6 @@ class Room(EventEmitter[EventTypes]):
                     event.participant_disconnected.disconnect_reason
                 )
                 self.emit("participant_disconnected", rparticipant)
-            if any(p.identity == identity for p in self._active_speakers):
-                self._active_speakers = [p for p in self._active_speakers if p.identity != identity]
-                self.emit("active_speakers_changed", list(self._active_speakers))
         elif which == "participant_active":
             rp = self._retrieve_remote_participant(event.participant_active.participant_identity)
             if rp:
@@ -1053,9 +1020,7 @@ class Room(EventEmitter[EventTypes]):
                 if participant is not None:
                     speakers.append(participant)
 
-            if [p.identity for p in speakers] != [p.identity for p in self._active_speakers]:
-                self._active_speakers = speakers
-                self.emit("active_speakers_changed", list(speakers))
+            self.emit("active_speakers_changed", speakers)
         elif which == "room_metadata_changed":
             old_metadata = self.metadata
             self._info.metadata = event.room_metadata_changed.metadata
@@ -1197,9 +1162,6 @@ class Room(EventEmitter[EventTypes]):
             self.emit("connection_state_changed", connection_state)
         elif which == "disconnected":
             self._fail_first_sid(RuntimeError("room disconnected before receiving sid"))
-            if self._active_speakers:
-                self._active_speakers = []
-                self.emit("active_speakers_changed", [])
             self.emit("disconnected", event.disconnected.reason)
         elif which == "reconnecting":
             self.emit("reconnecting")
