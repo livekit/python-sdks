@@ -238,3 +238,24 @@ async def test_mixer_close_does_not_block_on_full_output_queue():
             await asyncio.wait_for(mixer.__anext__(), timeout=1)
     finally:
         await mixer.aclose()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("method", ["aclose", "end_input"])
+async def test_mixer_termination_releases_concurrent_readers(method):
+    mixer = AudioMixer(sample_rate=SAMPLE_RATE, num_channels=1)
+    readers = [asyncio.create_task(mixer.__anext__()) for _ in range(2)]
+    await asyncio.sleep(0)
+    try:
+        if method == "aclose":
+            await mixer.aclose()
+        else:
+            mixer.end_input()
+        for reader in readers:
+            with pytest.raises(StopAsyncIteration):
+                await asyncio.wait_for(reader, timeout=1)
+    finally:
+        for reader in readers:
+            reader.cancel()
+        await asyncio.gather(*readers, return_exceptions=True)
+        await mixer.aclose()

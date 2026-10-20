@@ -112,6 +112,7 @@ class AudioMixer:
         item = await self._queue.get()
         if item is None:
             self._closed = True
+            self._queue.put_nowait(None)
             raise StopAsyncIteration
         return item
 
