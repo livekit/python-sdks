@@ -802,12 +802,9 @@ class Room(EventEmitter[EventTypes]):
             self.emit("participant_connected", rparticipant)
         elif which == "participant_disconnected":
             identity = event.participant_disconnected.participant_identity
-            if identity in self._remote_participants:
-                rparticipant = self._remote_participants.pop(identity)
-                rparticipant._info.disconnect_reason = (
-                    event.participant_disconnected.disconnect_reason
-                )
-                self.emit("participant_disconnected", rparticipant)
+            rparticipant = self._remote_participants.pop(identity)
+            rparticipant._info.disconnect_reason = event.participant_disconnected.disconnect_reason
+            self.emit("participant_disconnected", rparticipant)
         elif which == "participant_active":
             rp = self._retrieve_remote_participant(event.participant_active.participant_identity)
             if rp:
@@ -1017,8 +1014,8 @@ class Room(EventEmitter[EventTypes]):
             # TODO: pass participant identity
             for identity in event.active_speakers_changed.participant_identities:
                 participant = self._retrieve_participant(identity)
-                if participant is not None:
-                    speakers.append(participant)
+                assert isinstance(participant, Participant)
+                speakers.append(participant)
 
             self.emit("active_speakers_changed", speakers)
         elif which == "room_metadata_changed":
