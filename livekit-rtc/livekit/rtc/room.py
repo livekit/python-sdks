@@ -647,13 +647,15 @@ class Room(EventEmitter[EventTypes]):
             if not ready_sent:
                 if self._task is not None and not self._task.done():
                     self._task.cancel()
-                await self._cleanup_orphaned_room(self._ffi_handle)
-                self._ffi_handle = None
-                self._connection_state = ConnectionState.CONN_DISCONNECTED
-                self._remote_participants.clear()
-                self._local_participant = None
-                self._info = proto_room.RoomInfo()
-                self._fail_sid_waiters(e)
+                try:
+                    await asyncio.shield(self._cleanup_orphaned_room(self._ffi_handle))
+                finally:
+                    self._ffi_handle = None
+                    self._connection_state = ConnectionState.CONN_DISCONNECTED
+                    self._remote_participants.clear()
+                    self._local_participant = None
+                    self._info = proto_room.RoomInfo()
+                    self._fail_sid_waiters(e)
             raise
 
     @staticmethod
@@ -664,11 +666,8 @@ class Room(EventEmitter[EventTypes]):
     ) -> None:
         try:
             try:
-                cb = await asyncio.wait_for(
-                    queue.wait_for(lambda e: e.connect.async_id == async_id),
-                    timeout=30.0,
-                )
-            except (asyncio.TimeoutError, asyncio.CancelledError):
+                cb = await queue.wait_for(lambda e: e.connect.async_id == async_id)
+            except asyncio.CancelledError:
                 return
 
             if not cb.connect.error and cb.connect.result.room.handle.id != 0:
