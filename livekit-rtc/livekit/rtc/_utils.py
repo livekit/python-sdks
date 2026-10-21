@@ -82,8 +82,9 @@ class RingQueue(Generic[T]):
         self._event = asyncio.Event()
 
     def put(self, item: T) -> None:
-        if self._capacity > 0 and len(self._queue) == self._capacity:
-            self._queue.popleft()
+        if item is not None and self._capacity > 0:
+            while len(self._queue) >= self._capacity:
+                self._queue.popleft()
         self._queue.append(item)
         self._event.set()
 
