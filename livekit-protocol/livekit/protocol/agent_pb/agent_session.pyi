@@ -153,18 +153,27 @@ class ChatMessage(_message.Message):
     def __init__(self, id: _Optional[str] = ..., role: _Optional[_Union[ChatRole, str]] = ..., content: _Optional[_Iterable[_Union[ChatMessage.ChatContent, _Mapping]]] = ..., interrupted: bool = ..., transcript_confidence: _Optional[float] = ..., extra: _Optional[_Mapping[str, str]] = ..., metrics: _Optional[_Union[MetricsReport, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FunctionCall(_message.Message):
-    __slots__ = ("id", "call_id", "arguments", "name", "created_at")
+    __slots__ = ("id", "call_id", "arguments", "name", "created_at", "extra")
+    class ExtraEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     CALL_ID_FIELD_NUMBER: _ClassVar[int]
     ARGUMENTS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_FIELD_NUMBER: _ClassVar[int]
     id: str
     call_id: str
     arguments: str
     name: str
     created_at: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., arguments: _Optional[str] = ..., name: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    extra: _containers.ScalarMap[str, str]
+    def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., arguments: _Optional[str] = ..., name: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., extra: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class FunctionCallOutput(_message.Message):
     __slots__ = ("id", "name", "call_id", "output", "is_error", "created_at")
