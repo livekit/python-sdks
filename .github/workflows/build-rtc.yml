@@ -135,7 +135,8 @@ jobs:
       matrix:
         include:
           # Linux x86_64 tests
-          - os: ubuntu-latest
+          # setup-python has no Python 3.9 build for Ubuntu 26.04 (ubuntu-latest).
+          - os: ubuntu-24.04
             python-version: "3.9"
             artifact: rtc-release-ubuntu-latest
           - os: ubuntu-latest
