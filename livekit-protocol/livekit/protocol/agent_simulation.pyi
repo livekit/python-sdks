@@ -53,7 +53,7 @@ class SimulationRunSummary(_message.Message):
     def __init__(self, passed: _Optional[int] = ..., failed: _Optional[int] = ..., going_well: _Optional[str] = ..., to_improve: _Optional[str] = ..., issues: _Optional[_Iterable[_Union[SimulationRunSummary.Issue, _Mapping]]] = ..., chat_history: _Optional[_Mapping[str, _agent_session.ChatContext]] = ...) -> None: ...
 
 class SimulationRun(_message.Message):
-    __slots__ = ("id", "project_id", "status", "agent_description", "error", "created_at", "jobs", "agent_name", "scenario_group", "ended_at", "job_count", "passed_count", "failed_count", "num_simulations", "usage", "concurrency", "mode", "metrics", "summary_zstd", "issue_count", "ci")
+    __slots__ = ("id", "project_id", "status", "agent_description", "error", "created_at", "jobs", "agent_name", "scenario_group", "ended_at", "job_count", "passed_count", "failed_count", "num_simulations", "usage", "concurrency", "mode", "metrics", "summary_zstd", "issue_count", "ci", "sampling")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         STATUS_PENDING_UPLOAD: _ClassVar[SimulationRun.Status]
@@ -71,7 +71,7 @@ class SimulationRun(_message.Message):
     STATUS_FAILED: SimulationRun.Status
     STATUS_CANCELLED: SimulationRun.Status
     class Job(_message.Message):
-        __slots__ = ("id", "status", "instructions", "error", "agent_expectations", "label", "tags", "room_name", "started_at", "ended_at", "room_id", "usage", "metrics")
+        __slots__ = ("id", "status", "instructions", "error", "agent_expectations", "label", "tags", "room_name", "started_at", "ended_at", "room_id", "usage", "metrics", "scenario_id", "sample", "failure_reason")
         class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
             __slots__ = ()
             STATUS_PENDING: _ClassVar[SimulationRun.Job.Status]
@@ -84,6 +84,12 @@ class SimulationRun(_message.Message):
         STATUS_COMPLETED: SimulationRun.Job.Status
         STATUS_FAILED: SimulationRun.Job.Status
         STATUS_CANCELLED: SimulationRun.Job.Status
+        class FailureReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+            __slots__ = ()
+            FAILURE_REASON_UNSPECIFIED: _ClassVar[SimulationRun.Job.FailureReason]
+            FAILURE_REASON_AGENT_JOIN_TIMEOUT: _ClassVar[SimulationRun.Job.FailureReason]
+        FAILURE_REASON_UNSPECIFIED: SimulationRun.Job.FailureReason
+        FAILURE_REASON_AGENT_JOIN_TIMEOUT: SimulationRun.Job.FailureReason
         class Usage(_message.Message):
             __slots__ = ("text_turns_count", "audio_turns_count")
             TEXT_TURNS_COUNT_FIELD_NUMBER: _ClassVar[int]
@@ -104,6 +110,9 @@ class SimulationRun(_message.Message):
         ROOM_ID_FIELD_NUMBER: _ClassVar[int]
         USAGE_FIELD_NUMBER: _ClassVar[int]
         METRICS_FIELD_NUMBER: _ClassVar[int]
+        SCENARIO_ID_FIELD_NUMBER: _ClassVar[int]
+        SAMPLE_FIELD_NUMBER: _ClassVar[int]
+        FAILURE_REASON_FIELD_NUMBER: _ClassVar[int]
         id: str
         status: SimulationRun.Job.Status
         instructions: str
@@ -117,9 +126,28 @@ class SimulationRun(_message.Message):
         room_id: str
         usage: SimulationRun.Job.Usage
         metrics: SimulationRun.JobMetrics
-        def __init__(self, id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Job.Status, str]] = ..., instructions: _Optional[str] = ..., error: _Optional[str] = ..., agent_expectations: _Optional[str] = ..., label: _Optional[str] = ..., tags: _Optional[_Iterable[str]] = ..., room_name: _Optional[str] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., usage: _Optional[_Union[SimulationRun.Job.Usage, _Mapping]] = ..., metrics: _Optional[_Union[SimulationRun.JobMetrics, _Mapping]] = ...) -> None: ...
+        scenario_id: str
+        sample: int
+        failure_reason: SimulationRun.Job.FailureReason
+        def __init__(self, id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Job.Status, str]] = ..., instructions: _Optional[str] = ..., error: _Optional[str] = ..., agent_expectations: _Optional[str] = ..., label: _Optional[str] = ..., tags: _Optional[_Iterable[str]] = ..., room_name: _Optional[str] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., usage: _Optional[_Union[SimulationRun.Job.Usage, _Mapping]] = ..., metrics: _Optional[_Union[SimulationRun.JobMetrics, _Mapping]] = ..., scenario_id: _Optional[str] = ..., sample: _Optional[int] = ..., failure_reason: _Optional[_Union[SimulationRun.Job.FailureReason, str]] = ...) -> None: ...
     class JobMetrics(_message.Message):
-        __slots__ = ("task_completion", "overall_score", "stt", "llm", "tts", "conversation", "turns", "judge_model", "has_remote_session", "t0", "conciseness", "unnecessary_tool_calls", "information_loss", "redundant_statements", "poor_question_quality", "conversation_progression")
+        __slots__ = ("task_completion", "overall_score", "stt", "llm", "tts", "conversation", "turns", "judge_model", "has_remote_session", "t0", "conciseness", "unnecessary_tool_calls", "information_loss", "redundant_statements", "poor_question_quality", "conversation_progression", "end_reason", "caller_language", "caller_listen_language", "impairments")
+        class EndReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+            __slots__ = ()
+            END_REASON_UNSPECIFIED: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_SCENARIO_COMPLETED: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_AGENT_ENDED: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_INACTIVITY: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_TURN_LIMIT: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_EMPTY_RESPONSE: _ClassVar[SimulationRun.JobMetrics.EndReason]
+            END_REASON_AGENT_ERROR: _ClassVar[SimulationRun.JobMetrics.EndReason]
+        END_REASON_UNSPECIFIED: SimulationRun.JobMetrics.EndReason
+        END_REASON_SCENARIO_COMPLETED: SimulationRun.JobMetrics.EndReason
+        END_REASON_AGENT_ENDED: SimulationRun.JobMetrics.EndReason
+        END_REASON_INACTIVITY: SimulationRun.JobMetrics.EndReason
+        END_REASON_TURN_LIMIT: SimulationRun.JobMetrics.EndReason
+        END_REASON_EMPTY_RESPONSE: SimulationRun.JobMetrics.EndReason
+        END_REASON_AGENT_ERROR: SimulationRun.JobMetrics.EndReason
         class STT(_message.Message):
             __slots__ = ("wer", "words", "word_errors", "cer", "chars", "char_errors", "stt_delay_ms", "entity_recognition", "entities_uttered", "entities_recognized", "entity_recall", "entities_acquired_uttered", "entities_acquired_recognized")
             WER_FIELD_NUMBER: _ClassVar[int]
@@ -188,7 +216,7 @@ class SimulationRun(_message.Message):
             entities_acquired_recognized: int
             def __init__(self, ttfb_ms: _Optional[int] = ..., wer: _Optional[float] = ..., words: _Optional[int] = ..., word_errors: _Optional[int] = ..., cer: _Optional[float] = ..., chars: _Optional[int] = ..., char_errors: _Optional[int] = ..., entity_recognition: _Optional[float] = ..., entities_uttered: _Optional[int] = ..., entities_recognized: _Optional[int] = ..., entity_recall: _Optional[float] = ..., entities_acquired_uttered: _Optional[int] = ..., entities_acquired_recognized: _Optional[int] = ...) -> None: ...
         class Conversation(_message.Message):
-            __slots__ = ("turn_taking_score", "heard_e2e_latency_p50_ms", "heard_e2e_latency_p95_ms", "heard_e2e_latency_p99_ms", "time_to_yield_ms", "eot_misprediction_count", "overlap_ratio", "overlap_speech_ms", "total_speech_ms", "awkward_silence_count", "unanswered_turns", "false_interruption_count", "e2e_latency_ms")
+            __slots__ = ("turn_taking_score", "heard_e2e_latency_p50_ms", "heard_e2e_latency_p95_ms", "heard_e2e_latency_p99_ms", "time_to_yield_ms", "eot_misprediction_count", "overlap_ratio", "overlap_speech_ms", "total_speech_ms", "awkward_silence_count", "unanswered_turns", "false_interruption_count", "e2e_latency_ms", "backchannel_count")
             TURN_TAKING_SCORE_FIELD_NUMBER: _ClassVar[int]
             HEARD_E2E_LATENCY_P50_MS_FIELD_NUMBER: _ClassVar[int]
             HEARD_E2E_LATENCY_P95_MS_FIELD_NUMBER: _ClassVar[int]
@@ -202,6 +230,7 @@ class SimulationRun(_message.Message):
             UNANSWERED_TURNS_FIELD_NUMBER: _ClassVar[int]
             FALSE_INTERRUPTION_COUNT_FIELD_NUMBER: _ClassVar[int]
             E2E_LATENCY_MS_FIELD_NUMBER: _ClassVar[int]
+            BACKCHANNEL_COUNT_FIELD_NUMBER: _ClassVar[int]
             turn_taking_score: float
             heard_e2e_latency_p50_ms: int
             heard_e2e_latency_p95_ms: int
@@ -215,11 +244,13 @@ class SimulationRun(_message.Message):
             unanswered_turns: int
             false_interruption_count: int
             e2e_latency_ms: int
-            def __init__(self, turn_taking_score: _Optional[float] = ..., heard_e2e_latency_p50_ms: _Optional[int] = ..., heard_e2e_latency_p95_ms: _Optional[int] = ..., heard_e2e_latency_p99_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., eot_misprediction_count: _Optional[int] = ..., overlap_ratio: _Optional[float] = ..., overlap_speech_ms: _Optional[int] = ..., total_speech_ms: _Optional[int] = ..., awkward_silence_count: _Optional[int] = ..., unanswered_turns: _Optional[int] = ..., false_interruption_count: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ...) -> None: ...
+            backchannel_count: int
+            def __init__(self, turn_taking_score: _Optional[float] = ..., heard_e2e_latency_p50_ms: _Optional[int] = ..., heard_e2e_latency_p95_ms: _Optional[int] = ..., heard_e2e_latency_p99_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., eot_misprediction_count: _Optional[int] = ..., overlap_ratio: _Optional[float] = ..., overlap_speech_ms: _Optional[int] = ..., total_speech_ms: _Optional[int] = ..., awkward_silence_count: _Optional[int] = ..., unanswered_turns: _Optional[int] = ..., false_interruption_count: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., backchannel_count: _Optional[int] = ...) -> None: ...
         class Turn(_message.Message):
-            __slots__ = ("index", "role", "start_ms", "end_ms", "stt_delay_ms", "llm_ttft_ms", "llm_ttfs_ms", "llm_tps", "tts_ttfb_ms", "e2e_latency_ms", "heard_e2e_latency_ms", "time_to_yield_ms", "turn_taking_score", "conciseness", "eot_misprediction", "awkward_silence", "unanswered")
+            __slots__ = ("index", "role", "text", "start_ms", "end_ms", "stt_delay_ms", "llm_ttft_ms", "llm_ttfs_ms", "llm_tps", "tts_ttfb_ms", "e2e_latency_ms", "heard_e2e_latency_ms", "time_to_yield_ms", "turn_taking_score", "conciseness", "eot_misprediction", "awkward_silence", "unanswered")
             INDEX_FIELD_NUMBER: _ClassVar[int]
             ROLE_FIELD_NUMBER: _ClassVar[int]
+            TEXT_FIELD_NUMBER: _ClassVar[int]
             START_MS_FIELD_NUMBER: _ClassVar[int]
             END_MS_FIELD_NUMBER: _ClassVar[int]
             STT_DELAY_MS_FIELD_NUMBER: _ClassVar[int]
@@ -237,6 +268,7 @@ class SimulationRun(_message.Message):
             UNANSWERED_FIELD_NUMBER: _ClassVar[int]
             index: int
             role: _agent_session.ChatRole
+            text: str
             start_ms: int
             end_ms: int
             stt_delay_ms: int
@@ -252,7 +284,7 @@ class SimulationRun(_message.Message):
             eot_misprediction: bool
             awkward_silence: bool
             unanswered: bool
-            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., stt_delay_ms: _Optional[int] = ..., llm_ttft_ms: _Optional[int] = ..., llm_ttfs_ms: _Optional[int] = ..., llm_tps: _Optional[float] = ..., tts_ttfb_ms: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., heard_e2e_latency_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., turn_taking_score: _Optional[float] = ..., conciseness: _Optional[float] = ..., eot_misprediction: bool = ..., awkward_silence: bool = ..., unanswered: bool = ...) -> None: ...
+            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., text: _Optional[str] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., stt_delay_ms: _Optional[int] = ..., llm_ttft_ms: _Optional[int] = ..., llm_ttfs_ms: _Optional[int] = ..., llm_tps: _Optional[float] = ..., tts_ttfb_ms: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., heard_e2e_latency_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., turn_taking_score: _Optional[float] = ..., conciseness: _Optional[float] = ..., eot_misprediction: bool = ..., awkward_silence: bool = ..., unanswered: bool = ...) -> None: ...
         TASK_COMPLETION_FIELD_NUMBER: _ClassVar[int]
         OVERALL_SCORE_FIELD_NUMBER: _ClassVar[int]
         STT_FIELD_NUMBER: _ClassVar[int]
@@ -269,6 +301,10 @@ class SimulationRun(_message.Message):
         REDUNDANT_STATEMENTS_FIELD_NUMBER: _ClassVar[int]
         POOR_QUESTION_QUALITY_FIELD_NUMBER: _ClassVar[int]
         CONVERSATION_PROGRESSION_FIELD_NUMBER: _ClassVar[int]
+        END_REASON_FIELD_NUMBER: _ClassVar[int]
+        CALLER_LANGUAGE_FIELD_NUMBER: _ClassVar[int]
+        CALLER_LISTEN_LANGUAGE_FIELD_NUMBER: _ClassVar[int]
+        IMPAIRMENTS_FIELD_NUMBER: _ClassVar[int]
         task_completion: float
         overall_score: float
         stt: SimulationRun.JobMetrics.STT
@@ -285,7 +321,11 @@ class SimulationRun(_message.Message):
         redundant_statements: bool
         poor_question_quality: bool
         conversation_progression: float
-        def __init__(self, task_completion: _Optional[float] = ..., overall_score: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., turns: _Optional[_Iterable[_Union[SimulationRun.JobMetrics.Turn, _Mapping]]] = ..., judge_model: _Optional[str] = ..., has_remote_session: bool = ..., t0: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conciseness: _Optional[float] = ..., unnecessary_tool_calls: bool = ..., information_loss: bool = ..., redundant_statements: bool = ..., poor_question_quality: bool = ..., conversation_progression: _Optional[float] = ...) -> None: ...
+        end_reason: SimulationRun.JobMetrics.EndReason
+        caller_language: str
+        caller_listen_language: str
+        impairments: SimulationImpairments
+        def __init__(self, task_completion: _Optional[float] = ..., overall_score: _Optional[float] = ..., stt: _Optional[_Union[SimulationRun.JobMetrics.STT, _Mapping]] = ..., llm: _Optional[_Union[SimulationRun.JobMetrics.LLM, _Mapping]] = ..., tts: _Optional[_Union[SimulationRun.JobMetrics.TTS, _Mapping]] = ..., conversation: _Optional[_Union[SimulationRun.JobMetrics.Conversation, _Mapping]] = ..., turns: _Optional[_Iterable[_Union[SimulationRun.JobMetrics.Turn, _Mapping]]] = ..., judge_model: _Optional[str] = ..., has_remote_session: bool = ..., t0: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conciseness: _Optional[float] = ..., unnecessary_tool_calls: bool = ..., information_loss: bool = ..., redundant_statements: bool = ..., poor_question_quality: bool = ..., conversation_progression: _Optional[float] = ..., end_reason: _Optional[_Union[SimulationRun.JobMetrics.EndReason, str]] = ..., caller_language: _Optional[str] = ..., caller_listen_language: _Optional[str] = ..., impairments: _Optional[_Union[SimulationImpairments, _Mapping]] = ...) -> None: ...
     class RunMetrics(_message.Message):
         __slots__ = ("scenario_pass_rate", "overall_score", "stt", "llm", "tts", "conversation", "conciseness", "conversation_progression")
         SCENARIO_PASS_RATE_FIELD_NUMBER: _ClassVar[int]
@@ -320,10 +360,17 @@ class SimulationRun(_message.Message):
         run_url: str
         actor: str
         def __init__(self, provider: _Optional[str] = ..., commit_sha: _Optional[str] = ..., ref: _Optional[str] = ..., pull_request: _Optional[str] = ..., run_url: _Optional[str] = ..., actor: _Optional[str] = ...) -> None: ...
+    class SamplingOptions(_message.Message):
+        __slots__ = ("samples", "pass_rate")
+        SAMPLES_FIELD_NUMBER: _ClassVar[int]
+        PASS_RATE_FIELD_NUMBER: _ClassVar[int]
+        samples: int
+        pass_rate: float
+        def __init__(self, samples: _Optional[int] = ..., pass_rate: _Optional[float] = ...) -> None: ...
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci")
+            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
             NUM_SIMULATIONS_FIELD_NUMBER: _ClassVar[int]
@@ -335,6 +382,7 @@ class SimulationRun(_message.Message):
             LOW_QUALITY_MICROPHONE_FIELD_NUMBER: _ClassVar[int]
             PACKET_LOSS_FIELD_NUMBER: _ClassVar[int]
             CI_FIELD_NUMBER: _ClassVar[int]
+            SAMPLING_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             agent_name: str
             num_simulations: int
@@ -346,7 +394,8 @@ class SimulationRun(_message.Message):
             low_quality_microphone: bool
             packet_loss: bool
             ci: SimulationRun.CI
-            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ...) -> None: ...
+            sampling: SimulationRun.SamplingOptions
+            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("simulation_run_id", "presigned_post_request")
             SIMULATION_RUN_ID_FIELD_NUMBER: _ClassVar[int]
@@ -485,6 +534,7 @@ class SimulationRun(_message.Message):
     SUMMARY_ZSTD_FIELD_NUMBER: _ClassVar[int]
     ISSUE_COUNT_FIELD_NUMBER: _ClassVar[int]
     CI_FIELD_NUMBER: _ClassVar[int]
+    SAMPLING_FIELD_NUMBER: _ClassVar[int]
     id: str
     project_id: str
     status: SimulationRun.Status
@@ -506,7 +556,8 @@ class SimulationRun(_message.Message):
     summary_zstd: bytes
     issue_count: int
     ci: SimulationRun.CI
-    def __init__(self, id: _Optional[str] = ..., project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_description: _Optional[str] = ..., error: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., jobs: _Optional[_Iterable[_Union[SimulationRun.Job, _Mapping]]] = ..., agent_name: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., job_count: _Optional[int] = ..., passed_count: _Optional[int] = ..., failed_count: _Optional[int] = ..., num_simulations: _Optional[int] = ..., usage: _Optional[_Union[SimulationRun.Usage, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., metrics: _Optional[_Union[SimulationRun.RunMetrics, _Mapping]] = ..., summary_zstd: _Optional[bytes] = ..., issue_count: _Optional[int] = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ...) -> None: ...
+    sampling: SimulationRun.SamplingOptions
+    def __init__(self, id: _Optional[str] = ..., project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_description: _Optional[str] = ..., error: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., jobs: _Optional[_Iterable[_Union[SimulationRun.Job, _Mapping]]] = ..., agent_name: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., job_count: _Optional[int] = ..., passed_count: _Optional[int] = ..., failed_count: _Optional[int] = ..., num_simulations: _Optional[int] = ..., usage: _Optional[_Union[SimulationRun.Usage, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., metrics: _Optional[_Union[SimulationRun.RunMetrics, _Mapping]] = ..., summary_zstd: _Optional[bytes] = ..., issue_count: _Optional[int] = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ...) -> None: ...
 
 class Scenario(_message.Message):
     __slots__ = ("label", "instructions", "agent_expectations", "tags", "userdata", "id")
@@ -557,6 +608,16 @@ class ScenarioGroup(_message.Message):
     scenarios: _containers.RepeatedCompositeFieldContainer[Scenario]
     id: str
     def __init__(self, name: _Optional[str] = ..., scenarios: _Optional[_Iterable[_Union[Scenario, _Mapping]]] = ..., id: _Optional[str] = ...) -> None: ...
+
+class SimulationImpairments(_message.Message):
+    __slots__ = ("background_noise", "low_quality_microphone", "packet_loss")
+    BACKGROUND_NOISE_FIELD_NUMBER: _ClassVar[int]
+    LOW_QUALITY_MICROPHONE_FIELD_NUMBER: _ClassVar[int]
+    PACKET_LOSS_FIELD_NUMBER: _ClassVar[int]
+    background_noise: bool
+    low_quality_microphone: bool
+    packet_loss: bool
+    def __init__(self, background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ...) -> None: ...
 
 class SimulationDispatch(_message.Message):
     __slots__ = ("simulation_run_id", "job_id", "scenario", "mode")

@@ -18,6 +18,13 @@ class StreamState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ACTIVE: _ClassVar[StreamState]
     PAUSED: _ClassVar[StreamState]
 
+class NegotiatedDataChannelID(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    NDCI_INVALID: _ClassVar[NegotiatedDataChannelID]
+    NDCI_RELIABLE: _ClassVar[NegotiatedDataChannelID]
+    NDCI_LOSSY: _ClassVar[NegotiatedDataChannelID]
+    NDCI_DATA_TRACK: _ClassVar[NegotiatedDataChannelID]
+
 class CandidateProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     UDP: _ClassVar[CandidateProtocol]
@@ -27,6 +34,10 @@ PUBLISHER: SignalTarget
 SUBSCRIBER: SignalTarget
 ACTIVE: StreamState
 PAUSED: StreamState
+NDCI_INVALID: NegotiatedDataChannelID
+NDCI_RELIABLE: NegotiatedDataChannelID
+NDCI_LOSSY: NegotiatedDataChannelID
+NDCI_DATA_TRACK: NegotiatedDataChannelID
 UDP: CandidateProtocol
 TCP: CandidateProtocol
 TLS: CandidateProtocol
