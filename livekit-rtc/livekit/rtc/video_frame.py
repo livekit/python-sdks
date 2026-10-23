@@ -146,13 +146,16 @@ class VideoFrame:
             Optional[memoryview]: A memoryview of the specified plane's data, or None if
             the index is out of bounds for the format.
         """
-        plane_infos = _get_plane_infos(get_address(self.data), self.type, self.width, self.height)
-        if plane_nth >= len(plane_infos):
+        # with a base address of 0 the plane pointers are offsets into the frame's data
+        plane_infos = _get_plane_infos(0, self.type, self.width, self.height)
+        if not 0 <= plane_nth < len(plane_infos):
             return None
 
+        # a slice of the frame's own buffer keeps that buffer alive, stays read-only for
+        # bytes, and cannot run past its end
         plane_info = plane_infos[plane_nth]
-        cdata = (ctypes.c_uint8 * plane_info.size).from_address(plane_info.data_ptr)
-        return memoryview(cdata)
+        start = plane_info.data_ptr
+        return memoryview(self._data).cast("B")[start : start + plane_info.size]
 
     def convert(
         self, type: proto_video.VideoBufferType.ValueType, *, flip_y: bool = False

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import array
 import ctypes
+import gc
+import weakref
 
 import pytest
 
@@ -63,3 +66,29 @@ def test_get_plane_returns_each_i422_plane() -> None:
     frame = rtc.VideoFrame(w, h, T.I422, y + u + v)
 
     assert [bytes(frame.get_plane(i)) for i in range(3)] == [y, u, v]
+
+
+@pytest.mark.parametrize("plane_nth", [-1, -3, -4, 3])
+def test_get_plane_returns_none_outside_the_planes(plane_nth: int) -> None:
+    frame = rtc.VideoFrame(4, 2, T.I420, bytes(8 + 2 + 2))
+
+    assert frame.get_plane(plane_nth) is None
+
+
+def test_a_plane_keeps_the_frame_buffer_alive() -> None:
+    buffer = array.array("B", [1] * 8 + [2] * 2 + [3] * 2)
+    buffer_ref = weakref.ref(buffer)
+
+    plane = rtc.VideoFrame(4, 2, T.I420, memoryview(buffer)).get_plane(2)
+    del buffer
+    gc.collect()
+
+    # the frame is gone; the plane is the only thing left pointing at the buffer
+    assert buffer_ref() is not None
+    assert plane is not None and bytes(plane) == b"\x03\x03"
+
+
+def test_a_plane_of_a_bytes_frame_is_read_only() -> None:
+    plane = rtc.VideoFrame(4, 2, T.I420, bytes(8 + 2 + 2)).get_plane(0)
+
+    assert plane is not None and plane.readonly
