@@ -31,7 +31,7 @@ from ._proto.participant_pb2 import DisconnectReason
 from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, Queue
 from .e2ee import E2EEManager, E2EEOptions
 from .log import logger
 from .participant import (
@@ -198,6 +198,9 @@ class Room(EventEmitter[EventTypes]):
 
         self._token: str | None = None
         self._server_url: str | None = None
+        self._task: Optional[asyncio.Task] = None
+        self._cleanup_task: Optional[asyncio.Task[None]] = None
+        self._cleanup_tasks: set[asyncio.Task[None]] = set()
 
     def __del__(self) -> None:
         if self._ffi_handle is not None:
@@ -223,6 +226,13 @@ class Room(EventEmitter[EventTypes]):
         # carries it so waiters do not depend on event ordering.
         if sid and not self._first_sid_future.done():
             self._first_sid_future.set_result(sid)
+
+    def _fail_sid_waiters(self, err: BaseException) -> None:
+        fut = self._first_sid_future
+        if not fut.done():
+            fut.set_exception(err)
+            fut.exception()
+        self._first_sid_future = asyncio.Future[str]()
 
     @property
     def local_participant(self) -> LocalParticipant:
@@ -467,6 +477,12 @@ class Room(EventEmitter[EventTypes]):
             await room.connect("ws://localhost:7880", "your_token")
             ```
         """
+        if self._cleanup_tasks:
+            try:
+                await asyncio.shield(asyncio.gather(*self._cleanup_tasks))
+            except Exception:
+                pass
+
         self._server_url = url
         self._token = token
         req = proto_ffi.FfiRequest()
@@ -561,53 +577,166 @@ class Room(EventEmitter[EventTypes]):
         )
 
         queue = FfiClient.instance.queue.subscribe()
+        queue_unsubscribed = False
         try:
             resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.connect.async_id == resp.connect.async_id
-            )
+            try:
+                cb: proto_ffi.FfiEvent = await queue.wait_for(
+                    lambda e: e.connect.async_id == resp.connect.async_id
+                )
+            except asyncio.CancelledError as e:
+                # The connect request was already dispatched to the FFI server.
+                # Transfer cleanup to a background task so the caller unblocks immediately,
+                # while guaranteeing that when ConnectCallback arrives the FFI handshake is
+                # completed and cleanly disconnected (Issues #784, #804).
+                queue_unsubscribed = True
+                task = self._loop.create_task(
+                    self._cleanup_cancelled_connect(queue, resp.connect.async_id, self._ffi_queue)
+                )
+                self._cleanup_task = task
+                self._cleanup_tasks.add(task)
+                task.add_done_callback(self._cleanup_tasks.discard)
+                self._fail_sid_waiters(e)
+                raise
         finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+            if not queue_unsubscribed:
+                FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.connect.error:
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
             raise ConnectError(cb.connect.error)
 
         self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
+        ready_sent = False
+        try:
+            self._e2ee_manager = E2EEManager(
+                self._ffi_handle.handle, options.encryption or options.e2ee
+            )
 
-        self._e2ee_manager = E2EEManager(
-            self._ffi_handle.handle, options.encryption or options.e2ee
-        )
+            self._info = cb.connect.result.room.info
+            self._resolve_first_sid(self._info.sid)
+            self._connection_state = ConnectionState.CONN_CONNECTED
 
-        self._info = cb.connect.result.room.info
-        self._resolve_first_sid(self._info.sid)
-        self._connection_state = ConnectionState.CONN_CONNECTED
+            self._local_participant = LocalParticipant(
+                self._room_queue, cb.connect.result.local_participant
+            )
 
-        self._local_participant = LocalParticipant(
-            self._room_queue, cb.connect.result.local_participant
-        )
+            for pt in cb.connect.result.participants:
+                rp = self._create_remote_participant(pt.participant)
 
-        for pt in cb.connect.result.participants:
-            rp = self._create_remote_participant(pt.participant)
+                # add the initial remote participant tracks
+                for owned_publication_info in pt.publications:
+                    publication = RemoteTrackPublication(owned_publication_info)
+                    rp._track_publications[publication.sid] = publication
 
-            # add the initial remote participant tracks
-            for owned_publication_info in pt.publications:
-                publication = RemoteTrackPublication(owned_publication_info)
-                rp._track_publications[publication.sid] = publication
+            # start listening to room events
+            self._task = self._loop.create_task(self._listen_task())
 
-        # start listening to room events
-        self._task = self._loop.create_task(self._listen_task())
+            # unsubscribe from the FFI queue once the listen task ends.
+            # disconnect() unsubscribes too, but it early-returns when the
+            # room is already disconnected (e.g. removed remotely).
+            ffi_queue = self._ffi_queue
+            self._task.add_done_callback(lambda _: FfiClient.instance.queue.unsubscribe(ffi_queue))
 
-        # unsubscribe from the FFI queue once the listen task ends.
-        # disconnect() unsubscribes too, but it early-returns when the
-        # room is already disconnected (e.g. removed remotely).
-        ffi_queue = self._ffi_queue
-        self._task.add_done_callback(lambda _: FfiClient.instance.queue.unsubscribe(ffi_queue))
+            # Unblock the FFI server once this SDK is ready to receive room events.
+            ready_req = proto_ffi.FfiRequest()
+            ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
+            FfiClient.instance.request(ready_req)
+            ready_sent = True
+        except BaseException as e:
+            if not ready_sent:
+                if self._task is not None and not self._task.done():
+                    self._task.cancel()
+                try:
+                    await asyncio.shield(self._cleanup_orphaned_room(self._ffi_handle))
+                finally:
+                    self._ffi_handle = None
+                    self._connection_state = ConnectionState.CONN_DISCONNECTED
+                    self._remote_participants.clear()
+                    self._local_participant = None
+                    self._info = proto_room.RoomInfo()
+                    self._fail_sid_waiters(e)
+            raise
 
-        # Unblock the FFI server once this SDK is ready to receive room events.
-        ready_req = proto_ffi.FfiRequest()
-        ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
-        FfiClient.instance.request(ready_req)
+    @staticmethod
+    async def _cleanup_cancelled_connect(
+        queue: Queue[proto_ffi.FfiEvent],
+        async_id: int,
+        ffi_queue: Queue[proto_ffi.FfiEvent],
+    ) -> None:
+        try:
+            try:
+                cb = await queue.wait_for(lambda e: e.connect.async_id == async_id)
+            except asyncio.CancelledError:
+                return
+
+            if not cb.connect.error and cb.connect.result.room.handle.id != 0:
+                handle_id = cb.connect.result.room.handle.id
+                handle = FfiHandle(handle_id)
+                try:
+                    # Satisfy 15s handshake timeout so native FFI doesn't panic (Issue #784)
+                    ready_req = proto_ffi.FfiRequest()
+                    ready_req.ready_for_room_event.room_handle = handle_id
+                    try:
+                        FfiClient.instance.request(ready_req)
+                    except Exception:
+                        logger.exception(
+                            "failed to send ready_for_room_event in background cleanup"
+                        )
+
+                    # Disconnect native session so server frees participant identity (Issue #804)
+                    disc_req = proto_ffi.FfiRequest()
+                    disc_req.disconnect.room_handle = handle_id
+                    disc_req.disconnect.reason = DisconnectReason.CLIENT_INITIATED
+                    disc_queue = FfiClient.instance.queue.subscribe()
+                    try:
+                        disc_resp = FfiClient.instance.request(disc_req)
+                        await asyncio.wait_for(
+                            disc_queue.wait_for(
+                                lambda e: e.disconnect.async_id == disc_resp.disconnect.async_id
+                            ),
+                            timeout=10.0,
+                        )
+                    except Exception:
+                        logger.exception("failed to disconnect in background cleanup")
+                    finally:
+                        FfiClient.instance.queue.unsubscribe(disc_queue)
+                finally:
+                    handle.dispose()
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+            FfiClient.instance.queue.unsubscribe(ffi_queue)
+
+    async def _cleanup_orphaned_room(self, handle: FfiHandle) -> None:
+        try:
+            # Satisfy FFI server's 15s handshake timeout so it does not panic (Issue #784)
+            ready_req = proto_ffi.FfiRequest()
+            ready_req.ready_for_room_event.room_handle = handle.handle
+            try:
+                FfiClient.instance.request(ready_req)
+            except Exception:
+                logger.exception("failed to send ready_for_room_event during room cleanup")
+
+            # Disconnect the native room session cleanly so no ghost session lingers (Issue #804)
+            disc_req = proto_ffi.FfiRequest()
+            disc_req.disconnect.room_handle = handle.handle
+            disc_req.disconnect.reason = DisconnectReason.CLIENT_INITIATED
+            disc_queue = FfiClient.instance.queue.subscribe()
+            try:
+                disc_resp = FfiClient.instance.request(disc_req)
+                await asyncio.wait_for(
+                    disc_queue.wait_for(
+                        lambda e: e.disconnect.async_id == disc_resp.disconnect.async_id
+                    ),
+                    timeout=10.0,
+                )
+            except Exception:
+                logger.exception("failed to disconnect during room cleanup")
+            finally:
+                FfiClient.instance.queue.unsubscribe(disc_queue)
+        finally:
+            handle.dispose()
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
@@ -684,11 +813,21 @@ class Room(EventEmitter[EventTypes]):
         if cb.simulate_scenario.HasField("error") and cb.simulate_scenario.error:
             raise RuntimeError(f"simulate_scenario failed: {cb.simulate_scenario.error}")
 
+    @property
+    def cleanup_task(self) -> Optional[asyncio.Task[None]]:
+        """Pending background cleanup task from a previously cancelled connect, if any."""
+        return self._cleanup_task
+
     async def disconnect(
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
         if not self.isconnected():
+            if self._cleanup_tasks:
+                try:
+                    await asyncio.shield(asyncio.gather(*self._cleanup_tasks))
+                except Exception:
+                    pass
             return
 
         await self._drain_rpc_invocation_tasks()
@@ -705,7 +844,8 @@ class Room(EventEmitter[EventTypes]):
         finally:
             FfiClient.instance.queue.unsubscribe(queue)
 
-        await self._task
+        if self._task is not None:
+            await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
         # we should manually flip the state, since the connection could have been torn down before
