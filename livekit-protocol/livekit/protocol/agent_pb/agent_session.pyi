@@ -45,6 +45,15 @@ class ToolReplyStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     TR_INTERRUPTED: _ClassVar[ToolReplyStatus]
     TR_SKIPPED: _ClassVar[ToolReplyStatus]
 
+class CloseReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    CR_UNKNOWN: _ClassVar[CloseReason]
+    CR_ERROR: _ClassVar[CloseReason]
+    CR_JOB_SHUTDOWN: _ClassVar[CloseReason]
+    CR_PARTICIPANT_DISCONNECTED: _ClassVar[CloseReason]
+    CR_USER_INITIATED: _ClassVar[CloseReason]
+    CR_COMPLETED: _ClassVar[CloseReason]
+
 class AmdCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     AMD_UNKNOWN: _ClassVar[AmdCategory]
@@ -73,6 +82,12 @@ TR_SCHEDULED: ToolReplyStatus
 TR_COMPLETED: ToolReplyStatus
 TR_INTERRUPTED: ToolReplyStatus
 TR_SKIPPED: ToolReplyStatus
+CR_UNKNOWN: CloseReason
+CR_ERROR: CloseReason
+CR_JOB_SHUTDOWN: CloseReason
+CR_PARTICIPANT_DISCONNECTED: CloseReason
+CR_USER_INITIATED: CloseReason
+CR_COMPLETED: CloseReason
 AMD_UNKNOWN: AmdCategory
 AMD_HUMAN: AmdCategory
 AMD_MACHINE_IVR: AmdCategory
