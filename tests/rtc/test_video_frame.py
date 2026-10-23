@@ -63,3 +63,26 @@ def test_get_plane_returns_each_i422_plane() -> None:
     frame = rtc.VideoFrame(w, h, T.I422, y + u + v)
 
     assert [bytes(frame.get_plane(i)) for i in range(3)] == [y, u, v]
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["RGBA", "ABGR", "ARGB", "BGRA", "RGB24", "I420", "I420A", "I422", "I444", "I010", "NV12"],
+)
+def test_frame_rejects_data_shorter_than_the_format_needs(name: str) -> None:
+    t, w, h = getattr(T, name), 5, 3
+    length = video_frame._get_plane_length(t, w, h)
+
+    rtc.VideoFrame(w, h, t, bytearray(length))
+    with pytest.raises(ValueError):
+        rtc.VideoFrame(w, h, t, bytearray(length - 1))
+
+
+def test_frame_measures_a_memoryview_in_bytes() -> None:
+    w, h = 4, 3
+    pixels = memoryview(bytearray(w * h * 4))
+
+    rtc.VideoFrame(w, h, T.RGBA, pixels.cast("B", shape=[h, w, 4]))
+    rtc.VideoFrame(w, h, T.RGBA, pixels.cast("I"))
+    with pytest.raises(ValueError):
+        rtc.VideoFrame(w, h, T.RGBA, pixels[:-4].cast("I"))
