@@ -37,7 +37,7 @@ dependencies = [
     "multidict>=6.9.1; python_version >= '3.10'",
     "protobuf>=4",
     "types-protobuf>=4",
-    "livekit-protocol>=1.1.27,<2.0.0",
+    "livekit-protocol>=1.1.28,<2.0.0",
 ]
 
 [project.urls]
