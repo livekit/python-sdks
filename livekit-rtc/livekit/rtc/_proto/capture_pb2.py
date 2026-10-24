@@ -17,7 +17,7 @@ from . import room_pb2 as room__pb2
 from . import video_frame_pb2 as video__frame__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcapture.proto\x12\rlivekit.proto\x1a\x0chandle.proto\x1a\nroom.proto\x1a\x11video_frame.proto\"\x94\x01\n\x18PatternVideoSourceConfig\x12\x38\n\nresolution\x18\x01 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\rframerate_fps\x18\x02 \x02(\r\x12\'\n\x07pattern\x18\x03 \x02(\x0e\x32\x16.livekit.proto.Pattern\"i\n\x16\x43lockVideoSourceConfig\x12\x38\n\nresolution\x18\x01 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\rframerate_fps\x18\x02 \x02(\r\"\xa7\x02\n\x11\x43\x61ptureSourceInfo\x12.\n\x04kind\x18\x01 \x02(\x0e\x32 .livekit.proto.CaptureSourceKind\x12\x38\n\nresolution\x18\x02 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12(\n\x05\x63odec\x18\x03 \x01(\x0e\x32\x19.livekit.proto.VideoCodec\x12G\n\x1brecommended_publish_options\x18\x04 \x02(\x0b\x32\".livekit.proto.TrackPublishOptions\x12\x35\n\x0cvideo_source\x18\x05 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoSource\"s\n\x12OwnedCaptureSource\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12.\n\x04info\x18\x02 \x02(\x0b\x32 .livekit.proto.CaptureSourceInfo\"\xb1\x01\n\x17NewCaptureSourceRequest\x12:\n\x07pattern\x18\x02 \x01(\x0b\x32\'.livekit.proto.PatternVideoSourceConfigH\x00\x12\x36\n\x05\x63lock\x18\x05 \x01(\x0b\x32%.livekit.proto.ClockVideoSourceConfigH\x00\x12\x18\n\x10request_async_id\x18\x03 \x01(\x04\x42\x08\n\x06\x63onfig\",\n\x18NewCaptureSourceResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"}\n\x18NewCaptureSourceCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\x12\x0f\n\x05\x65rror\x18\x02 \x01(\tH\x00\x12\x33\n\x06source\x18\x03 \x01(\x0b\x32!.livekit.proto.OwnedCaptureSourceH\x00\x42\t\n\x07message\"-\n\x13StartCaptureRequest\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\"%\n\x14StartCaptureResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\",\n\x12StopCaptureRequest\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\"$\n\x13StopCaptureResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\"T\n\x0f\x43\x61ptureFinished\x12\x17\n\x0f\x66rames_captured\x18\x01 \x02(\x04\x12(\n\x04\x65xit\x18\x02 \x02(\x0e\x32\x1a.livekit.proto.CaptureExit\"\x1d\n\x0c\x43\x61ptureError\x12\r\n\x05\x65rror\x18\x01 \x02(\t\"\x99\x01\n\x12\x43\x61ptureSourceEvent\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\x12\x32\n\x08\x66inished\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.CaptureFinishedH\x00\x12,\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x1b.livekit.proto.CaptureErrorH\x00\x42\t\n\x07message*1\n\x07Pattern\x12\x14\n\x10PATTERN_GRADIENT\x10\x00\x12\x10\n\x0cPATTERN_LOGO\x10\x01*I\n\x11\x43\x61ptureSourceKind\x12\x18\n\x14\x43\x41PTURE_SOURCE_PIXEL\x10\x00\x12\x1a\n\x16\x43\x41PTURE_SOURCE_ENCODED\x10\x01*G\n\x0b\x43\x61ptureExit\x12\x18\n\x14\x43\x41PTURE_EXIT_STOPPED\x10\x00\x12\x1e\n\x1a\x43\x41PTURE_EXIT_END_OF_STREAM\x10\x01\x42\x10\xaa\x02\rLiveKit.Proto')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rcapture.proto\x12\rlivekit.proto\x1a\x0chandle.proto\x1a\nroom.proto\x1a\x11video_frame.proto\"l\n\x14GstreamerRateControl\x12\x0f\n\x07\x65lement\x18\x01 \x02(\t\x12\x10\n\x08property\x18\x02 \x02(\t\x12\x31\n\x04unit\x18\x03 \x02(\x0e\x32#.livekit.proto.GstreamerBitrateUnit\"\xcd\x01\n\x1aGstreamerVideoSourceConfig\x12\x10\n\x08pipeline\x18\x01 \x02(\t\x12(\n\x05\x63odec\x18\x02 \x01(\x0e\x32\x19.livekit.proto.VideoCodec\x12\x38\n\nresolution\x18\x03 \x01(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x39\n\x0crate_control\x18\x04 \x01(\x0b\x32#.livekit.proto.GstreamerRateControl\"\x94\x01\n\x18PatternVideoSourceConfig\x12\x38\n\nresolution\x18\x01 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\rframerate_fps\x18\x02 \x02(\r\x12\'\n\x07pattern\x18\x03 \x02(\x0e\x32\x16.livekit.proto.Pattern\"i\n\x16\x43lockVideoSourceConfig\x12\x38\n\nresolution\x18\x01 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12\x15\n\rframerate_fps\x18\x02 \x02(\r\"\xa7\x02\n\x11\x43\x61ptureSourceInfo\x12.\n\x04kind\x18\x01 \x02(\x0e\x32 .livekit.proto.CaptureSourceKind\x12\x38\n\nresolution\x18\x02 \x02(\x0b\x32$.livekit.proto.VideoSourceResolution\x12(\n\x05\x63odec\x18\x03 \x01(\x0e\x32\x19.livekit.proto.VideoCodec\x12G\n\x1brecommended_publish_options\x18\x04 \x02(\x0b\x32\".livekit.proto.TrackPublishOptions\x12\x35\n\x0cvideo_source\x18\x05 \x02(\x0b\x32\x1f.livekit.proto.OwnedVideoSource\"s\n\x12OwnedCaptureSource\x12-\n\x06handle\x18\x01 \x02(\x0b\x32\x1d.livekit.proto.FfiOwnedHandle\x12.\n\x04info\x18\x02 \x02(\x0b\x32 .livekit.proto.CaptureSourceInfo\"\xf1\x01\n\x17NewCaptureSourceRequest\x12>\n\tgstreamer\x18\x01 \x01(\x0b\x32).livekit.proto.GstreamerVideoSourceConfigH\x00\x12:\n\x07pattern\x18\x02 \x01(\x0b\x32\'.livekit.proto.PatternVideoSourceConfigH\x00\x12\x36\n\x05\x63lock\x18\x05 \x01(\x0b\x32%.livekit.proto.ClockVideoSourceConfigH\x00\x12\x18\n\x10request_async_id\x18\x03 \x01(\x04\x42\x08\n\x06\x63onfig\",\n\x18NewCaptureSourceResponse\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\"}\n\x18NewCaptureSourceCallback\x12\x10\n\x08\x61sync_id\x18\x01 \x02(\x04\x12\x0f\n\x05\x65rror\x18\x02 \x01(\tH\x00\x12\x33\n\x06source\x18\x03 \x01(\x0b\x32!.livekit.proto.OwnedCaptureSourceH\x00\x42\t\n\x07message\"-\n\x13StartCaptureRequest\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\"%\n\x14StartCaptureResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\",\n\x12StopCaptureRequest\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\"$\n\x13StopCaptureResponse\x12\r\n\x05\x65rror\x18\x01 \x01(\t\"T\n\x0f\x43\x61ptureFinished\x12\x17\n\x0f\x66rames_captured\x18\x01 \x02(\x04\x12(\n\x04\x65xit\x18\x02 \x02(\x0e\x32\x1a.livekit.proto.CaptureExit\"L\n\x0c\x43\x61ptureError\x12\r\n\x05\x65rror\x18\x01 \x02(\t\x12-\n\x04kind\x18\x02 \x02(\x0e\x32\x1f.livekit.proto.CaptureErrorKind\"\x99\x01\n\x12\x43\x61ptureSourceEvent\x12\x16\n\x0e\x63\x61pture_handle\x18\x01 \x02(\x04\x12\x32\n\x08\x66inished\x18\x02 \x01(\x0b\x32\x1e.livekit.proto.CaptureFinishedH\x00\x12,\n\x05\x65rror\x18\x03 \x01(\x0b\x32\x1b.livekit.proto.CaptureErrorH\x00\x42\t\n\x07message*W\n\x14GstreamerBitrateUnit\x12\x1e\n\x1aGSTREAMER_BITRATE_UNIT_BPS\x10\x00\x12\x1f\n\x1bGSTREAMER_BITRATE_UNIT_KBPS\x10\x01*1\n\x07Pattern\x12\x14\n\x10PATTERN_GRADIENT\x10\x00\x12\x10\n\x0cPATTERN_LOGO\x10\x01*I\n\x11\x43\x61ptureSourceKind\x12\x18\n\x14\x43\x41PTURE_SOURCE_PIXEL\x10\x00\x12\x1a\n\x16\x43\x41PTURE_SOURCE_ENCODED\x10\x01*G\n\x0b\x43\x61ptureExit\x12\x18\n\x14\x43\x41PTURE_EXIT_STOPPED\x10\x00\x12\x1e\n\x1a\x43\x41PTURE_EXIT_END_OF_STREAM\x10\x01*n\n\x10\x43\x61ptureErrorKind\x12\x1d\n\x19\x43\x41PTURE_ERROR_KIND_SOURCE\x10\x00\x12\x1a\n\x16\x43\x41PTURE_ERROR_KIND_RTC\x10\x01\x12\x1f\n\x1b\x43\x41PTURE_ERROR_KIND_PANICKED\x10\x02\x42\x10\xaa\x02\rLiveKit.Proto')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,38 +25,46 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'capture_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'\252\002\rLiveKit.Proto'
-  _globals['_PATTERN']._serialized_start=1546
-  _globals['_PATTERN']._serialized_end=1595
-  _globals['_CAPTURESOURCEKIND']._serialized_start=1597
-  _globals['_CAPTURESOURCEKIND']._serialized_end=1670
-  _globals['_CAPTUREEXIT']._serialized_start=1672
-  _globals['_CAPTUREEXIT']._serialized_end=1743
-  _globals['_PATTERNVIDEOSOURCECONFIG']._serialized_start=78
-  _globals['_PATTERNVIDEOSOURCECONFIG']._serialized_end=226
-  _globals['_CLOCKVIDEOSOURCECONFIG']._serialized_start=228
-  _globals['_CLOCKVIDEOSOURCECONFIG']._serialized_end=333
-  _globals['_CAPTURESOURCEINFO']._serialized_start=336
-  _globals['_CAPTURESOURCEINFO']._serialized_end=631
-  _globals['_OWNEDCAPTURESOURCE']._serialized_start=633
-  _globals['_OWNEDCAPTURESOURCE']._serialized_end=748
-  _globals['_NEWCAPTURESOURCEREQUEST']._serialized_start=751
-  _globals['_NEWCAPTURESOURCEREQUEST']._serialized_end=928
-  _globals['_NEWCAPTURESOURCERESPONSE']._serialized_start=930
-  _globals['_NEWCAPTURESOURCERESPONSE']._serialized_end=974
-  _globals['_NEWCAPTURESOURCECALLBACK']._serialized_start=976
-  _globals['_NEWCAPTURESOURCECALLBACK']._serialized_end=1101
-  _globals['_STARTCAPTUREREQUEST']._serialized_start=1103
-  _globals['_STARTCAPTUREREQUEST']._serialized_end=1148
-  _globals['_STARTCAPTURERESPONSE']._serialized_start=1150
-  _globals['_STARTCAPTURERESPONSE']._serialized_end=1187
-  _globals['_STOPCAPTUREREQUEST']._serialized_start=1189
-  _globals['_STOPCAPTUREREQUEST']._serialized_end=1233
-  _globals['_STOPCAPTURERESPONSE']._serialized_start=1235
-  _globals['_STOPCAPTURERESPONSE']._serialized_end=1271
-  _globals['_CAPTUREFINISHED']._serialized_start=1273
-  _globals['_CAPTUREFINISHED']._serialized_end=1357
-  _globals['_CAPTUREERROR']._serialized_start=1359
-  _globals['_CAPTUREERROR']._serialized_end=1388
-  _globals['_CAPTURESOURCEEVENT']._serialized_start=1391
-  _globals['_CAPTURESOURCEEVENT']._serialized_end=1544
+  _globals['_GSTREAMERBITRATEUNIT']._serialized_start=1975
+  _globals['_GSTREAMERBITRATEUNIT']._serialized_end=2062
+  _globals['_PATTERN']._serialized_start=2064
+  _globals['_PATTERN']._serialized_end=2113
+  _globals['_CAPTURESOURCEKIND']._serialized_start=2115
+  _globals['_CAPTURESOURCEKIND']._serialized_end=2188
+  _globals['_CAPTUREEXIT']._serialized_start=2190
+  _globals['_CAPTUREEXIT']._serialized_end=2261
+  _globals['_CAPTUREERRORKIND']._serialized_start=2263
+  _globals['_CAPTUREERRORKIND']._serialized_end=2373
+  _globals['_GSTREAMERRATECONTROL']._serialized_start=77
+  _globals['_GSTREAMERRATECONTROL']._serialized_end=185
+  _globals['_GSTREAMERVIDEOSOURCECONFIG']._serialized_start=188
+  _globals['_GSTREAMERVIDEOSOURCECONFIG']._serialized_end=393
+  _globals['_PATTERNVIDEOSOURCECONFIG']._serialized_start=396
+  _globals['_PATTERNVIDEOSOURCECONFIG']._serialized_end=544
+  _globals['_CLOCKVIDEOSOURCECONFIG']._serialized_start=546
+  _globals['_CLOCKVIDEOSOURCECONFIG']._serialized_end=651
+  _globals['_CAPTURESOURCEINFO']._serialized_start=654
+  _globals['_CAPTURESOURCEINFO']._serialized_end=949
+  _globals['_OWNEDCAPTURESOURCE']._serialized_start=951
+  _globals['_OWNEDCAPTURESOURCE']._serialized_end=1066
+  _globals['_NEWCAPTURESOURCEREQUEST']._serialized_start=1069
+  _globals['_NEWCAPTURESOURCEREQUEST']._serialized_end=1310
+  _globals['_NEWCAPTURESOURCERESPONSE']._serialized_start=1312
+  _globals['_NEWCAPTURESOURCERESPONSE']._serialized_end=1356
+  _globals['_NEWCAPTURESOURCECALLBACK']._serialized_start=1358
+  _globals['_NEWCAPTURESOURCECALLBACK']._serialized_end=1483
+  _globals['_STARTCAPTUREREQUEST']._serialized_start=1485
+  _globals['_STARTCAPTUREREQUEST']._serialized_end=1530
+  _globals['_STARTCAPTURERESPONSE']._serialized_start=1532
+  _globals['_STARTCAPTURERESPONSE']._serialized_end=1569
+  _globals['_STOPCAPTUREREQUEST']._serialized_start=1571
+  _globals['_STOPCAPTUREREQUEST']._serialized_end=1615
+  _globals['_STOPCAPTURERESPONSE']._serialized_start=1617
+  _globals['_STOPCAPTURERESPONSE']._serialized_end=1653
+  _globals['_CAPTUREFINISHED']._serialized_start=1655
+  _globals['_CAPTUREFINISHED']._serialized_end=1739
+  _globals['_CAPTUREERROR']._serialized_start=1741
+  _globals['_CAPTUREERROR']._serialized_end=1817
+  _globals['_CAPTURESOURCEEVENT']._serialized_start=1820
+  _globals['_CAPTURESOURCEEVENT']._serialized_end=1973
 # @@protoc_insertion_point(module_scope)
