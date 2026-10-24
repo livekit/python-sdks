@@ -56,10 +56,7 @@ def get_platform_tag():
     elif sys.platform == "linux":
         return f"linux_{platform.machine()}"
     elif sys.platform == "win32":
-        arch = platform.machine()
-        if arch == "AMD64":
-            arch = "amd64"
-        return f"win_{arch}"
+        return f"win_{platform.machine().lower()}"
     else:
         return f"{platform.system().lower()}_{platform.machine()}"
 
