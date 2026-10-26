@@ -23,7 +23,18 @@ import enum
 import os
 import mimetypes
 import weakref
-from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
+from typing import (
+    List,
+    Union,
+    Callable,
+    Dict,
+    Awaitable,
+    Optional,
+    Mapping,
+    cast,
+    TypeVar,
+    Sequence,
+)
 from abc import abstractmethod, ABC
 
 from ._ffi_client import FfiClient, FfiHandle
@@ -317,7 +328,7 @@ class LocalParticipant(Participant):
         payload: Union[bytes, str],
         *,
         reliable: bool = True,
-        destination_identities: List[str] = [],
+        destination_identities: Optional[Sequence[str]] = None,
         topic: str = "",
     ) -> None:
         """
@@ -326,7 +337,7 @@ class LocalParticipant(Participant):
         Args:
             payload (Union[bytes, str]): The data to publish.
             reliable (bool, optional): Whether to send reliably or not. Defaults to True.
-            destination_identities (List[str], optional): List of participant identities to send to. Defaults to [].
+            destination_identities (Optional[Sequence[str]], optional): Sequence of participant identities to send to. Defaults to None.
             topic (str, optional): The topic under which to publish the data. Defaults to "".
 
         Raises:
@@ -344,7 +355,8 @@ class LocalParticipant(Participant):
         req.publish_data.data_len = data_len
         req.publish_data.reliable = reliable
         req.publish_data.topic = topic
-        req.publish_data.destination_identities.extend(destination_identities)
+        if destination_identities:
+            req.publish_data.destination_identities.extend(destination_identities)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
