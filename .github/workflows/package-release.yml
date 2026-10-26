@@ -198,7 +198,9 @@ jobs:
             awk -v heading="## $package v$version " '
               index($0, heading) == 1 { found = 1; next }
               found && /^## / { exit }
-              found { print }
+              # Buffer blank lines so leading/trailing ones are dropped
+              found && /^[[:space:]]*$/ { if (started) blank = blank "\n"; next }
+              found { printf "%s%s\n", blank, $0; blank = ""; started = 1 }
             ' "$RUNNER_TEMP/pr-body.md" > "$notes"
             if ! grep -q '[^[:space:]]' "$notes"; then
               echo "Released from #$PR_NUMBER." > "$notes"
