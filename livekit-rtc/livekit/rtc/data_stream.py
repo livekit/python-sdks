@@ -389,7 +389,7 @@ class BaseStreamWriter:
         self,
         local_participant: LocalParticipant,
         topic: str = "",
-        attributes: Optional[Dict[str, str]] = {},
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         total_size: int | None = None,
         mime_type: str = "",
@@ -456,16 +456,17 @@ class BaseStreamWriter:
     async def aclose(
         self, *, reason: str = "", attributes: Optional[Dict[str, str]] = None
     ) -> None:
-        if self._closed:
-            raise RuntimeError("Stream already closed")
-        if self._writer_handle is None:
-            raise RuntimeError("Stream is not open")
-        self._closed = True
-        # unregister before sending: the request consumes the handle natively,
-        # so it must not be dropped again by the disconnect cleanup even if the
-        # close itself reports an error
-        self._unregister_open()
-        await self._send_close(reason=reason, attributes=attributes)
+        async with self._write_lock:
+            if self._closed:
+                raise RuntimeError("Stream already closed")
+            if self._writer_handle is None:
+                raise RuntimeError("Stream is not open")
+            self._closed = True
+            # unregister before sending: the request consumes the handle natively,
+            # so it must not be dropped again by the disconnect cleanup even if the
+            # close itself reports an error
+            self._unregister_open()
+            await self._send_close(reason=reason, attributes=attributes)
 
     async def _send_close(self, *, reason: str, attributes: Optional[Dict[str, str]]) -> None:
         raise NotImplementedError
@@ -477,7 +478,7 @@ class TextStreamWriter(BaseStreamWriter):
         local_participant: LocalParticipant,
         *,
         topic: str = "",
-        attributes: Optional[Dict[str, str]] = {},
+        attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
         total_size: int | None = None,
         reply_to_id: str | None = None,
