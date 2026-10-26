@@ -98,10 +98,15 @@ jobs:
   # ── Step 2: Publish on merge ──────────────────────────────────
   detect:
     name: Detect packages
+    # Only release PRs opened by the bump job (same repo, github-actions[bot],
+    # release/changesets-* branch) may trigger publishing; the branch name alone
+    # is not trusted.
     if: |
       github.event_name == 'pull_request'
       && github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/')
+      && startsWith(github.event.pull_request.head.ref, 'release/changesets-')
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.user.login == 'github-actions[bot]'
     runs-on: ubuntu-latest
     outputs:
       rtc: ${{ steps.detect.outputs.rtc }}
