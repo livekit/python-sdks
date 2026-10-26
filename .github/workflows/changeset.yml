@@ -17,7 +17,10 @@ permissions:
 jobs:
   validate:
     name: Validate changesets
-    if: github.event_name == 'pull_request'
+    # renovate/* PRs are dependency/security updates and never carry changesets
+    if: |
+      github.event_name == 'pull_request'
+      && !startsWith(github.event.pull_request.head.ref, 'renovate/')
     runs-on: ubuntu-latest
     steps:
       # Default ref is the PR merge commit, i.e. the base branch's versions plus
@@ -54,6 +57,7 @@ jobs:
     if: |
       github.event_name == 'pull_request_target'
       && !startsWith(github.event.pull_request.head.ref, 'release/changesets-')
+      && !startsWith(github.event.pull_request.head.ref, 'renovate/')
       && !endsWith(github.event.pull_request.user.login, '[bot]')
     runs-on: ubuntu-latest
     permissions:
@@ -67,8 +71,16 @@ jobs:
         run: |
           marker="<!-- changeset-reminder -->"
 
-          changesets=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
-            --jq '.[] | select(.status != "removed") | .filename' \
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '.[] | "\(.status) \(.filename)"')
+
+          # Dependency-only updates (lockfiles / package.json) don't need a changeset
+          if [ -z "$(grep -vE '^[a-z]+ (.*/)?([^/]+\.lock|package\.json|pnpm-lock\.yaml)$' <<< "$files")" ]; then
+            echo "Only dependency files changed, skipping"
+            exit 0
+          fi
+
+          changesets=$(grep -v '^removed ' <<< "$files" | cut -d' ' -f2- \
             | grep -E '^\.changeset/[^/]+\.md$' | grep -viE '/readme\.md$' || true)
           existing=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
             --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\"))) | .id")
