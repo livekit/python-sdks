@@ -1,9 +1,14 @@
 name: Changeset
 
 # Validate .changeset files on every commit of every PR, with the same rules
-# the Package Release workflow applies when it bumps versions.
+# the Package Release workflow applies when it bumps versions, and remind the
+# author once when a PR has no changeset.
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
+  # Needed for a write token on fork PRs. The remind job never checks out or
+  # runs PR code; it only reads the PR's file list through the API.
+  pull_request_target:
     types: [opened, synchronize, reopened]
 
 permissions:
@@ -12,6 +17,7 @@ permissions:
 jobs:
   validate:
     name: Validate changesets
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       # Default ref is the PR merge commit, i.e. the base branch's versions plus
@@ -42,3 +48,60 @@ jobs:
             exit 1
           fi
           echo "$out"
+
+  remind:
+    name: Changeset reminder
+    if: |
+      github.event_name == 'pull_request_target'
+      && !startsWith(github.event.pull_request.head.ref, 'release/changesets-')
+      && !endsWith(github.event.pull_request.user.login, '[bot]')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment when the PR has no changeset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          marker="<!-- changeset-reminder -->"
+
+          changesets=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '.[] | select(.status != "removed") | .filename' \
+            | grep -E '^\.changeset/[^/]+\.md$' | grep -viE '/readme\.md$' || true)
+          existing=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\"))) | .id")
+
+          if [ -n "$changesets" ]; then
+            echo "Changeset found:"; echo "$changesets"
+            # Drop the reminder once a changeset has been added
+            for id in $existing; do
+              gh api -X DELETE "repos/$REPO/issues/comments/$id"
+            done
+            exit 0
+          fi
+
+          if [ -n "$existing" ]; then
+            echo "Reminder already posted"
+            exit 0
+          fi
+
+          cat > "$RUNNER_TEMP/reminder.md" <<'EOF'
+          <!-- changeset-reminder -->
+          👋 This PR has no changeset. If it should be released, add a markdown file under `.changeset/` (any name, e.g. `.changeset/fix-token-parsing.md`):
+
+          ```md
+          ---
+          "livekit-rtc": patch
+          ---
+
+          Short description of the change, used in the release notes.
+          ```
+
+          - **Packages:** `livekit-rtc`, `livekit-api`, `livekit-protocol` (one line per package)
+          - **Types:** `patch`, `minor`, `major`, `patch-rc`, `minor-rc`, `major-rc`, `next-rc`, `promote`
+
+          If this change doesn't need a release (docs, CI, tests), you can ignore this comment.
+          EOF
+          gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file "$RUNNER_TEMP/reminder.md"
