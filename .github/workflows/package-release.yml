@@ -201,7 +201,10 @@ jobs:
             if [[ "$version" == *rc* ]]; then
               args+=(--prerelease)
             fi
+            # Created as a draft; each publish job makes its release public
+            # only after the PyPI upload succeeds.
             gh release create "$tag" \
+              --draft \
               --verify-tag \
               --title "$package v$version" \
               --notes-file "$notes" \
@@ -274,11 +277,12 @@ jobs:
 
   publish-rtc:
     name: Publish livekit (RTC)
-    needs: [detect, build-rtc, build-rtc-sdist]
+    needs: [detect, build-rtc, build-rtc-sdist, tag]
     if: needs.detect.outputs.rtc == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: write
       id-token: write
     steps:
       - name: Download build artifacts
@@ -293,6 +297,17 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == rtc-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
 
   # ── API build ────────────────────────────────────────────────
   build-api:
@@ -324,11 +339,12 @@ jobs:
 
   publish-api:
     name: Publish livekit-api
-    needs: [detect, build-api]
+    needs: [detect, build-api, tag]
     if: needs.detect.outputs.api == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: write
       id-token: write
     steps:
       - name: Download build artifact
@@ -342,6 +358,17 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == api-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
 
   # ── Protocol build ───────────────────────────────────────────
   build-protocol:
@@ -373,11 +400,12 @@ jobs:
 
   publish-protocol:
     name: Publish livekit-protocol
-    needs: [detect, build-protocol]
+    needs: [detect, build-protocol, tag]
     if: needs.detect.outputs.protocol == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: write
       id-token: write
     steps:
       - name: Download build artifact
@@ -391,6 +419,17 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == protocol-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
 
   # ── Docs ─────────────────────────────────────────────────────
   docs-rtc:
