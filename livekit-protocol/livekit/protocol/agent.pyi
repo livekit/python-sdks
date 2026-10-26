@@ -202,10 +202,12 @@ class RegisterWorkerResponse(_message.Message):
     def __init__(self, worker_id: _Optional[str] = ..., server_info: _Optional[_Union[_models.ServerInfo, _Mapping]] = ..., endpoint_settings: _Optional[_Union[AgentHttp.AgentEndpointSettings, _Mapping]] = ...) -> None: ...
 
 class MigrateJobRequest(_message.Message):
-    __slots__ = ("job_ids",)
+    __slots__ = ("job_ids", "jobs")
     JOB_IDS_FIELD_NUMBER: _ClassVar[int]
+    JOBS_FIELD_NUMBER: _ClassVar[int]
     job_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, job_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+    jobs: _containers.RepeatedCompositeFieldContainer[Job]
+    def __init__(self, job_ids: _Optional[_Iterable[str]] = ..., jobs: _Optional[_Iterable[_Union[Job, _Mapping]]] = ...) -> None: ...
 
 class AvailabilityRequest(_message.Message):
     __slots__ = ("job", "resuming")
