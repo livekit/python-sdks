@@ -87,7 +87,7 @@ def resolve(package: str, kinds: set[str]) -> str:
     return "next-rc"
 
 
-def check(package: str, kind: str) -> None:
+def validate(package: str, kind: str) -> None:
     cur = Version(read_version(pathlib.Path(PACKAGES[package])))
     if kind == "next-rc" and not (cur.pre and cur.pre[0] == "rc"):
         raise click.ClickException(f"{package}: next-rc requires an rc version (got {cur})")
@@ -159,14 +159,20 @@ def changeset_origin(path: pathlib.Path, repo: str | None) -> str:
     default=None,
     help="owner/name used to look up the PR and author of each changeset (needs gh).",
 )
-def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None) -> None:
+@click.option(
+    "--check",
+    is_flag=True,
+    default=False,
+    help="Only validate the pending changesets; don't change any file.",
+)
+def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: bool) -> None:
     files = sorted(p for p in CHANGESET_DIR.glob("*.md") if p.name.lower() != "readme.md")
 
     kinds: dict[str, set[str]] = {}
     summaries: dict[str, list[str]] = {}
     for path in files:
         bumps, summary = parse_changeset(path)
-        if summary:
+        if summary and not check:
             summary += changeset_origin(path, repo)
         for package, kind in bumps.items():
             kinds.setdefault(package, set()).add(kind)
@@ -182,7 +188,15 @@ def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None) -> None:
             )
     # Validate everything before touching any version file.
     for package, kind in resolved.items():
-        check(package, kind)
+        validate(package, kind)
+
+    if check:
+        click.echo(f"{len(files)} changeset(s) valid.")
+        for package in PACKAGES:
+            if package in resolved:
+                cur = read_version(pathlib.Path(PACKAGES[package]))
+                click.echo(f"  {package}: {cur} ({resolved[package]})")
+        return
 
     lines: list[str] = []
     released: list[str] = []
