@@ -21,9 +21,13 @@ from dataclasses import dataclass, field
 from typing import Callable, Dict, Literal, Optional, cast, Mapping
 import warnings
 
+from google.protobuf.descriptor import FieldDescriptor
+from google.protobuf.message import Message
+
 from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
+from ._proto.handle_pb2 import FfiOwnedHandle
 from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
@@ -31,7 +35,7 @@ from ._proto.participant_pb2 import DisconnectReason
 from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, Queue, task_done_logger
 from .e2ee import E2EEManager, E2EEOptions
 from .log import logger
 from .participant import (
@@ -167,6 +171,55 @@ class ConnectError(Exception):
         self.message = message
 
 
+# how long a cancelled connect's cleanup waits for its room's end of stream after
+# the disconnect, before it stops collecting the handles room events carry
+_ABORTED_CONNECT_EOS_TIMEOUT = 5.0
+
+
+def _is_repeated(field: FieldDescriptor) -> bool:
+    # protobuf 7 drops `label` for `is_repeated`; protobuf 5 only has `label`
+    if hasattr(field, "is_repeated"):
+        return bool(field.is_repeated)
+    return bool(getattr(field, "label") == FieldDescriptor.LABEL_REPEATED)
+
+
+def _dispose_owned_handles(msg: Message, *, keep: int = 0) -> None:
+    """Drop every FfiOwnedHandle in `msg`, at any depth, except `keep`."""
+    for fd, value in msg.ListFields():
+        message_type = fd.message_type
+        if fd.type != FieldDescriptor.TYPE_MESSAGE or message_type is None:
+            continue
+        if message_type.GetOptions().map_entry:
+            value_field = message_type.fields_by_name["value"]
+            if value_field.type != FieldDescriptor.TYPE_MESSAGE:
+                continue
+            items = list(value.values())
+        elif _is_repeated(fd):
+            items = list(value)
+        else:
+            items = [value]
+        for item in items:
+            if item.DESCRIPTOR.full_name == FfiOwnedHandle.DESCRIPTOR.full_name:
+                if item.id != keep:
+                    FfiHandle(item.id).dispose()
+            else:
+                _dispose_owned_handles(item, keep=keep)
+
+
+async def _drain_room_events(queue: Queue[proto_ffi.FfiEvent], room_handle: int) -> None:
+    """Drop the handles in a room's events until its end of stream."""
+    while True:
+        event = await queue.get()
+        queue.task_done()
+        if event.WhichOneof("message") != "room_event":
+            continue
+        if event.room_event.room_handle != room_handle:
+            continue
+        if event.room_event.HasField("eos"):
+            return
+        _dispose_owned_handles(event.room_event)
+
+
 class Room(EventEmitter[EventTypes]):
     def __init__(
         self,
@@ -184,6 +237,7 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
+        self._aborted_connect_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
@@ -550,6 +604,11 @@ class Room(EventEmitter[EventTypes]):
             )
             req.connect.options.rtc_config.ice_servers.extend(options.rtc_config.ice_servers)
 
+        # a cancelled earlier connect on this Room may still be joined server-side
+        # with the same identity. joining before it has left gets this attempt
+        # evicted as a duplicate, so wait for its cleanup first.
+        await self._wait_aborted_connects()
+
         # subscribe before connecting so we don't miss any events
         # Media streams have their own subscriptions. Keep other events, including
         # the publish/unpublish callbacks forwarded through _room_queue.
@@ -563,11 +622,24 @@ class Room(EventEmitter[EventTypes]):
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
+        except BaseException:
+            FfiClient.instance.queue.unsubscribe(queue)
+            raise
+
+        try:
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.connect.async_id == resp.connect.async_id
             )
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+        except BaseException:
+            # any exit here (cancellation, GeneratorExit when the coroutine is closed,
+            # KeyboardInterrupt) leaves the FFI server connecting and expecting a
+            # ReadyForRoomEvent once it answers. leaving that unanswered panics it, and
+            # the panic handler terminates the process, so close the room from a task
+            # that outlives this coroutine.
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+            self._close_aborted_connect(resp.connect.async_id, queue)
+            raise
+        FfiClient.instance.queue.unsubscribe(queue)
 
         if cb.connect.error:
             FfiClient.instance.queue.unsubscribe(self._ffi_queue)
@@ -608,6 +680,89 @@ class Room(EventEmitter[EventTypes]):
         ready_req = proto_ffi.FfiRequest()
         ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
         FfiClient.instance.request(ready_req)
+
+    def _close_aborted_connect(self, async_id: int, queue: Queue[proto_ffi.FfiEvent]) -> None:
+        """Close a room that connect() exited before it could own.
+
+        Takes ownership of `queue`. The FFI server has no cancel path for an in-flight
+        connect, so the room has to be created and then disconnected. Without this the
+        room also stays joined server-side and reconnecting with the same identity
+        evicts the new session as a duplicate.
+        """
+
+        async def _close() -> None:
+            try:
+                cb: proto_ffi.FfiEvent = await queue.wait_for(
+                    lambda e: e.connect.async_id == async_id
+                )
+                if cb.connect.error:
+                    return
+
+                room_handle = FfiHandle(cb.connect.result.room.handle.id)
+                # nothing will own the participants and publications the connect
+                # returned, so drop their handles here instead of leaking them
+                _dispose_owned_handles(cb.connect.result, keep=room_handle.handle)
+
+                ready_req = proto_ffi.FfiRequest()
+                ready_req.ready_for_room_event.room_handle = room_handle.handle
+                FfiClient.instance.request(ready_req)
+
+                await self._request_disconnect(
+                    room_handle.handle, DisconnectReason.CLIENT_INITIATED
+                )
+
+                # room events sent between the ready request and the disconnect
+                # (participant_connected, track_published, ...) carry owned handles
+                # too. drop them until the room's end of stream.
+                try:
+                    await asyncio.wait_for(
+                        _drain_room_events(queue, room_handle.handle),
+                        _ABORTED_CONNECT_EOS_TIMEOUT,
+                    )
+                except asyncio.TimeoutError:
+                    logger.warning(
+                        "no end of stream from an aborted connect's room after %ss",
+                        _ABORTED_CONNECT_EOS_TIMEOUT,
+                    )
+                room_handle.dispose()
+            finally:
+                FfiClient.instance.queue.unsubscribe(queue)
+
+        try:
+            task = self._loop.create_task(_close())
+        except RuntimeError:
+            # the loop is already closed: nothing can answer the FFI any more
+            FfiClient.instance.queue.unsubscribe(queue)
+            logger.warning("event loop closed before an aborted connect could be cleaned up")
+            return
+        self._aborted_connect_tasks.add(task)
+        task.add_done_callback(self._aborted_connect_tasks.discard)
+        # a failure here still ends in an FFI panic, so it must not be swallowed
+        task.add_done_callback(task_done_logger)
+
+    async def _wait_aborted_connects(self) -> None:
+        """Wait for any room a cancelled connect() is still closing."""
+        if not self._aborted_connect_tasks:
+            return
+        # shielded, because gather() cancels its children when it is cancelled.
+        # a caller who gives up on connect() or disconnect() would otherwise cancel
+        # the very cleanup that answers the FFI's wait, leaving it to time out and
+        # panic, which is the failure this path exists to prevent.
+        await asyncio.shield(
+            asyncio.gather(*tuple(self._aborted_connect_tasks), return_exceptions=True)
+        )
+
+    @staticmethod
+    async def _request_disconnect(room_handle: int, reason: DisconnectReason.ValueType) -> None:
+        req = proto_ffi.FfiRequest()
+        req.disconnect.room_handle = room_handle
+        req.disconnect.reason = reason
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            await queue.wait_for(lambda e: e.disconnect.async_id == resp.disconnect.async_id)
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
@@ -688,6 +843,10 @@ class Room(EventEmitter[EventTypes]):
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
     ) -> None:
         """Disconnects from the room."""
+        # a cancelled connect may still be closing a room the FFI server opened.
+        # wait for it so disconnect() leaves nothing behind.
+        await self._wait_aborted_connects()
+
         if not self.isconnected():
             return
 
@@ -695,15 +854,7 @@ class Room(EventEmitter[EventTypes]):
         self._error_stream_readers()
         self._dispose_open_stream_writers()
 
-        req = proto_ffi.FfiRequest()
-        req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-        req.disconnect.reason = reason
-        queue = FfiClient.instance.queue.subscribe()
-        try:
-            resp = FfiClient.instance.request(req)
-            await queue.wait_for(lambda e: e.disconnect.async_id == resp.disconnect.async_id)
-        finally:
-            FfiClient.instance.queue.unsubscribe(queue)
+        await self._request_disconnect(self._ffi_handle.handle, reason)  # type: ignore
 
         await self._task
         FfiClient.instance.queue.unsubscribe(self._ffi_queue)
