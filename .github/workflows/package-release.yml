@@ -38,6 +38,8 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           ref: ${{ env.BASE_BRANCH }}
+          # Full history to find the commit (and PR) that added each changeset
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -49,6 +51,8 @@ jobs:
 
       - name: Apply changesets
         id: changesets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Only RC releases are allowed from non-main branches
           args=()

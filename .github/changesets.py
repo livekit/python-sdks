@@ -20,6 +20,7 @@ from __future__ import annotations
 import os
 import pathlib
 import re
+import subprocess
 
 import click
 from packaging.version import Version
@@ -106,6 +107,39 @@ def apply(package: str, kind: str) -> None:
         do_bump(package, "release")
 
 
+def changeset_origin(path: pathlib.Path, repo: str | None) -> str:
+    """Return " (#123 by @user)" for the PR that added this changeset, or ""."""
+    if not repo:
+        return ""
+    try:
+        sha = subprocess.run(
+            ["git", "log", "--diff-filter=A", "--format=%H", "-1", "--", str(path)],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        if not sha:
+            return ""
+        pr = subprocess.run(
+            [
+                "gh",
+                "api",
+                f"repos/{repo}/commits/{sha}/pulls",
+                "--jq",
+                '.[0] // empty | "\\(.number) \\(.user.login)"',
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.split()
+    except (OSError, subprocess.CalledProcessError) as e:
+        click.echo(f"warning: cannot resolve PR for {path}: {e}", err=True)
+        return ""
+    if len(pr) == 2:
+        return f" (#{pr[0]} by @{pr[1]})"
+    return f" ({sha[:7]})"
+
+
 @click.command()
 @click.option(
     "--rc-only",
@@ -119,13 +153,21 @@ def apply(package: str, kind: str) -> None:
     default=None,
     help="Write release notes (markdown) to this file.",
 )
-def main(rc_only: bool, notes: pathlib.Path | None) -> None:
+@click.option(
+    "--repo",
+    envvar="GITHUB_REPOSITORY",
+    default=None,
+    help="owner/name used to look up the PR and author of each changeset (needs gh).",
+)
+def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None) -> None:
     files = sorted(p for p in CHANGESET_DIR.glob("*.md") if p.name.lower() != "readme.md")
 
     kinds: dict[str, set[str]] = {}
     summaries: dict[str, list[str]] = {}
     for path in files:
         bumps, summary = parse_changeset(path)
+        if summary:
+            summary += changeset_origin(path, repo)
         for package, kind in bumps.items():
             kinds.setdefault(package, set()).add(kind)
             if summary:
