@@ -33,8 +33,11 @@ jobs:
           files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" \
             --jq '.[] | "\(.status) \(.filename)"')
 
-          # Dependency-only updates (lockfiles / package.json) don't need a changeset
-          if [ -z "$(grep -vE '^[a-z]+ (.*/)?([^/]+\.lock|package\.json|pnpm-lock\.yaml)$' <<< "$files")" ]; then
+          # Dependency-only updates (lockfiles / package.json, and the root
+          # pyproject.toml, which is the unpublished workspace config) don't need
+          # a changeset. Package pyproject.toml files declare published runtime
+          # dependencies, so changing them still gets the reminder.
+          if [ -z "$(grep -vE '^[a-z]+ ((.*/)?([^/]+\.lock|package\.json|pnpm-lock\.yaml)|pyproject\.toml)$' <<< "$files")" ]; then
             echo "Only dependency files changed, skipping"
             exit 0
           fi
