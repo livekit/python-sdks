@@ -1,32 +1,12 @@
-name: Publish to PyPI
+name: Package Release
 
 on:
-  # Step 1: Dispatch creates a version bump PR
+  # Step 1: A merged PR (or a manual run) consumes pending .changeset files and
+  # opens/updates the release PR with the version bumps.
   workflow_dispatch:
     inputs:
-      package:
-        description: "Package to publish"
-        type: choice
-        required: true
-        options:
-          - livekit
-          - livekit-api
-          - livekit-protocol
-      version:
-        description: "What to publish"
-        type: choice
-        required: true
-        options:
-          - "patch       (1.5.1 → 1.5.2)"
-          - "minor       (1.5.1 → 1.6.0)"
-          - "major       (1.5.1 → 2.0.0)"
-          - "patch-rc    (1.5.1 → 1.5.2.rc1)"
-          - "minor-rc    (1.5.1 → 1.6.0.rc1)"
-          - "major-rc    (1.5.1 → 2.0.0.rc1)"
-          - "next-rc     (.rc1 → .rc2)"
-          - "promote     (1.6.0.rc2 → 1.6.0)"
       branch:
-        description: "Branch to publish from (default: main)"
+        description: "Branch to release from (default: main)"
         type: string
         required: false
         default: "main"
@@ -41,29 +21,23 @@ permissions:
   id-token: write
 
 jobs:
-  # ── Step 1: Create a version bump PR ──────────────────────────
+  # ── Step 1: Create / update the release PR from changesets ────
   bump:
     name: Create release PR
-    if: github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'workflow_dispatch'
+      || (github.event.pull_request.merged == true
+          && !startsWith(github.event.pull_request.head.ref, 'release/'))
     runs-on: ubuntu-latest
+    concurrency:
+      group: package-release-${{ inputs.branch || github.event.pull_request.base.ref }}
+      cancel-in-progress: true
+    env:
+      BASE_BRANCH: ${{ inputs.branch || github.event.pull_request.base.ref }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ inputs.branch }}
-          submodules: true
-
-      - name: Guard non-main branches
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-          INPUT_BRANCH: ${{ inputs.branch }}
-        run: |
-          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
-          if [ "$INPUT_BRANCH" != "main" ]; then
-            case "$key" in
-              *-rc|next-rc) ;; # allowed
-              *) echo "::error::Only RC releases are allowed from non-main branches (got '$key' on '$INPUT_BRANCH')"; exit 1 ;;
-            esac
-          fi
+          ref: ${{ env.BASE_BRANCH }}
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -73,133 +47,127 @@ jobs:
       - name: Install dependencies
         run: pip install click packaging
 
-      - name: Bump version
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
-          INPUT_PACKAGE: ${{ inputs.package }}
+      - name: Apply changesets
+        id: changesets
         run: |
-          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
-          pkg="$INPUT_PACKAGE"
+          # Only RC releases are allowed from non-main branches
+          args=()
+          if [ "$BASE_BRANCH" != "main" ]; then
+            args+=(--rc-only)
+          fi
+          python .github/changesets.py --notes "$RUNNER_TEMP/release-notes.md" "${args[@]}"
 
-          case "$key" in
-            patch|minor|major)
-              python .github/update_versions.py --package "$pkg" --bump-type "$key"
-              ;;
-            patch-rc|minor-rc|major-rc)
-              bump="${key%-rc}"
-              python .github/update_versions.py --package "$pkg" --bump-type "$bump"
-              python .github/update_versions.py --package "$pkg" --pre rc
-              ;;
-            next-rc)
-              python .github/update_versions.py --package "$pkg" --pre rc
-              ;;
-            promote)
-              python .github/update_versions.py --package "$pkg" --bump-type release
-              ;;
-          esac
-
-      - name: Read new version
-        id: version
-        env:
-          INPUT_PACKAGE: ${{ inputs.package }}
-        run: |
-          eval "$(python .github/update_versions.py --package "$INPUT_PACKAGE" --print-version)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "tag_prefix=$tag_prefix" >> "$GITHUB_OUTPUT"
-          echo "Package: $INPUT_PACKAGE, New version: $version, Tag: ${tag_prefix}-v${version}"
-
-      - name: Close existing release PRs for this package
+      - name: Create or update release PR
+        if: steps.changesets.outputs.title != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
+          TITLE: ${{ steps.changesets.outputs.title }}
         run: |
-          prefix="release/${TAG_PREFIX}-v"
-          gh pr list --state open --json number,headRefName \
-            --jq ".[] | select(.headRefName | startswith(\"$prefix\")) | .number" | while read -r pr; do
-            echo "Superseding release PR #$pr"
-            gh pr comment "$pr" --body "Superseded by a new release."
-            gh pr close "$pr" --delete-branch || true
-          done
-
-      - name: Create release PR
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.version.outputs.version }}
-          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
-          INPUT_BRANCH: ${{ inputs.branch }}
-          INPUT_PACKAGE: ${{ inputs.package }}
-        run: |
-          branch="release/${TAG_PREFIX}-v${VERSION}"
+          branch="release/changesets-${BASE_BRANCH//\//-}"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -b "$branch"
           git add -A
-          git commit -m "${TAG_PREFIX}-v${VERSION}"
+          git commit -m "Release: ${TITLE}"
           git push --force origin "$branch"
 
-          gh pr create \
-            --base "$INPUT_BRANCH" \
-            --head "$branch" \
-            --title "${INPUT_PACKAGE} v${VERSION}" \
-            --body "Merging this PR will publish **${INPUT_PACKAGE}** v${VERSION} to PyPI." \
+          {
+            echo "Merging this PR will publish the following packages to PyPI:"
+            echo
+            cat "$RUNNER_TEMP/release-notes.md"
+          } > "$RUNNER_TEMP/pr-body.md"
 
+          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "Release: ${TITLE}" --body-file "$RUNNER_TEMP/pr-body.md"
+          else
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head "$branch" \
+              --title "Release: ${TITLE}" \
+              --body-file "$RUNNER_TEMP/pr-body.md"
+          fi
 
   # ── Step 2: Publish on merge ──────────────────────────────────
   detect:
-    name: Detect package
+    name: Detect packages
     if: |
       github.event_name == 'pull_request'
       && github.event.pull_request.merged == true
       && startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     outputs:
-      package: ${{ steps.detect.outputs.package }}
-      tag: ${{ steps.detect.outputs.tag }}
+      rtc: ${{ steps.detect.outputs.rtc }}
+      api: ${{ steps.detect.outputs.api }}
+      protocol: ${{ steps.detect.outputs.protocol }}
+      tags: ${{ steps.detect.outputs.tags }}
     steps:
-      - name: Parse release branch
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install click packaging
+
+      - name: Detect bumped packages
         id: detect
         env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
-          # branch is like release/rtc-v1.2.0, release/api-v1.1.1, release/protocol-v1.1.5
-          ref="${HEAD_REF#release/}"
-          prefix="${ref%%-v*}"
+          # A package is released when the release PR changed its version.py
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" --jq '.[].filename')
 
-          case "$prefix" in
-            rtc) package="livekit" ;;
-            api) package="livekit-api" ;;
-            protocol) package="livekit-protocol" ;;
-            *) echo "::error::Unknown release prefix: $prefix"; exit 1 ;;
-          esac
+          tags=()
+          for entry in "rtc:livekit:livekit-rtc/livekit/rtc/version.py" \
+                       "api:livekit-api:livekit-api/livekit/api/version.py" \
+                       "protocol:livekit-protocol:livekit-protocol/livekit/protocol/version.py"; do
+            IFS=: read -r key package path <<< "$entry"
+            if grep -qxF "$path" <<< "$files"; then
+              eval "$(python .github/update_versions.py --package "$package" --print-version)"
+              tags+=("${tag_prefix}-v${version}")
+              echo "$key=true" >> "$GITHUB_OUTPUT"
+              echo "Releasing $package v$version"
+            else
+              echo "$key=false" >> "$GITHUB_OUTPUT"
+            fi
+          done
 
-          echo "package=$package" >> "$GITHUB_OUTPUT"
-          echo "tag=$ref" >> "$GITHUB_OUTPUT"
-          echo "Releasing $package (tag: $ref)"
+          echo "tags=${tags[*]}" >> "$GITHUB_OUTPUT"
 
   tag:
     name: Tag release
     needs: detect
+    if: needs.detect.outputs.tags != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
 
-      - name: Create git tag
+      - name: Create git tags
         env:
-          TAG: ${{ needs.detect.outputs.tag }}
+          TAGS: ${{ needs.detect.outputs.tags }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "$TAG"
-          git push origin "$TAG"
+          for tag in $TAGS; do
+            git tag "$tag"
+            git push origin "$tag"
+          done
 
   # ── RTC builds (multi-platform) ──────────────────────────────
   build-rtc:
     name: Build RTC wheels (${{ matrix.archs }})
     needs: detect
-    if: needs.detect.outputs.package == 'livekit'
+    if: needs.detect.outputs.rtc == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -239,7 +207,7 @@ jobs:
   build-rtc-sdist:
     name: Build RTC sdist
     needs: detect
-    if: needs.detect.outputs.package == 'livekit'
+    if: needs.detect.outputs.rtc == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -262,7 +230,7 @@ jobs:
   publish-rtc:
     name: Publish livekit (RTC)
     needs: [detect, build-rtc, build-rtc-sdist]
-    if: needs.detect.outputs.package == 'livekit'
+    if: needs.detect.outputs.rtc == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -285,7 +253,7 @@ jobs:
   build-api:
     name: Build API
     needs: detect
-    if: needs.detect.outputs.package == 'livekit-api'
+    if: needs.detect.outputs.api == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -312,7 +280,7 @@ jobs:
   publish-api:
     name: Publish livekit-api
     needs: [detect, build-api]
-    if: needs.detect.outputs.package == 'livekit-api'
+    if: needs.detect.outputs.api == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -334,7 +302,7 @@ jobs:
   build-protocol:
     name: Build Protocol
     needs: detect
-    if: needs.detect.outputs.package == 'livekit-protocol'
+    if: needs.detect.outputs.protocol == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -361,7 +329,7 @@ jobs:
   publish-protocol:
     name: Publish livekit-protocol
     needs: [detect, build-protocol]
-    if: needs.detect.outputs.package == 'livekit-protocol'
+    if: needs.detect.outputs.protocol == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -383,7 +351,7 @@ jobs:
   docs-rtc:
     name: Build RTC docs
     needs: [detect, publish-rtc]
-    if: needs.detect.outputs.package == 'livekit'
+    if: needs.detect.outputs.rtc == 'true'
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-rtc
@@ -393,7 +361,7 @@ jobs:
   docs-api:
     name: Build API docs
     needs: [detect, publish-api]
-    if: needs.detect.outputs.package == 'livekit-api'
+    if: needs.detect.outputs.api == 'true'
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-api
@@ -403,7 +371,7 @@ jobs:
   docs-protocol:
     name: Build Protocol docs
     needs: [detect, publish-protocol]
-    if: needs.detect.outputs.package == 'livekit-protocol'
+    if: needs.detect.outputs.protocol == 'true'
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-protocol
