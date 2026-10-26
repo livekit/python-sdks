@@ -177,7 +177,8 @@ def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: boo
         for package, kind in bumps.items():
             kinds.setdefault(package, set()).add(kind)
             if summary:
-                summaries.setdefault(package, []).append(summary)
+                # Each entry shows the bump type its changeset asked for.
+                summaries.setdefault(package, []).append(f"`{kind}` {summary}")
 
     resolved = {package: resolve(package, k) for package, k in kinds.items()}
     if rc_only:
