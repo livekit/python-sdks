@@ -1,8 +1,13 @@
 name: Package Release
 
 on:
-  # Step 1: A merged PR (or a manual run) consumes pending .changeset files and
-  # opens/updates the release PR with the version bumps.
+  # Step 1: A push to main (e.g. a merged PR, including from forks) or a manual
+  # run consumes pending .changeset files and opens/updates the release PR with
+  # the version bumps. This runs on `push` rather than `pull_request` so it gets
+  # a write-capable token for fork contributions too.
+  push:
+    branches: [main]
+
   workflow_dispatch:
     inputs:
       branch:
@@ -24,16 +29,13 @@ jobs:
   # ── Step 1: Create / update the release PR from changesets ────
   bump:
     name: Create release PR
-    if: |
-      github.event_name == 'workflow_dispatch'
-      || (github.event.pull_request.merged == true
-          && !startsWith(github.event.pull_request.head.ref, 'release/'))
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     concurrency:
-      group: package-release-${{ inputs.branch || github.event.pull_request.base.ref }}
+      group: package-release-${{ inputs.branch || github.ref_name }}
       cancel-in-progress: true
     env:
-      BASE_BRANCH: ${{ inputs.branch || github.event.pull_request.base.ref }}
+      BASE_BRANCH: ${{ inputs.branch || github.ref_name }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
