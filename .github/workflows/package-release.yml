@@ -78,7 +78,7 @@ jobs:
             cat "$RUNNER_TEMP/release-notes.md"
           } > "$RUNNER_TEMP/pr-body.md"
 
-          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number')
+          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
             gh pr edit "$existing" --title "Release: ${TITLE}" --body-file "$RUNNER_TEMP/pr-body.md"
           else
