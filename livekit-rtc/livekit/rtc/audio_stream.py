@@ -248,7 +248,8 @@ class AudioStream:
         )
 
     def __del__(self) -> None:
-        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+        if hasattr(self, "_ffi_queue"):
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     def _create_owned_stream(self) -> Any:
         assert self._track is not None
