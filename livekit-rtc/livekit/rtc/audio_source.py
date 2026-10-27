@@ -14,8 +14,9 @@
 
 from __future__ import annotations
 
-import time
 import asyncio
+import threading
+import time
 
 from ._ffi_client import FfiHandle, FfiClient
 from ._proto import audio_frame_pb2 as proto_audio_frame
@@ -53,7 +54,12 @@ class AudioSource:
         """
         self._sample_rate = sample_rate
         self._num_channels = num_channels
-        self._loop = loop or asyncio.get_event_loop()
+        self._loop: asyncio.AbstractEventLoop | None = loop
+        if self._loop is None:
+            try:
+                self._loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self._loop = None
 
         req = proto_ffi.FfiRequest()
         req.new_audio_source.type = proto_audio_frame.AudioSourceType.AUDIO_SOURCE_NATIVE
@@ -67,6 +73,8 @@ class AudioSource:
 
         self._last_capture = 0.0
         self._q_size = 0.0
+        self._capture_gen = 0
+        self._lock = threading.Lock()
         self._join_handle: asyncio.TimerHandle | None = None
         self._join_fut: asyncio.Future[None] | None = None
 
@@ -83,7 +91,8 @@ class AudioSource:
     @property
     def queued_duration(self) -> float:
         """The current duration (in seconds) of audio data queued for playback."""
-        return max(self._q_size - time.monotonic() + self._last_capture, 0.0)
+        with self._lock:
+            return max(self._q_size - time.monotonic() + self._last_capture, 0.0)
 
     def clear_queue(self) -> None:
         """
@@ -97,7 +106,16 @@ class AudioSource:
         req = proto_ffi.FfiRequest()
         req.clear_audio_buffer.source_handle = self._ffi_handle.handle
         _ = FfiClient.instance.request(req)
-        self._release_waiter()
+        with self._lock:
+            self._last_capture = 0.0
+            self._q_size = 0.0
+            target_gen = self._capture_gen
+        self._release_waiter_threadsafe(gen=target_gen)
+
+    def _get_loop(self) -> asyncio.AbstractEventLoop:
+        if self._loop is None or self._loop.is_closed():
+            self._loop = asyncio.get_running_loop()
+        return self._loop
 
     async def capture_frame(self, frame: AudioFrame) -> None:
         """
@@ -116,27 +134,38 @@ class AudioSource:
             Exception: If there is an error during frame capture.
         """
 
-        if frame.samples_per_channel == 0 or self._ffi_handle.disposed:
+        if frame.samples_per_channel == 0 or getattr(self._ffi_handle, "disposed", False):
             return
 
-        now = time.monotonic()
-        elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
-        self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
-        self._last_capture = now
+        loop = self._get_loop()
 
-        if self._join_handle:
-            self._join_handle.cancel()
+        with self._lock:
+            self._capture_gen += 1
+            current_gen = self._capture_gen
 
-        if self._join_fut is None:
-            self._join_fut = self._loop.create_future()
+            now = time.monotonic()
+            elapsed = 0.0 if self._last_capture == 0.0 else now - self._last_capture
+            self._q_size += frame.samples_per_channel / self.sample_rate - elapsed
+            self._last_capture = now
+            q_size = self._q_size
 
-        self._join_handle = self._loop.call_later(self._q_size, self._release_waiter)
+            if self._join_handle:
+                self._join_handle.cancel()
+
+            if (
+                self._join_fut is None
+                or self._join_fut.get_loop() is not loop
+                or self._join_fut.get_loop().is_closed()
+            ):
+                self._join_fut = loop.create_future()
+
+            self._join_handle = loop.call_later(q_size, self._release_waiter, current_gen)
 
         req = proto_ffi.FfiRequest()
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
 
-        queue = FfiClient.instance.queue.subscribe(loop=self._loop)
+        queue = FfiClient.instance.queue.subscribe(loop=loop)
         try:
             resp = FfiClient.instance.request(req)
             cb: proto_ffi.FfiEvent = await queue.wait_for(
@@ -162,20 +191,49 @@ class AudioSource:
 
         await asyncio.shield(self._join_fut)
 
-    def _release_waiter(self) -> None:
-        if self._join_fut is None:
-            return  # could be None when clear_queue is called
+    def _release_waiter(self, gen: int | None = None) -> None:
+        with self._lock:
+            if gen is not None and gen != self._capture_gen:
+                return
 
-        if not self._join_fut.done():
-            self._join_fut.set_result(None)
+            if self._join_handle is not None:
+                self._join_handle.cancel()
+                self._join_handle = None
 
-        self._last_capture = 0.0
-        self._q_size = 0.0
-        self._join_fut = None
+            if self._join_fut is None:
+                return  # could be None when clear_queue is called
 
-    async def aclose(self) -> None:
-        """Close the audio source
+            if not self._join_fut.done():
+                self._join_fut.set_result(None)
+
+            self._last_capture = 0.0
+            self._q_size = 0.0
+            self._join_fut = None
+
+    def _release_waiter_threadsafe(self, gen: int | None = None) -> None:
+        try:
+            running_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            running_loop = None
+
+        if self._loop is not None and self._loop.is_running() and running_loop is not self._loop:
+            self._loop.call_soon_threadsafe(self._release_waiter, gen)
+        else:
+            self._release_waiter(gen)
+
+    def close(self) -> None:
+        """Close the audio source.
 
         This method cleans up resources associated with the audio source.
         """
+        self._release_waiter_threadsafe()
         self._ffi_handle.dispose()
+
+    async def aclose(self) -> None:
+        """Close the audio source without blocking the event loop.
+
+        This method cleans up resources associated with the audio source.
+        """
+        self._release_waiter()
+        if not getattr(self._ffi_handle, "disposed", False):
+            await asyncio.to_thread(self._ffi_handle.dispose)
