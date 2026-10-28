@@ -38,7 +38,10 @@ anything else, is rejected. Only rc types are allowed on branches other than
    the check.
 2. On each push to `main`, **Package Release** applies all pending changesets
    and opens (or updates) the `Release: ...` PR with the version bumps and
-   release notes, then deletes the changesets it used.
+   release notes, then deletes the changesets it used. Changesets used by an
+   rc release are kept instead (and recorded in `.changeset/pre.json`) until
+   that package's next stable release, normally `promote`, whose release notes
+   then list every change since the last stable version.
 3. Merging that release PR tags each bumped package, publishes it to PyPI and
    creates its GitHub Release.
 

@@ -13,10 +13,16 @@ Supported bump types: patch, minor, major, patch-rc, minor-rc, major-rc,
 next-rc, promote. When several changesets touch the same package, the
 largest bump wins (an explicit X-rc wins over next-rc). Mixing stable and
 rc bumps, or combining promote with anything else, is an error.
+
+Changesets used by an rc release are kept and recorded in .changeset/pre.json
+(package -> file names) instead of being deleted, so later runs skip them. The
+package's next stable release (normally promote) lists them in its release
+notes and deletes them.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import pathlib
 import re
@@ -27,6 +33,8 @@ from packaging.version import Version
 from update_versions import PACKAGES, do_bump, do_prerelease, read_version
 
 CHANGESET_DIR = pathlib.Path(".changeset")
+# Changesets already released in an rc, kept until the package's stable release
+PRE_STATE = CHANGESET_DIR / "pre.json"
 
 # Names accepted in changeset frontmatter -> key in PACKAGES
 PACKAGE_ALIASES = {
@@ -140,6 +148,20 @@ def changeset_origin(path: pathlib.Path, repo: str | None) -> str:
     return f" ({sha[:7]})"
 
 
+def kept_entries(names: list[str], package: str, repo: str | None) -> list[str]:
+    """Release-note entries for this package from changesets kept since its rc releases."""
+    entries = []
+    for name in names:
+        path = CHANGESET_DIR / name
+        if not path.exists():
+            click.echo(f"warning: kept changeset {path} is missing", err=True)
+            continue
+        bumps, summary = parse_changeset(path)
+        if summary and package in bumps:
+            entries.append(f"`{bumps[package]}` {summary}{changeset_origin(path, repo)}")
+    return entries
+
+
 @click.command()
 @click.option(
     "--rc-only",
@@ -166,12 +188,20 @@ def changeset_origin(path: pathlib.Path, repo: str | None) -> str:
     help="Only validate the pending changesets; don't change any file.",
 )
 def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: bool) -> None:
-    files = sorted(p for p in CHANGESET_DIR.glob("*.md") if p.name.lower() != "readme.md")
+    pre: dict[str, list[str]] = json.loads(PRE_STATE.read_text()) if PRE_STATE.exists() else {}
+    kept = {name for names in pre.values() for name in names}
+    files = sorted(
+        p
+        for p in CHANGESET_DIR.glob("*.md")
+        if p.name.lower() != "readme.md" and p.name not in kept
+    )
 
     kinds: dict[str, set[str]] = {}
     summaries: dict[str, list[str]] = {}
+    packages_of: dict[str, set[str]] = {}
     for path in files:
         bumps, summary = parse_changeset(path)
+        packages_of[path.name] = set(bumps)
         if summary and not check:
             summary += changeset_origin(path, repo)
         for package, kind in bumps.items():
@@ -192,7 +222,7 @@ def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: boo
         validate(package, kind)
 
     if check:
-        click.echo(f"{len(files)} changeset(s) valid.")
+        click.echo(f"{len(files)} changeset(s) valid ({len(kept)} kept from rc releases).")
         for package in PACKAGES:
             if package in resolved:
                 cur = read_version(pathlib.Path(PACKAGES[package]))
@@ -204,17 +234,35 @@ def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: boo
     for package in PACKAGES:  # stable order
         if package not in resolved:
             continue
-        apply(package, resolved[package])
+        kind = resolved[package]
+        apply(package, kind)
         version = read_version(pathlib.Path(PACKAGES[package]))
         released.append(f"{package} v{version}")
-        lines.append(f"## {package} v{version} ({resolved[package]})\n")
-        for summary in summaries.get(package, []):
+        lines.append(f"## {package} v{version} ({kind})\n")
+        entries = summaries.get(package, [])
+        if kind in RC or kind == "next-rc":
+            # Keep this rc's changesets for the stable release notes.
+            pre.setdefault(package, []).extend(
+                p.name for p in files if package in packages_of[p.name]
+            )
+        else:
+            # A stable release (normally promote) also lists the changesets
+            # kept since this package's rc releases.
+            entries = kept_entries(pre.pop(package, []), package, repo) + entries
+        for summary in entries:
             lines.append("- " + summary.replace("\n", "\n  "))
         lines.append("")
 
-    # Changesets are consumed once applied (including ones listing no package).
-    for path in files:
-        path.unlink()
+    # Changesets are consumed once applied (including ones listing no package),
+    # except those still kept for a package's stable release.
+    still_kept = {name for names in pre.values() for name in names}
+    for name in {p.name for p in files} | kept:
+        if name not in still_kept:
+            (CHANGESET_DIR / name).unlink(missing_ok=True)
+    if pre:
+        PRE_STATE.write_text(json.dumps(pre, indent=2, sort_keys=True) + "\n")
+    else:
+        PRE_STATE.unlink(missing_ok=True)
 
     if notes is not None:
         notes.write_text("\n".join(lines))
