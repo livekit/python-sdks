@@ -46,3 +46,11 @@ anything else, is rejected. Only rc types are allowed on branches other than
    creates its GitHub Release.
 
 Changes that don't need a release (docs, CI, tests) don't need a changeset.
+
+## Manual version bump
+
+As a fallback, run the **Manual Version Bump** workflow with a package and
+bump type. It opens a `release/<prefix>-v<version>` PR without reading any
+changeset; merging it publishes the same way as a changeset release PR.
+It doesn't touch `.changeset/`, so changesets kept from rc releases stay until
+that package's next changeset stable release.
