@@ -48,11 +48,16 @@ class VideoStream:
         **kwargs: Any,
     ) -> None:
         self._loop = loop or asyncio.get_event_loop()
-        # Only subscribe to video_stream_event to avoid unnecessary memory allocations
-        # from other event types (room_event, track_event, etc.)
+        # Subscribe before creating the stream so none of its events are missed. Its
+        # handle is only known once the request returns; until then every video stream
+        # event is let through, and _run drops the ones of other streams.
+        handle_id: int | None = None
         self._ffi_queue = FfiClient.instance.queue.subscribe(
             self._loop,
-            filter_fn=lambda e: e.WhichOneof("message") == "video_stream_event",
+            filter_fn=lambda e: (
+                e.WhichOneof("message") == "video_stream_event"
+                and (handle_id is None or e.video_stream_event.stream_handle == handle_id)
+            ),
         )
         self._queue: RingQueue[VideoFrameEvent | None] = RingQueue(capacity)
         self._track: Track | None = track
@@ -68,6 +73,7 @@ class VideoStream:
             stream = self._create_owned_stream()
 
         self._ffi_handle = FfiHandle(stream.handle.id)
+        handle_id = stream.handle.id
         self._info = stream.info
 
         self._task = self._loop.create_task(self._run())
