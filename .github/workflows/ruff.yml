@@ -4,22 +4,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
-          python-version: "3.9"
+          python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
+          version: "0.13.4"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
       - name: Install the project
-        run: uv sync --all-extras --dev
+        run: uv sync --locked --all-extras --dev
 
+      # Use the ruff version pinned in uv.lock rather than uvx's latest release,
+      # so lint results only change when the lockfile is intentionally updated.
       - name: Ruff livekit-api
-        run: uvx ruff check --output-format=github .
+        run: uv run ruff check --output-format=github .
 
       - name: Check format
-        run: uvx ruff format --check .
+        run: uv run ruff format --check .

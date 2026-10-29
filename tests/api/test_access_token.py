@@ -1,7 +1,19 @@
+import calendar
 import datetime
 
-import pytest  # type: ignore
-from livekit.api import AccessToken, TokenVerifier, VideoGrants, SIPGrants
+import jwt
+import pytest
+from livekit.api import (
+    AccessToken,
+    AgentEndpointGrants,
+    AgentGrants,
+    AgentThreadGrants,
+    InferenceGrants,
+    ObservabilityGrants,
+    SIPGrants,
+    TokenVerifier,
+    VideoGrants,
+)
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
@@ -9,7 +21,7 @@ TEST_API_KEY = "myapikey"
 TEST_API_SECRET = "thiskeyistotallyunsafe"
 
 
-def test_verify_token():
+def test_verify_token() -> None:
     grants = VideoGrants(room_join=True, room="test_room")
     sip = SIPGrants(admin=True)
 
@@ -30,11 +42,70 @@ def test_verify_token():
     assert claims.metadata == "test_metadata"
     assert claims.video == grants
     assert claims.sip == sip
+    assert claims.attributes is not None
     assert claims.attributes["key1"] == "value1"
     assert claims.attributes["key2"] == "value2"
 
 
-def test_agent_config():
+def test_verify_token_preserves_can_subscribe_metrics() -> None:
+    # minted the way other server SDKs do, with the canSubscribeMetrics video grant
+    now = calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple())
+    token = jwt.encode(
+        {
+            "iss": TEST_API_KEY,
+            "sub": "test_identity",
+            "nbf": now,
+            "exp": now + 3600,
+            "video": {"roomJoin": True, "room": "test_room", "canSubscribeMetrics": True},
+        },
+        TEST_API_SECRET,
+        algorithm="HS256",
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.video is not None
+    assert claims.video.can_subscribe_metrics is True
+
+
+def test_mint_token_with_can_subscribe_metrics() -> None:
+    grants = VideoGrants(room_join=True, room="test_room", can_subscribe_metrics=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_grants(grants)
+        .to_jwt()
+    )
+
+    payload = jwt.decode(token, options={"verify_signature": False})
+    assert payload["video"]["canSubscribeMetrics"] is True
+    assert TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token).video == grants
+
+
+def test_agent_grants() -> None:
+    agent = AgentGrants(database_admin=True)
+    endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
+    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True)
+
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_agent_grants(agent)
+        .with_agent_endpoint_grants(endpoint)
+        .with_agent_thread_grants(thread)
+        .to_jwt()
+    )
+
+    decoded = jwt.decode(token, options={"verify_signature": False})
+    assert decoded["agentThread"]["threadIds"] == ["t1"]
+    assert decoded["agentEndpoint"]["agentName"] == "my-agent"
+    assert decoded["agent"]["databaseAdmin"] is True
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.agent == agent
+    assert claims.agent_endpoint == endpoint
+    assert claims.agent_thread == thread
+
+
+def test_agent_config() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")
@@ -50,6 +121,7 @@ def test_agent_config():
     token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
     claims = token_verifier.verify(token)
     # Verify the decoded claims match
+    assert claims.room_config is not None
     assert claims.room_config.agents[0].agent_name == "test-agent"
 
     # Split token into header.payload.signature
@@ -74,7 +146,7 @@ def test_agent_config():
     assert payload_json["roomConfig"]["agents"][0]["agentName"] == "test-agent"
 
 
-def test_verify_token_invalid():
+def test_verify_token_invalid() -> None:
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
     token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
@@ -86,7 +158,16 @@ def test_verify_token_invalid():
         token_verifier.verify(token)
 
 
-def test_verify_token_expired():
+def test_verify_token_padded_signature() -> None:
+    # PyJWT 2.15.0 rejected valid tokens with trailing Base64URL padding.
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+    header, payload, signature = token.split(".")
+    signature += "=" * (-len(signature) % 4)
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(f"{header}.{payload}.{signature}")
+    assert claims.identity == "test_identity"
+
+
+def test_verify_token_expired() -> None:
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_identity("test_identity")
@@ -99,3 +180,62 @@ def test_verify_token_expired():
     )
     with pytest.raises(Exception):
         token_verifier.verify(token)
+
+
+def test_verify_token_missing_exp() -> None:
+    now = calendar.timegm(datetime.datetime.now(datetime.timezone.utc).utctimetuple())
+    token = jwt.encode(
+        {"sub": "test_identity", "iss": TEST_API_KEY, "nbf": now},
+        TEST_API_SECRET,
+        algorithm="HS256",
+    )
+
+    token_verifier = TokenVerifier(TEST_API_KEY, TEST_API_SECRET)
+    with pytest.raises(Exception):
+        token_verifier.verify(token)
+
+
+def test_verify_token_preserves_kind_and_observability() -> None:
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_kind("agent")
+        .with_observability_grants(ObservabilityGrants(write=True))
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.kind == "agent"
+    assert claims.observability is not None
+    assert claims.observability.write is True
+
+
+def test_verify_token_omitted_grants_are_none() -> None:
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.inference is None
+    assert claims.observability is None
+    assert claims.agent is None
+    assert claims.agent_endpoint is None
+    assert claims.agent_thread is None
+
+
+def test_verify_token_with_only_inference_grants() -> None:
+    inference = InferenceGrants(perform=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_inference_grants(inference)
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.inference == inference
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.observability is None

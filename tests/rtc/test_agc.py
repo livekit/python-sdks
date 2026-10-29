@@ -7,7 +7,7 @@ from livekit.rtc import AudioProcessingModule, AudioFrame
 FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
 
 
-def test_agc_modifies_audio():
+def test_agc_modifies_audio() -> None:
     num_channels = 1
 
     input_wav = os.path.join(FIXTURES_DIR, "test_audio.wav")

@@ -31,14 +31,30 @@ from livekit.protocol.sip import (
     DeleteSIPDispatchRuleRequest,
     CreateSIPParticipantRequest,
     TransferSIPParticipantRequest,
+    TransferSIPParticipantResponse,
     SIPParticipantInfo,
     SIPTransport,
+    SIPMediaConfig,
 )
 from ._service import Service
+from .twirp_client import SipCallError, ServerError
+from ._dial_timeout import (
+    dial_timeout as _dial_timeout,
+    pin_ringing_timeout as _pin_ringing_timeout,
+)
 from .access_token import VideoGrants, SIPGrants
 
 SVC = "SIP"
 """@private"""
+
+
+def _as_sip_error(err: ServerError) -> ServerError:
+    """Surface a SIP dialing or transfer failure as a SipCallError so callers can
+    branch on the SIP status or the transfer reason; other failures (auth,
+    validation) are returned unchanged."""
+    if "sip_status_code" in err.metadata or "sip_transfer_reason" in err.metadata:
+        return SipCallError.from_server_error(err)
+    return err
 
 
 class SipService(Service):
@@ -53,8 +69,15 @@ class SipService(Service):
     ```
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: bool = True,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def create_inbound_trunk(
         self, create: CreateSIPInboundTrunkRequest
@@ -156,6 +179,7 @@ class SipService(Service):
         auth_password: Optional[str] = None,
         name: Optional[str] = None,
         metadata: Optional[str] = None,
+        media: Optional[SIPMediaConfig] = None,
     ) -> SIPInboundTrunkInfo:
         """Updates specific fields of an existing SIP inbound trunk.
 
@@ -166,6 +190,7 @@ class SipService(Service):
             auth_password=auth_password,
             name=name,
             metadata=metadata,
+            media=media,
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
@@ -335,6 +360,7 @@ class SipService(Service):
         auth_password: str | None = None,
         name: str | None = None,
         metadata: str | None = None,
+        media: Optional[SIPMediaConfig] = None,
     ) -> SIPOutboundTrunkInfo:
         """Updates specific fields of an existing SIP outbound trunk.
 
@@ -347,6 +373,7 @@ class SipService(Service):
             auth_password=auth_password,
             name=name,
             metadata=metadata,
+            media=media,
         )
         if numbers is not None:
             if isinstance(numbers, ListUpdate):
@@ -774,17 +801,15 @@ class SipService(Service):
             SIPError: If the SIP operation fails
         """
         client_timeout: Optional[aiohttp.ClientTimeout] = None
-        if timeout:
-            # obay user specified timeout
+        if create.wait_until_answered:
+            # Dialing a phone and waiting for an answer takes longer than a
+            # normal call, and the request must outlast ringing. Pin the ring
+            # window so the timeout doesn't depend on the server's default.
+            _pin_ringing_timeout(create)
+            client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, create))
+        elif timeout:
+            # obey user specified timeout
             client_timeout = aiohttp.ClientTimeout(total=timeout)
-        elif create.wait_until_answered:
-            # ensure default timeout isn't too short when using sync mode
-            if (
-                self._client._session.timeout
-                and self._client._session.timeout.total
-                and self._client._session.timeout.total < 20
-            ):
-                client_timeout = aiohttp.ClientTimeout(total=20)
 
         if trunk_id:
             create.sip_trunk_id = trunk_id
@@ -792,39 +817,60 @@ class SipService(Service):
         if outbound_trunk_config:
             create.trunk = outbound_trunk_config
 
-        return await self._client.request(
-            SVC,
-            "CreateSIPParticipant",
-            create,
-            self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
-            SIPParticipantInfo,
-            timeout=client_timeout,
-        )
+        try:
+            return await self._client.request(
+                SVC,
+                "CreateSIPParticipant",
+                create,
+                self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
+                SIPParticipantInfo,
+                timeout=client_timeout,
+            )
+        except ServerError as e:
+            raise _as_sip_error(e) from None
 
     async def transfer_sip_participant(
-        self, transfer: TransferSIPParticipantRequest
-    ) -> SIPParticipantInfo:
-        """Transfer a SIP participant to a different room.
+        self,
+        transfer: TransferSIPParticipantRequest,
+        *,
+        timeout: Optional[float] = None,
+    ) -> TransferSIPParticipantResponse:
+        """Transfer a SIP participant to another number or SIP endpoint.
 
         Args:
             transfer: Request containing transfer details
+            timeout: Optional request timeout in seconds. Transferring dials a
+                phone, which takes longer than normal, so it defaults to a
+                longer timeout when unset.
 
         Returns:
-            Updated SIP participant information
+            The outcome of the transfer: its id, status, reason, and the SIP
+            status when the outcome came from a SIP response. A status other
+            than successful means the transfer did not complete, even when no
+            error was raised.
         """
-        return await self._client.request(
-            SVC,
-            "TransferSIPParticipant",
-            transfer,
-            self._auth_header(
-                VideoGrants(
-                    room_admin=True,
-                    room=transfer.room_name,
+        # Transferring a call dials a phone, which takes longer than a normal
+        # call, so keep the request alive past ringing. Pin the ring window so the
+        # timeout doesn't depend on the server's default.
+        _pin_ringing_timeout(transfer)
+        client_timeout = aiohttp.ClientTimeout(total=_dial_timeout(timeout, transfer))
+        try:
+            return await self._client.request(
+                SVC,
+                "TransferSIPParticipant",
+                transfer,
+                self._auth_header(
+                    VideoGrants(
+                        room_admin=True,
+                        room=transfer.room_name,
+                    ),
+                    sip=SIPGrants(call=True),
                 ),
-                sip=SIPGrants(call=True),
-            ),
-            SIPParticipantInfo,
-        )
+                TransferSIPParticipantResponse,
+                timeout=client_timeout,
+            )
+        except ServerError as e:
+            raise _as_sip_error(e) from None
 
     def _admin_headers(self) -> dict[str, str]:
         return self._auth_header(VideoGrants(), sip=SIPGrants(admin=True))

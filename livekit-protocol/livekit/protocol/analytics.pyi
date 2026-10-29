@@ -1,9 +1,9 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from . import models as _models
 from . import egress as _egress
 from . import ingress as _ingress
-from . import sip as _sip
+from . import models as _models
 from . import room as _room
+from . import sip as _sip
 from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -226,7 +226,7 @@ class AnalyticsClientMeta(_message.Message):
     def __init__(self, region: _Optional[str] = ..., node: _Optional[str] = ..., client_addr: _Optional[str] = ..., client_connect_time: _Optional[int] = ..., connection_type: _Optional[str] = ..., reconnect_reason: _Optional[_Union[_models.ReconnectReason, str]] = ..., geo_hash: _Optional[str] = ..., country: _Optional[str] = ..., isp_asn: _Optional[int] = ...) -> None: ...
 
 class AnalyticsEvent(_message.Message):
-    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id", "sip_call_id", "sip_call", "sip_trunk_id", "sip_inbound_trunk", "sip_outbound_trunk", "sip_dispatch_rule_id", "sip_dispatch_rule", "sip_transfer", "report", "api_call", "webhook")
+    __slots__ = ("id", "type", "timestamp", "room_id", "room", "participant_id", "participant", "track_id", "track", "analytics_key", "client_info", "client_meta", "egress_id", "ingress_id", "max_subscribed_video_quality", "publisher", "mime", "egress", "ingress", "error", "rtp_stats", "video_layer", "node_id", "sip_call_id", "sip_call", "sip_trunk_id", "sip_inbound_trunk", "sip_outbound_trunk", "sip_dispatch_rule_id", "sip_dispatch_rule", "sip_transfer", "report", "api_call", "webhook", "room_end_reason")
     ID_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
@@ -261,6 +261,7 @@ class AnalyticsEvent(_message.Message):
     REPORT_FIELD_NUMBER: _ClassVar[int]
     API_CALL_FIELD_NUMBER: _ClassVar[int]
     WEBHOOK_FIELD_NUMBER: _ClassVar[int]
+    ROOM_END_REASON_FIELD_NUMBER: _ClassVar[int]
     id: str
     type: AnalyticsEventType
     timestamp: _timestamp_pb2.Timestamp
@@ -295,7 +296,8 @@ class AnalyticsEvent(_message.Message):
     report: ReportInfo
     api_call: APICallInfo
     webhook: WebhookInfo
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., sip_transfer: _Optional[_Union[_sip.SIPTransferInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ...) -> None: ...
+    room_end_reason: _models.RoomEndReason
+    def __init__(self, id: _Optional[str] = ..., type: _Optional[_Union[AnalyticsEventType, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., room_id: _Optional[str] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant_id: _Optional[str] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., track_id: _Optional[str] = ..., track: _Optional[_Union[_models.TrackInfo, _Mapping]] = ..., analytics_key: _Optional[str] = ..., client_info: _Optional[_Union[_models.ClientInfo, _Mapping]] = ..., client_meta: _Optional[_Union[AnalyticsClientMeta, _Mapping]] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., max_subscribed_video_quality: _Optional[_Union[_models.VideoQuality, str]] = ..., publisher: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., mime: _Optional[str] = ..., egress: _Optional[_Union[_egress.EgressInfo, _Mapping]] = ..., ingress: _Optional[_Union[_ingress.IngressInfo, _Mapping]] = ..., error: _Optional[str] = ..., rtp_stats: _Optional[_Union[_models.RTPStats, _Mapping]] = ..., video_layer: _Optional[int] = ..., node_id: _Optional[str] = ..., sip_call_id: _Optional[str] = ..., sip_call: _Optional[_Union[_sip.SIPCallInfo, _Mapping]] = ..., sip_trunk_id: _Optional[str] = ..., sip_inbound_trunk: _Optional[_Union[_sip.SIPInboundTrunkInfo, _Mapping]] = ..., sip_outbound_trunk: _Optional[_Union[_sip.SIPOutboundTrunkInfo, _Mapping]] = ..., sip_dispatch_rule_id: _Optional[str] = ..., sip_dispatch_rule: _Optional[_Union[_sip.SIPDispatchRuleInfo, _Mapping]] = ..., sip_transfer: _Optional[_Union[_sip.SIPTransferInfo, _Mapping]] = ..., report: _Optional[_Union[ReportInfo, _Mapping]] = ..., api_call: _Optional[_Union[APICallInfo, _Mapping]] = ..., webhook: _Optional[_Union[WebhookInfo, _Mapping]] = ..., room_end_reason: _Optional[_Union[_models.RoomEndReason, str]] = ...) -> None: ...
 
 class AnalyticsEvents(_message.Message):
     __slots__ = ("events",)
@@ -364,9 +366,11 @@ class FeatureUsageInfo(_message.Message):
         KRISP_NOISE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
         KRISP_BACKGROUND_VOICE_CANCELLATION: _ClassVar[FeatureUsageInfo.Feature]
         AIC_AUDIO_ENHANCEMENT: _ClassVar[FeatureUsageInfo.Feature]
+        KRISP_VIVA: _ClassVar[FeatureUsageInfo.Feature]
     KRISP_NOISE_CANCELLATION: FeatureUsageInfo.Feature
     KRISP_BACKGROUND_VOICE_CANCELLATION: FeatureUsageInfo.Feature
     AIC_AUDIO_ENHANCEMENT: FeatureUsageInfo.Feature
+    KRISP_VIVA: FeatureUsageInfo.Feature
     class FeatureInfoEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -453,7 +457,7 @@ class APICallInfo(_message.Message):
     def __init__(self, project_id: _Optional[str] = ..., request: _Optional[_Union[APICallRequest, _Mapping]] = ..., service: _Optional[str] = ..., method: _Optional[str] = ..., node_id: _Optional[str] = ..., status: _Optional[int] = ..., twirp_error_code: _Optional[str] = ..., twirp_error_message: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration_ns: _Optional[int] = ...) -> None: ...
 
 class WebhookInfo(_message.Message):
-    __slots__ = ("event_id", "event", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "egress_id", "ingress_id", "created_at", "queued_at", "queue_duration_ns", "sent_at", "send_duration_ns", "url", "num_dropped", "is_dropped", "service_status", "service_error_code", "service_error", "send_error")
+    __slots__ = ("event_id", "event", "project_id", "room_name", "room_id", "participant_identity", "participant_id", "track_id", "egress_id", "ingress_id", "created_at", "queued_at", "queue_duration_ns", "sent_at", "send_duration_ns", "url", "num_dropped", "is_dropped", "service_status", "service_error_code", "service_error", "send_error", "http_status_code")
     EVENT_ID_FIELD_NUMBER: _ClassVar[int]
     EVENT_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
@@ -476,6 +480,7 @@ class WebhookInfo(_message.Message):
     SERVICE_ERROR_CODE_FIELD_NUMBER: _ClassVar[int]
     SERVICE_ERROR_FIELD_NUMBER: _ClassVar[int]
     SEND_ERROR_FIELD_NUMBER: _ClassVar[int]
+    HTTP_STATUS_CODE_FIELD_NUMBER: _ClassVar[int]
     event_id: str
     event: str
     project_id: str
@@ -498,4 +503,5 @@ class WebhookInfo(_message.Message):
     service_error_code: int
     service_error: str
     send_error: str
-    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: bool = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ...) -> None: ...
+    http_status_code: int
+    def __init__(self, event_id: _Optional[str] = ..., event: _Optional[str] = ..., project_id: _Optional[str] = ..., room_name: _Optional[str] = ..., room_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_id: _Optional[str] = ..., track_id: _Optional[str] = ..., egress_id: _Optional[str] = ..., ingress_id: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queued_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., queue_duration_ns: _Optional[int] = ..., sent_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., send_duration_ns: _Optional[int] = ..., url: _Optional[str] = ..., num_dropped: _Optional[int] = ..., is_dropped: bool = ..., service_status: _Optional[str] = ..., service_error_code: _Optional[int] = ..., service_error: _Optional[str] = ..., send_error: _Optional[str] = ..., http_status_code: _Optional[int] = ...) -> None: ...

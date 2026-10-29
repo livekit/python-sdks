@@ -1,8 +1,17 @@
-import inspect
 import asyncio
-from typing import Callable, Dict, Set, Optional, Generic, TypeVar
+import inspect
+from typing import Any, Callable, Dict, Optional, Generic, TypeVar
 
 from .log import logger
+
+# `asyncio.iscoroutinefunction` also treats a callable tagged with this private
+# sentinel as a coroutine function (cpython/Lib/asyncio/coroutines.py:30-32);
+# `inspect.iscoroutinefunction` never has.
+# `@asyncio.coroutine` (removed in 3.11) applied the tag, but the sentinel itself
+# still exists on every version this package supports, so the check is kept on all
+# of them. Read defensively: it is private and may disappear with the deprecated
+# function in 3.16, and a bare attribute access would then fail at import time.
+_ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 
 T_contra = TypeVar("T_contra", contravariant=True)
 
@@ -12,9 +21,12 @@ class EventEmitter(Generic[T_contra]):
         """
         Initialize a new instance of EventEmitter.
         """
-        self._events: Dict[T_contra, Set[Callable]] = dict()
+        # A dict keyed by callback is an insertion-ordered set: handlers run in the
+        # order they were registered, so one that mutates the event still runs before
+        # a peer that reads it.
+        self._events: Dict[T_contra, Dict[Callable, None]] = dict()
 
-    def emit(self, event: T_contra, *args) -> None:
+    def emit(self, event: T_contra, *args: Any) -> None:
         """
         Trigger all callbacks associated with the given event.
 
@@ -36,7 +48,7 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            callables = self._events[event].copy()
+            callables = list(self._events[event])
             for callback in callables:
                 try:
                     sig = inspect.signature(callback)
@@ -104,7 +116,7 @@ class EventEmitter(Generic[T_contra]):
         """
         if callback is not None:
 
-            def once_callback(*args, **kwargs):
+            def once_callback(*args: Any, **kwargs: Any) -> None:
                 self.off(event, once_callback)
                 callback(*args, **kwargs)
 
@@ -157,14 +169,17 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-            if asyncio.iscoroutinefunction(callback):
+            if inspect.iscoroutinefunction(callback) or (
+                _ASYNCIO_COROUTINE_MARKER is not None
+                and getattr(callback, "_is_coroutine", None) is _ASYNCIO_COROUTINE_MARKER
+            ):
                 raise ValueError(
                     "Cannot register an async callback with `.on()`. Use `asyncio.create_task` within your synchronous callback instead."
                 )
 
             if event not in self._events:
-                self._events[event] = set()
-            self._events[event].add(callback)
+                self._events[event] = {}
+            self._events[event][callback] = None
             return callback
         else:
 
@@ -197,4 +212,4 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].discard(callback)
+            self._events[event].pop(callback, None)

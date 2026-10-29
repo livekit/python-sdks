@@ -22,6 +22,41 @@ This repo contains two packages
 - [livekit](https://pypi.org/project/livekit/): Real-time SDK for connecting to LiveKit as a participant
 - [livekit-api](https://pypi.org/project/livekit-api/): Access token generation and server APIs
 
+<!--BEGIN_AGENTS_INFO-->
+> [!IMPORTANT]
+> If you're building Voice AI, [LiveKit Agents](https://github.com/livekit/agents) is the SDK for code-first realtime voice agents. STT, LLM, TTS, turn detection, [expressive speech](https://docs.livekit.io/agents/models/tts/expressive/), [keyterm accuracy](https://docs.livekit.io/agents/models/stt/keyterms/), tool usage, and telephony all come bundled in the framework. It's available in both [Python](https://github.com/livekit/agents) and [Node.js](https://github.com/livekit/agents-js).
+>
+> ```python
+> # agent.py
+> from livekit import agents
+> from livekit.agents import Agent, AgentServer, AgentSession, STTContextOptions, TurnHandlingOptions, inference
+>
+> server = AgentServer()
+>
+>
+> @server.rtc_session(agent_name="my-agent")
+> async def my_agent(ctx: agents.JobContext):
+>     session = AgentSession(
+>         stt=inference.STT(model="deepgram/nova-3", language="multi"),
+>         llm=inference.LLM(model="google/gemma-4-31b-it"),
+>         tts=inference.TTS(model="inworld/inworld-tts-2", voice="Ashley"),
+>         turn_handling=TurnHandlingOptions(turn_detection=inference.TurnDetector()),
+>         stt_context_options=STTContextOptions(keyterms=["LiveKit", "Acme Corp"]),
+>         expressive=True,
+>     )
+>     await session.start(room=ctx.room, agent=Agent(instructions="You are a helpful voice AI assistant."))
+>     await session.generate_reply(instructions="Greet the user and offer your assistance.")
+>
+>
+> if __name__ == "__main__":
+>     agents.cli.run_app(server)
+> ```
+>
+> Models come from [LiveKit Inference](https://docs.livekit.io/agents/models/) with no per-provider API keys, and LiveKit Cloud handles [deployment](https://docs.livekit.io/deploy/agents/) and [observability](https://docs.livekit.io/deploy/observability/). Visit the docs for more info at [docs.livekit.io/agents](https://docs.livekit.io/agents/).
+>
+> Using a coding agent? Install the LiveKit skill with `npx skills add livekit/agent-skills` and add the docs MCP at `https://docs.livekit.io/mcp/` (see [coding agent support](https://docs.livekit.io/intro/coding-agents/)).
+<!--END_AGENTS_INFO-->
+
 ## Using Server API
 
 ```shell
@@ -65,6 +100,21 @@ async def main():
 asyncio.run(main())
 ```
 
+### Authentication
+
+Authenticate with an API key and secret (recommended for backend use), or with a
+pre-signed token for client-side use, where the API secret must not be exposed.
+Any omitted value falls back to `LIVEKIT_URL`, `LIVEKIT_API_KEY`,
+`LIVEKIT_API_SECRET`, and `LIVEKIT_TOKEN`.
+
+```python
+# API key & secret (backend)
+lkapi = api.LiveKitAPI("https://my-project.livekit.cloud", api_key="...", api_secret="...")
+
+# pre-signed token (client-side); the token must already carry the grants for the calls
+lkapi = api.LiveKitAPI.with_token(my_token, "https://my-project.livekit.cloud")
+```
+
 ### Using other APIs
 
 Services can be accessed via the LiveKitAPI object.
@@ -89,6 +139,38 @@ dispatch_svc = lkapi.agent_dispatch
 
 # Connector Service
 connector_svc = lkapi.connector
+```
+
+### Error handling
+
+A failed server API call raises `api.ServerError`, which exposes the error
+`code`, `message`, and any server-provided `metadata`.
+
+```python
+try:
+    await lkapi.room.create_room(api.CreateRoomRequest(name="my-room"))
+except api.ServerError as e:
+    print(e.code, e.message)
+```
+
+A failed SIP dial (e.g. the callee is busy or doesn't answer) raises
+`api.SipCallError`, a `ServerError` subclass that also exposes the SIP response
+status:
+
+```python
+try:
+    await lkapi.sip.create_sip_participant(api.CreateSIPParticipantRequest(
+        sip_trunk_id="ST_...",
+        sip_call_to="+15105550100",
+        room_name="my-room",
+        wait_until_answered=True,
+    ))
+except api.SipCallError as e:
+    print(e)                    # e.g. "SIP call failed: 486 Busy Here (failed_precondition)"
+    if e.sip_status_code == 486:
+        ...                     # busy
+except api.ServerError as e:
+    print(e.code, e.message)    # any other API error
 ```
 
 ## Using Real-time SDK
@@ -175,6 +257,29 @@ except Exception as e:
 ```
 
 You may find it useful to adjust the `response_timeout` parameter, which indicates the amount of time you will wait for a response. We recommend keeping this value as low as possible while still satisfying the constraints of your application.
+
+#### Intercepting RPC calls
+
+An `RpcInterceptor` wraps every RPC the local participant performs or handles, which is useful for logging, tracing, or attaching metadata to payloads. Each method receives the call and a `next` continuation; return what `next` returns. Interceptors run in the order they were added, the first being outermost, and errors from the remote side or from your handler flow through them unchanged. On the incoming side the caller's `response_timeout` covers the whole chain, interceptors included.
+
+```python
+class TimingInterceptor(rtc.RpcInterceptor):
+    async def intercept_outgoing(self, call, next):
+        start = time.perf_counter()
+        try:
+            return await next(call)
+        finally:
+            print(f"call {call.method} -> {call.destination_identity}: {time.perf_counter() - start:.3f}s")
+
+    async def intercept_incoming(self, invocation, next):
+        start = time.perf_counter()
+        try:
+            return await next(invocation)
+        finally:
+            print(f"handled {invocation.method} from {invocation.caller_identity}: {time.perf_counter() - start:.3f}s")
+
+room.local_participant.add_rpc_interceptor(TimingInterceptor())
+```
 
 ## Using local media devices
 
@@ -274,6 +379,20 @@ LiveKit is a dynamic realtime environment and calls can fail for various reasons
 
 You may throw errors of the type `RpcError` with a string `message` in an RPC method handler and they will be received on the caller's side with the message intact. Other errors will not be transmitted and will instead arrive to the caller as `1500` ("Application Error"). Other built-in errors are detailed in `RpcError`.
 
+## Hardware video codec support
+
+The underlying Rust SDK ships with platform-specific hardware-accelerated encoders/decoders, These are used automatically when available and compatible with the runtime environment (OS, drivers, GPU, and codec).
+
+| Platform                       | Codec(s)   | Encoder | Decoder | Backend                                |
+| ------------------------------ | ---------- | ------- | ------- | -------------------------------------- |
+| macOS                          | H264, H265 | ✓       | ✓       | VideoToolbox                           |
+| Linux (AMD GPU)                | H264       | ✓       |         | VAAPI                                  |
+| Linux x64 (NVIDIA GPU)         | H264, H265 | ✓       | ✓       | NVENC / NVDEC (NVIDIA Video Codec SDK) |
+
+Software encoders (libvpx for VP8/VP9, libaom for AV1, OpenH264 for H264) are used as a fallback when hardware acceleration is not available.
+
+> **Note:** Availability depends on the specific machine configuration, including GPU model, driver support, and runtime environment.
+
 ## Examples
 
 - [Facelandmark](https://github.com/livekit/python-sdks/tree/main/examples/face_landmark): Use mediapipe to detect face landmarks (eyes, nose ...)
@@ -284,6 +403,14 @@ You may throw errors of the type `RpcError` with a string `message` in an RPC me
 ## Getting help / Contributing
 
 Please join us on [Slack](https://livekit.io/join-slack) to get help from our devs / community members. We welcome your contributions(PRs) and details can be discussed there.
+
+### Development environment
+
+The published SDKs support Python 3.9 and later. Development and release tooling
+requires Python 3.10 or later so that patched versions of its dependencies can be
+installed. For example, run `uv sync --locked --dev --python 3.12` from the
+repository root. A Python 3.9 runtime environment can use
+`uv sync --locked --no-dev --python 3.9`.
 
 <!--BEGIN_REPO_NAV-->
 <br/><table>

@@ -12,16 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Type, TypeVar, Optional
+import asyncio
+import logging
+import uuid
+from typing import Dict, List, Optional, Type, TypeVar
 
 import aiohttp
 from google.protobuf.message import Message
 from urllib.parse import urlparse
 
+from ._failover import (
+    FAILOVER_BACKOFF_BASE,
+    RegionCache,
+    failover_attempts,
+    host_key,
+    is_cloud_api,
+    origin_of,
+    pick_next,
+)
+from .version import __version__
+
 DEFAULT_PREFIX = "twirp"
 
+logger = logging.getLogger("livekit")
 
-class TwirpError(Exception):
+# Identifies the SDK and version to the server on every request.
+_USER_AGENT = f"livekit-server-sdk-python/{__version__}"
+
+# Carries a per-request idempotency key. The SDK's auto-retries (see _failover)
+# keep the same key across attempts, so the server can identify and deduplicate
+# repeated requests.
+REQUEST_ID_HEADER = "X-Livekit-Request-Id"
+
+# Shared across all clients in the process so the region list is fetched once.
+_REGION_CACHE = RegionCache()
+
+
+class ServerError(Exception):
     def __init__(
         self,
         code: str,
@@ -50,18 +77,88 @@ class TwirpError(Exception):
 
     @property
     def metadata(self) -> Dict[str, str]:
-        """Twirp metadata"""
+        """Server-provided error metadata"""
         return self._metadata
 
     def __str__(self) -> str:
-        result = f"TwirpError(code={self.code}, message={self.message}, status={self.status}"
+        result = f"ServerError(code={self.code}, message={self.message}, status={self.status}"
         if self.metadata:
             result += f", metadata={self.metadata}"
         result += ")"
         return result
 
 
-class TwirpErrorCode:
+_SIP_META_KEYS = (
+    "sip_status_code",
+    "sip_status",
+    "sip_transfer_reason",
+    "error_details",
+)
+
+
+class SipCallError(ServerError):
+    """A :class:`ServerError` from a SIP dialing call (``create_sip_participant`` /
+    ``transfer_sip_participant``) that failed with a SIP response status, or a
+    transfer that failed for any other reason. The SIP code and reason, and the
+    transfer reason, are exposed as properties; any other error metadata remains
+    available via :attr:`metadata`."""
+
+    @property
+    def sip_status_code(self) -> Optional[int]:
+        """The SIP response code of the failed call, e.g. 486 (Busy Here)."""
+        raw = self.metadata.get("sip_status_code")
+        if raw is None:
+            return None
+        try:
+            return int(raw)
+        except ValueError:
+            return None
+
+    @property
+    def sip_status(self) -> Optional[str]:
+        """The SIP reason phrase of the failed call, e.g. "Busy Here"."""
+        return self.metadata.get("sip_status")
+
+    @property
+    def sip_transfer_reason(self) -> Optional[str]:
+        """Why a transfer failed, e.g. "STR_RINGING_TIMEOUT". Only set for
+        ``transfer_sip_participant``."""
+        return self.metadata.get("sip_transfer_reason")
+
+    @property
+    def sip_transfer_id(self) -> Optional[str]:
+        """The id of the failed transfer, for matching against SIP transfer logs."""
+        return self.metadata.get("sip_transfer_id")
+
+    @classmethod
+    def from_server_error(cls, err: ServerError) -> "SipCallError":
+        return cls(err.code, err.message, status=err.status, metadata=err.metadata)
+
+    def __str__(self) -> str:
+        code = self.metadata.get("sip_status_code")
+        transfer_reason = self.metadata.get("sip_transfer_reason")
+        if code is None and transfer_reason is None:
+            return super().__str__()
+        # A clear, SIP-specific representation, including any extra metadata.
+        parts = []
+        if transfer_reason is not None:
+            parts.append(transfer_reason)
+        if code is not None:
+            reason = self.metadata.get("sip_status")
+            parts.append(f"{code} {reason}" if reason else str(code))
+        what = "SIP transfer failed" if transfer_reason is not None else "SIP call failed"
+        result = f"{what}: {', '.join(parts)} ({self.code})"
+        extra = {k: v for k, v in self.metadata.items() if k not in _SIP_META_KEYS}
+        if extra:
+            result += " [" + ", ".join(f"{k}={v}" for k, v in extra.items()) + "]"
+        return result
+
+
+# Deprecated alias for :class:`ServerError`, kept for backwards compatibility.
+TwirpError = ServerError
+
+
+class ServerErrorCode:
     CANCELED = "canceled"
     UNKNOWN = "unknown"
     INVALID_ARGUMENT = "invalid_argument"
@@ -82,6 +179,10 @@ class TwirpErrorCode:
     DATA_LOSS = "dataloss"
 
 
+# Deprecated alias for :class:`ServerErrorCode`, kept for backwards compatibility.
+TwirpErrorCode = ServerErrorCode
+
+
 T = TypeVar("T", bound=Message)
 
 
@@ -92,17 +193,26 @@ class TwirpClient:
         host: str,
         pkg: str,
         prefix: str = DEFAULT_PREFIX,
+        failover: bool = True,
+        *,
+        _failover_force: bool = False,
+        _failover_backoff: float = FAILOVER_BACKOFF_BASE,
     ) -> None:
         parse_res = urlparse(host)
         scheme = parse_res.scheme
         if scheme.startswith("ws"):
             scheme = scheme.replace("ws", "http")
 
-        host = f"{scheme}://{parse_res.netloc}/{parse_res.path}"
+        host = f"{scheme}://{parse_res.netloc}{parse_res.path}"
         self.host = host.rstrip("/")
         self.pkg = pkg
         self.prefix = prefix
         self._session = session
+        # _failover_force / _failover_backoff are internal test-only knobs.
+        self._failover = failover
+        self._failover_force = _failover_force
+        self._failover_backoff = _failover_backoff
+        self._origin = origin_of(self.host)
 
     async def request(
         self,
@@ -114,21 +224,97 @@ class TwirpClient:
         *,
         timeout: Optional[aiohttp.ClientTimeout] = None,
     ) -> T:
-        url = f"{self.host}/{self.prefix}/{self.pkg}.{service}/{method}"
+        """Issues a Twirp request, failing over to alternative regions on
+        retryable errors. On any transport error or HTTP 5xx it discovers
+        regions via ``/settings/regions`` and replays the request — body and
+        headers intact — against the next untried region, with exponential
+        backoff. A 4xx is returned immediately."""
+        path = f"{self.prefix}/{self.pkg}.{service}/{method}"
+        headers = dict(headers)
+        headers["User-Agent"] = _USER_AGENT
+        forward_headers = dict(headers)  # for the discovery fetch (no content-type yet)
         headers["Content-Type"] = "application/protobuf"
-
+        headers[REQUEST_ID_HEADER] = str(uuid.uuid4())
         serialized_data = data.SerializeToString()
-        async with self._session.post(
-            url, headers=headers, data=serialized_data, timeout=timeout
-        ) as resp:
-            if resp.status == 200:
-                return response_class.FromString(await resp.read())
-            else:
-                # when we have an error, Twirp always encode it in json
-                error_data = await resp.json()
-                raise TwirpError(
-                    error_data.get("code", "unknown"),
-                    error_data.get("msg", ""),
-                    status=resp.status,
-                    metadata=error_data.get("meta"),
-                )
+
+        # The effective per-attempt timeout is the per-call override, or the
+        # session default; used to gate failover for short requests.
+        effective_timeout = timeout.total if timeout else None
+        if effective_timeout is None and self._session.timeout is not None:
+            effective_timeout = self._session.timeout.total
+        host = urlparse(self._origin).hostname
+        max_attempts = failover_attempts(
+            self._failover, host, self._failover_force, effective_timeout
+        )
+        attempted = {host_key(self._origin)}
+        # A Cloud API host has a single origin; region discovery is never consulted.
+        region_origins: Optional[List[str]] = [] if host and is_cloud_api(host) else None
+        current_origin = self._origin
+        # The configured host may carry a base path (e.g. behind a reverse
+        # proxy); fallback regions are bare origins.
+        current_base = self.host
+
+        for attempt in range(max_attempts):
+            is_last = attempt + 1 >= max_attempts
+            url = f"{current_base}/{path}"
+
+            transport_exc: Optional[BaseException] = None
+            retryable_status: Optional[int] = None
+            error_data: Dict = {}
+            try:
+                async with self._session.post(
+                    url, headers=headers, data=serialized_data, timeout=timeout
+                ) as resp:
+                    if resp.status == 200:
+                        return response_class.FromString(await resp.read())
+                    # Twirp encodes errors as JSON regardless of content type.
+                    try:
+                        error_data = await resp.json()
+                    except Exception:
+                        error_data = {}
+                    if resp.status < 500:
+                        # 4xx is terminal.
+                        raise self._server_error(error_data, resp.status)
+                    retryable_status = resp.status
+            except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                transport_exc = e
+
+            # Only retryable failures (5xx or transport error) reach this point.
+            next_origin = None
+            if not is_last:
+                if region_origins is None:
+                    region_origins = await _REGION_CACHE.region_origins(
+                        self._session, self._origin, forward_headers
+                    )
+                next_origin = pick_next(region_origins, attempted)
+
+            if next_origin is None:
+                if is_last:
+                    if transport_exc is not None:
+                        raise transport_exc
+                    raise self._server_error(error_data, retryable_status or 500)
+                # With no fallback origin, a retryable failure is retried against the same host.
+                next_origin = current_origin
+
+            reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
+            logger.warning(
+                "livekit API request to %s failed (%s), retrying with fallback url %s",
+                current_origin,
+                reason,
+                next_origin,
+            )
+            await asyncio.sleep(self._failover_backoff * (2**attempt))
+            attempted.add(host_key(next_origin))
+            current_origin = next_origin
+            current_base = next_origin
+
+        raise RuntimeError("failover loop exited without returning")  # unreachable
+
+    @staticmethod
+    def _server_error(error_data: Dict, status: int) -> "ServerError":
+        return ServerError(
+            error_data.get("code", "unknown"),
+            error_data.get("msg", ""),
+            status=status,
+            metadata=error_data.get("meta"),
+        )

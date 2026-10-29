@@ -28,12 +28,18 @@ from ._proto import participant_pb2 as proto_participant
 from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
 from ._proto.participant_pb2 import DisconnectReason
-from ._proto.room_pb2 import ConnectionState
+from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._utils import BroadcastQueue
 from .e2ee import E2EEManager, E2EEOptions
-from .participant import LocalParticipant, Participant, RemoteParticipant
+from .log import logger
+from .participant import (
+    LocalParticipant,
+    Participant,
+    RemoteParticipant,
+    _connection_quality_from_proto,
+)
 from .track import RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
@@ -52,6 +58,7 @@ EventTypes = Literal[
     "participant_active",
     "local_track_published",
     "local_track_unpublished",
+    "local_track_republished",
     "local_track_subscribed",
     "track_published",
     "track_unpublished",
@@ -101,6 +108,14 @@ class RtcConfiguration:
 
 
 @dataclass
+class DataStreamOptions:
+    max_payload_byte_length: int | None = None
+    """Maximum decompressed payload size in bytes accepted for a single incoming
+    data stream; oversized streams terminate with StreamError on the receiver.
+    When None, uses the FFI default."""
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     """Automatically subscribe to tracks when participants join."""
@@ -115,6 +130,8 @@ class RoomOptions:
     """Timeout in seconds for each signal connection attempt. When None, uses the default (5s)."""
     single_peer_connection: bool | None = None
     """Use a single peer connection for both publish and subscribe. When None, uses the default (false)."""
+    data_stream: DataStreamOptions | None = None
+    """Options for incoming data streams. When None, uses the FFI defaults."""
 
 
 @dataclass
@@ -167,15 +184,15 @@ class Room(EventEmitter[EventTypes]):
         self._room_queue = BroadcastQueue[proto_ffi.FfiEvent]()
         self._info = proto_room.RoomInfo()
         self._rpc_invocation_tasks: set[asyncio.Task] = set()
-        self._data_stream_tasks: set[asyncio.Task] = set()
 
         self._remote_participants: Dict[str, RemoteParticipant] = {}
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
 
-        self._text_stream_readers: Dict[str, TextStreamReader] = {}
-        self._byte_stream_readers: Dict[str, ByteStreamReader] = {}
+        # active incoming stream readers, keyed by FFI reader handle id
+        self._text_stream_readers: Dict[int, TextStreamReader] = {}
+        self._byte_stream_readers: Dict[int, ByteStreamReader] = {}
         self._text_stream_handlers: Dict[str, TextStreamHandler] = {}
         self._byte_stream_handlers: Dict[str, ByteStreamHandler] = {}
 
@@ -196,7 +213,16 @@ class Room(EventEmitter[EventTypes]):
         if self._info.sid:
             return self._info.sid
 
-        return await self._first_sid_future
+        # This future is shared state for the Room. Caller-side timeouts, e.g.
+        # asyncio.wait_for(room.sid, ...), should not cancel it for future waiters.
+        return await asyncio.shield(self._first_sid_future)
+
+    def _resolve_first_sid(self, sid: str) -> None:
+        # The room SID can arrive through the initial connect result or later
+        # room update events. Resolve the first-SID waiter from any source that
+        # carries it so waiters do not depend on event ordering.
+        if sid and not self._first_sid_future.done():
+            self._first_sid_future.set_result(sid)
 
     @property
     def local_participant(self) -> LocalParticipant:
@@ -346,6 +372,11 @@ class Room(EventEmitter[EventTypes]):
                 - Arguments: `publication` (LocalTrackPublication), `track` (Track)
             - **"local_track_unpublished"**: Called when a local track is unpublished.
                 - Arguments: `publication` (LocalTrackPublication)
+            - **"local_track_republished"**: Called when the SDK auto-republished a local
+                track during a full reconnect. The publication object is updated in place
+                with the new server-assigned SIDs (its previous SID is passed alongside so
+                callers can reconcile any external state keyed by the old SID).
+                - Arguments: `publication` (LocalTrackPublication), `previous_sid` (str)
             - **"local_track_subscribed"**: Called when a local track is subscribed.
                 - Arguments: `track` (Track)
             - **"track_published"**: Called when a remote participant publishes a track.
@@ -446,6 +477,14 @@ class Room(EventEmitter[EventTypes]):
         req.connect.options.auto_subscribe = options.auto_subscribe
         req.connect.options.dynacast = options.dynacast
 
+        if (
+            options.data_stream is not None
+            and options.data_stream.max_payload_byte_length is not None
+        ):
+            req.connect.options.data_stream.max_payload_byte_length = (
+                options.data_stream.max_payload_byte_length
+            )
+
         if options.connect_timeout is not None:
             req.connect.options.connect_timeout_ms = int(options.connect_timeout * 1000)
 
@@ -460,9 +499,10 @@ class Room(EventEmitter[EventTypes]):
             )
 
             req.connect.options.e2ee.encryption_type = options.e2ee.encryption_type
-            req.connect.options.e2ee.key_provider_options.shared_key = (
-                options.e2ee.key_provider_options.shared_key  # type: ignore
-            )
+            if options.e2ee.key_provider_options.shared_key is not None:
+                req.connect.options.e2ee.key_provider_options.shared_key = (
+                    options.e2ee.key_provider_options.shared_key
+                )
             req.connect.options.e2ee.key_provider_options.ratchet_salt = (
                 options.e2ee.key_provider_options.ratchet_salt
             )
@@ -481,9 +521,10 @@ class Room(EventEmitter[EventTypes]):
 
         if options.encryption:
             req.connect.options.encryption.encryption_type = options.encryption.encryption_type
-            req.connect.options.encryption.key_provider_options.shared_key = (
-                options.encryption.key_provider_options.shared_key  # type: ignore
-            )
+            if options.encryption.key_provider_options.shared_key is not None:
+                req.connect.options.encryption.key_provider_options.shared_key = (
+                    options.encryption.key_provider_options.shared_key
+                )
             req.connect.options.encryption.key_provider_options.ratchet_salt = (
                 options.encryption.key_provider_options.ratchet_salt
             )
@@ -503,14 +544,21 @@ class Room(EventEmitter[EventTypes]):
         if options.rtc_config:
             req.connect.options.rtc_config.ice_transport_type = (
                 options.rtc_config.ice_transport_type
-            )  # type: ignore
+            )
             req.connect.options.rtc_config.continual_gathering_policy = (
                 options.rtc_config.continual_gathering_policy
-            )  # type: ignore
+            )
             req.connect.options.rtc_config.ice_servers.extend(options.rtc_config.ice_servers)
 
         # subscribe before connecting so we don't miss any events
-        self._ffi_queue = FfiClient.instance.queue.subscribe(self._loop)
+        # Media streams have their own subscriptions. Keep other events, including
+        # the publish/unpublish callbacks forwarded through _room_queue.
+        self._ffi_queue = FfiClient.instance.queue.subscribe(
+            self._loop,
+            filter_fn=lambda e: (
+                e.WhichOneof("message") not in ("audio_stream_event", "video_stream_event")
+            ),
+        )
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -532,6 +580,7 @@ class Room(EventEmitter[EventTypes]):
         )
 
         self._info = cb.connect.result.room.info
+        self._resolve_first_sid(self._info.sid)
         self._connection_state = ConnectionState.CONN_CONNECTED
 
         self._local_participant = LocalParticipant(
@@ -548,6 +597,17 @@ class Room(EventEmitter[EventTypes]):
 
         # start listening to room events
         self._task = self._loop.create_task(self._listen_task())
+
+        # unsubscribe from the FFI queue once the listen task ends.
+        # disconnect() unsubscribes too, but it early-returns when the
+        # room is already disconnected (e.g. removed remotely).
+        ffi_queue = self._ffi_queue
+        self._task.add_done_callback(lambda _: FfiClient.instance.queue.unsubscribe(ffi_queue))
+
+        # Unblock the FFI server once this SDK is ready to receive room events.
+        ready_req = proto_ffi.FfiRequest()
+        ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
+        FfiClient.instance.request(ready_req)
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():
@@ -573,27 +633,56 @@ class Room(EventEmitter[EventTypes]):
 
         return RtcStats(publisher_stats=publisher_stats, subscriber_stats=subscriber_stats)
 
-    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler):
+    def register_byte_stream_handler(self, topic: str, handler: ByteStreamHandler) -> None:
         existing_handler = self._byte_stream_handlers.get(topic)
         if existing_handler is None:
             self._byte_stream_handlers[topic] = handler
         else:
             raise ValueError("byte stream handler for topic '%s' already set" % topic)
 
-    def unregister_byte_stream_handler(self, topic: str):
+    def unregister_byte_stream_handler(self, topic: str) -> None:
         if self._byte_stream_handlers.get(topic):
             self._byte_stream_handlers.pop(topic)
 
-    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler):
+    def register_text_stream_handler(self, topic: str, handler: TextStreamHandler) -> None:
         existing_handler = self._text_stream_handlers.get(topic)
         if existing_handler is None:
             self._text_stream_handlers[topic] = handler
         else:
             raise ValueError("text stream handler for topic '%s' already set" % topic)
 
-    def unregister_text_stream_handler(self, topic: str):
+    def unregister_text_stream_handler(self, topic: str) -> None:
         if self._text_stream_handlers.get(topic):
             self._text_stream_handlers.pop(topic)
+
+    async def simulate_scenario(self, scenario: SimulateScenarioKind.ValueType) -> None:
+        """Trigger a reconnection / chaos scenario for testing.
+
+        See `SimulateScenarioKind` for the available variants. Most useful
+        in tests to deterministically force a Resume (signal-only reconnect
+        that preserves the PeerConnection and existing publications) or a
+        full reconnect (the SDK rebuilds the RtcSession and re-publishes
+        existing local tracks).
+
+        Raises a `RuntimeError` if the SDK reports a failure.
+        """
+        if not self.isconnected() or self._ffi_handle is None:
+            raise RuntimeError("simulate_scenario requires a connected room")
+
+        req = proto_ffi.FfiRequest()
+        req.simulate_scenario.room_handle = self._ffi_handle.handle
+        req.simulate_scenario.scenario = scenario
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb = await queue.wait_for(
+                lambda e: e.simulate_scenario.async_id == resp.simulate_scenario.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.simulate_scenario.HasField("error") and cb.simulate_scenario.error:
+            raise RuntimeError(f"simulate_scenario failed: {cb.simulate_scenario.error}")
 
     async def disconnect(
         self, *, reason: DisconnectReason.ValueType = DisconnectReason.CLIENT_INITIATED
@@ -603,11 +692,12 @@ class Room(EventEmitter[EventTypes]):
             return
 
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream_tasks()
+        self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
         req = proto_ffi.FfiRequest()
         req.disconnect.room_handle = self._ffi_handle.handle  # type: ignore
-        req.disconnect.reason = reason  # type: ignore
+        req.disconnect.reason = reason
         queue = FfiClient.instance.queue.subscribe()
         try:
             resp = FfiClient.instance.request(req)
@@ -652,9 +742,10 @@ class Room(EventEmitter[EventTypes]):
 
         # Clean up any pending RPC invocation tasks
         await self._drain_rpc_invocation_tasks()
-        await self._drain_data_stream_tasks()
+        self._error_stream_readers()
+        self._dispose_open_stream_writers()
 
-    def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent):
+    def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent) -> None:
         if self._local_participant is None:
             return
 
@@ -672,7 +763,7 @@ class Room(EventEmitter[EventTypes]):
             self._rpc_invocation_tasks.add(task)
             task.add_done_callback(self._rpc_invocation_tasks.discard)
 
-    def _on_room_event(self, event: proto_room.RoomEvent):
+    def _on_room_event(self, event: proto_room.RoomEvent) -> None:
         which = event.WhichOneof("message")
         if which == "participant_connected":
             rparticipant = self._create_remote_participant(event.participant_connected.info)
@@ -691,59 +782,179 @@ class Room(EventEmitter[EventTypes]):
             sid = event.local_track_published.track_sid
             lpublication = self.local_participant.track_publications[sid]
             ltrack = lpublication.track
+            if ltrack is not None:
+                ltrack._set_room(self)
             self.emit("local_track_published", lpublication, ltrack)
         elif which == "local_track_unpublished":
+            # During teardown the publication may already have been removed
+            # from the participant's dict by LocalParticipant.unpublish_track
+            # (the FFI event races that async response), so the SID can be gone
+            # by the time this event is dispatched. Look it up defensively and
+            # skip the emit when it is no longer tracked, mirroring the
+            # local_track_republished and remote track_unpublished handlers,
+            # instead of raising a KeyError that _listen_task logs as an error.
             sid = event.local_track_unpublished.publication_sid
-            lpublication = self.local_participant.track_publications[sid]
-            self.emit("local_track_unpublished", lpublication)
+            unpublished = self.local_participant._track_publications.get(sid)
+            if unpublished is not None:
+                del self.local_participant._track_publications[sid]
+                track = unpublished.track
+                if track is not None:
+                    track._set_room(None)
+                # Emit while `publication.track` is still set, preserving the
+                # pre-existing payload for callbacks. This handler is synchronous
+                # and emit() invokes listeners synchronously, so nulling the track
+                # right after still completes before any other coroutine (e.g.
+                # unpublish_track) can interleave.
+                self.emit("local_track_unpublished", unpublished)
+                # Mirror track_unsubscribed: drop the publication's track
+                # reference. This also makes unpublish_track's own _set_room(None)
+                # a no-op when it loses the race (its `publication._track is not
+                # None` guard short-circuits), avoiding a redundant clear.
+                if track is not None:
+                    unpublished._track = None
+            else:
+                logging.debug("local_track_unpublished for untracked publication sid %s", sid)
+        elif which == "local_track_republished":
+            # The SDK auto-republished a local track during a full
+            # reconnect: the underlying Track (and its bound source) is
+            # preserved, but the publication and track SIDs were re-issued
+            # by the server. Update the existing LocalTrackPublication
+            # object in place so application code holding a cached
+            # reference continues to see current state, then rekey it
+            # under the new SID in the participant's publications dict.
+            previous_sid = event.local_track_republished.previous_sid
+            republished = self.local_participant._track_publications.get(previous_sid)
+            if republished is not None:
+                del self.local_participant._track_publications[previous_sid]
+                republished._info = event.local_track_republished.info
+                self.local_participant._track_publications[republished.sid] = republished
+                if republished.track is not None:
+                    # Keep the local-track invariant (track.sid == publication.sid,
+                    # set at publish_track) intact across republish, then re-push
+                    # metadata so any attached FrameProcessor learns the new
+                    # publication SID / credentials. _set_room with the same room
+                    # is a no-op for the token_refreshed listener but re-fans the
+                    # metadata to every registered AudioStream.
+                    republished.track._info.sid = republished.sid
+                    republished.track._set_room(self)
+                self.emit("local_track_republished", republished, previous_sid)
         elif which == "local_track_subscribed":
             sid = event.local_track_subscribed.track_sid
             lpublication = self.local_participant.track_publications[sid]
-            lpublication._first_subscription.set_result(None)
+            if not lpublication._first_subscription.done():
+                lpublication._first_subscription.set_result(None)
             self.emit("local_track_subscribed", lpublication.track)
         elif which == "track_published":
-            rparticipant = self._remote_participants[event.track_published.participant_identity]
-            rpublication = RemoteTrackPublication(event.track_published.publication)
-            rparticipant._track_publications[rpublication.sid] = rpublication
-            self.emit("track_published", rpublication, rparticipant)
+            # The participant may already have been removed by a racing
+            # disconnect or a duplicate event, so the lookup is done defensively
+            # and the emit is skipped when the participant is gone, mirroring the
+            # track_unpublished handler, instead of raising a KeyError that
+            # _listen_task logs as an error.
+            identity = event.track_published.participant_identity
+            published_participant = self._remote_participants.get(identity)
+            if published_participant is not None:
+                published = RemoteTrackPublication(event.track_published.publication)
+                published_participant._track_publications[published.sid] = published
+                self.emit("track_published", published, published_participant)
+            else:
+                logger.debug("track_published for untracked participant %s", identity)
         elif which == "track_unpublished":
-            rparticipant = self._remote_participants[event.track_unpublished.participant_identity]
-            rpublication = rparticipant._track_publications.pop(
-                event.track_unpublished.publication_sid
-            )
-            self.emit("track_unpublished", rpublication, rparticipant)
+            # The participant or publication may already have been removed by a
+            # racing disconnect or a duplicate event, so both lookups are done
+            # defensively and the emit is skipped when the entry is gone,
+            # mirroring the local_track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
+            identity = event.track_unpublished.participant_identity
+            sid = event.track_unpublished.publication_sid
+            rp = self._remote_participants.get(identity)
+            if rp is not None:
+                rpub = rp._track_publications.pop(sid, None)
+                if rpub is not None:
+                    self.emit("track_unpublished", rpub, rp)
+                else:
+                    logger.debug("track_unpublished for untracked publication sid %s", sid)
+            else:
+                logger.debug("track_unpublished for untracked participant %s", identity)
         elif which == "track_subscribed":
+            # The participant or publication may already have been removed by a
+            # racing disconnect or unpublish, so both lookups are done
+            # defensively and the emit is skipped when either entry is gone,
+            # mirroring the track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
             owned_track_info = event.track_subscribed.track
             track_info = owned_track_info.info
-            rparticipant = self._remote_participants[event.track_subscribed.participant_identity]
-            rpublication = rparticipant.track_publications[track_info.sid]
-            rpublication._subscribed = True
-            if track_info.kind == TrackKind.KIND_VIDEO:
-                remote_video_track = RemoteVideoTrack(owned_track_info)
-                rpublication._track = remote_video_track
-                self.emit("track_subscribed", remote_video_track, rpublication, rparticipant)
-            elif track_info.kind == TrackKind.KIND_AUDIO:
-                remote_audio_track = RemoteAudioTrack(owned_track_info)
-                rpublication._track = remote_audio_track
-                self.emit("track_subscribed", remote_audio_track, rpublication, rparticipant)
-        elif which == "track_unsubscribed":
-            identity = event.track_unsubscribed.participant_identity
-            rparticipant = self._remote_participants[identity]
-            rpublication = rparticipant.track_publications[event.track_unsubscribed.track_sid]
-            rtrack = rpublication.track
-            rpublication._track = None
-            rpublication._subscribed = False
-            self.emit("track_unsubscribed", rtrack, rpublication, rparticipant)
-        elif which == "track_subscription_failed":
-            identity = event.track_subscription_failed.participant_identity
-            rparticipant = self._remote_participants[identity]
-            error = event.track_subscription_failed.error
-            self.emit(
-                "track_subscription_failed",
-                rparticipant,
-                event.track_subscription_failed.track_sid,
-                error,
+            identity = event.track_subscribed.participant_identity
+            subscribed_participant = self._remote_participants.get(identity)
+            subscribed = (
+                subscribed_participant.track_publications.get(track_info.sid)
+                if subscribed_participant is not None
+                else None
             )
+            if subscribed_participant is not None and subscribed is not None:
+                subscribed._subscribed = True
+                if track_info.kind == TrackKind.KIND_VIDEO:
+                    remote_video_track = RemoteVideoTrack(owned_track_info)
+                    remote_video_track._set_room(self)
+                    subscribed._track = remote_video_track
+                    self.emit(
+                        "track_subscribed", remote_video_track, subscribed, subscribed_participant
+                    )
+                elif track_info.kind == TrackKind.KIND_AUDIO:
+                    remote_audio_track = RemoteAudioTrack(owned_track_info)
+                    remote_audio_track._set_room(self)
+                    subscribed._track = remote_audio_track
+                    self.emit(
+                        "track_subscribed", remote_audio_track, subscribed, subscribed_participant
+                    )
+            else:
+                logger.debug(
+                    "track_subscribed for untracked participant %s or publication %s",
+                    identity,
+                    track_info.sid,
+                )
+        elif which == "track_unsubscribed":
+            # The participant or publication may already have been removed by a
+            # racing disconnect or unpublish, so both lookups are done
+            # defensively and the emit is skipped when either entry is gone,
+            # mirroring the track_unpublished handler, instead of raising a
+            # KeyError that _listen_task logs as an error.
+            identity = event.track_unsubscribed.participant_identity
+            unsubscribed_participant = self._remote_participants.get(identity)
+            unsubscribed = (
+                unsubscribed_participant.track_publications.get(event.track_unsubscribed.track_sid)
+                if unsubscribed_participant is not None
+                else None
+            )
+            if unsubscribed_participant is not None and unsubscribed is not None:
+                rtrack = unsubscribed.track
+                if rtrack is not None:
+                    rtrack._set_room(None)
+                unsubscribed._track = None
+                unsubscribed._subscribed = False
+                self.emit("track_unsubscribed", rtrack, unsubscribed, unsubscribed_participant)
+            else:
+                logger.debug(
+                    "track_unsubscribed for untracked participant %s or publication %s",
+                    identity,
+                    event.track_unsubscribed.track_sid,
+                )
+        elif which == "track_subscription_failed":
+            # The participant may already have been removed by a racing
+            # disconnect, so the lookup is done defensively and the emit is
+            # skipped when the participant is gone, instead of raising a KeyError
+            # that _listen_task logs as an error.
+            identity = event.track_subscription_failed.participant_identity
+            failed_participant = self._remote_participants.get(identity)
+            if failed_participant is not None:
+                error = event.track_subscription_failed.error
+                self.emit(
+                    "track_subscription_failed",
+                    failed_participant,
+                    event.track_subscription_failed.track_sid,
+                    error,
+                )
+            else:
+                logger.debug("track_subscription_failed for untracked participant %s", identity)
         elif which == "track_muted":
             identity = event.track_muted.participant_identity
             # TODO: pass participant identity
@@ -780,8 +991,7 @@ class Room(EventEmitter[EventTypes]):
             self._info.metadata = event.room_metadata_changed.metadata
             self.emit("room_metadata_changed", old_metadata, self.metadata)
         elif which == "room_sid_changed":
-            if not self._info.sid:
-                self._first_sid_future.set_result(event.room_sid_changed.sid)
+            self._resolve_first_sid(event.room_sid_changed.sid)
             self._info.sid = event.room_sid_changed.sid
             # This is an internal event, not exposed to users
         elif which == "participant_metadata_changed":
@@ -828,7 +1038,7 @@ class Room(EventEmitter[EventTypes]):
                 participant,
                 event.participant_encryption_status_changed.is_encrypted,
             )
-        elif which == "participant_permissions_changed":
+        elif which == "participant_permission_changed":
             identity = event.participant_permission_changed.participant_identity
             participant = self._retrieve_participant(identity)
             assert isinstance(participant, Participant)
@@ -840,12 +1050,14 @@ class Room(EventEmitter[EventTypes]):
             )
         elif which == "connection_quality_changed":
             identity = event.connection_quality_changed.participant_identity
-            # TODO: pass participant identity
             participant = self._retrieve_participant(identity)
+            quality = _connection_quality_from_proto(event.connection_quality_changed.quality)
+            if participant:
+                participant._connection_quality = quality
             self.emit(
                 "connection_quality_changed",
                 participant,
-                event.connection_quality_changed.quality,
+                quality,
             )
         elif which == "transcription_received":
             transcription = event.transcription_received
@@ -919,29 +1131,18 @@ class Room(EventEmitter[EventTypes]):
             self.emit("reconnecting")
         elif which == "reconnected":
             self.emit("reconnected")
-        elif which == "stream_header_received":
-            self._handle_stream_header(
-                event.stream_header_received.header,
-                event.stream_header_received.participant_identity,
-            )
-        elif which == "stream_chunk_received":
-            task = asyncio.create_task(self._handle_stream_chunk(event.stream_chunk_received.chunk))
-            self._data_stream_tasks.add(task)
-            task.add_done_callback(self._data_stream_tasks.discard)
-
-        elif which == "stream_trailer_received":
-            task = asyncio.create_task(
-                self._handle_stream_trailer(event.stream_trailer_received.trailer)
-            )
-            self._data_stream_tasks.add(task)
-            task.add_done_callback(self._data_stream_tasks.discard)
-
+        elif which == "text_stream_opened":
+            self._handle_text_stream_opened(event.text_stream_opened)
+        elif which == "byte_stream_opened":
+            self._handle_byte_stream_opened(event.byte_stream_opened)
         elif which == "room_updated":
             self._info = event.room_updated
+            self._resolve_first_sid(self._info.sid)
             self.emit("room_updated")
 
         elif which == "moved":
             self._info = event.moved
+            self._resolve_first_sid(self._info.sid)
             self.emit("moved")
 
         elif which == "participants_updated":
@@ -961,69 +1162,80 @@ class Room(EventEmitter[EventTypes]):
         elif which == "data_track_unpublished":
             self.emit("data_track_unpublished", event.data_track_unpublished.sid)
 
-    def _handle_stream_header(
-        self, header: proto_room.DataStream.Header, participant_identity: str
-    ):
-        stream_type = header.WhichOneof("content_header")
-        if stream_type == "text_header":
-            text_stream_handler = self._text_stream_handlers.get(header.topic)
-            if text_stream_handler is None:
-                logging.info(
-                    "ignoring text stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
+    def _handle_text_stream_opened(self, opened: proto_room.TextStreamOpened) -> None:
+        topic = opened.reader.info.topic
+        text_stream_handler = self._text_stream_handlers.get(topic)
+        handle_id = opened.reader.handle.id
+        if text_stream_handler is None:
+            logging.info(
+                "ignoring text stream with topic '%s', no callback attached",
+                topic,
+            )
+            # the reader is never consumed by read_incremental, so the owned
+            # handle (and its buffered chunks) must be disposed here
+            FfiHandle(handle_id).dispose()
+            return
 
-            text_reader = TextStreamReader(header)
-            self._text_stream_readers[header.stream_id] = text_reader
-            text_stream_handler(text_reader, participant_identity)
-        elif stream_type == "byte_header":
-            byte_stream_handler = self._byte_stream_handlers.get(header.topic)
-            if byte_stream_handler is None:
-                logging.info(
-                    "ignoring byte stream with topic '%s', no callback attached",
-                    header.topic,
-                )
-                return
+        def on_close() -> None:
+            self._text_stream_readers.pop(handle_id, None)
 
-            byte_reader = ByteStreamReader(header)
-            self._byte_stream_readers[header.stream_id] = byte_reader
-            byte_stream_handler(byte_reader, participant_identity)
-        else:
-            logging.warning("received unknown header type, %s", stream_type)
-        pass
+        text_reader = TextStreamReader(opened.reader, on_close=on_close)
+        self._text_stream_readers[handle_id] = text_reader
+        text_stream_handler(text_reader, opened.participant_identity)
 
-    async def _handle_stream_chunk(self, chunk: proto_room.DataStream.Chunk):
-        text_reader = self._text_stream_readers.get(chunk.stream_id)
-        file_reader = self._byte_stream_readers.get(chunk.stream_id)
+    def _handle_byte_stream_opened(self, opened: proto_room.ByteStreamOpened) -> None:
+        topic = opened.reader.info.topic
+        byte_stream_handler = self._byte_stream_handlers.get(topic)
+        handle_id = opened.reader.handle.id
+        if byte_stream_handler is None:
+            logging.info(
+                "ignoring byte stream with topic '%s', no callback attached",
+                topic,
+            )
+            # the reader is never consumed by read_incremental, so the owned
+            # handle (and its buffered chunks) must be disposed here
+            FfiHandle(handle_id).dispose()
+            return
 
-        if text_reader:
-            await text_reader._on_chunk_update(chunk)
-        elif file_reader:
-            await file_reader._on_chunk_update(chunk)
+        def on_close() -> None:
+            self._byte_stream_readers.pop(handle_id, None)
 
-    async def _handle_stream_trailer(self, trailer: proto_room.DataStream.Trailer):
-        text_reader = self._text_stream_readers.get(trailer.stream_id)
-        file_reader = self._byte_stream_readers.get(trailer.stream_id)
+        byte_reader = ByteStreamReader(opened.reader, on_close=on_close)
+        self._byte_stream_readers[handle_id] = byte_reader
+        byte_stream_handler(byte_reader, opened.participant_identity)
 
-        if text_reader:
-            await text_reader._on_stream_close(trailer)
-            self._text_stream_readers.pop(trailer.stream_id)
-        elif file_reader:
-            await file_reader._on_stream_close(trailer)
-            self._byte_stream_readers.pop(trailer.stream_id)
+    def _dispose_open_stream_writers(self) -> None:
+        """Drops the native writers of data streams left open at disconnect.
+
+        A writer releases its handle only when it is closed, so one the
+        application abandoned — or left behind after a failed write — would
+        otherwise be held by the FFI server for the life of the process.
+        """
+        if self._local_participant is not None:
+            self._local_participant._dispose_open_stream_writers()
+
+    def _error_stream_readers(self) -> None:
+        """Wakes up any pending stream reads with a StreamError on disconnect.
+
+        This also drops each reader's FFI queue subscription, which would
+        otherwise outlive the room: a reader unsubscribes itself only once a
+        read consumes its end-of-stream event, so one the application never
+        finished reading would stay subscribed for the life of the process.
+        The readers stay open, so a read can still drain whatever arrived
+        before the disconnect and then raise StreamError.
+        """
+        for text_reader in list(self._text_stream_readers.values()):
+            text_reader._signal_disconnect()
+        for byte_reader in list(self._byte_stream_readers.values()):
+            byte_reader._signal_disconnect()
+        self._text_stream_readers.clear()
+        self._byte_stream_readers.clear()
 
     async def _drain_rpc_invocation_tasks(self) -> None:
         if self._rpc_invocation_tasks:
             for task in self._rpc_invocation_tasks:
                 task.cancel()
             await asyncio.gather(*self._rpc_invocation_tasks, return_exceptions=True)
-
-    async def _drain_data_stream_tasks(self) -> None:
-        if self._data_stream_tasks:
-            for task in self._data_stream_tasks:
-                task.cancel()
-            await asyncio.gather(*self._data_stream_tasks, return_exceptions=True)
 
     def _retrieve_remote_participant(self, identity: str) -> Optional[RemoteParticipant]:
         """Retrieve a remote participant by identity"""

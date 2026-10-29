@@ -204,7 +204,7 @@ class VideoFrame:
         return f"rtc.VideoFrame(width={self.width}, height={self.height}, type={proto_video.VideoBufferType.Name(self.type)})"
 
     @classmethod
-    def __get_pydantic_core_schema__(cls, *_: Any):
+    def __get_pydantic_core_schema__(cls, *_: Any) -> Any:
         from pydantic_core import core_schema
         import base64
 
@@ -280,7 +280,8 @@ def _get_plane_length(type: proto_video.VideoBufferType.ValueType, width: int, h
         return width * height + chroma_width * chroma_height * 2
     elif type == proto_video.VideoBufferType.I420A:
         chroma_width = (width + 1) // 2
-        return width * height * 2 + chroma_width * chroma_width * 2
+        chroma_height = (height + 1) // 2
+        return width * height * 2 + chroma_width * chroma_height * 2
     elif type == proto_video.VideoBufferType.I422:
         chroma_width = (width + 1) // 2
         return width * height + chroma_width * height * 2
@@ -293,7 +294,7 @@ def _get_plane_length(type: proto_video.VideoBufferType.ValueType, width: int, h
     elif type == proto_video.VideoBufferType.NV12:
         chroma_width = (width + 1) // 2
         chroma_height = (height + 1) // 2
-        return width * height + chroma_width * chroma_width * 2
+        return width * height + chroma_width * chroma_height * 2
 
     raise Exception(f"unsupported video buffer type: {type}")
 
@@ -320,7 +321,7 @@ def _get_plane_infos(
         chroma_width = (width + 1) // 2
         y = _component_info(addr, width, width * height)
         u = _component_info(y.data_ptr + y.size, chroma_width, chroma_width * height)
-        v = _component_info(u.data_ptr + u.size + u.size, chroma_width, chroma_width * height)
+        v = _component_info(u.data_ptr + u.size, chroma_width, chroma_width * height)
         return [y, u, v]
     elif type == proto_video.VideoBufferType.I444:
         y = _component_info(addr, width, width * height)

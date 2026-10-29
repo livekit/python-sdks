@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "livekit-protocol"
 dynamic = ["version"]
 description = "Python protocol stubs for LiveKit"
-requires-python = ">=3.7.0"
+requires-python = ">=3.9.0"
 license = "Apache-2.0"
 readme = { content-type = "text/plain", text = "Python protocol stubs for LiveKit" }
 keywords = ["webrtc", "realtime", "audio", "video", "livekit"]
@@ -16,15 +16,17 @@ authors = [
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
-    "protobuf>=4",
-    "types-protobuf>=4",
+    "protobuf>=5",
+    "types-protobuf>=5",
 ]
 
 [project.urls]

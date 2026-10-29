@@ -1,5 +1,6 @@
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
 from ..logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -29,6 +30,38 @@ class UserState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     US_SPEAKING: _ClassVar[UserState]
     US_LISTENING: _ClassVar[UserState]
     US_AWAY: _ClassVar[UserState]
+
+class ToolCallStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    TC_RUNNING: _ClassVar[ToolCallStatus]
+    TC_DONE: _ClassVar[ToolCallStatus]
+    TC_ERROR: _ClassVar[ToolCallStatus]
+    TC_CANCELLED: _ClassVar[ToolCallStatus]
+
+class ToolReplyStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    TR_SCHEDULED: _ClassVar[ToolReplyStatus]
+    TR_COMPLETED: _ClassVar[ToolReplyStatus]
+    TR_INTERRUPTED: _ClassVar[ToolReplyStatus]
+    TR_SKIPPED: _ClassVar[ToolReplyStatus]
+
+class CloseReason(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    CR_UNKNOWN: _ClassVar[CloseReason]
+    CR_ERROR: _ClassVar[CloseReason]
+    CR_JOB_SHUTDOWN: _ClassVar[CloseReason]
+    CR_PARTICIPANT_DISCONNECTED: _ClassVar[CloseReason]
+    CR_USER_INITIATED: _ClassVar[CloseReason]
+    CR_COMPLETED: _ClassVar[CloseReason]
+
+class AmdCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    AMD_UNKNOWN: _ClassVar[AmdCategory]
+    AMD_HUMAN: _ClassVar[AmdCategory]
+    AMD_MACHINE_IVR: _ClassVar[AmdCategory]
+    AMD_MACHINE_VM: _ClassVar[AmdCategory]
+    AMD_MACHINE_UNAVAILABLE: _ClassVar[AmdCategory]
+    AMD_UNCERTAIN: _ClassVar[AmdCategory]
 DEVELOPER: ChatRole
 SYSTEM: ChatRole
 USER: ChatRole
@@ -41,9 +74,29 @@ AS_SPEAKING: AgentState
 US_SPEAKING: UserState
 US_LISTENING: UserState
 US_AWAY: UserState
+TC_RUNNING: ToolCallStatus
+TC_DONE: ToolCallStatus
+TC_ERROR: ToolCallStatus
+TC_CANCELLED: ToolCallStatus
+TR_SCHEDULED: ToolReplyStatus
+TR_COMPLETED: ToolReplyStatus
+TR_INTERRUPTED: ToolReplyStatus
+TR_SKIPPED: ToolReplyStatus
+CR_UNKNOWN: CloseReason
+CR_ERROR: CloseReason
+CR_JOB_SHUTDOWN: CloseReason
+CR_PARTICIPANT_DISCONNECTED: CloseReason
+CR_USER_INITIATED: CloseReason
+CR_COMPLETED: CloseReason
+AMD_UNKNOWN: AmdCategory
+AMD_HUMAN: AmdCategory
+AMD_MACHINE_IVR: AmdCategory
+AMD_MACHINE_VM: AmdCategory
+AMD_MACHINE_UNAVAILABLE: AmdCategory
+AMD_UNCERTAIN: AmdCategory
 
 class MetricsReport(_message.Message):
-    __slots__ = ("started_speaking_at", "stopped_speaking_at", "transcription_delay", "end_of_turn_delay", "on_user_turn_completed_delay", "llm_node_ttft", "tts_node_ttfb", "e2e_latency")
+    __slots__ = ("started_speaking_at", "stopped_speaking_at", "transcription_delay", "end_of_turn_delay", "on_user_turn_completed_delay", "llm_node_ttft", "tts_node_ttfb", "e2e_latency", "llm_node_tps", "llm_node_ttfs")
     STARTED_SPEAKING_AT_FIELD_NUMBER: _ClassVar[int]
     STOPPED_SPEAKING_AT_FIELD_NUMBER: _ClassVar[int]
     TRANSCRIPTION_DELAY_FIELD_NUMBER: _ClassVar[int]
@@ -52,6 +105,8 @@ class MetricsReport(_message.Message):
     LLM_NODE_TTFT_FIELD_NUMBER: _ClassVar[int]
     TTS_NODE_TTFB_FIELD_NUMBER: _ClassVar[int]
     E2E_LATENCY_FIELD_NUMBER: _ClassVar[int]
+    LLM_NODE_TPS_FIELD_NUMBER: _ClassVar[int]
+    LLM_NODE_TTFS_FIELD_NUMBER: _ClassVar[int]
     started_speaking_at: _timestamp_pb2.Timestamp
     stopped_speaking_at: _timestamp_pb2.Timestamp
     transcription_delay: float
@@ -60,7 +115,9 @@ class MetricsReport(_message.Message):
     llm_node_ttft: float
     tts_node_ttfb: float
     e2e_latency: float
-    def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ...) -> None: ...
+    llm_node_tps: float
+    llm_node_ttfs: float
+    def __init__(self, started_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., stopped_speaking_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., transcription_delay: _Optional[float] = ..., end_of_turn_delay: _Optional[float] = ..., on_user_turn_completed_delay: _Optional[float] = ..., llm_node_ttft: _Optional[float] = ..., tts_node_ttfb: _Optional[float] = ..., e2e_latency: _Optional[float] = ..., llm_node_tps: _Optional[float] = ..., llm_node_ttfs: _Optional[float] = ...) -> None: ...
 
 class TimedString(_message.Message):
     __slots__ = ("text", "start_time", "end_time", "confidence", "start_time_offset", "speaker_id")
@@ -111,18 +168,27 @@ class ChatMessage(_message.Message):
     def __init__(self, id: _Optional[str] = ..., role: _Optional[_Union[ChatRole, str]] = ..., content: _Optional[_Iterable[_Union[ChatMessage.ChatContent, _Mapping]]] = ..., interrupted: bool = ..., transcript_confidence: _Optional[float] = ..., extra: _Optional[_Mapping[str, str]] = ..., metrics: _Optional[_Union[MetricsReport, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class FunctionCall(_message.Message):
-    __slots__ = ("id", "call_id", "arguments", "name", "created_at")
+    __slots__ = ("id", "call_id", "arguments", "name", "created_at", "extra")
+    class ExtraEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ID_FIELD_NUMBER: _ClassVar[int]
     CALL_ID_FIELD_NUMBER: _ClassVar[int]
     ARGUMENTS_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    EXTRA_FIELD_NUMBER: _ClassVar[int]
     id: str
     call_id: str
     arguments: str
     name: str
     created_at: _timestamp_pb2.Timestamp
-    def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., arguments: _Optional[str] = ..., name: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    extra: _containers.ScalarMap[str, str]
+    def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., arguments: _Optional[str] = ..., name: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., extra: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class FunctionCallOutput(_message.Message):
     __slots__ = ("id", "name", "call_id", "output", "is_error", "created_at")
@@ -257,17 +323,29 @@ class InterruptionModelUsage(_message.Message):
     total_requests: int
     def __init__(self, provider: _Optional[str] = ..., model: _Optional[str] = ..., total_requests: _Optional[int] = ...) -> None: ...
 
+class EotModelUsage(_message.Message):
+    __slots__ = ("provider", "model", "total_requests")
+    PROVIDER_FIELD_NUMBER: _ClassVar[int]
+    MODEL_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_REQUESTS_FIELD_NUMBER: _ClassVar[int]
+    provider: str
+    model: str
+    total_requests: int
+    def __init__(self, provider: _Optional[str] = ..., model: _Optional[str] = ..., total_requests: _Optional[int] = ...) -> None: ...
+
 class ModelUsage(_message.Message):
-    __slots__ = ("llm", "tts", "stt", "interruption")
+    __slots__ = ("llm", "tts", "stt", "interruption", "eot")
     LLM_FIELD_NUMBER: _ClassVar[int]
     TTS_FIELD_NUMBER: _ClassVar[int]
     STT_FIELD_NUMBER: _ClassVar[int]
     INTERRUPTION_FIELD_NUMBER: _ClassVar[int]
+    EOT_FIELD_NUMBER: _ClassVar[int]
     llm: LLMModelUsage
     tts: TTSModelUsage
     stt: STTModelUsage
     interruption: InterruptionModelUsage
-    def __init__(self, llm: _Optional[_Union[LLMModelUsage, _Mapping]] = ..., tts: _Optional[_Union[TTSModelUsage, _Mapping]] = ..., stt: _Optional[_Union[STTModelUsage, _Mapping]] = ..., interruption: _Optional[_Union[InterruptionModelUsage, _Mapping]] = ...) -> None: ...
+    eot: EotModelUsage
+    def __init__(self, llm: _Optional[_Union[LLMModelUsage, _Mapping]] = ..., tts: _Optional[_Union[TTSModelUsage, _Mapping]] = ..., stt: _Optional[_Union[STTModelUsage, _Mapping]] = ..., interruption: _Optional[_Union[InterruptionModelUsage, _Mapping]] = ..., eot: _Optional[_Union[EotModelUsage, _Mapping]] = ...) -> None: ...
 
 class AgentSessionUsage(_message.Message):
     __slots__ = ("model_usage",)
@@ -275,8 +353,14 @@ class AgentSessionUsage(_message.Message):
     model_usage: _containers.RepeatedCompositeFieldContainer[ModelUsage]
     def __init__(self, model_usage: _Optional[_Iterable[_Union[ModelUsage, _Mapping]]] = ...) -> None: ...
 
+class DebugMessage(_message.Message):
+    __slots__ = ("payload",)
+    PAYLOAD_FIELD_NUMBER: _ClassVar[int]
+    payload: _struct_pb2.Struct
+    def __init__(self, payload: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+
 class AgentSessionEvent(_message.Message):
-    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated")
+    __slots__ = ("created_at", "agent_state_changed", "user_state_changed", "conversation_item_added", "user_input_transcribed", "function_tools_executed", "error", "overlapping_speech", "session_usage_updated", "amd_prediction", "eot_prediction", "function_tools_started", "debug_message", "tool_execution_updated", "agent_false_interruption")
     class AgentStateChanged(_message.Message):
         __slots__ = ("old_state", "new_state")
         OLD_STATE_FIELD_NUMBER: _ClassVar[int]
@@ -305,6 +389,11 @@ class AgentSessionEvent(_message.Message):
         is_final: bool
         language: str
         def __init__(self, transcript: _Optional[str] = ..., is_final: bool = ..., language: _Optional[str] = ...) -> None: ...
+    class FunctionToolsStarted(_message.Message):
+        __slots__ = ("function_calls",)
+        FUNCTION_CALLS_FIELD_NUMBER: _ClassVar[int]
+        function_calls: _containers.RepeatedCompositeFieldContainer[FunctionCall]
+        def __init__(self, function_calls: _Optional[_Iterable[_Union[FunctionCall, _Mapping]]] = ...) -> None: ...
     class FunctionToolsExecuted(_message.Message):
         __slots__ = ("function_calls", "function_call_outputs")
         FUNCTION_CALLS_FIELD_NUMBER: _ClassVar[int]
@@ -328,11 +417,85 @@ class AgentSessionEvent(_message.Message):
         detection_delay: float
         detected_at: _timestamp_pb2.Timestamp
         def __init__(self, is_interruption: bool = ..., overlap_started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., detection_delay: _Optional[float] = ..., detected_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
+    class AmdPrediction(_message.Message):
+        __slots__ = ("speech_duration", "category", "reason", "transcript", "delay")
+        SPEECH_DURATION_FIELD_NUMBER: _ClassVar[int]
+        CATEGORY_FIELD_NUMBER: _ClassVar[int]
+        REASON_FIELD_NUMBER: _ClassVar[int]
+        TRANSCRIPT_FIELD_NUMBER: _ClassVar[int]
+        DELAY_FIELD_NUMBER: _ClassVar[int]
+        speech_duration: _duration_pb2.Duration
+        category: AmdCategory
+        reason: str
+        transcript: str
+        delay: _duration_pb2.Duration
+        def __init__(self, speech_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., category: _Optional[_Union[AmdCategory, str]] = ..., reason: _Optional[str] = ..., transcript: _Optional[str] = ..., delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    class EotPrediction(_message.Message):
+        __slots__ = ("probability", "threshold", "inference_duration", "delay")
+        PROBABILITY_FIELD_NUMBER: _ClassVar[int]
+        THRESHOLD_FIELD_NUMBER: _ClassVar[int]
+        INFERENCE_DURATION_FIELD_NUMBER: _ClassVar[int]
+        DELAY_FIELD_NUMBER: _ClassVar[int]
+        probability: float
+        threshold: float
+        inference_duration: _duration_pb2.Duration
+        delay: _duration_pb2.Duration
+        def __init__(self, probability: _Optional[float] = ..., threshold: _Optional[float] = ..., inference_duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., delay: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
     class SessionUsageUpdated(_message.Message):
         __slots__ = ("usage",)
         USAGE_FIELD_NUMBER: _ClassVar[int]
         usage: AgentSessionUsage
         def __init__(self, usage: _Optional[_Union[AgentSessionUsage, _Mapping]] = ...) -> None: ...
+    class ToolExecutionUpdated(_message.Message):
+        __slots__ = ("started", "call_updated", "reply_updated", "ended")
+        class Started(_message.Message):
+            __slots__ = ("function_call",)
+            FUNCTION_CALL_FIELD_NUMBER: _ClassVar[int]
+            function_call: FunctionCall
+            def __init__(self, function_call: _Optional[_Union[FunctionCall, _Mapping]] = ...) -> None: ...
+        class CallUpdated(_message.Message):
+            __slots__ = ("id", "call_id", "message")
+            ID_FIELD_NUMBER: _ClassVar[int]
+            CALL_ID_FIELD_NUMBER: _ClassVar[int]
+            MESSAGE_FIELD_NUMBER: _ClassVar[int]
+            id: str
+            call_id: str
+            message: str
+            def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+        class Ended(_message.Message):
+            __slots__ = ("id", "call_id", "message", "status")
+            ID_FIELD_NUMBER: _ClassVar[int]
+            CALL_ID_FIELD_NUMBER: _ClassVar[int]
+            MESSAGE_FIELD_NUMBER: _ClassVar[int]
+            STATUS_FIELD_NUMBER: _ClassVar[int]
+            id: str
+            call_id: str
+            message: str
+            status: ToolCallStatus
+            def __init__(self, id: _Optional[str] = ..., call_id: _Optional[str] = ..., message: _Optional[str] = ..., status: _Optional[_Union[ToolCallStatus, str]] = ...) -> None: ...
+        class ReplyUpdated(_message.Message):
+            __slots__ = ("update_ids", "status", "speech_id")
+            UPDATE_IDS_FIELD_NUMBER: _ClassVar[int]
+            STATUS_FIELD_NUMBER: _ClassVar[int]
+            SPEECH_ID_FIELD_NUMBER: _ClassVar[int]
+            update_ids: _containers.RepeatedScalarFieldContainer[str]
+            status: ToolReplyStatus
+            speech_id: str
+            def __init__(self, update_ids: _Optional[_Iterable[str]] = ..., status: _Optional[_Union[ToolReplyStatus, str]] = ..., speech_id: _Optional[str] = ...) -> None: ...
+        STARTED_FIELD_NUMBER: _ClassVar[int]
+        CALL_UPDATED_FIELD_NUMBER: _ClassVar[int]
+        REPLY_UPDATED_FIELD_NUMBER: _ClassVar[int]
+        ENDED_FIELD_NUMBER: _ClassVar[int]
+        started: AgentSessionEvent.ToolExecutionUpdated.Started
+        call_updated: AgentSessionEvent.ToolExecutionUpdated.CallUpdated
+        reply_updated: AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated
+        ended: AgentSessionEvent.ToolExecutionUpdated.Ended
+        def __init__(self, started: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.Started, _Mapping]] = ..., call_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.CallUpdated, _Mapping]] = ..., reply_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated, _Mapping]] = ..., ended: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated.Ended, _Mapping]] = ...) -> None: ...
+    class AgentFalseInterruption(_message.Message):
+        __slots__ = ("resumed",)
+        RESUMED_FIELD_NUMBER: _ClassVar[int]
+        resumed: bool
+        def __init__(self, resumed: bool = ...) -> None: ...
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     AGENT_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
     USER_STATE_CHANGED_FIELD_NUMBER: _ClassVar[int]
@@ -342,6 +505,12 @@ class AgentSessionEvent(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OVERLAPPING_SPEECH_FIELD_NUMBER: _ClassVar[int]
     SESSION_USAGE_UPDATED_FIELD_NUMBER: _ClassVar[int]
+    AMD_PREDICTION_FIELD_NUMBER: _ClassVar[int]
+    EOT_PREDICTION_FIELD_NUMBER: _ClassVar[int]
+    FUNCTION_TOOLS_STARTED_FIELD_NUMBER: _ClassVar[int]
+    DEBUG_MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    TOOL_EXECUTION_UPDATED_FIELD_NUMBER: _ClassVar[int]
+    AGENT_FALSE_INTERRUPTION_FIELD_NUMBER: _ClassVar[int]
     created_at: _timestamp_pb2.Timestamp
     agent_state_changed: AgentSessionEvent.AgentStateChanged
     user_state_changed: AgentSessionEvent.UserStateChanged
@@ -351,10 +520,16 @@ class AgentSessionEvent(_message.Message):
     error: AgentSessionEvent.Error
     overlapping_speech: AgentSessionEvent.OverlappingSpeech
     session_usage_updated: AgentSessionEvent.SessionUsageUpdated
-    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ...) -> None: ...
+    amd_prediction: AgentSessionEvent.AmdPrediction
+    eot_prediction: AgentSessionEvent.EotPrediction
+    function_tools_started: AgentSessionEvent.FunctionToolsStarted
+    debug_message: DebugMessage
+    tool_execution_updated: AgentSessionEvent.ToolExecutionUpdated
+    agent_false_interruption: AgentSessionEvent.AgentFalseInterruption
+    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., agent_state_changed: _Optional[_Union[AgentSessionEvent.AgentStateChanged, _Mapping]] = ..., user_state_changed: _Optional[_Union[AgentSessionEvent.UserStateChanged, _Mapping]] = ..., conversation_item_added: _Optional[_Union[AgentSessionEvent.ConversationItemAdded, _Mapping]] = ..., user_input_transcribed: _Optional[_Union[AgentSessionEvent.UserInputTranscribed, _Mapping]] = ..., function_tools_executed: _Optional[_Union[AgentSessionEvent.FunctionToolsExecuted, _Mapping]] = ..., error: _Optional[_Union[AgentSessionEvent.Error, _Mapping]] = ..., overlapping_speech: _Optional[_Union[AgentSessionEvent.OverlappingSpeech, _Mapping]] = ..., session_usage_updated: _Optional[_Union[AgentSessionEvent.SessionUsageUpdated, _Mapping]] = ..., amd_prediction: _Optional[_Union[AgentSessionEvent.AmdPrediction, _Mapping]] = ..., eot_prediction: _Optional[_Union[AgentSessionEvent.EotPrediction, _Mapping]] = ..., function_tools_started: _Optional[_Union[AgentSessionEvent.FunctionToolsStarted, _Mapping]] = ..., debug_message: _Optional[_Union[DebugMessage, _Mapping]] = ..., tool_execution_updated: _Optional[_Union[AgentSessionEvent.ToolExecutionUpdated, _Mapping]] = ..., agent_false_interruption: _Optional[_Union[AgentSessionEvent.AgentFalseInterruption, _Mapping]] = ...) -> None: ...
 
 class SessionRequest(_message.Message):
-    __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
+    __slots__ = ("request_id", "ping", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info", "update_io", "finalize_simulation")
     class Ping(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
@@ -381,6 +556,36 @@ class SessionRequest(_message.Message):
     class GetFrameworkInfo(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
+    class UpdateIO(_message.Message):
+        __slots__ = ("input", "output")
+        class Input(_message.Message):
+            __slots__ = ("audio_enabled", "video_enabled")
+            AUDIO_ENABLED_FIELD_NUMBER: _ClassVar[int]
+            VIDEO_ENABLED_FIELD_NUMBER: _ClassVar[int]
+            audio_enabled: bool
+            video_enabled: bool
+            def __init__(self, audio_enabled: bool = ..., video_enabled: bool = ...) -> None: ...
+        class Output(_message.Message):
+            __slots__ = ("audio_enabled", "video_enabled", "transcription_enabled")
+            AUDIO_ENABLED_FIELD_NUMBER: _ClassVar[int]
+            VIDEO_ENABLED_FIELD_NUMBER: _ClassVar[int]
+            TRANSCRIPTION_ENABLED_FIELD_NUMBER: _ClassVar[int]
+            audio_enabled: bool
+            video_enabled: bool
+            transcription_enabled: bool
+            def __init__(self, audio_enabled: bool = ..., video_enabled: bool = ..., transcription_enabled: bool = ...) -> None: ...
+        INPUT_FIELD_NUMBER: _ClassVar[int]
+        OUTPUT_FIELD_NUMBER: _ClassVar[int]
+        input: SessionRequest.UpdateIO.Input
+        output: SessionRequest.UpdateIO.Output
+        def __init__(self, input: _Optional[_Union[SessionRequest.UpdateIO.Input, _Mapping]] = ..., output: _Optional[_Union[SessionRequest.UpdateIO.Output, _Mapping]] = ...) -> None: ...
+    class FinalizeSimulation(_message.Message):
+        __slots__ = ("provisional_success", "provisional_reason")
+        PROVISIONAL_SUCCESS_FIELD_NUMBER: _ClassVar[int]
+        PROVISIONAL_REASON_FIELD_NUMBER: _ClassVar[int]
+        provisional_success: bool
+        provisional_reason: str
+        def __init__(self, provisional_success: bool = ..., provisional_reason: _Optional[str] = ...) -> None: ...
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     PING_FIELD_NUMBER: _ClassVar[int]
     GET_CHAT_HISTORY_FIELD_NUMBER: _ClassVar[int]
@@ -390,6 +595,8 @@ class SessionRequest(_message.Message):
     GET_RTC_STATS_FIELD_NUMBER: _ClassVar[int]
     GET_SESSION_USAGE_FIELD_NUMBER: _ClassVar[int]
     GET_FRAMEWORK_INFO_FIELD_NUMBER: _ClassVar[int]
+    UPDATE_IO_FIELD_NUMBER: _ClassVar[int]
+    FINALIZE_SIMULATION_FIELD_NUMBER: _ClassVar[int]
     request_id: str
     ping: SessionRequest.Ping
     get_chat_history: SessionRequest.GetChatHistory
@@ -399,10 +606,12 @@ class SessionRequest(_message.Message):
     get_rtc_stats: SessionRequest.GetRTCStats
     get_session_usage: SessionRequest.GetSessionUsage
     get_framework_info: SessionRequest.GetFrameworkInfo
-    def __init__(self, request_id: _Optional[str] = ..., ping: _Optional[_Union[SessionRequest.Ping, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionRequest.GetChatHistory, _Mapping]] = ..., run_input: _Optional[_Union[SessionRequest.RunInput, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionRequest.GetAgentInfo, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionRequest.GetSessionState, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionRequest.GetRTCStats, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionRequest.GetSessionUsage, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionRequest.GetFrameworkInfo, _Mapping]] = ...) -> None: ...
+    update_io: SessionRequest.UpdateIO
+    finalize_simulation: SessionRequest.FinalizeSimulation
+    def __init__(self, request_id: _Optional[str] = ..., ping: _Optional[_Union[SessionRequest.Ping, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionRequest.GetChatHistory, _Mapping]] = ..., run_input: _Optional[_Union[SessionRequest.RunInput, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionRequest.GetAgentInfo, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionRequest.GetSessionState, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionRequest.GetRTCStats, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionRequest.GetSessionUsage, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionRequest.GetFrameworkInfo, _Mapping]] = ..., update_io: _Optional[_Union[SessionRequest.UpdateIO, _Mapping]] = ..., finalize_simulation: _Optional[_Union[SessionRequest.FinalizeSimulation, _Mapping]] = ...) -> None: ...
 
 class SessionResponse(_message.Message):
-    __slots__ = ("request_id", "error", "pong", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info")
+    __slots__ = ("request_id", "error", "pong", "get_chat_history", "run_input", "get_agent_info", "get_session_state", "get_rtc_stats", "get_session_usage", "get_framework_info", "update_io", "finalize_simulation")
     class Pong(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
@@ -468,6 +677,21 @@ class SessionResponse(_message.Message):
         sdk: str
         sdk_version: str
         def __init__(self, sdk: _Optional[str] = ..., sdk_version: _Optional[str] = ...) -> None: ...
+    class UpdateIOResponse(_message.Message):
+        __slots__ = ()
+        def __init__(self) -> None: ...
+    class FinalizeSimulationResponse(_message.Message):
+        __slots__ = ("user_verdict",)
+        class SimulationVerdict(_message.Message):
+            __slots__ = ("success", "reason")
+            SUCCESS_FIELD_NUMBER: _ClassVar[int]
+            REASON_FIELD_NUMBER: _ClassVar[int]
+            success: bool
+            reason: str
+            def __init__(self, success: bool = ..., reason: _Optional[str] = ...) -> None: ...
+        USER_VERDICT_FIELD_NUMBER: _ClassVar[int]
+        user_verdict: SessionResponse.FinalizeSimulationResponse.SimulationVerdict
+        def __init__(self, user_verdict: _Optional[_Union[SessionResponse.FinalizeSimulationResponse.SimulationVerdict, _Mapping]] = ...) -> None: ...
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     PONG_FIELD_NUMBER: _ClassVar[int]
@@ -478,6 +702,8 @@ class SessionResponse(_message.Message):
     GET_RTC_STATS_FIELD_NUMBER: _ClassVar[int]
     GET_SESSION_USAGE_FIELD_NUMBER: _ClassVar[int]
     GET_FRAMEWORK_INFO_FIELD_NUMBER: _ClassVar[int]
+    UPDATE_IO_FIELD_NUMBER: _ClassVar[int]
+    FINALIZE_SIMULATION_FIELD_NUMBER: _ClassVar[int]
     request_id: str
     error: str
     pong: SessionResponse.Pong
@@ -488,7 +714,9 @@ class SessionResponse(_message.Message):
     get_rtc_stats: SessionResponse.GetRTCStatsResponse
     get_session_usage: SessionResponse.GetSessionUsageResponse
     get_framework_info: SessionResponse.GetFrameworkInfoResponse
-    def __init__(self, request_id: _Optional[str] = ..., error: _Optional[str] = ..., pong: _Optional[_Union[SessionResponse.Pong, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionResponse.GetChatHistoryResponse, _Mapping]] = ..., run_input: _Optional[_Union[SessionResponse.RunInputResponse, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionResponse.GetAgentInfoResponse, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionResponse.GetSessionStateResponse, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionResponse.GetRTCStatsResponse, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionResponse.GetSessionUsageResponse, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionResponse.GetFrameworkInfoResponse, _Mapping]] = ...) -> None: ...
+    update_io: SessionResponse.UpdateIOResponse
+    finalize_simulation: SessionResponse.FinalizeSimulationResponse
+    def __init__(self, request_id: _Optional[str] = ..., error: _Optional[str] = ..., pong: _Optional[_Union[SessionResponse.Pong, _Mapping]] = ..., get_chat_history: _Optional[_Union[SessionResponse.GetChatHistoryResponse, _Mapping]] = ..., run_input: _Optional[_Union[SessionResponse.RunInputResponse, _Mapping]] = ..., get_agent_info: _Optional[_Union[SessionResponse.GetAgentInfoResponse, _Mapping]] = ..., get_session_state: _Optional[_Union[SessionResponse.GetSessionStateResponse, _Mapping]] = ..., get_rtc_stats: _Optional[_Union[SessionResponse.GetRTCStatsResponse, _Mapping]] = ..., get_session_usage: _Optional[_Union[SessionResponse.GetSessionUsageResponse, _Mapping]] = ..., get_framework_info: _Optional[_Union[SessionResponse.GetFrameworkInfoResponse, _Mapping]] = ..., update_io: _Optional[_Union[SessionResponse.UpdateIOResponse, _Mapping]] = ..., finalize_simulation: _Optional[_Union[SessionResponse.FinalizeSimulationResponse, _Mapping]] = ...) -> None: ...
 
 class AgentSessionMessage(_message.Message):
     __slots__ = ("audio_input", "audio_output", "event", "request", "response", "audio_playback_flush", "audio_playback_clear", "audio_playback_finished")

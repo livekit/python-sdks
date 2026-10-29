@@ -65,7 +65,8 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
-        **kwargs,
+        auto_close_noise_cancellation: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initialize an `AudioStream` instance.
 
@@ -81,6 +82,9 @@ class AudioStream:
             noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
                 If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
+            auto_close_noise_cancellation (bool):
+                When the audio stream closes, should the FrameProcessor's close method be run? If
+                False, then the frame processor can be reused with another AudioStream.
 
         Example:
             ```python
@@ -113,14 +117,13 @@ class AudioStream:
         self._audio_filter_module: str | None = None
         self._audio_filter_options: dict[str, Any] | None = None
         self._processor: FrameProcessor[AudioFrame] | None = None
+        self._processor_auto_close = True
         if isinstance(noise_cancellation, NoiseCancellationOptions):
             self._audio_filter_module = noise_cancellation.module_id
             self._audio_filter_options = noise_cancellation.options
         elif isinstance(noise_cancellation, FrameProcessor):
             self._processor = noise_cancellation
-
-        self._task = self._loop.create_task(self._run())
-        self._task.add_done_callback(task_done_logger)
+            self._processor_auto_close = auto_close_noise_cancellation
 
         stream: Any = None
         if "participant" in kwargs:
@@ -131,6 +134,14 @@ class AudioStream:
             stream = self._create_owned_stream()
         self._ffi_handle = FfiHandle(stream.handle.id)
         self._info = stream.info
+
+        # Start _run only after _ffi_handle is set, so a failure above doesn't orphan
+        # a task that dereferences an unassigned _ffi_handle.
+        self._task = self._loop.create_task(self._run())
+        self._task.add_done_callback(task_done_logger)
+
+        if self._track is not None:
+            self._track._register_audio_stream(self)
 
     @classmethod
     def from_participant(
@@ -144,6 +155,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        auto_close_noise_cancellation: bool = True,
     ) -> AudioStream:
         """Create an `AudioStream` from a participant's audio track.
 
@@ -179,8 +191,9 @@ class AudioStream:
             track=None,  # type: ignore
             sample_rate=sample_rate,
             num_channels=num_channels,
-            noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
+            noise_cancellation=noise_cancellation,
+            auto_close_noise_cancellation=auto_close_noise_cancellation,
         )
 
     @classmethod
@@ -194,6 +207,7 @@ class AudioStream:
         num_channels: int = 1,
         frame_size_ms: int | None = None,
         noise_cancellation: Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]] = None,
+        auto_close_noise_cancellation: bool = False,
     ) -> AudioStream:
         """Create an `AudioStream` from an existing audio track.
 
@@ -203,9 +217,12 @@ class AudioStream:
             capacity (int, optional): The capacity of the internal frame queue. Defaults to 0 (unbounded).
             sample_rate (int, optional): The sample rate for the audio stream in Hz. Defaults to 48000.
             num_channels (int, optional): The number of audio channels. Defaults to 1.
-            noise_cancellation (Optional[NoiseCancellationOptions], optional):
-                If noise cancellation is used, pass a `NoiseCancellationOptions` instance
+            noise_cancellation (Optional[NoiseCancellationOptions | FrameProcessor[AudioFrame]], optional):
+                If noise cancellation is used, pass a `NoiseCancellationOptions` or `FrameProcessor[AudioFrame]` instance
                 created by the noise cancellation module.
+            auto_close_noise_cancellation (bool):
+                When the audio stream closes, leaves the FrameProcessor in an unclosed state so it
+                can be used with another AudioStream.
 
         Returns:
             AudioStream: An instance of `AudioStream` that can be used to receive audio frames.
@@ -225,8 +242,9 @@ class AudioStream:
             capacity=capacity,
             sample_rate=sample_rate,
             num_channels=num_channels,
-            noise_cancellation=noise_cancellation,
             frame_size_ms=frame_size_ms,
+            noise_cancellation=noise_cancellation,
+            auto_close_noise_cancellation=auto_close_noise_cancellation,
         )
 
     def __del__(self) -> None:
@@ -273,7 +291,7 @@ class AudioStream:
         resp = FfiClient.instance.request(req)
         return resp.audio_stream_from_participant.stream
 
-    async def _run(self):
+    async def _run(self) -> None:
         while True:
             event = await self._ffi_queue.wait_for(self._is_event)
             audio_event: proto_audio_frame.AudioStreamEvent = event.audio_stream_event
@@ -303,8 +321,12 @@ class AudioStream:
         This method cleans up resources associated with the audio stream and waits for
         any pending operations to complete.
         """
+        if self._track is not None:
+            self._track._unregister_audio_stream(self)
         self._ffi_handle.dispose()
         await self._task
+        if self._processor is not None and self._processor_auto_close:
+            self._processor._close()
 
     def _is_event(self, e: proto_ffi.FfiEvent) -> bool:
         return e.audio_stream_event.stream_handle == self._ffi_handle.handle

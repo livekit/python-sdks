@@ -17,16 +17,16 @@ import logging
 from collections import deque
 import ctypes
 import random
-from typing import Callable, Generator, Generic, List, TypeVar, Union
+from typing import Any, Callable, Generator, Generic, List, TypeVar, Union
 
 logger = logging.getLogger("livekit")
 
 
 class classproperty(object):
-    def __init__(self, f):
-        self.f = classmethod(f)
+    def __init__(self, f: Callable[..., Any]) -> None:
+        self.f: Any = classmethod(f)
 
-    def __get__(self, *a):
+    def __get__(self, *a: Any) -> Any:
         return self.f.__get__(*a)()
 
 
@@ -113,6 +113,19 @@ class Queue(asyncio.Queue[T]):
 
             self.task_done()
 
+    def release(self) -> None:
+        """Mark every unfinished item as done.
+
+        Lets a ``join()`` that is already waiting on this queue return once there
+        is no consumer left for it.
+        """
+        while True:
+            try:
+                self.task_done()
+            except ValueError:
+                # task_done() raises once every item is accounted for
+                return
+
 
 class BroadcastQueue(Generic[T]):
     """Queue with multiple subscribers."""
@@ -135,6 +148,10 @@ class BroadcastQueue(Generic[T]):
 
     def unsubscribe(self, queue: Queue[T]) -> None:
         self._subscribers.remove(queue)
+        # A join() may already hold this queue. Events that are still queued, or that
+        # the subscriber took but never finished, have no consumer anymore, so
+        # release them instead of leaving the joiner waiting forever.
+        queue.release()
 
     async def join(self) -> None:
         async with self._lock:
@@ -146,7 +163,7 @@ class BroadcastQueue(Generic[T]):
 _base62_characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def generate_random_base62(length=12):
+def generate_random_base62(length: int = 12) -> str:
     """
     Generate a random base62 encoded string of a specified length.
 

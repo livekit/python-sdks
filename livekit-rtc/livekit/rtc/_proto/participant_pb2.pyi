@@ -89,6 +89,7 @@ class _ParticipantKindDetailEnumTypeWrapper(google.protobuf.internal.enum_type_w
     PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: _ParticipantKindDetail.ValueType  # 2
     PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: _ParticipantKindDetail.ValueType  # 3
     PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: _ParticipantKindDetail.ValueType  # 4
+    PARTICIPANT_KIND_DETAIL_SIMULATION: _ParticipantKindDetail.ValueType  # 5
 
 class ParticipantKindDetail(_ParticipantKindDetail, metaclass=_ParticipantKindDetailEnumTypeWrapper): ...
 
@@ -97,6 +98,7 @@ PARTICIPANT_KIND_DETAIL_FORWARDED: ParticipantKindDetail.ValueType  # 1
 PARTICIPANT_KIND_DETAIL_CONNECTOR_WHATSAPP: ParticipantKindDetail.ValueType  # 2
 PARTICIPANT_KIND_DETAIL_CONNECTOR_TWILIO: ParticipantKindDetail.ValueType  # 3
 PARTICIPANT_KIND_DETAIL_BRIDGE_RTSP: ParticipantKindDetail.ValueType  # 4
+PARTICIPANT_KIND_DETAIL_SIMULATION: ParticipantKindDetail.ValueType  # 5
 global___ParticipantKindDetail = ParticipantKindDetail
 
 class _DisconnectReason:
@@ -202,6 +204,7 @@ class ParticipantInfo(google.protobuf.message.Message):
     JOINED_AT_FIELD_NUMBER: builtins.int
     KIND_DETAILS_FIELD_NUMBER: builtins.int
     PERMISSION_FIELD_NUMBER: builtins.int
+    CLIENT_PROTOCOL_FIELD_NUMBER: builtins.int
     sid: builtins.str
     name: builtins.str
     identity: builtins.str
@@ -211,6 +214,7 @@ class ParticipantInfo(google.protobuf.message.Message):
     disconnect_reason: global___DisconnectReason.ValueType
     joined_at: builtins.int
     """ms timestamp of when the participant joined the room, maps to joined_at_ms in livekit_models"""
+    client_protocol: builtins.int
     @property
     def attributes(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
     @property
@@ -231,9 +235,10 @@ class ParticipantInfo(google.protobuf.message.Message):
         joined_at: builtins.int | None = ...,
         kind_details: collections.abc.Iterable[global___ParticipantKindDetail.ValueType] | None = ...,
         permission: global___ParticipantPermission | None = ...,
+        client_protocol: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["client_protocol", b"client_protocol", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["attributes", b"attributes", "client_protocol", b"client_protocol", "disconnect_reason", b"disconnect_reason", "identity", b"identity", "joined_at", b"joined_at", "kind", b"kind", "kind_details", b"kind_details", "metadata", b"metadata", "name", b"name", "permission", b"permission", "sid", b"sid", "state", b"state"]) -> None: ...
 
 global___ParticipantInfo = ParticipantInfo
 

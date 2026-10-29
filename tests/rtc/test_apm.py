@@ -8,7 +8,7 @@ from livekit.rtc import AudioProcessingModule, AudioFrame
 FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
 
 
-def test_audio_processing():
+def test_audio_processing() -> None:
     sample_rate = 48000
     num_channels = 1
     frames_per_chunk = sample_rate // 100

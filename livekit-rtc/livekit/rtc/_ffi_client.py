@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 import signal
 import asyncio
 import sys
@@ -24,6 +26,7 @@ import os
 import platform
 import atexit
 import threading
+import weakref
 from typing import Callable, Generic, List, Optional, TypeVar
 
 from ._proto import ffi_pb2 as proto_ffi
@@ -34,7 +37,7 @@ _resource_files = ExitStack()
 atexit.register(_resource_files.close)
 
 
-def _lib_name():
+def _lib_name() -> Optional[str]:
     if platform.system() == "Linux":
         return "liblivekit_ffi.so"
     elif platform.system() == "Darwin":
@@ -44,7 +47,7 @@ def _lib_name():
     return None
 
 
-def get_ffi_lib():
+def get_ffi_lib() -> ctypes.CDLL:
     # allow to override the lib path using an env var
     libpath = os.environ.get("LIVEKIT_LIB_PATH", "").strip()
     if libpath:
@@ -68,22 +71,39 @@ ffi_cb_fnc = ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_siz
 INVALID_HANDLE = 0
 
 
+_live_handles: weakref.WeakSet[FfiHandle] = weakref.WeakSet()
+
+
 class FfiHandle:
     def __init__(self, handle: int) -> None:
         self.handle = handle
         self._disposed = False
+        _live_handles.add(self)
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.dispose()
 
     @property
     def disposed(self) -> bool:
         return self._disposed
 
+    def mark_consumed(self) -> None:
+        """Marks the handle as already released on the native side.
+
+        Some requests take ownership of their handle (``take_handle``) rather
+        than borrowing it. After issuing one, the handle must not be dropped
+        again, so this suppresses the drop that dispose/GC would otherwise do.
+        """
+        self._disposed = True
+
     def dispose(self) -> None:
         if self.handle != INVALID_HANDLE and not self._disposed:
             self._disposed = True
-            assert FfiClient.instance._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
+            ffi = FfiClient._instance
+            if ffi is None or ffi._pid != os.getpid() or getattr(FfiClient, "_ffi_disposed", False):
+                return
+            dropped = ffi._ffi_lib.livekit_ffi_drop_handle(ctypes.c_uint64(self.handle))
+            assert dropped
 
     def __repr__(self) -> str:
         return f"FfiHandle({self.handle})"
@@ -149,7 +169,7 @@ class FfiQueue(Generic[T]):
                     break
 
 
-@ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)
+@ctypes.CFUNCTYPE(None, ctypes.POINTER(ctypes.c_uint8), ctypes.c_size_t)  # type: ignore[untyped-decorator]
 def ffi_event_callback(
     data_ptr: ctypes.POINTER(ctypes.c_uint8),  # type: ignore
     data_len: ctypes.c_size_t,
@@ -210,6 +230,7 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
 
 class FfiClient:
     _instance: Optional["FfiClient"] = None
+    _ffi_disposed: bool = False
 
     @classproperty
     def instance(cls) -> "FfiClient":
@@ -218,6 +239,8 @@ class FfiClient:
         return cls._instance
 
     def __init__(self) -> None:
+        FfiClient._ffi_disposed = False
+        self._pid = os.getpid()
         self._lock = threading.RLock()
         self._queue = FfiQueue[proto_ffi.FfiEvent]()
 
@@ -252,20 +275,32 @@ class FfiClient:
             ffi_event_callback, True, b"python", __version__.encode("ascii")
         )
 
-        ffi_lib = self._ffi_lib
-
         @atexit.register
-        def _dispose_lk_ffi():
-            ffi_lib.livekit_ffi_dispose()
+        def _dispose_lk_ffi() -> None:
+            self._dispose()
+
+    def _dispose(self) -> None:
+        if self._pid != os.getpid() or FfiClient._ffi_disposed:
+            return
+        FfiClient._ffi_disposed = True
+        for handle in list(_live_handles):
+            handle.mark_consumed()
+        self._ffi_lib.livekit_ffi_dispose()
 
     @property
     def queue(self) -> FfiQueue[proto_ffi.FfiEvent]:
         return self._queue
 
     def request(self, req: proto_ffi.FfiRequest) -> proto_ffi.FfiResponse:
+        if self._pid != os.getpid():
+            raise RuntimeError(
+                "livekit.rtc was used in a parent process before fork(); the native "
+                "runtime cannot be used across fork(). Do not create or connect a Room "
+                "(or use any livekit.rtc object) before forking child processes."
+            )
         proto_data = req.SerializeToString()
         proto_len = len(proto_data)
-        data = (ctypes.c_ubyte * proto_len)(*proto_data)
+        data = ctypes.cast(ctypes.c_char_p(proto_data), ctypes.POINTER(ctypes.c_ubyte))
 
         resp_ptr = ctypes.POINTER(ctypes.c_ubyte)()
         resp_len = ctypes.c_size_t()

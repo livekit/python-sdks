@@ -57,12 +57,14 @@ class PerformRpcRequest(google.protobuf.message.Message):
     PAYLOAD_FIELD_NUMBER: builtins.int
     RESPONSE_TIMEOUT_MS_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    MAX_ROUND_TRIP_LATENCY_MS_FIELD_NUMBER: builtins.int
     local_participant_handle: builtins.int
     destination_identity: builtins.str
     method: builtins.str
     payload: builtins.str
     response_timeout_ms: builtins.int
     request_async_id: builtins.int
+    max_round_trip_latency_ms: builtins.int
     def __init__(
         self,
         *,
@@ -72,9 +74,10 @@ class PerformRpcRequest(google.protobuf.message.Message):
         payload: builtins.str | None = ...,
         response_timeout_ms: builtins.int | None = ...,
         request_async_id: builtins.int | None = ...,
+        max_round_trip_latency_ms: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["destination_identity", b"destination_identity", "local_participant_handle", b"local_participant_handle", "method", b"method", "payload", b"payload", "request_async_id", b"request_async_id", "response_timeout_ms", b"response_timeout_ms"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["destination_identity", b"destination_identity", "local_participant_handle", b"local_participant_handle", "method", b"method", "payload", b"payload", "request_async_id", b"request_async_id", "response_timeout_ms", b"response_timeout_ms"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["destination_identity", b"destination_identity", "local_participant_handle", b"local_participant_handle", "max_round_trip_latency_ms", b"max_round_trip_latency_ms", "method", b"method", "payload", b"payload", "request_async_id", b"request_async_id", "response_timeout_ms", b"response_timeout_ms"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["destination_identity", b"destination_identity", "local_participant_handle", b"local_participant_handle", "max_round_trip_latency_ms", b"max_round_trip_latency_ms", "method", b"method", "payload", b"payload", "request_async_id", b"request_async_id", "response_timeout_ms", b"response_timeout_ms"]) -> None: ...
 
 global___PerformRpcRequest = PerformRpcRequest
 

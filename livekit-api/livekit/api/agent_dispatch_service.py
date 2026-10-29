@@ -26,8 +26,15 @@ class AgentDispatchService(Service):
     ```
     """
 
-    def __init__(self, session: aiohttp.ClientSession, url: str, api_key: str, api_secret: str):
-        super().__init__(session, url, api_key, api_secret)
+    def __init__(
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        api_key: str,
+        api_secret: str,
+        failover: bool = True,
+    ):
+        super().__init__(session, url, api_key, api_secret, failover=failover)
 
     async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
         """Create an explicit dispatch for an agent to join a room.
@@ -35,7 +42,9 @@ class AgentDispatchService(Service):
         To use explicit dispatch, your agent must be registered with an `agentName`.
 
         Args:
-            req (CreateAgentDispatchRequest): Request containing dispatch creation parameters
+            req (CreateAgentDispatchRequest): Request containing dispatch creation parameters.
+                The request can include an optional `deployment` field to target a specific
+                deployment. Leave empty to target the production deployment.
 
         Returns:
             AgentDispatch: The created agent dispatch object

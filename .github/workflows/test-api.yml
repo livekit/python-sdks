@@ -1,0 +1,115 @@
+# Copyright 2026 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test API
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  failover:
+    name: API (Python ${{ matrix.python-version }})
+    # setup-python has no Python 3.9 build for Ubuntu 26.04 (ubuntu-latest).
+    runs-on: ${{ matrix.python-version == '3.9' && 'ubuntu-24.04' || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    services:
+      mock-server:
+        image: livekit/test-server:latest
+        ports:
+          - 9999:9999
+          - 10000:10000
+          - 10001:10001
+          - 10002:10002
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.13.4"
+
+      - name: Install livekit-api (without livekit-rtc)
+        run: |
+          uv venv .failover-venv
+          source .failover-venv/bin/activate
+          uv pip install ./livekit-protocol ./livekit-api "pytest>=9.0.3; python_version >= '3.10'" "pytest==8.4.2; python_version < '3.10'"
+          uv pip check
+
+      - name: Wait for mock server
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:9999/settings/regions >/dev/null && exit 0
+            sleep 1
+          done
+          echo "mock server did not become ready" && exit 1
+
+      - name: Run API tests
+        run: |
+          source .failover-venv/bin/activate
+          # Use a private directory instead of pytest's shared /tmp default.
+          pytest tests/api -v --basetemp="$(mktemp -d)"
+
+  wheels:
+    name: API wheels (${{ matrix.os }}, Python ${{ matrix.python-version }}, ${{ matrix.resolution }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: ["3.9", "3.14"]
+        resolution: [lowest-direct, highest]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.13.4"
+
+      - name: Build and install distributions
+        shell: bash
+        run: |
+          uv build --package livekit-api --out-dir dist
+          uv build --package livekit-protocol --out-dir dist
+          uv venv .api-wheel-venv
+          uv pip install --python .api-wheel-venv --resolution '${{ matrix.resolution }}' dist/*.whl "pytest>=9.0.3; python_version >= '3.10'" "pytest==8.4.2; python_version < '3.10'"
+          uv pip check --python .api-wheel-venv
+
+      - name: Test token and webhook compatibility
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            test_python=.api-wheel-venv/Scripts/python.exe
+          else
+            test_python=.api-wheel-venv/bin/python
+          fi
+          "$test_python" -m pytest tests/api/test_access_token.py tests/api/test_webhook.py -v --basetemp="$RUNNER_TEMP/pytest-api"

@@ -19,7 +19,7 @@ import os
 import jwt
 import dataclasses
 from dataclasses import dataclass
-from typing import Optional, List, Literal
+from typing import Optional, List, Literal, Type, TypeVar
 from google.protobuf.json_format import MessageToDict, ParseDict
 
 from livekit.protocol.room import RoomConfiguration
@@ -68,6 +68,12 @@ class VideoGrants:
     # indicates that the holder can register as an Agent framework worker
     agent: Optional[bool] = None
 
+    # allow participant to manage an agent session via RemoteSession
+    can_manage_agent_session: Optional[bool] = None
+
+    # allow participant to subscribe to metrics
+    can_subscribe_metrics: Optional[bool] = None
+
 
 @dataclass
 class SIPGrants:
@@ -90,6 +96,43 @@ class ObservabilityGrants:
 
 
 @dataclass
+class AgentGrants:
+    # create/update/delete Cloud Agents
+    admin: bool = False
+    # manage simulations and scenarios for evaluating agents
+    simulation_admin: bool = False
+    # access the project's agent databases
+    database_admin: bool = False
+    # manage the project's agent dispatch queue
+    dispatch_admin: bool = False
+
+
+@dataclass
+class AgentEndpointGrants:
+    # invoke an agent's non-public HTTP endpoints
+    call: bool = False
+    # restrict to one agent; empty grants every agent in the project
+    agent_name: str = ""
+    # restrict to one deployment; empty grants every deployment
+    deployment: str = ""
+
+
+@dataclass
+class AgentThreadGrants:
+    # every thread and scope of the project; the action flags still apply
+    all: bool = False
+    # scope in which threads may be listed and created
+    scope: str = ""
+    # threads that may be read, written and deleted
+    thread_ids: Optional[List[str]] = None
+    list: bool = False
+    create: bool = False
+    write: bool = False
+    read: bool = False
+    delete: bool = False
+
+
+@dataclass
 class Claims:
     identity: str = ""
     name: str = ""
@@ -99,6 +142,9 @@ class Claims:
     sip: Optional[SIPGrants] = None
     inference: Optional[InferenceGrants] = None
     observability: Optional[ObservabilityGrants] = None
+    agent: Optional[AgentGrants] = None
+    agent_endpoint: Optional[AgentEndpointGrants] = None
+    agent_thread: Optional[AgentThreadGrants] = None
     attributes: Optional[dict[str, str]] = None
     sha256: Optional[str] = None
     room_preset: Optional[str] = None
@@ -157,6 +203,18 @@ class AccessToken:
 
     def with_inference_grants(self, grants: InferenceGrants) -> "AccessToken":
         self.claims.inference = grants
+        return self
+
+    def with_agent_grants(self, grants: AgentGrants) -> "AccessToken":
+        self.claims.agent = grants
+        return self
+
+    def with_agent_endpoint_grants(self, grants: AgentEndpointGrants) -> "AccessToken":
+        self.claims.agent_endpoint = grants
+        return self
+
+    def with_agent_thread_grants(self, grants: AgentThreadGrants) -> "AccessToken":
+        self.claims.agent_thread = grants
         return self
 
     def with_identity(self, identity: str) -> "AccessToken":
@@ -230,47 +288,48 @@ class TokenVerifier:
         if verify_signature and (not self.api_key or not self.api_secret):
             raise ValueError("api_key and api_secret must be set")
 
-        claims = jwt.decode(
-            token,
-            key=self.api_secret or "",
-            issuer=self.api_key or "",
-            algorithms=["HS256"],
-            leeway=self._leeway.total_seconds(),
-            options={"verify_signature": verify_signature},
-        )
-        video_dict = claims.get("video", dict())
-        video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
-        video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
-        video = VideoGrants(**video_dict)
-
-        sip_dict = claims.get("sip", dict())
-        sip_dict = {camel_to_snake(k): v for k, v in sip_dict.items()}
-        sip_dict = {k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__}
-        sip = SIPGrants(**sip_dict)
-
-        inference_dict = claims.get("inference", dict())
-        inference_dict = {camel_to_snake(k): v for k, v in inference_dict.items()}
-        inference_dict = {
-            k: v for k, v in inference_dict.items() if k in InferenceGrants.__dataclass_fields__
-        }
-        inference = InferenceGrants(**inference_dict)
-
+        # First-party minters always set exp. Without this, a hand-rolled token
+        # with a valid signature and no exp verifies forever (livekit/protocol#1706).
+        if verify_signature:
+            claims = jwt.decode(
+                token,
+                key=self.api_secret or "",
+                issuer=self.api_key or "",
+                algorithms=["HS256"],
+                leeway=self._leeway.total_seconds(),
+                options={"verify_signature": True, "require": ["exp"]},
+            )
+        else:
+            claims = jwt.decode(
+                token,
+                key=self.api_secret or "",
+                issuer=self.api_key or "",
+                algorithms=["HS256"],
+                leeway=self._leeway.total_seconds(),
+                options={"verify_signature": False},
+            )
         grant_claims = Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
-            video=video,
-            sip=sip,
-            inference=inference,
+            kind=claims.get("kind", ""),
+            video=_parse_grants(claims, "video", VideoGrants),
+            sip=_parse_grants(claims, "sip", SIPGrants),
+            inference=_parse_grants(claims, "inference", InferenceGrants),
+            observability=_parse_grants(claims, "observability", ObservabilityGrants),
             attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
+            agent=_parse_grants(claims, "agent", AgentGrants),
+            agent_endpoint=_parse_grants(claims, "agentEndpoint", AgentEndpointGrants),
+            agent_thread=_parse_grants(claims, "agentThread", AgentThreadGrants),
         )
 
         if claims.get("roomPreset"):
             grant_claims.room_preset = claims.get("roomPreset")
-        if claims.get("roomConfig"):
+        room_config = claims.get("roomConfig")
+        if room_config:
             grant_claims.room_config = ParseDict(
-                claims.get("roomConfig"),
+                room_config,
                 RoomConfiguration(),
                 ignore_unknown_fields=True,
             )
@@ -278,9 +337,20 @@ class TokenVerifier:
         return grant_claims
 
 
-def camel_to_snake(t: str):
+_G = TypeVar("_G")
+
+
+def _parse_grants(claims: dict, key: str, cls: Type[_G]) -> Optional[_G]:
+    grants = claims.get(key)
+    if grants is None:
+        return None
+    fields = cls.__dataclass_fields__  # type: ignore[attr-defined]
+    return cls(**{camel_to_snake(k): v for k, v in grants.items() if camel_to_snake(k) in fields})
+
+
+def camel_to_snake(t: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", t).lower()
 
 
-def snake_to_lower_camel(t: str):
+def snake_to_lower_camel(t: str) -> str:
     return "".join(word.capitalize() if i else word for i, word in enumerate(t.split("_")))

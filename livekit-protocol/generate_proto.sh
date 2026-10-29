@@ -19,6 +19,48 @@
 set -e
 
 
+# --- protoc / gencode version guard -------------------------------------------
+#
+# Generated *_pb2.py stubs (protobuf>=5) embed a "gencode" version and a runtime
+# check that REFUSES to import when the installed protobuf runtime is OLDER than
+# the gencode (raising google.protobuf.runtime_version.VersionError). The only
+# rule is runtime >= gencode; there is NO lower bound, so gencode-N stubs load on
+# any runtime >= N (N, N+1, ...).
+#
+# IMPORTANT LIMITATION: the protobuf runtime is capped at <7 (tops out at 6.x)
+# because livekit-agents pulls deps that pin protobuf<7 — opentelemetry-proto
+# (via opentelemetry-exporter-otlp) and grpcio-tools (via the nvidia plugin).
+#
+# We target gencode 5 (protoc 26.x-29.x, e.g. protoc 29.3 => gencode 5.29.x):
+#   * gencode 5 needs only runtime >= 5, so it works on every 5.x / 6.x runtime
+#     AND a future 7.x — no regen needed when the <7 cap is eventually lifted.
+#   * gencode 6 would be minor-sensitive against today's pinned 6.x runtime
+#     (e.g. gencode 6.34 fails to import on runtime 6.33), so it is NOT safe yet.
+#   * gencode 7+ (libprotoc 35+) requires runtime >= 7 and breaks outright today.
+# This guard rejects gencode > 5. Ships stubs require protobuf>=5 (see pyproject).
+MAX_GENCODE_MAJOR=5
+
+_probe_dir=$(mktemp -d)
+trap 'rm -rf "$_probe_dir"' EXIT
+printf 'syntax = "proto3";\nmessage _ProtocVersionProbe {}\n' > "$_probe_dir/probe.proto"
+protoc -I="$_probe_dir" --python_out="$_probe_dir" "$_probe_dir/probe.proto"
+gencode_major=$(sed -n 's/^# Protobuf Python Version: \([0-9][0-9]*\).*/\1/p' "$_probe_dir/probe_pb2.py")
+
+if [ -z "$gencode_major" ]; then
+    # protoc <3.20 didn't stamp a version line; that predates the runtime guard
+    # entirely, so it's safe.
+    echo "note: protoc ($(protoc --version)) emits no gencode version stamp (pre-guard); proceeding."
+elif [ "$gencode_major" -gt "$MAX_GENCODE_MAJOR" ]; then
+    echo "ERROR: protoc ($(protoc --version)) emits gencode major ${gencode_major}, but this" >&2
+    echo "       package targets gencode ${MAX_GENCODE_MAJOR} (see the comment above). The" >&2
+    echo "       protobuf runtime is capped at <7 (6.x) by livekit-agents dependencies" >&2
+    echo "       (opentelemetry-proto, grpcio-tools), and gencode 6+ is not safe against it." >&2
+    echo "       Install protoc 26.x-29.x (e.g. a pinned protoc-29.3 download, or" >&2
+    echo "       'brew install protobuf@29'); protoc 29.3 emits gencode 5.29.x." >&2
+    exit 1
+fi
+
+
 API_PROTOCOL=./protocol/protobufs
 API_OUT_PYTHON=./livekit/protocol
 
@@ -33,11 +75,16 @@ protoc \
     $API_PROTOCOL/livekit_models.proto \
     $API_PROTOCOL/livekit_agent.proto \
     $API_PROTOCOL/livekit_agent_dispatch.proto \
+    $API_PROTOCOL/livekit_agent_worker.proto \
     $API_PROTOCOL/livekit_metrics.proto \
     $API_PROTOCOL/livekit_sip.proto \
     $API_PROTOCOL/livekit_analytics.proto \
     $API_PROTOCOL/livekit_rtc.proto \
+    $API_PROTOCOL/livekit_cloud_agent.proto \
+    $API_PROTOCOL/livekit_agent_simulation.proto \
+    $API_PROTOCOL/livekit_agentdb.proto \
     $API_PROTOCOL/agent/livekit_agent_session.proto \
+    $API_PROTOCOL/agent/livekit_agent_inference.proto \
     $API_PROTOCOL/agent/livekit_agent_text.proto \
     $API_PROTOCOL/agent/livekit_agent_dev.proto \
     $API_PROTOCOL/logger/options.proto \
@@ -71,8 +118,16 @@ mv "$API_OUT_PYTHON/livekit_agent_pb2.py" "$API_OUT_PYTHON/agent.py"
 mv "$API_OUT_PYTHON/livekit_agent_pb2.pyi" "$API_OUT_PYTHON/agent.pyi"
 mv "$API_OUT_PYTHON/livekit_agent_dispatch_pb2.py" "$API_OUT_PYTHON/agent_dispatch.py"
 mv "$API_OUT_PYTHON/livekit_agent_dispatch_pb2.pyi" "$API_OUT_PYTHON/agent_dispatch.pyi"
+mv "$API_OUT_PYTHON/livekit_agent_worker_pb2.py" "$API_OUT_PYTHON/agent_worker.py"
+mv "$API_OUT_PYTHON/livekit_agent_worker_pb2.pyi" "$API_OUT_PYTHON/agent_worker.pyi"
 mv "$API_OUT_PYTHON/livekit_analytics_pb2.py" "$API_OUT_PYTHON/analytics.py"
 mv "$API_OUT_PYTHON/livekit_analytics_pb2.pyi" "$API_OUT_PYTHON/analytics.pyi"
+mv "$API_OUT_PYTHON/livekit_cloud_agent_pb2.py" "$API_OUT_PYTHON/cloud_agent.py"
+mv "$API_OUT_PYTHON/livekit_cloud_agent_pb2.pyi" "$API_OUT_PYTHON/cloud_agent.pyi"
+mv "$API_OUT_PYTHON/livekit_agent_simulation_pb2.py" "$API_OUT_PYTHON/agent_simulation.py"
+mv "$API_OUT_PYTHON/livekit_agent_simulation_pb2.pyi" "$API_OUT_PYTHON/agent_simulation.pyi"
+mv "$API_OUT_PYTHON/livekit_agentdb_pb2.py" "$API_OUT_PYTHON/agentdb.py"
+mv "$API_OUT_PYTHON/livekit_agentdb_pb2.pyi" "$API_OUT_PYTHON/agentdb.pyi"
 mv "$API_OUT_PYTHON/livekit_sip_pb2.py" "$API_OUT_PYTHON/sip.py"
 mv "$API_OUT_PYTHON/livekit_sip_pb2.pyi" "$API_OUT_PYTHON/sip.pyi"
 mv "$API_OUT_PYTHON/livekit_metrics_pb2.py" "$API_OUT_PYTHON/metrics.py"
@@ -87,6 +142,8 @@ mv "$API_OUT_PYTHON/livekit_connector_pb2.py" "$API_OUT_PYTHON/connector.py"
 mv "$API_OUT_PYTHON/livekit_connector_pb2.pyi" "$API_OUT_PYTHON/connector.pyi"
 
 mkdir -p "$API_OUT_PYTHON/agent_pb"
+mv "$API_OUT_PYTHON/agent/livekit_agent_inference_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_inference.py"
+mv "$API_OUT_PYTHON/agent/livekit_agent_inference_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_inference.pyi"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_session.py"
 mv "$API_OUT_PYTHON/agent/livekit_agent_session_pb2.pyi" "$API_OUT_PYTHON/agent_pb/agent_session.pyi"
 mv "$API_OUT_PYTHON/agent/livekit_agent_text_pb2.py" "$API_OUT_PYTHON/agent_pb/agent_text.py"
@@ -98,7 +155,7 @@ mkdir -p "$API_OUT_PYTHON/logger_pb"
 mv "$API_OUT_PYTHON/logger/options_pb2.py" "$API_OUT_PYTHON/logger_pb/options.py"
 mv "$API_OUT_PYTHON/logger/options_pb2.pyi" "$API_OUT_PYTHON/logger_pb/options.pyi"
 
-find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|livekit_agent_dev_pb2\|options_pb2))|from . $1|g'
+find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|^(import (livekit_egress_pb2\|livekit_room_pb2\|livekit_webhook_pb2\|livekit_ingress_pb2\|livekit_models_pb2\|livekit_agent_pb2\|livekit_agent_dispatch_pb2\|livekit_agent_worker_pb2\|livekit_analytics_pb2\|livekit_sip_pb2\|livekit_metrics_pb2\|livekit_rtc_pb2\|livekit_cloud_agent_pb2\|livekit_agent_simulation_pb2\|livekit_agentdb_pb2\|livekit_connector_whatsapp_pb2\|livekit_connector_twilio_pb2\|livekit_connector_pb2\|livekit_agent_session_pb2\|livekit_agent_inference_pb2\|livekit_agent_dev_pb2\|livekit_agent_text_pb2\|options_pb2))|from . $1|g'
 
 find "$API_OUT_PYTHON" -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|livekit_(\w+)_pb2|${1}|g'
 
@@ -110,6 +167,9 @@ find "$API_OUT_PYTHON" -mindepth 2 -name '*.py' -o -name '*.pyi' | xargs perl -i
 
 # fix `from agent import agent_xxx as xxx` to `from . import agent_xxx as xxx`
 find "$API_OUT_PYTHON"/agent_pb -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from agent import (agent_\w+) as ([^ ]+)|from . import $1 as $2|g'
+
+# top-level files (e.g. agent_simulation) importing from agent/ -> agent_pb subpackage
+find "$API_OUT_PYTHON" -maxdepth 1 -name '*.py' -o -name '*.pyi' | xargs perl -i -pe 's|from agent import (agent_\w+) as ([^ ]+)|from .agent_pb import $1 as $2|g'
 
 # fixes - error: ClassVar can only be used for assignments in class body  [misc]
 perl -i -pe 's|^(\w+_FIELD_NUMBER): _ClassVar\[int\]|$1: int|g' "$API_OUT_PYTHON/logger_pb/options.pyi"

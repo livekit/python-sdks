@@ -16,10 +16,13 @@ from __future__ import annotations
 
 import ctypes
 import asyncio
+import functools
+import inspect
 import datetime
+import enum
 import os
 import mimetypes
-import aiofiles
+import weakref
 from typing import List, Union, Callable, Dict, Awaitable, Optional, Mapping, cast, TypeVar
 from abc import abstractmethod, ABC
 
@@ -28,6 +31,10 @@ from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
 from ._proto.room_pb2 import (
     TrackPublishOptions,
+)
+from ._proto.room_pb2 import (
+    ConnectionQuality as ProtoConnectionQuality,
+    DegradationPreference as ProtoDegradationPreference,
 )
 from ._proto.room_pb2 import (
     TranscriptionSegment as ProtoTranscriptionSegment,
@@ -43,16 +50,25 @@ from .track_publication import (
     TrackPublication,
 )
 from .transcription import Transcription
-from .rpc import RpcError
+from .rpc import (
+    RpcCallInfo,
+    RpcError,
+    RpcInterceptor,
+    RpcInvocationData,
+    _chain_incoming,
+    _chain_outgoing,
+)
 from ._proto.rpc_pb2 import RpcMethodInvocationResponseRequest
 from .log import logger
 
-from .rpc import RpcInvocationData
 from .data_stream import (
     TextStreamWriter,
+    TextStreamInfo,
     ByteStreamWriter,
     ByteStreamInfo,
-    STREAM_CHUNK_SIZE,
+    StreamError,
+    _text_stream_info_from_proto,
+    _byte_stream_info_from_proto,
 )
 from .data_track import LocalDataTrack
 from ._proto import data_track_pb2 as proto_data_track
@@ -88,10 +104,45 @@ class PublishDataTrackError(Exception):
         self.message = message
 
 
+class ConnectionQuality(enum.IntEnum):
+    """Connection quality reported for a participant."""
+
+    QUALITY_UNKNOWN = -1
+    """No connection-quality update has been reported yet (no proto equivalent)."""
+    QUALITY_POOR = ProtoConnectionQuality.QUALITY_POOR
+    QUALITY_GOOD = ProtoConnectionQuality.QUALITY_GOOD
+    QUALITY_EXCELLENT = ProtoConnectionQuality.QUALITY_EXCELLENT
+    QUALITY_LOST = ProtoConnectionQuality.QUALITY_LOST
+
+
+class DegradationPreference(enum.IntEnum):
+    """Controls how the encoder degrades quality when bandwidth is constrained."""
+
+    BALANCED = ProtoDegradationPreference.DEGRADATION_PREFERENCE_BALANCED
+    """Balance between framerate and resolution degradation."""
+    MAINTAIN_FRAMERATE = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE
+    """Degrade resolution to maintain framerate (prioritize smooth motion)."""
+    MAINTAIN_RESOLUTION = ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_RESOLUTION
+    """Degrade framerate to maintain resolution (prioritize image clarity)."""
+    MAINTAIN_FRAMERATE_AND_RESOLUTION = (
+        ProtoDegradationPreference.DEGRADATION_PREFERENCE_MAINTAIN_FRAMERATE_AND_RESOLUTION
+    )
+    """Maintain both framerate and resolution. Frames may be dropped before encoding
+    if necessary to avoid overusing network and encoder resources."""
+
+
+def _connection_quality_from_proto(value: int) -> ConnectionQuality:
+    try:
+        return ConnectionQuality(value)
+    except ValueError:
+        return ConnectionQuality.QUALITY_UNKNOWN
+
+
 class Participant(ABC):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         self._info = owned_info.info
         self._ffi_handle = FfiHandle(owned_info.handle.id)
+        self._connection_quality = ConnectionQuality.QUALITY_UNKNOWN
 
     @property
     @abstractmethod
@@ -128,6 +179,11 @@ class Participant(ABC):
         return self._info.kind
 
     @property
+    def kind_details(self) -> list[proto_participant.ParticipantKindDetail.ValueType]:
+        """Additional details refining the participant's kind (e.g., cloud agent, forwarded, whatsapp/twilio connector, rtsp bridge)."""
+        return list(self._info.kind_details)
+
+    @property
     def state(self) -> proto_participant.ParticipantState.ValueType:
         """Participant's connection state (joining, joined, active, disconnected)."""
         return self._info.state
@@ -145,6 +201,16 @@ class Participant(ABC):
     def permissions(self) -> proto_participant.ParticipantPermission:
         """The participant's permissions within the room."""
         return self._info.permission
+
+    @property
+    def connection_quality(self) -> ConnectionQuality:
+        """The participant's most recently reported connection quality.
+
+        Returns ``ConnectionQuality.QUALITY_UNKNOWN`` until the first
+        connection-quality update is received. Updated automatically whenever a
+        ``connection_quality_changed`` event fires for this participant.
+        """
+        return self._connection_quality
 
     @property
     def disconnect_reason(
@@ -172,6 +238,26 @@ class Participant(ABC):
 
 
 RpcHandler = Callable[["RpcInvocationData"], Union[Awaitable[Optional[str]], Optional[str]]]
+
+# how long a cancelled incoming RPC chain gets to unwind before the caller is answered
+# without it (the room's disconnect waits on these invocations)
+_RPC_CANCEL_UNWIND_TIMEOUT = 2.0
+
+
+def _observe_unwind(method: str, chain_task: "asyncio.Future[Optional[str]]") -> None:
+    """Consume what a cancelled chain raised while unwinding.
+
+    The caller has been (or is being) answered without it, so nobody awaits the chain
+    anymore; unless its exception is retrieved here the loop reports it as never retrieved
+    when the task is garbage collected.
+    """
+    if chain_task.cancelled():
+        return
+    exc = chain_task.exception()
+    if exc is not None:
+        logger.warning("RPC handler for %s raised while being cancelled", method, exc_info=exc)
+
+
 F = TypeVar(
     "F", bound=Callable[[RpcInvocationData], Union[Awaitable[Optional[str]], Optional[str]]]
 )
@@ -187,8 +273,21 @@ class LocalParticipant(Participant):
     ) -> None:
         super().__init__(owned_info)
         self._room_queue = room_queue
-        self._track_publications: dict[str, LocalTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, LocalTrackPublication] = {}
         self._rpc_handlers: Dict[str, RpcHandler] = {}
+        self._rpc_interceptors: List[RpcInterceptor] = []
+        # Handles of data stream writers that have been opened but not yet
+        # closed, so the room can drop them at disconnect. The FFI close
+        # request consumes the handle (take_handle), so an entry is removed as
+        # soon as a close is sent for it.
+        #
+        # Held weakly: the writer itself owns the FfiHandle, and a writer that
+        # is simply abandoned should be collectable so its handle is dropped at
+        # GC rather than lingering until disconnect. A strong reference here
+        # would pin every writer for the life of the room.
+        self._open_stream_writers: weakref.WeakValueDictionary[int, FfiHandle] = (
+            weakref.WeakValueDictionary()
+        )
 
     @property
     def track_publications(self) -> Mapping[str, LocalTrackPublication]:
@@ -196,6 +295,22 @@ class LocalParticipant(Participant):
         A dictionary of track publications associated with the participant.
         """
         return self._track_publications
+
+    def _dispose_open_stream_writers(self) -> None:
+        """Drops the native writers of any data streams that were opened but
+        never closed — a writer the caller abandoned, or one left behind by a
+        failed write. Their handles would otherwise be held by the FFI server
+        for the lifetime of the process.
+
+        The room is already gone at this point, so the handles are dropped
+        directly rather than closed: there is no end-of-stream left to deliver.
+        """
+        for ffi_handle in list(self._open_stream_writers.values()):
+            try:
+                ffi_handle.dispose()
+            except Exception:
+                logger.exception("failed to dispose data stream writer handle")
+        self._open_stream_writers.clear()
 
     async def publish_data(
         self,
@@ -318,6 +433,7 @@ class LocalParticipant(Participant):
         method: str,
         payload: str,
         response_timeout: Optional[float] = None,
+        max_round_trip_latency: Optional[float] = None,
     ) -> str:
         """
         Initiate an RPC call to a remote participant.
@@ -327,6 +443,12 @@ class LocalParticipant(Participant):
             method (str): The method name to call
             payload (str): The method payload
             response_timeout (Optional[float]): Timeout for receiving a response after initial connection
+            max_round_trip_latency (float): The maximum amount of time it should ever take for an RPC
+                request to reach the destination and for the ACK to come back. Defaults to 7 seconds to
+                account for various relay timeouts and retries in LiveKit Cloud that occur in rare cases.
+                Most callers should not need to change this, but it can be increased to tolerate
+                high-latency networks where RPC requests are backed up behind other messages on the
+                data channel.
 
         Returns:
             str: The response payload
@@ -334,13 +456,27 @@ class LocalParticipant(Participant):
         Raises:
             RpcError: On failure. Details in `message`.
         """
+        call = RpcCallInfo(
+            destination_identity=destination_identity,
+            method=method,
+            payload=payload,
+            response_timeout=response_timeout,
+            max_round_trip_latency=max_round_trip_latency,
+        )
+        # snapshot the interceptor list so add/remove during a call is well defined
+        perform = _chain_outgoing(list(self._rpc_interceptors), self._perform_rpc_ffi)
+        return await perform(call)
+
+    async def _perform_rpc_ffi(self, call: RpcCallInfo) -> str:
         req = proto_ffi.FfiRequest()
         req.perform_rpc.local_participant_handle = self._ffi_handle.handle
-        req.perform_rpc.destination_identity = destination_identity
-        req.perform_rpc.method = method
-        req.perform_rpc.payload = payload
-        if response_timeout is not None:
-            req.perform_rpc.response_timeout_ms = int(response_timeout * 1000)
+        req.perform_rpc.destination_identity = call.destination_identity
+        req.perform_rpc.method = call.method
+        req.perform_rpc.payload = call.payload
+        if call.response_timeout is not None:
+            req.perform_rpc.response_timeout_ms = int(call.response_timeout * 1000)
+        if call.max_round_trip_latency is not None:
+            req.perform_rpc.max_round_trip_latency_ms = int(call.max_round_trip_latency * 1000)
 
         queue = FfiClient.instance.queue.subscribe()
         try:
@@ -352,7 +488,32 @@ class LocalParticipant(Participant):
         if cb.perform_rpc.HasField("error"):
             raise RpcError._from_proto(cb.perform_rpc.error)
 
-        return cb.perform_rpc.payload
+        return cast(str, cb.perform_rpc.payload)
+
+    def add_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Add an :class:`RpcInterceptor` that wraps every RPC this participant performs or
+        handles. Interceptors run in the order they were added, the first being outermost.
+        Adding the same instance twice is a no-op.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to add.
+        """
+        # identity, not equality: two distinct interceptors that compare equal must coexist
+        if not any(existing is interceptor for existing in self._rpc_interceptors):
+            self._rpc_interceptors.append(interceptor)
+
+    def remove_rpc_interceptor(self, interceptor: RpcInterceptor) -> None:
+        """
+        Remove a previously added :class:`RpcInterceptor`. Calls already in flight keep the
+        chain they started with.
+
+        Args:
+            interceptor (RpcInterceptor): The interceptor to remove.
+        """
+        self._rpc_interceptors = [
+            existing for existing in self._rpc_interceptors if existing is not interceptor
+        ]
 
     def register_rpc_method(
         self,
@@ -457,33 +618,20 @@ class LocalParticipant(Participant):
         response_error: Optional[RpcError] = None
         response_payload: Optional[str] = None
 
-        params = RpcInvocationData(request_id, caller_identity, payload, response_timeout)
+        params = RpcInvocationData(
+            request_id, caller_identity, payload, response_timeout, method=method
+        )
 
-        handler = self._rpc_handlers.get(method)
-
-        if not handler:
-            response_error = RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
-        else:
-            try:
-                if asyncio.iscoroutinefunction(handler):
-                    try:
-                        response_payload = await asyncio.wait_for(
-                            handler(params), timeout=response_timeout
-                        )
-                    except asyncio.TimeoutError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
-                    except asyncio.CancelledError:
-                        raise RpcError._built_in(RpcError.ErrorCode.RECIPIENT_DISCONNECTED)
-                else:
-                    response_payload = cast(Optional[str], handler(params))
-            except RpcError as error:
-                response_error = error
-            except Exception:
-                logger.exception(
-                    f"Uncaught error returned by RPC handler for {method}. "
-                    "Returning APPLICATION_ERROR instead. "
-                )
-                response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+        try:
+            response_payload = await self._run_incoming_chain(params)
+        except RpcError as error:
+            response_error = error
+        except Exception:
+            logger.exception(
+                f"Uncaught error returned by RPC handler for {method}. "
+                "Returning APPLICATION_ERROR instead. "
+            )
+            response_error = RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
 
         req = proto_ffi.FfiRequest(
             rpc_method_invocation_response=RpcMethodInvocationResponseRequest(
@@ -499,6 +647,115 @@ class LocalParticipant(Participant):
         if res.rpc_method_invocation_response.error:
             err = res.rpc_method_invocation_response.error
             logger.error(f"error sending rpc method invocation response: {err}")
+
+    async def _run_incoming_chain(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the interceptor chain and the handler under the caller's response deadline.
+
+        The deadline covers the whole chain, so time an interceptor spends before or after
+        ``next`` counts against it; when it passes, the chain is cancelled and the caller
+        gets ``RESPONSE_TIMEOUT``, whatever the chain raises while unwinding. Cancellation
+        from outside (the room disconnecting) maps to ``RECIPIENT_DISCONNECTED``, as before.
+
+        A ``TimeoutError`` raised by the handler or an interceptor itself before the
+        deadline (an HTTP client timing out, say) is not the response deadline: it
+        propagates as an application error rather than being reported as
+        ``RESPONSE_TIMEOUT``.
+        """
+        handle = _chain_incoming(list(self._rpc_interceptors), self._invoke_rpc_handler)
+        loop = asyncio.get_running_loop()
+        # ensure_future: `next` continuations are typed as Awaitable, not Coroutine
+        chain_task: asyncio.Future[Optional[str]] = asyncio.ensure_future(handle(invocation))
+
+        # the deadline is recorded independently of whatever the chain raises while it
+        # unwinds, so a TimeoutError (or anything else) from cancellation cleanup cannot be
+        # mistaken for an application failure, nor a genuine in-chain timeout for the deadline
+        deadline_fired = False
+
+        def _on_deadline() -> None:
+            nonlocal deadline_fired
+            # only a cancel the chain accepted counts: cancel() is False when the chain has
+            # already finished, which can happen in the same loop iteration the timer fires
+            # while this task has not resumed yet; that result is the caller's, not a timeout
+            invocation.cancel_reason = RpcError.ErrorCode.RESPONSE_TIMEOUT
+            deadline_fired = chain_task.cancel()
+            if not deadline_fired:
+                invocation.cancel_reason = None
+
+        deadline = loop.call_later(invocation.response_timeout, _on_deadline)
+        try:
+            # asyncio.wait never cancels what it waits on, so a cancel from outside (the room
+            # disconnecting) is raised here at once with the chain untouched. Awaiting the
+            # chain directly would forward the cancel to it and keep this task parked until
+            # the chain finished, so a handler that ignored cancellation held up
+            # room.disconnect() for as long as the caller's deadline. (Not asyncio.shield:
+            # since Python 3.14 it reports the inner future's exception to the loop's
+            # exception handler once its outer future was cancelled.)
+            await asyncio.wait([chain_task])
+        except asyncio.CancelledError:
+            # cancelled from outside: stop the chain and let it unwind before answering the
+            # caller, but not for long; this is the path room.disconnect() waits on.
+            # First cause wins: if the deadline already cancelled the chain, the interceptors
+            # are unwinding with RESPONSE_TIMEOUT and the caller gets that too, and the timer
+            # is cancelled here so it cannot fire into the wait below and flip the reason
+            deadline.cancel()
+            if not deadline_fired:
+                invocation.cancel_reason = RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+                chain_task.cancel()
+            _, pending = await asyncio.wait([chain_task], timeout=_RPC_CANCEL_UNWIND_TIMEOUT)
+            if pending:
+                logger.warning(
+                    "RPC handler for %s did not stop within %.1fs of being cancelled; "
+                    "answering the caller without it",
+                    invocation.method,
+                    _RPC_CANCEL_UNWIND_TIMEOUT,
+                )
+                chain_task.add_done_callback(functools.partial(_observe_unwind, invocation.method))
+            else:
+                _observe_unwind(invocation.method, chain_task)
+            raise RpcError._built_in(
+                RpcError.ErrorCode.RESPONSE_TIMEOUT
+                if deadline_fired
+                else RpcError.ErrorCode.RECIPIENT_DISCONNECTED
+            ) from None
+        finally:
+            deadline.cancel()
+
+        if deadline_fired:
+            # whatever the chain raised while unwinding is not the caller's business
+            _observe_unwind(invocation.method, chain_task)
+            raise RpcError._built_in(RpcError.ErrorCode.RESPONSE_TIMEOUT)
+        if chain_task.cancelled():
+            # nothing here cancelled it: an interceptor or the handler let a CancelledError
+            # of its own escape. That is a failure of the handler, and it must still be
+            # answered; result() would re-raise the CancelledError past the response code
+            # and leave the caller waiting for its timeout.
+            logger.warning(
+                "RPC handler for %s raised CancelledError; returning APPLICATION_ERROR",
+                invocation.method,
+            )
+            raise RpcError._built_in(RpcError.ErrorCode.APPLICATION_ERROR)
+        # the chain's own outcome: its exception, if any, propagates unchanged
+        return chain_task.result()
+
+    async def _invoke_rpc_handler(self, invocation: RpcInvocationData) -> Optional[str]:
+        """Run the registered handler for ``invocation`` (the innermost step of the chain).
+
+        Raises ``RpcError(UNSUPPORTED_METHOD)`` when nothing is registered; any exception
+        from the handler propagates unchanged so interceptors can observe it before the
+        caller's response is built. The response deadline is enforced by the caller around
+        the whole chain.
+        """
+        handler = self._rpc_handlers.get(invocation.method)
+        if not handler:
+            raise RpcError._built_in(RpcError.ErrorCode.UNSUPPORTED_METHOD)
+
+        # RpcHandler admits any callable returning a payload or an awaitable of one: a
+        # coroutine function, but also a callable object with an async __call__ or a sync
+        # wrapper handing back a coroutine, which iscoroutinefunction would not recognize
+        result = handler(invocation)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
 
     async def set_metadata(self, metadata: str) -> None:
         """
@@ -612,20 +869,35 @@ class LocalParticipant(Participant):
         topic: str = "",
         attributes: Optional[Dict[str, str]] = None,
         reply_to_id: str | None = None,
-    ):
-        total_size = len(text.encode())
-        writer = await self.stream_text(
-            destination_identities=destination_identities,
-            topic=topic,
-            attributes=attributes,
-            reply_to_id=reply_to_id,
-            total_size=total_size,
-        )
+        compress: bool = True,
+    ) -> TextStreamInfo:
+        req = proto_ffi.FfiRequest()
+        req.send_text.local_participant_handle = self._ffi_handle.handle
+        req.send_text.text = text
+        options = req.send_text.options
+        options.topic = topic
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if reply_to_id:
+            options.reply_to_stream_id = reply_to_id
+        options.compress = compress
+        options.sender_identity = self.identity
 
-        await writer.write(text)
-        await writer.aclose()
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_text.async_id == resp.send_text.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
-        return writer.info
+        if cb.send_text.HasField("error"):
+            raise StreamError(cb.send_text.error.description)
+
+        return _text_stream_info_from_proto(cb.send_text.info)
 
     async def stream_bytes(
         self,
@@ -665,29 +937,92 @@ class LocalParticipant(Participant):
         destination_identities: Optional[List[str]] = None,
         attributes: Optional[Dict[str, str]] = None,
         stream_id: str | None = None,
+        compress: bool = True,
     ) -> ByteStreamInfo:
-        file_size = os.path.getsize(file_path)
         file_name = os.path.basename(file_path)
         mime_type, _ = mimetypes.guess_type(file_path)
         if mime_type is None:
             mime_type = "application/octet-stream"  # Fallback MIME type for unknown files
 
-        writer: ByteStreamWriter = await self.stream_bytes(
-            name=file_name,
-            total_size=file_size,
-            mime_type=mime_type,
-            attributes=attributes,
-            stream_id=stream_id,
-            destination_identities=destination_identities,
-            topic=topic,
-        )
+        req = proto_ffi.FfiRequest()
+        req.send_file.local_participant_handle = self._ffi_handle.handle
+        req.send_file.file_path = file_path
+        options = req.send_file.options
+        options.topic = topic
+        options.name = file_name
+        options.mime_type = mime_type
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
+        options.compress = compress
+        options.sender_identity = self.identity
 
-        async with aiofiles.open(file_path, "rb") as f:
-            while bytes := await f.read(STREAM_CHUNK_SIZE):
-                await writer.write(bytes)
-        await writer.aclose()
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_file.async_id == resp.send_file.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
 
-        return writer.info
+        if cb.send_file.HasField("error"):
+            raise StreamError(cb.send_file.error.description)
+
+        return _byte_stream_info_from_proto(cb.send_file.info)
+
+    async def send_bytes(
+        self,
+        data: bytes,
+        *,
+        topic: str = "",
+        name: str | None = None,
+        mime_type: str | None = None,
+        destination_identities: Optional[List[str]] = None,
+        attributes: Optional[Dict[str, str]] = None,
+        stream_id: str | None = None,
+        compress: bool = True,
+    ) -> ByteStreamInfo:
+        """
+        Sends an in-memory buffer as a complete byte stream in one call.
+        Unlike stream_bytes(), the whole payload is known up front, so short payloads can be
+        sent as a single packet and larger ones compressed, when every recipient supports it.
+        `name` defaults to "unknown" and `mime_type` to "application/octet-stream".
+        """
+        req = proto_ffi.FfiRequest()
+        req.send_bytes.local_participant_handle = self._ffi_handle.handle
+        req.send_bytes.bytes = data
+        options = req.send_bytes.options
+        options.topic = topic
+        if name is not None:
+            options.name = name
+        if mime_type is not None:
+            options.mime_type = mime_type
+        if attributes:
+            options.attributes.update(attributes)
+        if destination_identities:
+            options.destination_identities.extend(destination_identities)
+        if stream_id is not None:
+            options.id = stream_id
+        options.compress = compress
+        options.sender_identity = self.identity
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.send_bytes.async_id == resp.send_bytes.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.send_bytes.HasField("error"):
+            raise StreamError(cb.send_bytes.error.description)
+
+        return _byte_stream_info_from_proto(cb.send_bytes.info)
 
     async def publish_data_track(
         self,
@@ -778,6 +1113,13 @@ class LocalParticipant(Participant):
         Raises:
             UnpublishTrackError: If there is an error in unpublishing the track.
         """
+        # Capture the publication before the FFI round-trip. The
+        # local_track_unpublished room event races this async response and may
+        # remove it from _track_publications first; holding our own reference
+        # guarantees the track is cleared once unpublish completes, regardless
+        # of which path removes the publication from the dict.
+        publication = self._track_publications.get(track_sid)
+
         req = proto_ffi.FfiRequest()
         req.unpublish_track.local_participant_handle = self._ffi_handle.handle
         req.unpublish_track.track_sid = track_sid
@@ -793,8 +1135,20 @@ class LocalParticipant(Participant):
             if cb.unpublish_track.error:
                 raise UnpublishTrackError(cb.unpublish_track.error)
 
-            publication = self._track_publications.pop(track_sid)
-            publication._track = None
+            # Remove defensively: the room-event handler may already have done
+            # so when it processed local_track_unpublished first.
+            self._track_publications.pop(track_sid, None)
+            if publication is not None:
+                # Clear the processor's room context here too: this path races
+                # the local_track_unpublished room event, and whichever loses
+                # the race finds the publication already gone and skips its own
+                # _set_room(None). Calling it from both paths guarantees the
+                # processor is cleared (and the token_refreshed listener
+                # detached) exactly once it matters; _set_room(None) is
+                # idempotent, so a double-clear when this path wins is safe.
+                if publication._track is not None:
+                    publication._track._set_room(None)
+                publication._track = None
             queue.task_done()
         finally:
             self._room_queue.unsubscribe(queue)
@@ -806,7 +1160,7 @@ class LocalParticipant(Participant):
 class RemoteParticipant(Participant):
     def __init__(self, owned_info: proto_participant.OwnedParticipant) -> None:
         super().__init__(owned_info)
-        self._track_publications: dict[str, RemoteTrackPublication] = {}  # type: ignore
+        self._track_publications: dict[str, RemoteTrackPublication] = {}
 
     @property
     def track_publications(self) -> Mapping[str, RemoteTrackPublication]:

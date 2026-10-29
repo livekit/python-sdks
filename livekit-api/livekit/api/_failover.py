@@ -1,0 +1,168 @@
+# Copyright 2026 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Region failover for the Twirp API clients.
+
+On a retryable failure (any transport error or HTTP 5xx) the client discovers
+alternative LiveKit Cloud regions via ``/settings/regions`` and replays the
+request against the next region, with exponential backoff. 4xx responses are
+returned immediately.
+"""
+
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass
+from typing import Dict, List, Optional
+from urllib.parse import urlparse
+
+import aiohttp
+
+FAILOVER_MAX_ATTEMPTS = 3
+FAILOVER_BACKOFF_BASE = 0.2  # seconds
+# Below this per-request timeout (seconds) a retry is unlikely to help and many
+# clients would retry in lockstep across regions, so a short request gets a
+# single attempt (thundering-herd guard).
+MIN_FAILOVER_TIMEOUT = 5.0
+
+
+def failover_attempts(
+    enabled: bool,
+    host: Optional[str],
+    force: bool = False,
+    timeout: Optional[float] = None,
+) -> int:
+    """Total request attempts for a host; 1 means no failover. Failover only
+    engages when enabled, the host is a LiveKit Cloud project or Cloud API
+    domain, and the request timeout is long enough to retry. ``force`` bypasses
+    the cloud-host check and is for internal testing only.
+    """
+    if not (enabled and (force or (host is not None and (is_cloud(host) or is_cloud_api(host))))):
+        return 1
+    if timeout is not None and 0 < timeout < MIN_FAILOVER_TIMEOUT:
+        return 1
+    return FAILOVER_MAX_ATTEMPTS
+
+
+def is_cloud(host: str) -> bool:
+    # Failover only engages for LiveKit Cloud project domains.
+    return host.endswith(".livekit.cloud")
+
+
+def is_cloud_api(host: str) -> bool:
+    # cloud-api.livekit.io or a cloud-api.<env>.livekit.io variant; hostnames are case-insensitive.
+    host = host.lower()
+    return host.startswith("cloud-api.") and host.endswith(".livekit.io")
+
+
+def to_http(url: str) -> str:
+    """Normalizes a region URL to an http(s) scheme (ws -> http, wss -> https)."""
+    if url.startswith("ws"):
+        return "http" + url[2:]
+    return url
+
+
+def origin_of(url: str) -> str:
+    """Returns the scheme://host[:port] origin of a URL, dropping any path."""
+    parsed = urlparse(url)
+    return f"{parsed.scheme}://{parsed.netloc}"
+
+
+def host_key(url: str) -> str:
+    """A stable key identifying a host (including port) for dedup across attempts."""
+    return urlparse(url).netloc.lower()
+
+
+def pick_next(region_origins: List[str], attempted: set[str]) -> Optional[str]:
+    """Returns the first region origin whose host has not yet been attempted."""
+    for origin in region_origins:
+        if host_key(origin) not in attempted:
+            return origin
+    return None
+
+
+@dataclass
+class _CacheEntry:
+    origins: List[str]
+    fetched_at: float
+    ttl: float
+
+
+class RegionCache:
+    """Process-wide cache of the LiveKit Cloud region list, keyed by host."""
+
+    def __init__(self) -> None:
+        self._entries: Dict[str, _CacheEntry] = {}
+
+    async def region_origins(
+        self,
+        session: aiohttp.ClientSession,
+        origin: str,
+        headers: Dict[str, str],
+    ) -> List[str]:
+        """Returns alternative region origins for ``origin``, fetching
+        ``/settings/regions`` if the cache is stale. Best-effort: on a fetch
+        failure it serves a stale cached list when available, otherwise an empty
+        list. Forwards ``headers`` so a valid token — and any test directives —
+        reach the discovery endpoint."""
+        key = host_key(origin)
+        entry = self._entries.get(key)
+        if entry is not None and (time.monotonic() - entry.fetched_at) < entry.ttl:
+            return entry.origins
+
+        try:
+            origins, ttl = await self._fetch(session, origin, headers)
+        except Exception:
+            return entry.origins if entry is not None else []
+
+        # A zero TTL (e.g. Cache-Control: max-age=0) means "do not cache".
+        if ttl > 0:
+            self._entries[key] = _CacheEntry(origins, time.monotonic(), ttl)
+        return origins
+
+    async def _fetch(
+        self,
+        session: aiohttp.ClientSession,
+        origin: str,
+        headers: Dict[str, str],
+    ) -> tuple[List[str], float]:
+        fetch_headers = {
+            k: v for k, v in headers.items() if k.lower() not in ("content-type", "content-length")
+        }
+        # Short timeout so a slow/unreachable discovery endpoint doesn't stall
+        # the failover path.
+        async with session.get(
+            f"{origin}/settings/regions",
+            headers=fetch_headers,
+            timeout=aiohttp.ClientTimeout(total=2),
+        ) as resp:
+            if resp.status != 200:
+                raise RuntimeError(f"region discovery failed: {resp.status}")
+            ttl = _parse_max_age(resp.headers.get("Cache-Control"))
+            body = await resp.json()
+        origins = [origin_of(to_http(r["url"])) for r in body.get("regions", []) if r.get("url")]
+        return origins, ttl
+
+
+def _parse_max_age(cache_control: Optional[str]) -> float:
+    if not cache_control:
+        return 0.0
+    for directive in cache_control.split(","):
+        directive = directive.strip().lower()
+        if directive.startswith("max-age="):
+            try:
+                return float(int(directive[len("max-age=") :]))
+            except ValueError:
+                return 0.0
+    return 0.0

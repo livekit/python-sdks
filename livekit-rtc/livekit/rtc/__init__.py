@@ -20,24 +20,38 @@ See https://docs.livekit.io/home/client/connect/#installing-the-livekit-sdk for 
 
 from ._proto import stats_pb2 as stats
 from ._proto.e2ee_pb2 import EncryptionState, EncryptionType, KeyDerivationFunction
-from ._proto.participant_pb2 import ParticipantKind, ParticipantState, DisconnectReason
+from ._proto.participant_pb2 import (
+    ParticipantKind,
+    ParticipantKindDetail,
+    ParticipantState,
+    DisconnectReason,
+)
 from ._proto.room_pb2 import (
-    ConnectionQuality,
     ConnectionState,
     ContinualGatheringPolicy,
     DataPacketKind,
     IceServer,
     IceTransportType,
+    SimulateScenarioKind,
     TrackPublishOptions,
     VideoEncoding,
+    VideoEncoderBackend,
 )
 from ._proto.track_pb2 import (
+    FrameMetadataFeature,
     StreamState,
     TrackKind,
     TrackSource,
     ParticipantTrackPermission,
 )
-from ._proto.video_frame_pb2 import VideoBufferType, VideoCodec, VideoRotation
+from ._proto.video_frame_pb2 import (
+    EncodedFrameType,
+    FrameMetadata,
+    VideoBufferType,
+    VideoCodec,
+    VideoRotation,
+)
+from ._proto.track_publication_pb2 import VideoQuality
 from .audio_frame import AudioFrame
 from .audio_source import AudioSource
 from .audio_stream import AudioFrameEvent, AudioStream, NoiseCancellationOptions
@@ -50,6 +64,8 @@ from .e2ee import (
     KeyProviderOptions,
 )
 from .participant import (
+    ConnectionQuality,
+    DegradationPreference,
     LocalParticipant,
     Participant,
     RemoteParticipant,
@@ -57,6 +73,7 @@ from .participant import (
 from .room import (
     ConnectError,
     DataPacket,
+    DataStreamOptions,
     Room,
     RoomOptions,
     RtcConfiguration,
@@ -85,11 +102,24 @@ from .version import __version__
 from .video_frame import (
     VideoFrame,
 )
+from .encoded_video import (
+    EncodedVideoFrame,
+    EncodedVideoSource,
+    EncodedVideoSourceFeedback,
+    EncodedRateControl,
+)
 from .video_source import VideoSource
 from .video_stream import VideoFrameEvent, VideoStream
 from .audio_resampler import AudioResampler, AudioResamplerQuality
 from .audio_mixer import AudioMixer
 from .apm import AudioProcessingModule
+from .platform_audio import (
+    PlatformAudio,
+    PlatformAudioSource,
+    PlatformAudioOptions,
+    PlatformAudioError,
+    AudioDeviceInfo,
+)
 
 try:
     from .media_devices import MediaDevices as MediaDevices
@@ -98,7 +128,7 @@ try:
 except Exception:  # pragma: no cover - optional dependency (sounddevice)
     _HAS_MEDIA_DEVICES = False
 from .utils import combine_audio_frames
-from .rpc import RpcError, RpcInvocationData
+from .rpc import RpcCallInfo, RpcError, RpcInterceptor, RpcInvocationData
 from .synchronizer import AVSynchronizer
 from .data_stream import (
     TextStreamInfo,
@@ -107,6 +137,7 @@ from .data_stream import (
     TextStreamWriter,
     ByteStreamWriter,
     ByteStreamReader,
+    StreamError,
 )
 from .data_track import (
     LocalDataTrack,
@@ -120,9 +151,16 @@ from .data_track import (
 from .frame_processor import FrameProcessor
 
 __all__ = [
+    "EncodedFrameType",
+    "EncodedVideoFrame",
+    "EncodedVideoSource",
+    "EncodedVideoSourceFeedback",
+    "EncodedRateControl",
+    "VideoEncoderBackend",
     "ConnectionQuality",
     "ConnectionState",
     "DataPacketKind",
+    "DegradationPreference",
     "TrackPublishOptions",
     "IceTransportType",
     "ContinualGatheringPolicy",
@@ -133,9 +171,11 @@ __all__ = [
     "StreamState",
     "TrackKind",
     "TrackSource",
+    "FrameMetadataFeature",
     "ParticipantTrackPermission",
     "VideoBufferType",
     "VideoRotation",
+    "FrameMetadata",
     "stats",
     "AudioFrame",
     "AudioSource",
@@ -146,13 +186,16 @@ __all__ = [
     "LocalParticipant",
     "Participant",
     "ParticipantKind",
+    "ParticipantKindDetail",
     "ParticipantState",
     "DisconnectReason",
     "RemoteParticipant",
     "ConnectError",
     "Room",
     "RoomOptions",
+    "DataStreamOptions",
     "RtcConfiguration",
+    "SimulateScenarioKind",
     "SipDTMF",
     "RtcStats",
     "DataPacket",
@@ -177,6 +220,7 @@ __all__ = [
     "TranscriptionSegment",
     "VideoCodec",
     "VideoEncoding",
+    "VideoQuality",
     "VideoFrame",
     "VideoFrameEvent",
     "VideoSource",
@@ -186,6 +230,8 @@ __all__ = [
     "AudioResamplerQuality",
     "RpcError",
     "RpcInvocationData",
+    "RpcCallInfo",
+    "RpcInterceptor",
     "EventEmitter",
     "combine_audio_frames",
     "AVSynchronizer",
@@ -195,7 +241,13 @@ __all__ = [
     "TextStreamWriter",
     "ByteStreamReader",
     "ByteStreamWriter",
+    "StreamError",
     "AudioProcessingModule",
+    "PlatformAudio",
+    "PlatformAudioSource",
+    "PlatformAudioOptions",
+    "PlatformAudioError",
+    "AudioDeviceInfo",
     "FrameProcessor",
     "LocalDataTrack",
     "RemoteDataTrack",
