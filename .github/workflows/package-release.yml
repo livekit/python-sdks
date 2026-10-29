@@ -20,10 +20,10 @@ on:
   pull_request:
     types: [closed]
 
+# Read-only by default; jobs that write ask for it themselves, so build jobs
+# (which run third-party build code) never get a write or OIDC token.
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
+  contents: read
 
 jobs:
   # ── Step 1: Create / update the release PR from changesets ────
@@ -31,6 +31,9 @@ jobs:
     name: Create release PR
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     concurrency:
       group: package-release-${{ inputs.branch || github.ref_name }}
       cancel-in-progress: true
@@ -95,6 +98,20 @@ jobs:
               --body-file "$RUNNER_TEMP/pr-body.md"
           fi
 
+      # Pending changesets can disappear after the release PR was opened (e.g.
+      # reverted); merging that stale PR would still publish.
+      - name: Close stale release PR
+        if: steps.changesets.outputs.title == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="release/changesets-${BASE_BRANCH//\//-}"
+          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr comment "$existing" --body "Closing: no pending changesets left to release."
+            gh pr close "$existing" --delete-branch
+          fi
+
   # ── Step 2: Publish on merge ──────────────────────────────────
   detect:
     name: Detect packages
@@ -109,6 +126,9 @@ jobs:
       && github.event.pull_request.head.repo.full_name == github.repository
       && github.event.pull_request.user.login == 'github-actions[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       rtc: ${{ steps.detect.outputs.rtc }}
       api: ${{ steps.detect.outputs.api }}
@@ -159,6 +179,8 @@ jobs:
     needs: detect
     if: needs.detect.outputs.tags != ''
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
