@@ -153,9 +153,6 @@ def kept_entries(names: list[str], package: str, repo: str | None) -> list[str]:
     entries = []
     for name in names:
         path = CHANGESET_DIR / name
-        if not path.exists():
-            click.echo(f"warning: kept changeset {path} is missing", err=True)
-            continue
         bumps, summary = parse_changeset(path)
         if summary and package in bumps:
             entries.append(f"`{bumps[package]}` {summary}{changeset_origin(path, repo)}")
@@ -190,6 +187,13 @@ def kept_entries(names: list[str], package: str, repo: str | None) -> list[str]:
 def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: bool) -> None:
     pre: dict[str, list[str]] = json.loads(PRE_STATE.read_text()) if PRE_STATE.exists() else {}
     kept = {name for names in pre.values() for name in names}
+    # A kept changeset still owes its entry to the stable release notes.
+    missing = sorted(name for name in kept if not (CHANGESET_DIR / name).exists())
+    if missing:
+        raise click.ClickException(
+            f"changesets kept from rc releases are missing: {missing} "
+            f"(restore them, or remove them from {PRE_STATE} on purpose)"
+        )
     files = sorted(
         p
         for p in CHANGESET_DIR.glob("*.md")
