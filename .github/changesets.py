@@ -12,7 +12,8 @@ A changeset looks like:
 Supported bump types: patch, minor, major, patch-rc, minor-rc, major-rc,
 next-rc, promote. When several changesets touch the same package, the
 largest bump wins (an explicit X-rc wins over next-rc). Mixing stable and
-rc bumps, or combining promote with anything else, is an error.
+rc bumps, or combining promote with anything else, is an error. While a
+package is at an rc, only next-rc and promote are accepted for it.
 
 Changesets used by an rc release are kept and recorded in .changeset/pre.json
 (package -> file names) instead of being deleted, so later runs skip them. The
@@ -101,6 +102,13 @@ def validate(package: str, kind: str) -> None:
         raise click.ClickException(f"{package}: next-rc requires an rc version (got {cur})")
     if kind == "promote" and not cur.is_prerelease:
         raise click.ClickException(f"{package}: promote requires a pre-release (got {cur})")
+    # Any other bump would move past the rc's planned stable version, e.g.
+    # patch on 1.4.0.rc1 releases 1.4.1 and 1.4.0 never ships.
+    if cur.is_prerelease and kind not in ("next-rc", "promote"):
+        raise click.ClickException(
+            f"{package}: {kind} is not allowed while at pre-release {cur}; "
+            "use next-rc or promote (or the Manual Version Bump workflow)"
+        )
 
 
 def apply(package: str, kind: str) -> None:

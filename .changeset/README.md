@@ -32,6 +32,11 @@ Mixing stable and rc types for one package, or combining `promote` with
 anything else, is rejected. Only rc types are allowed on branches other than
 `main`.
 
+While a package is at an rc (e.g. `1.6.0.rc1`), only `next-rc` and `promote`
+are accepted for it, so fixes land in the next rc and the planned `1.6.0` still
+ships. Any other type would skip it (`patch` would release `1.6.1`). To move
+to a different version line, use the Manual Version Bump workflow below.
+
 ## How releases happen
 
 1. Every PR is checked by the **Changeset** workflow; invalid changesets fail
