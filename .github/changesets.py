@@ -194,6 +194,10 @@ def main(rc_only: bool, notes: pathlib.Path | None, repo: str | None, check: boo
             f"changesets kept from rc releases are missing: {missing} "
             f"(restore them, or remove them from {PRE_STATE} on purpose)"
         )
+    # Parse them now too, so a broken kept changeset fails the PR check
+    # instead of the stable release.
+    for name in sorted(kept):
+        parse_changeset(CHANGESET_DIR / name)
     files = sorted(
         p
         for p in CHANGESET_DIR.glob("*.md")

@@ -54,3 +54,8 @@ bump type. It opens a `release/<prefix>-v<version>` PR without reading any
 changeset; merging it publishes the same way as a changeset release PR.
 It doesn't touch `.changeset/`, so changesets kept from rc releases stay until
 that package's next changeset stable release.
+
+The two flows don't know about each other: a manual bump doesn't close an open
+`Release: ...` changeset PR for the same package (or the other way round), and
+both change that package's version, so once one merges the other conflicts.
+Close the stale one before merging.
