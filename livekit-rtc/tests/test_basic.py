@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio
 import os
 import uuid
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import pytest
 
@@ -26,7 +26,7 @@ WAIT_TIMEOUT = 20.0
 WAIT_INTERVAL = 0.1
 
 
-def skip_if_no_credentials():
+def skip_if_no_credentials() -> pytest.MarkDecorator:
     required_vars = ["LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
     missing = [var for var in required_vars if not os.getenv(var)]
     return pytest.mark.skipif(
@@ -108,7 +108,7 @@ def _expect_event(
     loop = asyncio.get_event_loop()
     fut: asyncio.Future = loop.create_future()
 
-    def _on_event(*args, **kwargs) -> None:
+    def _on_event(*args: Any, **kwargs: Any) -> None:
         if fut.done():
             return
         if predicate is None or predicate(*args, **kwargs):
