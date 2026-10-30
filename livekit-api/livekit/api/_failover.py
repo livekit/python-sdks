@@ -14,15 +14,18 @@
 
 """Region failover for the Twirp API clients.
 
-On a retryable failure (any transport error or HTTP 5xx) the client discovers
+On a retryable failure (any transport error, or an HTTP 5xx other than a 503
+without Retry-After) the client discovers
 alternative LiveKit Cloud regions via ``/settings/regions`` and replays the
-request against the next region, with exponential backoff. 4xx responses are
+request against the next region, with jittered exponential backoff. 4xx responses are
 returned immediately.
 """
 
 from __future__ import annotations
 
+import random
 import time
+from email.utils import parsedate_to_datetime
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
@@ -64,6 +67,26 @@ def is_cloud_api(host: str) -> bool:
     # cloud-api.livekit.io or a cloud-api.<env>.livekit.io variant; hostnames are case-insensitive.
     host = host.lower()
     return host.startswith("cloud-api.") and host.endswith(".livekit.io")
+
+
+def backoff(attempt: int, base: float) -> float:
+    """Full jitter: a uniform delay in [0, base * 2^attempt) so clients that
+    failed together don't retry in lockstep."""
+    return random.random() * base * (2**attempt)
+
+
+def parse_retry_after(header: Optional[str]) -> Optional[float]:
+    """Parses a Retry-After header (delay-seconds or an HTTP-date) to seconds."""
+    value = (header or "").strip()
+    if not value:
+        return None
+    if value.isdigit():
+        return float(value)
+    try:
+        date = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    return max(0.0, date.timestamp() - time.time())
 
 
 def to_http(url: str) -> str:
