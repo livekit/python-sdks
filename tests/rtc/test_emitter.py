@@ -186,6 +186,57 @@ def test_on_rejects_async_mock() -> None:
         emitter.on("connected", AsyncMock())
 
 
+def test_once_rejects_async_callback() -> None:
+    """`.once()` refuses coroutine functions, however they are spelled."""
+    EventTypes = Literal["connected"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    async def on_connected() -> None:
+        pass
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.once("connected", on_connected)
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.once("connected", functools.partial(on_connected))
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+
+        @emitter.once("connected")
+        async def on_connected_decorated() -> None:
+            pass
+
+
+def test_once_rejects_sentinel_tagged_callback() -> None:
+    """A callable tagged with asyncio's private coroutine sentinel is rejected by `.once()`."""
+    marker = getattr(asyncio.coroutines, "_is_coroutine", None)
+    if marker is None:
+        pytest.skip("asyncio.coroutines._is_coroutine is not defined on this Python")
+
+    EventTypes = Literal["connected"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    def on_connected() -> None:
+        pass
+
+    on_connected._is_coroutine = marker  # type: ignore[attr-defined]
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.once("connected", on_connected)
+
+
+def test_once_rejects_async_mock() -> None:
+    """`AsyncMock` is rejected by `.once()` on every supported version."""
+    EventTypes = Literal["connected"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    with pytest.raises(ValueError, match="Cannot register an async callback"):
+        emitter.once("connected", AsyncMock())
+
+
 class _OrderedHandler:
     """A callable whose hash is fixed, so a set orders it independently of registration."""
 
