@@ -189,6 +189,7 @@ class Room(EventEmitter[EventTypes]):
         self._connection_state = ConnectionState.CONN_DISCONNECTED
         self._first_sid_future = asyncio.Future[str]()
         self._local_participant: LocalParticipant | None = None
+        self._is_connecting: bool = False
 
         # active incoming stream readers, keyed by FFI reader handle id
         self._text_stream_readers: Dict[int, TextStreamReader] = {}
@@ -209,9 +210,15 @@ class Room(EventEmitter[EventTypes]):
 
         Returns:
             str: The session ID of the room.
+
+        Raises:
+            RuntimeError: If the room is disconnected and no SID was received.
         """
         if self._info.sid:
             return self._info.sid
+
+        if self._connection_state == ConnectionState.CONN_DISCONNECTED and not self._is_connecting:
+            raise RuntimeError("cannot get sid of a disconnected room")
 
         # This future is shared state for the Room. Caller-side timeouts, e.g.
         # asyncio.wait_for(room.sid, ...), should not cancel it for future waiters.
@@ -221,8 +228,16 @@ class Room(EventEmitter[EventTypes]):
         # The room SID can arrive through the initial connect result or later
         # room update events. Resolve the first-SID waiter from any source that
         # carries it so waiters do not depend on event ordering.
-        if sid and not self._first_sid_future.done():
-            self._first_sid_future.set_result(sid)
+        if sid:
+            self._info.sid = sid
+            if not self._first_sid_future.done():
+                self._first_sid_future.set_result(sid)
+
+    def _fail_first_sid(self, exc: BaseException) -> None:
+        if not self._first_sid_future.done():
+            self._first_sid_future.set_exception(exc)
+            # Retrieve the exception to suppress unretrieved future warnings if unawaited
+            self._first_sid_future.exception()
 
     @property
     def local_participant(self) -> LocalParticipant:
@@ -469,6 +484,9 @@ class Room(EventEmitter[EventTypes]):
         """
         self._server_url = url
         self._token = token
+        self._is_connecting = True
+        if self._first_sid_future.done() and not self._info.sid:
+            self._first_sid_future = asyncio.Future[str]()
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
@@ -560,43 +578,55 @@ class Room(EventEmitter[EventTypes]):
             ),
         )
 
-        queue = FfiClient.instance.queue.subscribe()
         try:
-            resp = FfiClient.instance.request(req)
-            cb: proto_ffi.FfiEvent = await queue.wait_for(
-                lambda e: e.connect.async_id == resp.connect.async_id
+            queue = FfiClient.instance.queue.subscribe()
+            try:
+                resp = FfiClient.instance.request(req)
+                cb: proto_ffi.FfiEvent = await queue.wait_for(
+                    lambda e: e.connect.async_id == resp.connect.async_id
+                )
+            finally:
+                FfiClient.instance.queue.unsubscribe(queue)
+
+            if cb.connect.error:
+                FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+                raise ConnectError(cb.connect.error)
+
+            self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
+
+            self._e2ee_manager = E2EEManager(
+                self._ffi_handle.handle, options.encryption or options.e2ee
             )
+
+            self._info = cb.connect.result.room.info
+            self._resolve_first_sid(self._info.sid)
+            self._connection_state = ConnectionState.CONN_CONNECTED
+
+            self._local_participant = LocalParticipant(
+                self._room_queue, cb.connect.result.local_participant
+            )
+
+            for pt in cb.connect.result.participants:
+                rp = self._create_remote_participant(pt.participant)
+
+                # add the initial remote participant tracks
+                for owned_publication_info in pt.publications:
+                    publication = RemoteTrackPublication(owned_publication_info)
+                    rp._track_publications[publication.sid] = publication
+
+            # start listening to room events
+            self._task = self._loop.create_task(self._listen_task())
+        except BaseException as e:
+            if self._ffi_handle is None and hasattr(self, "_ffi_queue"):
+                FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+            self._fail_first_sid(
+                RuntimeError("room connection was cancelled")
+                if isinstance(e, asyncio.CancelledError)
+                else e
+            )
+            raise
         finally:
-            FfiClient.instance.queue.unsubscribe(queue)
-
-        if cb.connect.error:
-            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
-            raise ConnectError(cb.connect.error)
-
-        self._ffi_handle = FfiHandle(cb.connect.result.room.handle.id)
-
-        self._e2ee_manager = E2EEManager(
-            self._ffi_handle.handle, options.encryption or options.e2ee
-        )
-
-        self._info = cb.connect.result.room.info
-        self._resolve_first_sid(self._info.sid)
-        self._connection_state = ConnectionState.CONN_CONNECTED
-
-        self._local_participant = LocalParticipant(
-            self._room_queue, cb.connect.result.local_participant
-        )
-
-        for pt in cb.connect.result.participants:
-            rp = self._create_remote_participant(pt.participant)
-
-            # add the initial remote participant tracks
-            for owned_publication_info in pt.publications:
-                publication = RemoteTrackPublication(owned_publication_info)
-                rp._track_publications[publication.sid] = publication
-
-        # start listening to room events
-        self._task = self._loop.create_task(self._listen_task())
+            self._is_connecting = False
 
         # unsubscribe from the FFI queue once the listen task ends.
         # disconnect() unsubscribes too, but it early-returns when the
@@ -713,6 +743,7 @@ class Room(EventEmitter[EventTypes]):
         if self._connection_state != ConnectionState.CONN_DISCONNECTED:
             self.local_participant._info.disconnect_reason = reason
             self._connection_state = ConnectionState.CONN_DISCONNECTED
+            self._fail_first_sid(RuntimeError("room disconnected before receiving sid"))
             self.emit("connection_state_changed", self._connection_state)
             self.emit("disconnected", reason)
 
@@ -744,6 +775,7 @@ class Room(EventEmitter[EventTypes]):
         await self._drain_rpc_invocation_tasks()
         self._error_stream_readers()
         self._dispose_open_stream_writers()
+        self._fail_first_sid(RuntimeError("room disconnected before receiving sid"))
 
     def _on_rpc_method_invocation(self, rpc_invocation: RpcMethodInvocationEvent) -> None:
         if self._local_participant is None:
@@ -1126,6 +1158,7 @@ class Room(EventEmitter[EventTypes]):
             self._connection_state = connection_state
             self.emit("connection_state_changed", connection_state)
         elif which == "disconnected":
+            self._fail_first_sid(RuntimeError("room disconnected before receiving sid"))
             self.emit("disconnected", event.disconnected.reason)
         elif which == "reconnecting":
             self.emit("reconnecting")
@@ -1243,8 +1276,12 @@ class Room(EventEmitter[EventTypes]):
 
     def _retrieve_participant(self, identity: str) -> Optional[Participant]:
         """Retrieve a local or remote participant by identity"""
-        if identity and identity == self.local_participant.identity:
-            return self.local_participant
+        if (
+            identity
+            and self._local_participant is not None
+            and identity == self._local_participant.identity
+        ):
+            return self._local_participant
 
         return self._retrieve_remote_participant(identity)
 
@@ -1260,7 +1297,13 @@ class Room(EventEmitter[EventTypes]):
 
     def __repr__(self) -> str:
         sid = "unknown"
-        if self._first_sid_future.done():
+        if self._info.sid:
+            sid = self._info.sid
+        elif (
+            self._first_sid_future.done()
+            and not self._first_sid_future.cancelled()
+            and self._first_sid_future.exception() is None
+        ):
             sid = self._first_sid_future.result()
 
         return f"rtc.Room(sid={sid}, name={self.name}, metadata={self.metadata}, connection_state={ConnectionState.Name(self._connection_state)})"

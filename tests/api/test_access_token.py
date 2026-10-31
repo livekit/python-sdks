@@ -8,16 +8,17 @@ from livekit.api import (
     AgentEndpointGrants,
     AgentGrants,
     AgentThreadGrants,
+    InferenceGrants,
+    ObservabilityGrants,
     SIPGrants,
     TokenVerifier,
     VideoGrants,
 )
-from livekit.api.access_token import ObservabilityGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
 TEST_API_KEY = "myapikey"
-TEST_API_SECRET = "thiskeyistotallyunsafe"
+TEST_API_SECRET = "thiskeyistotallyunsafe-but-32-bytes-long"
 
 
 def test_verify_token() -> None:
@@ -148,7 +149,7 @@ def test_agent_config() -> None:
 def test_verify_token_invalid() -> None:
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
-    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
+    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret-padded-to-32-bytes-long")
     with pytest.raises(Exception):
         token_verifier.verify(token)
 
@@ -207,3 +208,34 @@ def test_verify_token_preserves_kind_and_observability() -> None:
     assert claims.kind == "agent"
     assert claims.observability is not None
     assert claims.observability.write is True
+
+
+def test_verify_token_omitted_grants_are_none() -> None:
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.inference is None
+    assert claims.observability is None
+    assert claims.agent is None
+    assert claims.agent_endpoint is None
+    assert claims.agent_thread is None
+
+
+def test_verify_token_with_only_inference_grants() -> None:
+    inference = InferenceGrants(perform=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_inference_grants(inference)
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.inference == inference
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.observability is None

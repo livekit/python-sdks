@@ -1,0 +1,497 @@
+name: Package Release
+
+on:
+  # Step 1: A push to main (e.g. a merged PR, including from forks) or a manual
+  # run consumes pending .changeset files and opens/updates the release PR with
+  # the version bumps. This runs on `push` rather than `pull_request` so it gets
+  # a write-capable token for fork contributions too.
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to release from (default: main)"
+        type: string
+        required: false
+        default: "main"
+
+  # Step 2: Merging the release PR triggers build + publish
+  pull_request:
+    types: [closed]
+
+# Read-only by default; jobs that write ask for it themselves, so build jobs
+# (which run third-party build code) never get a write or OIDC token.
+permissions:
+  contents: read
+
+jobs:
+  # ── Step 1: Create / update the release PR from changesets ────
+  bump:
+    name: Create release PR
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: package-release-${{ inputs.branch || github.ref_name }}
+      cancel-in-progress: true
+    env:
+      BASE_BRANCH: ${{ inputs.branch || github.ref_name }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          # Full history to find the commit (and PR) that added each changeset
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install click packaging
+
+      - name: Apply changesets
+        id: changesets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only RC releases are allowed from non-main branches
+          args=()
+          if [ "$BASE_BRANCH" != "main" ]; then
+            args+=(--rc-only)
+          fi
+          python .github/changesets.py --notes "$RUNNER_TEMP/release-notes.md" "${args[@]}"
+
+      - name: Create or update release PR
+        if: steps.changesets.outputs.title != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TITLE: ${{ steps.changesets.outputs.title }}
+        run: |
+          branch="release/changesets-${BASE_BRANCH//\//-}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "Release: ${TITLE}"
+          git push --force origin "$branch"
+
+          {
+            echo "Merging this PR will publish the following packages to PyPI:"
+            echo
+            cat "$RUNNER_TEMP/release-notes.md"
+          } > "$RUNNER_TEMP/pr-body.md"
+
+          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "Release: ${TITLE}" --body-file "$RUNNER_TEMP/pr-body.md"
+          else
+            gh pr create \
+              --base "$BASE_BRANCH" \
+              --head "$branch" \
+              --title "Release: ${TITLE}" \
+              --body-file "$RUNNER_TEMP/pr-body.md"
+          fi
+
+      # Pending changesets can disappear after the release PR was opened (e.g.
+      # reverted); merging that stale PR would still publish.
+      - name: Close stale release PR
+        if: steps.changesets.outputs.title == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="release/changesets-${BASE_BRANCH//\//-}"
+          existing=$(gh pr list --state open --head "$branch" --base "$BASE_BRANCH" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh pr comment "$existing" --body "Closing: no pending changesets left to release."
+            gh pr close "$existing" --delete-branch
+          fi
+
+  # ── Step 2: Publish on merge ──────────────────────────────────
+  detect:
+    name: Detect packages
+    # Only release PRs opened by a bump job (same repo, github-actions[bot],
+    # release/* branch: release/changesets-* from this workflow or
+    # release/<prefix>-v<version> from Manual Version Bump) may trigger
+    # publishing; the branch name alone is not trusted.
+    if: |
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/')
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.user.login == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      rtc: ${{ steps.detect.outputs.rtc }}
+      api: ${{ steps.detect.outputs.api }}
+      protocol: ${{ steps.detect.outputs.protocol }}
+      tags: ${{ steps.detect.outputs.tags }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install click packaging
+
+      - name: Detect bumped packages
+        id: detect
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # A package is released when the release PR changed its version.py
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/files" --jq '.[].filename')
+
+          tags=()
+          for entry in "rtc:livekit:livekit-rtc/livekit/rtc/version.py" \
+                       "api:livekit-api:livekit-api/livekit/api/version.py" \
+                       "protocol:livekit-protocol:livekit-protocol/livekit/protocol/version.py"; do
+            IFS=: read -r key package path <<< "$entry"
+            if grep -qxF "$path" <<< "$files"; then
+              eval "$(python .github/update_versions.py --package "$package" --print-version)"
+              tags+=("${tag_prefix}-v${version}")
+              echo "$key=true" >> "$GITHUB_OUTPUT"
+              echo "Releasing $package v$version"
+            else
+              echo "$key=false" >> "$GITHUB_OUTPUT"
+            fi
+          done
+
+          echo "tags=${tags[*]}" >> "$GITHUB_OUTPUT"
+
+  tag:
+    name: Tag & create GitHub releases
+    needs: detect
+    if: needs.detect.outputs.tags != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Create git tags
+        env:
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for tag in $TAGS; do
+            git tag "$tag"
+            git push origin "$tag"
+          done
+
+      - name: Create GitHub releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          printf '%s\n' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+
+          for tag in $TAGS; do
+            prefix="${tag%%-v*}"
+            version="${tag#*-v}"
+            case "$prefix" in
+              rtc) package="livekit" ;;
+              api) package="livekit-api" ;;
+              protocol) package="livekit-protocol" ;;
+            esac
+
+            # Take this package's "## <package> v<version> (...)" section from
+            # the release PR body (written from the consumed changesets)
+            notes="$RUNNER_TEMP/notes-$tag.md"
+            awk -v heading="## $package v$version " '
+              index($0, heading) == 1 { found = 1; next }
+              found && /^## / { exit }
+              # Buffer blank lines so leading/trailing ones are dropped
+              found && /^[[:space:]]*$/ { if (started) blank = blank "\n"; next }
+              found { printf "%s%s\n", blank, $0; blank = ""; started = 1 }
+            ' "$RUNNER_TEMP/pr-body.md" > "$notes"
+            if ! grep -q '[^[:space:]]' "$notes"; then
+              echo "Released from #$PR_NUMBER." > "$notes"
+            fi
+
+            args=()
+            if [[ "$version" == *rc* ]]; then
+              args+=(--prerelease)
+            fi
+            # Created as a draft; each publish job makes its release public
+            # only after the PyPI upload succeeds.
+            gh release create "$tag" \
+              --draft \
+              --verify-tag \
+              --title "$package v$version" \
+              --notes-file "$notes" \
+              "${args[@]}"
+          done
+
+  # ── RTC builds (multi-platform) ──────────────────────────────
+  build-rtc:
+    name: Build RTC wheels (${{ matrix.archs }})
+    needs: detect
+    if: needs.detect.outputs.rtc == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            archs: x86_64
+          - os: namespace-profile-default-arm64
+            archs: aarch64
+          - os: windows-latest
+            archs: AMD64
+          - os: windows-11-arm
+            archs: ARM64
+          - os: macos-latest
+            archs: x86_64 arm64
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        id: setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Build wheels
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
+        env:
+          CIBW_ARCHS: ${{ matrix.archs }}
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-rtc-${{ matrix.os }}
+          path: livekit-rtc/dist/*.whl
+
+  build-rtc-sdist:
+    name: Build RTC sdist
+    needs: detect
+    if: needs.detect.outputs.rtc == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - name: Build sdist
+        run: |
+          pip3 install build
+          python3 -m build --sdist
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-rtc-sdist
+          path: livekit-rtc/dist/*.tar.gz
+
+  publish-rtc:
+    name: Publish livekit (RTC)
+    needs: [detect, build-rtc, build-rtc-sdist, tag]
+    if: needs.detect.outputs.rtc == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: dist-rtc-*
+          path: dist
+          merge-multiple: true
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == rtc-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
+
+  # ── API build ────────────────────────────────────────────────
+  build-api:
+    name: Build API
+    needs: detect
+    if: needs.detect.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-api
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+
+      - name: Build wheel & sdist
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel --sdist
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-api
+          path: |
+            livekit-api/dist/*.whl
+            livekit-api/dist/*.tar.gz
+
+  publish-api:
+    name: Publish livekit-api
+    needs: [detect, build-api, tag]
+    if: needs.detect.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: dist-api
+          path: dist/
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == api-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
+
+  # ── Protocol build ───────────────────────────────────────────
+  build-protocol:
+    name: Build Protocol
+    needs: detect
+    if: needs.detect.outputs.protocol == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-protocol
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+
+      - name: Build wheel & sdist
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel --sdist
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-protocol
+          path: |
+            livekit-protocol/dist/*.whl
+            livekit-protocol/dist/*.tar.gz
+
+  publish-protocol:
+    name: Publish livekit-protocol
+    needs: [detect, build-protocol, tag]
+    if: needs.detect.outputs.protocol == 'true'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: dist-protocol
+          path: dist/
+
+      - name: List distributions
+        run: ls -la dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAGS: ${{ needs.detect.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            if [[ "$tag" == protocol-v* ]]; then
+              gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --draft=false
+            fi
+          done
+
+  # ── Docs ─────────────────────────────────────────────────────
+  docs-rtc:
+    name: Build RTC docs
+    needs: [detect, publish-rtc]
+    if: needs.detect.outputs.rtc == 'true'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-rtc
+      package_name: livekit.rtc
+    secrets: inherit
+
+  docs-api:
+    name: Build API docs
+    needs: [detect, publish-api]
+    if: needs.detect.outputs.api == 'true'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-api
+      package_name: livekit.api
+    secrets: inherit
+
+  docs-protocol:
+    name: Build Protocol docs
+    needs: [detect, publish-protocol]
+    if: needs.detect.outputs.protocol == 'true'
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-protocol
+      package_name: livekit.protocol
+    secrets: inherit
