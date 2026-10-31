@@ -46,13 +46,17 @@ def _ensure_compatible_buffer(
     """Validate and normalize a buffer for FFI use.
 
     Sliced memoryviews are materialized because get_address cannot
-    reliably resolve their offset for all buffer types.
+    reliably resolve their offset for all buffer types. So are read-only
+    memoryviews of anything but bytes or bytearray (e.g. a read-only numpy
+    array), whose address get_address cannot take.
     """
     if isinstance(data, memoryview):
         if not data.contiguous:
             raise ValueError("memoryview must be contiguous")
         if data.nbytes != len(data.obj):  # type: ignore[arg-type]
             return bytearray(data) if not data.readonly else bytes(data)
+        if data.readonly and not isinstance(data.obj, (bytes, bytearray)):
+            return bytes(data)
     elif not isinstance(data, (bytes, bytearray)):
         raise TypeError(f"expected bytes, bytearray, or memoryview, got {type(data)}")
     return data
