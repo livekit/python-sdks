@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import gc
 import subprocess
 import sys
 
@@ -43,25 +42,46 @@ def test_active_runtime_invalid_handle_asserts() -> None:
 
 
 def test_live_handles_marked_consumed_and_no_assert_after_dispose() -> None:
-    handle_id = _allocate_real_handle()
-    handle = FfiHandle(handle_id)
-    assert not handle.disposed
+    code = """
+import gc
+from livekit.rtc._ffi_client import FfiClient, FfiHandle
+from livekit.rtc._proto import audio_frame_pb2, ffi_pb2
 
-    # Global dispose marks all live handles consumed and sets _ffi_disposed
-    FfiClient.instance._dispose()
-    assert handle.disposed
+req = ffi_pb2.FfiRequest()
+req.new_audio_source.type = audio_frame_pb2.AUDIO_SOURCE_NATIVE
+req.new_audio_source.sample_rate = 48000
+req.new_audio_source.num_channels = 1
+req.new_audio_source.queue_size_ms = 100
+resp = FfiClient.instance.request(req)
+handle_id = resp.new_audio_source.source.handle.id
+assert handle_id != 0
 
-    # Explicit dispose or __del__ after global dispose should be a no-op and not assert
-    handle.dispose()
-    handle.__del__()
+handle = FfiHandle(int(handle_id))
+assert not handle.disposed
 
-    # Newly instantiated handle after global dispose also safely no-ops without assert
-    late_handle = FfiHandle(12345)
-    late_handle.dispose()
+# Global dispose marks all live handles consumed and sets _ffi_disposed
+FfiClient.instance._dispose()
+assert handle.disposed
 
-    del handle
-    del late_handle
-    gc.collect()
+# Explicit dispose or __del__ after global dispose should be a no-op and not assert
+handle.dispose()
+handle.__del__()
+
+# Newly instantiated handle after global dispose also safely no-ops without assert
+late_handle = FfiHandle(12345)
+late_handle.dispose()
+
+del handle
+del late_handle
+gc.collect()
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert "AssertionError" not in result.stderr
 
 
 def test_subprocess_exit_with_undisposed_handle_has_no_assertion_error() -> None:
