@@ -12,6 +12,8 @@ Requires the following environment variables to run:
 from __future__ import annotations
 
 import asyncio
+import ctypes
+import gc
 from typing import Optional
 
 import pytest
@@ -277,3 +279,45 @@ async def test_data_targeted_with_topic() -> None:
     await _assert_no_data(other, other_collector)
 
     await asyncio.gather(sender.disconnect(), target.disconnect(), other.disconnect())
+
+
+@skip_if_no_credentials()  # type: ignore[untyped-decorator]
+@pytest.mark.asyncio
+async def test_publish_data_makes_no_ctypes_array_type() -> None:
+    """Sending and receiving payloads of new lengths makes no ctypes array type."""
+    room_name = unique_room_name("py-dc-array-type")
+
+    sender = rtc.Room()
+    receiver = rtc.Room()
+
+    await connect_room("sender", room_name, room=sender)
+    await connect_room("receiver", room_name, room=receiver)
+    await ensure_rooms_all_connected([sender, receiver])
+    await ensure_participants_visible(sender, ["receiver"])
+
+    collector = _DataCollector(receiver, sender_identity="sender")
+    lengths = range(1001, 1011)
+    payloads = [bytes([i]) * n for i, n in enumerate(lengths)]
+
+    gc.collect()
+    gc.disable()
+    try:
+        for payload in payloads:
+            await sender.local_participant.publish_data(payload)
+        await wait_until(
+            lambda: len(collector.packets) >= len(payloads),
+            message="receiver did not get all payloads",
+        )
+        array_types = [
+            o
+            for o in gc.get_objects()
+            if isinstance(o, type)
+            and issubclass(o, ctypes.Array)
+            and getattr(o, "_length_", None) in lengths
+        ]
+    finally:
+        gc.enable()
+    assert array_types == []
+    assert collector.payloads() == payloads
+
+    await asyncio.gather(sender.disconnect(), receiver.disconnect())

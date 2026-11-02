@@ -1115,12 +1115,7 @@ class Room(EventEmitter[EventTypes]):
             if which_val == "user":
                 owned_buffer_info = packet.user.data
                 buffer_info = owned_buffer_info.data
-                native_data = ctypes.cast(
-                    buffer_info.data_ptr,
-                    ctypes.POINTER(ctypes.c_byte * buffer_info.data_len),
-                ).contents
-
-                data = bytes(native_data)
+                data = ctypes.string_at(buffer_info.data_ptr, buffer_info.data_len)
                 FfiHandle(owned_buffer_info.handle.id).dispose()
                 rparticipant = cast(
                     RemoteParticipant,
