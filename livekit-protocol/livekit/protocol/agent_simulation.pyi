@@ -370,7 +370,7 @@ class SimulationRun(_message.Message):
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling")
+            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling", "sip_call_to", "sip_trunk_id", "sip_number")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
             NUM_SIMULATIONS_FIELD_NUMBER: _ClassVar[int]
@@ -383,6 +383,9 @@ class SimulationRun(_message.Message):
             PACKET_LOSS_FIELD_NUMBER: _ClassVar[int]
             CI_FIELD_NUMBER: _ClassVar[int]
             SAMPLING_FIELD_NUMBER: _ClassVar[int]
+            SIP_CALL_TO_FIELD_NUMBER: _ClassVar[int]
+            SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
+            SIP_NUMBER_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             agent_name: str
             num_simulations: int
@@ -395,7 +398,10 @@ class SimulationRun(_message.Message):
             packet_loss: bool
             ci: SimulationRun.CI
             sampling: SimulationRun.SamplingOptions
-            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ...) -> None: ...
+            sip_call_to: str
+            sip_trunk_id: str
+            sip_number: str
+            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_trunk_id: _Optional[str] = ..., sip_number: _Optional[str] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("simulation_run_id", "presigned_post_request")
             SIMULATION_RUN_ID_FIELD_NUMBER: _ClassVar[int]

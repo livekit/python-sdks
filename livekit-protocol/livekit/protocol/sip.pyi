@@ -320,16 +320,18 @@ class SIPCodec(_message.Message):
     def __init__(self, name: _Optional[str] = ..., rate: _Optional[int] = ...) -> None: ...
 
 class SIPMediaConfig(_message.Message):
-    __slots__ = ("only_listed_codecs", "codecs", "encryption", "media_timeout")
+    __slots__ = ("only_listed_codecs", "codecs", "encryption", "media_timeout", "drop_audio_during_dtmf")
     ONLY_LISTED_CODECS_FIELD_NUMBER: _ClassVar[int]
     CODECS_FIELD_NUMBER: _ClassVar[int]
     ENCRYPTION_FIELD_NUMBER: _ClassVar[int]
     MEDIA_TIMEOUT_FIELD_NUMBER: _ClassVar[int]
+    DROP_AUDIO_DURING_DTMF_FIELD_NUMBER: _ClassVar[int]
     only_listed_codecs: bool
     codecs: _containers.RepeatedCompositeFieldContainer[SIPCodec]
     encryption: SIPMediaEncryption
     media_timeout: _duration_pb2.Duration
-    def __init__(self, only_listed_codecs: bool = ..., codecs: _Optional[_Iterable[_Union[SIPCodec, _Mapping]]] = ..., encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., media_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    drop_audio_during_dtmf: bool
+    def __init__(self, only_listed_codecs: bool = ..., codecs: _Optional[_Iterable[_Union[SIPCodec, _Mapping]]] = ..., encryption: _Optional[_Union[SIPMediaEncryption, str]] = ..., media_timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., drop_audio_during_dtmf: bool = ...) -> None: ...
 
 class ProviderInfo(_message.Message):
     __slots__ = ("id", "name", "type", "prevent_transfer")
