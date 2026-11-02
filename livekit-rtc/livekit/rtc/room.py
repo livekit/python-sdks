@@ -129,7 +129,7 @@ class RoomOptions:
     connect_timeout: float | None = None
     """Timeout in seconds for each signal connection attempt. When None, uses the default (5s)."""
     single_peer_connection: bool | None = None
-    """Use a single peer connection for both publish and subscribe. When None, uses the default (false)."""
+    """Use a single peer connection for both publish and subscribe. When None, uses the default (true)."""
     data_stream: DataStreamOptions | None = None
     """Options for incoming data streams. When None, uses the FFI defaults."""
 
