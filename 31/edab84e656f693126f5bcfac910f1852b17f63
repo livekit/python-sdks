@@ -1,0 +1,21 @@
+.changeset/bump-protocol-amd-v2.md
+  s_aaf78334cb7322::t_54ba3fe9408e23 1-5
+livekit-protocol/protocol
+  s_aaf78334cb7322::t_0b8bf6555c2dc0 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "31edab84e656f693126f5bcfac910f1852b17f63",
+  "prompts": {},
+  "sessions": {
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
