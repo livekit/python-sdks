@@ -32,6 +32,7 @@ class EncodedFileType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     MP4: _ClassVar[EncodedFileType]
     OGG: _ClassVar[EncodedFileType]
     MP3: _ClassVar[EncodedFileType]
+    MCAP: _ClassVar[EncodedFileType]
 
 class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -93,6 +94,7 @@ DEFAULT_FILETYPE: EncodedFileType
 MP4: EncodedFileType
 OGG: EncodedFileType
 MP3: EncodedFileType
+MCAP: EncodedFileType
 DEFAULT_PROTOCOL: StreamProtocol
 RTMP: StreamProtocol
 SRT: StreamProtocol
@@ -165,14 +167,18 @@ class WebSource(_message.Message):
     def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ...) -> None: ...
 
 class MediaSource(_message.Message):
-    __slots__ = ("video_track_id", "participant_video", "audio")
+    __slots__ = ("video_track_id", "participant_video", "videos", "audio", "data")
     VIDEO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_VIDEO_FIELD_NUMBER: _ClassVar[int]
+    VIDEOS_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
     video_track_id: str
     participant_video: ParticipantVideo
+    videos: VideoConfig
     audio: AudioConfig
-    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ...) -> None: ...
+    data: DataConfig
+    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., videos: _Optional[_Union[VideoConfig, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ..., data: _Optional[_Union[DataConfig, _Mapping]] = ...) -> None: ...
 
 class ParticipantVideo(_message.Message):
     __slots__ = ("identity", "prefer_screen_share")
@@ -181,6 +187,26 @@ class ParticipantVideo(_message.Message):
     identity: str
     prefer_screen_share: bool
     def __init__(self, identity: _Optional[str] = ..., prefer_screen_share: bool = ...) -> None: ...
+
+class VideoConfig(_message.Message):
+    __slots__ = ("capture_all", "selectors")
+    CAPTURE_ALL_FIELD_NUMBER: _ClassVar[int]
+    SELECTORS_FIELD_NUMBER: _ClassVar[int]
+    capture_all: bool
+    selectors: _containers.RepeatedCompositeFieldContainer[VideoSelector]
+    def __init__(self, capture_all: bool = ..., selectors: _Optional[_Iterable[_Union[VideoSelector, _Mapping]]] = ...) -> None: ...
+
+class VideoSelector(_message.Message):
+    __slots__ = ("track_id", "participant_identity", "track_name", "exclude")
+    TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
+    track_id: str
+    participant_identity: str
+    track_name: str
+    exclude: bool
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., track_name: _Optional[str] = ..., exclude: bool = ...) -> None: ...
 
 class AudioConfig(_message.Message):
     __slots__ = ("capture_all", "routes")
@@ -191,16 +217,20 @@ class AudioConfig(_message.Message):
     def __init__(self, capture_all: bool = ..., routes: _Optional[_Iterable[_Union[AudioRoute, _Mapping]]] = ...) -> None: ...
 
 class AudioRoute(_message.Message):
-    __slots__ = ("track_id", "participant_identity", "participant_kind", "channel")
+    __slots__ = ("track_id", "participant_identity", "participant_kind", "track_name", "exclude", "channel")
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_KIND_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
     CHANNEL_FIELD_NUMBER: _ClassVar[int]
     track_id: str
     participant_identity: str
     participant_kind: _models.ParticipantInfo.Kind
+    track_name: str
+    exclude: bool
     channel: AudioChannel
-    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., track_name: _Optional[str] = ..., exclude: bool = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
 
 class DataConfig(_message.Message):
     __slots__ = ("capture_all", "selectors")
@@ -211,12 +241,16 @@ class DataConfig(_message.Message):
     def __init__(self, capture_all: bool = ..., selectors: _Optional[_Iterable[_Union[DataSelector, _Mapping]]] = ...) -> None: ...
 
 class DataSelector(_message.Message):
-    __slots__ = ("track_id", "participant_identity")
+    __slots__ = ("track_id", "participant_identity", "track_name", "exclude")
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
     track_id: str
     participant_identity: str
-    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ...) -> None: ...
+    track_name: str
+    exclude: bool
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., track_name: _Optional[str] = ..., exclude: bool = ...) -> None: ...
 
 class EncodingOptions(_message.Message):
     __slots__ = ("width", "height", "depth", "framerate", "audio_codec", "audio_bitrate", "audio_frequency", "video_codec", "video_bitrate", "key_frame_interval", "audio_quality", "video_quality")
