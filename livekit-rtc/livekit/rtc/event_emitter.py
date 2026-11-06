@@ -13,6 +13,17 @@ from .log import logger
 # function in 3.16, and a bare attribute access would then fail at import time.
 _ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 
+
+def _check_async_callback(callback: Callable, method_name: str) -> None:
+    if inspect.iscoroutinefunction(callback) or (
+        _ASYNCIO_COROUTINE_MARKER is not None
+        and getattr(callback, "_is_coroutine", None) is _ASYNCIO_COROUTINE_MARKER
+    ):
+        raise ValueError(
+            f"Cannot register an async callback with `.{method_name}()`. Use `asyncio.create_task` within your synchronous callback instead."
+        )
+
+
 T_contra = TypeVar("T_contra", contravariant=True)
 
 
@@ -115,6 +126,7 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
+            _check_async_callback(callback, "once")
 
             def once_callback(*args: Any, **kwargs: Any) -> None:
                 self.off(event, once_callback)
@@ -169,13 +181,7 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-            if inspect.iscoroutinefunction(callback) or (
-                _ASYNCIO_COROUTINE_MARKER is not None
-                and getattr(callback, "_is_coroutine", None) is _ASYNCIO_COROUTINE_MARKER
-            ):
-                raise ValueError(
-                    "Cannot register an async callback with `.on()`. Use `asyncio.create_task` within your synchronous callback instead."
-                )
+            _check_async_callback(callback, "on")
 
             if event not in self._events:
                 self._events[event] = {}
