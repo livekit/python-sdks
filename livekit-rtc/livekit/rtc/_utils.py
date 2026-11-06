@@ -17,7 +17,7 @@ import logging
 from collections import deque
 import ctypes
 import random
-from typing import Any, Callable, Generator, Generic, List, TypeVar, Union
+from typing import Any, Callable, Generator, Generic, List, Optional, TypeVar, Union
 
 logger = logging.getLogger("livekit")
 
@@ -76,14 +76,24 @@ T = TypeVar("T")
 
 
 class RingQueue(Generic[T]):
-    def __init__(self, capacity: int = 0) -> None:
+    def __init__(self, capacity: int = 0, on_discard: Optional[Callable[[T], None]] = None) -> None:
+        """
+        Args:
+            capacity: Maximum queued items, or 0 for unbounded.
+            on_discard: Called with the oldest item when a put evicts it.
+                Lets an owner of out-of-band resources (an SDK buffer, say)
+                release them instead of waiting for the collector.
+        """
         self._capacity = capacity
         self._queue: deque[T] = deque()
         self._event = asyncio.Event()
+        self._on_discard = on_discard
 
     def put(self, item: T) -> None:
         if self._capacity > 0 and len(self._queue) == self._capacity:
-            self._queue.popleft()
+            discarded = self._queue.popleft()
+            if self._on_discard is not None:
+                self._on_discard(discarded)
         self._queue.append(item)
         self._event.set()
 
@@ -92,6 +102,10 @@ class RingQueue(Generic[T]):
             await self._event.wait()
         self._event.clear()
         return self._queue.popleft()
+
+    def get_nowait(self) -> Optional[T]:
+        """Returns the next item, or None when the queue is empty."""
+        return self._queue.popleft() if self._queue else None
 
 
 class Queue(asyncio.Queue[T]):

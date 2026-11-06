@@ -50,6 +50,11 @@ class VideoFrame:
         """
         data = _ensure_compatible_buffer(data)
 
+        # Set for a borrowed frame only; see `_borrow_owned_info`. An owned
+        # frame holds its own copy of the pixels and has nothing to release.
+        self._owner: Optional[FfiHandle] = None
+        self._closed = False
+
         self._width = width
         self._height = height
         self._type = type
@@ -92,11 +97,79 @@ class VideoFrame:
 
         Returns:
             memoryview: The raw pixel data of the video frame as a memoryview object.
+
+        Raises:
+            RuntimeError: If this is a borrowed frame that has already been
+                closed. See :meth:`close`.
         """
+        if self._closed:
+            raise RuntimeError(
+                "the video frame has been closed; its pixel data belonged to the SDK "
+                "and has been released. Copy what you need before the frame closes."
+            )
         return memoryview(self._data)
+
+    @property
+    def is_borrowed(self) -> bool:
+        """
+        Whether this frame reads the SDK's own pixel buffer rather than a copy.
+
+        A borrowed frame's :attr:`data` is only valid until the frame is closed;
+        see :meth:`close`. Frames are owned unless the stream was created with
+        ``zero_copy=True``.
+        """
+        return self._owner is not None
+
+    def close(self) -> None:
+        """
+        Releases a borrowed frame's pixel buffer back to the SDK.
+
+        No-op for an owned frame, and safe to call more than once.
+
+        After this returns, :attr:`data` raises. **Anything else still pointing
+        at the buffer -- a ``memoryview`` taken from :attr:`data`, a ``numpy``
+        array built with ``np.frombuffer`` -- points at freed memory and must
+        not be read.**
+
+        There is deliberately no check for that. CPython reports an outstanding
+        export only against the exact buffer object it was taken from, and a
+        view derived from :attr:`data` re-exports the underlying array instead,
+        so a check here would catch almost nothing while reading as a
+        guarantee. Use ``np.array(frame.data)`` rather than
+        ``np.frombuffer(frame.data)`` when the result has to outlive the frame.
+
+        :class:`VideoStream` closes the previous borrowed frame before yielding
+        the next one, so a loop that does not hold onto frames needs no explicit
+        call. Use the frame as a context manager to release it sooner.
+        """
+        if self._closed or self._owner is None:
+            return
+
+        self._closed = True
+        if isinstance(self._data, memoryview):
+            # Invalidates the frame's own view, so a later read of a stale
+            # `frame.data` fails loudly instead of reading freed memory.
+            self._data.release()
+        self._owner.dispose()
+        self._owner = None
+
+    def __enter__(self) -> "VideoFrame":
+        return self
+
+    def __exit__(self, *_: Any) -> None:
+        self.close()
+
+    def __del__(self) -> None:
+        # Backstop for a borrowed frame the application never closed and the
+        # stream never superseded. Best effort: __del__ must not raise.
+        try:
+            self.close()
+        except Exception:
+            pass
 
     @staticmethod
     def _from_owned_info(owned_info: proto_video.OwnedVideoBuffer) -> "VideoFrame":
+        """Copies the pixels out of the SDK buffer and releases the handle."""
         info = owned_info.info
         data_len = _get_plane_length(info.type, info.width, info.height)
         cdata = (ctypes.c_uint8 * data_len).from_address(info.data_ptr)
@@ -108,6 +181,30 @@ class VideoFrame:
             data=data,
         )
         FfiHandle(owned_info.handle.id).dispose()
+        return frame
+
+    @staticmethod
+    def _borrow_owned_info(owned_info: proto_video.OwnedVideoBuffer) -> "VideoFrame":
+        """
+        Wraps the SDK's buffer in place, without copying it.
+
+        The returned frame owns the FFI handle and keeps the buffer alive until
+        the frame is closed. This is what makes the frame's lifetime matter:
+        an owned frame is independent of the SDK, a borrowed one is not.
+        """
+        info = owned_info.info
+        data_len = _get_plane_length(info.type, info.width, info.height)
+        cdata = (ctypes.c_uint8 * data_len).from_address(info.data_ptr)
+        frame = VideoFrame(
+            width=info.width,
+            height=info.height,
+            type=info.type,
+            # `cast` is not optional: a view of a ctypes array carries format
+            # "<B", which memoryview refuses to index. Casting to "B" gives the
+            # same plain bytes view the copying path produces from a bytearray.
+            data=memoryview(cdata).cast("B"),
+        )
+        frame._owner = FfiHandle(owned_info.handle.id)
         return frame
 
     def _proto_info(self) -> proto_video.VideoBufferInfo:
