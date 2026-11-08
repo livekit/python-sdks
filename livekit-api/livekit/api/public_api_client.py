@@ -91,7 +91,6 @@ class PublicApiClient:
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         response_class: Type[M],
-        *,
         field: Optional[str] = None,
         **params: Any,
     ) -> M:
@@ -106,7 +105,6 @@ class PublicApiClient:
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         response_class: Type[M],
-        *,
         items: str,
         page_token: str,
         limit: int,
