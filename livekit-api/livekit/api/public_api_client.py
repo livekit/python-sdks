@@ -116,7 +116,8 @@ class PublicApiClient:
         data = await self._call(
             operation=operation,
             headers=headers,
-            params={"page_cursor": page_token, "page_page_size": limit, **params},
+            # A limit of zero or below leaves the page size to the server.
+            params={"page_cursor": page_token, "page_page_size": max(limit, 0), **params},
         )
         next_page = (data.get("pageInfo") or {}).get("nextCursor", "")
         return _parse({items: data.get("items"), "nextPageToken": next_page}, response_class)

@@ -190,6 +190,11 @@ def test_list_threads_sends_no_unset_filter():
     assert len(res.threads) == 0 and res.next_page_token == ""
 
 
+def test_list_threads_leaves_a_negative_limit_to_the_server():
+    _, rec = run(lambda lk: lk.threads.list_threads(api.ListThreadsRequest(limit=-1)))
+    assert rec.query == {}
+
+
 def test_thread_items():
     reply = {
         "items": [
