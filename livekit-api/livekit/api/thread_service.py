@@ -33,18 +33,18 @@ class ThreadService(PublicApiService):
     async def create_thread(self, req: AgentThread.CreateRequest) -> AgentThread.Thread:
         """Creates a thread and its database."""
         return await self._client.request(
-            self._client.threads.thread_service_create_thread_without_preload_content,
-            self._auth_header(),
-            AgentThread.Thread,
+            operation=self._client.threads.thread_service_create_thread_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentThread.Thread,
             field="thread",
             thread_service_create_thread_body=ThreadServiceCreateThreadBody.from_dict(to_json(req)),
         )
 
     async def get_thread(self, thread_id: str) -> AgentThread.Thread:
         return await self._client.request(
-            self._client.threads.thread_service_get_thread_without_preload_content,
-            self._auth_header(),
-            AgentThread.Thread,
+            operation=self._client.threads.thread_service_get_thread_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentThread.Thread,
             field="thread",
             thread_id=thread_id,
         )
@@ -52,9 +52,9 @@ class ThreadService(PublicApiService):
     async def list_threads(self, req: AgentThread.ListRequest) -> AgentThread.ListResponse:
         """The threads of one scope (every scope when empty), newest first."""
         return await self._client.list(
-            self._client.threads.thread_service_list_threads_without_preload_content,
-            self._auth_header(),
-            AgentThread.ListResponse,
+            operation=self._client.threads.thread_service_list_threads_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentThread.ListResponse,
             items="threads",
             page_token=req.page_token,
             limit=req.limit,
@@ -67,9 +67,9 @@ class ThreadService(PublicApiService):
         body = to_json(req)
         body.pop("threadId", None)
         return await self._client.request(
-            self._client.threads.thread_service_update_thread_without_preload_content,
-            self._auth_header(),
-            AgentThread.Thread,
+            operation=self._client.threads.thread_service_update_thread_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentThread.Thread,
             field="thread",
             thread_id=req.thread_id,
             thread_service_update_thread_body=ThreadServiceUpdateThreadBody.from_dict(body),
@@ -78,9 +78,9 @@ class ThreadService(PublicApiService):
     async def delete_thread(self, thread_id: str) -> None:
         """Deletes the thread and its database."""
         await self._client.request(
-            self._client.threads.thread_service_delete_thread_without_preload_content,
-            self._auth_header(),
-            Empty,
+            operation=self._client.threads.thread_service_delete_thread_without_preload_content,
+            headers=self._auth_header(),
+            response_class=Empty,
             thread_id=thread_id,
         )
 
@@ -89,9 +89,9 @@ class ThreadService(PublicApiService):
     ) -> AgentThread.GetItemsResponse:
         """The thread's chat items, oldest first unless `sort_order` says otherwise."""
         return await self._client.list(
-            self._client.threads.thread_service_get_thread_items_without_preload_content,
-            self._auth_header(),
-            AgentThread.GetItemsResponse,
+            operation=self._client.threads.thread_service_get_thread_items_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentThread.GetItemsResponse,
             items="items",
             page_token=req.page_token,
             limit=req.limit,
@@ -108,9 +108,9 @@ class ThreadService(PublicApiService):
             else None
         )
         return await self._client.list(
-            self._client.threads.thread_service_get_thread_tasks_without_preload_content,
-            self._auth_header(),
-            AgentTask.GetTasksResponse,
+            operation=self._client.threads.thread_service_get_thread_tasks_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentTask.GetTasksResponse,
             items="tasks",
             page_token=req.page_token,
             limit=req.limit,

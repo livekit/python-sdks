@@ -87,6 +87,7 @@ class PublicApiClient:
 
     async def request(
         self,
+        *,
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         response_class: Type[M],
@@ -96,11 +97,12 @@ class PublicApiClient:
     ) -> M:
         """Calls a generated operation and parses its JSON (or its `field`) into `response_class`.
         A parameter at its protobuf default (`""`, `0`) is left unset."""
-        data = await self._call(operation, headers, params)
+        data = await self._call(operation=operation, headers=headers, params=params)
         return _parse(data.get(field) if field else data, response_class)
 
     async def list(
         self,
+        *,
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         response_class: Type[M],
@@ -113,13 +115,16 @@ class PublicApiClient:
         """Calls a generated list operation for one page: its `items` and `pageInfo` become the
         protocol response's `items` field and `next_page_token`."""
         data = await self._call(
-            operation, headers, {"page_cursor": page_token, "page_page_size": limit, **params}
+            operation=operation,
+            headers=headers,
+            params={"page_cursor": page_token, "page_page_size": limit, **params},
         )
         next_page = (data.get("pageInfo") or {}).get("nextCursor", "")
         return _parse({items: data.get("items"), "nextPageToken": next_page}, response_class)
 
     async def _call(
         self,
+        *,
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         params: Dict[str, Any],

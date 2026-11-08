@@ -23,9 +23,9 @@ class DatabaseService(PublicApiService):
     async def create_database(self, req: AgentDB.CreateRequest) -> AgentDB.CreateResponse:
         """Creates an empty database. Not idempotent: a retry creates a second one."""
         return await self._client.request(
-            self._client.databases.database_service_create_database_without_preload_content,
-            self._auth_header(),
-            AgentDB.CreateResponse,
+            operation=self._client.databases.database_service_create_database_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentDB.CreateResponse,
             database_service_create_database_body=DatabaseServiceCreateDatabaseBody.from_dict(
                 to_json(req)
             ),
@@ -33,18 +33,18 @@ class DatabaseService(PublicApiService):
 
     async def get_database(self, database_id: str) -> AgentDB.AgentDatabase:
         return await self._client.request(
-            self._client.databases.database_service_get_database_without_preload_content,
-            self._auth_header(),
-            AgentDB.AgentDatabase,
+            operation=self._client.databases.database_service_get_database_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentDB.AgentDatabase,
             field="database",
             database_id=database_id,
         )
 
     async def list_databases(self, req: AgentDB.ListRequest) -> AgentDB.ListResponse:
         return await self._client.list(
-            self._client.databases.database_service_list_databases_without_preload_content,
-            self._auth_header(),
-            AgentDB.ListResponse,
+            operation=self._client.databases.database_service_list_databases_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentDB.ListResponse,
             items="databases",
             page_token=req.page_token,
             limit=req.page_size,
@@ -53,17 +53,17 @@ class DatabaseService(PublicApiService):
     async def delete_database(self, database_id: str) -> None:
         """Deletes the database with its data."""
         await self._client.request(
-            self._client.databases.database_service_delete_database_without_preload_content,
-            self._auth_header(),
-            Empty,
+            operation=self._client.databases.database_service_delete_database_without_preload_content,
+            headers=self._auth_header(),
+            response_class=Empty,
             database_id=database_id,
         )
 
     async def export_database(self, database_id: str) -> AgentDB.ExportResponse:
         """A pre-authenticated download URL of a consistent snapshot of the database."""
         return await self._client.request(
-            self._client.databases.database_service_export_database_without_preload_content,
-            self._auth_header(),
-            AgentDB.ExportResponse,
+            operation=self._client.databases.database_service_export_database_without_preload_content,
+            headers=self._auth_header(),
+            response_class=AgentDB.ExportResponse,
             database_id=database_id,
         )
