@@ -3,12 +3,6 @@ from __future__ import annotations
 from google.protobuf.empty_pb2 import Empty
 from livekit.protocol.agent_pb.agent_thread import AgentTask, AgentThread
 
-from ._generated.public_api.models import (
-    LivekitAgentAgentTaskStatus,
-    LivekitPublicapiCommonV1SortOrder,
-    ThreadServiceCreateThreadBody,
-    ThreadServiceUpdateThreadBody,
-)
 from ._service import PublicApiService
 from .public_api_client import to_json
 
@@ -25,11 +19,6 @@ GetThreadItemsRequest = AgentThread.GetItemsRequest
 GetThreadItemsResponse = AgentThread.GetItemsResponse
 GetThreadTasksRequest = AgentTask.GetTasksRequest
 GetThreadTasksResponse = AgentTask.GetTasksResponse
-
-_SORT_ORDERS = {
-    AgentThread.SORT_ORDER_ASC: LivekitPublicapiCommonV1SortOrder.SORT_ORDER_ASC,
-    AgentThread.SORT_ORDER_DESC: LivekitPublicapiCommonV1SortOrder.SORT_ORDER_DESC,
-}
 
 
 class ThreadService(PublicApiService):
@@ -51,7 +40,9 @@ class ThreadService(PublicApiService):
             headers=self._auth_header(),
             response_class=Thread,
             field="thread",
-            thread_service_create_thread_body=ThreadServiceCreateThreadBody.from_dict(to_json(req)),
+            thread_service_create_thread_body=self._client.models.ThreadServiceCreateThreadBody.from_dict(
+                to_json(req)
+            ),
         )
 
     async def get_thread(self, *, thread_id: str) -> Thread:
@@ -86,7 +77,9 @@ class ThreadService(PublicApiService):
             response_class=Thread,
             field="thread",
             thread_id=req.thread_id,
-            thread_service_update_thread_body=ThreadServiceUpdateThreadBody.from_dict(body),
+            thread_service_update_thread_body=self._client.models.ThreadServiceUpdateThreadBody.from_dict(
+                body
+            ),
         )
 
     async def delete_thread(self, *, thread_id: str) -> None:
@@ -109,13 +102,19 @@ class ThreadService(PublicApiService):
             limit=req.limit,
             thread_id=req.thread_id,
             agent=req.agent,
-            sort_order=_SORT_ORDERS.get(req.sort_order),
+            sort_order=(
+                self._client.models.LivekitPublicapiCommonV1SortOrder(
+                    ThreadSortOrder.Name(req.sort_order)
+                )
+                if req.sort_order
+                else None
+            ),
         )
 
     async def get_thread_tasks(self, req: GetThreadTasksRequest) -> GetThreadTasksResponse:
         """The thread's tasks, oldest first."""
         status = (
-            LivekitAgentAgentTaskStatus(ThreadTaskStatus.Name(req.status))
+            self._client.models.LivekitAgentAgentTaskStatus(ThreadTaskStatus.Name(req.status))
             if req.HasField("status")
             else None
         )

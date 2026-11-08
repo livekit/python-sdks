@@ -3,7 +3,6 @@ from __future__ import annotations
 from google.protobuf.empty_pb2 import Empty
 from livekit.protocol.agentdb import AgentDB
 
-from ._generated.public_api.models import DatabaseServiceCreateDatabaseBody
 from ._service import PublicApiService
 from .public_api_client import to_json
 
@@ -33,7 +32,7 @@ class DatabaseService(PublicApiService):
             operation=self._client.databases.database_service_create_database_without_preload_content,
             headers=self._auth_header(),
             response_class=CreateDatabaseResponse,
-            database_service_create_database_body=DatabaseServiceCreateDatabaseBody.from_dict(
+            database_service_create_database_body=self._client.models.DatabaseServiceCreateDatabaseBody.from_dict(
                 to_json(req)
             ),
         )

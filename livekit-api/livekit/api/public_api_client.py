@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import functools
 import inspect
 import json
 from collections.abc import Awaitable
@@ -24,7 +25,6 @@ import aiohttp
 from google.protobuf import json_format
 from google.protobuf.message import Message
 
-from ._generated.public_api import ApiClient, Configuration, DatabaseServiceApi, ThreadServiceApi
 from .errors import ServerError, ServerErrorCode
 from .version import USER_AGENT
 
@@ -82,12 +82,37 @@ class PublicApiClient:
     ) -> None:
         self.host = public_api_url(host)
         self.timeout = timeout.total if timeout and timeout.total else DEFAULT_TIMEOUT
+        self._session = session
+
+    # The generated client (and pydantic) load on the first Public API call, not with
+    # `import livekit.api`.
+    @functools.cached_property
+    def _api(self) -> Any:
+        from ._generated.public_api import ApiClient, Configuration
+
         api = ApiClient(Configuration(host=self.host))
         api.user_agent = USER_AGENT
         # Requests go through the caller's session, which this client never closes.
-        api.rest_client.pool_manager = session
-        self.threads = ThreadServiceApi(api)
-        self.databases = DatabaseServiceApi(api)
+        api.rest_client.pool_manager = self._session
+        return api
+
+    @functools.cached_property
+    def threads(self) -> Any:
+        from ._generated.public_api import ThreadServiceApi
+
+        return ThreadServiceApi(self._api)
+
+    @functools.cached_property
+    def databases(self) -> Any:
+        from ._generated.public_api import DatabaseServiceApi
+
+        return DatabaseServiceApi(self._api)
+
+    @property
+    def models(self) -> Any:
+        from ._generated.public_api import models
+
+        return models
 
     async def request(
         self,

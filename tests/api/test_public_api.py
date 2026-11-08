@@ -17,6 +17,8 @@ the requests they send (path, query, body, bearer token) and the protocol
 messages they map the responses onto."""
 
 import asyncio
+import subprocess
+import sys
 import json
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple
 
@@ -354,3 +356,12 @@ def test_services_share_the_session_and_timeout():
     assert r["pool"] is r["session"]
     assert r["host"] == "https://beta-api.livekit.cloud"
     assert (r["default"], r["custom"]) == (10.0, 3)
+
+
+def test_importing_livekit_api_does_not_load_the_generated_client():
+    code = (
+        "import sys, livekit.api; "
+        "assert 'pydantic' not in sys.modules; "
+        "assert not any(m.startswith('livekit.api._generated') for m in sys.modules)"
+    )
+    subprocess.run([sys.executable, "-c", code], check=True)
