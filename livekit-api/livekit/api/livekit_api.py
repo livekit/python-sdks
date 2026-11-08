@@ -6,6 +6,8 @@ from .ingress_service import IngressService
 from .sip_service import SipService
 from .agent_dispatch_service import AgentDispatchService
 from .connector_service import ConnectorService
+from .thread_service import ThreadService
+from .database_service import DatabaseService
 from typing import Any, Optional
 
 
@@ -83,6 +85,8 @@ class LiveKitAPI:
         self._sip = SipService(self._session, url, key, secret, failover)
         self._agent_dispatch = AgentDispatchService(self._session, url, key, secret, failover)
         self._connector = ConnectorService(self._session, url, key, secret, failover)
+        self._threads = ThreadService(self._session, url, key, secret, timeout=timeout)
+        self._databases = DatabaseService(self._session, url, key, secret, timeout=timeout)
 
         if token:
             for svc in (
@@ -92,6 +96,8 @@ class LiveKitAPI:
                 self._sip,
                 self._agent_dispatch,
                 self._connector,
+                self._threads,
+                self._databases,
             ):
                 svc._token = token
 
@@ -148,6 +154,16 @@ class LiveKitAPI:
     def connector(self) -> ConnectorService:
         """Instance of the ConnectorService"""
         return self._connector
+
+    @property
+    def threads(self) -> ThreadService:
+        """Instance of the ThreadService"""
+        return self._threads
+
+    @property
+    def databases(self) -> DatabaseService:
+        """Instance of the DatabaseService"""
+        return self._databases
 
     async def aclose(self) -> None:
         """Close the API client

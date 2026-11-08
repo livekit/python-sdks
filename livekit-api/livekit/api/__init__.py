@@ -66,6 +66,8 @@ __all__ = [
     "sip_service",
     "agent_dispatch_service",
     "connector_service",
+    "thread_service",
+    "database_service",
     "InferenceGrants",
     "ObservabilityGrants",
     "AgentGrants",
