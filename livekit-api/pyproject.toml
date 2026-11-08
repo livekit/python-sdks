@@ -38,7 +38,7 @@ dependencies = [
     "protobuf>=4",
     "types-protobuf>=4",
     "livekit-protocol>=1.1.31,<2.0.0",
-    # The generated Public API client (livekit/api/_public_api, see public-api/generate.sh).
+    # The generated Public API client (livekit/api/_generated, see public-api/generate.sh).
     "aiohttp-retry>=2.8.3",
     "pydantic>=2.11",
     "python-dateutil>=2.8.2",

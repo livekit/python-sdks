@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The transport of the services served by the LiveKit Cloud Public API.
-
-The HTTP layer is generated from the Public API OpenAPI spec into `_public_api`
-(see `livekit-api/public-api/generate.sh`). `PublicApiClient` sends its requests
-through the caller's aiohttp session and turns responses into JSON or a
-`ServerError`, the way `TwirpClient` does for the Twirp services.
-"""
-
 from __future__ import annotations
 
 import json
@@ -31,7 +23,7 @@ import aiohttp
 from google.protobuf import json_format
 from google.protobuf.message import Message
 
-from ._public_api import ApiClient, Configuration, DatabaseServiceApi, ThreadServiceApi
+from ._generated.public_api import ApiClient, Configuration, DatabaseServiceApi, ThreadServiceApi
 from .twirp_client import _USER_AGENT, ServerError, ServerErrorCode
 
 # The project id that names the project of the request's token.
@@ -100,12 +92,7 @@ class PublicApiClient:
         headers: Dict[str, str],
         **params: Any,
     ) -> Dict[str, Any]:
-        """Issues a generated `*_without_preload_content` operation in the project
-        of the request's token, returning the JSON of a success. An error status
-        raises a `ServerError`.
-
-        `params` are the operation's parameters by name: the generated signatures
-        don't promise a positional order."""
+        """The JSON of a successful response; an error status raises `ServerError`."""
         resp = await operation(
             project_id=PROJECT, _headers=headers, _request_timeout=self.timeout, **params
         )

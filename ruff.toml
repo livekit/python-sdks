@@ -1,7 +1,7 @@
 exclude = [
   "_proto",
   "livekit-protocol/livekit/protocol",
-  "livekit-api/livekit/api/_public_api"
+  "livekit-api/livekit/api/_generated"
 ]
 
 line-length = 100

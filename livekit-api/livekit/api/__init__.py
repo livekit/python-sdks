@@ -35,6 +35,8 @@ from livekit.protocol.webhook import *
 from livekit.protocol.sip import *
 from livekit.protocol.connector_whatsapp import *
 from livekit.protocol.connector_twilio import *
+from livekit.protocol.agent_pb.agent_thread import AgentTask, AgentThread
+from livekit.protocol.agentdb import AgentDB
 
 from .twirp_client import (
     ServerError,
@@ -68,6 +70,9 @@ __all__ = [
     "connector_service",
     "thread_service",
     "database_service",
+    "AgentThread",
+    "AgentTask",
+    "AgentDB",
     "InferenceGrants",
     "ObservabilityGrants",
     "AgentGrants",

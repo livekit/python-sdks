@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional
+from collections.abc import Awaitable
+from typing import Any, Callable, Dict, Optional
 
 import aiohttp
 from abc import ABC
@@ -63,15 +64,13 @@ class PublicApiService(ABC):
         self._client = PublicApiClient(session, host, timeout=timeout)
         self.api_key = api_key
         self.api_secret = api_secret
-        # A pre-signed token set by LiveKitAPI for token auth; sent verbatim.
+        # Set by LiveKitAPI.with_token: sent verbatim, its grants are the caller's.
         self._token: str | None = None
 
-    def _auth_header(self) -> dict[str, str]:
-        # A pre-signed token is sent verbatim; the caller is responsible for its grants.
-        if self._token:
-            return {AUTHORIZATION: "Bearer {}".format(self._token)}
-
-        token = (
+    async def _request(
+        self, operation: Callable[..., Awaitable[aiohttp.ClientResponse]], **params: Any
+    ) -> Dict[str, Any]:
+        token = self._token or (
             AccessToken(self.api_key, self.api_secret)
             .with_ttl(self.TOKEN_TTL)
             .with_agent_grants(AgentGrants(database_admin=True))
@@ -82,4 +81,6 @@ class PublicApiService(ABC):
             )
             .to_jwt()
         )
-        return {AUTHORIZATION: "Bearer {}".format(token)}
+        return await self._client.request(
+            operation, headers={AUTHORIZATION: f"Bearer {token}"}, **params
+        )

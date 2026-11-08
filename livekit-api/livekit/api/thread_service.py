@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from livekit.protocol.agent_pb.agent_thread import AgentTask, AgentThread
 
-from ._public_api.models import (
+from ._generated.public_api.models import (
     LivekitAgentAgentTaskStatus,
     LivekitPublicapiCommonV1SortOrder,
     ThreadServiceCreateThreadBody,
@@ -18,100 +18,94 @@ _SORT_ORDERS = {
 
 
 class ThreadService(PublicApiService):
-    """Agent threads of the project: conversations whose chat items, tasks and
-    database outlive any one session. Served by the LiveKit Cloud Public API.
+    """Agent threads: conversations whose chat items, tasks and database outlive any one session.
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:
 
     ```python
     from livekit import api
     lkapi = api.LiveKitAPI()
-    threads = lkapi.threads
+    thread = await lkapi.threads.create_thread(api.AgentThread.CreateRequest(scope="user_42"))
     ```
     """
 
-    async def create(self, req: AgentThread.CreateRequest) -> AgentThread.Thread:
+    async def create_thread(self, req: AgentThread.CreateRequest) -> AgentThread.Thread:
         """Creates a thread and its database."""
-        res = await self._client.request(
+        res = await self._request(
             self._client.threads.thread_service_create_thread_without_preload_content,
             thread_service_create_thread_body=ThreadServiceCreateThreadBody.from_dict(to_json(req)),
-            headers=self._auth_header(),
         )
         return from_json(res.get("thread"), AgentThread.Thread())
 
-    async def get(self, thread_id: str) -> AgentThread.Thread:
-        res = await self._client.request(
+    async def get_thread(self, thread_id: str) -> AgentThread.Thread:
+        res = await self._request(
             self._client.threads.thread_service_get_thread_without_preload_content,
             thread_id=thread_id,
-            headers=self._auth_header(),
         )
         return from_json(res.get("thread"), AgentThread.Thread())
 
-    async def list(self, req: AgentThread.ListRequest) -> AgentThread.ListResponse:
+    async def list_threads(self, req: AgentThread.ListRequest) -> AgentThread.ListResponse:
         """The threads of one scope (every scope when empty), newest first."""
-        res = await self._client.request(
+        res = await self._request(
             self._client.threads.thread_service_list_threads_without_preload_content,
             scope=opt(req.scope),
             page_cursor=opt(req.page_token),
             page_page_size=page_size(req.limit),
-            headers=self._auth_header(),
         )
         return from_json(
             {"threads": res.get("items"), "nextPageToken": next_cursor(res)},
             AgentThread.ListResponse(),
         )
 
-    async def update(self, req: AgentThread.UpdateRequest) -> AgentThread.Thread:
-        """Merges the thread's attributes (an empty value deletes the entry) and sets
-        its idle TTL. Every update counts as activity and pushes `expires_at` out."""
+    async def update_thread(self, req: AgentThread.UpdateRequest) -> AgentThread.Thread:
+        """Merges the thread's attributes (an empty value deletes the entry) and sets its idle
+        TTL. An update counts as activity."""
         body = to_json(req)
         body.pop("threadId", None)
-        res = await self._client.request(
+        res = await self._request(
             self._client.threads.thread_service_update_thread_without_preload_content,
             thread_id=req.thread_id,
             thread_service_update_thread_body=ThreadServiceUpdateThreadBody.from_dict(body),
-            headers=self._auth_header(),
         )
         return from_json(res.get("thread"), AgentThread.Thread())
 
-    async def delete(self, thread_id: str) -> None:
+    async def delete_thread(self, thread_id: str) -> None:
         """Deletes the thread and its database."""
-        await self._client.request(
+        await self._request(
             self._client.threads.thread_service_delete_thread_without_preload_content,
             thread_id=thread_id,
-            headers=self._auth_header(),
         )
 
-    async def items(self, req: AgentThread.GetItemsRequest) -> AgentThread.GetItemsResponse:
+    async def get_thread_items(
+        self, req: AgentThread.GetItemsRequest
+    ) -> AgentThread.GetItemsResponse:
         """The thread's chat items, oldest first unless `sort_order` says otherwise."""
-        res = await self._client.request(
+        res = await self._request(
             self._client.threads.thread_service_get_thread_items_without_preload_content,
             thread_id=req.thread_id,
             agent=opt(req.agent),
             page_cursor=opt(req.page_token),
             page_page_size=page_size(req.limit),
             sort_order=_SORT_ORDERS.get(req.sort_order),
-            headers=self._auth_header(),
         )
         return from_json(
             {"items": res.get("items"), "nextPageToken": next_cursor(res)},
             AgentThread.GetItemsResponse(),
         )
 
-    async def tasks(self, req: AgentTask.GetTasksRequest) -> AgentTask.GetTasksResponse:
+    async def get_thread_tasks(self, req: AgentTask.GetTasksRequest) -> AgentTask.GetTasksResponse:
         """The thread's tasks, oldest first."""
         status = (
             LivekitAgentAgentTaskStatus(AgentTask.Status.Name(req.status))
             if req.HasField("status")
             else None
         )
-        res = await self._client.request(
+        res = await self._request(
             self._client.threads.thread_service_get_thread_tasks_without_preload_content,
             thread_id=req.thread_id,
             status=status,
             page_cursor=opt(req.page_token),
             page_page_size=page_size(req.limit),
-            headers=self._auth_header(),
         )
         return from_json(
             {"tasks": res.get("items"), "nextPageToken": next_cursor(res)},
