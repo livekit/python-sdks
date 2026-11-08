@@ -7,14 +7,14 @@ from livekit.protocol.agent_dispatch import (
     ListAgentDispatchRequest,
     ListAgentDispatchResponse,
 )
-from ._service import Service
+from ._service import TwirpService
 from .access_token import VideoGrants
 
 SVC = "AgentDispatchService"
 """@private"""
 
 
-class AgentDispatchService(Service):
+class AgentDispatchService(TwirpService):
     """Manage agent dispatches. Service APIs require roomAdmin permissions.
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:

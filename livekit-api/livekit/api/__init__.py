@@ -35,17 +35,33 @@ from livekit.protocol.webhook import *
 from livekit.protocol.sip import *
 from livekit.protocol.connector_whatsapp import *
 from livekit.protocol.connector_twilio import *
-from livekit.protocol.agent_pb.agent_thread import AgentTask, AgentThread
-from livekit.protocol.agentdb import AgentDB
 
-from .twirp_client import (
-    ServerError,
-    ServerErrorCode,
-    SipCallError,
-    TwirpError,
-    TwirpErrorCode,
-)
+from .errors import ServerError, ServerErrorCode
+from .twirp_client import SipCallError, TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
+from .thread_service import (
+    Thread,
+    ThreadItem,
+    ThreadTask,
+    ThreadSortOrder,
+    ThreadTaskStatus,
+    CreateThreadRequest,
+    ListThreadsRequest,
+    ListThreadsResponse,
+    UpdateThreadRequest,
+    GetThreadItemsRequest,
+    GetThreadItemsResponse,
+    GetThreadTasksRequest,
+    GetThreadTasksResponse,
+)
+from .database_service import (
+    AgentDatabase,
+    CreateDatabaseRequest,
+    CreateDatabaseResponse,
+    ListDatabasesRequest,
+    ListDatabasesResponse,
+    ExportDatabaseResponse,
+)
 from .access_token import (
     InferenceGrants,
     ObservabilityGrants,
@@ -70,9 +86,25 @@ __all__ = [
     "connector_service",
     "thread_service",
     "database_service",
-    "AgentThread",
-    "AgentTask",
-    "AgentDB",
+    "Thread",
+    "ThreadItem",
+    "ThreadTask",
+    "ThreadSortOrder",
+    "ThreadTaskStatus",
+    "CreateThreadRequest",
+    "ListThreadsRequest",
+    "ListThreadsResponse",
+    "UpdateThreadRequest",
+    "GetThreadItemsRequest",
+    "GetThreadItemsResponse",
+    "GetThreadTasksRequest",
+    "GetThreadTasksResponse",
+    "AgentDatabase",
+    "CreateDatabaseRequest",
+    "CreateDatabaseResponse",
+    "ListDatabasesRequest",
+    "ListDatabasesResponse",
+    "ExportDatabaseResponse",
     "InferenceGrants",
     "ObservabilityGrants",
     "AgentGrants",

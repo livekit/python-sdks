@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 import aiohttp
 from abc import ABC
@@ -12,7 +12,23 @@ from .access_token import AccessToken, AgentGrants, AgentThreadGrants, VideoGran
 AUTHORIZATION = "authorization"
 
 
-class Service(ABC):
+class BaseService(ABC):
+    """What every service shares: requests are signed with the project's key pair, or carry the
+    pre-signed token `LiveKitAPI.with_token` set, verbatim (its grants are the caller's)."""
+
+    def __init__(self, api_key: str, api_secret: str):
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self._token: str | None = None
+
+    def _bearer(self, grant: Callable[[AccessToken], AccessToken]) -> Dict[str, str]:
+        token = self._token or grant(AccessToken(self.api_key, self.api_secret)).to_jwt()
+        return {AUTHORIZATION: f"Bearer {token}"}
+
+
+class TwirpService(BaseService):
+    """A service served over Twirp by the LiveKit server."""
+
     def __init__(
         self,
         session: aiohttp.ClientSession,
@@ -21,31 +37,23 @@ class Service(ABC):
         api_secret: str,
         failover: bool = True,
     ):
+        super().__init__(api_key, api_secret)
         self._client = TwirpClient(session, host, "livekit", failover=failover)
-        self.api_key = api_key
-        self.api_secret = api_secret
-        # A pre-signed token set by LiveKitAPI for token auth; sent verbatim,
-        # skipping per-call signing. Per-service constructors stay key/secret-only.
-        self._token: str | None = None
 
     def _auth_header(
         self, grants: VideoGrants | None, sip: SIPGrants | None = None
-    ) -> dict[str, str]:
-        # A pre-signed token is sent verbatim; the caller is responsible for its grants.
-        if self._token:
-            return {AUTHORIZATION: "Bearer {}".format(self._token)}
+    ) -> Dict[str, str]:
+        def grant(token: AccessToken) -> AccessToken:
+            if grants:
+                token.with_grants(grants)
+            if sip is not None:
+                token.with_sip_grants(sip)
+            return token
 
-        tok = AccessToken(self.api_key, self.api_secret)
-        if grants:
-            tok.with_grants(grants)
-        if sip is not None:
-            tok.with_sip_grants(sip)
-
-        token = tok.to_jwt()
-        return {AUTHORIZATION: "Bearer {}".format(token)}
+        return self._bearer(grant)
 
 
-class PublicApiService(ABC):
+class PublicApiService(BaseService):
     """A service served by the LiveKit Cloud Public API."""
 
     # Each request signs its own token, so a short lifetime is enough.
@@ -60,22 +68,18 @@ class PublicApiService(ABC):
         *,
         timeout: Optional[aiohttp.ClientTimeout] = None,
     ):
+        super().__init__(api_key, api_secret)
         self._client = PublicApiClient(session, host, timeout=timeout)
-        self.api_key = api_key
-        self.api_secret = api_secret
-        # Set by LiveKitAPI.with_token: sent verbatim, its grants are the caller's.
-        self._token: str | None = None
 
     def _auth_header(self) -> Dict[str, str]:
-        token = self._token or (
-            AccessToken(self.api_key, self.api_secret)
-            .with_ttl(self.TOKEN_TTL)
-            .with_agent_grants(AgentGrants(database_admin=True))
-            .with_agent_thread_grants(
-                AgentThreadGrants(
-                    all=True, list=True, create=True, write=True, read=True, delete=True
+        return self._bearer(
+            lambda token: (
+                token.with_ttl(self.TOKEN_TTL)
+                .with_agent_grants(AgentGrants(database_admin=True))
+                .with_agent_thread_grants(
+                    AgentThreadGrants(
+                        all=True, list=True, create=True, write=True, read=True, delete=True
+                    )
                 )
             )
-            .to_jwt()
         )
-        return {AUTHORIZATION: f"Bearer {token}"}

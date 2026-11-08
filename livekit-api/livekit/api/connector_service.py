@@ -17,7 +17,7 @@ from livekit.protocol.connector_twilio import (
     ConnectTwilioCallRequest,
     ConnectTwilioCallResponse,
 )
-from ._service import Service
+from ._service import TwirpService
 from ._dial_timeout import DEFAULT_RINGING_TIMEOUT
 from .access_token import VideoGrants
 
@@ -25,7 +25,7 @@ SVC = "Connector"
 """@private"""
 
 
-class ConnectorService(Service):
+class ConnectorService(TwirpService):
     """Client for LiveKit Connector Service API
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:

@@ -24,7 +24,8 @@ from google.protobuf import json_format
 from google.protobuf.message import Message
 
 from ._generated.public_api import ApiClient, Configuration, DatabaseServiceApi, ThreadServiceApi
-from .twirp_client import _USER_AGENT, ServerError, ServerErrorCode
+from .errors import ServerError, ServerErrorCode
+from .version import USER_AGENT
 
 # The project id that names the project of the request's token.
 PROJECT = "p_"
@@ -79,7 +80,7 @@ class PublicApiClient:
         self.host = public_api_url(host)
         self.timeout = timeout.total if timeout and timeout.total else DEFAULT_TIMEOUT
         api = ApiClient(Configuration(host=self.host))
-        api.user_agent = _USER_AGENT
+        api.user_agent = USER_AGENT
         # Requests go through the caller's session, which this client never closes.
         api.rest_client.pool_manager = session
         self.threads = ThreadServiceApi(api)

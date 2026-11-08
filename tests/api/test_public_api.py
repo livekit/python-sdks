@@ -27,11 +27,10 @@ from aiohttp import web
 from aiohttp.test_utils import TestServer
 from google.protobuf.duration_pb2 import Duration
 
+from livekit import api
 from livekit.api import LiveKitAPI, ServerError, TokenVerifier
 from livekit.api.public_api_client import public_api_url
 from livekit.protocol.agent_pb.agent_session import ChatRole
-from livekit.protocol.agent_pb.agent_thread import AgentTask, AgentThread
-from livekit.protocol.agentdb import AgentDB
 
 KEY, SECRET = "key", "a-secret-long-enough-for-hmac-sha256"
 
@@ -106,7 +105,9 @@ def test_get_thread_signs_a_short_lived_token_with_thread_and_database_grants():
         "idleTtl": "86400s",
         "databaseId": "DB_1",
     }
-    thread, req = run(lambda lk: lk.threads.get_thread("AT_1"), (200, {"thread": thread_json}))
+    thread, req = run(
+        lambda lk: lk.threads.get_thread(thread_id="AT_1"), (200, {"thread": thread_json})
+    )
 
     assert req.method == "GET"
     assert req.path == "/v0/projects/p_/threads/AT_1"
@@ -127,19 +128,19 @@ def test_get_thread_signs_a_short_lived_token_with_thread_and_database_grants():
 
 
 def test_token_ttl_is_60_seconds():
-    _, req = run(lambda lk: lk.threads.get_thread("AT_1"))
+    _, req = run(lambda lk: lk.threads.get_thread(thread_id="AT_1"))
     raw = jwt.decode(req.bearer, options={"verify_signature": False})
     assert raw["iss"] == KEY
     assert raw["exp"] - raw["nbf"] == 60
 
 
 def test_pre_signed_token_is_sent_verbatim():
-    _, req = run(lambda lk: lk.databases.get_database("DB_1"), token="pre-signed")
+    _, req = run(lambda lk: lk.databases.get_database(database_id="DB_1"), token="pre-signed")
     assert req.bearer == "pre-signed"
 
 
 def test_create_thread_body():
-    req = AgentThread.CreateRequest(
+    req = api.CreateThreadRequest(
         scope="user-1", attributes={"plan": "pro"}, idle_ttl=Duration(seconds=60)
     )
     thread, rec = run(
@@ -151,12 +152,12 @@ def test_create_thread_body():
 
 
 def test_create_thread_leaves_unset_fields_out():
-    _, rec = run(lambda lk: lk.threads.create_thread(AgentThread.CreateRequest()))
+    _, rec = run(lambda lk: lk.threads.create_thread(api.CreateThreadRequest()))
     assert rec.json == {}
 
 
 def test_update_thread_keeps_the_id_in_the_path():
-    req = AgentThread.UpdateRequest(thread_id="AT_1", attributes={"plan": "", "seat": "3"})
+    req = api.UpdateThreadRequest(thread_id="AT_1", attributes={"plan": "", "seat": "3"})
     _, rec = run(lambda lk: lk.threads.update_thread(req), (200, {"thread": {"threadId": "AT_1"}}))
     assert (rec.method, rec.path) == ("PATCH", "/v0/projects/p_/threads/AT_1")
     # An empty value deletes the attribute, so it must reach the server.
@@ -164,7 +165,7 @@ def test_update_thread_keeps_the_id_in_the_path():
 
 
 def test_delete_thread():
-    result, rec = run(lambda lk: lk.threads.delete_thread("AT_1"))
+    result, rec = run(lambda lk: lk.threads.delete_thread(thread_id="AT_1"))
     assert (rec.method, rec.path) == ("DELETE", "/v0/projects/p_/threads/AT_1")
     assert result is None
 
@@ -174,7 +175,7 @@ def test_list_threads_pages():
         "items": [{"threadId": "AT_1"}, {"threadId": "AT_2"}],
         "pageInfo": {"nextCursor": "c2", "hasMore": True},
     }
-    req = AgentThread.ListRequest(scope="user-1", page_token="c1", limit=2)
+    req = api.ListThreadsRequest(scope="user-1", page_token="c1", limit=2)
     res, rec = run(lambda lk: lk.threads.list_threads(req), (200, reply))
     assert rec.query == {"scope": "user-1", "page.cursor": "c1", "page.pageSize": "2"}
     assert [t.thread_id for t in res.threads] == ["AT_1", "AT_2"]
@@ -183,7 +184,7 @@ def test_list_threads_pages():
 
 def test_list_threads_sends_no_unset_filter():
     res, rec = run(
-        lambda lk: lk.threads.list_threads(AgentThread.ListRequest()), (200, {"items": []})
+        lambda lk: lk.threads.list_threads(api.ListThreadsRequest()), (200, {"items": []})
     )
     assert rec.query == {}
     assert len(res.threads) == 0 and res.next_page_token == ""
@@ -204,8 +205,11 @@ def test_thread_items():
         ],
         "pageInfo": {"nextCursor": "", "hasMore": False},
     }
-    req = AgentThread.GetItemsRequest(
-        thread_id="AT_1", agent="frontdesk", limit=10, sort_order=AgentThread.SORT_ORDER_DESC
+    req = api.GetThreadItemsRequest(
+        thread_id="AT_1",
+        agent="frontdesk",
+        limit=10,
+        sort_order=api.ThreadSortOrder.SORT_ORDER_DESC,
     )
     res, rec = run(lambda lk: lk.threads.get_thread_items(req), (200, reply))
     assert rec.path == "/v0/projects/p_/threads/AT_1/items"
@@ -223,21 +227,23 @@ def test_thread_items():
 
 def test_thread_tasks_status_filter():
     reply = {"items": [{"taskId": "t1", "threadId": "AT_1", "name": "book", "status": "RUNNING"}]}
-    req = AgentTask.GetTasksRequest(thread_id="AT_1", status=AgentTask.RUNNING)
+    req = api.GetThreadTasksRequest(thread_id="AT_1", status=api.ThreadTaskStatus.RUNNING)
     res, rec = run(lambda lk: lk.threads.get_thread_tasks(req), (200, reply))
     assert rec.path == "/v0/projects/p_/threads/AT_1/tasks"
     assert rec.query == {"status": "RUNNING"}
-    assert res.tasks[0].status == AgentTask.RUNNING
+    assert res.tasks[0].status == api.ThreadTaskStatus.RUNNING
 
     _, rec = run(
-        lambda lk: lk.threads.get_thread_tasks(AgentTask.GetTasksRequest(thread_id="AT_1"))
+        lambda lk: lk.threads.get_thread_tasks(api.GetThreadTasksRequest(thread_id="AT_1"))
     )
     assert rec.query == {}
 
 
 def test_database_operations():
     created, rec = run(
-        lambda lk: lk.databases.create_database(AgentDB.CreateRequest(ttl=Duration(seconds=3600))),
+        lambda lk: lk.databases.create_database(
+            api.CreateDatabaseRequest(ttl=Duration(seconds=3600))
+        ),
         (200, {"databaseId": "DB_1", "expiresAt": "2026-01-02T03:04:05Z"}),
     )
     assert (rec.method, rec.path, rec.json) == (
@@ -248,25 +254,27 @@ def test_database_operations():
     assert created.database_id == "DB_1" and created.expires_at.seconds > 0
 
     db, rec = run(
-        lambda lk: lk.databases.get_database("DB_1"),
+        lambda lk: lk.databases.get_database(database_id="DB_1"),
         (200, {"database": {"databaseId": "DB_1", "region": "us", "tip": "12"}}),
     )
     assert (rec.method, rec.path) == ("GET", "/v0/projects/p_/databases/DB_1")
     assert (db.database_id, db.region, db.tip) == ("DB_1", "us", 12)
 
     listed, rec = run(
-        lambda lk: lk.databases.list_databases(AgentDB.ListRequest(page_size=5, page_token="c1")),
+        lambda lk: lk.databases.list_databases(
+            api.ListDatabasesRequest(page_size=5, page_token="c1")
+        ),
         (200, {"items": [{"databaseId": "DB_1"}], "pageInfo": {"nextCursor": "c2"}}),
     )
     assert rec.query == {"page.cursor": "c1", "page.pageSize": "5"}
     assert [d.database_id for d in listed.databases] == ["DB_1"]
     assert listed.next_page_token == "c2"
 
-    _, rec = run(lambda lk: lk.databases.delete_database("DB_1"))
+    _, rec = run(lambda lk: lk.databases.delete_database(database_id="DB_1"))
     assert (rec.method, rec.path) == ("DELETE", "/v0/projects/p_/databases/DB_1")
 
     exported, rec = run(
-        lambda lk: lk.databases.export_database("DB_1"),
+        lambda lk: lk.databases.export_database(database_id="DB_1"),
         (200, {"downloadUrl": "https://s3/db", "expiresAt": "2026-01-02T03:04:05Z", "tip": "42"}),
     )
     assert (rec.method, rec.path) == ("POST", "/v0/projects/p_/databases/DB_1:export")
@@ -286,7 +294,7 @@ def test_database_operations():
 def test_errors_map_to_server_error(reply: Reply, code: str, message: str):
     async def call(lk: LiveKitAPI) -> ServerError:
         with pytest.raises(ServerError) as err:
-            await lk.threads.get_thread("AT_1")
+            await lk.threads.get_thread(thread_id="AT_1")
         return err.value
 
     err, _ = run(call, reply)
