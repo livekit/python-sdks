@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Awaitable
-from typing import Any, Callable, Dict, Optional, TypeVar
+from typing import Any, Callable, Dict, Optional, Type, TypeVar
 from urllib.parse import urlparse
 
 import aiohttp
@@ -88,19 +88,56 @@ class PublicApiClient:
     async def request(
         self,
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
-        *,
         headers: Dict[str, str],
+        response_class: Type[M],
+        *,
+        field: Optional[str] = None,
         **params: Any,
+    ) -> M:
+        """Calls a generated operation and parses its JSON (or its `field`) into `response_class`.
+        A parameter at its protobuf default (`""`, `0`) is left unset."""
+        data = await self._call(operation, headers, params)
+        return _parse(data.get(field) if field else data, response_class)
+
+    async def list(
+        self,
+        operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
+        headers: Dict[str, str],
+        response_class: Type[M],
+        *,
+        items: str,
+        page_token: str,
+        limit: int,
+        **params: Any,
+    ) -> M:
+        """Calls a generated list operation for one page: its `items` and `pageInfo` become the
+        protocol response's `items` field and `next_page_token`."""
+        data = await self._call(
+            operation, headers, {"page_cursor": page_token, "page_page_size": limit, **params}
+        )
+        next_page = (data.get("pageInfo") or {}).get("nextCursor", "")
+        return _parse({items: data.get("items"), "nextPageToken": next_page}, response_class)
+
+    async def _call(
+        self,
+        operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
+        headers: Dict[str, str],
+        params: Dict[str, Any],
     ) -> Dict[str, Any]:
-        """The JSON of a successful response; an error status raises `ServerError`."""
+        set_params = {k: v for k, v in params.items() if v not in (None, "", 0)}
         resp = await operation(
-            project_id=PROJECT, _headers=headers, _request_timeout=self.timeout, **params
+            project_id=PROJECT, _headers=headers, _request_timeout=self.timeout, **set_params
         )
         body = await resp.read()
-        if 200 <= resp.status < 300:
-            data = json.loads(body) if body else {}
-            return data if isinstance(data, dict) else {}
-        raise _server_error(body, resp.status)
+        if not 200 <= resp.status < 300:
+            raise _server_error(body, resp.status)
+        data = json.loads(body) if body else {}
+        return data if isinstance(data, dict) else {}
+
+
+def _parse(data: Any, response_class: Type[M]) -> M:
+    # Fields this SDK doesn't know yet are ignored.
+    return json_format.ParseDict(data or {}, response_class(), ignore_unknown_fields=True)
 
 
 def _server_error(body: bytes, status: int) -> ServerError:
@@ -126,25 +163,3 @@ def _server_error(body: bytes, status: int) -> ServerError:
 def to_json(msg: Message) -> Dict[str, Any]:
     """The protobuf JSON of a request message, leaving unset fields out."""
     return json_format.MessageToDict(msg)
-
-
-def from_json(data: Any, msg: M) -> M:
-    """Parses protobuf JSON into `msg`, ignoring fields this SDK doesn't know."""
-    json_format.ParseDict(data or {}, msg, ignore_unknown_fields=True)
-    return msg
-
-
-def next_cursor(data: Dict[str, Any]) -> str:
-    """The cursor of the page after a list response; empty when exhausted."""
-    page = data.get("pageInfo") or {}
-    return str(page.get("nextCursor") or "")
-
-
-def opt(s: str) -> Optional[str]:
-    """An empty string is unset."""
-    return s or None
-
-
-def page_size(limit: int) -> Optional[int]:
-    """A zero limit is unset."""
-    return limit if limit > 0 else None

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from collections.abc import Awaitable
-from typing import Any, Callable, Dict, Optional
+from typing import Dict, Optional
 
 import aiohttp
 from abc import ABC
@@ -67,9 +66,7 @@ class PublicApiService(ABC):
         # Set by LiveKitAPI.with_token: sent verbatim, its grants are the caller's.
         self._token: str | None = None
 
-    async def _request(
-        self, operation: Callable[..., Awaitable[aiohttp.ClientResponse]], **params: Any
-    ) -> Dict[str, Any]:
+    def _auth_header(self) -> Dict[str, str]:
         token = self._token or (
             AccessToken(self.api_key, self.api_secret)
             .with_ttl(self.TOKEN_TTL)
@@ -81,6 +78,4 @@ class PublicApiService(ABC):
             )
             .to_jwt()
         )
-        return await self._client.request(
-            operation, headers={AUTHORIZATION: f"Bearer {token}"}, **params
-        )
+        return {AUTHORIZATION: f"Bearer {token}"}
