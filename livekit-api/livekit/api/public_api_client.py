@@ -14,9 +14,10 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 from collections.abc import Awaitable
-from typing import Any, Callable, Dict, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar
 from urllib.parse import urlparse
 
 import aiohttp
@@ -41,7 +42,9 @@ _STATUS_CODES = {
     404: ServerErrorCode.NOT_FOUND,
     409: ServerErrorCode.ALREADY_EXISTS,
     429: ServerErrorCode.RESOURCE_EXHAUSTED,
+    499: ServerErrorCode.CANCELED,
     501: ServerErrorCode.UNIMPLEMENTED,
+    502: ServerErrorCode.UNAVAILABLE,
     503: ServerErrorCode.UNAVAILABLE,
     504: ServerErrorCode.DEADLINE_EXCEEDED,
 }
@@ -97,8 +100,8 @@ class PublicApiClient:
     ) -> M:
         """Calls a generated operation and parses its JSON (or its `field`) into `response_class`.
         A parameter at its protobuf default (`""`, `0`) is left unset."""
-        data = await self._call(operation=operation, headers=headers, params=params)
-        return _parse(data.get(field) if field else data, response_class)
+        data, status = await self._call(operation=operation, headers=headers, params=params)
+        return _parse(data.get(field) if field else data, response_class, status)
 
     async def list(
         self,
@@ -113,14 +116,15 @@ class PublicApiClient:
     ) -> M:
         """Calls a generated list operation for one page: its `items` and `pageInfo` become the
         protocol response's `items` field and `next_page_token`."""
-        data = await self._call(
+        data, status = await self._call(
             operation=operation,
             headers=headers,
             # A limit of zero or below leaves the page size to the server.
             params={"page_cursor": page_token, "page_page_size": max(limit, 0), **params},
         )
         next_page = (data.get("pageInfo") or {}).get("nextCursor", "")
-        return _parse({items: data.get("items"), "nextPageToken": next_page}, response_class)
+        page = {items: data.get("items"), "nextPageToken": next_page}
+        return _parse(page, response_class, status)
 
     async def _call(
         self,
@@ -128,21 +132,48 @@ class PublicApiClient:
         operation: Callable[..., Awaitable[aiohttp.ClientResponse]],
         headers: Dict[str, str],
         params: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        set_params = {k: v for k, v in params.items() if v not in (None, "", 0)}
+    ) -> Tuple[Dict[str, Any], int]:
+        """The JSON object of a successful response and its status. Required parameters (the
+        operation's own, without a default) must be set; optional ones at their protobuf
+        default are left unset."""
+        required = {
+            name
+            for name, p in inspect.signature(operation).parameters.items()
+            if p.default is p.empty and p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
+        }
+        for name in required & params.keys():
+            if params[name] in (None, ""):
+                raise ValueError(f"{name} must not be empty")
+        set_params = {k: v for k, v in params.items() if k in required or v not in (None, "", 0)}
         resp = await operation(
             project_id=PROJECT, _headers=headers, _request_timeout=self.timeout, **set_params
         )
-        body = await resp.read()
+        try:
+            body = await resp.read()
+        finally:
+            resp.release()
         if not 200 <= resp.status < 300:
             raise _server_error(body, resp.status)
-        data = json.loads(body) if body else {}
-        return data if isinstance(data, dict) else {}
+        try:
+            data = json.loads(body) if body else {}
+        except ValueError:
+            data = None
+        if not isinstance(data, dict):
+            raise _malformed("response is not a JSON object", body, resp.status)
+        return data, resp.status
 
 
-def _parse(data: Any, response_class: Type[M]) -> M:
+def _parse(data: Any, response_class: Type[M], status: int) -> M:
     # Fields this SDK doesn't know yet are ignored.
-    return json_format.ParseDict(data or {}, response_class(), ignore_unknown_fields=True)
+    try:
+        return json_format.ParseDict(data or {}, response_class(), ignore_unknown_fields=True)
+    except json_format.ParseError as e:
+        raise ServerError(ServerErrorCode.MALFORMED, f"malformed response: {e}", status=status)
+
+
+def _malformed(reason: str, body: bytes, status: int) -> ServerError:
+    snippet = body[:200].decode("utf-8", errors="replace")
+    return ServerError(ServerErrorCode.MALFORMED, f"{reason}: {snippet}", status=status)
 
 
 def _server_error(body: bytes, status: int) -> ServerError:
@@ -162,7 +193,7 @@ def _server_error(body: bytes, status: int) -> ServerError:
         code = _STATUS_CODES.get(status) or (
             ServerErrorCode.INTERNAL if status >= 500 else ServerErrorCode.UNKNOWN
         )
-    return ServerError(code, msg or text, status=status)
+    return ServerError(code, msg or text or f"HTTP {status}", status=status)
 
 
 def to_json(msg: Message) -> Dict[str, Any]:

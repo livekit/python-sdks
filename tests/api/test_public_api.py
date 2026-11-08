@@ -57,9 +57,9 @@ def run(
     reply: Reply = (200, {}),
     *,
     token: Optional[str] = None,
-) -> Tuple[Any, Recorded]:
+) -> Tuple[Any, Any]:
     """Runs `call` against a server answering every request with `reply`, and
-    returns its result with the one request the server received."""
+    returns its result with the one request the server received (None when none was sent)."""
     requests: List[Recorded] = []
 
     async def handle(request: web.Request) -> web.Response:
@@ -82,8 +82,8 @@ def run(
                 return await call(lkapi)
 
     result = asyncio.run(main())
-    assert len(requests) == 1
-    return result, requests[0]
+    assert len(requests) <= 1
+    return result, requests[0] if requests else None
 
 
 def test_public_api_url_from_project_url():
@@ -292,7 +292,8 @@ def test_database_operations():
         ((404, {"code": 5, "message": "thread not found"}), "not_found", "thread not found"),
         ((409, {"code": "aborted", "message": "busy"}), "aborted", "busy"),
         ((503, "upstream down"), "unavailable", "upstream down"),
-        ((502, {}), "internal", "{}"),
+        ((502, {}), "unavailable", "{}"),
+        ((499, ""), "canceled", "HTTP 499"),
         ((418, {}), "unknown", "{}"),
     ],
 )
@@ -304,6 +305,31 @@ def test_errors_map_to_server_error(reply: Reply, code: str, message: str):
 
     err, _ = run(call, reply)
     assert (err.code, err.message, err.status) == (code, message, reply[0])
+
+
+@pytest.mark.parametrize(
+    "reply",
+    [(200, "<html>gateway</html>"), (200, [1, 2]), (200, {"thread": {"attributes": "x"}})],
+)
+def test_a_success_the_sdk_cannot_read_is_malformed(reply: Reply):
+    async def call(lk: LiveKitAPI) -> ServerError:
+        with pytest.raises(ServerError) as err:
+            await lk.threads.get_thread(thread_id="AT_1")
+        return err.value
+
+    err, _ = run(call, reply)
+    assert (err.code, err.status) == ("malformed", 200)
+
+
+def test_an_empty_id_fails_before_any_request():
+    async def call(lk: LiveKitAPI) -> str:
+        with pytest.raises(ValueError) as err:
+            await lk.threads.get_thread(thread_id="")
+        return str(err.value)
+
+    message, rec = run(call)
+    assert message == "thread_id must not be empty"
+    assert rec is None
 
 
 def test_services_share_the_session_and_timeout():
