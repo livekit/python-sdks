@@ -308,10 +308,13 @@ async def test_publish_data_makes_no_ctypes_array_type() -> None:
             lambda: len(collector.packets) >= len(payloads),
             message="receiver did not get all payloads",
         )
+        # Check `type(o)` instead of `isinstance(o, type)`: gc can hand back a
+        # dead `weakref.proxy`, and isinstance() dereferences it and raises
+        # ReferenceError (seen on Windows ARM64).
         array_types = [
             o
             for o in gc.get_objects()
-            if isinstance(o, type)
+            if issubclass(type(o), type)
             and issubclass(o, ctypes.Array)
             and getattr(o, "_length_", None) in lengths
         ]
