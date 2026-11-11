@@ -48,6 +48,9 @@ async def test_clear_queue_cuts_a_capture_longer_than_the_queue() -> None:
         await asyncio.sleep(0.025)
         cleared = time.monotonic()
         source.clear_queue()
+        # the next reply starts at once, while the cut capture winds down
+        silence = SAMPLE_RATE // 100
+        await source.capture_frame(rtc.AudioFrame(b"\x00\x00" * silence, SAMPLE_RATE, 1, silence))
         await asyncio.wait_for(capture, 0.1)
         await asyncio.sleep(0.6)
     finally:
