@@ -63,7 +63,6 @@ class VideoStream:
         self._track: Track | None = track
         self._format = format
         self._capacity = capacity
-        self._format = format
         stream: Any = None
         if "participant" in kwargs:
             stream = self._create_owned_stream_from_participant(
@@ -115,7 +114,10 @@ class VideoStream:
         )
 
     def __del__(self) -> None:
-        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+        # _ffi_queue is unset if __init__ raised early or the instance was built via __new__
+        ffi_queue = getattr(self, "_ffi_queue", None)
+        if ffi_queue is not None:
+            FfiClient.instance.queue.unsubscribe(ffi_queue)
 
     def _create_owned_stream(self) -> Any:
         assert self._track is not None
@@ -144,31 +146,33 @@ class VideoStream:
         return resp.video_stream_from_participant.stream
 
     async def _run(self) -> None:
-        while True:
-            event = await self._ffi_queue.wait_for(self._is_event)
-            video_event = event.video_stream_event
+        try:
+            while True:
+                event = await self._ffi_queue.wait_for(self._is_event)
+                video_event = event.video_stream_event
 
-            if video_event.HasField("frame_received"):
-                frame_received = video_event.frame_received
-                owned_buffer_info = frame_received.buffer
-                frame = VideoFrame._from_owned_info(owned_buffer_info)
-                metadata: proto_video_frame.FrameMetadata | None = None
-                if frame_received.HasField("metadata"):
-                    metadata = proto_video_frame.FrameMetadata()
-                    metadata.CopyFrom(frame_received.metadata)
+                if video_event.HasField("frame_received"):
+                    frame_received = video_event.frame_received
+                    owned_buffer_info = frame_received.buffer
+                    frame = VideoFrame._from_owned_info(owned_buffer_info)
+                    metadata: proto_video_frame.FrameMetadata | None = None
+                    if frame_received.HasField("metadata"):
+                        metadata = proto_video_frame.FrameMetadata()
+                        metadata.CopyFrom(frame_received.metadata)
 
-                event = VideoFrameEvent(
-                    frame=frame,
-                    timestamp_us=frame_received.timestamp_us,
-                    rotation=frame_received.rotation,
-                    metadata=metadata,
-                )
+                    event = VideoFrameEvent(
+                        frame=frame,
+                        timestamp_us=frame_received.timestamp_us,
+                        rotation=frame_received.rotation,
+                        metadata=metadata,
+                    )
 
-                self._queue.put(event)
-            elif video_event.HasField("eos"):
-                break
-
-        FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+                    self._queue.put(event)
+                elif video_event.HasField("eos"):
+                    self._queue.put(None)
+                    break
+        finally:
+            FfiClient.instance.queue.unsubscribe(self._ffi_queue)
 
     async def aclose(self) -> None:
         self._ffi_handle.dispose()
