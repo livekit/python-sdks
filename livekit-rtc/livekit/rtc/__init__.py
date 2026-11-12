@@ -79,6 +79,7 @@ from .room import (
     RtcConfiguration,
     SipDTMF,
     RtcStats,
+    PrewarmedConnection,
 )
 from .track import (
     AudioTrack,
@@ -192,6 +193,7 @@ __all__ = [
     "RemoteParticipant",
     "ConnectError",
     "Room",
+    "PrewarmedConnection",
     "RoomOptions",
     "DataStreamOptions",
     "RtcConfiguration",

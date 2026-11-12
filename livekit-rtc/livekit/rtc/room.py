@@ -115,6 +115,60 @@ class DataStreamOptions:
     When None, uses the FFI default."""
 
 
+class PrewarmedConnection:
+    """A connection to a LiveKit server opened ahead of :meth:`Room.connect`.
+
+    Opening the TCP (and, for ``wss``, TLS) connection early lets the connect
+    perform only the WebSocket upgrade. Pass it as
+    :attr:`RoomOptions.prewarmed_connection`. It is used at most once; if it is no
+    longer usable or was opened for a different server, the connect dials a fresh
+    connection instead.
+    """
+
+    def __init__(self, ffi_handle: FfiHandle) -> None:
+        self._ffi_handle = ffi_handle
+
+    @classmethod
+    async def create(cls, url: str) -> PrewarmedConnection:
+        """Opens a connection to the server at ``url``.
+
+        ``http(s)`` URLs are treated as ``ws(s)``.
+
+        Raises:
+            ConnectError: If the connection could not be opened, or a proxy is
+                configured through ``HTTP(S)_PROXY``.
+        """
+        req = proto_ffi.FfiRequest()
+        req.prewarm.url = url
+
+        queue = FfiClient.instance.queue.subscribe()
+        try:
+            resp = FfiClient.instance.request(req)
+            cb: proto_ffi.FfiEvent = await queue.wait_for(
+                lambda e: e.prewarm.async_id == resp.prewarm.async_id
+            )
+        finally:
+            FfiClient.instance.queue.unsubscribe(queue)
+
+        if cb.prewarm.WhichOneof("message") != "connection":
+            raise ConnectError(cb.prewarm.error)
+        return cls(FfiHandle(cb.prewarm.connection.id))
+
+    @property
+    def alive(self) -> bool:
+        """Whether the connection is unused, open, and not closed by the server."""
+        if self._ffi_handle.disposed:
+            return False
+        req = proto_ffi.FfiRequest()
+        req.prewarmed_connection_alive.connection_handle = self._ffi_handle.handle
+        resp: proto_ffi.FfiResponse = FfiClient.instance.request(req)
+        return resp.prewarmed_connection_alive.alive
+
+    def close(self) -> None:
+        """Closes the connection without using it."""
+        self._ffi_handle.dispose()
+
+
 @dataclass
 class RoomOptions:
     auto_subscribe: bool = True
@@ -132,6 +186,8 @@ class RoomOptions:
     """Use a single peer connection for both publish and subscribe. When None, uses the default (true)."""
     data_stream: DataStreamOptions | None = None
     """Options for incoming data streams. When None, uses the FFI defaults."""
+    prewarmed_connection: PrewarmedConnection | None = None
+    """A connection opened ahead of time, used by the first signal connection attempt."""
 
 
 @dataclass
@@ -505,6 +561,13 @@ class Room(EventEmitter[EventTypes]):
 
         if options.connect_timeout is not None:
             req.connect.options.connect_timeout_ms = int(options.connect_timeout * 1000)
+        if (
+            options.prewarmed_connection is not None
+            and not options.prewarmed_connection._ffi_handle.disposed
+        ):
+            req.connect.options.prewarmed_connection_handle = (
+                options.prewarmed_connection._ffi_handle.handle
+            )
 
         if options.single_peer_connection is not None:
             req.connect.options.single_peer_connection = options.single_peer_connection

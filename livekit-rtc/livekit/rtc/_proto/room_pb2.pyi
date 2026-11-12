@@ -236,6 +236,107 @@ KIND_RELIABLE: DataPacketKind.ValueType  # 1
 global___DataPacketKind = DataPacketKind
 
 @typing.final
+class PrewarmRequest(google.protobuf.message.Message):
+    """Open a connection (TCP, plus TLS for wss) to a server ahead of a ConnectRequest.
+    Pass the returned handle as RoomOptions.prewarmed_connection_handle so the
+    connect only performs the WebSocket upgrade. The connection is used at most
+    once; dropping the handle closes it.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    URL_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    url: builtins.str
+    request_async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        url: builtins.str | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "url", b"url"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["request_async_id", b"request_async_id", "url", b"url"]) -> None: ...
+
+global___PrewarmRequest = PrewarmRequest
+
+@typing.final
+class PrewarmResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___PrewarmResponse = PrewarmResponse
+
+@typing.final
+class PrewarmCallback(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    ERROR_FIELD_NUMBER: builtins.int
+    CONNECTION_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    error: builtins.str
+    @property
+    def connection(self) -> handle_pb2.FfiOwnedHandle: ...
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+        error: builtins.str | None = ...,
+        connection: handle_pb2.FfiOwnedHandle | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "connection", b"connection", "error", b"error", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "connection", b"connection", "error", b"error", "message", b"message"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["error", "connection"] | None: ...
+
+global___PrewarmCallback = PrewarmCallback
+
+@typing.final
+class PrewarmedConnectionAliveRequest(google.protobuf.message.Message):
+    """Whether a pre-warmed connection can still be used: not used yet, and not
+    closed by the server.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CONNECTION_HANDLE_FIELD_NUMBER: builtins.int
+    connection_handle: builtins.int
+    def __init__(
+        self,
+        *,
+        connection_handle: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["connection_handle", b"connection_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["connection_handle", b"connection_handle"]) -> None: ...
+
+global___PrewarmedConnectionAliveRequest = PrewarmedConnectionAliveRequest
+
+@typing.final
+class PrewarmedConnectionAliveResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ALIVE_FIELD_NUMBER: builtins.int
+    alive: builtins.bool
+    def __init__(
+        self,
+        *,
+        alive: builtins.bool | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["alive", b"alive"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["alive", b"alive"]) -> None: ...
+
+global___PrewarmedConnectionAliveResponse = PrewarmedConnectionAliveResponse
+
+@typing.final
 class ConnectRequest(google.protobuf.message.Message):
     """Connect to a new LiveKit room"""
 
@@ -1399,13 +1500,10 @@ class RoomDataStreamOptions(google.protobuf.message.Message):
     receiving side. Unset falls back to the SDK default.
     """
     use_legacy_client_implementation: builtins.bool
-    """Temporary migration aid for SDKs that still implement data streams in
-    their own client-side code on top of the FFI instead of using the FFI
-    data stream API. When true, this client does not advertise data streams
-    v2 support: ClientInfo.client_protocol is capped at 1 (DATA_STREAM_RPC),
-    so remote clients will not use v2-only behavior toward this client.
-    Defaults to false (v2 advertised). Will be removed once all FFI
-    consumers migrate.
+    """Deprecated: no client SDK uses this anymore, and it is ignored. It was a
+    temporary migration aid for SDKs that implemented data streams in their
+    own client-side code on top of the FFI; data streams v2 support is now
+    always advertised. Kept only so the field number is not reused.
     """
     def __init__(
         self,
@@ -1433,6 +1531,7 @@ class RoomOptions(google.protobuf.message.Message):
     CONNECT_TIMEOUT_MS_FIELD_NUMBER: builtins.int
     DATA_STREAM_FIELD_NUMBER: builtins.int
     OTHER_SDKS_FIELD_NUMBER: builtins.int
+    PREWARMED_CONNECTION_HANDLE_FIELD_NUMBER: builtins.int
     auto_subscribe: builtins.bool
     adaptive_stream: builtins.bool
     dynacast: builtins.bool
@@ -1444,6 +1543,10 @@ class RoomOptions(google.protobuf.message.Message):
     other_sdks: builtins.str
     """Comma separated list of additional LiveKit SDKs layered on top of this one, with versions,
     e.g. "components-js:1.2.3,track-processors-js:1.2.3". Forwarded to ClientInfo.other_sdks.
+    """
+    prewarmed_connection_handle: builtins.int
+    """Handle from a PrewarmCallback. The first signal connection attempt runs the
+    WebSocket upgrade over it, or dials a fresh connection if it is unusable.
     """
     @property
     def e2ee(self) -> e2ee_pb2.E2eeOptions: ...
@@ -1471,9 +1574,10 @@ class RoomOptions(google.protobuf.message.Message):
         connect_timeout_ms: builtins.int | None = ...,
         data_stream: global___RoomDataStreamOptions | None = ...,
         other_sdks: builtins.str | None = ...,
+        prewarmed_connection_handle: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "prewarmed_connection_handle", b"prewarmed_connection_handle", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["adaptive_stream", b"adaptive_stream", "auto_subscribe", b"auto_subscribe", "connect_timeout_ms", b"connect_timeout_ms", "data_stream", b"data_stream", "dynacast", b"dynacast", "e2ee", b"e2ee", "encryption", b"encryption", "join_retries", b"join_retries", "other_sdks", b"other_sdks", "prewarmed_connection_handle", b"prewarmed_connection_handle", "rtc_config", b"rtc_config", "single_peer_connection", b"single_peer_connection"]) -> None: ...
 
 global___RoomOptions = RoomOptions
 
