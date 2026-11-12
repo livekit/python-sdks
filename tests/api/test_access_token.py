@@ -5,6 +5,7 @@ import jwt
 import pytest
 from livekit.api import (
     AccessToken,
+    AgentDatabaseGrants,
     AgentEndpointGrants,
     AgentGrants,
     AgentThreadGrants,
@@ -82,27 +83,42 @@ def test_mint_token_with_can_subscribe_metrics() -> None:
 
 
 def test_agent_grants() -> None:
-    agent = AgentGrants(database_admin=True)
+    agent = AgentGrants(dispatch_admin=True)
     endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
-    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True)
+    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True, sql=True)
+    database = AgentDatabaseGrants(
+        database_ids=["DB_1"], read=True, delete=True, create=True, list=True
+    )
 
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_agent_grants(agent)
         .with_agent_endpoint_grants(endpoint)
         .with_agent_thread_grants(thread)
+        .with_agent_database_grants(database)
         .to_jwt()
     )
 
     decoded = jwt.decode(token, options={"verify_signature": False})
     assert decoded["agentThread"]["threadIds"] == ["t1"]
     assert decoded["agentEndpoint"]["agentName"] == "my-agent"
-    assert decoded["agent"]["databaseAdmin"] is True
+    assert decoded["agentThread"]["sql"] is True
+    assert decoded["agentDatabase"] == {
+        "databaseIds": ["DB_1"],
+        "read": True,
+        "write": False,
+        "delete": True,
+        "create": True,
+        "list": True,
+    }
+    assert decoded["agent"]["dispatchAdmin"] is True
+    assert "databaseAdmin" not in decoded["agent"]
 
     claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
     assert claims.agent == agent
     assert claims.agent_endpoint == endpoint
     assert claims.agent_thread == thread
+    assert claims.agent_database == database
 
 
 def test_agent_config() -> None:
@@ -222,6 +238,7 @@ def test_verify_token_omitted_grants_are_none() -> None:
     assert claims.agent is None
     assert claims.agent_endpoint is None
     assert claims.agent_thread is None
+    assert claims.agent_database is None
 
 
 def test_verify_token_with_only_inference_grants() -> None:
