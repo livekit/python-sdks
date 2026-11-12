@@ -126,7 +126,7 @@ class JobState(_message.Message):
     def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ..., worker_id: _Optional[str] = ..., agent_id: _Optional[str] = ..., reason: _Optional[_Union[JobStateReason, str]] = ..., accepted_at: _Optional[int] = ..., assigned_at: _Optional[int] = ..., attempts: _Optional[int] = ..., first_started_at: _Optional[int] = ..., agent_failed_attempts_ns: _Optional[int] = ..., workers_asked: _Optional[int] = ...) -> None: ...
 
 class WorkerMessage(_message.Message):
-    __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job")
+    __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job", "create_job_token")
     REGISTER_FIELD_NUMBER: _ClassVar[int]
     AVAILABILITY_FIELD_NUMBER: _ClassVar[int]
     UPDATE_WORKER_FIELD_NUMBER: _ClassVar[int]
@@ -134,6 +134,7 @@ class WorkerMessage(_message.Message):
     PING_FIELD_NUMBER: _ClassVar[int]
     SIMULATE_JOB_FIELD_NUMBER: _ClassVar[int]
     MIGRATE_JOB_FIELD_NUMBER: _ClassVar[int]
+    CREATE_JOB_TOKEN_FIELD_NUMBER: _ClassVar[int]
     register: RegisterWorkerRequest
     availability: AvailabilityResponse
     update_worker: UpdateWorkerStatus
@@ -141,23 +142,26 @@ class WorkerMessage(_message.Message):
     ping: WorkerPing
     simulate_job: SimulateJobRequest
     migrate_job: MigrateJobRequest
-    def __init__(self, register: _Optional[_Union[RegisterWorkerRequest, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityResponse, _Mapping]] = ..., update_worker: _Optional[_Union[UpdateWorkerStatus, _Mapping]] = ..., update_job: _Optional[_Union[UpdateJobStatus, _Mapping]] = ..., ping: _Optional[_Union[WorkerPing, _Mapping]] = ..., simulate_job: _Optional[_Union[SimulateJobRequest, _Mapping]] = ..., migrate_job: _Optional[_Union[MigrateJobRequest, _Mapping]] = ...) -> None: ...
+    create_job_token: CreateJobTokenRequest
+    def __init__(self, register: _Optional[_Union[RegisterWorkerRequest, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityResponse, _Mapping]] = ..., update_worker: _Optional[_Union[UpdateWorkerStatus, _Mapping]] = ..., update_job: _Optional[_Union[UpdateJobStatus, _Mapping]] = ..., ping: _Optional[_Union[WorkerPing, _Mapping]] = ..., simulate_job: _Optional[_Union[SimulateJobRequest, _Mapping]] = ..., migrate_job: _Optional[_Union[MigrateJobRequest, _Mapping]] = ..., create_job_token: _Optional[_Union[CreateJobTokenRequest, _Mapping]] = ...) -> None: ...
 
 class ServerMessage(_message.Message):
-    __slots__ = ("register", "availability", "assignment", "termination", "pong", "go_away")
+    __slots__ = ("register", "availability", "assignment", "termination", "pong", "go_away", "create_job_token")
     REGISTER_FIELD_NUMBER: _ClassVar[int]
     AVAILABILITY_FIELD_NUMBER: _ClassVar[int]
     ASSIGNMENT_FIELD_NUMBER: _ClassVar[int]
     TERMINATION_FIELD_NUMBER: _ClassVar[int]
     PONG_FIELD_NUMBER: _ClassVar[int]
     GO_AWAY_FIELD_NUMBER: _ClassVar[int]
+    CREATE_JOB_TOKEN_FIELD_NUMBER: _ClassVar[int]
     register: RegisterWorkerResponse
     availability: AvailabilityRequest
     assignment: JobAssignment
     termination: JobTermination
     pong: WorkerPong
     go_away: AgentHttp.GoAway
-    def __init__(self, register: _Optional[_Union[RegisterWorkerResponse, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityRequest, _Mapping]] = ..., assignment: _Optional[_Union[JobAssignment, _Mapping]] = ..., termination: _Optional[_Union[JobTermination, _Mapping]] = ..., pong: _Optional[_Union[WorkerPong, _Mapping]] = ..., go_away: _Optional[_Union[AgentHttp.GoAway, _Mapping]] = ...) -> None: ...
+    create_job_token: CreateJobTokenResponse
+    def __init__(self, register: _Optional[_Union[RegisterWorkerResponse, _Mapping]] = ..., availability: _Optional[_Union[AvailabilityRequest, _Mapping]] = ..., assignment: _Optional[_Union[JobAssignment, _Mapping]] = ..., termination: _Optional[_Union[JobTermination, _Mapping]] = ..., pong: _Optional[_Union[WorkerPong, _Mapping]] = ..., go_away: _Optional[_Union[AgentHttp.GoAway, _Mapping]] = ..., create_job_token: _Optional[_Union[CreateJobTokenResponse, _Mapping]] = ...) -> None: ...
 
 class SimulateJobRequest(_message.Message):
     __slots__ = ("type", "room", "participant")
@@ -321,6 +325,28 @@ class JobTermination(_message.Message):
     JOB_ID_FIELD_NUMBER: _ClassVar[int]
     job_id: str
     def __init__(self, job_id: _Optional[str] = ...) -> None: ...
+
+class CreateJobTokenRequest(_message.Message):
+    __slots__ = ("request_id", "job_id", "claims")
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    JOB_ID_FIELD_NUMBER: _ClassVar[int]
+    CLAIMS_FIELD_NUMBER: _ClassVar[int]
+    request_id: str
+    job_id: str
+    claims: str
+    def __init__(self, request_id: _Optional[str] = ..., job_id: _Optional[str] = ..., claims: _Optional[str] = ...) -> None: ...
+
+class CreateJobTokenResponse(_message.Message):
+    __slots__ = ("request_id", "token", "expires_at", "error")
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    ERROR_FIELD_NUMBER: _ClassVar[int]
+    request_id: str
+    token: str
+    expires_at: int
+    error: str
+    def __init__(self, request_id: _Optional[str] = ..., token: _Optional[str] = ..., expires_at: _Optional[int] = ..., error: _Optional[str] = ...) -> None: ...
 
 class AgentHttp(_message.Message):
     __slots__ = ()
