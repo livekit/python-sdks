@@ -305,8 +305,9 @@ class TwirpClient:
             )
             await asyncio.sleep(self._failover_backoff * (2**attempt))
             attempted.add(host_key(next_origin))
-            current_origin = next_origin
-            current_base = next_origin
+            if next_origin != current_origin:
+                current_origin = next_origin
+                current_base = next_origin
 
         raise RuntimeError("failover loop exited without returning")  # unreachable
 
