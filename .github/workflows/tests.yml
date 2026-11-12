@@ -31,6 +31,7 @@ jobs:
   test:
     name: Test (${{ inputs.os }}, Python ${{ inputs.python-version }})
     runs-on: ${{ inputs.os }}
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -100,7 +101,7 @@ jobs:
           uv venv .test-venv
           source .test-venv/bin/activate
           uv pip install rtc-wheel/*.whl ./livekit-api ./livekit-protocol
-          uv pip install pytest pytest-asyncio numpy matplotlib
+          uv pip install pytest pytest-asyncio pytest-timeout numpy matplotlib
 
       - name: Create venv and install dependencies (macOS)
         if: runner.os == 'macOS'
@@ -109,7 +110,7 @@ jobs:
           source .test-venv/bin/activate
           uv pip install "${{ steps.select-wheel-macos.outputs.wheel }}"
           uv pip install ./livekit-api ./livekit-protocol
-          uv pip install pytest pytest-asyncio numpy matplotlib
+          uv pip install pytest pytest-asyncio pytest-timeout numpy matplotlib
 
       - name: Create venv and install dependencies (Windows)
         if: runner.os == 'Windows'
@@ -117,7 +118,7 @@ jobs:
           uv venv .test-venv
           $wheel = (Get-ChildItem rtc-wheel\*.whl)[0].FullName
           uv pip install --python .test-venv $wheel .\livekit-api .\livekit-protocol
-          uv pip install --python .test-venv pytest pytest-asyncio numpy matplotlib
+          uv pip install --python .test-venv pytest pytest-asyncio pytest-timeout numpy matplotlib
         shell: pwsh
 
       - name: Run tests (Unix)
@@ -128,7 +129,7 @@ jobs:
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
         run: |
           source .test-venv/bin/activate
-          pytest tests/ livekit-rtc/tests/
+          pytest --timeout=300 tests/ livekit-rtc/tests/
 
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
@@ -136,6 +137,6 @@ jobs:
           LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
           LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
           LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
-        run: .test-venv\Scripts\python.exe -m pytest tests/ livekit-rtc/tests/
+        run: .test-venv\Scripts\python.exe -m pytest --timeout=300 tests/ livekit-rtc/tests/
         shell: pwsh
         

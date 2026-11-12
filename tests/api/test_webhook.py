@@ -5,7 +5,7 @@ import pytest
 from livekit.api import AccessToken, TokenVerifier, WebhookReceiver
 
 TEST_API_KEY = "myapikey"
-TEST_API_SECRET = "thiskeyistotallyunsafe"
+TEST_API_SECRET = "thiskeyistotallyunsafe-but-32-bytes-long"
 TEST_EVENT = """
 {
   "event": "room_started",

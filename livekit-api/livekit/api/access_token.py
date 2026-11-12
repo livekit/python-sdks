@@ -308,40 +308,14 @@ class TokenVerifier:
                 leeway=self._leeway.total_seconds(),
                 options={"verify_signature": False},
             )
-        video_dict = claims.get("video", dict())
-        video_dict = {camel_to_snake(k): v for k, v in video_dict.items()}
-        video_dict = {k: v for k, v in video_dict.items() if k in VideoGrants.__dataclass_fields__}
-        video = VideoGrants(**video_dict)
-
-        sip_dict = claims.get("sip", dict())
-        sip_dict = {camel_to_snake(k): v for k, v in sip_dict.items()}
-        sip_dict = {k: v for k, v in sip_dict.items() if k in SIPGrants.__dataclass_fields__}
-        sip = SIPGrants(**sip_dict)
-
-        inference_dict = claims.get("inference", dict())
-        inference_dict = {camel_to_snake(k): v for k, v in inference_dict.items()}
-        inference_dict = {
-            k: v for k, v in inference_dict.items() if k in InferenceGrants.__dataclass_fields__
-        }
-        inference = InferenceGrants(**inference_dict)
-
-        observability_dict = claims.get("observability", dict())
-        observability_dict = {camel_to_snake(k): v for k, v in observability_dict.items()}
-        observability_dict = {
-            k: v
-            for k, v in observability_dict.items()
-            if k in ObservabilityGrants.__dataclass_fields__
-        }
-        observability = ObservabilityGrants(**observability_dict)
-
         grant_claims = Claims(
             identity=claims.get("sub", ""),
             name=claims.get("name", ""),
             kind=claims.get("kind", ""),
-            video=video,
-            sip=sip,
-            inference=inference,
-            observability=observability,
+            video=_parse_grants(claims, "video", VideoGrants),
+            sip=_parse_grants(claims, "sip", SIPGrants),
+            inference=_parse_grants(claims, "inference", InferenceGrants),
+            observability=_parse_grants(claims, "observability", ObservabilityGrants),
             attributes=claims.get("attributes", {}),
             metadata=claims.get("metadata", ""),
             sha256=claims.get("sha256", ""),
