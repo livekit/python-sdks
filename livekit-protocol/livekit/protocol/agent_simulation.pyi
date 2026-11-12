@@ -247,7 +247,16 @@ class SimulationRun(_message.Message):
             backchannel_count: int
             def __init__(self, turn_taking_score: _Optional[float] = ..., heard_e2e_latency_p50_ms: _Optional[int] = ..., heard_e2e_latency_p95_ms: _Optional[int] = ..., heard_e2e_latency_p99_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., eot_misprediction_count: _Optional[int] = ..., overlap_ratio: _Optional[float] = ..., overlap_speech_ms: _Optional[int] = ..., total_speech_ms: _Optional[int] = ..., awkward_silence_count: _Optional[int] = ..., unanswered_turns: _Optional[int] = ..., false_interruption_count: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., backchannel_count: _Optional[int] = ...) -> None: ...
         class Turn(_message.Message):
-            __slots__ = ("index", "role", "text", "start_ms", "end_ms", "stt_delay_ms", "llm_ttft_ms", "llm_ttfs_ms", "llm_tps", "tts_ttfb_ms", "e2e_latency_ms", "heard_e2e_latency_ms", "time_to_yield_ms", "turn_taking_score", "conciseness", "eot_misprediction", "awkward_silence", "unanswered")
+            __slots__ = ("index", "role", "text", "start_ms", "end_ms", "stt_delay_ms", "llm_ttft_ms", "llm_ttfs_ms", "llm_tps", "tts_ttfb_ms", "e2e_latency_ms", "heard_e2e_latency_ms", "time_to_yield_ms", "turn_taking_score", "conciseness", "eot_misprediction", "awkward_silence", "unanswered", "entities", "item_id")
+            class Entity(_message.Message):
+                __slots__ = ("said", "heard", "recognized")
+                SAID_FIELD_NUMBER: _ClassVar[int]
+                HEARD_FIELD_NUMBER: _ClassVar[int]
+                RECOGNIZED_FIELD_NUMBER: _ClassVar[int]
+                said: str
+                heard: str
+                recognized: bool
+                def __init__(self, said: _Optional[str] = ..., heard: _Optional[str] = ..., recognized: bool = ...) -> None: ...
             INDEX_FIELD_NUMBER: _ClassVar[int]
             ROLE_FIELD_NUMBER: _ClassVar[int]
             TEXT_FIELD_NUMBER: _ClassVar[int]
@@ -266,6 +275,8 @@ class SimulationRun(_message.Message):
             EOT_MISPREDICTION_FIELD_NUMBER: _ClassVar[int]
             AWKWARD_SILENCE_FIELD_NUMBER: _ClassVar[int]
             UNANSWERED_FIELD_NUMBER: _ClassVar[int]
+            ENTITIES_FIELD_NUMBER: _ClassVar[int]
+            ITEM_ID_FIELD_NUMBER: _ClassVar[int]
             index: int
             role: _agent_session.ChatRole
             text: str
@@ -284,7 +295,9 @@ class SimulationRun(_message.Message):
             eot_misprediction: bool
             awkward_silence: bool
             unanswered: bool
-            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., text: _Optional[str] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., stt_delay_ms: _Optional[int] = ..., llm_ttft_ms: _Optional[int] = ..., llm_ttfs_ms: _Optional[int] = ..., llm_tps: _Optional[float] = ..., tts_ttfb_ms: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., heard_e2e_latency_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., turn_taking_score: _Optional[float] = ..., conciseness: _Optional[float] = ..., eot_misprediction: bool = ..., awkward_silence: bool = ..., unanswered: bool = ...) -> None: ...
+            entities: _containers.RepeatedCompositeFieldContainer[SimulationRun.JobMetrics.Turn.Entity]
+            item_id: str
+            def __init__(self, index: _Optional[int] = ..., role: _Optional[_Union[_agent_session.ChatRole, str]] = ..., text: _Optional[str] = ..., start_ms: _Optional[int] = ..., end_ms: _Optional[int] = ..., stt_delay_ms: _Optional[int] = ..., llm_ttft_ms: _Optional[int] = ..., llm_ttfs_ms: _Optional[int] = ..., llm_tps: _Optional[float] = ..., tts_ttfb_ms: _Optional[int] = ..., e2e_latency_ms: _Optional[int] = ..., heard_e2e_latency_ms: _Optional[int] = ..., time_to_yield_ms: _Optional[int] = ..., turn_taking_score: _Optional[float] = ..., conciseness: _Optional[float] = ..., eot_misprediction: bool = ..., awkward_silence: bool = ..., unanswered: bool = ..., entities: _Optional[_Iterable[_Union[SimulationRun.JobMetrics.Turn.Entity, _Mapping]]] = ..., item_id: _Optional[str] = ...) -> None: ...
         TASK_COMPLETION_FIELD_NUMBER: _ClassVar[int]
         OVERALL_SCORE_FIELD_NUMBER: _ClassVar[int]
         STT_FIELD_NUMBER: _ClassVar[int]
@@ -370,7 +383,7 @@ class SimulationRun(_message.Message):
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling")
+            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling", "sip_call_to", "sip_trunk_id", "sip_number", "deployment")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
             NUM_SIMULATIONS_FIELD_NUMBER: _ClassVar[int]
@@ -383,6 +396,10 @@ class SimulationRun(_message.Message):
             PACKET_LOSS_FIELD_NUMBER: _ClassVar[int]
             CI_FIELD_NUMBER: _ClassVar[int]
             SAMPLING_FIELD_NUMBER: _ClassVar[int]
+            SIP_CALL_TO_FIELD_NUMBER: _ClassVar[int]
+            SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
+            SIP_NUMBER_FIELD_NUMBER: _ClassVar[int]
+            DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             agent_name: str
             num_simulations: int
@@ -395,7 +412,11 @@ class SimulationRun(_message.Message):
             packet_loss: bool
             ci: SimulationRun.CI
             sampling: SimulationRun.SamplingOptions
-            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ...) -> None: ...
+            sip_call_to: str
+            sip_trunk_id: str
+            sip_number: str
+            deployment: str
+            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_trunk_id: _Optional[str] = ..., sip_number: _Optional[str] = ..., deployment: _Optional[str] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("simulation_run_id", "presigned_post_request")
             SIMULATION_RUN_ID_FIELD_NUMBER: _ClassVar[int]

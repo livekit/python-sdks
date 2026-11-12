@@ -231,12 +231,17 @@ def to_python_level(level: proto_ffi.LogLevel.ValueType) -> Optional[int]:
 class FfiClient:
     _instance: Optional["FfiClient"] = None
     _ffi_disposed: bool = False
+    _instance_lock = threading.Lock()
 
     @classproperty
     def instance(cls) -> "FfiClient":
-        if cls._instance is None:
-            cls._instance = FfiClient()
-        return cls._instance
+        if cls._instance is not None:
+            return cls._instance
+        # threads that race here would each get their own client and lose events sent to the other
+        with cls._instance_lock:
+            if cls._instance is None:
+                cls._instance = FfiClient()
+            return cls._instance
 
     def __init__(self) -> None:
         FfiClient._ffi_disposed = False

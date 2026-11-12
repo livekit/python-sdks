@@ -129,7 +129,7 @@ class RoomOptions:
     connect_timeout: float | None = None
     """Timeout in seconds for each signal connection attempt. When None, uses the default (5s)."""
     single_peer_connection: bool | None = None
-    """Use a single peer connection for both publish and subscribe. When None, uses the default (false)."""
+    """Use a single peer connection for both publish and subscribe. When None, uses the default (true)."""
     data_stream: DataStreamOptions | None = None
     """Options for incoming data streams. When None, uses the FFI defaults."""
 
@@ -1115,12 +1115,7 @@ class Room(EventEmitter[EventTypes]):
             if which_val == "user":
                 owned_buffer_info = packet.user.data
                 buffer_info = owned_buffer_info.data
-                native_data = ctypes.cast(
-                    buffer_info.data_ptr,
-                    ctypes.POINTER(ctypes.c_byte * buffer_info.data_len),
-                ).contents
-
-                data = bytes(native_data)
+                data = ctypes.string_at(buffer_info.data_ptr, buffer_info.data_len)
                 FfiHandle(owned_buffer_info.handle.id).dispose()
                 rparticipant = cast(
                     RemoteParticipant,
