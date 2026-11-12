@@ -134,12 +134,15 @@ class AgentThreadGrants:
 
 @dataclass
 class AgentDatabaseGrants:
-    # standalone databases ("DB_...") that may be read or written
+    # databases that may be read, written and deleted
     database_ids: Optional[List[str]] = None
     read: bool = False
     write: bool = False
-    # read and write every database of the project, threads' included
-    admin: bool = False
+    delete: bool = False
+    # create databases in the project
+    create: bool = False
+    # list the project's databases
+    list: bool = False
 
 
 @dataclass

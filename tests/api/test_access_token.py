@@ -86,7 +86,9 @@ def test_agent_grants() -> None:
     agent = AgentGrants(dispatch_admin=True)
     endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
     thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True, sql=True)
-    database = AgentDatabaseGrants(database_ids=["DB_1"], read=True)
+    database = AgentDatabaseGrants(
+        database_ids=["DB_1"], read=True, delete=True, create=True, list=True
+    )
 
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
@@ -101,7 +103,14 @@ def test_agent_grants() -> None:
     assert decoded["agentThread"]["threadIds"] == ["t1"]
     assert decoded["agentEndpoint"]["agentName"] == "my-agent"
     assert decoded["agentThread"]["sql"] is True
-    assert decoded["agentDatabase"]["databaseIds"] == ["DB_1"]
+    assert decoded["agentDatabase"] == {
+        "databaseIds": ["DB_1"],
+        "read": True,
+        "write": False,
+        "delete": True,
+        "create": True,
+        "list": True,
+    }
     assert decoded["agent"]["dispatchAdmin"] is True
     assert "databaseAdmin" not in decoded["agent"]
 
