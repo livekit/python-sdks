@@ -51,7 +51,7 @@ JSR_DISPATCH_DELETED: JobStateReason
 JSR_RETRYING: JobStateReason
 
 class Job(_message.Message):
-    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording", "deployment", "attributes", "enable_redaction", "created_at")
+    __slots__ = ("id", "dispatch_id", "type", "room", "participant", "namespace", "metadata", "agent_name", "state", "enable_recording", "deployment", "attributes", "enable_redaction", "created_at", "thread_id")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -73,6 +73,7 @@ class Job(_message.Message):
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     ENABLE_REDACTION_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    THREAD_ID_FIELD_NUMBER: _ClassVar[int]
     id: str
     dispatch_id: str
     type: JobType
@@ -87,10 +88,11 @@ class Job(_message.Message):
     attributes: _containers.ScalarMap[str, str]
     enable_redaction: bool
     created_at: int
-    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., enable_redaction: bool = ..., created_at: _Optional[int] = ...) -> None: ...
+    thread_id: str
+    def __init__(self, id: _Optional[str] = ..., dispatch_id: _Optional[str] = ..., type: _Optional[_Union[JobType, str]] = ..., room: _Optional[_Union[_models.Room, _Mapping]] = ..., participant: _Optional[_Union[_models.ParticipantInfo, _Mapping]] = ..., namespace: _Optional[str] = ..., metadata: _Optional[str] = ..., agent_name: _Optional[str] = ..., state: _Optional[_Union[JobState, _Mapping]] = ..., enable_recording: bool = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., enable_redaction: bool = ..., created_at: _Optional[int] = ..., thread_id: _Optional[str] = ...) -> None: ...
 
 class JobState(_message.Message):
-    __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id", "reason", "accepted_at", "assigned_at")
+    __slots__ = ("status", "error", "started_at", "ended_at", "updated_at", "participant_identity", "worker_id", "agent_id", "reason", "accepted_at", "assigned_at", "attempts", "first_started_at", "agent_failed_attempts_ns", "workers_asked")
     STATUS_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
@@ -102,6 +104,10 @@ class JobState(_message.Message):
     REASON_FIELD_NUMBER: _ClassVar[int]
     ACCEPTED_AT_FIELD_NUMBER: _ClassVar[int]
     ASSIGNED_AT_FIELD_NUMBER: _ClassVar[int]
+    ATTEMPTS_FIELD_NUMBER: _ClassVar[int]
+    FIRST_STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    AGENT_FAILED_ATTEMPTS_NS_FIELD_NUMBER: _ClassVar[int]
+    WORKERS_ASKED_FIELD_NUMBER: _ClassVar[int]
     status: JobStatus
     error: str
     started_at: int
@@ -113,7 +119,11 @@ class JobState(_message.Message):
     reason: JobStateReason
     accepted_at: int
     assigned_at: int
-    def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ..., worker_id: _Optional[str] = ..., agent_id: _Optional[str] = ..., reason: _Optional[_Union[JobStateReason, str]] = ..., accepted_at: _Optional[int] = ..., assigned_at: _Optional[int] = ...) -> None: ...
+    attempts: int
+    first_started_at: int
+    agent_failed_attempts_ns: int
+    workers_asked: int
+    def __init__(self, status: _Optional[_Union[JobStatus, str]] = ..., error: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., participant_identity: _Optional[str] = ..., worker_id: _Optional[str] = ..., agent_id: _Optional[str] = ..., reason: _Optional[_Union[JobStateReason, str]] = ..., accepted_at: _Optional[int] = ..., assigned_at: _Optional[int] = ..., attempts: _Optional[int] = ..., first_started_at: _Optional[int] = ..., agent_failed_attempts_ns: _Optional[int] = ..., workers_asked: _Optional[int] = ...) -> None: ...
 
 class WorkerMessage(_message.Message):
     __slots__ = ("register", "availability", "update_worker", "update_job", "ping", "simulate_job", "migrate_job")
