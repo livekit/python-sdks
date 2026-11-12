@@ -518,10 +518,12 @@ class NewApmRequest(google.protobuf.message.Message):
     GAIN_CONTROLLER_ENABLED_FIELD_NUMBER: builtins.int
     HIGH_PASS_FILTER_ENABLED_FIELD_NUMBER: builtins.int
     NOISE_SUPPRESSION_ENABLED_FIELD_NUMBER: builtins.int
+    GAIN_CONTROLLER_INITIAL_GAIN_DB_FIELD_NUMBER: builtins.int
     echo_canceller_enabled: builtins.bool
     gain_controller_enabled: builtins.bool
     high_pass_filter_enabled: builtins.bool
     noise_suppression_enabled: builtins.bool
+    gain_controller_initial_gain_db: builtins.float
     def __init__(
         self,
         *,
@@ -529,9 +531,10 @@ class NewApmRequest(google.protobuf.message.Message):
         gain_controller_enabled: builtins.bool | None = ...,
         high_pass_filter_enabled: builtins.bool | None = ...,
         noise_suppression_enabled: builtins.bool | None = ...,
+        gain_controller_initial_gain_db: builtins.float | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "gain_controller_initial_gain_db", b"gain_controller_initial_gain_db", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["echo_canceller_enabled", b"echo_canceller_enabled", "gain_controller_enabled", b"gain_controller_enabled", "gain_controller_initial_gain_db", b"gain_controller_initial_gain_db", "high_pass_filter_enabled", b"high_pass_filter_enabled", "noise_suppression_enabled", b"noise_suppression_enabled"]) -> None: ...
 
 global___NewApmRequest = NewApmRequest
 
