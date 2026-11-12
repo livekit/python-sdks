@@ -24,14 +24,14 @@ from livekit.protocol.room import (
     MoveParticipantResponse,
 )
 from livekit.protocol.models import Room, ParticipantInfo
-from ._service import Service
+from ._service import TwirpService
 from .access_token import VideoGrants
 
 SVC = "RoomService"
 """@private"""
 
 
-class RoomService(Service):
+class RoomService(TwirpService):
     """Client for LiveKit RoomService API
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:

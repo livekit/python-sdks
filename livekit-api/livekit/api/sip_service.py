@@ -36,8 +36,9 @@ from livekit.protocol.sip import (
     SIPTransport,
     SIPMediaConfig,
 )
-from ._service import Service
-from .twirp_client import SipCallError, ServerError
+from ._service import TwirpService
+from .errors import ServerError
+from .twirp_client import SipCallError
 from ._dial_timeout import (
     dial_timeout as _dial_timeout,
     pin_ringing_timeout as _pin_ringing_timeout,
@@ -57,7 +58,7 @@ def _as_sip_error(err: ServerError) -> ServerError:
     return err
 
 
-class SipService(Service):
+class SipService(TwirpService):
     """Client for LiveKit SIP Service API
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:

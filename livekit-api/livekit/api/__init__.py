@@ -36,14 +36,32 @@ from livekit.protocol.sip import *
 from livekit.protocol.connector_whatsapp import *
 from livekit.protocol.connector_twilio import *
 
-from .twirp_client import (
-    ServerError,
-    ServerErrorCode,
-    SipCallError,
-    TwirpError,
-    TwirpErrorCode,
-)
+from .errors import ServerError, ServerErrorCode
+from .twirp_client import SipCallError, TwirpError, TwirpErrorCode
 from .livekit_api import LiveKitAPI
+from .thread_service import (
+    Thread,
+    ThreadItem,
+    ThreadTask,
+    ThreadSortOrder,
+    ThreadTaskStatus,
+    CreateThreadRequest,
+    ListThreadsRequest,
+    ListThreadsResponse,
+    UpdateThreadRequest,
+    GetThreadItemsRequest,
+    GetThreadItemsResponse,
+    GetThreadTasksRequest,
+    GetThreadTasksResponse,
+)
+from .database_service import (
+    AgentDatabase,
+    CreateDatabaseRequest,
+    CreateDatabaseResponse,
+    ListDatabasesRequest,
+    ListDatabasesResponse,
+    ExportDatabaseResponse,
+)
 from .access_token import (
     InferenceGrants,
     ObservabilityGrants,
@@ -66,6 +84,27 @@ __all__ = [
     "sip_service",
     "agent_dispatch_service",
     "connector_service",
+    "thread_service",
+    "database_service",
+    "Thread",
+    "ThreadItem",
+    "ThreadTask",
+    "ThreadSortOrder",
+    "ThreadTaskStatus",
+    "CreateThreadRequest",
+    "ListThreadsRequest",
+    "ListThreadsResponse",
+    "UpdateThreadRequest",
+    "GetThreadItemsRequest",
+    "GetThreadItemsResponse",
+    "GetThreadTasksRequest",
+    "GetThreadTasksResponse",
+    "AgentDatabase",
+    "CreateDatabaseRequest",
+    "CreateDatabaseResponse",
+    "ListDatabasesRequest",
+    "ListDatabasesResponse",
+    "ExportDatabaseResponse",
     "InferenceGrants",
     "ObservabilityGrants",
     "AgentGrants",

@@ -7,14 +7,14 @@ from livekit.protocol.ingress import (
     DeleteIngressRequest,
     ListIngressResponse,
 )
-from ._service import Service
+from ._service import TwirpService
 from .access_token import VideoGrants
 
 SVC = "Ingress"
 """@private"""
 
 
-class IngressService(Service):
+class IngressService(TwirpService):
     """Client for LiveKit Ingress Service API
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:

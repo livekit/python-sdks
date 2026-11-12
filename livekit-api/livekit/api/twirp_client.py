@@ -30,14 +30,15 @@ from ._failover import (
     origin_of,
     pick_next,
 )
-from .version import __version__
+
+# Re-exported for code that imports them from here.
+from .errors import ServerError as ServerError, ServerErrorCode as ServerErrorCode
+from .version import USER_AGENT as _USER_AGENT
 
 DEFAULT_PREFIX = "twirp"
 
 logger = logging.getLogger("livekit")
 
-# Identifies the SDK and version to the server on every request.
-_USER_AGENT = f"livekit-server-sdk-python/{__version__}"
 
 # Carries a per-request idempotency key. The SDK's auto-retries (see _failover)
 # keep the same key across attempts, so the server can identify and deduplicate
@@ -46,46 +47,6 @@ REQUEST_ID_HEADER = "X-Livekit-Request-Id"
 
 # Shared across all clients in the process so the region list is fetched once.
 _REGION_CACHE = RegionCache()
-
-
-class ServerError(Exception):
-    def __init__(
-        self,
-        code: str,
-        msg: str,
-        *,
-        status: int,
-        metadata: Optional[Dict[str, str]] = None,
-    ) -> None:
-        self._code = code
-        self._msg = msg
-        self._status = status
-        self._metadata = metadata or {}
-
-    @property
-    def code(self) -> str:
-        return self._code
-
-    @property
-    def message(self) -> str:
-        return self._msg
-
-    @property
-    def status(self) -> int:
-        """HTTP status code"""
-        return self._status
-
-    @property
-    def metadata(self) -> Dict[str, str]:
-        """Server-provided error metadata"""
-        return self._metadata
-
-    def __str__(self) -> str:
-        result = f"ServerError(code={self.code}, message={self.message}, status={self.status}"
-        if self.metadata:
-            result += f", metadata={self.metadata}"
-        result += ")"
-        return result
 
 
 _SIP_META_KEYS = (
@@ -156,27 +117,6 @@ class SipCallError(ServerError):
 
 # Deprecated alias for :class:`ServerError`, kept for backwards compatibility.
 TwirpError = ServerError
-
-
-class ServerErrorCode:
-    CANCELED = "canceled"
-    UNKNOWN = "unknown"
-    INVALID_ARGUMENT = "invalid_argument"
-    MALFORMED = "malformed"
-    DEADLINE_EXCEEDED = "deadline_exceeded"
-    NOT_FOUND = "not_found"
-    BAD_ROUTE = "bad_route"
-    ALREADY_EXISTS = "already_exists"
-    PERMISSION_DENIED = "permission_denied"
-    UNAUTHENTICATED = "unauthenticated"
-    RESOURCE_EXHAUSTED = "resource_exhausted"
-    FAILED_PRECONDITION = "failed_precondition"
-    ABORTED = "aborted"
-    OUT_OF_RANGE = "out_of_range"
-    UNIMPLEMENTED = "unimplemented"
-    INTERNAL = "internal"
-    UNAVAILABLE = "unavailable"
-    DATA_LOSS = "dataloss"
 
 
 # Deprecated alias for :class:`ServerErrorCode`, kept for backwards compatibility.

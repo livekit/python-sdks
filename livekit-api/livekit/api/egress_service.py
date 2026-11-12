@@ -13,14 +13,14 @@ from livekit.protocol.egress import (
     EgressInfo,
     ListEgressResponse,
 )
-from ._service import Service
+from ._service import TwirpService
 from .access_token import VideoGrants
 
 SVC = "Egress"
 """@private"""
 
 
-class EgressService(Service):
+class EgressService(TwirpService):
     """Client for LiveKit Egress Service API
 
     Recommended way to use this service is via `livekit.api.LiveKitAPI`:
