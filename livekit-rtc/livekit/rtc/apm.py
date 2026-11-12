@@ -19,6 +19,7 @@ class AudioProcessingModule:
         noise_suppression: bool = False,
         high_pass_filter: bool = False,
         auto_gain_control: bool = False,
+        auto_gain_control_initial_gain_db: float | None = None,
     ) -> None:
         """
         Initialize an AudioProcessingModule instance with the specified audio processing features.
@@ -28,12 +29,16 @@ class AudioProcessingModule:
             noise_suppression (bool, optional): Whether to enable noise suppression.
             high_pass_filter (bool, optional): Whether to enable a high-pass filter.
             auto_gain_control (bool, optional): Whether to enable auto gain control.
+            auto_gain_control_initial_gain_db (float, optional): The gain in dB that auto gain
+                control starts from. Defaults to the WebRTC default.
         """
         req = proto_ffi.FfiRequest()
         req.new_apm.echo_canceller_enabled = echo_cancellation
         req.new_apm.noise_suppression_enabled = noise_suppression
         req.new_apm.high_pass_filter_enabled = high_pass_filter
         req.new_apm.gain_controller_enabled = auto_gain_control
+        if auto_gain_control_initial_gain_db is not None:
+            req.new_apm.gain_controller_initial_gain_db = auto_gain_control_initial_gain_db
 
         resp = FfiClient.instance.request(req)
         self._ffi_handle = FfiHandle(resp.new_apm.apm.handle.id)
