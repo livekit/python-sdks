@@ -179,10 +179,13 @@ class _FPSController:
 
     def after_process(self) -> None:
         """Update timing information after processing a frame."""
-        assert self._next_frame_time is not None, "wait_next_process must be called first"
+        now = time.perf_counter()
+        if self._next_frame_time is None:
+            # reset() ran after wait_next_process() for this frame (e.g. during its sleep)
+            self._next_frame_time = now
 
         # update timing information
-        self._send_timestamps.append(time.perf_counter())
+        self._send_timestamps.append(now)
 
         # calculate next frame time
         self._next_frame_time += self._frame_interval
