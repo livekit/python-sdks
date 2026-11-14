@@ -1,7 +1,7 @@
 name: Protocol / livekit-agents compatibility
 
-# Every published livekit-agents release must still encode its session history with the
-# livekit-protocol build under review. Releases already deployed cannot be changed.
+# Every published livekit-agents release must still encode its session history with a
+# livekit-protocol 1.x build: those releases accept livekit-protocol<2 and are already deployed.
 
 on:
   pull_request:
@@ -32,6 +32,10 @@ jobs:
         run: |
           set -euo pipefail
           wheel=$(ls dist/livekit_protocol-*.whl)
+          case "$(basename "$wheel")" in
+            livekit_protocol-1.*) ;;
+            *) echo "livekit-protocol 2+ cannot reach livekit-agents 1.x"; exit 0 ;;
+          esac
           versions=$(curl -sf https://pypi.org/pypi/livekit-agents/json | uvx --with packaging python -c '
           import json, sys
           from packaging.version import Version
