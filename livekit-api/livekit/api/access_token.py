@@ -15,6 +15,7 @@
 import calendar
 import re
 import datetime
+import json
 import os
 import jwt
 import dataclasses
@@ -185,14 +186,9 @@ class AccessToken:
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
     ) -> None:
-        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
-        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
-
-        if not api_key or not api_secret:
-            raise ValueError("api_key and api_secret must be set")
-
-        self.api_key = api_key  # iss
-        self.api_secret = api_secret
+        # the key and secret are checked in to_jwt, so that to_claims_json works without them
+        self.api_key = api_key or os.getenv("LIVEKIT_API_KEY") or ""  # iss
+        self.api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET") or ""
         self.claims = Claims()
 
         # default jwt claims
@@ -267,7 +263,23 @@ class AccessToken:
         self.claims.room_config = config
         return self
 
+    def to_claims_json(self) -> str:
+        """Returns the claims of this token as JSON, without signing them.
+
+        The JSON has the shape of the payload `to_jwt` signs, without the claims the
+        signer sets (iss, sub, nbf, exp); the identity is in `identity`. It needs no
+        API key or secret, so a process without them can send it to a server that
+        signs the token, such as in `CreateJobTokenRequest.claims`.
+        """
+        claims = self.claims.asdict()
+        if self.identity:
+            claims["identity"] = self.identity
+        return json.dumps(claims)
+
     def to_jwt(self) -> str:
+        if not self.api_key or not self.api_secret:
+            raise ValueError("api_key and api_secret must be set")
+
         video = self.claims.video
         if video and video.room_join and (not self.identity or not video.room):
             raise ValueError("identity and room must be set when joining a room")

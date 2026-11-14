@@ -79,7 +79,7 @@ class RoomService(Service):
             SVC,
             "CreateRoom",
             create,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             Room,
         )
 
@@ -98,7 +98,7 @@ class RoomService(Service):
             SVC,
             "ListRooms",
             list,
-            self._auth_header(VideoGrants(room_list=True)),
+            await self._auth_header(VideoGrants(room_list=True)),
             ListRoomsResponse,
         )
 
@@ -116,7 +116,7 @@ class RoomService(Service):
             SVC,
             "DeleteRoom",
             delete,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             DeleteRoomResponse,
         )
 
@@ -135,7 +135,7 @@ class RoomService(Service):
             SVC,
             "UpdateRoomMetadata",
             update,
-            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             Room,
         )
 
@@ -154,7 +154,7 @@ class RoomService(Service):
             SVC,
             "ListParticipants",
             list,
-            self._auth_header(VideoGrants(room_admin=True, room=list.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=list.room)),
             ListParticipantsResponse,
         )
 
@@ -183,7 +183,7 @@ class RoomService(Service):
             SVC,
             "GetParticipant",
             get,
-            self._auth_header(VideoGrants(room_admin=True, room=get.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=get.room)),
             ParticipantInfo,
         )
 
@@ -204,7 +204,7 @@ class RoomService(Service):
             SVC,
             "RemoveParticipant",
             remove,
-            self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=remove.room)),
             RemoveParticipantResponse,
         )
 
@@ -224,7 +224,7 @@ class RoomService(Service):
             SVC,
             "ForwardParticipant",
             forward,
-            self._auth_header(
+            await self._auth_header(
                 VideoGrants(
                     room_admin=True, room=forward.room, destination_room=forward.destination_room
                 )
@@ -248,7 +248,7 @@ class RoomService(Service):
             SVC,
             "MoveParticipant",
             move,
-            self._auth_header(
+            await self._auth_header(
                 VideoGrants(
                     room_admin=True,
                     room=move.room,
@@ -279,7 +279,7 @@ class RoomService(Service):
             SVC,
             "MutePublishedTrack",
             update,
-            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             MuteRoomTrackResponse,
         )
 
@@ -302,7 +302,7 @@ class RoomService(Service):
             SVC,
             "UpdateParticipant",
             update,
-            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             ParticipantInfo,
         )
 
@@ -326,7 +326,7 @@ class RoomService(Service):
             SVC,
             "UpdateSubscriptions",
             update,
-            self._auth_header(VideoGrants(room_admin=True, room=update.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=update.room)),
             UpdateSubscriptionsResponse,
         )
 
@@ -350,6 +350,6 @@ class RoomService(Service):
             SVC,
             "SendData",
             send,
-            self._auth_header(VideoGrants(room_admin=True, room=send.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=send.room)),
             SendDataResponse,
         )

@@ -6,6 +6,7 @@ from .ingress_service import IngressService
 from .sip_service import SipService
 from .agent_dispatch_service import AgentDispatchService
 from .connector_service import ConnectorService
+from ._service import TokenSource
 from typing import Any, Optional
 
 
@@ -30,6 +31,7 @@ class LiveKitAPI:
         api_secret: Optional[str] = None,
         *,
         token: Optional[str] = None,
+        token_source: Optional[TokenSource] = None,
         timeout: Optional[aiohttp.ClientTimeout] = None,
         session: Optional[aiohttp.ClientSession] = None,
         failover: bool = True,
@@ -45,6 +47,8 @@ class LiveKitAPI:
             api_key: API key (read from `LIVEKIT_API_KEY` environment variable if not provided)
             api_secret: API secret (read from `LIVEKIT_API_SECRET` environment variable if not provided)
             token: Pre-signed access token (read from `LIVEKIT_TOKEN` environment variable if not provided)
+            token_source: Async callable that returns a token for the claims of each call,
+                in place of signing one with api_key and api_secret
             timeout: Request timeout (default: 10 seconds)
             session: aiohttp.ClientSession instance to use for requests, if not provided, a new one will be created
         """
@@ -53,16 +57,19 @@ class LiveKitAPI:
         # Only fall back to environment credentials when none were provided
         # explicitly, so an ambient LIVEKIT_TOKEN can't silently override an
         # explicit api_key/secret (or vice versa).
-        if not token and not api_key and not api_secret:
+        if not token and not token_source and not api_key and not api_secret:
             token = os.getenv("LIVEKIT_TOKEN")
-        if not token and not api_key and not api_secret:
+        if not token and not token_source and not api_key and not api_secret:
             api_key = os.getenv("LIVEKIT_API_KEY")
             api_secret = os.getenv("LIVEKIT_API_SECRET")
 
         if not url:
             raise ValueError("url must be set")
 
-        if not token and (not api_key or not api_secret):
+        if token and token_source:
+            raise ValueError("token and token_source cannot both be set")
+
+        if not token and not token_source and (not api_key or not api_secret):
             raise ValueError("either token, or api_key and api_secret, must be set")
 
         self._custom_session = True
@@ -84,7 +91,7 @@ class LiveKitAPI:
         self._agent_dispatch = AgentDispatchService(self._session, url, key, secret, failover)
         self._connector = ConnectorService(self._session, url, key, secret, failover)
 
-        if token:
+        if token or token_source:
             for svc in (
                 self._room,
                 self._ingress,
@@ -94,6 +101,7 @@ class LiveKitAPI:
                 self._connector,
             ):
                 svc._token = token
+                svc._token_source = token_source
 
     @classmethod
     def with_token(
