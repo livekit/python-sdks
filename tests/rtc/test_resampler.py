@@ -65,3 +65,12 @@ def test_audio_resampler() -> None:
             wf_out.setsampwidth(sampwidth)
             wf_out.setframerate(8000)
             wf_out.writeframes(output_data)
+
+
+def test_flush_with_nothing_buffered_returns_no_frames() -> None:
+    resampler = AudioResampler(48000, 16000)
+    assert resampler.flush() == []
+
+    resampler.push(AudioFrame(bytes(9600), 48000, 1, 4800))
+    assert sum(f.samples_per_channel for f in resampler.flush()) > 0  # the buffered tail
+    assert resampler.flush() == []
