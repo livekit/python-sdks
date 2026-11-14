@@ -74,7 +74,8 @@ async def _call(
         headers = {
             "authorization": "Bearer test-token",
             # These tests exercise failover, not authz; skip the mock's permission check.
-            "X-Lk-Mock": json.dumps({"skipAuth": True, **mock}),
+            # The mock fails with a 503 by default, which is retried only with Retry-After.
+            "X-Lk-Mock": json.dumps({"skipAuth": True, "failStatus": 502, **mock}),
             **(extra_headers or {}),
         }
         return await client.request("RoomService", "CreateRoom", CreateRoomRequest(), headers, Room)
