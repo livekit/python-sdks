@@ -44,6 +44,7 @@ from .twirp_client import (
     TwirpErrorCode,
 )
 from .livekit_api import LiveKitAPI
+from ._service import TokenSource
 from .access_token import (
     InferenceGrants,
     ObservabilityGrants,
@@ -61,6 +62,7 @@ from .version import __version__
 
 __all__ = [
     "LiveKitAPI",
+    "TokenSource",
     "room_service",
     "egress_service",
     "ingress_service",

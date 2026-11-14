@@ -50,7 +50,7 @@ class EgressService(Service):
             SVC,
             "StartRoomCompositeEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -60,7 +60,7 @@ class EgressService(Service):
             SVC,
             "StartWebEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -70,7 +70,7 @@ class EgressService(Service):
             SVC,
             "StartParticipantEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -80,7 +80,7 @@ class EgressService(Service):
             SVC,
             "StartTrackCompositeEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -90,7 +90,7 @@ class EgressService(Service):
             SVC,
             "StartTrackEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -100,7 +100,7 @@ class EgressService(Service):
             SVC,
             "StartEgress",
             start,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -110,7 +110,7 @@ class EgressService(Service):
             SVC,
             "UpdateLayout",
             update,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -120,7 +120,7 @@ class EgressService(Service):
             SVC,
             "UpdateStream",
             update,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )
 
@@ -137,7 +137,7 @@ class EgressService(Service):
             SVC,
             "ListEgress",
             list,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             ListEgressResponse,
         )
 
@@ -147,6 +147,6 @@ class EgressService(Service):
             SVC,
             "StopEgress",
             stop,
-            self._auth_header(VideoGrants(room_record=True)),
+            await self._auth_header(VideoGrants(room_record=True)),
             EgressInfo,
         )

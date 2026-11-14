@@ -63,7 +63,7 @@ class ConnectorService(Service):
             SVC,
             "DialWhatsAppCall",
             request,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             DialWhatsAppCallResponse,
         )
 
@@ -83,7 +83,7 @@ class ConnectorService(Service):
             SVC,
             "DisconnectWhatsAppCall",
             request,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             DisconnectWhatsAppCallResponse,
         )
 
@@ -103,7 +103,7 @@ class ConnectorService(Service):
             SVC,
             "ConnectWhatsAppCall",
             request,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             ConnectWhatsAppCallResponse,
         )
 
@@ -140,7 +140,7 @@ class ConnectorService(Service):
             SVC,
             "AcceptWhatsAppCall",
             request,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             AcceptWhatsAppCallResponse,
             timeout=client_timeout,
         )
@@ -161,6 +161,6 @@ class ConnectorService(Service):
             SVC,
             "ConnectTwilioCall",
             request,
-            self._auth_header(VideoGrants(room_create=True)),
+            await self._auth_header(VideoGrants(room_create=True)),
             ConnectTwilioCallResponse,
         )

@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import json
 
 import jwt
 import pytest
@@ -256,3 +257,45 @@ def test_verify_token_with_only_inference_grants() -> None:
     assert claims.video is None
     assert claims.sip is None
     assert claims.observability is None
+
+
+def _claims_token() -> AccessToken:
+    return (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_name("test_name")
+        .with_kind("agent")
+        .with_metadata("test_metadata")
+        .with_attributes({"key1": "value1"})
+        .with_grants(VideoGrants(room_join=True, room="test_room", can_publish_data=False))
+        .with_sip_grants(SIPGrants(call=True))
+        .with_room_config(RoomConfiguration(agents=[RoomAgentDispatch(agent_name="test-agent")]))
+    )
+
+
+def test_claims_json_matches_signed_payload() -> None:
+    claims = json.loads(_claims_token().to_claims_json())
+    payload = jwt.decode(_claims_token().to_jwt(), options={"verify_signature": False})
+
+    # the claims the signer sets are left out; the identity is in `identity`
+    assert claims == {k: v for k, v in payload.items() if k not in ("iss", "sub", "nbf", "exp")} | {
+        "identity": "test_identity"
+    }
+    assert claims["video"] == {
+        "roomJoin": True,
+        "room": "test_room",
+        "canPublish": True,
+        "canSubscribe": True,
+        "canPublishData": False,
+    }
+    assert claims["kind"] == "agent"
+
+
+def test_claims_json_without_key_or_secret(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("LIVEKIT_API_KEY", raising=False)
+    monkeypatch.delenv("LIVEKIT_API_SECRET", raising=False)
+
+    token = AccessToken().with_identity("test_identity").with_grants(VideoGrants(room_list=True))
+    assert json.loads(token.to_claims_json())["identity"] == "test_identity"
+    with pytest.raises(ValueError, match="api_key and api_secret must be set"):
+        token.to_jwt()
