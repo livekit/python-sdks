@@ -1,0 +1,52 @@
+name: Protocol / livekit-agents compatibility
+
+# Every published livekit-agents release must still encode its session history with the
+# livekit-protocol build under review. Releases already deployed cannot be changed.
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - livekit-protocol/**
+      - tests/protocol/**
+      - .github/workflows/protocol-agents-compat.yml
+  workflow_dispatch:
+
+jobs:
+  agents-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          python-version: "3.12"
+
+      - name: Build livekit-protocol
+        run: uv build --wheel livekit-protocol -o dist
+
+      - name: Encode a session history with every livekit-agents release
+        run: |
+          set -euo pipefail
+          wheel=$(ls dist/livekit_protocol-*.whl)
+          versions=$(curl -sf https://pypi.org/pypi/livekit-agents/json | uvx --with packaging python -c '
+          import json, sys
+          from packaging.version import Version
+          releases = json.load(sys.stdin)["releases"]
+          print(" ".join(v for v in sorted(releases, key=Version)
+                         if releases[v] and not Version(v).is_prerelease
+                         and Version("1.7.0") <= Version(v) < Version("2")))')
+          failed=""
+          for v in $versions; do
+            uv venv -q --allow-existing "venv-$v"
+            VIRTUAL_ENV="venv-$v" uv pip install -q "livekit-agents==$v"
+            VIRTUAL_ENV="venv-$v" uv pip install -q --no-deps --reinstall "$wheel"
+            "venv-$v/bin/python" tests/protocol/agents_session_history.py || failed="$failed $v"
+          done
+          if [ -n "$failed" ]; then
+            echo "::error::livekit-agents releases that cannot encode a session history:$failed"
+            exit 1
+          fi
