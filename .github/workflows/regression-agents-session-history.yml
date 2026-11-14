@@ -1,4 +1,4 @@
-name: Protocol / livekit-agents compatibility
+name: Regression - livekit-agents releases encode their session history
 
 # Every published livekit-agents release must still encode its session history with a
 # livekit-protocol 1.x build: those releases accept livekit-protocol<2 and are already deployed.
@@ -10,11 +10,11 @@ on:
     paths:
       - livekit-protocol/**
       - tests/protocol/**
-      - .github/workflows/protocol-agents-compat.yml
+      - .github/workflows/regression-agents-session-history.yml
   workflow_dispatch:
 
 jobs:
-  agents-releases:
+  regression-agents-session-history:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -48,7 +48,7 @@ jobs:
             uv venv -q --allow-existing "venv-$v"
             VIRTUAL_ENV="venv-$v" uv pip install -q "livekit-agents==$v"
             VIRTUAL_ENV="venv-$v" uv pip install -q --no-deps --reinstall "$wheel"
-            "venv-$v/bin/python" tests/protocol/agents_session_history.py || failed="$failed $v"
+            "venv-$v/bin/python" tests/protocol/regression_agents_session_history.py || failed="$failed $v"
           done
           if [ -n "$failed" ]; then
             echo "::error::livekit-agents releases that cannot encode a session history:$failed"

@@ -1,4 +1,7 @@
-"""Encode a session history the way an installed livekit-agents release uploads it.
+"""Regression: livekit-protocol 1.1.28 added FunctionCall.extra, and livekit-agents 1.7.0 to 1.8.8
+failed to upload the session history (TypeError: bad argument type for built-in operation).
+
+Encodes a session history the way an installed livekit-agents release uploads it.
 
 livekit-agents 1.7.0 to 1.8.8 fill every field the installed protocol declares on a chat item
 from the attribute of the same name, so a new field can break releases already deployed.
