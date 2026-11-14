@@ -57,6 +57,7 @@ async def _call_single_host(
     attempts: List[int],
     *,
     host: str = "127.0.0.1",
+    base_path: str = "",
     discovery_hits: Optional[List[None]] = None,
 ) -> Room:
     """Runs one CreateRoom against a server, reached as ``host``, whose only
@@ -81,14 +82,14 @@ async def _call_single_host(
         return resp
 
     app = web.Application()
-    app.router.add_post("/twirp/livekit.RoomService/CreateRoom", twirp)
+    app.router.add_post(f"{base_path}/twirp/livekit.RoomService/CreateRoom", twirp)
     app.router.add_get("/settings/regions", regions)
     async with TestServer(app) as server:
         connector = aiohttp.TCPConnector(resolver=_StaticResolver())
         async with aiohttp.ClientSession(connector=connector) as session:
             client = TwirpClient(
                 session,
-                f"http://{host}:{server.port}",
+                f"http://{host}:{server.port}{base_path}",
                 "livekit",
                 _failover_force=host == "127.0.0.1",
                 _failover_backoff=0.001,
@@ -138,6 +139,20 @@ def test_retries_same_host_on_5xx():
 
     attempts: List[int] = []
     room = asyncio.run(_call_single_host(behave, attempts))
+    assert room.name == "r"
+    assert len(attempts) == 2
+
+
+def test_same_host_retry_keeps_the_base_path():
+    """A retry against the same host keeps the base path of the configured URL."""
+
+    def behave(attempt: int, request: web.Request):
+        return None if attempt == 0 else _ok(request)
+
+    attempts: List[int] = []
+    room = asyncio.run(
+        _call_single_host(behave, attempts, host="cloud-api.livekit.io", base_path="/livekit")
+    )
     assert room.name == "r"
     assert len(attempts) == 2
 
