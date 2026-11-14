@@ -53,7 +53,7 @@ class SimulationRunSummary(_message.Message):
     def __init__(self, passed: _Optional[int] = ..., failed: _Optional[int] = ..., going_well: _Optional[str] = ..., to_improve: _Optional[str] = ..., issues: _Optional[_Iterable[_Union[SimulationRunSummary.Issue, _Mapping]]] = ..., chat_history: _Optional[_Mapping[str, _agent_session.ChatContext]] = ...) -> None: ...
 
 class SimulationRun(_message.Message):
-    __slots__ = ("id", "project_id", "status", "agent_description", "error", "created_at", "jobs", "agent_name", "scenario_group", "ended_at", "job_count", "passed_count", "failed_count", "num_simulations", "usage", "concurrency", "mode", "metrics", "summary_zstd", "issue_count", "ci", "sampling")
+    __slots__ = ("id", "project_id", "status", "agent_description", "error", "created_at", "jobs", "agent_name", "scenario_group", "ended_at", "job_count", "passed_count", "failed_count", "num_simulations", "usage", "concurrency", "mode", "metrics", "summary_zstd", "issue_count", "ci", "sampling", "persona_model")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         STATUS_PENDING_UPLOAD: _ClassVar[SimulationRun.Status]
@@ -383,7 +383,7 @@ class SimulationRun(_message.Message):
     class Create(_message.Message):
         __slots__ = ()
         class Request(_message.Message):
-            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling", "sip_call_to", "sip_trunk_id", "sip_number", "deployment")
+            __slots__ = ("project_id", "agent_name", "num_simulations", "region", "scenario_group", "concurrency", "mode", "background_noise", "low_quality_microphone", "packet_loss", "ci", "sampling", "sip_call_to", "sip_trunk_id", "sip_number", "deployment", "persona_model")
             PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
             AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
             NUM_SIMULATIONS_FIELD_NUMBER: _ClassVar[int]
@@ -400,6 +400,7 @@ class SimulationRun(_message.Message):
             SIP_TRUNK_ID_FIELD_NUMBER: _ClassVar[int]
             SIP_NUMBER_FIELD_NUMBER: _ClassVar[int]
             DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
+            PERSONA_MODEL_FIELD_NUMBER: _ClassVar[int]
             project_id: str
             agent_name: str
             num_simulations: int
@@ -416,7 +417,8 @@ class SimulationRun(_message.Message):
             sip_trunk_id: str
             sip_number: str
             deployment: str
-            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_trunk_id: _Optional[str] = ..., sip_number: _Optional[str] = ..., deployment: _Optional[str] = ...) -> None: ...
+            persona_model: str
+            def __init__(self, project_id: _Optional[str] = ..., agent_name: _Optional[str] = ..., num_simulations: _Optional[int] = ..., region: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., background_noise: bool = ..., low_quality_microphone: bool = ..., packet_loss: bool = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ..., sip_call_to: _Optional[str] = ..., sip_trunk_id: _Optional[str] = ..., sip_number: _Optional[str] = ..., deployment: _Optional[str] = ..., persona_model: _Optional[str] = ...) -> None: ...
         class Response(_message.Message):
             __slots__ = ("simulation_run_id", "presigned_post_request")
             SIMULATION_RUN_ID_FIELD_NUMBER: _ClassVar[int]
@@ -556,6 +558,7 @@ class SimulationRun(_message.Message):
     ISSUE_COUNT_FIELD_NUMBER: _ClassVar[int]
     CI_FIELD_NUMBER: _ClassVar[int]
     SAMPLING_FIELD_NUMBER: _ClassVar[int]
+    PERSONA_MODEL_FIELD_NUMBER: _ClassVar[int]
     id: str
     project_id: str
     status: SimulationRun.Status
@@ -578,7 +581,8 @@ class SimulationRun(_message.Message):
     issue_count: int
     ci: SimulationRun.CI
     sampling: SimulationRun.SamplingOptions
-    def __init__(self, id: _Optional[str] = ..., project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_description: _Optional[str] = ..., error: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., jobs: _Optional[_Iterable[_Union[SimulationRun.Job, _Mapping]]] = ..., agent_name: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., job_count: _Optional[int] = ..., passed_count: _Optional[int] = ..., failed_count: _Optional[int] = ..., num_simulations: _Optional[int] = ..., usage: _Optional[_Union[SimulationRun.Usage, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., metrics: _Optional[_Union[SimulationRun.RunMetrics, _Mapping]] = ..., summary_zstd: _Optional[bytes] = ..., issue_count: _Optional[int] = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ...) -> None: ...
+    persona_model: str
+    def __init__(self, id: _Optional[str] = ..., project_id: _Optional[str] = ..., status: _Optional[_Union[SimulationRun.Status, str]] = ..., agent_description: _Optional[str] = ..., error: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., jobs: _Optional[_Iterable[_Union[SimulationRun.Job, _Mapping]]] = ..., agent_name: _Optional[str] = ..., scenario_group: _Optional[_Union[ScenarioGroup, _Mapping]] = ..., ended_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., job_count: _Optional[int] = ..., passed_count: _Optional[int] = ..., failed_count: _Optional[int] = ..., num_simulations: _Optional[int] = ..., usage: _Optional[_Union[SimulationRun.Usage, _Mapping]] = ..., concurrency: _Optional[int] = ..., mode: _Optional[_Union[SimulationMode, str]] = ..., metrics: _Optional[_Union[SimulationRun.RunMetrics, _Mapping]] = ..., summary_zstd: _Optional[bytes] = ..., issue_count: _Optional[int] = ..., ci: _Optional[_Union[SimulationRun.CI, _Mapping]] = ..., sampling: _Optional[_Union[SimulationRun.SamplingOptions, _Mapping]] = ..., persona_model: _Optional[str] = ...) -> None: ...
 
 class Scenario(_message.Message):
     __slots__ = ("label", "instructions", "agent_expectations", "tags", "userdata", "id")
