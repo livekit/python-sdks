@@ -178,6 +178,18 @@ class Claims:
         return claims
 
 
+# The grants that a `TokenProvider` is asked for. Today these are v1 claims
+# (`Claims`). Grants v2 will be accepted here too. The provider does not convert
+# between the two: it passes the grants on with `token_grants_to_json`, and the
+# server that signs the token converts them to the format of its key.
+TokenGrants = Claims
+
+
+def token_grants_to_json(grants: TokenGrants) -> str:
+    """Returns the grants as JSON, in the shape of an access token's payload."""
+    return json.dumps(grants.asdict())
+
+
 class AccessToken:
     ParticipantKind = Literal["standard", "egress", "ingress", "sip", "agent"]
 

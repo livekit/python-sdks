@@ -4,15 +4,15 @@ import aiohttp
 from abc import ABC
 from typing import Awaitable, Callable
 from .twirp_client import TwirpClient
-from .access_token import AccessToken, Claims, VideoGrants, SIPGrants
+from .access_token import AccessToken, Claims, TokenGrants, VideoGrants, SIPGrants
 
 AUTHORIZATION = "authorization"
 
-TokenSource = Callable[[Claims], Awaitable[str]]
-"""Returns a token that carries the given claims.
+TokenProvider = Callable[[TokenGrants], Awaitable[str]]
+"""Returns a token that carries the given grants.
 
 `LiveKitAPI` calls it before each request, in place of signing a token with an API
-key and secret, with the claims that request needs. It may cache tokens.
+key and secret, with the grants that request needs. It may cache tokens.
 """
 
 
@@ -32,7 +32,7 @@ class Service(ABC):
         # skipping per-call signing. Per-service constructors stay key/secret-only.
         self._token: str | None = None
         # Set by LiveKitAPI to get a token per call in place of signing one.
-        self._token_source: TokenSource | None = None
+        self._token_provider: TokenProvider | None = None
 
     async def _auth_header(
         self, grants: VideoGrants | None, sip: SIPGrants | None = None
@@ -41,8 +41,8 @@ class Service(ABC):
         if self._token:
             return {AUTHORIZATION: "Bearer {}".format(self._token)}
 
-        if self._token_source is not None:
-            token = await self._token_source(Claims(video=grants, sip=sip))
+        if self._token_provider is not None:
+            token = await self._token_provider(Claims(video=grants, sip=sip))
             return {AUTHORIZATION: "Bearer {}".format(token)}
 
         tok = AccessToken(self.api_key, self.api_secret)
