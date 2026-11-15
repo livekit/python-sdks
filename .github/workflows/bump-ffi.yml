@@ -190,7 +190,9 @@ jobs:
 
           release_url="https://github.com/$RUST_SDKS_REPO/releases/tag/$TAG"
           compare_url="https://github.com/$RUST_SDKS_REPO/compare/livekit-ffi/v${CURRENT}...${TAG}"
-          notes=$(gh release view "$TAG" --repo "$RUST_SDKS_REPO" --json body --jq '.body' 2>/dev/null || true)
+          # Wrap @mentions in code spans so the PR doesn't notify release-note authors.
+          notes=$(gh release view "$TAG" --repo "$RUST_SDKS_REPO" --json body --jq '.body' 2>/dev/null \
+            | sed -E 's/(^|[^A-Za-z0-9_`])@([A-Za-z0-9][A-Za-z0-9-]*)/\1`@\2`/g' || true)
 
           {
             echo "Bumps livekit-ffi from \`v${CURRENT}\` to \`v${TARGET}\`."
