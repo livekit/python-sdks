@@ -28,6 +28,8 @@ permissions:
 env:
   RUST_SDKS_REPO: livekit/rust-sdks
   SUBMODULE_PATH: livekit-rtc/rust-sdks
+  # Pin gh to this repo; on a fork it may otherwise target the upstream.
+  GH_REPO: ${{ github.repository }}
 
 jobs:
   bump:
