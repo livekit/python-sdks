@@ -1,0 +1,230 @@
+name: Bump livekit-ffi
+
+# Check livekit/rust-sdks for a newer livekit-ffi release and, when there is
+# one, open a PR that moves the rust-sdks submodule to that tag, regenerates
+# the protobuf stubs and adds a changeset for livekit-rtc.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "livekit-ffi version to bump to, e.g. 0.14.0 (default: latest release)"
+        type: string
+        required: false
+        default: ""
+      bump:
+        description: "Changeset bump type for livekit-rtc"
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  RUST_SDKS_REPO: livekit/rust-sdks
+  SUBMODULE_PATH: livekit-rtc/rust-sdks
+
+jobs:
+  bump:
+    name: Bump livekit-ffi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          submodules: true
+
+      - name: Resolve versions
+        id: versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          current=$(grep -m1 -E '^version[[:space:]]*=' "$SUBMODULE_PATH/livekit-ffi/Cargo.toml" \
+            | sed -E 's/^version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+
+          if [ -n "$INPUT_VERSION" ]; then
+            target="${INPUT_VERSION#livekit-ffi/}"
+            target="${target#v}"
+          else
+            # The repo publishes releases for several crates, so filter by tag
+            # prefix instead of relying on the repo-wide "latest" release.
+            target=$(gh api --paginate "repos/$RUST_SDKS_REPO/releases?per_page=100" \
+              --jq '.[] | select(.draft | not) | select(.prerelease | not) | .tag_name' \
+              | grep -E '^livekit-ffi/v[0-9]+\.[0-9]+\.[0-9]+$' \
+              | sed 's|^livekit-ffi/v||' | sort -V | tail -n1)
+          fi
+
+          if [ -z "$current" ] || [ -z "$target" ]; then
+            echo "::error::Could not resolve versions (current='$current', target='$target')"
+            exit 1
+          fi
+
+          tag="livekit-ffi/v${target}"
+          if ! gh api "repos/$RUST_SDKS_REPO/git/ref/tags/$tag" > /dev/null; then
+            echo "::error::Tag $tag does not exist in $RUST_SDKS_REPO"
+            exit 1
+          fi
+
+          highest=$(printf '%s\n%s\n' "$current" "$target" | sort -V | tail -n1)
+          if [ "$current" = "$target" ] || [ "$highest" != "$target" ]; then
+            update=false
+            echo "livekit-ffi is up to date (current v$current, target v$target)" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            update=true
+            echo "livekit-ffi v$current → v$target" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+          {
+            echo "current=$current"
+            echo "target=$target"
+            echo "tag=$tag"
+            echo "update=$update"
+            echo "branch=bump/livekit-ffi-v$target"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for an existing PR
+        id: existing
+        if: steps.versions.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.versions.outputs.branch }}
+        run: |
+          pr=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // empty')
+          if [ -n "$pr" ]; then
+            echo "A bump PR already exists: $pr" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update rust-sdks submodule
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        env:
+          TAG: ${{ steps.versions.outputs.tag }}
+          TARGET: ${{ steps.versions.outputs.target }}
+        run: |
+          git -C "$SUBMODULE_PATH" fetch --depth 1 origin "refs/tags/$TAG:refs/tags/$TAG"
+          git -C "$SUBMODULE_PATH" checkout --detach "$TAG"
+
+          actual=$(grep -m1 -E '^version[[:space:]]*=' "$SUBMODULE_PATH/livekit-ffi/Cargo.toml" \
+            | sed -E 's/^version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+          if [ "$actual" != "$TARGET" ]; then
+            echo "::error::$TAG has livekit-ffi version $actual in Cargo.toml, expected $TARGET"
+            exit 1
+          fi
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        with:
+          python-version: "3.11"
+
+      # Same toolchain as the generate_protobuf job in build-rtc.yml, so that
+      # job finds nothing to change on this PR.
+      - name: Install Protoc
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        with:
+          version: "25.1"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Regenerate protobuf stubs
+        id: proto
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        working-directory: livekit-rtc
+        run: |
+          pip3 install mypy-protobuf==3.6.0 "protobuf>=4.25.0,<5.0.0"
+          ./generate_proto.sh
+
+          # generate_proto.sh lists the proto files explicitly; flag any new
+          # ones so they get added by hand.
+          missing=""
+          for f in rust-sdks/livekit-ffi/protocol/*.proto; do
+            name=$(basename "$f")
+            grep -q "/$name" generate_proto.sh || missing="$missing $name"
+          done
+          missing="${missing# }"
+          if [ -n "$missing" ]; then
+            echo "::warning::Proto files not covered by generate_proto.sh: $missing"
+          fi
+          echo "missing=$missing" >> "$GITHUB_OUTPUT"
+
+      - name: Add changeset
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        env:
+          TARGET: ${{ steps.versions.outputs.target }}
+          BUMP: ${{ inputs.bump }}
+        run: |
+          cat > ".changeset/bump-livekit-ffi-v${TARGET}.md" <<EOF
+          ---
+          "livekit-rtc": ${BUMP}
+          ---
+
+          Bump livekit-ffi to v${TARGET}.
+          EOF
+
+      - name: Create PR
+        if: steps.versions.outputs.update == 'true' && steps.existing.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT: ${{ steps.versions.outputs.current }}
+          TARGET: ${{ steps.versions.outputs.target }}
+          TAG: ${{ steps.versions.outputs.tag }}
+          BRANCH: ${{ steps.versions.outputs.branch }}
+          MISSING_PROTOS: ${{ steps.proto.outputs.missing }}
+          ACTOR: ${{ github.actor }}
+          BASE_BRANCH: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add "$SUBMODULE_PATH" livekit-rtc/livekit/rtc/_proto .changeset
+          git commit -m "Bump to livekit-ffi/v${TARGET}"
+          git push --force origin "$BRANCH"
+
+          release_url="https://github.com/$RUST_SDKS_REPO/releases/tag/$TAG"
+          compare_url="https://github.com/$RUST_SDKS_REPO/compare/livekit-ffi/v${CURRENT}...${TAG}"
+          notes=$(gh release view "$TAG" --repo "$RUST_SDKS_REPO" --json body --jq '.body' 2>/dev/null || true)
+
+          {
+            echo "Bumps livekit-ffi from \`v${CURRENT}\` to \`v${TARGET}\`."
+            echo
+            echo "- Release: ${release_url}"
+            echo "- Changes: ${compare_url}"
+            echo
+            echo "This PR updates the \`${SUBMODULE_PATH}\` submodule to \`${TAG}\`, regenerates the protobuf stubs in \`livekit-rtc/livekit/rtc/_proto\` and adds a changeset for \`livekit-rtc\`."
+            if [ -n "$MISSING_PROTOS" ]; then
+              echo
+              echo "> [!WARNING]"
+              echo "> These proto files are not listed in \`livekit-rtc/generate_proto.sh\` and were not generated: \`${MISSING_PROTOS}\`. Add them to the script and regenerate."
+            fi
+            echo
+            echo "Check the proto diff for API changes that need matching updates in the Python SDK (new fields, renamed messages, new requests/events)."
+            echo
+            echo "### Generated files"
+            echo
+            echo '```'
+            git show --stat --format= HEAD
+            echo '```'
+            if [ -n "$notes" ]; then
+              echo
+              echo "<details><summary>Release notes</summary>"
+              echo
+              echo "$notes"
+              echo
+              echo "</details>"
+            fi
+            echo
+            echo "Triggered by @${ACTOR} via the Bump livekit-ffi workflow."
+          } > "$RUNNER_TEMP/pr-body.md"
+
+          url=$(gh pr create \
+            --base "$BASE_BRANCH" \
+            --head "$BRANCH" \
+            --title "Bump to livekit-ffi/v${TARGET}" \
+            --body-file "$RUNNER_TEMP/pr-body.md")
+          echo "Opened $url" | tee -a "$GITHUB_STEP_SUMMARY"
