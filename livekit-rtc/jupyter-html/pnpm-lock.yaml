@@ -35,7 +35,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(supports-color@7.2.0)(vite@6.4.3)
+        version: 4.7.0(supports-color@7.2.0)(vite@6.4.4)
       eslint:
         specifier: ^9.39.3
         version: 9.39.4(supports-color@7.2.0)
@@ -56,10 +56,10 @@ importers:
         version: 8.59.2(eslint@9.39.4(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.9.3)
       vite:
         specifier: ^6.4.1
-        version: 6.4.3
+        version: 6.4.4
       vite-plugin-singlefile:
         specifier: ^2.3.0
-        version: 2.3.3(rollup@4.62.0)(vite@6.4.3)
+        version: 2.3.3(rollup@4.62.0)(vite@6.4.4)
 
 packages:
 
@@ -1203,8 +1203,8 @@ packages:
       rollup:
         optional: true
 
-  vite@6.4.3:
-    resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
+  vite@6.4.4:
+    resolution: {integrity: sha512-xGjU/SyjeNyb0E4KxXBvYz/1C+3JXuujvf2hXNOtnlcE+58o5ajd9N2/n2VhkiJvpCP2qQasnUpx5PXNeI+p1Q==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -1795,7 +1795,7 @@ snapshots:
       '@typescript-eslint/types': 8.59.2
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@4.7.0(supports-color@7.2.0)(vite@6.4.3)':
+  '@vitejs/plugin-react@4.7.0(supports-color@7.2.0)(vite@6.4.4)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@7.2.0)
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.7(supports-color@7.2.0))
@@ -1803,7 +1803,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.4.3
+      vite: 6.4.4
     transitivePeerDependencies:
       - supports-color
 
@@ -2311,14 +2311,14 @@ snapshots:
       lodash.debounce: 4.0.8
       react: 19.2.5
 
-  vite-plugin-singlefile@2.3.3(rollup@4.62.0)(vite@6.4.3):
+  vite-plugin-singlefile@2.3.3(rollup@4.62.0)(vite@6.4.4):
     dependencies:
       micromatch: 4.0.8
-      vite: 6.4.3
+      vite: 6.4.4
     optionalDependencies:
       rollup: 4.62.0
 
-  vite@6.4.3:
+  vite@6.4.4:
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.4)
