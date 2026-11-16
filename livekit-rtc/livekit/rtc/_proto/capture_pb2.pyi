@@ -56,8 +56,9 @@ class GstreamerBitrateUnit(_GstreamerBitrateUnit, metaclass=_GstreamerBitrateUni
        embeds an OwnedVideoSource for the existing CreateVideoTrackRequest and
        the recommended TrackPublishOptions for PublishTrackRequest.
     2. StartCaptureRequest: starts pumping frames into the RTC source.
-    3. The capture runs until StopCaptureRequest, end of stream, or an error;
-       a CaptureSourceEvent is delivered exactly once when it ends.
+    3. StopCaptureRequest signals the pump to stop without waiting.
+    4. JoinCaptureRequest consumes the running pump and completes asynchronously
+       after its thread exits, returning its terminal result.
 
     Bitrate unit expected by a GStreamer encoder property.
     """
@@ -456,9 +457,8 @@ global___StartCaptureResponse = StartCaptureResponse
 
 @typing.final
 class StopCaptureRequest(google.protobuf.message.Message):
-    """Signal a running capture to stop after the frame in flight. The terminal
-    CaptureSourceEvent follows shortly. Stopping an already-finished capture
-    is a no-op.
+    """Signal a running capture to stop after the frame in flight without waiting
+    for its thread to exit. Stopping an already-finished capture is a no-op.
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -490,6 +490,45 @@ class StopCaptureResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
 
 global___StopCaptureResponse = StopCaptureResponse
+
+@typing.final
+class JoinCaptureRequest(google.protobuf.message.Message):
+    """Consume a running capture and wait asynchronously for its pump thread to
+    exit. This does not signal the capture to stop.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CAPTURE_HANDLE_FIELD_NUMBER: builtins.int
+    REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    capture_handle: builtins.int
+    request_async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        capture_handle: builtins.int | None = ...,
+        request_async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["capture_handle", b"capture_handle", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["capture_handle", b"capture_handle", "request_async_id", b"request_async_id"]) -> None: ...
+
+global___JoinCaptureRequest = JoinCaptureRequest
+
+@typing.final
+class JoinCaptureResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ASYNC_ID_FIELD_NUMBER: builtins.int
+    async_id: builtins.int
+    def __init__(
+        self,
+        *,
+        async_id: builtins.int | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id"]) -> None: ...
+
+global___JoinCaptureResponse = JoinCaptureResponse
 
 @typing.final
 class CaptureFinished(google.protobuf.message.Message):
@@ -530,17 +569,15 @@ class CaptureError(google.protobuf.message.Message):
 global___CaptureError = CaptureError
 
 @typing.final
-class CaptureSourceEvent(google.protobuf.message.Message):
-    """Delivered exactly once when a started capture ends, regardless of why
-    (stop request, end of stream, or failure).
-    """
+class JoinCaptureCallback(google.protobuf.message.Message):
+    """Completes JoinCaptureRequest with the pump's terminal result."""
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    CAPTURE_HANDLE_FIELD_NUMBER: builtins.int
+    ASYNC_ID_FIELD_NUMBER: builtins.int
     FINISHED_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
-    capture_handle: builtins.int
+    async_id: builtins.int
     @property
     def finished(self) -> global___CaptureFinished: ...
     @property
@@ -548,12 +585,12 @@ class CaptureSourceEvent(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        capture_handle: builtins.int | None = ...,
+        async_id: builtins.int | None = ...,
         finished: global___CaptureFinished | None = ...,
         error: global___CaptureError | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["capture_handle", b"capture_handle", "error", b"error", "finished", b"finished", "message", b"message"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["capture_handle", b"capture_handle", "error", b"error", "finished", b"finished", "message", b"message"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "finished", b"finished", "message", b"message"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["async_id", b"async_id", "error", b"error", "finished", b"finished", "message", b"message"]) -> None: ...
     def WhichOneof(self, oneof_group: typing.Literal["message", b"message"]) -> typing.Literal["finished", "error"] | None: ...
 
-global___CaptureSourceEvent = CaptureSourceEvent
+global___JoinCaptureCallback = JoinCaptureCallback
