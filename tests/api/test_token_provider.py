@@ -15,6 +15,7 @@
 """How LiveKitAPI authenticates each call: with a token provider, an API key and
 secret, or a static token. A recording session stands in for the server."""
 
+import asyncio
 from typing import Dict, List
 
 import jwt
@@ -62,37 +63,43 @@ async def _list_participants(lk: api.LiveKitAPI) -> None:
     await lk.room.list_participants(ListParticipantsRequest(room="test-room"))
 
 
-async def test_token_provider_gets_the_grants_of_each_call() -> None:
-    requested: List[api.TokenGrants] = []
+def test_token_provider_gets_the_grants_of_each_call() -> None:
+    async def run() -> None:
+        requested: List[api.TokenGrants] = []
 
-    async def token_provider(grants: api.TokenGrants) -> str:
-        requested.append(grants)
-        return f"provider-token-{len(requested)}"
+        async def token_provider(grants: api.TokenGrants) -> str:
+            requested.append(grants)
+            return f"provider-token-{len(requested)}"
 
-    session = _RecordingSession()
-    lk = api.LiveKitAPI(URL, token_provider=token_provider, session=session)  # type: ignore[arg-type]
+        session = _RecordingSession()
+        lk = api.LiveKitAPI(URL, token_provider=token_provider, session=session)  # type: ignore[arg-type]
 
-    await _list_participants(lk)
-    assert requested == [Claims(video=api.VideoGrants(room_admin=True, room="test-room"))]
-    assert _bearer(session) == "provider-token-1"
+        await _list_participants(lk)
+        assert requested == [Claims(video=api.VideoGrants(room_admin=True, room="test-room"))]
+        assert _bearer(session) == "provider-token-1"
 
-    await lk.sip.list_inbound_trunk(api.ListSIPInboundTrunkRequest())
-    assert requested[-1] == Claims(video=api.VideoGrants(), sip=api.SIPGrants(admin=True))
-    assert _bearer(session) == "provider-token-2"
+        await lk.sip.list_inbound_trunk(api.ListSIPInboundTrunkRequest())
+        assert requested[-1] == Claims(video=api.VideoGrants(), sip=api.SIPGrants(admin=True))
+        assert _bearer(session) == "provider-token-2"
+
+    asyncio.run(run())
 
 
-async def test_token_provider_takes_precedence_over_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("LIVEKIT_TOKEN", "env-token")
-    monkeypatch.setenv("LIVEKIT_API_KEY", KEY)
-    monkeypatch.setenv("LIVEKIT_API_SECRET", SECRET)
+def test_token_provider_takes_precedence_over_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    async def run() -> None:
+        monkeypatch.setenv("LIVEKIT_TOKEN", "env-token")
+        monkeypatch.setenv("LIVEKIT_API_KEY", KEY)
+        monkeypatch.setenv("LIVEKIT_API_SECRET", SECRET)
 
-    async def token_provider(grants: api.TokenGrants) -> str:
-        return "provider-token"
+        async def token_provider(grants: api.TokenGrants) -> str:
+            return "provider-token"
 
-    session = _RecordingSession()
-    lk = api.LiveKitAPI(URL, token_provider=token_provider, session=session)  # type: ignore[arg-type]
-    await _list_participants(lk)
-    assert _bearer(session) == "provider-token"
+        session = _RecordingSession()
+        lk = api.LiveKitAPI(URL, token_provider=token_provider, session=session)  # type: ignore[arg-type]
+        await _list_participants(lk)
+        assert _bearer(session) == "provider-token"
+
+    asyncio.run(run())
 
 
 def test_token_and_token_provider_are_exclusive() -> None:
@@ -103,18 +110,24 @@ def test_token_and_token_provider_are_exclusive() -> None:
         api.LiveKitAPI(URL, token="static", token_provider=token_provider)
 
 
-async def test_key_and_secret_sign_each_call() -> None:
-    session = _RecordingSession()
-    lk = api.LiveKitAPI(URL, KEY, SECRET, session=session)  # type: ignore[arg-type]
-    await _list_participants(lk)
+def test_key_and_secret_sign_each_call() -> None:
+    async def run() -> None:
+        session = _RecordingSession()
+        lk = api.LiveKitAPI(URL, KEY, SECRET, session=session)  # type: ignore[arg-type]
+        await _list_participants(lk)
 
-    claims = api.TokenVerifier(KEY, SECRET).verify(_bearer(session))
-    assert claims.video == api.VideoGrants(room_admin=True, room="test-room")
-    assert jwt.decode(_bearer(session), options={"verify_signature": False})["iss"] == KEY
+        claims = api.TokenVerifier(KEY, SECRET).verify(_bearer(session))
+        assert claims.video == api.VideoGrants(room_admin=True, room="test-room")
+        assert jwt.decode(_bearer(session), options={"verify_signature": False})["iss"] == KEY
+
+    asyncio.run(run())
 
 
-async def test_static_token_is_sent_verbatim() -> None:
-    session = _RecordingSession()
-    lk = api.LiveKitAPI.with_token("static-token", URL, session=session)  # type: ignore[arg-type]
-    await _list_participants(lk)
-    assert _bearer(session) == "static-token"
+def test_static_token_is_sent_verbatim() -> None:
+    async def run() -> None:
+        session = _RecordingSession()
+        lk = api.LiveKitAPI.with_token("static-token", URL, session=session)  # type: ignore[arg-type]
+        await _list_participants(lk)
+        assert _bearer(session) == "static-token"
+
+    asyncio.run(run())

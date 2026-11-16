@@ -47,7 +47,6 @@ from .livekit_api import LiveKitAPI
 from ._service import TokenProvider
 from .access_token import (
     TokenGrants,
-    token_grants_to_json,
     InferenceGrants,
     ObservabilityGrants,
     AgentGrants,
@@ -66,7 +65,6 @@ __all__ = [
     "LiveKitAPI",
     "TokenProvider",
     "TokenGrants",
-    "token_grants_to_json",
     "room_service",
     "egress_service",
     "ingress_service",
