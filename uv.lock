@@ -643,7 +643,7 @@ dependencies = [
     { name = "filelock" },
     { name = "humanize" },
     { name = "packaging" },
-    { name = "patchelf", marker = "(platform_machine == 'aarch64' and sys_platform == 'darwin') or (platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'arm64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')" },
+    { name = "patchelf", marker = "(platform_machine == 'aarch64' or platform_machine == 'arm64' or platform_machine == 'x86_64') and (sys_platform == 'darwin' or sys_platform == 'linux')" },
     { name = "platformdirs" },
     { name = "pyelftools" },
     { name = "wheel" },
