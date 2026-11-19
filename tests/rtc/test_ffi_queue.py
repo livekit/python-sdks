@@ -19,6 +19,7 @@ FfiQueue can be imported without loading the native FFI library.
 """
 
 import asyncio
+import threading
 from collections.abc import Generator
 from dataclasses import dataclass
 
@@ -266,3 +267,93 @@ class TestFfiQueueMemoryReduction:
                 sub.get_nowait()
                 count += 1
             assert count == 50
+
+
+class TestFfiQueueConcurrency:
+    """Test put running concurrently with other puts and with subscribe/unsubscribe."""
+
+    @pytest.fixture
+    def event_loop(self) -> Generator[asyncio.AbstractEventLoop, None, None]:
+        loop = asyncio.new_event_loop()
+        yield loop
+        loop.close()
+
+    def test_subscribe_and_unsubscribe_do_not_wait_for_put(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
+        """subscribe/unsubscribe return while put is still delivering on another thread."""
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
+        delivering = threading.Event()
+        release = threading.Event()
+        released: list[bool] = []
+
+        def blocking_filter(e: MockFfiEvent) -> bool:
+            delivering.set()
+            released.append(release.wait(timeout=5))
+            return True
+
+        sub = queue.subscribe(event_loop, filter_fn=blocking_filter)
+        put_thread = threading.Thread(target=queue.put, args=(MockFfiEvent("room_event"),))
+        put_thread.start()
+        assert delivering.wait(timeout=5)
+
+        queue.unsubscribe(queue.subscribe(event_loop))
+        release.set()
+        put_thread.join()
+        event_loop.run_until_complete(asyncio.sleep(0.01))
+
+        assert released == [True]
+        assert sub.qsize() == 1
+
+    def test_unsubscribe_during_put_does_not_skip_other_subscribers(
+        self, event_loop: asyncio.AbstractEventLoop
+    ) -> None:
+        """A subscriber removed during put does not make the next one miss the item."""
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
+
+        def unsubscribe_self(e: MockFfiEvent) -> bool:
+            queue.unsubscribe(sub)
+            return True
+
+        sub = queue.subscribe(event_loop, filter_fn=unsubscribe_self)
+        other = queue.subscribe(event_loop)
+
+        queue.put(MockFfiEvent("room_event"))
+        event_loop.run_until_complete(asyncio.sleep(0.01))
+
+        assert other.qsize() == 1
+
+    def test_concurrent_puts_keep_their_order(self, event_loop: asyncio.AbstractEventLoop) -> None:
+        """A put from another thread does not overtake one that is still delivering."""
+        queue: FfiQueue[MockFfiEvent] = FfiQueue()
+        delivering = threading.Event()
+        second_done = threading.Event()
+
+        def slow_filter(e: MockFfiEvent) -> bool:
+            if e.WhichOneof("message") == "room_event":
+                delivering.set()
+                # only set in time if the second put overtook this one
+                second_done.wait(timeout=0.2)
+            return True
+
+        def put_second() -> None:
+            queue.put(MockFfiEvent("unpublish_track"))
+            second_done.set()
+
+        queue.subscribe(event_loop, filter_fn=slow_filter)
+        sub = queue.subscribe(event_loop)
+
+        first = threading.Thread(target=queue.put, args=(MockFfiEvent("room_event"),))
+        first.start()
+        assert delivering.wait(timeout=5)
+        second = threading.Thread(target=put_second)
+        second.start()
+        first.join()
+        second.join()
+        event_loop.run_until_complete(asyncio.sleep(0.01))
+
+        received = []
+        while not sub.empty():
+            received.append(sub.get_nowait()._message_type)
+
+        assert received == ["room_event", "unpublish_track"]
