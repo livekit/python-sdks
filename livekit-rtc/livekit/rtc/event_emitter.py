@@ -56,7 +56,7 @@ class EventEmitter(Generic[T_contra]):
 
                     has_varargs = any(p.kind == p.VAR_POSITIONAL for p in params)
                     if has_varargs:
-                        callback(*args)
+                        callback_args = args
                     else:
                         positional_params = [
                             p
@@ -67,7 +67,13 @@ class EventEmitter(Generic[T_contra]):
                         num_args = min(len(args), num_params)
                         callback_args = args[:num_args]
 
+                    # an event with too few arguments for the handler raises; a TypeError
+                    # from inside the handler is logged like any other exception
+                    sig.bind(*callback_args)
+                    try:
                         callback(*callback_args)
+                    except Exception:
+                        logger.exception(f"failed to emit event {event}")
                 except TypeError:
                     raise
                 except Exception:
