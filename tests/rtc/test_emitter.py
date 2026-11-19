@@ -287,3 +287,104 @@ def test_registering_the_same_handler_twice_keeps_one_entry() -> None:
     emitter.on("event", handler)
     emitter.emit("event")
     assert calls == ["x"]
+
+
+def test_once_passes_only_the_arguments_the_callback_takes() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[Any] = []
+
+    @emitter.once("event")
+    def on_event(first: Any) -> None:
+        calls.append(first)
+
+    emitter.emit("event", 1, 2, 3)  # like on(), the extra arguments are dropped
+    emitter.emit("event", 4)
+
+    assert calls == [1]
+
+
+def test_once_runs_a_callback_without_a_signature() -> None:
+    emitter = EventEmitter[str]()
+    results: list[Any] = []
+
+    emitter.once("event", min)  # builtins like min expose no signature
+    emitter.once("event", lambda *args: results.append(args))
+    emitter.emit("event", 2, 1)
+    emitter.emit("event", 3, 4)
+
+    assert results == [(2, 1)]
+    assert not emitter._events["event"]
+
+
+def test_off_removes_a_once_handler() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[str] = []
+
+    def handler() -> None:
+        calls.append("x")
+
+    class Listener:
+        def handle(self) -> None:
+            calls.append("method")
+
+    listener = Listener()
+    emitter.once("event", handler)
+    emitter.once("event", listener.handle)
+    emitter.off("event", handler)
+    emitter.off("event", listener.handle)  # a new bound method object, equal to the first
+    emitter.emit("event")
+
+    assert calls == []
+
+
+def test_once_trims_to_the_callback_signature_at_emit_time() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[tuple[Any, Any]] = []
+
+    def handler(a: Any, b: Any) -> None:
+        calls.append((a, b))
+
+    callback = functools.partial(handler, b="registered")
+    emitter.once("event", callback)
+    callback.keywords.clear()  # a partial's signature can change after registration
+    emitter.emit("event", 1, 2)
+
+    assert calls == [(1, 2)]
+
+
+def test_off_does_not_compare_unrelated_once_callbacks() -> None:
+    emitter = EventEmitter[str]()
+
+    class Strict:
+        def __call__(self) -> None:
+            pass
+
+        def __eq__(self, other: object) -> bool:
+            if not isinstance(other, Strict):
+                raise ValueError("compared with an unrelated callable")
+            return other is self
+
+        __hash__ = object.__hash__
+
+    def plain() -> None:
+        pass
+
+    emitter.once("event", Strict())
+    emitter.on("event", plain)
+    emitter.off("event", plain)
+
+    assert len(emitter._events["event"]) == 1
+
+
+def test_an_on_handler_with_a_once_callback_attribute_keeps_its_signature() -> None:
+    emitter = EventEmitter[str]()
+    calls: list[Any] = []
+
+    def handler(value: Any) -> None:
+        calls.append(value)
+
+    handler._once_callback = lambda: None  # type: ignore[attr-defined]
+    emitter.on("event", handler)
+    emitter.emit("event", 1)
+
+    assert calls == [1]
