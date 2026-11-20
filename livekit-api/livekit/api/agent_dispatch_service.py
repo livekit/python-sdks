@@ -33,8 +33,9 @@ class AgentDispatchService(Service):
         api_key: str,
         api_secret: str,
         failover: bool = True,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
     ):
-        super().__init__(session, url, api_key, api_secret, failover=failover)
+        super().__init__(session, url, api_key, api_secret, failover=failover, timeout=timeout)
 
     async def create_dispatch(self, req: CreateAgentDispatchRequest) -> AgentDispatch:
         """Create an explicit dispatch for an agent to join a room.

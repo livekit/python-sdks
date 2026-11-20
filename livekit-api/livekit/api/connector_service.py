@@ -44,8 +44,9 @@ class ConnectorService(Service):
         api_key: str,
         api_secret: str,
         failover: bool = True,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
     ):
-        super().__init__(session, url, api_key, api_secret, failover=failover)
+        super().__init__(session, url, api_key, api_secret, failover=failover, timeout=timeout)
 
     async def dial_whatsapp_call(
         self, request: DialWhatsAppCallRequest

@@ -24,8 +24,9 @@ class Service(ABC):
         api_key: str,
         api_secret: str,
         failover: bool = True,
+        timeout: aiohttp.ClientTimeout | None = None,
     ):
-        self._client = TwirpClient(session, host, "livekit", failover=failover)
+        self._client = TwirpClient(session, host, "livekit", failover=failover, timeout=timeout)
         self.api_key = api_key
         self.api_secret = api_secret
         # A pre-signed token set by LiveKitAPI for token auth; sent verbatim,
