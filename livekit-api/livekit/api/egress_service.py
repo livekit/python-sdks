@@ -15,6 +15,7 @@ from livekit.protocol.egress import (
 )
 from ._service import Service
 from .access_token import VideoGrants
+from typing import Optional
 
 SVC = "Egress"
 """@private"""
@@ -41,8 +42,9 @@ class EgressService(Service):
         api_key: str,
         api_secret: str,
         failover: bool = True,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
     ):
-        super().__init__(session, url, api_key, api_secret, failover=failover)
+        super().__init__(session, url, api_key, api_secret, failover=failover, timeout=timeout)
 
     async def start_room_composite_egress(self, start: RoomCompositeEgressRequest) -> EgressInfo:
         """Starts a composite recording of a room."""
