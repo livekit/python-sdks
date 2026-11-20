@@ -261,9 +261,10 @@ class TwirpClient:
             transport_exc: Optional[BaseException] = None
             retryable_status: Optional[int] = None
             error_data: Dict = {}
+            post_kwargs = {"timeout": timeout} if timeout is not None else {}
             try:
                 async with self._session.post(
-                    url, headers=headers, data=serialized_data, timeout=timeout
+                    url, headers=headers, data=serialized_data, **post_kwargs
                 ) as resp:
                     if resp.status == 200:
                         return response_class.FromString(await resp.read())
