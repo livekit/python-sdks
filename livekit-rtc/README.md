@@ -4,6 +4,32 @@ Python SDK to integrate LiveKit's real-time video, audio, and data capabilities 
 
 See https://docs.livekit.io/ for more information.
 
+## Publishing prepared tracks during connection
+
+Create a track backed by an empty source and supply its complete publication options
+when connecting. Audio generation can run concurrently; no PCM or capture device is
+needed to prepare the publication.
+
+```python
+from livekit import rtc
+
+source = rtc.AudioSource(sample_rate=24000, num_channels=1)
+track = rtc.LocalAudioTrack.create_audio_track("agent_audio", source)
+options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
+await room.connect(url, token, rtc.RoomOptions(publish_tracks=[(track, options)]))
+publication = next(p for p in room.local_participant.track_publications.values()
+                   if p.track is track)
+# Push generated audio later with await source.capture_frame(frame).
+# At shutdown:
+await room.local_participant.unpublish_track(publication.sid)
+await source.aclose()
+```
+
+Single-PC connections can bundle these publications into JOIN on supporting servers;
+other configurations use ordinary publication. Do not publish the supplied tracks
+again after connect. This requires the matching native FFI build. Cancellation waits
+for the native connection attempt to finish and cleans up any unclaimed room.
+
 ## Publishing pre-encoded video
 
 Use `EncodedVideoSource` when an upstream encoder already provides compressed
