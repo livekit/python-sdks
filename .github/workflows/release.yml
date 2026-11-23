@@ -1,0 +1,294 @@
+# After a release PR merges: build every package, then tag and create the
+# GitHub releases (drafts), then upload to PyPI and make the releases
+# public. The step that cannot be undone comes last.
+name: Release
+
+on:
+  # No `branches` filter: an rc PR from pre-release.yml targets the branch
+  # the workflow was run on. The `guard` job decides which PRs release.
+  pull_request:
+    types: [closed]
+  # A failed job is re-run with "Re-run failed jobs" on the run itself:
+  # that keeps the merge commit. This trigger is for a run that needs a
+  # fixed workflow file from the branch. `verwalter release` resumes from
+  # the current state and skips what is done.
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit or tag to build and publish. Set it to the release tag when the tag exists. Empty is the branch head.
+        required: false
+        default: ""
+      package:
+        description: Only this package; always reported to the publish job.
+        required: false
+        default: ""
+
+# Read-only by default: build jobs run third-party build code and never get
+# a write or OIDC token.
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    # Only a release PR that verwalter opened: the branch prefix alone would
+    # let any pushed `release/*` branch trigger a publish. The author is the
+    # verwalter-release GitHub App, or github-actions[bot] without the App.
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      || (github.event.pull_request.merged == true
+      && startsWith(github.event.pull_request.head.ref, 'release/')
+      && github.event.pull_request.head.repo.full_name == github.repository
+      && (github.event.pull_request.user.login == 'verwalter-release[bot]' || github.event.pull_request.user.login == 'github-actions[bot]')
+      && contains(github.event.pull_request.body, '<!-- verwalter release -->'))
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Release PR accepted"
+
+  # ── Builds ───────────────────────────────────────────────────
+  build-rtc:
+    name: Build RTC wheels (${{ matrix.archs }})
+    needs: guard
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            archs: x86_64
+          - os: namespace-profile-default-arm64
+            archs: aarch64
+          - os: windows-latest
+            archs: AMD64
+          - os: windows-11-arm
+            archs: ARM64
+          - os: macos-latest
+            archs: x86_64 arm64
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        id: setup-python
+        with:
+          python-version: "3.11"
+
+      - name: Build wheels
+        run: pipx run --python '${{ steps.setup-python.outputs.python-path }}' cibuildwheel==3.3.1 --output-dir dist
+        env:
+          CIBW_ARCHS: ${{ matrix.archs }}
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-rtc-${{ matrix.os }}
+          path: livekit-rtc/dist/*.whl
+
+  build-rtc-sdist:
+    name: Build RTC sdist
+    needs: guard
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./livekit-rtc
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          submodules: true
+
+      - name: Build sdist
+        run: |
+          pip3 install build
+          python3 -m build --sdist
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-rtc-sdist
+          path: livekit-rtc/dist/*.tar.gz
+
+  build:
+    name: Build ${{ matrix.package }}
+    needs: guard
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [livekit-api, livekit-protocol]
+    defaults:
+      run:
+        working-directory: ./${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          submodules: true
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+
+      - name: Build wheel & sdist
+        run: |
+          pip3 install build wheel
+          python3 -m build --wheel --sdist
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: dist-${{ matrix.package }}
+          path: |
+            ${{ matrix.package }}/dist/*.whl
+            ${{ matrix.package }}/dist/*.tar.gz
+
+  # ── Tag & GitHub releases ────────────────────────────────────
+  release:
+    needs: [build-rtc, build-rtc-sdist, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      released: ${{ steps.verwalter.outputs.released }}
+      releases: ${{ steps.verwalter.outputs.releases }}
+      docs: ${{ steps.docs.outputs.packages }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          # The merge commit itself: a push to main right after the merge
+          # must not move the tags.
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          fetch-depth: 0
+      - id: verwalter
+        uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        with:
+          command: release
+          args: ${{ inputs.package && format('--package {0}', inputs.package) || '' }}
+      # The docs site holds one version per package: an rc must not replace
+      # the docs of the last final release.
+      - id: docs
+        env:
+          RELEASES: ${{ steps.verwalter.outputs.releases }}
+        run: echo "packages=$(jq -c '[.[] | select(.prerelease | not) | .package]' <<< "${RELEASES:-[]}")" >> "$GITHUB_OUTPUT"
+
+  # ── PyPI ─────────────────────────────────────────────────────
+  # Uploads each released package with skip-existing, dependencies first,
+  # so a re-run completes a half-uploaded wheel set. `verwalter publish`
+  # then finds every version on PyPI and makes the draft releases public.
+  publish:
+    needs: release
+    if: needs.release.outputs.released == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: write   # the tool makes the draft releases public
+      id-token: write   # trusted publishing
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          fetch-depth: 0  # tags decide what is published
+
+      - id: pkgs
+        env:
+          RELEASES: ${{ needs.release.outputs.releases }}
+        run: |
+          # A run by hand with nothing left to tag gets an empty list: then
+          # try every package. skip-existing skips what PyPI has.
+          if [ -z "$RELEASES" ] || [ "$RELEASES" = "[]" ]; then
+            echo 'packages=["livekit","livekit-api","livekit-protocol"]' >> "$GITHUB_OUTPUT"
+          else
+            echo "packages=$(jq -c '[.[].package]' <<< "$RELEASES")" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: dist-rtc-*
+          path: dist/livekit
+          merge-multiple: true
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: dist-livekit-api
+          path: dist/livekit-api
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: dist-livekit-protocol
+          path: dist/livekit-protocol
+
+      - name: List distributions
+        run: ls -laR dist/
+
+      - name: Publish livekit-protocol
+        if: contains(fromJSON(steps.pkgs.outputs.packages), 'livekit-protocol')
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/livekit-protocol/
+          skip-existing: true
+
+      - name: Publish livekit-api
+        if: contains(fromJSON(steps.pkgs.outputs.packages), 'livekit-api')
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/livekit-api/
+          skip-existing: true
+
+      - name: Publish livekit
+        if: contains(fromJSON(steps.pkgs.outputs.packages), 'livekit')
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/livekit/
+          skip-existing: true
+
+      - name: Make the GitHub releases public
+        uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          command: publish
+          releases: ${{ needs.release.outputs.releases }}
+
+  # The end state, asserted: fails when a tag is not on the remote, a GitHub
+  # release is missing or still a draft, or PyPI does not have the version.
+  verify:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # reads only. A draft release is visible only with write access
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          fetch-depth: 0
+      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        with:
+          command: status
+          args: --check
+
+  # ── Docs (final versions only) ───────────────────────────────
+  docs-rtc:
+    name: Build RTC docs
+    needs: [release, publish]
+    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit')
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-rtc
+      package_name: livekit.rtc
+    secrets: inherit
+
+  docs-api:
+    name: Build API docs
+    needs: [release, publish]
+    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit-api')
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-api
+      package_name: livekit.api
+    secrets: inherit
+
+  docs-protocol:
+    name: Build Protocol docs
+    needs: [release, publish]
+    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit-protocol')
+    uses: ./.github/workflows/build-docs.yml
+    with:
+      package_dir: livekit-protocol
+      package_name: livekit.protocol
+    secrets: inherit

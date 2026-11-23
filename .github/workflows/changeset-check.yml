@@ -1,0 +1,24 @@
+# Fails a contributor PR that changes a versioned package without a
+# changeset, with a comment that links to a prefilled changeset file.
+# The `internal` label (config: [check] exempt_label) skips the check.
+name: Changeset check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    # renovate/* PRs are dependency/security updates and never carry changesets
+    if: "!startsWith(github.event.pull_request.head.ref, 'renovate/')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        with:
+          command: check

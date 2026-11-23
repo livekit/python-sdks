@@ -27,8 +27,8 @@ jobs:
             exit 0
           fi
 
-          if [ "$PR_AUTHOR" != "github-actions[bot]" ]; then
-            echo "::error::Release PRs must be created by the publish workflow, not by '$PR_AUTHOR'"
+          if [ "$PR_AUTHOR" != "verwalter-release[bot]" ] && [ "$PR_AUTHOR" != "github-actions[bot]" ]; then
+            echo "::error::Release PRs must be created by verwalter (release-pr.yml or pre-release.yml), not by '$PR_AUTHOR'"
             exit 1
           fi
 

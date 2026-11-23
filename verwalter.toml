@@ -1,0 +1,21 @@
+#:schema https://raw.githubusercontent.com/livekit/verwalter/main/schemas/v1.json
+
+[workspace]
+members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
+exclude = ["python-sdks"]   # the uv workspace root, never published
+
+[publish]
+registry = "pypi"
+
+[packages.livekit]
+versioning.files = [{ path = "livekit/rtc/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "rtc-v{version}"
+
+[packages.livekit-api]
+dependencies = ["livekit-protocol"]   # the pyproject.toml requirement is not read: verwalter finds no dependency
+versioning.files = [{ path = "livekit/api/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "api-v{version}"
+
+[packages.livekit-protocol]
+versioning.files = [{ path = "livekit/protocol/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "protocol-v{version}"
