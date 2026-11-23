@@ -26,6 +26,6 @@ jobs:
           fetch-depth: 0 # the dry run reads the tags to find what the release PR releases
           submodules: true # the sdist of each package includes its submodule
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-      - uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+      - uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: check

@@ -70,7 +70,7 @@ jobs:
             exit 1
           fi
       - id: verwalter
-        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+        uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: gate
 
@@ -191,7 +191,7 @@ jobs:
           ref: ${{ needs.gate.outputs.sha }}
           fetch-depth: 0
       - id: verwalter
-        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+        uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: release
           args: ${{ inputs.package && format('--package {0}', inputs.package) || '' }}
@@ -256,7 +256,7 @@ jobs:
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
 
       - name: Upload to PyPI and make the GitHub releases public
-        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+        uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         env:
           GH_TOKEN: ${{ github.token }}
         with:
@@ -285,8 +285,6 @@ jobs:
 
   # The end state, asserted: fails when a tag is not on the remote, a GitHub
   # release is missing or still a draft, or PyPI does not have the sdist.
-  # TODO(livekit/verwalter#138): fails for every rc until exists_url has a
-  # PEP 440 placeholder (see verwalter.toml).
   verify:
     needs: [gate, publish]
     runs-on: ubuntu-latest
@@ -297,7 +295,7 @@ jobs:
         with:
           ref: ${{ needs.gate.outputs.sha }}
           fetch-depth: 0
-      - uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+      - uses: livekit/verwalter@14fef9bf275fb347702b083d573e4a1f09bf0ef4 # v0.32.0-rc.2
         with:
           command: status
           args: --check

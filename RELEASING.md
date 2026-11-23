@@ -55,10 +55,6 @@ decide the packages and the levels. The rc is `1.6.0rc1` in `version.py` and on
 PyPI, and `1.6.0-rc.1` in the tag. The changesets stay pending for the final
 release.
 
-<!-- TODO(livekit/verwalter#138): remove this paragraph once exists_url has a PEP 440 placeholder. -->
-The `verify` job fails for an rc: the PyPI check asks for the sdist
-`1.6.0-rc.1`, but the file is `1.6.0rc1`. Check the rc on PyPI by hand.
-
 <!-- TODO(livekit/verwalter#137): remove this paragraph once an rc includes the dependents it needs. -->
 An rc includes only the packages with a pending changeset. For a major rc of
 `livekit-protocol`, also add a `patch` changeset for `livekit-api`. Else the rc
