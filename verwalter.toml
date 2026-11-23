@@ -4,15 +4,18 @@
 members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
 exclude = ["python-sdks"]   # the uv workspace root, never published
 
+[check]
+publish_dry_run = "uv build --out-dir dist && uvx twine check dist/*"   # PyPI has no built-in dry run
+
 [publish]
 registry = "pypi"
 
 [packages.livekit]
 versioning.files = [{ path = "livekit/rtc/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
 release.tag = "rtc-v{version}"
+check.publish_dry_run = "uv build --sdist --out-dir dist && uvx twine check dist/*"   # the wheels need cibuildwheel and the FFI binaries
 
 [packages.livekit-api]
-dependencies = ["livekit-protocol"]   # the pyproject.toml requirement is not read: verwalter finds no dependency
 versioning.files = [{ path = "livekit/api/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
 release.tag = "api-v{version}"
 

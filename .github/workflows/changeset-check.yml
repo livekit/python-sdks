@@ -1,6 +1,9 @@
 # Fails a contributor PR that changes a versioned package without a
 # changeset, with a comment that links to a prefilled changeset file.
 # The `internal` label (config: [check] exempt_label) skips the check.
+# On the release PR, it runs the `[check].publish_dry_run` command of each
+# package that the merge releases (build and `twine check`), and fails the
+# PR when one fails, before the version reaches main.
 name: Changeset check
 
 on:
@@ -19,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        with:
+          fetch-depth: 0 # the dry run reads the tags to find what the release PR releases
+          submodules: true # the sdist of each package includes its submodule
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+      - uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         with:
           command: check

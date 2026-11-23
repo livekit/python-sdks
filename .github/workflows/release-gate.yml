@@ -18,6 +18,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
@@ -27,15 +28,18 @@ jobs:
             exit 0
           fi
 
-          if [ "$PR_AUTHOR" != "verwalter-release[bot]" ] && [ "$PR_AUTHOR" != "github-actions[bot]" ]; then
+          # The same author that `verwalter gate` accepts ([release].author)
+          if [ "$PR_AUTHOR" != "verwalter-release[bot]" ]; then
             echo "::error::Release PRs must be created by verwalter (release-pr.yml or pre-release.yml), not by '$PR_AUTHOR'"
             exit 1
           fi
 
-          approvals=$(gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" \
-            --jq '[group_by(.user.login)[] | sort_by(.submitted_at) | last | select(.state == "APPROVED") | .user.login] | length')
-          echo "Approvals: $approvals"
+          # Each push to main regenerates the release branch. Only an
+          # approval of the current head commit counts.
+          approvals=$(gh api --paginate "repos/$REPO/pulls/$PR_NUMBER/reviews" \
+            | jq -s --arg sha "$HEAD_SHA" '[add | .[] | select(.commit_id == $sha and (.state == "APPROVED" or .state == "CHANGES_REQUESTED" or .state == "DISMISSED"))] | group_by(.user.login) | map(sort_by(.submitted_at) | last | select(.state == "APPROVED")) | length')
+          echo "Approvals of $HEAD_SHA: $approvals"
           if [ "$approvals" -lt 2 ]; then
-            echo "::error::Release PRs require at least 2 approvals (got $approvals)"
+            echo "::error::Release PRs require at least 2 approvals of the head commit (got $approvals)"
             exit 1
           fi

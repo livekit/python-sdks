@@ -29,25 +29,46 @@ permissions:
   contents: read
 
 jobs:
-  guard:
-    # Only a release PR that verwalter opened: the branch prefix alone would
-    # let any pushed `release/*` branch trigger a publish. The author is the
-    # verwalter-release GitHub App, or github-actions[bot] without the App.
-    if: >-
-      github.event_name == 'workflow_dispatch'
-      || (github.event.pull_request.merged == true
-      && startsWith(github.event.pull_request.head.ref, 'release/')
-      && github.event.pull_request.head.repo.full_name == github.repository
-      && (github.event.pull_request.user.login == 'verwalter-release[bot]' || github.event.pull_request.user.login == 'github-actions[bot]')
-      && contains(github.event.pull_request.body, '<!-- verwalter release -->'))
+  # Only a run by hand, or a merged release PR or rc PR that verwalter
+  # opened: the branch name alone would let any pushed `release/*` branch
+  # trigger a publish. The author is `[release].author` in verwalter.toml.
+  gate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      release: ${{ steps.verwalter.outputs.release }}
     steps:
-      - run: echo "Release PR accepted"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          fetch-depth: 0
+      # `verwalter gate` answers yes for every run by hand. The release
+      # gate (2 approvals) covers only PRs into main, so a run by hand
+      # releases only a commit that is on main.
+      - name: Guard the run by hand
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::Run this workflow from main, not $REF. Set the commit to release with the ref input."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::$(git rev-parse HEAD) is not on main. Only a commit on main can be released by hand."
+            exit 1
+          fi
+      - id: verwalter
+        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
+        with:
+          command: gate
 
   # ── Builds ───────────────────────────────────────────────────
   build-rtc:
     name: Build RTC wheels (${{ matrix.archs }})
-    needs: guard
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -89,7 +110,8 @@ jobs:
 
   build-rtc-sdist:
     name: Build RTC sdist
-    needs: guard
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -112,7 +134,8 @@ jobs:
 
   build:
     name: Build ${{ matrix.package }}
-    needs: guard
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -158,7 +181,7 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
           fetch-depth: 0
       - id: verwalter
-        uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         with:
           command: release
           args: ${{ inputs.package && format('--package {0}', inputs.package) || '' }}
@@ -238,7 +261,7 @@ jobs:
           skip-existing: true
 
       - name: Make the GitHub releases public
-        uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+        uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         env:
           GH_TOKEN: ${{ github.token }}
         with:
@@ -257,7 +280,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
           fetch-depth: 0
-      - uses: livekit/verwalter@39e3d7c57c2b6d96cf2d4b7771f3ab199490faba # v0.31.0
+      - uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         with:
           command: status
           args: --check
@@ -271,6 +294,7 @@ jobs:
     with:
       package_dir: livekit-rtc
       package_name: livekit.rtc
+      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
     secrets: inherit
 
   docs-api:
@@ -281,6 +305,7 @@ jobs:
     with:
       package_dir: livekit-api
       package_name: livekit.api
+      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
     secrets: inherit
 
   docs-protocol:
@@ -291,4 +316,5 @@ jobs:
     with:
       package_dir: livekit-protocol
       package_name: livekit.protocol
+      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
     secrets: inherit
