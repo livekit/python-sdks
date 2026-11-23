@@ -7,18 +7,34 @@ exclude = ["python-sdks"]   # the uv workspace root, never published
 [check]
 publish_dry_run = "uv build --out-dir dist && uvx twine check dist/*"   # PyPI has no built-in dry run
 
+# PyPI as a custom registry: the built-in `pypi` check answers yes after the
+# first file of a version, so a half upload would count as published. Here a
+# version exists when its sdist exists. twine uploads the wheels first and the
+# sdist last, and stops at the first error, so the sdist means every file is
+# there. A re-run after a half upload finds no sdist, runs the command again,
+# and --skip-existing completes the missing files.
+# The release workflow builds into dist/<package>/ at the root.
 [publish]
-registry = "pypi"
+registry = "custom"
+command = "uvx pypi-attestations@0.0.31 sign $VERWALTER_ROOT/dist/{package}/* && uvx twine@7.0.0 upload --attestations --skip-existing $VERWALTER_ROOT/dist/{package}/*"
 
+# TODO(livekit/verwalter#138): `{version}` is the semver form (1.6.0-rc.1), but
+# the sdist of an rc is 1.6.0rc1. Until a PEP 440 placeholder exists, the check
+# never finds an rc: `publish` uploads it anyway (the command is safe to run
+# twice), but `status --check` in the verify job fails for it. Switch each URL to
+# the PEP 440 placeholder once it ships.
 [packages.livekit]
 versioning.files = [{ path = "livekit/rtc/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
 release.tag = "rtc-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit/livekit-{version}.tar.gz"
 check.publish_dry_run = "uv build --sdist --out-dir dist && uvx twine check dist/*"   # the wheels need cibuildwheel and the FFI binaries
 
 [packages.livekit-api]
 versioning.files = [{ path = "livekit/api/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
 release.tag = "api-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit-api/livekit_api-{version}.tar.gz"
 
 [packages.livekit-protocol]
 versioning.files = [{ path = "livekit/protocol/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
 release.tag = "protocol-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit-protocol/livekit_protocol-{version}.tar.gz"

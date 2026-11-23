@@ -42,8 +42,10 @@ by hand releases only a commit that is on `main`.
    `main` regenerates the PR, and the approvals then count no more.
 2. Watch the run of `package-release.yml`: `gh run list --workflow package-release.yml --limit 1`.
 
-The `verify` job checks the end state. Each tag has a public GitHub release,
-and PyPI has each version. For a final version, the docs job of the package
+`verwalter publish` uploads with twine: the wheels first, the sdist last. A
+version counts as on PyPI when its sdist is there, so a half upload stays a
+draft, and a re-run uploads the missing files. The `verify` job checks the end
+state. Each tag has a public GitHub release, and PyPI has each sdist. For a final version, the docs job of the package
 must also be green.
 
 ## Pre-release
@@ -53,6 +55,11 @@ decide the packages and the levels. The rc is `1.6.0rc1` in `version.py` and on
 PyPI, and `1.6.0-rc.1` in the tag. The changesets stay pending for the final
 release.
 
+<!-- TODO(livekit/verwalter#138): remove this paragraph once exists_url has a PEP 440 placeholder. -->
+The `verify` job fails for an rc: the PyPI check asks for the sdist
+`1.6.0-rc.1`, but the file is `1.6.0rc1`. Check the rc on PyPI by hand.
+
+<!-- TODO(livekit/verwalter#137): remove this paragraph once an rc includes the dependents it needs. -->
 An rc includes only the packages with a pending changeset. For a major rc of
 `livekit-protocol`, also add a `patch` changeset for `livekit-api`. Else the rc
 PR leaves `livekit-api` at `livekit-protocol<3.0.0`, which excludes the rc, and
@@ -71,7 +78,7 @@ has the paths by cause.
 |---|---|
 | A job failed for a transient reason | `gh run rerun <run-id> --failed` |
 | The workflow needed a fix, now on `main` | `gh workflow run package-release.yml -f ref=<tag>` |
-| The publish job left out a release because its source changed since its tag | `gh workflow run package-release.yml -f ref=<tag> -f package=<package>` |
+| `publish` failed a package with `HEAD changed the source since <tag>` | `gh workflow run package-release.yml -f ref=<tag> -f package=<package>` |
 | A build failed. The builds run before the tag, so no tag exists. | Merge the fix to `main` without a changeset, then `gh workflow run package-release.yml` |
 | The released commit is wrong | `verwalter release --abandon <tag>`, then a changeset and the next version |
 
