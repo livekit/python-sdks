@@ -1,7 +1,7 @@
 # After a release PR merges: build every package, then tag and create the
 # GitHub releases (drafts), then upload to PyPI and make the releases
 # public. The step that cannot be undone comes last.
-name: Release
+name: Package Release
 
 on:
   # No `branches` filter: an rc PR from pre-release.yml targets the branch
