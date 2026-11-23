@@ -5,7 +5,7 @@ name: Package Release
 
 on:
   # No `branches` filter: an rc PR from pre-release.yml targets the branch
-  # the workflow was run on. The `guard` job decides which PRs release.
+  # the workflow was run on. The `gate` job decides which PRs release.
   pull_request:
     types: [closed]
   # A failed job is re-run with "Re-run failed jobs" on the run itself:
@@ -38,11 +38,16 @@ jobs:
       contents: read
     outputs:
       release: ${{ steps.verwalter.outputs.release }}
+      sha: ${{ steps.commit.outputs.sha }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
           fetch-depth: 0
+      # Every later job checks out this commit. A branch name in `ref`
+      # resolves once, here, and cannot move between the jobs.
+      - id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       # `verwalter gate` answers yes for every run by hand. The release
       # gate (2 approvals) covers only PRs into main, so a run by hand
       # releases only a commit that is on main.
@@ -50,7 +55,12 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         env:
           REF: ${{ github.ref }}
+          PACKAGE: ${{ inputs.package }}
         run: |
+          case "$PACKAGE" in
+            ""|livekit|livekit-api|livekit-protocol) ;;
+            *) echo "::error::Unknown package '$PACKAGE'. Use livekit, livekit-api or livekit-protocol."; exit 1 ;;
+          esac
           if [ "$REF" != "refs/heads/main" ]; then
             echo "::error::Run this workflow from main, not $REF. Set the commit to release with the ref input."
             exit 1
@@ -90,7 +100,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -119,7 +129,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
 
       - name: Build sdist
@@ -146,7 +156,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           submodules: true
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -165,39 +175,54 @@ jobs:
 
   # ── Tag & GitHub releases ────────────────────────────────────
   release:
-    needs: [build-rtc, build-rtc-sdist, build]
+    needs: [gate, build-rtc, build-rtc-sdist, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
       released: ${{ steps.verwalter.outputs.released }}
       releases: ${{ steps.verwalter.outputs.releases }}
-      docs: ${{ steps.docs.outputs.packages }}
+      docs: ${{ steps.docs.outputs.tags }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           # The merge commit itself: a push to main right after the merge
           # must not move the tags.
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           fetch-depth: 0
       - id: verwalter
         uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         with:
           command: release
           args: ${{ inputs.package && format('--package {0}', inputs.package) || '' }}
-      # The docs site holds one version per package: an rc must not replace
-      # the docs of the last final release.
+      # The docs site holds one version per package. Only the newest final
+      # tag of a package may deploy: not an rc, and not an older version
+      # that a run by hand reports again. Output: {"<package>": "<tag>"}.
       - id: docs
         env:
           RELEASES: ${{ steps.verwalter.outputs.releases }}
-        run: echo "packages=$(jq -c '[.[] | select(.prerelease | not) | .package]' <<< "${RELEASES:-[]}")" >> "$GITHUB_OUTPUT"
+        run: |
+          git fetch -q --tags --force origin
+          docs='{}'
+          while read -r pkg tag; do
+            [ -n "$pkg" ] || continue
+            newest=$(git tag --list "${tag%-v*}-v*" | grep -v -- '-rc' | sort -V | tail -n 1)
+            if [ "$tag" = "$newest" ]; then
+              docs=$(jq -c --arg p "$pkg" --arg t "$tag" '. + {($p): $t}' <<< "$docs")
+            else
+              echo "No docs for $tag: $newest is newer"
+            fi
+          done < <(jq -r '.[] | select(.prerelease | not) | "\(.package) \(.tag)"' <<< "${RELEASES:-[]}")
+          echo "tags=$docs" >> "$GITHUB_OUTPUT"
 
   # ── PyPI ─────────────────────────────────────────────────────
   # Uploads each released package with skip-existing, dependencies first,
   # so a re-run completes a half-uploaded wheel set. `verwalter publish`
   # then finds every version on PyPI and makes the draft releases public.
+  # The upload builds from this run's commit, so a package whose source
+  # changed since its tag (an older draft) is left out and fails the job.
   publish:
-    needs: release
+    needs: [gate, release]
     if: needs.release.outputs.released == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     environment: pypi
@@ -207,20 +232,33 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           fetch-depth: 0  # tags decide what is published
 
+      # Only a release whose tag exists and whose package source equals
+      # the source at its tag is uploaded and made public. An empty list
+      # uploads nothing: `verwalter publish` with an empty list would make
+      # every tagged draft public that PyPI has, also a half-uploaded one.
       - id: pkgs
         env:
           RELEASES: ${{ needs.release.outputs.releases }}
         run: |
-          # A run by hand with nothing left to tag gets an empty list: then
-          # try every package. skip-existing skips what PyPI has.
-          if [ -z "$RELEASES" ] || [ "$RELEASES" = "[]" ]; then
-            echo 'packages=["livekit","livekit-api","livekit-protocol"]' >> "$GITHUB_OUTPUT"
-          else
-            echo "packages=$(jq -c '[.[].package]' <<< "$RELEASES")" >> "$GITHUB_OUTPUT"
-          fi
+          ok='[]'
+          left_out=''
+          while read -r release; do
+            [ -n "$release" ] || continue
+            pkg=$(jq -r .package <<< "$release")
+            tag=$(jq -r .tag <<< "$release")
+            case "$pkg" in livekit) path=livekit-rtc ;; *) path=$pkg ;; esac
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null && git diff --quiet "$tag" HEAD -- "$path"; then
+              ok=$(jq -c --argjson r "$release" '. + [$r]' <<< "$ok")
+            else
+              left_out="$left_out $pkg:$tag"
+            fi
+          done < <(jq -c '.[]' <<< "${RELEASES:-[]}")
+          echo "releases=$ok" >> "$GITHUB_OUTPUT"
+          echo "packages=$(jq -c '[.[].package]' <<< "$ok")" >> "$GITHUB_OUTPUT"
+          echo "left_out=${left_out# }" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -261,60 +299,71 @@ jobs:
           skip-existing: true
 
       - name: Make the GitHub releases public
+        if: steps.pkgs.outputs.releases != '[]'
         uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         env:
           GH_TOKEN: ${{ github.token }}
         with:
           command: publish
-          releases: ${{ needs.release.outputs.releases }}
+          releases: ${{ steps.pkgs.outputs.releases }}
+
+      - name: Fail for the releases left out
+        if: steps.pkgs.outputs.left_out != ''
+        env:
+          LEFT_OUT: ${{ steps.pkgs.outputs.left_out }}
+        run: |
+          for entry in $LEFT_OUT; do
+            echo "::error::${entry%%:*}: the source changed since ${entry#*:}, or the tag is missing. Repair: gh workflow run package-release.yml -f ref=${entry#*:} -f package=${entry%%:*}"
+          done
+          exit 1
 
   # The end state, asserted: fails when a tag is not on the remote, a GitHub
   # release is missing or still a draft, or PyPI does not have the version.
   verify:
-    needs: publish
+    needs: [gate, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: write   # reads only. A draft release is visible only with write access
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+          ref: ${{ needs.gate.outputs.sha }}
           fetch-depth: 0
       - uses: livekit/verwalter@9da894a1e4f7d298095a961be60c818afd47905b # v0.32.0-rc.1
         with:
           command: status
           args: --check
 
-  # ── Docs (final versions only) ───────────────────────────────
+  # ── Docs (the newest final version only, built from its tag) ─
   docs-rtc:
     name: Build RTC docs
-    needs: [release, publish]
-    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit')
+    needs: [gate, release, publish]
+    if: fromJSON(needs.release.outputs.docs || '{}')['livekit'] != null
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-rtc
       package_name: livekit.rtc
-      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+      ref: ${{ fromJSON(needs.release.outputs.docs)['livekit'] }}
     secrets: inherit
 
   docs-api:
     name: Build API docs
-    needs: [release, publish]
-    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit-api')
+    needs: [gate, release, publish]
+    if: fromJSON(needs.release.outputs.docs || '{}')['livekit-api'] != null
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-api
       package_name: livekit.api
-      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+      ref: ${{ fromJSON(needs.release.outputs.docs)['livekit-api'] }}
     secrets: inherit
 
   docs-protocol:
     name: Build Protocol docs
-    needs: [release, publish]
-    if: contains(fromJSON(needs.release.outputs.docs || '[]'), 'livekit-protocol')
+    needs: [gate, release, publish]
+    if: fromJSON(needs.release.outputs.docs || '{}')['livekit-protocol'] != null
     uses: ./.github/workflows/build-docs.yml
     with:
       package_dir: livekit-protocol
       package_name: livekit.protocol
-      ref: ${{ github.event.pull_request.merge_commit_sha || inputs.ref || github.sha }}
+      ref: ${{ fromJSON(needs.release.outputs.docs)['livekit-protocol'] }}
     secrets: inherit

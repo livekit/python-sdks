@@ -53,6 +53,11 @@ decide the packages and the levels. The rc is `1.6.0rc1` in `version.py` and on
 PyPI, and `1.6.0-rc.1` in the tag. The changesets stay pending for the final
 release.
 
+An rc includes only the packages with a pending changeset. For a major rc of
+`livekit-protocol`, also add a `patch` changeset for `livekit-api`. Else the rc
+PR leaves `livekit-api` at `livekit-protocol<3.0.0`, which excludes the rc, and
+the API tests cannot install both packages.
+
 The release gate covers only PRs into `main`. An rc PR into another branch
 needs no approval, and its merge releases the rc.
 
@@ -66,6 +71,7 @@ has the paths by cause.
 |---|---|
 | A job failed for a transient reason | `gh run rerun <run-id> --failed` |
 | The workflow needed a fix, now on `main` | `gh workflow run package-release.yml -f ref=<tag>` |
+| The publish job left out a release because its source changed since its tag | `gh workflow run package-release.yml -f ref=<tag> -f package=<package>` |
 | A build failed. The builds run before the tag, so no tag exists. | Merge the fix to `main` without a changeset, then `gh workflow run package-release.yml` |
 | The released commit is wrong | `verwalter release --abandon <tag>`, then a changeset and the next version |
 

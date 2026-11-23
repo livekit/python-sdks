@@ -21,5 +21,6 @@ also releases `livekit-api` as a patch, with no changeset for it.
 
 A PR that needs no release (docs, CI, tests) gets the `internal` label.
 
-Pre-releases (`1.6.0-rc.1`) are not a changeset level: run the Pre-release PR
-workflow. See [RELEASING.md](../RELEASING.md).
+Pre-releases (`1.6.0rc1`) are not a changeset level: run the Pre-release PR
+workflow. For a major rc of `livekit-protocol`, also add a `patch` changeset for
+`livekit-api`. See [RELEASING.md](../RELEASING.md).
