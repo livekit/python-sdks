@@ -208,3 +208,54 @@ async def test_partial_audio_source_validation_releases_borrowed_sources():
         assert room._local_participant is None
     finally:
         await source.aclose()
+
+
+@pytest.mark.parametrize("single_pc", [False, True])
+async def test_mixed_existing_and_source_publications(single_pc):
+    """Normalize both input kinds without mixing source indices or duplicating tracks."""
+
+    async def connect_and_close():
+        name = "mixed-prepared-" + uuid.uuid4().hex[:12]
+        room = rtc.Room()
+        sources = [rtc.AudioSource(24000, 1) for _ in range(3)]
+        existing = rtc.LocalAudioTrack.create_audio_track("existing", sources[0])
+        options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
+        descriptions = [
+            rtc.AudioTrackToPublish(source=source, name=f"source-{index}", options=options)
+            for index, source in enumerate(sources[1:])
+        ]
+        try:
+            await room.connect(
+                os.environ["LIVEKIT_URL"],
+                token(name, "agent"),
+                rtc.RoomOptions(
+                    single_peer_connection=single_pc,
+                    publish_tracks=[(existing, options)],
+                    publish_audio_tracks=descriptions,
+                ),
+            )
+            publications = room.local_participant.track_publications
+            assert len(publications) == 3
+            by_name = {publication.name: publication for publication in publications.values()}
+            assert by_name["existing"].track is existing
+            for index, description in enumerate(descriptions):
+                assert description.track is not None
+                assert by_name[f"source-{index}"].track is description.track
+            refs = [weakref.ref(source) for source in sources]
+            refs += [weakref.ref(existing)]
+            refs += [weakref.ref(description.track) for description in descriptions]
+            refs += [weakref.ref(publication) for publication in publications.values()]
+            for publication in list(publications.values()):
+                await room.local_participant.unpublish_track(publication.sid)
+            assert not room.local_participant.track_publications
+        finally:
+            await room.disconnect()
+            await asyncio.gather(*(source.aclose() for source in sources))
+            async with api.LiveKitAPI() as client:
+                await client.room.delete_room(api.DeleteRoomRequest(room=name))
+        return refs
+
+    for _ in range(2):
+        refs = await connect_and_close()
+        gc.collect()
+        assert all(reference() is None for reference in refs)
