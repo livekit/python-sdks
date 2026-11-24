@@ -32,6 +32,7 @@ class EncodedFileType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     MP4: _ClassVar[EncodedFileType]
     OGG: _ClassVar[EncodedFileType]
     MP3: _ClassVar[EncodedFileType]
+    MCAP: _ClassVar[EncodedFileType]
 
 class StreamProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -44,6 +45,7 @@ class SegmentedFileProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     DEFAULT_SEGMENTED_FILE_PROTOCOL: _ClassVar[SegmentedFileProtocol]
     HLS_PROTOCOL: _ClassVar[SegmentedFileProtocol]
+    HLS_FMP4_PROTOCOL: _ClassVar[SegmentedFileProtocol]
 
 class SegmentedFileSuffix(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -92,12 +94,14 @@ DEFAULT_FILETYPE: EncodedFileType
 MP4: EncodedFileType
 OGG: EncodedFileType
 MP3: EncodedFileType
+MCAP: EncodedFileType
 DEFAULT_PROTOCOL: StreamProtocol
 RTMP: StreamProtocol
 SRT: StreamProtocol
 WEBSOCKET: StreamProtocol
 DEFAULT_SEGMENTED_FILE_PROTOCOL: SegmentedFileProtocol
 HLS_PROTOCOL: SegmentedFileProtocol
+HLS_FMP4_PROTOCOL: SegmentedFileProtocol
 INDEX: SegmentedFileSuffix
 TIMESTAMP: SegmentedFileSuffix
 IMAGE_SUFFIX_INDEX: ImageFileSuffix
@@ -163,14 +167,18 @@ class WebSource(_message.Message):
     def __init__(self, url: _Optional[str] = ..., audio_only: bool = ..., video_only: bool = ..., await_start_signal: bool = ...) -> None: ...
 
 class MediaSource(_message.Message):
-    __slots__ = ("video_track_id", "participant_video", "audio")
+    __slots__ = ("video_track_id", "participant_video", "videos", "audio", "data")
     VIDEO_TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_VIDEO_FIELD_NUMBER: _ClassVar[int]
+    VIDEOS_FIELD_NUMBER: _ClassVar[int]
     AUDIO_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
     video_track_id: str
     participant_video: ParticipantVideo
+    videos: VideoConfig
     audio: AudioConfig
-    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ...) -> None: ...
+    data: DataConfig
+    def __init__(self, video_track_id: _Optional[str] = ..., participant_video: _Optional[_Union[ParticipantVideo, _Mapping]] = ..., videos: _Optional[_Union[VideoConfig, _Mapping]] = ..., audio: _Optional[_Union[AudioConfig, _Mapping]] = ..., data: _Optional[_Union[DataConfig, _Mapping]] = ...) -> None: ...
 
 class ParticipantVideo(_message.Message):
     __slots__ = ("identity", "prefer_screen_share")
@@ -179,6 +187,26 @@ class ParticipantVideo(_message.Message):
     identity: str
     prefer_screen_share: bool
     def __init__(self, identity: _Optional[str] = ..., prefer_screen_share: bool = ...) -> None: ...
+
+class VideoConfig(_message.Message):
+    __slots__ = ("capture_all", "selectors")
+    CAPTURE_ALL_FIELD_NUMBER: _ClassVar[int]
+    SELECTORS_FIELD_NUMBER: _ClassVar[int]
+    capture_all: bool
+    selectors: _containers.RepeatedCompositeFieldContainer[VideoSelector]
+    def __init__(self, capture_all: bool = ..., selectors: _Optional[_Iterable[_Union[VideoSelector, _Mapping]]] = ...) -> None: ...
+
+class VideoSelector(_message.Message):
+    __slots__ = ("track_id", "participant_identity", "track_name", "exclude")
+    TRACK_ID_FIELD_NUMBER: _ClassVar[int]
+    PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
+    track_id: str
+    participant_identity: str
+    track_name: str
+    exclude: bool
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., track_name: _Optional[str] = ..., exclude: bool = ...) -> None: ...
 
 class AudioConfig(_message.Message):
     __slots__ = ("capture_all", "routes")
@@ -189,16 +217,20 @@ class AudioConfig(_message.Message):
     def __init__(self, capture_all: bool = ..., routes: _Optional[_Iterable[_Union[AudioRoute, _Mapping]]] = ...) -> None: ...
 
 class AudioRoute(_message.Message):
-    __slots__ = ("track_id", "participant_identity", "participant_kind", "channel")
+    __slots__ = ("track_id", "participant_identity", "participant_kind", "track_name", "exclude", "channel")
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_KIND_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
     CHANNEL_FIELD_NUMBER: _ClassVar[int]
     track_id: str
     participant_identity: str
     participant_kind: _models.ParticipantInfo.Kind
+    track_name: str
+    exclude: bool
     channel: AudioChannel
-    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., participant_kind: _Optional[_Union[_models.ParticipantInfo.Kind, str]] = ..., track_name: _Optional[str] = ..., exclude: bool = ..., channel: _Optional[_Union[AudioChannel, str]] = ...) -> None: ...
 
 class DataConfig(_message.Message):
     __slots__ = ("capture_all", "selectors")
@@ -209,12 +241,16 @@ class DataConfig(_message.Message):
     def __init__(self, capture_all: bool = ..., selectors: _Optional[_Iterable[_Union[DataSelector, _Mapping]]] = ...) -> None: ...
 
 class DataSelector(_message.Message):
-    __slots__ = ("track_id", "participant_identity")
+    __slots__ = ("track_id", "participant_identity", "track_name", "exclude")
     TRACK_ID_FIELD_NUMBER: _ClassVar[int]
     PARTICIPANT_IDENTITY_FIELD_NUMBER: _ClassVar[int]
+    TRACK_NAME_FIELD_NUMBER: _ClassVar[int]
+    EXCLUDE_FIELD_NUMBER: _ClassVar[int]
     track_id: str
     participant_identity: str
-    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ...) -> None: ...
+    track_name: str
+    exclude: bool
+    def __init__(self, track_id: _Optional[str] = ..., participant_identity: _Optional[str] = ..., track_name: _Optional[str] = ..., exclude: bool = ...) -> None: ...
 
 class EncodingOptions(_message.Message):
     __slots__ = ("width", "height", "depth", "framerate", "audio_codec", "audio_bitrate", "audio_frequency", "video_codec", "video_bitrate", "key_frame_interval", "audio_quality", "video_quality")
@@ -269,12 +305,22 @@ class FileOutput(_message.Message):
     def __init__(self, file_type: _Optional[_Union[EncodedFileType, str]] = ..., filepath: _Optional[str] = ..., disable_manifest: bool = ...) -> None: ...
 
 class StreamOutput(_message.Message):
-    __slots__ = ("protocol", "urls")
+    __slots__ = ("protocol", "urls", "destinations")
     PROTOCOL_FIELD_NUMBER: _ClassVar[int]
     URLS_FIELD_NUMBER: _ClassVar[int]
+    DESTINATIONS_FIELD_NUMBER: _ClassVar[int]
     protocol: StreamProtocol
     urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, protocol: _Optional[_Union[StreamProtocol, str]] = ..., urls: _Optional[_Iterable[str]] = ...) -> None: ...
+    destinations: _containers.RepeatedCompositeFieldContainer[StreamDestination]
+    def __init__(self, protocol: _Optional[_Union[StreamProtocol, str]] = ..., urls: _Optional[_Iterable[str]] = ..., destinations: _Optional[_Iterable[_Union[StreamDestination, _Mapping]]] = ...) -> None: ...
+
+class StreamDestination(_message.Message):
+    __slots__ = ("id", "url")
+    ID_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    url: str
+    def __init__(self, id: _Optional[str] = ..., url: _Optional[str] = ...) -> None: ...
 
 class SegmentedFileOutput(_message.Message):
     __slots__ = ("protocol", "filename_prefix", "playlist_name", "live_playlist_name", "segment_duration", "filename_suffix", "disable_manifest", "s3", "gcp", "azure", "aliOSS")
@@ -508,7 +554,7 @@ class EgressInfo(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ..., room_id: _Optional[str] = ..., room_name: _Optional[str] = ..., source_type: _Optional[_Union[EgressSourceType, str]] = ..., status: _Optional[_Union[EgressStatus, str]] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., updated_at: _Optional[int] = ..., egress: _Optional[_Union[StartEgressRequest, _Mapping]] = ..., replay: _Optional[_Union[ExportReplayRequest, _Mapping]] = ..., room_composite: _Optional[_Union[RoomCompositeEgressRequest, _Mapping]] = ..., web: _Optional[_Union[WebEgressRequest, _Mapping]] = ..., participant: _Optional[_Union[ParticipantEgressRequest, _Mapping]] = ..., track_composite: _Optional[_Union[TrackCompositeEgressRequest, _Mapping]] = ..., track: _Optional[_Union[TrackEgressRequest, _Mapping]] = ..., stream_results: _Optional[_Iterable[_Union[StreamInfo, _Mapping]]] = ..., file_results: _Optional[_Iterable[_Union[FileInfo, _Mapping]]] = ..., segment_results: _Optional[_Iterable[_Union[SegmentsInfo, _Mapping]]] = ..., image_results: _Optional[_Iterable[_Union[ImagesInfo, _Mapping]]] = ..., error: _Optional[str] = ..., error_code: _Optional[int] = ..., details: _Optional[str] = ..., manifest_location: _Optional[str] = ..., backup_storage_used: bool = ..., retry_count: _Optional[int] = ..., stream: _Optional[_Union[StreamInfoList, _Mapping]] = ..., file: _Optional[_Union[FileInfo, _Mapping]] = ..., segments: _Optional[_Union[SegmentsInfo, _Mapping]] = ...) -> None: ...
 
 class StreamInfo(_message.Message):
-    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries")
+    __slots__ = ("url", "started_at", "ended_at", "duration", "status", "error", "last_retry_at", "retries", "id")
     class Status(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = ()
         ACTIVE: _ClassVar[StreamInfo.Status]
@@ -525,6 +571,7 @@ class StreamInfo(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     LAST_RETRY_AT_FIELD_NUMBER: _ClassVar[int]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
     url: str
     started_at: int
     ended_at: int
@@ -533,7 +580,8 @@ class StreamInfo(_message.Message):
     error: str
     last_retry_at: int
     retries: int
-    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ..., last_retry_at: _Optional[int] = ..., retries: _Optional[int] = ...) -> None: ...
+    id: str
+    def __init__(self, url: _Optional[str] = ..., started_at: _Optional[int] = ..., ended_at: _Optional[int] = ..., duration: _Optional[int] = ..., status: _Optional[_Union[StreamInfo.Status, str]] = ..., error: _Optional[str] = ..., last_retry_at: _Optional[int] = ..., retries: _Optional[int] = ..., id: _Optional[str] = ...) -> None: ...
 
 class FileInfo(_message.Message):
     __slots__ = ("filename", "started_at", "ended_at", "duration", "size", "location")
@@ -818,14 +866,16 @@ class UpdateLayoutRequest(_message.Message):
     def __init__(self, egress_id: _Optional[str] = ..., layout: _Optional[str] = ...) -> None: ...
 
 class UpdateStreamRequest(_message.Message):
-    __slots__ = ("egress_id", "add_output_urls", "remove_output_urls")
+    __slots__ = ("egress_id", "add_output_urls", "remove_output_urls", "add_destinations")
     EGRESS_ID_FIELD_NUMBER: _ClassVar[int]
     ADD_OUTPUT_URLS_FIELD_NUMBER: _ClassVar[int]
     REMOVE_OUTPUT_URLS_FIELD_NUMBER: _ClassVar[int]
+    ADD_DESTINATIONS_FIELD_NUMBER: _ClassVar[int]
     egress_id: str
     add_output_urls: _containers.RepeatedScalarFieldContainer[str]
     remove_output_urls: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, egress_id: _Optional[str] = ..., add_output_urls: _Optional[_Iterable[str]] = ..., remove_output_urls: _Optional[_Iterable[str]] = ...) -> None: ...
+    add_destinations: _containers.RepeatedCompositeFieldContainer[StreamDestination]
+    def __init__(self, egress_id: _Optional[str] = ..., add_output_urls: _Optional[_Iterable[str]] = ..., remove_output_urls: _Optional[_Iterable[str]] = ..., add_destinations: _Optional[_Iterable[_Union[StreamDestination, _Mapping]]] = ...) -> None: ...
 
 class StreamInfoList(_message.Message):
     __slots__ = ("info",)

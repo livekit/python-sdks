@@ -43,7 +43,7 @@ class IngressService(Service):
             SVC,
             "CreateIngress",
             create,
-            self._auth_header(VideoGrants(ingress_admin=True)),
+            await self._auth_header(VideoGrants(ingress_admin=True)),
             IngressInfo,
         )
 
@@ -52,7 +52,7 @@ class IngressService(Service):
             SVC,
             "UpdateIngress",
             update,
-            self._auth_header(VideoGrants(ingress_admin=True)),
+            await self._auth_header(VideoGrants(ingress_admin=True)),
             IngressInfo,
         )
 
@@ -61,7 +61,7 @@ class IngressService(Service):
             SVC,
             "ListIngress",
             list,
-            self._auth_header(VideoGrants(ingress_admin=True)),
+            await self._auth_header(VideoGrants(ingress_admin=True)),
             ListIngressResponse,
         )
 
@@ -70,6 +70,6 @@ class IngressService(Service):
             SVC,
             "DeleteIngress",
             delete,
-            self._auth_header(VideoGrants(ingress_admin=True)),
+            await self._auth_header(VideoGrants(ingress_admin=True)),
             IngressInfo,
         )

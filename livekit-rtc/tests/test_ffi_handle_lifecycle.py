@@ -14,26 +14,12 @@
 
 from __future__ import annotations
 
-import gc
 import subprocess
 import sys
 
 import pytest
 
 from livekit.rtc._ffi_client import FfiClient, FfiHandle
-from livekit.rtc._proto import audio_frame_pb2, ffi_pb2
-
-
-def _allocate_real_handle() -> int:
-    req = ffi_pb2.FfiRequest()
-    req.new_audio_source.type = audio_frame_pb2.AUDIO_SOURCE_NATIVE
-    req.new_audio_source.sample_rate = 48000
-    req.new_audio_source.num_channels = 1
-    req.new_audio_source.queue_size_ms = 100
-    resp = FfiClient.instance.request(req)
-    handle_id = resp.new_audio_source.source.handle.id
-    assert handle_id != 0
-    return int(handle_id)
 
 
 def test_active_runtime_invalid_handle_asserts() -> None:
@@ -42,26 +28,57 @@ def test_active_runtime_invalid_handle_asserts() -> None:
         FfiHandle(999999).dispose()
 
 
+# Runs in a fresh interpreter: FfiClient._dispose() tears down the process-wide
+# FFI runtime, and every later test in the same pytest process would then wait
+# forever for FFI callbacks that never arrive.
+_DISPOSE_MARKS_LIVE_HANDLES_CONSUMED = """
+import gc
+
+from livekit.rtc._ffi_client import FfiClient, FfiHandle
+from livekit.rtc._proto import audio_frame_pb2, ffi_pb2
+
+req = ffi_pb2.FfiRequest()
+req.new_audio_source.type = audio_frame_pb2.AUDIO_SOURCE_NATIVE
+req.new_audio_source.sample_rate = 48000
+req.new_audio_source.num_channels = 1
+req.new_audio_source.queue_size_ms = 100
+resp = FfiClient.instance.request(req)
+handle_id = resp.new_audio_source.source.handle.id
+assert handle_id != 0
+
+handle = FfiHandle(handle_id)
+assert not handle.disposed
+
+# Global dispose marks all live handles consumed and sets _ffi_disposed
+FfiClient.instance._dispose()
+assert handle.disposed
+
+# Explicit dispose or __del__ after global dispose should be a no-op and not assert
+handle.dispose()
+handle.__del__()
+
+# Newly instantiated handle after global dispose also safely no-ops without assert
+late_handle = FfiHandle(12345)
+late_handle.dispose()
+
+del handle
+del late_handle
+gc.collect()
+print("ok")
+"""
+
+
 def test_live_handles_marked_consumed_and_no_assert_after_dispose() -> None:
-    handle_id = _allocate_real_handle()
-    handle = FfiHandle(handle_id)
-    assert not handle.disposed
-
-    # Global dispose marks all live handles consumed and sets _ffi_disposed
-    FfiClient.instance._dispose()
-    assert handle.disposed
-
-    # Explicit dispose or __del__ after global dispose should be a no-op and not assert
-    handle.dispose()
-    handle.__del__()
-
-    # Newly instantiated handle after global dispose also safely no-ops without assert
-    late_handle = FfiHandle(12345)
-    late_handle.dispose()
-
-    del handle
-    del late_handle
-    gc.collect()
+    result = subprocess.run(
+        [sys.executable, "-c", _DISPOSE_MARKS_LIVE_HANDLES_CONSUMED],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "ok"
+    assert "AssertionError" not in result.stderr
+    assert "Exception ignored" not in result.stderr
 
 
 def test_subprocess_exit_with_undisposed_handle_has_no_assertion_error() -> None:
@@ -85,6 +102,7 @@ sys.exit(0)
         [sys.executable, "-c", code],
         capture_output=True,
         text=True,
+        timeout=60,
     )
     assert result.returncode == 0
     assert "AssertionError" not in result.stderr

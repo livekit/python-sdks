@@ -87,10 +87,12 @@ class SessionClose(_message.Message):
     def __init__(self) -> None: ...
 
 class InferenceStart(_message.Message):
-    __slots__ = ("request_id",)
+    __slots__ = ("request_id", "turn_samples")
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    TURN_SAMPLES_FIELD_NUMBER: _ClassVar[int]
     request_id: str
-    def __init__(self, request_id: _Optional[str] = ...) -> None: ...
+    turn_samples: int
+    def __init__(self, request_id: _Optional[str] = ..., turn_samples: _Optional[int] = ...) -> None: ...
 
 class InferenceStop(_message.Message):
     __slots__ = ("request_id",)

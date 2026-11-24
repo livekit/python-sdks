@@ -53,7 +53,7 @@ class AgentDispatchService(Service):
             SVC,
             "CreateDispatch",
             req,
-            self._auth_header(VideoGrants(room_admin=True, room=req.room)),
+            await self._auth_header(VideoGrants(room_admin=True, room=req.room)),
             AgentDispatch,
         )
 
@@ -74,7 +74,7 @@ class AgentDispatchService(Service):
                 dispatch_id=dispatch_id,
                 room=room_name,
             ),
-            self._auth_header(VideoGrants(room_admin=True, room=room_name)),
+            await self._auth_header(VideoGrants(room_admin=True, room=room_name)),
             AgentDispatch,
         )
 
@@ -91,7 +91,7 @@ class AgentDispatchService(Service):
             SVC,
             "ListDispatch",
             ListAgentDispatchRequest(room=room_name),
-            self._auth_header(VideoGrants(room_admin=True, room=room_name)),
+            await self._auth_header(VideoGrants(room_admin=True, room=room_name)),
             ListAgentDispatchResponse,
         )
         return list(res.agent_dispatches)
@@ -110,7 +110,7 @@ class AgentDispatchService(Service):
             SVC,
             "ListDispatch",
             ListAgentDispatchRequest(dispatch_id=dispatch_id, room=room_name),
-            self._auth_header(VideoGrants(room_admin=True, room=room_name)),
+            await self._auth_header(VideoGrants(room_admin=True, room=room_name)),
             ListAgentDispatchResponse,
         )
         if len(res.agent_dispatches) > 0:

@@ -1,23 +1,26 @@
 import calendar
 import datetime
+import json
 
 import jwt
 import pytest
 from livekit.api import (
     AccessToken,
+    AgentDatabaseGrants,
     AgentEndpointGrants,
     AgentGrants,
     AgentThreadGrants,
+    InferenceGrants,
+    ObservabilityGrants,
     SIPGrants,
     TokenVerifier,
     VideoGrants,
 )
-from livekit.api.access_token import ObservabilityGrants
 from livekit.protocol.room import RoomConfiguration
 from livekit.protocol.agent_dispatch import RoomAgentDispatch
 
 TEST_API_KEY = "myapikey"
-TEST_API_SECRET = "thiskeyistotallyunsafe"
+TEST_API_SECRET = "thiskeyistotallyunsafe-but-32-bytes-long"
 
 
 def test_verify_token() -> None:
@@ -81,27 +84,42 @@ def test_mint_token_with_can_subscribe_metrics() -> None:
 
 
 def test_agent_grants() -> None:
-    agent = AgentGrants(database_admin=True)
+    agent = AgentGrants(dispatch_admin=True)
     endpoint = AgentEndpointGrants(call=True, agent_name="my-agent")
-    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True)
+    thread = AgentThreadGrants(thread_ids=["t1"], read=True, write=True, sql=True)
+    database = AgentDatabaseGrants(
+        database_ids=["DB_1"], read=True, delete=True, create=True, list=True
+    )
 
     token = (
         AccessToken(TEST_API_KEY, TEST_API_SECRET)
         .with_agent_grants(agent)
         .with_agent_endpoint_grants(endpoint)
         .with_agent_thread_grants(thread)
+        .with_agent_database_grants(database)
         .to_jwt()
     )
 
     decoded = jwt.decode(token, options={"verify_signature": False})
     assert decoded["agentThread"]["threadIds"] == ["t1"]
     assert decoded["agentEndpoint"]["agentName"] == "my-agent"
-    assert decoded["agent"]["databaseAdmin"] is True
+    assert decoded["agentThread"]["sql"] is True
+    assert decoded["agentDatabase"] == {
+        "databaseIds": ["DB_1"],
+        "read": True,
+        "write": False,
+        "delete": True,
+        "create": True,
+        "list": True,
+    }
+    assert decoded["agent"]["dispatchAdmin"] is True
+    assert "databaseAdmin" not in decoded["agent"]
 
     claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
     assert claims.agent == agent
     assert claims.agent_endpoint == endpoint
     assert claims.agent_thread == thread
+    assert claims.agent_database == database
 
 
 def test_agent_config() -> None:
@@ -148,7 +166,7 @@ def test_agent_config() -> None:
 def test_verify_token_invalid() -> None:
     token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
 
-    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret")
+    token_verifier = TokenVerifier(TEST_API_KEY, "invalid_secret-padded-to-32-bytes-long")
     with pytest.raises(Exception):
         token_verifier.verify(token)
 
@@ -207,3 +225,77 @@ def test_verify_token_preserves_kind_and_observability() -> None:
     assert claims.kind == "agent"
     assert claims.observability is not None
     assert claims.observability.write is True
+
+
+def test_verify_token_omitted_grants_are_none() -> None:
+    token = AccessToken(TEST_API_KEY, TEST_API_SECRET).with_identity("test_identity").to_jwt()
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.inference is None
+    assert claims.observability is None
+    assert claims.agent is None
+    assert claims.agent_endpoint is None
+    assert claims.agent_thread is None
+    assert claims.agent_database is None
+
+
+def test_verify_token_with_only_inference_grants() -> None:
+    inference = InferenceGrants(perform=True)
+    token = (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_inference_grants(inference)
+        .to_jwt()
+    )
+
+    claims = TokenVerifier(TEST_API_KEY, TEST_API_SECRET).verify(token)
+    assert claims.identity == "test_identity"
+    assert claims.inference == inference
+    assert claims.video is None
+    assert claims.sip is None
+    assert claims.observability is None
+
+
+def _claims_token() -> AccessToken:
+    return (
+        AccessToken(TEST_API_KEY, TEST_API_SECRET)
+        .with_identity("test_identity")
+        .with_name("test_name")
+        .with_kind("agent")
+        .with_metadata("test_metadata")
+        .with_attributes({"key1": "value1"})
+        .with_grants(VideoGrants(room_join=True, room="test_room", can_publish_data=False))
+        .with_sip_grants(SIPGrants(call=True))
+        .with_room_config(RoomConfiguration(agents=[RoomAgentDispatch(agent_name="test-agent")]))
+    )
+
+
+def test_claims_json_matches_signed_payload() -> None:
+    claims = json.loads(_claims_token().to_claims_json())
+    payload = jwt.decode(_claims_token().to_jwt(), options={"verify_signature": False})
+
+    # the claims the signer sets are left out; the identity is in `identity`
+    assert claims == {k: v for k, v in payload.items() if k not in ("iss", "sub", "nbf", "exp")} | {
+        "identity": "test_identity"
+    }
+    assert claims["video"] == {
+        "roomJoin": True,
+        "room": "test_room",
+        "canPublish": True,
+        "canSubscribe": True,
+        "canPublishData": False,
+    }
+    assert claims["kind"] == "agent"
+
+
+def test_claims_json_without_key_or_secret(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("LIVEKIT_API_KEY", raising=False)
+    monkeypatch.delenv("LIVEKIT_API_SECRET", raising=False)
+
+    token = AccessToken().with_identity("test_identity").with_grants(VideoGrants(room_list=True))
+    assert json.loads(token.to_claims_json())["identity"] == "test_identity"
+    with pytest.raises(ValueError, match="api_key and api_secret must be set"):
+        token.to_jwt()

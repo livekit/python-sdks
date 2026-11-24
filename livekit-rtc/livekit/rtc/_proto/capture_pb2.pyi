@@ -33,18 +33,16 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
-class _Pattern:
+class _GstreamerBitrateUnit:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _PatternEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_Pattern.ValueType], builtins.type):
+class _GstreamerBitrateUnitEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_GstreamerBitrateUnit.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
-    PATTERN_GRADIENT: _Pattern.ValueType  # 0
-    """Animated color gradient."""
-    PATTERN_LOGO: _Pattern.ValueType  # 1
-    """Bouncing LiveKit logo."""
+    GSTREAMER_BITRATE_UNIT_BPS: _GstreamerBitrateUnit.ValueType  # 0
+    GSTREAMER_BITRATE_UNIT_KBPS: _GstreamerBitrateUnit.ValueType  # 1
 
-class Pattern(_Pattern, metaclass=_PatternEnumTypeWrapper):
+class GstreamerBitrateUnit(_GstreamerBitrateUnit, metaclass=_GstreamerBitrateUnitEnumTypeWrapper):
     """Capture sources (livekit-capture)
 
     A capture source owns a media producer (e.g. a GStreamer pipeline) and the
@@ -61,8 +59,26 @@ class Pattern(_Pattern, metaclass=_PatternEnumTypeWrapper):
     3. The capture runs until StopCaptureRequest, end of stream, or an error;
        a CaptureSourceEvent is delivered exactly once when it ends.
 
-    Test patterns built into livekit-capture.
+    Bitrate unit expected by a GStreamer encoder property.
     """
+
+GSTREAMER_BITRATE_UNIT_BPS: GstreamerBitrateUnit.ValueType  # 0
+GSTREAMER_BITRATE_UNIT_KBPS: GstreamerBitrateUnit.ValueType  # 1
+global___GstreamerBitrateUnit = GstreamerBitrateUnit
+
+class _Pattern:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _PatternEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_Pattern.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    PATTERN_GRADIENT: _Pattern.ValueType  # 0
+    """Animated color gradient."""
+    PATTERN_LOGO: _Pattern.ValueType  # 1
+    """Bouncing LiveKit logo."""
+
+class Pattern(_Pattern, metaclass=_PatternEnumTypeWrapper):
+    """Test patterns built into livekit-capture."""
 
 PATTERN_GRADIENT: Pattern.ValueType  # 0
 """Animated color gradient."""
@@ -109,6 +125,104 @@ CAPTURE_EXIT_STOPPED: CaptureExit.ValueType  # 0
 CAPTURE_EXIT_END_OF_STREAM: CaptureExit.ValueType  # 1
 """The producer reached the end of its stream."""
 global___CaptureExit = CaptureExit
+
+class _CaptureErrorKind:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _CaptureErrorKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CaptureErrorKind.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    CAPTURE_ERROR_KIND_SOURCE: _CaptureErrorKind.ValueType  # 0
+    """The capture source failed or violated its contract."""
+    CAPTURE_ERROR_KIND_RTC: _CaptureErrorKind.ValueType  # 1
+    """The RTC video source rejected a frame."""
+    CAPTURE_ERROR_KIND_PANICKED: _CaptureErrorKind.ValueType  # 2
+    """The pump thread panicked."""
+
+class CaptureErrorKind(_CaptureErrorKind, metaclass=_CaptureErrorKindEnumTypeWrapper):
+    """Why a capture ended with an error."""
+
+CAPTURE_ERROR_KIND_SOURCE: CaptureErrorKind.ValueType  # 0
+"""The capture source failed or violated its contract."""
+CAPTURE_ERROR_KIND_RTC: CaptureErrorKind.ValueType  # 1
+"""The RTC video source rejected a frame."""
+CAPTURE_ERROR_KIND_PANICKED: CaptureErrorKind.ValueType  # 2
+"""The pump thread panicked."""
+global___CaptureErrorKind = CaptureErrorKind
+
+@typing.final
+class GstreamerRateControl(google.protobuf.message.Message):
+    """Binding from WebRTC rate-control targets to a GStreamer encoder property."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ELEMENT_FIELD_NUMBER: builtins.int
+    PROPERTY_FIELD_NUMBER: builtins.int
+    UNIT_FIELD_NUMBER: builtins.int
+    element: builtins.str
+    """Name of the encoder element in the pipeline (e.g. `lk_encoder`)."""
+    property: builtins.str
+    """Bitrate property to set on the element (e.g. `bitrate` for x264enc,
+    `target-bitrate` for vp8enc/vp9enc).
+    """
+    unit: global___GstreamerBitrateUnit.ValueType
+    """Unit the property expects."""
+    def __init__(
+        self,
+        *,
+        element: builtins.str | None = ...,
+        property: builtins.str | None = ...,
+        unit: global___GstreamerBitrateUnit.ValueType | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["element", b"element", "property", b"property", "unit", b"unit"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["element", b"element", "property", b"property", "unit", b"unit"]) -> None: ...
+
+global___GstreamerRateControl = GstreamerRateControl
+
+@typing.final
+class GstreamerVideoSourceConfig(google.protobuf.message.Message):
+    """Encoded ingest from a GStreamer pipeline."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PIPELINE_FIELD_NUMBER: builtins.int
+    CODEC_FIELD_NUMBER: builtins.int
+    RESOLUTION_FIELD_NUMBER: builtins.int
+    RATE_CONTROL_FIELD_NUMBER: builtins.int
+    pipeline: builtins.str
+    """GStreamer launch description for the encoded producer pipeline.
+    Must contain `appsink name=lk_appsink`, or leave exactly one encoded
+    video source pad unlinked for the source to attach one to.
+    """
+    codec: video_frame_pb2.VideoCodec.ValueType
+    """Codec expected from the pipeline; inferred from pipeline caps when
+    omitted.
+    """
+    @property
+    def resolution(self) -> video_frame_pb2.VideoSourceResolution:
+        """Encoded frame resolution. When omitted, it is discovered from the
+        pipeline's negotiated caps; when set, the pipeline output is verified
+        against it.
+        """
+
+    @property
+    def rate_control(self) -> global___GstreamerRateControl:
+        """Forwards WebRTC rate-control targets to an encoder element's bitrate
+        property. Without this, the pipeline encodes at a fixed bitrate.
+        """
+
+    def __init__(
+        self,
+        *,
+        pipeline: builtins.str | None = ...,
+        codec: video_frame_pb2.VideoCodec.ValueType | None = ...,
+        resolution: video_frame_pb2.VideoSourceResolution | None = ...,
+        rate_control: global___GstreamerRateControl | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["codec", b"codec", "pipeline", b"pipeline", "rate_control", b"rate_control", "resolution", b"resolution"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["codec", b"codec", "pipeline", b"pipeline", "rate_control", b"rate_control", "resolution", b"resolution"]) -> None: ...
+
+global___GstreamerVideoSourceConfig = GstreamerVideoSourceConfig
 
 @typing.final
 class PatternVideoSourceConfig(google.protobuf.message.Message):
@@ -241,10 +355,13 @@ class NewCaptureSourceRequest(google.protobuf.message.Message):
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    GSTREAMER_FIELD_NUMBER: builtins.int
     PATTERN_FIELD_NUMBER: builtins.int
     CLOCK_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     request_async_id: builtins.int
+    @property
+    def gstreamer(self) -> global___GstreamerVideoSourceConfig: ...
     @property
     def pattern(self) -> global___PatternVideoSourceConfig: ...
     @property
@@ -252,13 +369,14 @@ class NewCaptureSourceRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
+        gstreamer: global___GstreamerVideoSourceConfig | None = ...,
         pattern: global___PatternVideoSourceConfig | None = ...,
         clock: global___ClockVideoSourceConfig | None = ...,
         request_async_id: builtins.int | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["clock", b"clock", "config", b"config", "pattern", b"pattern", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["clock", b"clock", "config", b"config", "pattern", b"pattern", "request_async_id", b"request_async_id"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing.Literal["config", b"config"]) -> typing.Literal["pattern", "clock"] | None: ...
+    def HasField(self, field_name: typing.Literal["clock", b"clock", "config", b"config", "gstreamer", b"gstreamer", "pattern", b"pattern", "request_async_id", b"request_async_id"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["clock", b"clock", "config", b"config", "gstreamer", b"gstreamer", "pattern", b"pattern", "request_async_id", b"request_async_id"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing.Literal["config", b"config"]) -> typing.Literal["gstreamer", "pattern", "clock"] | None: ...
 
 global___NewCaptureSourceRequest = NewCaptureSourceRequest
 
@@ -397,14 +515,17 @@ class CaptureError(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ERROR_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
     error: builtins.str
+    kind: global___CaptureErrorKind.ValueType
     def __init__(
         self,
         *,
         error: builtins.str | None = ...,
+        kind: global___CaptureErrorKind.ValueType | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing.Literal["error", b"error"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["error", b"error"]) -> None: ...
+    def HasField(self, field_name: typing.Literal["error", b"error", "kind", b"kind"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["error", b"error", "kind", b"kind"]) -> None: ...
 
 global___CaptureError = CaptureError
 

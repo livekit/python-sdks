@@ -47,8 +47,19 @@ class VideoFrame:
             type (proto_video.VideoBufferType.ValueType): The format type of the video frame data
                 (e.g., RGBA, BGRA, RGB24, etc.).
             data (Union[bytes, bytearray, memoryview]): The raw pixel data for the video frame.
+
+        Raises:
+            ValueError: If `data` is smaller than a frame of this size and type.
         """
         data = _ensure_compatible_buffer(data)
+
+        min_size = _get_plane_length(type, width, height)
+        data_size = data.nbytes if isinstance(data, memoryview) else len(data)
+        if data_size < min_size:
+            raise ValueError(
+                f"data length must be >= {min_size} bytes for a {width}x{height} "
+                f"{proto_video.VideoBufferType.Name(type)} frame, got {data_size}"
+            )
 
         self._width = width
         self._height = height

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import array
+import ctypes
 import io
 import types
 import wave
@@ -76,3 +77,14 @@ def test_serialized_frame_holds_only_the_frame_samples() -> None:
     data = adapter.dump_python(_frame([1, 2, 99, 99], samples_per_channel=2))
 
     assert list(adapter.validate_python(data).data) == [1, 2]
+
+
+def test_frame_from_a_read_only_numpy_buffer_can_be_captured() -> None:
+    # np.frombuffer returns a read-only array, so its memoryview is read-only too.
+    np = pytest.importorskip("numpy")
+    samples = bytes(range(8))
+    frame = rtc.AudioFrame(memoryview(np.frombuffer(samples, dtype=np.uint8)), 48000, 1, 4)
+
+    info = frame._proto_info()
+
+    assert ctypes.string_at(info.data_ptr, len(samples)) == samples

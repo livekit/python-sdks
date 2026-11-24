@@ -136,9 +136,19 @@ class AudioSource:
         req.capture_audio_frame.source_handle = self._ffi_handle.handle
         req.capture_audio_frame.buffer.CopyFrom(frame._proto_info())
 
-        queue = FfiClient.instance.queue.subscribe(loop=self._loop)
+        # The async_id is only known once the request returns; until then every capture
+        # callback is let through, and wait_for drops the ones of other captures.
+        async_id: int | None = None
+        queue = FfiClient.instance.queue.subscribe(
+            loop=self._loop,
+            filter_fn=lambda e: (
+                e.WhichOneof("message") == "capture_audio_frame"
+                and (async_id is None or e.capture_audio_frame.async_id == async_id)
+            ),
+        )
         try:
             resp = FfiClient.instance.request(req)
+            async_id = resp.capture_audio_frame.async_id
             cb: proto_ffi.FfiEvent = await queue.wait_for(
                 lambda e: e.capture_audio_frame.async_id == resp.capture_audio_frame.async_id
             )

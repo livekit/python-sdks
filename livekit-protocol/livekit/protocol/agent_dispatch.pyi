@@ -12,11 +12,22 @@ class JobRestartPolicy(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     JRP_ON_FAILURE: _ClassVar[JobRestartPolicy]
     JRP_NEVER: _ClassVar[JobRestartPolicy]
+
+class AgentDispatchTrigger(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    ADT_UNSPECIFIED: _ClassVar[AgentDispatchTrigger]
+    ADT_JOIN: _ClassVar[AgentDispatchTrigger]
+    ADT_ROOM_API: _ClassVar[AgentDispatchTrigger]
+    ADT_DISPATCH_API: _ClassVar[AgentDispatchTrigger]
 JRP_ON_FAILURE: JobRestartPolicy
 JRP_NEVER: JobRestartPolicy
+ADT_UNSPECIFIED: AgentDispatchTrigger
+ADT_JOIN: AgentDispatchTrigger
+ADT_ROOM_API: AgentDispatchTrigger
+ADT_DISPATCH_API: AgentDispatchTrigger
 
 class CreateAgentDispatchRequest(_message.Message):
-    __slots__ = ("agent_name", "room", "metadata", "restart_policy", "deployment", "attributes")
+    __slots__ = ("agent_name", "room", "metadata", "restart_policy", "deployment", "attributes", "thread_id")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -30,16 +41,18 @@ class CreateAgentDispatchRequest(_message.Message):
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    THREAD_ID_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     room: str
     metadata: str
     restart_policy: JobRestartPolicy
     deployment: str
     attributes: _containers.ScalarMap[str, str]
-    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    thread_id: str
+    def __init__(self, agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., thread_id: _Optional[str] = ...) -> None: ...
 
 class RoomAgentDispatch(_message.Message):
-    __slots__ = ("agent_name", "metadata", "restart_policy", "deployment", "attributes")
+    __slots__ = ("agent_name", "metadata", "restart_policy", "deployment", "attributes", "thread_id")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -52,12 +65,14 @@ class RoomAgentDispatch(_message.Message):
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    THREAD_ID_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     metadata: str
     restart_policy: JobRestartPolicy
     deployment: str
     attributes: _containers.ScalarMap[str, str]
-    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    thread_id: str
+    def __init__(self, agent_name: _Optional[str] = ..., metadata: _Optional[str] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., thread_id: _Optional[str] = ...) -> None: ...
 
 class DeleteAgentDispatchRequest(_message.Message):
     __slots__ = ("dispatch_id", "room")
@@ -82,7 +97,7 @@ class ListAgentDispatchResponse(_message.Message):
     def __init__(self, agent_dispatches: _Optional[_Iterable[_Union[AgentDispatch, _Mapping]]] = ...) -> None: ...
 
 class AgentDispatch(_message.Message):
-    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy", "deployment", "attributes")
+    __slots__ = ("id", "agent_name", "room", "metadata", "state", "restart_policy", "deployment", "attributes", "thread_id")
     class AttributesEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -98,6 +113,7 @@ class AgentDispatch(_message.Message):
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_FIELD_NUMBER: _ClassVar[int]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    THREAD_ID_FIELD_NUMBER: _ClassVar[int]
     id: str
     agent_name: str
     room: str
@@ -106,14 +122,17 @@ class AgentDispatch(_message.Message):
     restart_policy: JobRestartPolicy
     deployment: str
     attributes: _containers.ScalarMap[str, str]
-    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    thread_id: str
+    def __init__(self, id: _Optional[str] = ..., agent_name: _Optional[str] = ..., room: _Optional[str] = ..., metadata: _Optional[str] = ..., state: _Optional[_Union[AgentDispatchState, _Mapping]] = ..., restart_policy: _Optional[_Union[JobRestartPolicy, str]] = ..., deployment: _Optional[str] = ..., attributes: _Optional[_Mapping[str, str]] = ..., thread_id: _Optional[str] = ...) -> None: ...
 
 class AgentDispatchState(_message.Message):
-    __slots__ = ("jobs", "created_at", "deleted_at")
+    __slots__ = ("jobs", "created_at", "deleted_at", "trigger")
     JOBS_FIELD_NUMBER: _ClassVar[int]
     CREATED_AT_FIELD_NUMBER: _ClassVar[int]
     DELETED_AT_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_FIELD_NUMBER: _ClassVar[int]
     jobs: _containers.RepeatedCompositeFieldContainer[_agent.Job]
     created_at: int
     deleted_at: int
-    def __init__(self, jobs: _Optional[_Iterable[_Union[_agent.Job, _Mapping]]] = ..., created_at: _Optional[int] = ..., deleted_at: _Optional[int] = ...) -> None: ...
+    trigger: AgentDispatchTrigger
+    def __init__(self, jobs: _Optional[_Iterable[_Union[_agent.Job, _Mapping]]] = ..., created_at: _Optional[int] = ..., deleted_at: _Optional[int] = ..., trigger: _Optional[_Union[AgentDispatchTrigger, str]] = ...) -> None: ...

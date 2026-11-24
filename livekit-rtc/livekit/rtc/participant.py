@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 
-import ctypes
 import asyncio
 import functools
 import inspect
@@ -42,7 +41,7 @@ from ._proto.room_pb2 import (
 from ._proto.track_pb2 import (
     ParticipantTrackPermission,
 )
-from ._utils import BroadcastQueue
+from ._utils import BroadcastQueue, get_address
 from .track import LocalTrack
 from .track_publication import (
     LocalTrackPublication,
@@ -336,11 +335,10 @@ class LocalParticipant(Participant):
             payload = payload.encode("utf-8")
 
         data_len = len(payload)
-        cdata = (ctypes.c_byte * data_len)(*payload)
 
         req = proto_ffi.FfiRequest()
         req.publish_data.local_participant_handle = self._ffi_handle.handle
-        req.publish_data.data_ptr = ctypes.addressof(cdata)
+        req.publish_data.data_ptr = get_address(payload)
         req.publish_data.data_len = data_len
         req.publish_data.reliable = reliable
         req.publish_data.topic = topic

@@ -1,3 +1,6 @@
+from google.protobuf import duration_pb2 as _duration_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from .logger_pb import options as _options_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -9,19 +12,17 @@ DESCRIPTOR: _descriptor.FileDescriptor
 class AgentDB(_message.Message):
     __slots__ = ()
     class CreateRequest(_message.Message):
-        __slots__ = ("region", "ttl_seconds")
-        REGION_FIELD_NUMBER: _ClassVar[int]
-        TTL_SECONDS_FIELD_NUMBER: _ClassVar[int]
-        region: str
-        ttl_seconds: int
-        def __init__(self, region: _Optional[str] = ..., ttl_seconds: _Optional[int] = ...) -> None: ...
+        __slots__ = ("ttl",)
+        TTL_FIELD_NUMBER: _ClassVar[int]
+        ttl: _duration_pb2.Duration
+        def __init__(self, ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
     class CreateResponse(_message.Message):
         __slots__ = ("database_id", "expires_at")
         DATABASE_ID_FIELD_NUMBER: _ClassVar[int]
         EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
         database_id: str
-        expires_at: int
-        def __init__(self, database_id: _Optional[str] = ..., expires_at: _Optional[int] = ...) -> None: ...
+        expires_at: _timestamp_pb2.Timestamp
+        def __init__(self, database_id: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
     class GetRequest(_message.Message):
         __slots__ = ("database_id",)
         DATABASE_ID_FIELD_NUMBER: _ClassVar[int]
@@ -50,10 +51,10 @@ class AgentDB(_message.Message):
         TIP_FIELD_NUMBER: _ClassVar[int]
         database_id: str
         region: str
-        created_at: int
-        expires_at: int
+        created_at: _timestamp_pb2.Timestamp
+        expires_at: _timestamp_pb2.Timestamp
         tip: int
-        def __init__(self, database_id: _Optional[str] = ..., region: _Optional[str] = ..., created_at: _Optional[int] = ..., expires_at: _Optional[int] = ..., tip: _Optional[int] = ...) -> None: ...
+        def __init__(self, database_id: _Optional[str] = ..., region: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., tip: _Optional[int] = ...) -> None: ...
     class DeleteRequest(_message.Message):
         __slots__ = ("database_id",)
         DATABASE_ID_FIELD_NUMBER: _ClassVar[int]
@@ -62,20 +63,20 @@ class AgentDB(_message.Message):
     class DeleteResponse(_message.Message):
         __slots__ = ()
         def __init__(self) -> None: ...
-    class DumpRequest(_message.Message):
+    class ExportRequest(_message.Message):
         __slots__ = ("database_id",)
         DATABASE_ID_FIELD_NUMBER: _ClassVar[int]
         database_id: str
         def __init__(self, database_id: _Optional[str] = ...) -> None: ...
-    class DumpResponse(_message.Message):
+    class ExportResponse(_message.Message):
         __slots__ = ("download_url", "expires_at", "tip")
         DOWNLOAD_URL_FIELD_NUMBER: _ClassVar[int]
         EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
         TIP_FIELD_NUMBER: _ClassVar[int]
         download_url: str
-        expires_at: int
+        expires_at: _timestamp_pb2.Timestamp
         tip: int
-        def __init__(self, download_url: _Optional[str] = ..., expires_at: _Optional[int] = ..., tip: _Optional[int] = ...) -> None: ...
+        def __init__(self, download_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., tip: _Optional[int] = ...) -> None: ...
     class Wire(_message.Message):
         __slots__ = ()
         class QueryLang(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
@@ -211,10 +212,12 @@ class AgentDB(_message.Message):
             ping_timeout_ms: int
             def __init__(self, tip: _Optional[int] = ..., ping_interval_ms: _Optional[int] = ..., ping_timeout_ms: _Optional[int] = ...) -> None: ...
         class Columns(_message.Message):
-            __slots__ = ("names",)
+            __slots__ = ("names", "statement")
             NAMES_FIELD_NUMBER: _ClassVar[int]
+            STATEMENT_FIELD_NUMBER: _ClassVar[int]
             names: _containers.RepeatedScalarFieldContainer[str]
-            def __init__(self, names: _Optional[_Iterable[str]] = ...) -> None: ...
+            statement: int
+            def __init__(self, names: _Optional[_Iterable[str]] = ..., statement: _Optional[int] = ...) -> None: ...
         class Column(_message.Message):
             __slots__ = ("types", "ints", "doubles", "text_data", "text_ends", "blob_data", "blob_ends")
             TYPES_FIELD_NUMBER: _ClassVar[int]
@@ -233,21 +236,25 @@ class AgentDB(_message.Message):
             blob_ends: _containers.RepeatedScalarFieldContainer[int]
             def __init__(self, types: _Optional[bytes] = ..., ints: _Optional[_Iterable[int]] = ..., doubles: _Optional[_Iterable[float]] = ..., text_data: _Optional[bytes] = ..., text_ends: _Optional[_Iterable[int]] = ..., blob_data: _Optional[bytes] = ..., blob_ends: _Optional[_Iterable[int]] = ...) -> None: ...
         class ColumnBatch(_message.Message):
-            __slots__ = ("columns", "rows")
+            __slots__ = ("columns", "rows", "statement")
             COLUMNS_FIELD_NUMBER: _ClassVar[int]
             ROWS_FIELD_NUMBER: _ClassVar[int]
+            STATEMENT_FIELD_NUMBER: _ClassVar[int]
             columns: _containers.RepeatedCompositeFieldContainer[AgentDB.Wire.Column]
             rows: int
-            def __init__(self, columns: _Optional[_Iterable[_Union[AgentDB.Wire.Column, _Mapping]]] = ..., rows: _Optional[int] = ...) -> None: ...
+            statement: int
+            def __init__(self, columns: _Optional[_Iterable[_Union[AgentDB.Wire.Column, _Mapping]]] = ..., rows: _Optional[int] = ..., statement: _Optional[int] = ...) -> None: ...
         class ExecResult(_message.Message):
-            __slots__ = ("rows_affected", "last_insert_id", "tip")
+            __slots__ = ("rows_affected", "last_insert_id", "tip", "statement")
             ROWS_AFFECTED_FIELD_NUMBER: _ClassVar[int]
             LAST_INSERT_ID_FIELD_NUMBER: _ClassVar[int]
             TIP_FIELD_NUMBER: _ClassVar[int]
+            STATEMENT_FIELD_NUMBER: _ClassVar[int]
             rows_affected: int
             last_insert_id: int
             tip: int
-            def __init__(self, rows_affected: _Optional[int] = ..., last_insert_id: _Optional[int] = ..., tip: _Optional[int] = ...) -> None: ...
+            statement: int
+            def __init__(self, rows_affected: _Optional[int] = ..., last_insert_id: _Optional[int] = ..., tip: _Optional[int] = ..., statement: _Optional[int] = ...) -> None: ...
         class Done(_message.Message):
             __slots__ = ("tip", "total_rows")
             TIP_FIELD_NUMBER: _ClassVar[int]

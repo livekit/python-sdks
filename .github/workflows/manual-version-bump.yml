@@ -1,0 +1,152 @@
+name: Manual Version Bump
+
+# Fallback for the changeset flow: bump one package by hand and open a release
+# PR. Merging that PR publishes through the Package Release workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Package to publish"
+        type: choice
+        required: true
+        options:
+          - livekit
+          - livekit-api
+          - livekit-protocol
+      version:
+        description: "What to publish"
+        type: choice
+        required: true
+        options:
+          - "patch       (1.5.1 → 1.5.2)"
+          - "minor       (1.5.1 → 1.6.0)"
+          - "major       (1.5.1 → 2.0.0)"
+          - "patch-rc    (1.5.1 → 1.5.2.rc1)"
+          - "minor-rc    (1.5.1 → 1.6.0.rc1)"
+          - "major-rc    (1.5.1 → 2.0.0.rc1)"
+          - "next-rc     (.rc1 → .rc2)"
+          - "promote     (1.6.0.rc2 → 1.6.0)"
+      branch:
+        description: "Branch to publish from (default: main)"
+        type: string
+        required: false
+        default: "main"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    name: Create release PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ inputs.branch }}
+          submodules: true
+
+      - name: Guard non-main branches
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+        run: |
+          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
+          if [ "$INPUT_BRANCH" != "main" ]; then
+            case "$key" in
+              *-rc|next-rc) ;; # allowed
+              *) echo "::error::Only RC releases are allowed from non-main branches (got '$key' on '$INPUT_BRANCH')"; exit 1 ;;
+            esac
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install click packaging
+
+      - name: Bump version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
+          pkg="$INPUT_PACKAGE"
+
+          case "$key" in
+            patch|minor|major)
+              python .github/update_versions.py --package "$pkg" --bump-type "$key"
+              ;;
+            patch-rc|minor-rc|major-rc)
+              bump="${key%-rc}"
+              python .github/update_versions.py --package "$pkg" --bump-type "$bump"
+              python .github/update_versions.py --package "$pkg" --pre rc
+              ;;
+            next-rc)
+              python .github/update_versions.py --package "$pkg" --pre rc
+              ;;
+            promote)
+              python .github/update_versions.py --package "$pkg" --bump-type release
+              ;;
+          esac
+
+      - name: Read new version
+        id: version
+        env:
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          eval "$(python .github/update_versions.py --package "$INPUT_PACKAGE" --print-version)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag_prefix=$tag_prefix" >> "$GITHUB_OUTPUT"
+          echo "Package: $INPUT_PACKAGE, New version: $version, Tag: ${tag_prefix}-v${version}"
+
+      - name: Close existing release PRs for this package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
+        run: |
+          prefix="release/${TAG_PREFIX}-v"
+          gh pr list --state open --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"$prefix\")) | .number" | while read -r pr; do
+            echo "Superseding release PR #$pr"
+            gh pr comment "$pr" --body "Superseded by a new release."
+            gh pr close "$pr" --delete-branch || true
+          done
+
+      - name: Create release PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG_PREFIX: ${{ steps.version.outputs.tag_prefix }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_VERSION: ${{ inputs.version }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          branch="release/${TAG_PREFIX}-v${VERSION}"
+          key=$(echo "$INPUT_VERSION" | awk '{print $1}')
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "${TAG_PREFIX}-v${VERSION}"
+          git push --force origin "$branch"
+
+          # Same section format as the changeset release PR, so Package Release
+          # can take the GitHub release notes from it.
+          {
+            echo "Merging this PR will publish the following packages to PyPI:"
+            echo
+            echo "## ${INPUT_PACKAGE} v${VERSION} (${key})"
+            echo
+            echo "- Manual version bump by @${ACTOR}."
+          } > "$RUNNER_TEMP/pr-body.md"
+
+          gh pr create \
+            --base "$INPUT_BRANCH" \
+            --head "$branch" \
+            --title "${INPUT_PACKAGE} v${VERSION}" \
+            --body-file "$RUNNER_TEMP/pr-body.md"

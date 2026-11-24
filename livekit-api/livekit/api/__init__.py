@@ -44,12 +44,15 @@ from .twirp_client import (
     TwirpErrorCode,
 )
 from .livekit_api import LiveKitAPI
+from ._service import TokenProvider
 from .access_token import (
+    TokenGrants,
     InferenceGrants,
     ObservabilityGrants,
     AgentGrants,
     AgentEndpointGrants,
     AgentThreadGrants,
+    AgentDatabaseGrants,
     VideoGrants,
     SIPGrants,
     AccessToken,
@@ -60,6 +63,8 @@ from .version import __version__
 
 __all__ = [
     "LiveKitAPI",
+    "TokenProvider",
+    "TokenGrants",
     "room_service",
     "egress_service",
     "ingress_service",
@@ -71,6 +76,7 @@ __all__ = [
     "AgentGrants",
     "AgentEndpointGrants",
     "AgentThreadGrants",
+    "AgentDatabaseGrants",
     "VideoGrants",
     "SIPGrants",
     "AccessToken",
