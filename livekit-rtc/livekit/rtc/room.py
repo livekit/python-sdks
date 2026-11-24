@@ -32,6 +32,7 @@ from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
 from ._proto.track_pb2 import TrackKind
 from ._utils import BroadcastQueue, Queue
+from .audio_source import AudioSource
 from .data_stream import (
     ByteStreamHandler,
     ByteStreamReader,
@@ -48,7 +49,7 @@ from .participant import (
     RemoteParticipant,
     _connection_quality_from_proto,
 )
-from .track import LocalTrack, RemoteAudioTrack, RemoteVideoTrack
+from .track import LocalAudioTrack, LocalTrack, RemoteAudioTrack, RemoteVideoTrack
 from .track_publication import LocalTrackPublication, RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
 
@@ -116,6 +117,25 @@ class DataStreamOptions:
 
 
 @dataclass
+class AudioTrackToPublish:
+    """Describe an audio publication whose native track is created during connection.
+
+    The source accepts PCM later; no capture device or generated audio is required.
+    Do not modify or reuse a descriptor while its connection attempt is in progress.
+    """
+
+    source: AudioSource
+    name: str = "audio"
+    options: proto_room.TrackPublishOptions = field(default_factory=proto_room.TrackPublishOptions)
+    _track: LocalAudioTrack | None = field(default=None, init=False, repr=False, compare=False)
+
+    @property
+    def track(self) -> LocalAudioTrack | None:
+        """The track returned by a successful connection, or None before completion."""
+        return self._track
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     """Automatically subscribe to tracks when participants join."""
@@ -140,6 +160,12 @@ class RoomOptions:
     Prepare sources without capturing media first. Supported servers can bundle publication
     with JOIN; other configurations use normal publication. Publications are available through
     ``local_participant.track_publications`` after connect. Do not publish these tracks again.
+    """
+    publish_audio_tracks: list[AudioTrackToPublish] = field(default_factory=list)
+    """Audio sources and publication settings prepared natively inside connect.
+
+    Use this instead of constructing a local audio track first to keep native setup off the
+    caller's event loop. Created tracks are available on each descriptor after connect.
     """
 
 
@@ -496,6 +522,12 @@ class Room(EventEmitter[EventTypes]):
         if len(initial_tracks) != len(options.publish_tracks):
             raise ValueError("publish_tracks contains the same track more than once")
 
+        initial_audio = list(options.publish_audio_tracks)
+        if len({id(audio) for audio in initial_audio}) != len(initial_audio):
+            raise ValueError("publish_audio_tracks contains the same descriptor more than once")
+        for audio in initial_audio:
+            audio._track = None
+
         self._server_url = url
         self._token = token
         self._is_connecting = True
@@ -507,6 +539,12 @@ class Room(EventEmitter[EventTypes]):
         for track, publish_options in options.publish_tracks:
             initial = req.connect.publish_tracks.add(track_handle=track._ffi_handle.handle)
             initial.options.CopyFrom(publish_options)
+
+        for audio in initial_audio:
+            initial = req.connect.publish_audio_tracks.add(
+                source_handle=audio.source._ffi_handle.handle, name=audio.name
+            )
+            initial.options.CopyFrom(audio.options)
 
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
@@ -599,7 +637,7 @@ class Room(EventEmitter[EventTypes]):
             queue = FfiClient.instance.queue.subscribe()
             try:
                 resp = FfiClient.instance.request(req)
-                if initial_tracks:
+                if initial_tracks or initial_audio:
                     cb = await self._wait_prepared_connect(queue, resp.connect.async_id)
                 else:
                     cb = await queue.wait_for(lambda e: e.connect.async_id == resp.connect.async_id)
@@ -625,7 +663,11 @@ class Room(EventEmitter[EventTypes]):
             )
 
             for initial in cb.connect.result.local_publications:
-                track = initial_tracks[initial.track_handle]
+                if initial.HasField("track"):
+                    track = LocalAudioTrack(initial.track)
+                    initial_audio[initial.audio_track_index]._track = track
+                else:
+                    track = initial_tracks[initial.track_handle]
                 publication = LocalTrackPublication(initial.publication)
                 publication._track = track
                 track._info.sid = publication.sid
@@ -711,6 +753,8 @@ class Room(EventEmitter[EventTypes]):
             FfiHandle(result.local_participant.handle.id).dispose()
             for initial in result.local_publications:
                 FfiHandle(initial.publication.handle.id).dispose()
+                if initial.HasField("track"):
+                    FfiHandle(initial.track.handle.id).dispose()
             for participant in result.participants:
                 FfiHandle(participant.participant.handle.id).dispose()
                 for publication in participant.publications:

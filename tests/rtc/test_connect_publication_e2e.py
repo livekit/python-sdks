@@ -30,12 +30,14 @@ def token(room, identity):
     )
 
 
-async def round_trip(single_pc, prepared):
+async def round_trip(single_pc, mode):
     name = "prepared-audio-" + uuid.uuid4().hex[:12]
     receiver, sender = rtc.Room(), rtc.Room()
     source = rtc.AudioSource(24000, 1)
-    track = rtc.LocalAudioTrack.create_audio_track("prepared", source)
+    track = None if mode == "source" else rtc.LocalAudioTrack.create_audio_track("prepared", source)
     options = rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE)
+    audio = rtc.AudioTrackToPublish(source=source, name="prepared", options=options)
+    prepared = mode != "normal"
     subscribed = asyncio.get_running_loop().create_future()
     receiver.on("track_subscribed", lambda remote, *_: subscribed.set_result(remote))
     stream = None
@@ -46,9 +48,13 @@ async def round_trip(single_pc, prepared):
             token(name, "agent"),
             rtc.RoomOptions(
                 single_peer_connection=single_pc,
-                publish_tracks=[(track, options)] if prepared else [],
+                publish_tracks=[(track, options)] if mode == "existing" else [],
+                publish_audio_tracks=[audio] if mode == "source" else [],
             ),
         )
+        if mode == "source":
+            track = audio.track
+            assert track is not None
         if prepared:
             assert len(sender.local_participant.track_publications) == 1
             publication = next(iter(sender.local_participant.track_publications.values()))
@@ -98,21 +104,28 @@ async def round_trip(single_pc, prepared):
 
 
 @pytest.mark.parametrize("single_pc", [False, True])
-@pytest.mark.parametrize("prepared", [False, True])
-async def test_audio_after_prepared_or_normal_publication(single_pc, prepared):
+@pytest.mark.parametrize("mode", ["normal", "existing", "source"])
+async def test_audio_after_prepared_or_normal_publication(single_pc, mode):
     for _ in range(2):
-        references = await round_trip(single_pc, prepared)
+        references = await round_trip(single_pc, mode)
         gc.collect()
         assert all(reference() is None for reference in references)
 
 
 @pytest.mark.parametrize("cancel", [False, True])
-async def test_failed_or_cancelled_connect_releases_prepared_track(cancel):
+@pytest.mark.parametrize("native_source", [False, True])
+async def test_failed_or_cancelled_connect_releases_prepared_track(cancel, native_source):
     source = rtc.AudioSource(24000, 1)
-    track = rtc.LocalAudioTrack.create_audio_track("prepared", source)
-    refs = [weakref.ref(source), weakref.ref(track)]
+    track = None if native_source else rtc.LocalAudioTrack.create_audio_track("prepared", source)
+    audio = rtc.AudioTrackToPublish(source=source, name="prepared")
+    refs = [weakref.ref(source), weakref.ref(audio)]
+    if track is not None:
+        refs.append(weakref.ref(track))
     room = rtc.Room()
-    connect_options = rtc.RoomOptions(publish_tracks=[(track, rtc.TrackPublishOptions())])
+    connect_options = rtc.RoomOptions(
+        publish_tracks=[] if native_source else [(track, rtc.TrackPublishOptions())],
+        publish_audio_tracks=[audio] if native_source else [],
+    )
     connecting = asyncio.create_task(
         room.connect(os.environ["LIVEKIT_URL"], "invalid-token", connect_options)
     )
@@ -127,22 +140,32 @@ async def test_failed_or_cancelled_connect_releases_prepared_track(cancel):
     assert not room.isconnected()
     assert room._local_participant is None
     await source.aclose()
-    del source, track, connecting, connect_options
+    assert audio.track is None
+    del source, track, audio, connecting, connect_options
     # A completed task can remain in the event loop's current callback until it yields.
     await asyncio.sleep(0)
     gc.collect()
     assert all(reference() is None for reference in refs)
 
 
-async def test_cancelled_successful_connect_reclaims_publication():
+@pytest.mark.parametrize("native_source", [False, True])
+async def test_cancelled_successful_connect_reclaims_publication(native_source):
     """A late successful callback must be disconnected and its owned handles released."""
     for _ in range(2):
         name = "cancel-prepared-" + uuid.uuid4().hex[:12]
         room = rtc.Room()
         source = rtc.AudioSource(24000, 1)
-        track = rtc.LocalAudioTrack.create_audio_track("cancelled", source)
-        refs = [weakref.ref(source), weakref.ref(track)]
-        options = rtc.RoomOptions(publish_tracks=[(track, rtc.TrackPublishOptions())])
+        track = (
+            None if native_source else rtc.LocalAudioTrack.create_audio_track("cancelled", source)
+        )
+        audio = rtc.AudioTrackToPublish(source=source, name="cancelled")
+        refs = [weakref.ref(source), weakref.ref(audio)]
+        if track is not None:
+            refs.append(weakref.ref(track))
+        options = rtc.RoomOptions(
+            publish_tracks=[] if native_source else [(track, rtc.TrackPublishOptions())],
+            publish_audio_tracks=[audio] if native_source else [],
+        )
         connecting = asyncio.create_task(
             room.connect(os.environ["LIVEKIT_URL"], token(name, "agent"), options)
         )
@@ -158,7 +181,30 @@ async def test_cancelled_successful_connect_reclaims_publication():
         finally:
             async with api.LiveKitAPI() as client:
                 await client.room.delete_room(api.DeleteRoomRequest(room=name))
-        del source, track, connecting, options
+        assert audio.track is None
+        del source, track, audio, connecting, options
         await asyncio.sleep(0)
         gc.collect()
         assert all(reference() is None for reference in refs)
+
+
+async def test_partial_audio_source_validation_releases_borrowed_sources():
+    from types import SimpleNamespace
+
+    source = rtc.AudioSource(24000, 1)
+    room = rtc.Room()
+    audio = rtc.AudioTrackToPublish(source=source)
+    invalid = rtc.AudioTrackToPublish(
+        source=SimpleNamespace(_ffi_handle=SimpleNamespace(handle=2**64 - 1))
+    )
+    try:
+        with pytest.raises(rtc.ConnectError, match="handle not found"):
+            await room.connect(
+                "wss://unused.invalid",
+                "unused",
+                rtc.RoomOptions(publish_audio_tracks=[audio, invalid]),
+            )
+        assert audio.track is None and invalid.track is None
+        assert room._local_participant is None
+    finally:
+        await source.aclose()

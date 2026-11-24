@@ -258,6 +258,33 @@ class InitialTrack(google.protobuf.message.Message):
 global___InitialTrack = InitialTrack
 
 @typing.final
+class InitialAudioTrack(google.protobuf.message.Message):
+    """An audio publication described without constructing a native track on the caller thread.
+    The caller retains ownership of the source handle. Options include all codec/encoding settings.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
+    name: builtins.str
+    @property
+    def options(self) -> global___TrackPublishOptions: ...
+    def __init__(
+        self,
+        *,
+        source_handle: builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        options: global___TrackPublishOptions | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "options", b"options", "source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "options", b"options", "source_handle", b"source_handle"]) -> None: ...
+
+global___InitialAudioTrack = InitialAudioTrack
+
+@typing.final
 class ConnectRequest(google.protobuf.message.Message):
     """Connect to a new LiveKit room"""
 
@@ -268,6 +295,7 @@ class ConnectRequest(google.protobuf.message.Message):
     OPTIONS_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
     PUBLISH_TRACKS_FIELD_NUMBER: builtins.int
+    PUBLISH_AUDIO_TRACKS_FIELD_NUMBER: builtins.int
     url: builtins.str
     token: builtins.str
     request_async_id: builtins.int
@@ -275,6 +303,8 @@ class ConnectRequest(google.protobuf.message.Message):
     def options(self) -> global___RoomOptions: ...
     @property
     def publish_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___InitialTrack]: ...
+    @property
+    def publish_audio_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___InitialAudioTrack]: ...
     def __init__(
         self,
         *,
@@ -283,9 +313,10 @@ class ConnectRequest(google.protobuf.message.Message):
         options: global___RoomOptions | None = ...,
         request_async_id: builtins.int | None = ...,
         publish_tracks: collections.abc.Iterable[global___InitialTrack] | None = ...,
+        publish_audio_tracks: collections.abc.Iterable[global___InitialAudioTrack] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["options", b"options", "publish_tracks", b"publish_tracks", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "publish_audio_tracks", b"publish_audio_tracks", "publish_tracks", b"publish_tracks", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> None: ...
 
 global___ConnectRequest = ConnectRequest
 
@@ -338,17 +369,26 @@ class ConnectCallback(google.protobuf.message.Message):
 
         TRACK_HANDLE_FIELD_NUMBER: builtins.int
         PUBLICATION_FIELD_NUMBER: builtins.int
+        TRACK_FIELD_NUMBER: builtins.int
+        AUDIO_TRACK_INDEX_FIELD_NUMBER: builtins.int
         track_handle: builtins.int
+        audio_track_index: builtins.int
         @property
         def publication(self) -> track_pb2.OwnedTrackPublication: ...
+        @property
+        def track(self) -> track_pb2.OwnedTrack:
+            """Present only for a track constructed from publish_audio_tracks by this connect."""
+
         def __init__(
             self,
             *,
             track_handle: builtins.int | None = ...,
             publication: track_pb2.OwnedTrackPublication | None = ...,
+            track: track_pb2.OwnedTrack | None = ...,
+            audio_track_index: builtins.int | None = ...,
         ) -> None: ...
-        def HasField(self, field_name: typing.Literal["publication", b"publication", "track_handle", b"track_handle"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["publication", b"publication", "track_handle", b"track_handle"]) -> None: ...
+        def HasField(self, field_name: typing.Literal["audio_track_index", b"audio_track_index", "publication", b"publication", "track", b"track", "track_handle", b"track_handle"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["audio_track_index", b"audio_track_index", "publication", b"publication", "track", b"track", "track_handle", b"track_handle"]) -> None: ...
 
     @typing.final
     class Result(google.protobuf.message.Message):
