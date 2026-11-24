@@ -1,5 +1,21 @@
 # React + TypeScript + Vite
 
+## Local checks
+
+Use Node.js 24 and the pnpm version pinned in `package.json`:
+
+```sh
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm run lint
+pnpm run build
+```
+
+The build uses TypeScript 7 through the `@typescript/native` npm alias, which
+provides `tsc`. ESLint needs the TypeScript compiler API, which TypeScript 7.0
+does not expose, so `typescript` aliases `@typescript/typescript6` for linting.
+Keep these aliases separate until typescript-eslint supports the native API.
+See the [TypeScript side-by-side guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
