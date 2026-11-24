@@ -31,18 +31,18 @@ def combine_audio_frames(buffer: AudioFrame | list[AudioFrame]) -> AudioFrame:
 
     Example:
         >>> frame1 = rtc.AudioFrame(
-        ...     data=b"\x01\x02", sample_rate=48000, num_channels=2, samples_per_channel=1
+        ...     data=b"\x01\x00", sample_rate=48000, num_channels=1, samples_per_channel=1
         ... )
         >>> frame2 = rtc.AudioFrame(
-        ...     data=b"\x03\x04", sample_rate=48000, num_channels=2, samples_per_channel=1
+        ...     data=b"\x02\x00", sample_rate=48000, num_channels=1, samples_per_channel=1
         ... )
         >>> combined_frame = combine_audio_frames([frame1, frame2])
-        >>> combined_frame.data
-        b'\x01\x02\x03\x04'
+        >>> combined_frame.data.tobytes()
+        b'\x01\x00\x02\x00'
         >>> combined_frame.sample_rate
         48000
         >>> combined_frame.num_channels
-        2
+        1
         >>> combined_frame.samples_per_channel
         2
     """
@@ -69,7 +69,7 @@ def combine_audio_frames(buffer: AudioFrame | list[AudioFrame]) -> AudioFrame:
                 f"Channel count mismatch: expected {num_channels}, got {frame.num_channels}"
             )
 
-        total_data_length += len(frame.data)
+        total_data_length += frame.data.nbytes
         total_samples_per_channel += frame.samples_per_channel
 
     data = bytearray(total_data_length)
