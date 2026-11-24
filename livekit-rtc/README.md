@@ -4,6 +4,42 @@ Python SDK to integrate LiveKit's real-time video, audio, and data capabilities 
 
 See https://docs.livekit.io/ for more information.
 
+## Publishing prepared tracks during connection
+
+Describe the audio source and complete publication options when connecting. Rust
+creates the native track on its blocking pool inside the asynchronous connection
+task, keeping cold native initialization off the Python event loop. Audio generation
+can run concurrently; no PCM or capture device is needed to prepare the publication.
+
+```python
+from livekit import rtc
+
+source = rtc.AudioSource(sample_rate=24000, num_channels=1)
+audio = rtc.AudioTrackToPublish(
+    source=source,
+    name="agent_audio",
+    options=rtc.TrackPublishOptions(source=rtc.TrackSource.SOURCE_MICROPHONE),
+)
+await room.connect(url, token, rtc.RoomOptions(publish_audio_tracks=[audio]))
+track = audio.track  # Created by Rust and returned after successful connection.
+publication = next(p for p in room.local_participant.track_publications.values()
+                   if p.track is track)
+# Push generated audio later with await source.capture_frame(frame).
+# At shutdown:
+await room.local_participant.unpublish_track(publication.sid)
+await source.aclose()
+```
+
+If a local track already exists, use `RoomOptions(publish_tracks=[(track, options)])`
+instead. Both paths preserve full publication options. Single-PC connections can
+bundle these publications into JOIN on supporting servers; other configurations
+use ordinary publication. Do not publish these tracks again after connect.
+
+This requires the matching native FFI build. Keep each audio descriptor within one
+connection attempt at a time and do not modify it while connecting. Cancellation
+waits for the native connection attempt to finish and cleans up any unclaimed room,
+publication and newly created track. The caller retains ownership of the source.
+
 ## Publishing pre-encoded video
 
 Use `EncodedVideoSource` when an upstream encoder already provides compressed

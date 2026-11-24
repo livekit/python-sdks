@@ -13,15 +13,15 @@
 # limitations under the License.
 from __future__ import annotations
 
-import datetime
 import asyncio
 import ctypes
+import datetime
 import logging
-from dataclasses import dataclass, field
-from typing import Callable, Dict, Literal, Optional, cast, Mapping
 import warnings
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Callable, Dict, Literal, Optional, cast
 
-from .event_emitter import EventEmitter
 from ._ffi_client import FfiClient, FfiHandle
 from ._proto import ffi_pb2 as proto_ffi
 from ._proto import participant_pb2 as proto_participant
@@ -29,10 +29,19 @@ from ._proto import room_pb2 as proto_room
 from ._proto import stats_pb2 as proto_stats
 from ._proto.participant_pb2 import DisconnectReason
 from ._proto.room_pb2 import ConnectionState, SimulateScenarioKind
-from ._proto.track_pb2 import TrackKind
 from ._proto.rpc_pb2 import RpcMethodInvocationEvent
-from ._utils import BroadcastQueue
+from ._proto.track_pb2 import TrackKind
+from ._utils import BroadcastQueue, Queue
+from .audio_source import AudioSource
+from .data_stream import (
+    ByteStreamHandler,
+    ByteStreamReader,
+    TextStreamHandler,
+    TextStreamReader,
+)
+from .data_track import RemoteDataTrack
 from .e2ee import E2EEManager, E2EEOptions
+from .event_emitter import EventEmitter
 from .log import logger
 from .participant import (
     LocalParticipant,
@@ -40,17 +49,9 @@ from .participant import (
     RemoteParticipant,
     _connection_quality_from_proto,
 )
-from .track import RemoteAudioTrack, RemoteVideoTrack
-from .track_publication import RemoteTrackPublication, TrackPublication
+from .track import LocalAudioTrack, LocalTrack, RemoteAudioTrack, RemoteVideoTrack
+from .track_publication import LocalTrackPublication, RemoteTrackPublication, TrackPublication
 from .transcription import TranscriptionSegment
-from .data_stream import (
-    TextStreamReader,
-    ByteStreamReader,
-    TextStreamHandler,
-    ByteStreamHandler,
-)
-from .data_track import RemoteDataTrack
-
 
 EventTypes = Literal[
     "participant_connected",
@@ -116,6 +117,25 @@ class DataStreamOptions:
 
 
 @dataclass
+class AudioTrackToPublish:
+    """Describe an audio publication whose native track is created during connection.
+
+    The source accepts PCM later; no capture device or generated audio is required.
+    Do not modify or reuse a descriptor while its connection attempt is in progress.
+    """
+
+    source: AudioSource
+    name: str = "audio"
+    options: proto_room.TrackPublishOptions = field(default_factory=proto_room.TrackPublishOptions)
+    _track: LocalAudioTrack | None = field(default=None, init=False, repr=False, compare=False)
+
+    @property
+    def track(self) -> LocalAudioTrack | None:
+        """The track returned by a successful connection, or None before completion."""
+        return self._track
+
+
+@dataclass
 class RoomOptions:
     auto_subscribe: bool = True
     """Automatically subscribe to tracks when participants join."""
@@ -132,6 +152,21 @@ class RoomOptions:
     """Use a single peer connection for both publish and subscribe. When None, uses the default (true)."""
     data_stream: DataStreamOptions | None = None
     """Options for incoming data streams. When None, uses the FFI defaults."""
+    publish_tracks: list[tuple[LocalTrack, proto_room.TrackPublishOptions]] = field(
+        default_factory=list
+    )
+    """Tracks and complete publication options to publish while connecting.
+
+    Prepare sources without capturing media first. Supported servers can bundle publication
+    with JOIN; other configurations use normal publication. Publications are available through
+    ``local_participant.track_publications`` after connect. Do not publish these tracks again.
+    """
+    publish_audio_tracks: list[AudioTrackToPublish] = field(default_factory=list)
+    """Audio sources and publication settings prepared natively inside connect.
+
+    Use this instead of constructing a local audio track first to keep native setup off the
+    caller's event loop. Created tracks are available on each descriptor after connect.
+    """
 
 
 @dataclass
@@ -482,6 +517,17 @@ class Room(EventEmitter[EventTypes]):
             await room.connect("ws://localhost:7880", "your_token")
             ```
         """
+        # Snapshot caller-owned configuration and retain tracks through the async connect.
+        initial_tracks = {track._ffi_handle.handle: track for track, _ in options.publish_tracks}
+        if len(initial_tracks) != len(options.publish_tracks):
+            raise ValueError("publish_tracks contains the same track more than once")
+
+        initial_audio = list(options.publish_audio_tracks)
+        if len({id(audio) for audio in initial_audio}) != len(initial_audio):
+            raise ValueError("publish_audio_tracks contains the same descriptor more than once")
+        for audio in initial_audio:
+            audio._track = None
+
         self._server_url = url
         self._token = token
         self._is_connecting = True
@@ -490,6 +536,15 @@ class Room(EventEmitter[EventTypes]):
         req = proto_ffi.FfiRequest()
         req.connect.url = url
         req.connect.token = token
+        for track, publish_options in options.publish_tracks:
+            initial = req.connect.publish_tracks.add(track_handle=track._ffi_handle.handle)
+            initial.options.CopyFrom(publish_options)
+
+        for audio in initial_audio:
+            initial = req.connect.publish_audio_tracks.add(
+                source_handle=audio.source._ffi_handle.handle, name=audio.name
+            )
+            initial.options.CopyFrom(audio.options)
 
         # options
         req.connect.options.auto_subscribe = options.auto_subscribe
@@ -582,9 +637,10 @@ class Room(EventEmitter[EventTypes]):
             queue = FfiClient.instance.queue.subscribe()
             try:
                 resp = FfiClient.instance.request(req)
-                cb: proto_ffi.FfiEvent = await queue.wait_for(
-                    lambda e: e.connect.async_id == resp.connect.async_id
-                )
+                if initial_tracks or initial_audio:
+                    cb = await self._wait_prepared_connect(queue, resp.connect.async_id)
+                else:
+                    cb = await queue.wait_for(lambda e: e.connect.async_id == resp.connect.async_id)
             finally:
                 FfiClient.instance.queue.unsubscribe(queue)
 
@@ -606,6 +662,17 @@ class Room(EventEmitter[EventTypes]):
                 self._room_queue, cb.connect.result.local_participant
             )
 
+            for initial in cb.connect.result.local_publications:
+                if initial.HasField("track"):
+                    track = LocalAudioTrack(initial.track)
+                    initial_audio[initial.audio_track_index]._track = track
+                else:
+                    track = initial_tracks[initial.track_handle]
+                publication = LocalTrackPublication(initial.publication)
+                publication._track = track
+                track._info.sid = publication.sid
+                self._local_participant._track_publications[publication.sid] = publication
+
             for pt in cb.connect.result.participants:
                 rp = self._create_remote_participant(pt.participant)
 
@@ -619,10 +686,12 @@ class Room(EventEmitter[EventTypes]):
         except BaseException as e:
             if self._ffi_handle is None and hasattr(self, "_ffi_queue"):
                 FfiClient.instance.queue.unsubscribe(self._ffi_queue)
+            # Do not store the original traceback on a room-owned future: its connect frame
+            # retains the room, caller options and prepared tracks after a failed connection.
             self._fail_first_sid(
                 RuntimeError("room connection was cancelled")
                 if isinstance(e, asyncio.CancelledError)
-                else e
+                else ConnectError(str(e))
             )
             raise
         finally:
@@ -638,6 +707,59 @@ class Room(EventEmitter[EventTypes]):
         ready_req = proto_ffi.FfiRequest()
         ready_req.ready_for_room_event.room_handle = self._ffi_handle.handle
         FfiClient.instance.request(ready_req)
+
+    async def _wait_prepared_connect(
+        self, queue: Queue[proto_ffi.FfiEvent], async_id: int
+    ) -> proto_ffi.FfiEvent:
+        """Reclaim connect-owned publications if the caller cancels before the callback."""
+        callback = self._loop.create_task(
+            queue.wait_for(lambda e: e.connect.async_id == async_id),
+            name="prepared_connect_callback",
+        )
+        try:
+            return await asyncio.shield(callback)
+        except asyncio.CancelledError:
+            # The native connect request cannot be cancelled. Wait for its bounded connection
+            # attempt and tear down any successful room before releasing the prepared sources.
+            cleanup = self._loop.create_task(
+                self._discard_prepared_connect(callback, queue), name="prepared_connect_cleanup"
+            )
+            while not cleanup.done():
+                try:
+                    await asyncio.shield(cleanup)
+                except asyncio.CancelledError:
+                    continue
+            cleanup.result()
+            raise
+
+    async def _discard_prepared_connect(
+        self, callback: asyncio.Task[proto_ffi.FfiEvent], queue: Queue[proto_ffi.FfiEvent]
+    ) -> None:
+        """Disconnect an unclaimed room and release all handles in its connect result."""
+        event = await callback
+        if event.connect.WhichOneof("message") != "result":
+            return
+        result = event.connect.result
+        handle = result.room.handle.id
+        try:
+            ready = proto_ffi.FfiRequest()
+            ready.ready_for_room_event.room_handle = handle
+            FfiClient.instance.request(ready)
+            request = proto_ffi.FfiRequest()
+            request.disconnect.room_handle = handle
+            response = FfiClient.instance.request(request)
+            await queue.wait_for(lambda e: e.disconnect.async_id == response.disconnect.async_id)
+        finally:
+            FfiHandle(result.local_participant.handle.id).dispose()
+            for initial in result.local_publications:
+                FfiHandle(initial.publication.handle.id).dispose()
+                if initial.HasField("track"):
+                    FfiHandle(initial.track.handle.id).dispose()
+            for participant in result.participants:
+                FfiHandle(participant.participant.handle.id).dispose()
+                for publication in participant.publications:
+                    FfiHandle(publication.handle.id).dispose()
+            FfiHandle(handle).dispose()
 
     async def get_rtc_stats(self) -> RtcStats:
         if not self.isconnected():

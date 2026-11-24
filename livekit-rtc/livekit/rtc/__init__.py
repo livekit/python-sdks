@@ -71,6 +71,7 @@ from .participant import (
     RemoteParticipant,
 )
 from .room import (
+    AudioTrackToPublish,
     ConnectError,
     DataPacket,
     DataStreamOptions,
@@ -151,6 +152,7 @@ from .data_track import (
 from .frame_processor import FrameProcessor
 
 __all__ = [
+    "AudioTrackToPublish",
     "EncodedFrameType",
     "EncodedVideoFrame",
     "EncodedVideoSource",

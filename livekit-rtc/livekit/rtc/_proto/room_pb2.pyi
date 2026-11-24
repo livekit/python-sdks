@@ -236,6 +236,55 @@ KIND_RELIABLE: DataPacketKind.ValueType  # 1
 global___DataPacketKind = DataPacketKind
 
 @typing.final
+class InitialTrack(google.protobuf.message.Message):
+    """A local track prepared before connecting. The caller retains ownership of the track handle."""
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TRACK_HANDLE_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    track_handle: builtins.int
+    @property
+    def options(self) -> global___TrackPublishOptions: ...
+    def __init__(
+        self,
+        *,
+        track_handle: builtins.int | None = ...,
+        options: global___TrackPublishOptions | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "track_handle", b"track_handle"]) -> None: ...
+
+global___InitialTrack = InitialTrack
+
+@typing.final
+class InitialAudioTrack(google.protobuf.message.Message):
+    """An audio publication described without constructing a native track on the caller thread.
+    The caller retains ownership of the source handle. Options include all codec/encoding settings.
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SOURCE_HANDLE_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    OPTIONS_FIELD_NUMBER: builtins.int
+    source_handle: builtins.int
+    name: builtins.str
+    @property
+    def options(self) -> global___TrackPublishOptions: ...
+    def __init__(
+        self,
+        *,
+        source_handle: builtins.int | None = ...,
+        name: builtins.str | None = ...,
+        options: global___TrackPublishOptions | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing.Literal["name", b"name", "options", b"options", "source_handle", b"source_handle"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing.Literal["name", b"name", "options", b"options", "source_handle", b"source_handle"]) -> None: ...
+
+global___InitialAudioTrack = InitialAudioTrack
+
+@typing.final
 class ConnectRequest(google.protobuf.message.Message):
     """Connect to a new LiveKit room"""
 
@@ -245,11 +294,17 @@ class ConnectRequest(google.protobuf.message.Message):
     TOKEN_FIELD_NUMBER: builtins.int
     OPTIONS_FIELD_NUMBER: builtins.int
     REQUEST_ASYNC_ID_FIELD_NUMBER: builtins.int
+    PUBLISH_TRACKS_FIELD_NUMBER: builtins.int
+    PUBLISH_AUDIO_TRACKS_FIELD_NUMBER: builtins.int
     url: builtins.str
     token: builtins.str
     request_async_id: builtins.int
     @property
     def options(self) -> global___RoomOptions: ...
+    @property
+    def publish_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___InitialTrack]: ...
+    @property
+    def publish_audio_tracks(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___InitialAudioTrack]: ...
     def __init__(
         self,
         *,
@@ -257,9 +312,11 @@ class ConnectRequest(google.protobuf.message.Message):
         token: builtins.str | None = ...,
         options: global___RoomOptions | None = ...,
         request_async_id: builtins.int | None = ...,
+        publish_tracks: collections.abc.Iterable[global___InitialTrack] | None = ...,
+        publish_audio_tracks: collections.abc.Iterable[global___InitialAudioTrack] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing.Literal["options", b"options", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> None: ...
+    def ClearField(self, field_name: typing.Literal["options", b"options", "publish_audio_tracks", b"publish_audio_tracks", "publish_tracks", b"publish_tracks", "request_async_id", b"request_async_id", "token", b"token", "url", b"url"]) -> None: ...
 
 global___ConnectRequest = ConnectRequest
 
@@ -307,27 +364,58 @@ class ConnectCallback(google.protobuf.message.Message):
         def ClearField(self, field_name: typing.Literal["participant", b"participant", "publications", b"publications"]) -> None: ...
 
     @typing.final
+    class InitialPublication(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        TRACK_HANDLE_FIELD_NUMBER: builtins.int
+        PUBLICATION_FIELD_NUMBER: builtins.int
+        TRACK_FIELD_NUMBER: builtins.int
+        AUDIO_TRACK_INDEX_FIELD_NUMBER: builtins.int
+        track_handle: builtins.int
+        audio_track_index: builtins.int
+        @property
+        def publication(self) -> track_pb2.OwnedTrackPublication: ...
+        @property
+        def track(self) -> track_pb2.OwnedTrack:
+            """Present only for a track constructed from publish_audio_tracks by this connect."""
+
+        def __init__(
+            self,
+            *,
+            track_handle: builtins.int | None = ...,
+            publication: track_pb2.OwnedTrackPublication | None = ...,
+            track: track_pb2.OwnedTrack | None = ...,
+            audio_track_index: builtins.int | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing.Literal["audio_track_index", b"audio_track_index", "publication", b"publication", "track", b"track", "track_handle", b"track_handle"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing.Literal["audio_track_index", b"audio_track_index", "publication", b"publication", "track", b"track", "track_handle", b"track_handle"]) -> None: ...
+
+    @typing.final
     class Result(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
         ROOM_FIELD_NUMBER: builtins.int
         LOCAL_PARTICIPANT_FIELD_NUMBER: builtins.int
         PARTICIPANTS_FIELD_NUMBER: builtins.int
+        LOCAL_PUBLICATIONS_FIELD_NUMBER: builtins.int
         @property
         def room(self) -> global___OwnedRoom: ...
         @property
         def local_participant(self) -> participant_pb2.OwnedParticipant: ...
         @property
         def participants(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConnectCallback.ParticipantWithTracks]: ...
+        @property
+        def local_publications(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConnectCallback.InitialPublication]: ...
         def __init__(
             self,
             *,
             room: global___OwnedRoom | None = ...,
             local_participant: participant_pb2.OwnedParticipant | None = ...,
             participants: collections.abc.Iterable[global___ConnectCallback.ParticipantWithTracks] | None = ...,
+            local_publications: collections.abc.Iterable[global___ConnectCallback.InitialPublication] | None = ...,
         ) -> None: ...
         def HasField(self, field_name: typing.Literal["local_participant", b"local_participant", "room", b"room"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing.Literal["local_participant", b"local_participant", "participants", b"participants", "room", b"room"]) -> None: ...
+        def ClearField(self, field_name: typing.Literal["local_participant", b"local_participant", "local_publications", b"local_publications", "participants", b"participants", "room", b"room"]) -> None: ...
 
     ASYNC_ID_FIELD_NUMBER: builtins.int
     ERROR_FIELD_NUMBER: builtins.int
@@ -1399,13 +1487,10 @@ class RoomDataStreamOptions(google.protobuf.message.Message):
     receiving side. Unset falls back to the SDK default.
     """
     use_legacy_client_implementation: builtins.bool
-    """Temporary migration aid for SDKs that still implement data streams in
-    their own client-side code on top of the FFI instead of using the FFI
-    data stream API. When true, this client does not advertise data streams
-    v2 support: ClientInfo.client_protocol is capped at 1 (DATA_STREAM_RPC),
-    so remote clients will not use v2-only behavior toward this client.
-    Defaults to false (v2 advertised). Will be removed once all FFI
-    consumers migrate.
+    """Deprecated: no client SDK uses this anymore, and it is ignored. It was a
+    temporary migration aid for SDKs that implemented data streams in their
+    own client-side code on top of the FFI; data streams v2 support is now
+    always advertised. Kept only so the field number is not reused.
     """
     def __init__(
         self,
