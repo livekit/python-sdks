@@ -91,7 +91,7 @@ class SignalRequest(_message.Message):
     def __init__(self, offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., add_track: _Optional[_Union[AddTrackRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., subscription: _Optional[_Union[UpdateSubscription, _Mapping]] = ..., track_setting: _Optional[_Union[UpdateTrackSettings, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., update_layers: _Optional[_Union[UpdateVideoLayers, _Mapping]] = ..., subscription_permission: _Optional[_Union[SubscriptionPermission, _Mapping]] = ..., sync_state: _Optional[_Union[SyncState, _Mapping]] = ..., simulate: _Optional[_Union[SimulateScenario, _Mapping]] = ..., ping: _Optional[int] = ..., update_metadata: _Optional[_Union[UpdateParticipantMetadata, _Mapping]] = ..., ping_req: _Optional[_Union[Ping, _Mapping]] = ..., update_audio_track: _Optional[_Union[UpdateLocalAudioTrack, _Mapping]] = ..., update_video_track: _Optional[_Union[UpdateLocalVideoTrack, _Mapping]] = ..., publish_data_track_request: _Optional[_Union[PublishDataTrackRequest, _Mapping]] = ..., unpublish_data_track_request: _Optional[_Union[UnpublishDataTrackRequest, _Mapping]] = ..., update_data_subscription: _Optional[_Union[UpdateDataSubscription, _Mapping]] = ..., store_data_blob_request: _Optional[_Union[StoreDataBlobRequest, _Mapping]] = ..., get_data_blob_request: _Optional[_Union[GetDataBlobRequest, _Mapping]] = ...) -> None: ...
 
 class SignalResponse(_message.Message):
-    __slots__ = ("join", "answer", "offer", "trickle", "update", "track_published", "leave", "mute", "speakers_changed", "room_update", "connection_quality", "stream_state_update", "subscribed_quality_update", "subscription_permission_update", "refresh_token", "track_unpublished", "pong", "reconnect", "pong_resp", "subscription_response", "request_response", "track_subscribed", "room_moved", "media_sections_requirement", "subscribed_audio_codec_update", "publish_data_track_response", "unpublish_data_track_response", "data_track_subscriber_handles", "store_data_blob_response", "get_data_blob_response")
+    __slots__ = ("join", "answer", "offer", "trickle", "update", "track_published", "leave", "mute", "speakers_changed", "room_update", "connection_quality", "stream_state_update", "subscribed_quality_update", "subscription_permission_update", "refresh_token", "track_unpublished", "pong", "reconnect", "pong_resp", "subscription_response", "request_response", "track_subscribed", "room_moved", "media_sections_requirement", "subscribed_audio_codec_update", "publish_data_track_response", "unpublish_data_track_response", "data_track_subscriber_handles", "data_track_demand_update", "store_data_blob_response", "get_data_blob_response")
     JOIN_FIELD_NUMBER: _ClassVar[int]
     ANSWER_FIELD_NUMBER: _ClassVar[int]
     OFFER_FIELD_NUMBER: _ClassVar[int]
@@ -120,6 +120,7 @@ class SignalResponse(_message.Message):
     PUBLISH_DATA_TRACK_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     UNPUBLISH_DATA_TRACK_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     DATA_TRACK_SUBSCRIBER_HANDLES_FIELD_NUMBER: _ClassVar[int]
+    DATA_TRACK_DEMAND_UPDATE_FIELD_NUMBER: _ClassVar[int]
     STORE_DATA_BLOB_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     GET_DATA_BLOB_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     join: JoinResponse
@@ -150,9 +151,10 @@ class SignalResponse(_message.Message):
     publish_data_track_response: PublishDataTrackResponse
     unpublish_data_track_response: UnpublishDataTrackResponse
     data_track_subscriber_handles: DataTrackSubscriberHandles
+    data_track_demand_update: DataTrackDemandUpdate
     store_data_blob_response: StoreDataBlobResponse
     get_data_blob_response: GetDataBlobResponse
-    def __init__(self, join: _Optional[_Union[JoinResponse, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., update: _Optional[_Union[ParticipantUpdate, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublishedResponse, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., speakers_changed: _Optional[_Union[SpeakersChanged, _Mapping]] = ..., room_update: _Optional[_Union[RoomUpdate, _Mapping]] = ..., connection_quality: _Optional[_Union[ConnectionQualityUpdate, _Mapping]] = ..., stream_state_update: _Optional[_Union[StreamStateUpdate, _Mapping]] = ..., subscribed_quality_update: _Optional[_Union[SubscribedQualityUpdate, _Mapping]] = ..., subscription_permission_update: _Optional[_Union[SubscriptionPermissionUpdate, _Mapping]] = ..., refresh_token: _Optional[str] = ..., track_unpublished: _Optional[_Union[TrackUnpublishedResponse, _Mapping]] = ..., pong: _Optional[int] = ..., reconnect: _Optional[_Union[ReconnectResponse, _Mapping]] = ..., pong_resp: _Optional[_Union[Pong, _Mapping]] = ..., subscription_response: _Optional[_Union[SubscriptionResponse, _Mapping]] = ..., request_response: _Optional[_Union[RequestResponse, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., room_moved: _Optional[_Union[RoomMovedResponse, _Mapping]] = ..., media_sections_requirement: _Optional[_Union[MediaSectionsRequirement, _Mapping]] = ..., subscribed_audio_codec_update: _Optional[_Union[SubscribedAudioCodecUpdate, _Mapping]] = ..., publish_data_track_response: _Optional[_Union[PublishDataTrackResponse, _Mapping]] = ..., unpublish_data_track_response: _Optional[_Union[UnpublishDataTrackResponse, _Mapping]] = ..., data_track_subscriber_handles: _Optional[_Union[DataTrackSubscriberHandles, _Mapping]] = ..., store_data_blob_response: _Optional[_Union[StoreDataBlobResponse, _Mapping]] = ..., get_data_blob_response: _Optional[_Union[GetDataBlobResponse, _Mapping]] = ...) -> None: ...
+    def __init__(self, join: _Optional[_Union[JoinResponse, _Mapping]] = ..., answer: _Optional[_Union[SessionDescription, _Mapping]] = ..., offer: _Optional[_Union[SessionDescription, _Mapping]] = ..., trickle: _Optional[_Union[TrickleRequest, _Mapping]] = ..., update: _Optional[_Union[ParticipantUpdate, _Mapping]] = ..., track_published: _Optional[_Union[TrackPublishedResponse, _Mapping]] = ..., leave: _Optional[_Union[LeaveRequest, _Mapping]] = ..., mute: _Optional[_Union[MuteTrackRequest, _Mapping]] = ..., speakers_changed: _Optional[_Union[SpeakersChanged, _Mapping]] = ..., room_update: _Optional[_Union[RoomUpdate, _Mapping]] = ..., connection_quality: _Optional[_Union[ConnectionQualityUpdate, _Mapping]] = ..., stream_state_update: _Optional[_Union[StreamStateUpdate, _Mapping]] = ..., subscribed_quality_update: _Optional[_Union[SubscribedQualityUpdate, _Mapping]] = ..., subscription_permission_update: _Optional[_Union[SubscriptionPermissionUpdate, _Mapping]] = ..., refresh_token: _Optional[str] = ..., track_unpublished: _Optional[_Union[TrackUnpublishedResponse, _Mapping]] = ..., pong: _Optional[int] = ..., reconnect: _Optional[_Union[ReconnectResponse, _Mapping]] = ..., pong_resp: _Optional[_Union[Pong, _Mapping]] = ..., subscription_response: _Optional[_Union[SubscriptionResponse, _Mapping]] = ..., request_response: _Optional[_Union[RequestResponse, _Mapping]] = ..., track_subscribed: _Optional[_Union[TrackSubscribed, _Mapping]] = ..., room_moved: _Optional[_Union[RoomMovedResponse, _Mapping]] = ..., media_sections_requirement: _Optional[_Union[MediaSectionsRequirement, _Mapping]] = ..., subscribed_audio_codec_update: _Optional[_Union[SubscribedAudioCodecUpdate, _Mapping]] = ..., publish_data_track_response: _Optional[_Union[PublishDataTrackResponse, _Mapping]] = ..., unpublish_data_track_response: _Optional[_Union[UnpublishDataTrackResponse, _Mapping]] = ..., data_track_subscriber_handles: _Optional[_Union[DataTrackSubscriberHandles, _Mapping]] = ..., data_track_demand_update: _Optional[_Union[DataTrackDemandUpdate, _Mapping]] = ..., store_data_blob_response: _Optional[_Union[StoreDataBlobResponse, _Mapping]] = ..., get_data_blob_response: _Optional[_Union[GetDataBlobResponse, _Mapping]] = ...) -> None: ...
 
 class SimulcastCodec(_message.Message):
     __slots__ = ("codec", "cid", "layers", "video_layer_mode")
@@ -259,6 +261,14 @@ class DataTrackSubscriberHandles(_message.Message):
     SUB_HANDLES_FIELD_NUMBER: _ClassVar[int]
     sub_handles: _containers.MessageMap[int, DataTrackSubscriberHandles.PublishedDataTrack]
     def __init__(self, sub_handles: _Optional[_Mapping[int, DataTrackSubscriberHandles.PublishedDataTrack]] = ...) -> None: ...
+
+class DataTrackDemandUpdate(_message.Message):
+    __slots__ = ("pub_handle", "has_subscribers")
+    PUB_HANDLE_FIELD_NUMBER: _ClassVar[int]
+    HAS_SUBSCRIBERS_FIELD_NUMBER: _ClassVar[int]
+    pub_handle: int
+    has_subscribers: bool
+    def __init__(self, pub_handle: _Optional[int] = ..., has_subscribers: bool = ...) -> None: ...
 
 class TrickleRequest(_message.Message):
     __slots__ = ("candidateInit", "target", "final")
@@ -796,18 +806,20 @@ class TrackSubscribed(_message.Message):
     def __init__(self, track_sid: _Optional[str] = ...) -> None: ...
 
 class ConnectionSettings(_message.Message):
-    __slots__ = ("auto_subscribe", "adaptive_stream", "subscriber_allow_pause", "disable_ice_lite", "auto_subscribe_data_track")
+    __slots__ = ("auto_subscribe", "adaptive_stream", "subscriber_allow_pause", "disable_ice_lite", "auto_subscribe_data_track", "candidate_protocol")
     AUTO_SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     ADAPTIVE_STREAM_FIELD_NUMBER: _ClassVar[int]
     SUBSCRIBER_ALLOW_PAUSE_FIELD_NUMBER: _ClassVar[int]
     DISABLE_ICE_LITE_FIELD_NUMBER: _ClassVar[int]
     AUTO_SUBSCRIBE_DATA_TRACK_FIELD_NUMBER: _ClassVar[int]
+    CANDIDATE_PROTOCOL_FIELD_NUMBER: _ClassVar[int]
     auto_subscribe: bool
     adaptive_stream: bool
     subscriber_allow_pause: bool
     disable_ice_lite: bool
     auto_subscribe_data_track: bool
-    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., subscriber_allow_pause: bool = ..., disable_ice_lite: bool = ..., auto_subscribe_data_track: bool = ...) -> None: ...
+    candidate_protocol: CandidateProtocol
+    def __init__(self, auto_subscribe: bool = ..., adaptive_stream: bool = ..., subscriber_allow_pause: bool = ..., disable_ice_lite: bool = ..., auto_subscribe_data_track: bool = ..., candidate_protocol: _Optional[_Union[CandidateProtocol, str]] = ...) -> None: ...
 
 class JoinRequest(_message.Message):
     __slots__ = ("client_info", "connection_settings", "metadata", "participant_attributes", "add_track_requests", "publisher_offer", "reconnect", "reconnect_reason", "participant_sid", "sync_state")
