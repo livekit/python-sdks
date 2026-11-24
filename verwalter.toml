@@ -1,0 +1,34 @@
+#:schema https://raw.githubusercontent.com/livekit/verwalter/main/schemas/v1.json
+
+[workspace]
+members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
+exclude = ["python-sdks"]   # the uv workspace root, never published
+
+[check]
+publish_dry_run = "uv build --out-dir dist && uvx twine check dist/*"   # PyPI has no built-in dry run
+
+# A PyPI version has many files, and PyPI shows the version after the first
+# one. So each package checks for its sdist (`publish.exists_url`), which twine
+# uploads last after the wheels: a half upload stays a draft, and a re-run
+# with --skip-existing uploads the missing files. `{version}` is PEP 440 there.
+# The command signs PEP 740 attestations, which the built-in one does not.
+# The release workflow builds into dist/<package>/ at the root.
+[publish]
+registry = "pypi"
+command = "uvx pypi-attestations@0.0.31 sign $VERWALTER_ROOT/dist/{package}/* && uvx twine@7.0.0 upload --attestations --skip-existing $VERWALTER_ROOT/dist/{package}/*"
+
+[packages.livekit]
+versioning.files = [{ path = "livekit/rtc/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "rtc-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit/livekit-{version}.tar.gz"
+check.publish_dry_run = "uv build --sdist --out-dir dist && uvx twine check dist/*"   # the wheels need cibuildwheel and the FFI binaries
+
+[packages.livekit-api]
+versioning.files = [{ path = "livekit/api/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "api-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit-api/livekit_api-{version}.tar.gz"
+
+[packages.livekit-protocol]
+versioning.files = [{ path = "livekit/protocol/version.py", regex = '__version__ = "(?<version>[^"]+)"' }]
+release.tag = "protocol-v{version}"
+publish.exists_url = "https://files.pythonhosted.org/packages/source/l/livekit-protocol/livekit_protocol-{version}.tar.gz"

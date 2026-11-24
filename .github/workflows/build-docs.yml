@@ -21,6 +21,11 @@ on:
       package_name:
         required: true
         type: string
+      ref:
+        description: The commit to document. Empty is the commit of the calling run.
+        required: false
+        type: string
+        default: ""
     secrets:
       PYPI_API_TOKEN:
         required: true
@@ -39,6 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          ref: ${{ inputs.ref || github.sha }}
           submodules: recursive
 
       - name: Install Package to Document
