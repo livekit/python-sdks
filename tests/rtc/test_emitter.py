@@ -110,6 +110,65 @@ def test_throw() -> None:
     assert len(calls) == 2
 
 
+def test_type_error_in_handler_is_logged() -> None:
+    EventTypes = Literal["update"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    calls = []
+
+    @emitter.on("update")
+    def on_update(payload: Any) -> None:
+        calls.append(True)
+        payload["user"]["name"]
+
+    @emitter.on("update")
+    def on_update_another(payload: Any) -> None:
+        calls.append(True)
+
+    emitter.emit("update", {"user": None})
+
+    assert len(calls) == 2
+
+
+def test_once_args() -> None:
+    EventTypes = Literal["whatever"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    calls = []
+
+    @emitter.once("whatever")
+    def on_whatever(first: Any, second: Any) -> None:
+        calls.append((first, second))
+
+    with pytest.raises(TypeError):
+        emitter.emit("whatever", 1)
+
+    assert calls == []
+
+
+def test_type_error_in_once_handler_is_logged() -> None:
+    EventTypes = Literal["update"]
+
+    emitter = EventEmitter[EventTypes]()
+
+    calls = []
+
+    @emitter.once("update")
+    def on_update(payload: Any) -> None:
+        calls.append(True)
+        payload["user"]["name"]
+
+    @emitter.on("update")
+    def on_update_another(payload: Any) -> None:
+        calls.append(True)
+
+    emitter.emit("update", {"user": None})
+
+    assert len(calls) == 2
+
+
 def test_on_does_not_warn() -> None:
     """Registering a callback must not emit a DeprecationWarning.
 
