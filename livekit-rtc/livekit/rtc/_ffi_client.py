@@ -115,13 +115,16 @@ T = TypeVar("T")
 class FfiQueue(Generic[T]):
     def __init__(self) -> None:
         self._lock = threading.RLock()
+        self._put_lock = threading.RLock()
         # Format: (queue, loop, filter_fn or None)
         self._subscribers: List[
             tuple[Queue[T], asyncio.AbstractEventLoop, Optional[Callable[[T], bool]]]
         ] = []
 
     def put(self, item: T) -> None:
-        with self._lock:
+        # _put_lock keeps concurrent puts in order at every subscriber. subscribe and
+        # unsubscribe replace the list instead of mutating it, so they don't wait for a put
+        with self._put_lock:
             for queue, loop, filter_fn in self._subscribers:
                 # If filter provided, skip items that don't match
                 if filter_fn is not None:
@@ -157,7 +160,7 @@ class FfiQueue(Generic[T]):
         with self._lock:
             queue = Queue[T]()
             loop = loop or asyncio.get_event_loop()
-            self._subscribers.append((queue, loop, filter_fn))
+            self._subscribers = [*self._subscribers, (queue, loop, filter_fn)]
             return queue
 
     def unsubscribe(self, queue: Queue[T]) -> None:
@@ -165,7 +168,7 @@ class FfiQueue(Generic[T]):
             # looping here is ok, since we don't expect a lot of subscribers
             for i, (q, _, _) in enumerate(self._subscribers):
                 if q == queue:
-                    self._subscribers.pop(i)
+                    self._subscribers = self._subscribers[:i] + self._subscribers[i + 1 :]
                     break
 
 
