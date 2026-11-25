@@ -1,8 +1,11 @@
-from livekit.rtc import AudioResampler, AudioResamplerQuality, AudioFrame
+from livekit.rtc import AudioResampler, AudioResamplerQuality, AudioFrame, audio_resampler
 import time
+import types
 import wave
 import os
 from typing import List
+
+import pytest
 
 # Test fixture directory
 FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
@@ -65,3 +68,28 @@ def test_audio_resampler() -> None:
             wf_out.setsampwidth(sampwidth)
             wf_out.setframerate(8000)
             wf_out.writeframes(output_data)
+
+
+def test_flush_with_nothing_buffered_returns_no_frames() -> None:
+    resampler = AudioResampler(48000, 16000)
+    assert resampler.flush() == []
+
+    resampler.push(AudioFrame(bytes(9600), 48000, 1, 4800))
+    assert sum(f.samples_per_channel for f in resampler.flush()) > 0  # the buffered tail
+    assert resampler.flush() == []
+
+
+def test_flush_error_is_raised(monkeypatch: pytest.MonkeyPatch) -> None:
+    resampler = AudioResampler(48000, 16000)
+
+    class _FailingClient:
+        def request(self, req):  # type: ignore[no-untyped-def]
+            resp = audio_resampler.proto_ffi.FfiResponse()
+            resp.flush_sox_resampler.error = "flush failed"
+            return resp
+
+    monkeypatch.setattr(
+        audio_resampler, "FfiClient", types.SimpleNamespace(instance=_FailingClient())
+    )
+    with pytest.raises(Exception, match="flush failed"):
+        resampler.flush()

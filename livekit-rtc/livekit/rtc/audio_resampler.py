@@ -142,7 +142,10 @@ class AudioResampler:
 
         resp = FfiClient.instance.request(req)
 
-        if not resp.flush_sox_resampler.output_ptr:
+        if resp.flush_sox_resampler.error:
+            raise Exception(resp.flush_sox_resampler.error)
+
+        if not resp.flush_sox_resampler.size:
             return []
 
         cdata = (ctypes.c_int8 * resp.flush_sox_resampler.size).from_address(
