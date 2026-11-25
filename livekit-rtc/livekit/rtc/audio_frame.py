@@ -63,10 +63,6 @@ class AudioFrame:
                 "data length must be >= num_channels * samples_per_channel * sizeof(int16)"
             )
 
-        if data_len % ctypes.sizeof(ctypes.c_int16) != 0:
-            # can happen if data is bigger than needed
-            raise ValueError("data length must be a multiple of sizeof(int16)")
-
         self._data = data
 
         self._sample_rate = sample_rate

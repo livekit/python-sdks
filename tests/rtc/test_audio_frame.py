@@ -24,6 +24,12 @@ def test_data_holds_only_the_frame_samples() -> None:
     assert list(frame.data) == [1, 2, 3, 4]
 
 
+def test_a_trailing_odd_byte_is_not_part_of_the_frame() -> None:
+    frame = rtc.AudioFrame(bytes([1, 0, 2, 0, 99]), 16000, 1, 2)
+
+    assert list(frame.data) == [1, 2]
+
+
 def test_combine_audio_frames_keeps_every_frame_sample() -> None:
     combined = rtc.combine_audio_frames([_frame([1, 2, 99, 99], 2), _frame([3, 4], 2)])
 
