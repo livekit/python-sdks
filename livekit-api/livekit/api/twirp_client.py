@@ -296,18 +296,18 @@ class TwirpClient:
                 # With no fallback origin, a retryable failure is retried against the same host.
                 next_origin = current_origin
 
+            next_base = current_base if next_origin == current_origin else next_origin
             reason = transport_exc if transport_exc is not None else f"status {retryable_status}"
             logger.warning(
                 "livekit API request to %s failed (%s), retrying with fallback url %s",
-                current_origin,
+                current_base,
                 reason,
-                next_origin,
+                next_base,
             )
             await asyncio.sleep(self._failover_backoff * (2**attempt))
             attempted.add(host_key(next_origin))
-            if next_origin != current_origin:
-                current_origin = next_origin
-                current_base = next_origin
+            current_origin = next_origin
+            current_base = next_base
 
         raise RuntimeError("failover loop exited without returning")  # unreachable
 

@@ -143,18 +143,24 @@ def test_retries_same_host_on_5xx():
     assert len(attempts) == 2
 
 
-def test_same_host_retry_keeps_the_base_path():
-    """A retry against the same host keeps the base path of the configured URL."""
+@pytest.mark.parametrize("host", ["cloud-api.livekit.io", "127.0.0.1"])
+@pytest.mark.parametrize("status", [None, 502], ids=["transport error", "5xx"])
+def test_same_host_retry_keeps_the_base_path(
+    host: str, status: Optional[int], caplog: pytest.LogCaptureFixture
+):
+    """A retry against the same host keeps the base path of the configured URL,
+    and the retry log shows it."""
 
     def behave(attempt: int, request: web.Request):
-        return None if attempt == 0 else _ok(request)
+        if attempt > 0:
+            return _ok(request)
+        return None if status is None else web.json_response({}, status=status)
 
     attempts: List[int] = []
-    room = asyncio.run(
-        _call_single_host(behave, attempts, host="cloud-api.livekit.io", base_path="/livekit")
-    )
+    room = asyncio.run(_call_single_host(behave, attempts, host=host, base_path="/livekit"))
     assert room.name == "r"
     assert len(attempts) == 2
+    assert caplog.text.rstrip().endswith("/livekit")
 
 
 @pytest.mark.parametrize(
