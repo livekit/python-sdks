@@ -142,6 +142,9 @@ class AudioResampler:
 
         resp = FfiClient.instance.request(req)
 
+        if resp.flush_sox_resampler.error:
+            raise Exception(resp.flush_sox_resampler.error)
+
         if not resp.flush_sox_resampler.size:
             return []
 
