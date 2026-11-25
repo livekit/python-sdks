@@ -26,6 +26,7 @@ from livekit.protocol.room import (
 from livekit.protocol.models import Room, ParticipantInfo
 from ._service import Service
 from .access_token import VideoGrants
+from typing import Optional
 
 SVC = "RoomService"
 """@private"""
@@ -52,8 +53,9 @@ class RoomService(Service):
         api_key: str,
         api_secret: str,
         failover: bool = True,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
     ):
-        super().__init__(session, url, api_key, api_secret, failover=failover)
+        super().__init__(session, url, api_key, api_secret, failover=failover, timeout=timeout)
 
     async def create_room(
         self,

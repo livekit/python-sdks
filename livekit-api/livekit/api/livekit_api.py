@@ -49,7 +49,11 @@ class LiveKitAPI:
             token: Pre-signed access token (read from `LIVEKIT_TOKEN` environment variable if not provided)
             token_provider: Async callable that returns a token for the grants of each call,
                 in place of signing one with api_key and api_secret
-            timeout: Request timeout (default: 10 seconds)
+            timeout: Per-request timeout, applied to every API call. Defaults to
+                10 seconds when this instance creates its own session. When a
+                `session` is supplied, it defaults to that session's timeout;
+                pass this to give API calls a deadline of their own without
+                changing the timeout of other traffic sharing the session.
             session: aiohttp.ClientSession instance to use for requests, if not provided, a new one will be created
         """
         url = url or os.getenv("LIVEKIT_URL")
@@ -84,12 +88,17 @@ class LiveKitAPI:
         # the token, injected into each service below.
         key = api_key or ""
         secret = api_secret or ""
-        self._room = RoomService(self._session, url, key, secret, failover)
-        self._ingress = IngressService(self._session, url, key, secret, failover)
-        self._egress = EgressService(self._session, url, key, secret, failover)
-        self._sip = SipService(self._session, url, key, secret, failover)
-        self._agent_dispatch = AgentDispatchService(self._session, url, key, secret, failover)
-        self._connector = ConnectorService(self._session, url, key, secret, failover)
+        # Passed to every service so that `timeout` applies to API calls even
+        # when the session belongs to the caller, whose timeout is typically
+        # tuned for other traffic sharing that session.
+        self._room = RoomService(self._session, url, key, secret, failover, timeout)
+        self._ingress = IngressService(self._session, url, key, secret, failover, timeout)
+        self._egress = EgressService(self._session, url, key, secret, failover, timeout)
+        self._sip = SipService(self._session, url, key, secret, failover, timeout)
+        self._agent_dispatch = AgentDispatchService(
+            self._session, url, key, secret, failover, timeout
+        )
+        self._connector = ConnectorService(self._session, url, key, secret, failover, timeout)
 
         if token or token_provider:
             for svc in (
@@ -122,7 +131,11 @@ class LiveKitAPI:
         Args:
             token: Pre-signed access token
             url: LiveKit server URL (read from `LIVEKIT_URL` if not provided)
-            timeout: Request timeout (default: 10 seconds)
+            timeout: Per-request timeout, applied to every API call. Defaults to
+                10 seconds when this instance creates its own session. When a
+                `session` is supplied, it defaults to that session's timeout;
+                pass this to give API calls a deadline of their own without
+                changing the timeout of other traffic sharing the session.
             session: aiohttp.ClientSession to use; a new one is created if omitted
         """
         return cls(url, token=token, timeout=timeout, session=session, failover=failover)

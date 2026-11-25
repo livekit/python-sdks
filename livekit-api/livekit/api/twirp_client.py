@@ -195,6 +195,7 @@ class TwirpClient:
         prefix: str = DEFAULT_PREFIX,
         failover: bool = True,
         *,
+        timeout: Optional[aiohttp.ClientTimeout] = None,
         _failover_force: bool = False,
         _failover_backoff: float = FAILOVER_BACKOFF_BASE,
     ) -> None:
@@ -208,6 +209,10 @@ class TwirpClient:
         self.pkg = pkg
         self.prefix = prefix
         self._session = session
+        # Applies to every request this client issues, unless a call passes its
+        # own. Lets a caller who supplies a shared session still give the API a
+        # deadline of its own, without touching the session's.
+        self._timeout = timeout
         # _failover_force / _failover_backoff are internal test-only knobs.
         self._failover = failover
         self._failover_force = _failover_force
@@ -237,11 +242,18 @@ class TwirpClient:
         headers[REQUEST_ID_HEADER] = str(uuid.uuid4())
         serialized_data = data.SerializeToString()
 
-        # The effective per-attempt timeout is the per-call override, or the
-        # session default; used to gate failover for short requests.
-        effective_timeout = timeout.total if timeout else None
-        if effective_timeout is None and self._session.timeout is not None:
-            effective_timeout = self._session.timeout.total
+        # The per-attempt timeout is the per-call override, then this client's
+        # default, then the session default. aiohttp treats an explicit
+        # ``timeout=None`` as "no timeout at all" rather than "use the session
+        # default" — only a *missing* argument selects the session timeout — so
+        # resolve the fallback here and pass the result explicitly.
+        request_timeout = timeout
+        if request_timeout is None:
+            request_timeout = self._timeout
+        if request_timeout is None:
+            request_timeout = self._session.timeout
+        # Used to gate failover for short requests.
+        effective_timeout = request_timeout.total if request_timeout is not None else None
         host = urlparse(self._origin).hostname
         max_attempts = failover_attempts(
             self._failover, host, self._failover_force, effective_timeout
@@ -263,7 +275,7 @@ class TwirpClient:
             error_data: Dict = {}
             try:
                 async with self._session.post(
-                    url, headers=headers, data=serialized_data, timeout=timeout
+                    url, headers=headers, data=serialized_data, timeout=request_timeout
                 ) as resp:
                     if resp.status == 200:
                         return response_class.FromString(await resp.read())
