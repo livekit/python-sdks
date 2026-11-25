@@ -13,6 +13,20 @@ class SignalTarget(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PUBLISHER: _ClassVar[SignalTarget]
     SUBSCRIBER: _ClassVar[SignalTarget]
 
+class FECProtectionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    FEC_MODE_DISABLED: _ClassVar[FECProtectionMode]
+    FEC_MODE_ADAPTIVE: _ClassVar[FECProtectionMode]
+    FEC_MODE_FIXED: _ClassVar[FECProtectionMode]
+    FEC_MODE_MINIMUM: _ClassVar[FECProtectionMode]
+
+class FECProtectionLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    FEC_LEVEL_UNSPECIFIED: _ClassVar[FECProtectionLevel]
+    FEC_LEVEL_LOW: _ClassVar[FECProtectionLevel]
+    FEC_LEVEL_MEDIUM: _ClassVar[FECProtectionLevel]
+    FEC_LEVEL_HIGH: _ClassVar[FECProtectionLevel]
+
 class StreamState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     ACTIVE: _ClassVar[StreamState]
@@ -32,6 +46,14 @@ class CandidateProtocol(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     TLS: _ClassVar[CandidateProtocol]
 PUBLISHER: SignalTarget
 SUBSCRIBER: SignalTarget
+FEC_MODE_DISABLED: FECProtectionMode
+FEC_MODE_ADAPTIVE: FECProtectionMode
+FEC_MODE_FIXED: FECProtectionMode
+FEC_MODE_MINIMUM: FECProtectionMode
+FEC_LEVEL_UNSPECIFIED: FECProtectionLevel
+FEC_LEVEL_LOW: FECProtectionLevel
+FEC_LEVEL_MEDIUM: FECProtectionLevel
+FEC_LEVEL_HIGH: FECProtectionLevel
 ACTIVE: StreamState
 PAUSED: StreamState
 NDCI_INVALID: NegotiatedDataChannelID
@@ -432,8 +454,16 @@ class GetDataBlobResponse(_message.Message):
     blob: _models.DataBlob
     def __init__(self, request_id: _Optional[int] = ..., blob: _Optional[_Union[_models.DataBlob, _Mapping]] = ...) -> None: ...
 
+class FECProtection(_message.Message):
+    __slots__ = ("mode", "level")
+    MODE_FIELD_NUMBER: _ClassVar[int]
+    LEVEL_FIELD_NUMBER: _ClassVar[int]
+    mode: FECProtectionMode
+    level: FECProtectionLevel
+    def __init__(self, mode: _Optional[_Union[FECProtectionMode, str]] = ..., level: _Optional[_Union[FECProtectionLevel, str]] = ...) -> None: ...
+
 class UpdateTrackSettings(_message.Message):
-    __slots__ = ("track_sids", "disabled", "quality", "width", "height", "fps", "priority")
+    __slots__ = ("track_sids", "disabled", "quality", "width", "height", "fps", "priority", "fec")
     TRACK_SIDS_FIELD_NUMBER: _ClassVar[int]
     DISABLED_FIELD_NUMBER: _ClassVar[int]
     QUALITY_FIELD_NUMBER: _ClassVar[int]
@@ -441,6 +471,7 @@ class UpdateTrackSettings(_message.Message):
     HEIGHT_FIELD_NUMBER: _ClassVar[int]
     FPS_FIELD_NUMBER: _ClassVar[int]
     PRIORITY_FIELD_NUMBER: _ClassVar[int]
+    FEC_FIELD_NUMBER: _ClassVar[int]
     track_sids: _containers.RepeatedScalarFieldContainer[str]
     disabled: bool
     quality: _models.VideoQuality
@@ -448,7 +479,8 @@ class UpdateTrackSettings(_message.Message):
     height: int
     fps: int
     priority: int
-    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., disabled: bool = ..., quality: _Optional[_Union[_models.VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., fps: _Optional[int] = ..., priority: _Optional[int] = ...) -> None: ...
+    fec: FECProtection
+    def __init__(self, track_sids: _Optional[_Iterable[str]] = ..., disabled: bool = ..., quality: _Optional[_Union[_models.VideoQuality, str]] = ..., width: _Optional[int] = ..., height: _Optional[int] = ..., fps: _Optional[int] = ..., priority: _Optional[int] = ..., fec: _Optional[_Union[FECProtection, _Mapping]] = ...) -> None: ...
 
 class UpdateLocalAudioTrack(_message.Message):
     __slots__ = ("track_sid", "features")
