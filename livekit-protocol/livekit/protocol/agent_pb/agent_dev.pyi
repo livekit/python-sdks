@@ -7,22 +7,36 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class AgentDevMessage(_message.Message):
-    __slots__ = ("get_running_jobs_request", "get_running_jobs_response", "server_info")
+    __slots__ = ("get_running_jobs_request", "get_running_jobs_response", "server_info", "credentials")
     GET_RUNNING_JOBS_REQUEST_FIELD_NUMBER: _ClassVar[int]
     GET_RUNNING_JOBS_RESPONSE_FIELD_NUMBER: _ClassVar[int]
     SERVER_INFO_FIELD_NUMBER: _ClassVar[int]
+    CREDENTIALS_FIELD_NUMBER: _ClassVar[int]
     get_running_jobs_request: GetRunningAgentJobsRequest
     get_running_jobs_response: GetRunningAgentJobsResponse
     server_info: ServerInfo
-    def __init__(self, get_running_jobs_request: _Optional[_Union[GetRunningAgentJobsRequest, _Mapping]] = ..., get_running_jobs_response: _Optional[_Union[GetRunningAgentJobsResponse, _Mapping]] = ..., server_info: _Optional[_Union[ServerInfo, _Mapping]] = ...) -> None: ...
+    credentials: Credentials
+    def __init__(self, get_running_jobs_request: _Optional[_Union[GetRunningAgentJobsRequest, _Mapping]] = ..., get_running_jobs_response: _Optional[_Union[GetRunningAgentJobsResponse, _Mapping]] = ..., server_info: _Optional[_Union[ServerInfo, _Mapping]] = ..., credentials: _Optional[_Union[Credentials, _Mapping]] = ...) -> None: ...
 
 class ServerInfo(_message.Message):
-    __slots__ = ("agent_name", "url")
+    __slots__ = ("agent_name", "url", "supports_token_mode")
     AGENT_NAME_FIELD_NUMBER: _ClassVar[int]
     URL_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTS_TOKEN_MODE_FIELD_NUMBER: _ClassVar[int]
     agent_name: str
     url: str
-    def __init__(self, agent_name: _Optional[str] = ..., url: _Optional[str] = ...) -> None: ...
+    supports_token_mode: bool
+    def __init__(self, agent_name: _Optional[str] = ..., url: _Optional[str] = ..., supports_token_mode: bool = ...) -> None: ...
+
+class Credentials(_message.Message):
+    __slots__ = ("url", "token", "expires_at")
+    URL_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    url: str
+    token: str
+    expires_at: int
+    def __init__(self, url: _Optional[str] = ..., token: _Optional[str] = ..., expires_at: _Optional[int] = ...) -> None: ...
 
 class GetRunningAgentJobsRequest(_message.Message):
     __slots__ = ()

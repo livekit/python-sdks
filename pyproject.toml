@@ -9,15 +9,15 @@ dependencies = ["livekit", "livekit-api", "livekit-protocol"]
 # Security floors for transitive development and release dependencies.
 constraint-dependencies = [
     "cryptography>=50.0.0",
-    "filelock>=3.20.3",
-    "pillow>=12.3.0",
+    "filelock>=4.2.1",
+    "pillow>=13.0.0",
     "pygments>=2.20.0",
     "urllib3>=2.8.0",
 ]
 
 [tool.uv.dependency-groups]
-# Patched tooling requires Python 3.10; published SDKs still support Python 3.9.
-dev = { requires-python = ">=3.10" }
+# Patched tooling requires Python 3.11; published SDKs still support Python 3.9.
+dev = { requires-python = ">=3.11" }
 
 [tool.uv.workspace]
 members = ["livekit-rtc", "livekit-api", "livekit-protocol"]
@@ -82,7 +82,7 @@ addopts = ["--import-mode=importlib", "--ignore=examples"]
 
 
 [tool.mypy]
-exclude = "(build|setup\\.py|livekit-rtc/rust-sdks.*)"
+exclude = "(build|setup\\.py|livekit-rtc/rust-sdks.*|livekit-protocol/protocol/.*)"
 namespace_packages = true
 explicit_package_bases = true
 mypy_path = "livekit-protocol:livekit-api:livekit-rtc"

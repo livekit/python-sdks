@@ -94,6 +94,18 @@ def test_a_plane_of_a_bytes_frame_is_read_only() -> None:
     assert plane is not None and plane.readonly
 
 
+def test_frame_from_a_read_only_numpy_buffer_can_be_captured() -> None:
+    # np.frombuffer returns a read-only array, so its memoryview is read-only too.
+    np = pytest.importorskip("numpy")
+    w, h = 4, 2
+    pixels = bytes(range(w * h * 4))
+    frame = rtc.VideoFrame(w, h, T.RGBA, memoryview(np.frombuffer(pixels, dtype=np.uint8)))
+
+    info = frame._proto_info()
+
+    assert ctypes.string_at(info.data_ptr, len(pixels)) == pixels
+
+
 @pytest.mark.parametrize(
     "name",
     ["RGBA", "ABGR", "ARGB", "BGRA", "RGB24", "I420", "I420A", "I422", "I444", "I010", "NV12"],

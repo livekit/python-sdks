@@ -196,12 +196,14 @@ class AgentDB(_message.Message):
             timestamp_ms: int
             def __init__(self, last_ping_timestamp_ms: _Optional[int] = ..., timestamp_ms: _Optional[int] = ...) -> None: ...
         class Hello(_message.Message):
-            __slots__ = ("token", "database_id")
+            __slots__ = ("token", "database_id", "client_version")
             TOKEN_FIELD_NUMBER: _ClassVar[int]
             DATABASE_ID_FIELD_NUMBER: _ClassVar[int]
+            CLIENT_VERSION_FIELD_NUMBER: _ClassVar[int]
             token: str
             database_id: str
-            def __init__(self, token: _Optional[str] = ..., database_id: _Optional[str] = ...) -> None: ...
+            client_version: str
+            def __init__(self, token: _Optional[str] = ..., database_id: _Optional[str] = ..., client_version: _Optional[str] = ...) -> None: ...
         class HelloOk(_message.Message):
             __slots__ = ("tip", "ping_interval_ms", "ping_timeout_ms")
             TIP_FIELD_NUMBER: _ClassVar[int]
@@ -263,11 +265,13 @@ class AgentDB(_message.Message):
             total_rows: int
             def __init__(self, tip: _Optional[int] = ..., total_rows: _Optional[int] = ...) -> None: ...
         class Error(_message.Message):
-            __slots__ = ("code", "message")
+            __slots__ = ("code", "name", "description")
             CODE_FIELD_NUMBER: _ClassVar[int]
-            MESSAGE_FIELD_NUMBER: _ClassVar[int]
-            code: str
-            message: str
-            def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
+            NAME_FIELD_NUMBER: _ClassVar[int]
+            DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+            code: int
+            name: str
+            description: str
+            def __init__(self, code: _Optional[int] = ..., name: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
         def __init__(self) -> None: ...
     def __init__(self) -> None: ...

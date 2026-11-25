@@ -94,7 +94,7 @@ class SipService(Service):
             SVC,
             "CreateSIPInboundTrunk",
             create,
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPInboundTrunkInfo,
         )
 
@@ -140,7 +140,7 @@ class SipService(Service):
                 sip_trunk_id=trunk_id,
                 replace=trunk,
             ),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPInboundTrunkInfo,
         )
 
@@ -221,7 +221,7 @@ class SipService(Service):
                 sip_trunk_id=trunk_id,
                 update=update,
             ),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPInboundTrunkInfo,
         )
 
@@ -275,7 +275,7 @@ class SipService(Service):
             SVC,
             "CreateSIPOutboundTrunk",
             create,
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPOutboundTrunkInfo,
         )
 
@@ -321,7 +321,7 @@ class SipService(Service):
                 sip_trunk_id=trunk_id,
                 replace=trunk,
             ),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPOutboundTrunkInfo,
         )
 
@@ -390,7 +390,7 @@ class SipService(Service):
                 sip_trunk_id=trunk_id,
                 update=update,
             ),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPOutboundTrunkInfo,
         )
 
@@ -444,7 +444,7 @@ class SipService(Service):
             SVC,
             "ListSIPInboundTrunk",
             list,
-            self._admin_headers(),
+            await self._admin_headers(),
             ListSIPInboundTrunkResponse,
         )
 
@@ -484,7 +484,7 @@ class SipService(Service):
             SVC,
             "ListSIPOutboundTrunk",
             list,
-            self._admin_headers(),
+            await self._admin_headers(),
             ListSIPOutboundTrunkResponse,
         )
 
@@ -522,7 +522,7 @@ class SipService(Service):
             SVC,
             "DeleteSIPTrunk",
             delete,
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPTrunkInfo,
         )
 
@@ -560,7 +560,7 @@ class SipService(Service):
             SVC,
             "CreateSIPDispatchRule",
             create,
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPDispatchRuleInfo,
         )
 
@@ -603,7 +603,7 @@ class SipService(Service):
             SVC,
             "UpdateSIPDispatchRule",
             UpdateSIPDispatchRuleRequest(sip_dispatch_rule_id=rule_id, replace=rule),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPDispatchRuleInfo,
         )
 
@@ -663,7 +663,7 @@ class SipService(Service):
             SVC,
             "UpdateSIPDispatchRule",
             UpdateSIPDispatchRuleRequest(sip_dispatch_rule_id=rule_id, update=update),
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPDispatchRuleInfo,
         )
 
@@ -713,7 +713,7 @@ class SipService(Service):
             SVC,
             "ListSIPDispatchRule",
             list,
-            self._admin_headers(),
+            await self._admin_headers(),
             ListSIPDispatchRuleResponse,
         )
 
@@ -753,7 +753,7 @@ class SipService(Service):
             SVC,
             "DeleteSIPDispatchRule",
             delete,
-            self._admin_headers(),
+            await self._admin_headers(),
             SIPDispatchRuleInfo,
         )
 
@@ -822,7 +822,7 @@ class SipService(Service):
                 SVC,
                 "CreateSIPParticipant",
                 create,
-                self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
+                await self._auth_header(VideoGrants(), sip=SIPGrants(call=True)),
                 SIPParticipantInfo,
                 timeout=client_timeout,
             )
@@ -859,7 +859,7 @@ class SipService(Service):
                 SVC,
                 "TransferSIPParticipant",
                 transfer,
-                self._auth_header(
+                await self._auth_header(
                     VideoGrants(
                         room_admin=True,
                         room=transfer.room_name,
@@ -872,5 +872,5 @@ class SipService(Service):
         except ServerError as e:
             raise _as_sip_error(e) from None
 
-    def _admin_headers(self) -> dict[str, str]:
-        return self._auth_header(VideoGrants(), sip=SIPGrants(admin=True))
+    async def _admin_headers(self) -> dict[str, str]:
+        return await self._auth_header(VideoGrants(), sip=SIPGrants(admin=True))

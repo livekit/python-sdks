@@ -15,6 +15,7 @@
 import calendar
 import re
 import datetime
+import json
 import os
 import jwt
 import dataclasses
@@ -101,8 +102,6 @@ class AgentGrants:
     admin: bool = False
     # manage simulations and scenarios for evaluating agents
     simulation_admin: bool = False
-    # access the project's agent databases
-    database_admin: bool = False
     # manage the project's agent dispatch queue
     dispatch_admin: bool = False
 
@@ -130,6 +129,21 @@ class AgentThreadGrants:
     write: bool = False
     read: bool = False
     delete: bool = False
+    # open a covered thread's database, whose id is the thread's
+    sql: bool = False
+
+
+@dataclass
+class AgentDatabaseGrants:
+    # databases that may be read, written and deleted
+    database_ids: Optional[List[str]] = None
+    read: bool = False
+    write: bool = False
+    delete: bool = False
+    # create databases in the project
+    create: bool = False
+    # list the project's databases
+    list: bool = False
 
 
 @dataclass
@@ -145,6 +159,7 @@ class Claims:
     agent: Optional[AgentGrants] = None
     agent_endpoint: Optional[AgentEndpointGrants] = None
     agent_thread: Optional[AgentThreadGrants] = None
+    agent_database: Optional[AgentDatabaseGrants] = None
     attributes: Optional[dict[str, str]] = None
     sha256: Optional[str] = None
     room_preset: Optional[str] = None
@@ -163,6 +178,13 @@ class Claims:
         return claims
 
 
+# The grants that a `TokenProvider` is asked for. Today these are v1 claims
+# (`Claims`). Grants v2 will be accepted here too. The provider does not convert
+# between the two: it passes the grants on as they are, and the server that
+# signs the token converts them to the format of its key.
+TokenGrants = Claims
+
+
 class AccessToken:
     ParticipantKind = Literal["standard", "egress", "ingress", "sip", "agent"]
 
@@ -171,14 +193,9 @@ class AccessToken:
         api_key: Optional[str] = None,
         api_secret: Optional[str] = None,
     ) -> None:
-        api_key = api_key or os.getenv("LIVEKIT_API_KEY")
-        api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET")
-
-        if not api_key or not api_secret:
-            raise ValueError("api_key and api_secret must be set")
-
-        self.api_key = api_key  # iss
-        self.api_secret = api_secret
+        # the key and secret are checked in to_jwt, so that to_claims_json works without them
+        self.api_key = api_key or os.getenv("LIVEKIT_API_KEY") or ""  # iss
+        self.api_secret = api_secret or os.getenv("LIVEKIT_API_SECRET") or ""
         self.claims = Claims()
 
         # default jwt claims
@@ -217,6 +234,10 @@ class AccessToken:
         self.claims.agent_thread = grants
         return self
 
+    def with_agent_database_grants(self, grants: AgentDatabaseGrants) -> "AccessToken":
+        self.claims.agent_database = grants
+        return self
+
     def with_identity(self, identity: str) -> "AccessToken":
         self.identity = identity
         return self
@@ -249,7 +270,23 @@ class AccessToken:
         self.claims.room_config = config
         return self
 
+    def to_claims_json(self) -> str:
+        """Returns the claims of this token as JSON, without signing them.
+
+        The JSON has the shape of the payload `to_jwt` signs, without the claims the
+        signer sets (iss, sub, nbf, exp); the identity is in `identity`. It needs no
+        API key or secret, so a process without them can send it to a server that
+        signs the token, such as in `CreateJobTokenRequest.claims`.
+        """
+        claims = self.claims.asdict()
+        if self.identity:
+            claims["identity"] = self.identity
+        return json.dumps(claims)
+
     def to_jwt(self) -> str:
+        if not self.api_key or not self.api_secret:
+            raise ValueError("api_key and api_secret must be set")
+
         video = self.claims.video
         if video and video.room_join and (not self.identity or not video.room):
             raise ValueError("identity and room must be set when joining a room")
@@ -322,6 +359,7 @@ class TokenVerifier:
             agent=_parse_grants(claims, "agent", AgentGrants),
             agent_endpoint=_parse_grants(claims, "agentEndpoint", AgentEndpointGrants),
             agent_thread=_parse_grants(claims, "agentThread", AgentThreadGrants),
+            agent_database=_parse_grants(claims, "agentDatabase", AgentDatabaseGrants),
         )
 
         if claims.get("roomPreset"):
