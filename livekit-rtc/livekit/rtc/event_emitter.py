@@ -16,6 +16,43 @@ _ASYNCIO_COROUTINE_MARKER = getattr(asyncio.coroutines, "_is_coroutine", None)
 T_contra = TypeVar("T_contra", contravariant=True)
 
 
+class _OnceHandler:
+    """The handler once() registers: removes itself, then calls the callback."""
+
+    def __init__(self, emitter: "EventEmitter[Any]", event: Any, callback: Callable) -> None:
+        self._emitter = emitter
+        self._event = event
+        self.callback = callback
+
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
+        self._emitter.off(self._event, self)
+        self.callback(*args, **kwargs)
+
+
+def _signature(handler: Callable) -> inspect.Signature:
+    """Signature emit() trims the arguments to: a once() handler's callback's, read at call time."""
+    if isinstance(handler, _OnceHandler):
+        try:
+            return inspect.signature(handler.callback)
+        except (TypeError, ValueError):
+            pass  # no signature (e.g. a builtin): the handler's *args passes everything
+    return inspect.signature(handler)
+
+
+def _is_once_handler_for(handler: Callable, callback: Callable) -> bool:
+    """Whether handler is a once() handler of callback, matched the way a dict key is."""
+    if not isinstance(handler, _OnceHandler):
+        return False
+    target = handler.callback
+    if target is callback:
+        return True
+    try:
+        # compare hashes first, so an unrelated callback's __eq__ is never called
+        return hash(target) == hash(callback) and bool(target == callback)
+    except TypeError:  # unhashable
+        return False
+
+
 class EventEmitter(Generic[T_contra]):
     def __init__(self) -> None:
         """
@@ -51,7 +88,7 @@ class EventEmitter(Generic[T_contra]):
             callables = list(self._events[event])
             for callback in callables:
                 try:
-                    sig = inspect.signature(callback)
+                    sig = _signature(callback)
                     params = sig.parameters.values()
 
                     has_varargs = any(p.kind == p.VAR_POSITIONAL for p in params)
@@ -115,12 +152,9 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if callback is not None:
-
-            def once_callback(*args: Any, **kwargs: Any) -> None:
-                self.off(event, once_callback)
-                callback(*args, **kwargs)
-
-            return self.on(event, once_callback)
+            # emit() trims the arguments to the callback's signature, as for on(), and
+            # off() removes the handler by the callback it was registered with
+            return self.on(event, _OnceHandler(self, event, callback))
         else:
 
             def decorator(callback: Callable) -> Callable:
@@ -212,4 +246,8 @@ class EventEmitter(Generic[T_contra]):
             ```
         """
         if event in self._events:
-            self._events[event].pop(callback, None)
+            handlers = self._events[event]
+            handlers.pop(callback, None)
+            once_handlers = [h for h in handlers if _is_once_handler_for(h, callback)]
+            for handler in once_handlers:
+                handlers.pop(handler)
