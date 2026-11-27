@@ -44,7 +44,8 @@ def dial_timeout(user_timeout: Optional[float], request: DialRequest) -> float:
     @private
     """
     if request.HasField("ringing_timeout"):
-        ring: float = request.ringing_timeout.seconds
+        duration = request.ringing_timeout
+        ring = duration.seconds + duration.nanos / 1_000_000_000
     else:
         ring = DEFAULT_RINGING_TIMEOUT
     floor = ring + RINGING_TIMEOUT_MARGIN
